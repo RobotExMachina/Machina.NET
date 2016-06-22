@@ -323,9 +323,12 @@ public class TuioDemo : Form , TuioListener
         List<double> transY = MapCoordiantes(xpos, 0, 320);
         for (int i = 0; i < transX.Count; i++)
         {
+            if (i == 0) currentPath.Add(transX[i], transY[i], 350);
             currentPath.Add(transX[i], transY[i], 200);
+            if (i == transX.Count - 1) currentPath.Add(transX[i], transY[i], 350);
         }
-        arm.ExecutePath(currentPath);
+        //arm.ExecutePath(currentPath);
+        arm.LoadPath(currentPath);
 
     }
 

@@ -38,6 +38,7 @@ namespace RobotControl
 
         private ConnectionMode connectionMode = ConnectionMode.Instruct;  // Instruct mode by default
 
+        private Queue queue;
 
         // Public properties
         public bool isConnected { get; protected set; }
@@ -45,6 +46,8 @@ namespace RobotControl
         public bool isMainTaskRetrieved { get; private set; }
 
         public string IP { get; protected set; }
+
+
 
 
 
@@ -191,17 +194,24 @@ namespace RobotControl
         /// PROTO: for the moment, it stops current execution, generates the RAPID module, loads it into the controller and starts it
         /// </summary>
         /// <param name="path"></param>
-        public void ExecutePath(Path path)
-        {
-            StopProgram();
+        //public void ExecutePath(Path path)
+        //{
+        //    StopProgram();
 
-            List<string> module = RAPID.UNSAFEModuleFromPath("Stroke", path, 100, 5);
-            SaveModuleToFile(module, tempBufferFilepath);
-            bool loaded = LoadModuleFromFilename(tempBufferFilepath);
-            Console.WriteLine("LOADED: " + loaded);
-            ResetProgramPointer();
-            StartProgram();
-            Console.WriteLine("Obama out!");
+        //    List<string> module = RAPID.UNSAFEModuleFromPath("Stroke", path, 100, 5);
+        //    SaveModuleToFile(module, tempBufferFilepath);
+        //    bool loaded = LoadModuleFromFilename(tempBufferFilepath);
+        //    Console.WriteLine("LOADED: " + loaded);
+        //    ResetProgramPointer();
+        //    StartProgram();
+        //    Console.WriteLine("Obama out!");
+        //}
+
+
+        public void LoadPath(Path path)
+        {
+            AddPathToQueue(path);
+            TriggerQueue();
         }
 
 
@@ -231,6 +241,7 @@ namespace RobotControl
             isMainTaskRetrieved = false;
             IP = "";
 
+            queue = new Queue();
         }
 
         /// <summary>
@@ -254,6 +265,7 @@ namespace RobotControl
                 LogOn();
                 RetrieveMainTask();
                 RunMode("once");
+                SubscribeToEvents();
             }
             else
             {
@@ -272,6 +284,14 @@ namespace RobotControl
             DisposeController();
             LogOff();
             Reset();
+        }
+
+        /// <summary>
+        /// Upon connection, subscribe to relevant events and handle them.
+        /// </summary>
+        private void SubscribeToEvents()
+        {
+            controller.Rapid.ExecutionStatusChanged += OnExecutionStatusChanged;
         }
 
         /// <summary>
@@ -377,9 +397,13 @@ namespace RobotControl
             return count;
         }
 
+
+        
+
         /// <summary>
         /// Loads a module into de controller from a local file. 
         /// @TODO: This is an expensive operation, should probably become threaded. 
+        /// @TODO: By default, wipes out all previous modules --> parameterize.
         /// </summary>
         /// <param name="filepath"></param>
         /// <returns></returns>
@@ -518,6 +542,88 @@ namespace RobotControl
         private RobJoint GetRobotJoints()
         {
             return controller.MotionSystem.ActiveMechanicalUnit.GetPosition().RobAx;
+        }
+
+
+
+
+
+
+
+        private void AddPathToQueue(Path path)
+        {
+            queue.Add(path);
+        }
+
+        /// <summary>
+        /// Checks the state of the execution of the robot, and if stopped, and if elements 
+        /// remaining on the queue, starts executing them
+        /// </summary>
+        private void TriggerQueue()
+        {
+            if (controller.Rapid.ExecutionStatus == ExecutionStatus.Stopped) 
+            {
+                TriggerQueue(true);
+            }
+        }
+
+        /// <summary>
+        /// An overload to bypass ExecutionStatus check
+        /// </summary>
+        /// <param name="robotIsStopped"></param>
+        private void TriggerQueue(bool robotIsStopped)
+        {
+            if (queue.ArePathsPending())
+            {
+                Path path = queue.GetNext();
+                RunPath(path);
+            }
+        }
+
+
+        /// <summary>
+        /// Generates a module from a path, loads it to the controller and runs it.
+        /// It assumes the robot is stopped (does this even matter anyway...?)
+        /// </summary>
+        /// <param name="path"></param>
+        private void RunPath(Path path)
+        {
+            if (DEBUG) Console.WriteLine("RUNNING NEW PATH: " + path.targetCount);
+            List<string> module = RAPID.UNSAFEModuleFromPath("LivePath", path, 100, 5);
+            SaveModuleToFile(module, tempBufferFilepath);
+            LoadModuleFromFilename(tempBufferFilepath);
+            ResetProgramPointer();
+            StartProgram();
+        }
+
+
+
+
+
+
+
+
+        //███████╗██╗   ██╗███████╗███╗   ██╗████████╗    ██╗  ██╗ █████╗ ███╗   ██╗██████╗ ██╗     ██╗███╗   ██╗ ██████╗ 
+        //██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝    ██║  ██║██╔══██╗████╗  ██║██╔══██╗██║     ██║████╗  ██║██╔════╝ 
+        //█████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║       ███████║███████║██╔██╗ ██║██║  ██║██║     ██║██╔██╗ ██║██║  ███╗
+        //██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║       ██╔══██║██╔══██║██║╚██╗██║██║  ██║██║     ██║██║╚██╗██║██║   ██║
+        //███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║       ██║  ██║██║  ██║██║ ╚████║██████╔╝███████╗██║██║ ╚████║╚██████╔╝
+        //╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝       ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+
+        /// <summary>
+        /// What to do when the robot starts running or stops.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
+        {
+            if (DEBUG) Console.WriteLine("EXECUTION STATUS CHANGED: " + e.Status);
+
+            if (e.Status == ExecutionStatus.Stopped)
+            {
+                // Tick queue to move forward
+                TriggerQueue(true);
+            }
         }
 
     }
