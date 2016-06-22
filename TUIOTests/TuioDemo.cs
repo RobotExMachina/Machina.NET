@@ -1,4 +1,4 @@
-/*
+﻿/*
 	TUIO C# Demo - part of the reacTIVision project
 	Copyright (c) 2005-2014 Martin Kaltenbrunner <martin@tuio.org>
 
@@ -56,13 +56,6 @@ public class TuioDemo : Form , TuioListener
 	SolidBrush grayBrush = new SolidBrush(Color.Gray);
 	Pen fingerPen = new Pen(new SolidBrush(Color.Blue), 1);
         
-    // ROBOT STUFF
-    private Robot arm;
-    private List<double> xpos = new List<double>();
-    private List<double> ypos = new List<double>();
-
-
-
 
     public TuioDemo(int port) {
 		
@@ -90,16 +83,11 @@ public class TuioDemo : Form , TuioListener
 
 		client.connect();
 
-
         // ROBOT
-        arm = new Robot();
-
-        arm.Connect("instruct");
-        Console.WriteLine(arm.IP);
-        Console.WriteLine(arm.GetPosition());
-        Console.WriteLine(arm.GetOrientation());
-        Console.WriteLine(arm.GetJoints());
+        InitializeRobot();
     }
+
+
 
     private void Form_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e) {
 
@@ -156,74 +144,33 @@ public class TuioDemo : Form , TuioListener
 		}
         if (verbose) Console.WriteLine("add obj "+o.SymbolID+" ("+o.SessionID+") "+o.X+" "+o.Y+" "+o.Angle);
 
-        // Clear the lists and add position
-        xpos = new List<double>();
-        ypos = new List<double>();
-        xpos.Add(o.X);
-        ypos.Add(o.Y);
+        // ROBOT
+        InitializePath(o);
     }
 
-	public void updateTuioObject(TuioObject o) {
+
+
+    public void updateTuioObject(TuioObject o) {
 		lock(objectSync) {
 			objectList[o.SessionID].update(o);
 		}
 		if (verbose) Console.WriteLine("set obj "+o.SymbolID+" "+o.SessionID+" "+o.X+" "+o.Y+" "+o.Angle+" "+o.MotionSpeed+" "+o.RotationSpeed+" "+o.MotionAccel+" "+o.RotationAccel);
 
-        // Add position
-        xpos.Add(o.X);
-        ypos.Add(o.Y);
+        // ROBOT
+        AddTargetToPath(o);
     }
 
-	public void removeTuioObject(TuioObject o) {
+
+    public void removeTuioObject(TuioObject o) {
 		lock(objectSync) {
 			objectList.Remove(o.SessionID);
 		}
 		if (verbose) Console.WriteLine("del obj "+o.SymbolID+" ("+o.SessionID+")");
 
-        // Add position and trigger robot command
-        xpos.Add(o.X);
-        ypos.Add(o.Y);
+        // ROBOT
+        AddTargetToPath(o);
         SendPathToRobot();
     }
-
-
-
-    public void SendPathToRobot()
-    {
-        //arm.Stop();
-
-        Console.WriteLine("--> SENDING PATH");
-
-        //List<double> transX = MapCoordiantes(ypos, 200, 240);
-        //List<double> transY = MapCoordiantes(xpos, 0, 320);
-
-        //arm.QuickLoadPath(transX, transY);
-
-        //arm.Start();
-
-        Path currentPath = new Path();
-        List<double> transX = MapCoordiantes(ypos, 200, 240);
-        List<double> transY = MapCoordiantes(xpos, 0, 320);
-        for (int i = 0; i < transX.Count; i++)
-        {
-            currentPath.Add(transX[i], transY[i], 200);
-        }
-        arm.ExecutePath(currentPath);
-
-    }
-
-    public List<double> MapCoordiantes(List<double> normVal, double newOrigin, double newDim)
-    {
-        List<double> mapped = new List<double>();
-        for (int i = 0; i < normVal.Count; i++)
-        {
-            mapped.Add(newOrigin + normVal[i] * newDim);
-        }
-
-        return mapped;
-    }
-
-
 
 	public void addTuioCursor(TuioCursor c) {
 		lock(cursorSync) {
@@ -300,7 +247,7 @@ public class TuioDemo : Form , TuioListener
 			}
 		}
 
-        Console.WriteLine("Painting");
+        Console.WriteLine("OnPaintBackground");
 	}
 
 	public static void Main(String[] argv) {
@@ -322,4 +269,75 @@ public class TuioDemo : Form , TuioListener
 		TuioDemo app = new TuioDemo(port);
 		Application.Run(app);
 	}
+
+
+
+
+    //██████╗  ██████╗ ██████╗  ██████╗ ████████╗
+    //██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
+    //██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
+    //██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   
+    //██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   
+    //╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
+
+    // ROBOT STUFF
+    private Robot arm;
+    private List<double> xpos = new List<double>();
+    private List<double> ypos = new List<double>();
+
+    private void InitializeRobot()
+    {
+        // ROBOT
+        arm = new Robot();
+
+        //arm.Connect("instruct");
+        arm.Connect();
+        Console.WriteLine(arm.IP);
+        Console.WriteLine(arm.GetPosition());
+        Console.WriteLine(arm.GetOrientation());
+        Console.WriteLine(arm.GetJoints());
+    }
+
+    private void InitializePath(TuioObject o)
+    {
+        // Clear the lists and add position
+        xpos = new List<double>();
+        ypos = new List<double>();
+        xpos.Add(o.X);
+        ypos.Add(o.Y);
+    }
+
+    private void AddTargetToPath(TuioObject o)
+    {
+        // Add position
+        xpos.Add(o.X);
+        ypos.Add(o.Y);
+    }
+
+    private void SendPathToRobot()
+    {
+        Console.WriteLine("--> SENDING PATH");
+
+        Path currentPath = new Path();
+        List<double> transX = MapCoordiantes(ypos, 200, 240);
+        List<double> transY = MapCoordiantes(xpos, 0, 320);
+        for (int i = 0; i < transX.Count; i++)
+        {
+            currentPath.Add(transX[i], transY[i], 200);
+        }
+        arm.ExecutePath(currentPath);
+
+    }
+
+    private List<double> MapCoordiantes(List<double> normVal, double newOrigin, double newDim)
+    {
+        List<double> mapped = new List<double>();
+        for (int i = 0; i < normVal.Count; i++)
+        {
+            mapped.Add(newOrigin + normVal[i] * newDim);
+        }
+
+        return mapped;
+    }
+
 }

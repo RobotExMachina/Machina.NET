@@ -17,7 +17,7 @@ namespace RobotControl
     /// Different connection modes. 
     /// </summary>
     public enum ConnectionMode : int { Instruct = 1, Stream = 2 };
-
+    
 
 
     //██████╗  ██████╗ ██████╗  ██████╗ ████████╗
@@ -29,13 +29,13 @@ namespace RobotControl
 
     public class Robot
     {
+        private const bool DEBUG = true;
         private static string tempBufferFilepath = @"C:\buffer.mod";
 
         // Private properties
         private Controller controller;
         private ABB.Robotics.Controllers.RapidDomain.Task mainTask;
 
-        private bool verbose = true;
         private ConnectionMode connectionMode = ConnectionMode.Instruct;  // Instruct mode by default
 
 
@@ -62,52 +62,68 @@ namespace RobotControl
             Reset();
         }
 
-
+        /// <summary>
+        /// In 'online' modes, performs all necessary instructions to connect to the robot controller. 
+        /// </summary>
+        /// <returns></returns>
         public bool Connect()
         {
             return Connect(ConnectionMode.Instruct);
         }
 
-        public bool Connect(string mode)
-        {
-            if (mode.ToLower().Equals("stream"))
-            {
-                return Connect(ConnectionMode.Stream);
-            }
-            else if (mode.ToLower().Equals("instruct"))
-            {
-                return Connect(ConnectionMode.Instruct);
-            }
-            else
-            {
-                Console.WriteLine("Unknown connection mode, please specify 'instruct' or 'stream'");
-            }
-            return false;
+        //public bool Connect(string mode)
+        //{
+        //    if (mode.ToLower().Equals("stream"))
+        //    {
+        //        return Connect(ConnectionMode.Stream);
+        //    }
+        //    else if (mode.ToLower().Equals("instruct"))
+        //    {
+        //        return Connect(ConnectionMode.Instruct);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Unknown connection mode, please specify 'instruct' or 'stream'");
+        //    }
+        //    return false;
 
-        }
+        //}
 
-
+        /// <summary>
+        /// This will at some point differentiate between 'instruct' and 'stream', not at the moment
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public bool Connect(ConnectionMode mode)
         {
             connectionMode = mode;
             return ConnectToController();
         }
 
-
+        /// <summary>
+        /// In 'online' modes, performs all necessary instructions to disconnect from the controller.
+        /// </summary>
         public void Disconnect()
         {
-            if (verbose) Console.WriteLine("Disconnecting from controller on " + IP);
+            if (DEBUG) Console.WriteLine("Disconnecting from controller on " + IP);
 
             DisconnectFromController();
         }
 
-
+        /// <summary>
+        /// Loads a module to the controller from a local file. 
+        /// TODO: By default, it will wipe out any other modules in the task, add the possibility to choose.
+        /// </summary>
+        /// <param name="filepath"></param>
         public void LoadModule(string filepath)
         {
             LoadModuleFromFilename(filepath);
         }
 
-
+        /// <summary>
+        /// Allows to toggle between "once" and "loop" modes.
+        /// </summary>
+        /// <param name="mode"></param>
         public void RunMode(string mode)
         {
             if (isConnected)
@@ -115,50 +131,60 @@ namespace RobotControl
                 using (Mastership.Request(controller.Rapid))
                 {
                     controller.Rapid.Cycle = mode.ToLower().Equals("loop") ? ExecutionCycle.Forever : ExecutionCycle.Once;
-                    if (verbose) Console.WriteLine("RunMode set to " + controller.Rapid.Cycle);
+                    if (DEBUG) Console.WriteLine("RunMode set to " + controller.Rapid.Cycle);
                 }
             }
         }
 
-
+        /// <summary>
+        /// Starts execution of the current module/s in the controller.
+        /// </summary>
         public void Start()
         {
-
             ResetProgramPointer();
             StartProgram();
         }
 
+        /// <summary>
+        /// Stops execution of the current module/s in the controller. 
+        /// TODO: Right now it does hard stop wherver in the program the robot might be. 
+        /// Add the possibility to choose immediate or after program ends. 
+        /// </summary>
         public void Stop()
         {
             StopProgram();
         }
 
-
+        /// <summary>
+        /// Returns a string representation of the end frame's TCP position in mm.
+        /// </summary>
+        /// <returns></returns>
         public string GetPosition()
         {
             RobTarget rt = GetTCPRobTarget();
             return rt.Trans.ToString();
         }
 
-
+        /// <summary>
+        /// Returns a string representation of the end frame's TCP orientation in quaterions.
+        /// </summary>
+        /// <returns></returns>
         public string GetOrientation()
         {
             RobTarget rt = GetTCPRobTarget();
             return rt.Rot.ToString();
         }
 
-
+        /// <summary>
+        /// Returns a string representation of the robot's joint rotations in degrees.
+        /// </summary>
+        /// <returns></returns>
         public string GetJoints()
         {
             RobJoint rj = GetRobotJoints();
             return rj.ToString();
         }
 
-        //public void QuickLoadPath(List<double> xpos, List<double> ypos)
-        //{
-        //    CreateQuickModuleFromPoints("FastModule", xpos, ypos, @"D:\temp\buffer.mod");
-        //    LoadModuleFromFilename(@"D:\temp\buffer.mod");
-        //}
 
         /// <summary>
         /// This method takes a path as an input, and adds it to the path queue to be executed as soon as it gets priority.
@@ -223,7 +249,7 @@ namespace RobotControl
                 controller = ControllerFactory.CreateFrom(controllers[0]);
                 isConnected = true;
                 IP = controller.IPAddress.ToString();
-                if (verbose) Console.WriteLine("Found controller on " + IP);
+                if (DEBUG) Console.WriteLine("Found controller on " + IP);
 
                 LogOn();
                 RetrieveMainTask();
@@ -231,7 +257,7 @@ namespace RobotControl
             }
             else
             {
-                if (verbose) Console.WriteLine("No controllers found on the network");
+                if (DEBUG) Console.WriteLine("No controllers found on the network");
                 isConnected = false;
             }
             return true;
@@ -330,7 +356,7 @@ namespace RobotControl
         {
             if (!isConnected)
             {
-                if (verbose) Console.WriteLine("Can't ClearAllModules(), not connected to controller");
+                if (DEBUG) Console.WriteLine("Can't ClearAllModules(), not connected to controller");
                 return -1;
             }
 
@@ -343,7 +369,7 @@ namespace RobotControl
             {
                 foreach (Module m in modules)
                 {
-                    if (verbose) Console.WriteLine("Deleting module: " + m.Name);
+                    if (DEBUG) Console.WriteLine("Deleting module: " + m.Name);
                     m.Delete();
                 }
             }
@@ -357,7 +383,7 @@ namespace RobotControl
         /// </summary>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        public bool LoadModuleFromFilename(string filepath)
+        private bool LoadModuleFromFilename(string filepath)
         {
             if (!isConnected)
             {
@@ -406,7 +432,7 @@ namespace RobotControl
             }
             else
             {
-                if (verbose) Console.WriteLine("Sucessfully loaded " + filepath);
+                if (DEBUG) Console.WriteLine("Sucessfully loaded " + filepath);
             }
 
             return success;
