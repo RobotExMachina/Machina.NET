@@ -9,7 +9,7 @@ using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
 using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
 using ABB.Robotics.Controllers.EventLogDomain;
-
+using System.Threading;
 
 namespace RobotControl
 {
@@ -188,26 +188,10 @@ namespace RobotControl
             return rj.ToString();
         }
 
-
         /// <summary>
-        /// This method takes a path as an input, and adds it to the path queue to be executed as soon as it gets priority.
-        /// PROTO: for the moment, it stops current execution, generates the RAPID module, loads it into the controller and starts it
+        /// Loads the path to the queue manager and triggers execution of the program if applicable
         /// </summary>
         /// <param name="path"></param>
-        //public void ExecutePath(Path path)
-        //{
-        //    StopProgram();
-
-        //    List<string> module = RAPID.UNSAFEModuleFromPath("Stroke", path, 100, 5);
-        //    SaveModuleToFile(module, tempBufferFilepath);
-        //    bool loaded = LoadModuleFromFilename(tempBufferFilepath);
-        //    Console.WriteLine("LOADED: " + loaded);
-        //    ResetProgramPointer();
-        //    StartProgram();
-        //    Console.WriteLine("Obama out!");
-        //}
-
-
         public void LoadPath(Path path)
         {
             AddPathToQueue(path);
@@ -287,6 +271,22 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// Disposes the controller object. This has to be done manually, since COM objects are not
+        /// automatically garbage collected. 
+        /// </summary>
+        /// <returns></returns>
+        private bool DisposeController()
+        {
+            if (controller != null)
+            {
+                controller.Dispose();
+                controller = null;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Upon connection, subscribe to relevant events and handle them.
         /// </summary>
         private void SubscribeToEvents()
@@ -317,22 +317,6 @@ namespace RobotControl
                 controller.Logoff();
                 isLogged = false;
             }
-        }
-
-        /// <summary>
-        /// Disposes the controller object. This has to be done manually, since COM objects are not
-        /// automatically garbage collected. 
-        /// </summary>
-        /// <returns></returns>
-        private bool DisposeController()
-        {
-            if (controller != null)
-            {
-                controller.Dispose();
-                controller = null;
-                return true;
-            }
-            return false;
         }
 
         /// <summary>
@@ -397,8 +381,6 @@ namespace RobotControl
             return count;
         }
 
-
-        
 
         /// <summary>
         /// Loads a module into de controller from a local file. 
@@ -549,15 +531,18 @@ namespace RobotControl
 
 
 
-
+        /// <summary>
+        /// Adds a path to the queue manager.
+        /// </summary>
+        /// <param name="path"></param>
         private void AddPathToQueue(Path path)
         {
             queue.Add(path);
         }
 
         /// <summary>
-        /// Checks the state of the execution of the robot, and if stopped, and if elements 
-        /// remaining on the queue, starts executing them
+        /// Checks the state of the execution of the robot, and if stopped and if elements 
+        /// remaining on the queue, starts executing them.
         /// </summary>
         private void TriggerQueue()
         {
@@ -568,7 +553,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// An overload to bypass ExecutionStatus check
+        /// An overload to bypass ExecutionStatus check.
         /// </summary>
         /// <param name="robotIsStopped"></param>
         private void TriggerQueue(bool robotIsStopped)
@@ -576,7 +561,16 @@ namespace RobotControl
             if (queue.ArePathsPending())
             {
                 Path path = queue.GetNext();
-                RunPath(path);
+                // RunPath(path);
+
+                // https://msdn.microsoft.com/en-us/library/aa645740(v=vs.71).aspx
+                // Thread oThread = new Thread(new ThreadStart(oAlpha.Beta));
+                // http://stackoverflow.com/a/3360582
+                // Thread thread = new Thread(() => download(filename));
+
+                // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
+                Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
+                runPathThread.Start();
             }
         }
 

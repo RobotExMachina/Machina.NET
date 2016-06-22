@@ -327,7 +327,7 @@ public class TuioDemo : Form , TuioListener
             currentPath.Add(transX[i], transY[i], 200);
             if (i == transX.Count - 1) currentPath.Add(transX[i], transY[i], 350);
         }
-        //arm.ExecutePath(currentPath);
+
         arm.LoadPath(currentPath);
 
     }
