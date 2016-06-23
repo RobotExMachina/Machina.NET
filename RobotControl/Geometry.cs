@@ -415,7 +415,7 @@ namespace RobotControl
         private void SimplifyRadialDistance(double sqTolerance)
         {
             Frame prevFrame = Targets[0];
-            List<Frame> newTargets = new List<Frame>();
+            List<Frame> newTargets = new List<Frame> { prevFrame };
             Frame frame = null;
 
             for (int i = 1; i < Targets.Count; i++)
