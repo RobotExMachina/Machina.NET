@@ -10,22 +10,22 @@ namespace RobotControl
         /// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
         /// WARNING: this method is EXTREMELY UNSAFE, since it performs no IK calculations, assuming all targets are in the positive XYZ octant hence a robot configuration of [0,0,0,0]. To be extended with a proper module creator
         /// </summary>
-        /// <param name="name"></param>
         /// <param name="path"></param>
         /// <param name="velocity"></param>
         /// <param name="zone"></param>
+        /// 
         /// <returns></returns>
-        public static List<string> UNSAFEModuleFromPath(string name, Path path, int velocity, int zone)
+        public static List<string> UNSAFEModuleFromPath(Path path, int velocity, int zone)
         {
             string vel = "v" + velocity;
             string zon = "z" + zone;
 
             List<string> module = new List<string>();
 
-            module.Add("MODULE " + name);
+            module.Add("MODULE " + path.Name);
             module.Add("");
 
-            for (int i = 0; i < path.targetCount; i++)
+            for (int i = 0; i < path.Count; i++)
             {
                 Frame t = path.GetTarget(i);
                 module.Add("  CONST robtarget Target_" + i
@@ -37,7 +37,7 @@ namespace RobotControl
             module.Add(@"    ConfJ \Off;");
             module.Add(@"    ConfL \Off;");
 
-            for (int i = 0; i < path.targetCount; i++)
+            for (int i = 0; i < path.Count; i++)
             {
                 module.Add("    MoveL Target_" + i
                     + "," + vel

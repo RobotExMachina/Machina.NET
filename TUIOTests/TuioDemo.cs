@@ -294,6 +294,7 @@ public class TuioDemo : Form , TuioListener
     private List<double> ypos = new List<double>();
 
     private Dictionary<int, Path> fiduPaths;
+    private int strokeCount = 0;
 
 
 
@@ -318,11 +319,11 @@ public class TuioDemo : Form , TuioListener
 
         if (fiduPaths.ContainsKey(o.SymbolID))
         {
-            fiduPaths[o.SymbolID] = new Path();
+            fiduPaths[o.SymbolID] = new Path("Stroke_" + strokeCount++);
         } 
         else
         {
-            fiduPaths.Add(o.SymbolID, new Path());
+            fiduPaths.Add(o.SymbolID, new Path("Stroke_" + strokeCount++));
         }
     }
 
@@ -342,8 +343,9 @@ public class TuioDemo : Form , TuioListener
         targetPath.RemapAxis("y", 0, 1, 100, 420);
         targetPath.RemapAxis("z", 0, 1, 200, 300);
 
-        arm.LoadPath(targetPath);
+        targetPath.Simplify(0.1, false);
 
+        arm.LoadPath(targetPath);
     }
 
     private void RequestStopAfterCurrentProgram()
