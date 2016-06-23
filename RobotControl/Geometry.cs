@@ -197,11 +197,11 @@ namespace RobotControl
         //        Console.WriteLine("Please use 'x', 'y' or 'z' as arguments");
         //        return false;
         //    }
-
-
-
         //}
 
+        /// <summary>
+        /// Flips the XY coordinates of all target frames.
+        /// </summary>
         public void FlipXY()
         {
             foreach (Frame f in targets)
@@ -212,6 +212,15 @@ namespace RobotControl
             }
         }
 
+        /// <summary>
+        /// Remaps the coordinates of all target frames from a source to a target domain.
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="prevMin"></param>
+        /// <param name="prevMax"></param>
+        /// <param name="newMin"></param>
+        /// <param name="newMax"></param>
+        /// <returns></returns>
         public bool RemapAxis(string axis, double prevMin, double prevMax, double newMin, double newMax)
         {
             string a = axis.ToLower();

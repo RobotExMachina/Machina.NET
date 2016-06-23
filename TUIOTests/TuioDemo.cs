@@ -336,18 +336,7 @@ public class TuioDemo : Form , TuioListener
     {
         Console.WriteLine("--> SENDING PATH");
 
-        //Path currentPath = new Path();
-        //List<double> transX = MapCoordiantes(ypos, 200, 240);
-        //List<double> transY = MapCoordiantes(xpos, 0, 320);
-        //for (int i = 0; i < transX.Count; i++)
-        //{
-        //    if (i == 0) currentPath.Add(transX[i], transY[i], 350);
-        //    currentPath.Add(transX[i], transY[i], 200);
-        //    if (i == transX.Count - 1) currentPath.Add(transX[i], transY[i], 350);
-        //}
-
         Path targetPath = fiduPaths[o.SymbolID];
-        //targetPath.Flip("x", "y");
         targetPath.FlipXY();
         targetPath.RemapAxis("x", 0, 1, 200, 440);
         targetPath.RemapAxis("y", 0, 1, 100, 420);
@@ -356,17 +345,6 @@ public class TuioDemo : Form , TuioListener
         arm.LoadPath(targetPath);
 
     }
-
-    //private List<double> MapCoordiantes(List<double> normVal, double newOrigin, double newDim)
-    //{
-    //    List<double> mapped = new List<double>();
-    //    for (int i = 0; i < normVal.Count; i++)
-    //    {
-    //        mapped.Add(newOrigin + normVal[i] * newDim);
-    //    }
-
-    //    return mapped;
-    //}
 
     private void RequestStopAfterCurrentProgram()
     {
