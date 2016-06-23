@@ -126,7 +126,12 @@ public class TuioDemo : Form , TuioListener
 
  		} else if ( e.KeyData == Keys.V ) {
  			verbose=!verbose;
- 		}
+
+        } else if ( e.KeyData == Keys.S ) {
+            RequestStopAfterCurrentProgram();
+
+        }
+        
 
  	}
 
@@ -341,6 +346,11 @@ public class TuioDemo : Form , TuioListener
         }
 
         return mapped;
+    }
+
+    private void RequestStopAfterCurrentProgram()
+    {
+        arm.StopAfterProgram();
     }
 
 }

@@ -31,6 +31,7 @@ namespace RobotControl
     {
         private const bool DEBUG = true;
         private static string tempBufferFilepath = @"C:\buffer.mod";
+        private Thread pathExecuter;
 
         // Private properties
         private Controller controller;
@@ -149,13 +150,12 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Stops execution of the current module/s in the controller. 
-        /// TODO: Right now it does hard stop wherver in the program the robot might be. 
-        /// Add the possibility to choose immediate or after program ends. 
+        /// Stops execution of the current module/s in the controller immediately. 
+        /// Use StopAfterProgram() to schedule robot atop after completion of current cycle.
         /// </summary>
         public void Stop()
         {
-            StopProgram();
+            StopProgram(true);
         }
 
         /// <summary>
@@ -197,6 +197,16 @@ namespace RobotControl
             AddPathToQueue(path);
             TriggerQueue();
         }
+
+        /// <summary>
+        /// Stops the robot after execution of current program. This will also clear the queue.
+        /// </summary>
+        public void StopAfterProgram()
+        {
+            ClearQueue();
+            StopProgram(false);
+        }
+
 
 
 
@@ -495,15 +505,15 @@ namespace RobotControl
 
         /// <summary>
         /// Requests stop executing the program in the main task.
-        /// @TODO: Right now it requests a hard immediate stop. This could probably be customized. 
         /// </summary>
-        private void StopProgram()
+        private void StopProgram(bool immediate)
         {
             if (isMainTaskRetrieved)
             {
                 using (Mastership.Request(controller.Rapid))
                 {
-                    controller.Rapid.Stop(StopMode.Immediate);
+                    controller.Rapid.Stop(immediate ? StopMode.Immediate : StopMode.Cycle);
+                    //controller.Rapid.Stop(StopMode.Immediate);
                 }
             }
         }
@@ -558,7 +568,7 @@ namespace RobotControl
         /// <param name="robotIsStopped"></param>
         private void TriggerQueue(bool robotIsStopped)
         {
-            if (queue.ArePathsPending())
+            if (queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
             {
                 Path path = queue.GetNext();
                 // RunPath(path);
@@ -569,8 +579,13 @@ namespace RobotControl
                 // Thread thread = new Thread(() => download(filename));
 
                 // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
-                Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
-                runPathThread.Start();
+                //Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
+                //runPathThread.Start();
+
+                pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
+                pathExecuter.Start();
+
+                
             }
         }
 
@@ -590,6 +605,14 @@ namespace RobotControl
             StartProgram();
         }
 
+
+        /// <summary>
+        /// Remove all pending elements from the queue.
+        /// </summary>
+        private void ClearQueue()
+        {
+            queue.EmptyQueue();
+        }
 
 
 

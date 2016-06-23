@@ -41,6 +41,12 @@ namespace RobotControl
             return queuedPaths.Count > 0;
         }
 
+        public bool EmptyQueue()
+        {
+            bool rem = ArePathsPending();
+            queuedPaths.Clear();
+            return rem;
+        }
         
     }
 }
