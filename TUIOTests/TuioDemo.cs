@@ -151,6 +151,8 @@ public class TuioDemo : Form , TuioListener
 
         // ROBOT
         InitializePath(o);
+        AddTargetToPath(o, 1);
+        AddTargetToPath(o, 0);
     }
 
 
@@ -162,7 +164,7 @@ public class TuioDemo : Form , TuioListener
 		if (verbose) Console.WriteLine("set obj "+o.SymbolID+" "+o.SessionID+" "+o.X+" "+o.Y+" "+o.Angle+" "+o.MotionSpeed+" "+o.RotationSpeed+" "+o.MotionAccel+" "+o.RotationAccel);
 
         // ROBOT
-        AddTargetToPath(o);
+        AddTargetToPath(o, 0);
     }
 
 
@@ -173,8 +175,9 @@ public class TuioDemo : Form , TuioListener
 		if (verbose) Console.WriteLine("del obj "+o.SymbolID+" ("+o.SessionID+")");
 
         // ROBOT
-        AddTargetToPath(o);
-        SendPathToRobot();
+        AddTargetToPath(o, 0);
+        AddTargetToPath(o, 1);
+        SendPathToRobot(o);
     }
 
 	public void addTuioCursor(TuioCursor c) {
@@ -290,6 +293,10 @@ public class TuioDemo : Form , TuioListener
     private List<double> xpos = new List<double>();
     private List<double> ypos = new List<double>();
 
+    private Dictionary<int, Path> fiduPaths;
+
+
+
     private void InitializeRobot()
     {
         // ROBOT
@@ -301,52 +308,65 @@ public class TuioDemo : Form , TuioListener
         Console.WriteLine(arm.GetPosition());
         Console.WriteLine(arm.GetOrientation());
         Console.WriteLine(arm.GetJoints());
+
+        fiduPaths = new Dictionary<int, Path>();
     }
 
     private void InitializePath(TuioObject o)
     {
-        // Clear the lists and add position
-        xpos = new List<double>();
-        ypos = new List<double>();
-        xpos.Add(o.X);
-        ypos.Add(o.Y);
+        //fiduPaths[o.SymbolID] = new Path();
+
+        if (fiduPaths.ContainsKey(o.SymbolID))
+        {
+            fiduPaths[o.SymbolID] = new Path();
+        } 
+        else
+        {
+            fiduPaths.Add(o.SymbolID, new Path());
+        }
     }
 
-    private void AddTargetToPath(TuioObject o)
+    private void AddTargetToPath(TuioObject o, double z)
     {
-        // Add position
-        xpos.Add(o.X);
-        ypos.Add(o.Y);
+        // Add a position
+        fiduPaths[o.SymbolID].Add(o.X, o.Y, z);
     }
 
-    private void SendPathToRobot()
+    private void SendPathToRobot(TuioObject o)
     {
         Console.WriteLine("--> SENDING PATH");
 
-        Path currentPath = new Path();
-        List<double> transX = MapCoordiantes(ypos, 200, 240);
-        List<double> transY = MapCoordiantes(xpos, 0, 320);
-        for (int i = 0; i < transX.Count; i++)
-        {
-            if (i == 0) currentPath.Add(transX[i], transY[i], 350);
-            currentPath.Add(transX[i], transY[i], 200);
-            if (i == transX.Count - 1) currentPath.Add(transX[i], transY[i], 350);
-        }
+        //Path currentPath = new Path();
+        //List<double> transX = MapCoordiantes(ypos, 200, 240);
+        //List<double> transY = MapCoordiantes(xpos, 0, 320);
+        //for (int i = 0; i < transX.Count; i++)
+        //{
+        //    if (i == 0) currentPath.Add(transX[i], transY[i], 350);
+        //    currentPath.Add(transX[i], transY[i], 200);
+        //    if (i == transX.Count - 1) currentPath.Add(transX[i], transY[i], 350);
+        //}
 
-        arm.LoadPath(currentPath);
+        Path targetPath = fiduPaths[o.SymbolID];
+        //targetPath.Flip("x", "y");
+        targetPath.FlipXY();
+        targetPath.RemapAxis("x", 0, 1, 200, 440);
+        targetPath.RemapAxis("y", 0, 1, 100, 420);
+        targetPath.RemapAxis("z", 0, 1, 200, 300);
+
+        arm.LoadPath(targetPath);
 
     }
 
-    private List<double> MapCoordiantes(List<double> normVal, double newOrigin, double newDim)
-    {
-        List<double> mapped = new List<double>();
-        for (int i = 0; i < normVal.Count; i++)
-        {
-            mapped.Add(newOrigin + normVal[i] * newDim);
-        }
+    //private List<double> MapCoordiantes(List<double> normVal, double newOrigin, double newDim)
+    //{
+    //    List<double> mapped = new List<double>();
+    //    for (int i = 0; i < normVal.Count; i++)
+    //    {
+    //        mapped.Add(newOrigin + normVal[i] * newDim);
+    //    }
 
-        return mapped;
-    }
+    //    return mapped;
+    //}
 
     private void RequestStopAfterCurrentProgram()
     {

@@ -185,6 +185,70 @@ namespace RobotControl
             return this.targets[index];
         }
 
+        //public bool Flip(string firstAxis, string secondAxis)
+        //{
+        //    string a = firstAxis.ToLower();
+        //    string b = secondAxis.ToLower();
+
+        //    // Some sanity
+        //    if ( (!a.Equals("x") && !a.Equals("y") && !a.Equals("z")) 
+        //        || (!b.Equals("x") && !b.Equals("y") && !b.Equals("z")))
+        //    {
+        //        Console.WriteLine("Please use 'x', 'y' or 'z' as arguments");
+        //        return false;
+        //    }
+
+
+
+        //}
+
+        public void FlipXY()
+        {
+            foreach (Frame f in targets)
+            {
+                double x = f.position.x;
+                f.position.x = f.position.y;
+                f.position.y = x;
+            }
+        }
+
+        public bool RemapAxis(string axis, double prevMin, double prevMax, double newMin, double newMax)
+        {
+            string a = axis.ToLower();
+            //Some sanity
+            if ( !a.Equals("x") && !a.Equals("y") && !a.Equals("z") )
+            {
+                Console.WriteLine("Please use 'x', 'y' or 'z' as arguments");
+                return false;
+            }
+
+            int axid = a.Equals("x") ? 0 : a.Equals("y") ? 1 : 2;
+
+            switch(axid)
+            {
+                case 0:
+                    foreach (Frame f in targets)
+                    {
+                        f.position.x = Util.Remap(f.position.x, prevMin, prevMax, newMin, newMax);
+                    }
+                    break;
+                case 1:
+                    foreach (Frame f in targets)
+                    {
+                        f.position.y = Util.Remap(f.position.y, prevMin, prevMax, newMin, newMax);
+                    }
+                    break;
+                default:
+                    foreach (Frame f in targets)
+                    {
+                        f.position.z = Util.Remap(f.position.z, prevMin, prevMax, newMin, newMax);
+                    }
+                    break;
+            }
+            
+            return true;
+        }
+
     }
 
 }
