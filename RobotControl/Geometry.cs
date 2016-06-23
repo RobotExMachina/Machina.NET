@@ -218,6 +218,16 @@ namespace RobotControl
             return this.Targets[index];
         }
 
+        public Frame GetFirstTarget()
+        {
+            return this.Targets[0];
+        }
+
+        public Frame GetLastTarget()
+        {
+            return this.Targets[this.Targets.Count - 1];
+        }
+
         private void UpadateTargetCount()
         {
             Count = Targets.Count;

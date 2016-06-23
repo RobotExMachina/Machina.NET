@@ -151,7 +151,7 @@ public class TuioDemo : Form , TuioListener
 
         // ROBOT
         InitializePath(o);
-        AddTargetToPath(o, 1);
+        //AddTargetToPath(o, 1);  // added upon path creation (to avoid lead in/out per glitchy poly)
         AddTargetToPath(o, 0);
     }
 
@@ -176,8 +176,8 @@ public class TuioDemo : Form , TuioListener
 
         // ROBOT
         AddTargetToPath(o, 0);
-        AddTargetToPath(o, 1);
-        SendPathToRobot(o);
+        //AddTargetToPath(o, 1);  // added to SendPathToRobot to avoid lead in/out per glitchy segment
+        //SendPathToRobot(o);
     }
 
 	public void addTuioCursor(TuioCursor c) {
@@ -217,7 +217,15 @@ public class TuioDemo : Form , TuioListener
 	}
 
 	public void refresh(TuioTime frameTime) {
-		Invalidate();
+        //Console.WriteLine("Refreshing");
+        //Console.WriteLine("secs: " + frameTime.Seconds);                    // seconds elapsed since program start
+        //Console.WriteLine("totalsecs: " + frameTime.TotalMilliseconds);     // millis elapsed since program start
+        //Console.WriteLine("micros: " + frameTime.Microseconds);             // micros elapsed since last whole second
+
+        // ROBOT
+        TimeTick(frameTime);
+
+        Invalidate();
 	}
 
 	protected override void OnPaintBackground(PaintEventArgs pevent)
@@ -255,7 +263,7 @@ public class TuioDemo : Form , TuioListener
 			}
 		}
 
-        Console.WriteLine("OnPaintBackground");
+        //Console.WriteLine("OnPaintBackground: ");
 	}
 
 	public static void Main(String[] argv) {
@@ -290,13 +298,15 @@ public class TuioDemo : Form , TuioListener
 
     // ROBOT STUFF
     private Robot arm;
-    private List<double> xpos = new List<double>();
-    private List<double> ypos = new List<double>();
+    //private List<double> xpos = new List<double>();
+    //private List<double> ypos = new List<double>();
 
     private Dictionary<int, Path> fiduPaths;
+    private Dictionary<int, long> fiduTimes;  // stores the time elapsed since last target was added
     private int strokeCount = 0;
 
-
+    private long lastTimeTick = 0;
+    private long maxTimeInc = 1000;  // if a path hasn't received a target before this much time, it will be sent to the robot
 
     private void InitializeRobot()
     {
@@ -311,6 +321,7 @@ public class TuioDemo : Form , TuioListener
         Console.WriteLine(arm.GetJoints());
 
         fiduPaths = new Dictionary<int, Path>();
+        fiduTimes = new Dictionary<int, long>();
     }
 
     private void InitializePath(TuioObject o)
@@ -319,11 +330,14 @@ public class TuioDemo : Form , TuioListener
 
         if (fiduPaths.ContainsKey(o.SymbolID))
         {
-            fiduPaths[o.SymbolID] = new Path("Stroke_" + strokeCount++);
+            //fiduPaths[o.SymbolID] = new Path("Stroke_" + strokeCount++);
+            //fiduTimes[o.SymbolID] = 0;
         } 
         else
         {
             fiduPaths.Add(o.SymbolID, new Path("Stroke_" + strokeCount++));
+            fiduTimes.Add(o.SymbolID, 0);
+            AddTargetToPath(o, 1);
         }
     }
 
@@ -331,26 +345,82 @@ public class TuioDemo : Form , TuioListener
     {
         // Add a position
         fiduPaths[o.SymbolID].Add(o.X, o.Y, z);
+        fiduTimes[o.SymbolID] = 0;
     }
 
-    private void SendPathToRobot(TuioObject o)
-    {
-        Console.WriteLine("--> SENDING PATH");
+    //private void SendPathToRobot(TuioObject o)
+    //{
+    //    Console.WriteLine("--> SENDING PATH");
 
-        Path targetPath = fiduPaths[o.SymbolID];
+    //    Path targetPath = fiduPaths[o.SymbolID];
+    //    targetPath.FlipXY();
+    //    targetPath.RemapAxis("x", 0, 1, 200, 440);
+    //    targetPath.RemapAxis("y", 0, 1, 100, 420);
+    //    targetPath.RemapAxis("z", 0, 1, 200, 300);
+
+    //    targetPath.Simplify(0.1, false);
+
+    //    arm.LoadPath(targetPath);
+    //}
+
+    private void SendPathToRobot(int objID)
+    {
+
+        Path targetPath = fiduPaths[objID];
+
+        // Replicate last target at height 1
+        targetPath.Add(targetPath.GetLastTarget().Position.X, targetPath.GetLastTarget().Position.Y, 1);
+
+        Console.WriteLine("--> SENDING PATH " + targetPath.Name);
+
         targetPath.FlipXY();
         targetPath.RemapAxis("x", 0, 1, 200, 440);
         targetPath.RemapAxis("y", 0, 1, 100, 420);
         targetPath.RemapAxis("z", 0, 1, 200, 300);
-
         targetPath.Simplify(0.1, false);
 
         arm.LoadPath(targetPath);
+        RemovePathFromDicts(objID);
     }
+
 
     private void RequestStopAfterCurrentProgram()
     {
         arm.StopAfterProgram();
+    }
+
+    /// <summary>
+    /// Invoked any time the window is refreshed. 
+    /// For every Path, it updates timestamps since last frame was added, 
+    /// and triggers executions if over a certain threshold.
+    /// </summary>
+    private void TimeTick(TuioTime frameTime)
+    {
+        long timeInc = frameTime.TotalMilliseconds - lastTimeTick;
+
+        //foreach (var item in fiduTimes)
+        //{
+        //    //item.Value += timeInc;
+        //}
+
+        // http://stackoverflow.com/a/2260472
+        var keys = new List<int>(fiduTimes.Keys);
+        foreach (var key in keys)
+        {
+            fiduTimes[key] += timeInc;
+            if (fiduTimes[key] > maxTimeInc)
+            {
+                SendPathToRobot(key);
+            }
+        }
+        
+        lastTimeTick = frameTime.TotalMilliseconds;
+    }
+
+    private void RemovePathFromDicts(int objID)
+    {
+        fiduPaths.Remove(objID);
+        fiduTimes.Remove(objID);
     }
 
 }
