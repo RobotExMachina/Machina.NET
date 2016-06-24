@@ -35,8 +35,8 @@ namespace RobotControl
         private Thread pathExecuter;
 
         // Private properties
-        private Controller controller;
-        private ABB.Robotics.Controllers.RapidDomain.Task mainTask;
+        public Controller controller;  // @TODO: make this private (made it public for quick debugging)
+        public ABB.Robotics.Controllers.RapidDomain.Task mainTask;  // @TODO: make this private (made it public for quick debugging)
 
         private ConnectionMode connectionMode = ConnectionMode.Instruct;  // Instruct mode by default
 
