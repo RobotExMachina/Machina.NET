@@ -22,6 +22,7 @@ namespace EXAMPLE_ConnectionCheck
 {
     class ConnectionCheck
     {
+        [MTAThread] // "For an application running in a Multi Threaded Apartment (MTA) the Dispose call will remove both managed and native objects"
         static void Main(string[] args)
         {
             Console.WriteLine("Initializing Connection Check");
