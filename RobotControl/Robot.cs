@@ -216,6 +216,7 @@ namespace RobotControl
             DebugBanner();
             DebugControllerDump();
             DebugTaskDump();
+            TestMastership();
         }
 
 
@@ -269,7 +270,7 @@ namespace RobotControl
 
                 LogOn();
                 RetrieveMainTask();
-                RunMode("once");
+                if (TestMastership()) RunMode("once");
                 SubscribeToEvents();
             }
             else
@@ -278,6 +279,41 @@ namespace RobotControl
                 isConnected = false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Checks if the controller resource is available for Mastership, or held by someone else. 
+        /// </summary>
+        /// <returns></returns>
+        private bool TestMastership()
+        {
+            bool available = false;
+            if (isConnected)
+            {
+                try
+                {
+                    using (Mastership.Request(controller.Rapid))
+                    {
+                        // Gets the current execution cycle from the RAPID module and sets it back to the same value
+                        ExecutionCycle mode = controller.Rapid.Cycle;
+                        controller.Rapid.Cycle = mode;
+                        available = true;
+                    }
+                }
+                catch (GenericControllerException ex)
+                {
+                    Console.WriteLine("MASTERSHIP ERROR: The controller is held by someone else");
+                    if (DEBUG) Console.WriteLine(ex);
+                }
+            }
+            else
+            {
+                Console.WriteLine("TestMastership(): not connected to controller");
+            }
+
+            if (available && DEBUG) Console.WriteLine("Controller Mastership available");
+
+            return available;
         }
 
         /// <summary>
