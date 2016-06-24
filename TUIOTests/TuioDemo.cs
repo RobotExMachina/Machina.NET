@@ -1,4 +1,19 @@
 ﻿/*
+ * ROBOTCONTROL - TUIO_DEMO
+ * A quick implementation of the RobotControl library using ReacTIVision.
+ * This example reads Tuio packages sent from a running instance of ReacTIVision,
+ * generates 2D paths for each fiducial and uploads them to a Robot Controller
+ * in real time to be immediate executed.
+ * 
+ * USAGE:
+ * - Connect the computer to a real (e.g. IRC5) or virtual (e.g. RobotStudio) controller
+ * - Run an instance of ReacTIVision in the system
+ * - Run this app
+ * - Use fiducial markers to generate 2D paths 
+ */ 
+ 
+
+/*
 	TUIO C# Demo - part of the reacTIVision project
 	Copyright (c) 2005-2014 Martin Kaltenbrunner <martin@tuio.org>
 

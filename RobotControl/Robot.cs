@@ -208,6 +208,16 @@ namespace RobotControl
             StopProgram(false);
         }
 
+        /// <summary>
+        /// Dumps a ton of information to the console about the controller, the main task, etc.
+        /// </summary>
+        public void DebugDump()
+        {
+            DebugBanner();
+            DebugControllerDump();
+            DebugTaskDump();
+        }
+
 
 
 
@@ -613,6 +623,83 @@ namespace RobotControl
         private void ClearQueue()
         {
             queue.EmptyQueue();
+        }
+
+        /// <summary>
+        /// Printlines a "DEBUG" ASCII banner... ;)
+        /// </summary>
+        private void DebugBanner()
+        {
+            Console.WriteLine("");
+            Console.WriteLine("██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ ");
+            Console.WriteLine("██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ ");
+            Console.WriteLine("██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗");
+            Console.WriteLine("██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║");
+            Console.WriteLine("██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝");
+            Console.WriteLine("╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ ");
+            Console.WriteLine("");
+        }
+
+        /// <summary>
+        /// Dumps a bunch of controller info to the console.
+        /// </summary>
+        private void DebugControllerDump()
+        {
+            Console.WriteLine("");
+            Console.WriteLine("DEBUG CONTROLLER DUMP:");
+            Console.WriteLine("     AuthenticationSystem: " + controller.AuthenticationSystem.Name);
+            Console.WriteLine("     BackupInProgress: " + controller.BackupInProgress);
+            Console.WriteLine("     Configuration: " + controller.Configuration);
+            Console.WriteLine("     Connected: " + controller.Connected);
+            Console.WriteLine("     CurrentUser: " + controller.CurrentUser);
+            Console.WriteLine("     DateTime: " + controller.DateTime);
+            Console.WriteLine("     EventLog: " + controller.EventLog);
+            Console.WriteLine("     FileSystem: " + controller.FileSystem);
+            Console.WriteLine("     IOSystem: " + controller.IOSystem);
+            Console.WriteLine("     IPAddress: " + controller.IPAddress);
+            Console.WriteLine("     Ipc: " + controller.Ipc);
+            Console.WriteLine("     IsMaster: " + controller.IsMaster);
+            Console.WriteLine("     IsVirtual: " + controller.IsVirtual);
+            Console.WriteLine("     MacAddress: " + controller.MacAddress);
+            Console.WriteLine("     MainComputerServiceInfo: ");
+            Console.WriteLine("         BoardType: " + controller.MainComputerServiceInfo.BoardType);
+            Console.WriteLine("         CpuInfo: " + controller.MainComputerServiceInfo.CpuInfo);
+            Console.WriteLine("         RamSize: " + controller.MainComputerServiceInfo.RamSize);
+            Console.WriteLine("         Temperature: " + controller.MainComputerServiceInfo.Temperature);
+            Console.WriteLine("     MastershipPolicy: " + controller.MastershipPolicy);
+            Console.WriteLine("     MotionSystem: " + controller.MotionSystem);
+            Console.WriteLine("     Name: " + controller.Name);
+            //Console.WriteLine("     NetworkSettings: " + controller.NetworkSettings);
+            Console.WriteLine("     OperatingMode: " + controller.OperatingMode);
+            Console.WriteLine("     Rapid: " + controller.Rapid);
+            Console.WriteLine("     RobotWare: " + controller.RobotWare);
+            Console.WriteLine("     RobotWareVersion: " + controller.RobotWareVersion);
+            Console.WriteLine("     RunLevel: " + controller.RunLevel);
+            Console.WriteLine("     State: " + controller.State);
+            Console.WriteLine("     SystemId: " + controller.SystemId);
+            Console.WriteLine("     SystemName: " + controller.SystemName);
+            //Console.WriteLine("     TimeServer: " + controller.TimeServer);
+            //Console.WriteLine("     TimeZone: " + controller.TimeZone);
+            //Console.WriteLine("     UICulture: " + controller.UICulture);
+            Console.WriteLine("");
+        }
+
+        private void DebugTaskDump()
+        {
+            Console.WriteLine("");
+            Console.WriteLine("DEBUG TASK DUMP:");
+            Console.WriteLine("    Cycle: " + mainTask.Cycle);
+            Console.WriteLine("    Enabled: " + mainTask.Enabled);
+            Console.WriteLine("    ExecutionStatus: " + mainTask.ExecutionStatus);
+            Console.WriteLine("    ExecutionType: " + mainTask.ExecutionType);
+            Console.WriteLine("    Motion: " + mainTask.Motion);
+            Console.WriteLine("    MotionPointer: " + mainTask.MotionPointer.Module);
+            Console.WriteLine("    Name: " + mainTask.Name);
+            Console.WriteLine("    ProgramPointer: " + mainTask.ProgramPointer.Module);
+            Console.WriteLine("    RemainingCycles: " + mainTask.RemainingCycles);
+            Console.WriteLine("    TaskType: " + mainTask.TaskType);
+            Console.WriteLine("    Type: " + mainTask.Type);
+            Console.WriteLine("");
         }
 
 
