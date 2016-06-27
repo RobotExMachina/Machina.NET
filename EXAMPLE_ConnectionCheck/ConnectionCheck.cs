@@ -28,7 +28,11 @@ namespace EXAMPLE_ConnectionCheck
             Console.WriteLine("Initializing Connection Check");
 
             Robot arm = new Robot();
-            arm.Connect();
+            while (!arm.Connect())
+            {
+
+            }
+
             arm.DebugDump();
 
             arm.Disconnect();

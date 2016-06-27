@@ -10,7 +10,7 @@ using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
 using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
 using ABB.Robotics.Controllers.EventLogDomain;
-
+using ABB.Robotics.Controllers.FileSystemDomain;
 
 namespace RobotControl
 {
@@ -31,7 +31,10 @@ namespace RobotControl
     public class Robot
     {
         private const bool DEBUG = true;
-        private static string tempBufferFilepath = @"C:\buffer.mod";
+        //private static string localBufferFile = @"C:\buffer.mod";
+        private static string localBufferPathname = @"C:\";
+        private static string localBufferFilename = "buffer.mod";
+        private static string remoteBufferDirectory = "RobotControl";
         private Thread pathExecuter;
 
         // Private properties
@@ -119,10 +122,11 @@ namespace RobotControl
         /// Loads a module to the controller from a local file. 
         /// TODO: By default, it will wipe out any other modules in the task, add the possibility to choose.
         /// </summary>
+        /// <param name="filename"></param>
         /// <param name="filepath"></param>
-        public void LoadModule(string filepath)
+        public void LoadModule(string filename, string filepath)
         {
-            LoadModuleFromFilename(filepath);
+            LoadModuleFromFilename(filename, filepath);
         }
 
         /// <summary>
@@ -214,9 +218,9 @@ namespace RobotControl
         public void DebugDump()
         {
             DebugBanner();
+            TestMastership();
             DebugControllerDump();
             DebugTaskDump();
-            TestMastership();
         }
 
 
@@ -259,7 +263,8 @@ namespace RobotControl
         {
             NetworkScanner scanner = new NetworkScanner();
 
-            ControllerInfo[] controllers = scanner.GetControllers(NetworkScannerSearchCriterias.Virtual);
+            //ControllerInfo[] controllers = scanner.GetControllers(NetworkScannerSearchCriterias.Virtual);
+            ControllerInfo[] controllers = scanner.GetControllers();
             if (controllers.Length > 0)
             {
 
@@ -360,7 +365,26 @@ namespace RobotControl
             {
                 LogOff();
             }
+
+            Console.WriteLine(UserInfo.DefaultUser.Name);
+            Console.WriteLine(UserInfo.DefaultUser.Password);
+            Console.WriteLine(UserInfo.DefaultUser.ReadOnly);
+            Console.WriteLine(UserInfo.DefaultUser.Application);
             controller.Logon(UserInfo.DefaultUser);
+
+            //UserInfo tmpUser = new UserInfo("tmp0");
+            try
+            {
+                //controller.Logon(tmpUser);
+                controller.Logon(UserInfo.DefaultUser);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("USER LOGON ERROR: " + ex);
+            }
+            
+            Console.WriteLine("connected? " + controller.CurrentUser);
+
             isLogged = true;
         }
 
@@ -426,13 +450,20 @@ namespace RobotControl
             Module[] modules = mainTask.GetModules();
             count = modules.Length;
 
-            using (Mastership.Request(controller.Rapid))
+            try
             {
-                foreach (Module m in modules)
+                using (Mastership.Request(controller.Rapid))
                 {
-                    if (DEBUG) Console.WriteLine("Deleting module: " + m.Name);
-                    m.Delete();
+                    foreach (Module m in modules)
+                    {
+                        if (DEBUG) Console.WriteLine("Deleting module: " + m.Name);
+                        m.Delete();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("CLEAR MODULES ERROR: " + ex);
             }
 
             return count;
@@ -446,11 +477,31 @@ namespace RobotControl
         /// </summary>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        private bool LoadModuleFromFilename(string filepath)
+        private bool LoadModuleFromFilename(string filename, string filepath)
         {
+            // When connecting to a real controller, the reference filesystem 
+            // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
+            // to copy the file to the system first, and then load it. 
+
+            string fullPath = filepath + filename;
+
+            try
+            {
+                using (Mastership.Request(controller.Rapid))
+                {
+                    Console.WriteLine("LocalDirectory: " + controller.FileSystem.LocalDirectory);
+                    Console.WriteLine("RemoteDirectory: " + controller.FileSystem.RemoteDirectory);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("PATH ERROR: " + ex);
+            }
+
+
             if (!isConnected)
             {
-                Console.WriteLine("Could not load module '" + filepath + "', not connected to controller");
+                Console.WriteLine("Could not load module '" + fullPath + "', not connected to controller");
                 return false;
             }
 
@@ -459,43 +510,58 @@ namespace RobotControl
 
             // Load the module
             bool success = false;
-            using (Mastership.Request(controller.Rapid))
+            try
             {
-                try
+                using (Mastership.Request(controller.Rapid))
                 {
-                    // Loads a Rapid module to the task in the robot controller
-                    success = mainTask.LoadModuleFromFile(filepath, RapidLoadMode.Replace);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("ERROR: Could not load module: " + ex);
-                }
+                    // Create the remoteBufferDirectory if applicable
+                    FileSystem fs = controller.FileSystem;
+                    string remotePath = fs.RemoteDirectory + "/" + remoteBufferDirectory;
+                    bool dirExists = fs.DirectoryExists(remoteBufferDirectory);
+                    Console.WriteLine("Exists? " + dirExists);
+                    if (!dirExists)
+                    {
+                        Console.WriteLine("Creating " + remotePath);
+                        fs.CreateDirectory(remoteBufferDirectory);
+                    }
+                    //@TODO: Should implement some kind of file cleanup at somepoint
 
+                    // Copy the file to the remote controller
+                    controller.FileSystem.PutFile(fullPath, remoteBufferDirectory + "/" + filename, true);
+                    Console.WriteLine("Copied");
+
+                    // Loads a Rapid module to the task in the robot controller
+                    success = mainTask.LoadModuleFromFile(remotePath + "/" + filename, RapidLoadMode.Replace);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: Could not load module: " + ex);
             }
 
             // True if loading succeeds without any errors, otherwise false.  
             if (!success)
             {
-                // Gets the available categories of the EventLog. 
-                foreach (EventLogCategory category in controller.EventLog.GetCategories())
-                {
-                    if (category.Name == "Common")
-                    {
-                        if (category.Messages.Count > 0)
-                        {
-                            foreach (EventLogMessage message in category.Messages)
-                            {
-                                Console.WriteLine("Program [{1}:{2}({0})] {3} {4}",
-                                    message.Name, message.SequenceNumber,
-                                    message.Timestamp, message.Title, message.Body);
-                            }
-                        }
-                    }
-                }
+                //// Gets the available categories of the EventLog. 
+                //foreach (EventLogCategory category in controller.EventLog.GetCategories())
+                //{
+                //    if (category.Name == "Common")
+                //    {
+                //        if (category.Messages.Count > 0)
+                //        {
+                //            foreach (EventLogMessage message in category.Messages)
+                //            {
+                //                Console.WriteLine("Program [{1}:{2}({0})] {3} {4}",
+                //                    message.Name, message.SequenceNumber,
+                //                    message.Timestamp, message.Title, message.Body);
+                //            }
+                //        }
+                //    }
+                //}
             }
             else
             {
-                if (DEBUG) Console.WriteLine("Sucessfully loaded " + filepath);
+                if (DEBUG) Console.WriteLine("Sucessfully loaded " + filepath + filename);
             }
 
             return success;
@@ -519,10 +585,19 @@ namespace RobotControl
         {
             if (isMainTaskRetrieved)
             {
-                using (Mastership.Request(controller.Rapid))
+                try
                 {
-                    mainTask.ResetProgramPointer();
+                    using (Mastership.Request(controller.Rapid))
+                    {
+                        mainTask.ResetProgramPointer();
+                    }
+
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("POINTER RESET ERROR: " + ex);
+                }
+                
             }
 
         }
@@ -534,19 +609,20 @@ namespace RobotControl
         {
             if (isMainTaskRetrieved)
             {
-                using (Mastership.Request(controller.Rapid))
+
+                try
                 {
-                    try
+                    using (Mastership.Request(controller.Rapid))
                     {
                         controller.Rapid.Start(true);
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Could not StartProgram(): " + ex);
-                        throw ex;
-                    }
-
+                    
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("PROGRAM START ERROR: " + ex);
+                }
+                
             }
         }
 
@@ -646,8 +722,8 @@ namespace RobotControl
         {
             if (DEBUG) Console.WriteLine("RUNNING NEW PATH: " + path.Count);
             List<string> module = RAPID.UNSAFEModuleFromPath(path, 100, 5);
-            SaveModuleToFile(module, tempBufferFilepath);
-            LoadModuleFromFilename(tempBufferFilepath);
+            SaveModuleToFile(module, localBufferPathname + localBufferFilename);
+            LoadModuleFromFilename(localBufferFilename, localBufferPathname);
             ResetProgramPointer();
             StartProgram();
         }
@@ -681,61 +757,67 @@ namespace RobotControl
         /// </summary>
         private void DebugControllerDump()
         {
-            Console.WriteLine("");
-            Console.WriteLine("DEBUG CONTROLLER DUMP:");
-            Console.WriteLine("     AuthenticationSystem: " + controller.AuthenticationSystem.Name);
-            Console.WriteLine("     BackupInProgress: " + controller.BackupInProgress);
-            Console.WriteLine("     Configuration: " + controller.Configuration);
-            Console.WriteLine("     Connected: " + controller.Connected);
-            Console.WriteLine("     CurrentUser: " + controller.CurrentUser);
-            Console.WriteLine("     DateTime: " + controller.DateTime);
-            Console.WriteLine("     EventLog: " + controller.EventLog);
-            Console.WriteLine("     FileSystem: " + controller.FileSystem);
-            Console.WriteLine("     IOSystem: " + controller.IOSystem);
-            Console.WriteLine("     IPAddress: " + controller.IPAddress);
-            Console.WriteLine("     Ipc: " + controller.Ipc);
-            Console.WriteLine("     IsMaster: " + controller.IsMaster);
-            Console.WriteLine("     IsVirtual: " + controller.IsVirtual);
-            Console.WriteLine("     MacAddress: " + controller.MacAddress);
-            Console.WriteLine("     MainComputerServiceInfo: ");
-            Console.WriteLine("         BoardType: " + controller.MainComputerServiceInfo.BoardType);
-            Console.WriteLine("         CpuInfo: " + controller.MainComputerServiceInfo.CpuInfo);
-            Console.WriteLine("         RamSize: " + controller.MainComputerServiceInfo.RamSize);
-            Console.WriteLine("         Temperature: " + controller.MainComputerServiceInfo.Temperature);
-            Console.WriteLine("     MastershipPolicy: " + controller.MastershipPolicy);
-            Console.WriteLine("     MotionSystem: " + controller.MotionSystem);
-            Console.WriteLine("     Name: " + controller.Name);
-            //Console.WriteLine("     NetworkSettings: " + controller.NetworkSettings);
-            Console.WriteLine("     OperatingMode: " + controller.OperatingMode);
-            Console.WriteLine("     Rapid: " + controller.Rapid);
-            Console.WriteLine("     RobotWare: " + controller.RobotWare);
-            Console.WriteLine("     RobotWareVersion: " + controller.RobotWareVersion);
-            Console.WriteLine("     RunLevel: " + controller.RunLevel);
-            Console.WriteLine("     State: " + controller.State);
-            Console.WriteLine("     SystemId: " + controller.SystemId);
-            Console.WriteLine("     SystemName: " + controller.SystemName);
-            //Console.WriteLine("     TimeServer: " + controller.TimeServer);
-            //Console.WriteLine("     TimeZone: " + controller.TimeZone);
-            //Console.WriteLine("     UICulture: " + controller.UICulture);
-            Console.WriteLine("");
+            if (isConnected)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("DEBUG CONTROLLER DUMP:");
+                Console.WriteLine("     AuthenticationSystem: " + controller.AuthenticationSystem.Name);
+                Console.WriteLine("     BackupInProgress: " + controller.BackupInProgress);
+                Console.WriteLine("     Configuration: " + controller.Configuration);
+                Console.WriteLine("     Connected: " + controller.Connected);
+                Console.WriteLine("     CurrentUser: " + controller.CurrentUser);
+                Console.WriteLine("     DateTime: " + controller.DateTime);
+                Console.WriteLine("     EventLog: " + controller.EventLog);
+                Console.WriteLine("     FileSystem: " + controller.FileSystem);
+                Console.WriteLine("     IOSystem: " + controller.IOSystem);
+                Console.WriteLine("     IPAddress: " + controller.IPAddress);
+                Console.WriteLine("     Ipc: " + controller.Ipc);
+                Console.WriteLine("     IsMaster: " + controller.IsMaster);
+                Console.WriteLine("     IsVirtual: " + controller.IsVirtual);
+                Console.WriteLine("     MacAddress: " + controller.MacAddress);
+                //Console.WriteLine("     MainComputerServiceInfo: ");
+                //Console.WriteLine("         BoardType: " + controller.MainComputerServiceInfo.BoardType);
+                //Console.WriteLine("         CpuInfo: " + controller.MainComputerServiceInfo.CpuInfo);
+                //Console.WriteLine("         RamSize: " + controller.MainComputerServiceInfo.RamSize);
+                //Console.WriteLine("         Temperature: " + controller.MainComputerServiceInfo.Temperature);
+                Console.WriteLine("     MastershipPolicy: " + controller.MastershipPolicy);
+                Console.WriteLine("     MotionSystem: " + controller.MotionSystem);
+                Console.WriteLine("     Name: " + controller.Name);
+                //Console.WriteLine("     NetworkSettings: " + controller.NetworkSettings);
+                Console.WriteLine("     OperatingMode: " + controller.OperatingMode);
+                Console.WriteLine("     Rapid: " + controller.Rapid);
+                Console.WriteLine("     RobotWare: " + controller.RobotWare);
+                Console.WriteLine("     RobotWareVersion: " + controller.RobotWareVersion);
+                Console.WriteLine("     RunLevel: " + controller.RunLevel);
+                Console.WriteLine("     State: " + controller.State);
+                Console.WriteLine("     SystemId: " + controller.SystemId);
+                Console.WriteLine("     SystemName: " + controller.SystemName);
+                //Console.WriteLine("     TimeServer: " + controller.TimeServer);
+                //Console.WriteLine("     TimeZone: " + controller.TimeZone);
+                //Console.WriteLine("     UICulture: " + controller.UICulture);
+                Console.WriteLine("");
+            }
         }
 
         private void DebugTaskDump()
         {
-            Console.WriteLine("");
-            Console.WriteLine("DEBUG TASK DUMP:");
-            Console.WriteLine("    Cycle: " + mainTask.Cycle);
-            Console.WriteLine("    Enabled: " + mainTask.Enabled);
-            Console.WriteLine("    ExecutionStatus: " + mainTask.ExecutionStatus);
-            Console.WriteLine("    ExecutionType: " + mainTask.ExecutionType);
-            Console.WriteLine("    Motion: " + mainTask.Motion);
-            Console.WriteLine("    MotionPointer: " + mainTask.MotionPointer.Module);
-            Console.WriteLine("    Name: " + mainTask.Name);
-            Console.WriteLine("    ProgramPointer: " + mainTask.ProgramPointer.Module);
-            Console.WriteLine("    RemainingCycles: " + mainTask.RemainingCycles);
-            Console.WriteLine("    TaskType: " + mainTask.TaskType);
-            Console.WriteLine("    Type: " + mainTask.Type);
-            Console.WriteLine("");
+            if (isMainTaskRetrieved)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("DEBUG TASK DUMP:");
+                Console.WriteLine("    Cycle: " + mainTask.Cycle);
+                Console.WriteLine("    Enabled: " + mainTask.Enabled);
+                Console.WriteLine("    ExecutionStatus: " + mainTask.ExecutionStatus);
+                Console.WriteLine("    ExecutionType: " + mainTask.ExecutionType);
+                Console.WriteLine("    Motion: " + mainTask.Motion);
+                Console.WriteLine("    MotionPointer: " + mainTask.MotionPointer.Module);
+                Console.WriteLine("    Name: " + mainTask.Name);
+                Console.WriteLine("    ProgramPointer: " + mainTask.ProgramPointer.Module);
+                Console.WriteLine("    RemainingCycles: " + mainTask.RemainingCycles);
+                Console.WriteLine("    TaskType: " + mainTask.TaskType);
+                Console.WriteLine("    Type: " + mainTask.Type);
+                Console.WriteLine("");
+            }
         }
 
 
