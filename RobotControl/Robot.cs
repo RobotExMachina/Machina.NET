@@ -721,7 +721,7 @@ namespace RobotControl
         private void RunPath(Path path)
         {
             if (DEBUG) Console.WriteLine("RUNNING NEW PATH: " + path.Count);
-            List<string> module = RAPID.UNSAFEModuleFromPath(path, 100, 5);
+            List<string> module = RAPID.UNSAFEModuleFromPath(path, 20, 5);
             SaveModuleToFile(module, localBufferPathname + localBufferFilename);
             LoadModuleFromFilename(localBufferFilename, localBufferPathname);
             ResetProgramPointer();

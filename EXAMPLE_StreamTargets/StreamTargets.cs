@@ -18,9 +18,9 @@ namespace EXAMPLE_StreamTargets
 {
     class StreamTargets
     {
-
-        static string moduleFilePath = @"D:\temp\remote_robot_v3_slow.mod";
         static string moduleName = "RemoteMain";
+        static string moduleFilepath = @"D:\temp\";
+        static string moduleFilename = "remote_robot_v3_slow.mod";
 
         static Robot arm;
 
@@ -70,7 +70,7 @@ namespace EXAMPLE_StreamTargets
             //bool moduleIsLoaded = LoadModuleFromFile(controller, moduleFilePath, tRob1);
             //Console.WriteLine("    success loading module: " + moduleIsLoaded);
 
-            arm.LoadModule(moduleFilePath);
+            arm.LoadModule(moduleFilename, moduleFilepath);
 
 
             //// Load RapidData control variables
