@@ -7,8 +7,8 @@ namespace EXAMPLE_StreamTargets2
     class StreamTargets2
     {
 
-        public static double leadSpeed = 300;
-        public static double traceSpeed = 100;
+        public static double leadSpeed = 50;
+        public static double traceSpeed = 20;
 
         [MTAThread]
         static void Main(string[] args)
@@ -24,16 +24,16 @@ namespace EXAMPLE_StreamTargets2
             arm.Start();
 
             // Set some properties from here on
-            arm.SetVelocity(traceSpeed);        // in mm/s
-            arm.SetZone(20);             // in mm
+            arm.SetVelocity(traceSpeed);    // in mm/s
+            arm.SetZone(20);                // in mm
 
             // A set of horizontal squares
-            arm.MoveTo("home");          // a 'bbokmarked' target
+            arm.MoveTo("home");             // a 'bbokmarked' target
 
             arm.SetVelocity(leadSpeed);
-            arm.MoveTo(250, 250, 250);   // absolute movement
+            arm.MoveTo(250, 250, 250);      // absolute movement
             arm.SetVelocity(traceSpeed);
-            arm.Move(50, 0, 0);          // relative movement
+            arm.Move(50, 0, 0);             // relative movement
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
 
