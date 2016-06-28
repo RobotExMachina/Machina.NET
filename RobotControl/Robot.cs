@@ -360,6 +360,9 @@ namespace RobotControl
                 return false;
             }
 
+            TCPPosition.Add(incX, incY, incZ);
+            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
+            TickStreamQueue();
 
             return true;
         }

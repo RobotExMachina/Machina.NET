@@ -7,6 +7,8 @@ namespace EXAMPLE_StreamTargets2
     class StreamTargets2
     {
 
+        public static double leadSpeed = 300;
+        public static double traceSpeed = 100;
 
         [MTAThread]
         static void Main(string[] args)
@@ -22,54 +24,46 @@ namespace EXAMPLE_StreamTargets2
             arm.Start();
 
             // Set some properties from here on
-            arm.SetVelocity(100);        // in mm/s
-            arm.SetZone(5);             // in mm
+            arm.SetVelocity(traceSpeed);        // in mm/s
+            arm.SetZone(20);             // in mm
 
-            //// A horizontal rectangle
-            //arm.MoveTo("home");         // internally, all targets are being stream on the fly to the controller whenever they get priority
-            //arm.MoveTo(200, 200, 150);  // absolute movement
-            //arm.Move(0, 50, 0);         // relative movement
-            //arm.Move(50, 0, 0);
-            //arm.Move(0, -50, 0);
-            //arm.MoveTo("home");
+            // A set of horizontal squares
+            arm.MoveTo("home");          // a 'bbokmarked' target
 
-            //arm.Stop();                 // this shouldn't be necessary, should come with Disconnect()
+            arm.SetVelocity(leadSpeed);
+            arm.MoveTo(250, 250, 250);   // absolute movement
+            arm.SetVelocity(traceSpeed);
+            arm.Move(50, 0, 0);          // relative movement
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
 
+            arm.SetVelocity(leadSpeed);
+            arm.Move(0, -50, 50);
+            arm.SetVelocity(traceSpeed);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
+
+            arm.SetVelocity(leadSpeed);
+            arm.Move(0, -50, 50);
+            arm.SetVelocity(traceSpeed);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
+
+            arm.SetVelocity(leadSpeed);
+            arm.Move(0, -50, 50);
+            arm.SetVelocity(traceSpeed);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
+
+            arm.SetVelocity(leadSpeed);
             arm.MoveTo("home");
-            arm.MoveTo(200, 200, 150);  // absolute movement
-            arm.MoveTo(250, 200, 150);
-            arm.MoveTo(250, 250, 150);
-            arm.MoveTo(200, 250, 150);
-            arm.MoveTo(200, 200, 200);
-            arm.MoveTo(250, 200, 200);
-            arm.MoveTo(250, 250, 200);
-            arm.MoveTo(200, 250, 200);
-            arm.MoveTo(200, 200, 300);
-            arm.MoveTo(250, 200, 300);
-            arm.MoveTo(250, 250, 300);
-            arm.MoveTo(200, 250, 300);
 
-            Console.WriteLine("Press any key to EXIT the program...");
+            Console.WriteLine("Press any key to STOP the program...");
             Console.ReadKey();
-            arm.Stop();
-
-            //Console.WriteLine("Press any key to EXIT the program...");
-            //Console.ReadKey();
-            //arm.Start();
-
-            //Console.WriteLine("Press any key to EXIT the program...");
-            //Console.ReadKey();
-            //arm.Stop();
-
-            //Console.WriteLine("Press any key to EXIT the program...");
-            //Console.ReadKey();
-            //arm.Start();
-
-            //Console.WriteLine("Press any key to EXIT the program...");
-            //Console.ReadKey();
-            //arm.Stop();
-
-
+            arm.Stop();  // this shouldn't be neccessary, should come with Disconnect()
             arm.Disconnect();
 
             Console.WriteLine("Press any key to EXIT the program...");
