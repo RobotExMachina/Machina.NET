@@ -42,6 +42,11 @@ namespace RobotControl
             return queuedTargets.Count > 0;
         }
 
+        public int FramesPending()
+        {
+            return queuedTargets.Count();
+        }
+
         public bool EmptyQueue()
         {
             bool rem = AreFramesPending();

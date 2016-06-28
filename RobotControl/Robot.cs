@@ -87,7 +87,7 @@ namespace RobotControl
         private double currentZone = 5;
 
         private StreamQueue streamQueue;
-
+        private bool mHeld = false;  // is Mastership currentl held by someone? useful when several threads want to write to the robot...
 
 
 
@@ -362,7 +362,15 @@ namespace RobotControl
 
             TCPPosition.Add(incX, incY, incZ);
             AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
-            TickStreamQueue();
+
+            // Only tick queue if there are no targets pending to be streamed
+            if (streamQueue.FramesPending() == 1 )
+            {
+                TickStreamQueue(false);
+            } else
+            {
+                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+            }
 
             return true;
         }
@@ -377,7 +385,17 @@ namespace RobotControl
 
             TCPPosition.Set(newX, newY, newZ);
             AddFrameToStreamQueue(new Frame(newX, newY, newZ, currentVelocity, currentZone));
-            TickStreamQueue();
+
+            // Only tick queue if there are no targets pending to be streamed
+            if (streamQueue.FramesPending() == 1)
+            {
+                TickStreamQueue(false);
+            }
+            else
+            {
+                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+            }
+
 
             return true;
         }
@@ -1012,62 +1030,78 @@ namespace RobotControl
         /// and if necessary will add a new target to the stream. This is meant to be called
         /// to initiate the stream update chain, like when adding a new target, or pnum event handling.
         /// </summary>
-        private void TickStreamQueue()
+        private void TickStreamQueue(bool hasPriority)
         {
-            if (DEBUG) Console.WriteLine("TICKING StreamQueue");
+            if (DEBUG) Console.WriteLine("TICKING StreamQueue: {0} targets pending", streamQueue.FramesPending());
             if (streamQueue.AreFramesPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
             {
-                SetNextVirtualTarget();
+                SetNextVirtualTarget(hasPriority);
                 virtualStepCounter++;
-                TickStreamQueue();
+                TickStreamQueue(hasPriority);
             }
         }
 
-        private void SetNextVirtualTarget()
+        private void SetNextVirtualTarget(bool hasPriority)
         {
             if (DEBUG) Console.WriteLine("Setting frame #{0}", virtualStepCounter);
 
             Frame target = streamQueue.GetNext();
             if (target != null)
             {
+                // When masterhip is held, only priority calls make it through (which are the ones holding mastership)
+                while (!hasPriority && mHeld) {
+                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 1");
+                }  // safety mechanism to not hit held mastership by eventhandlers
                 SetRapidDataVarString(RD_p[virtualStepCounter % virtualRDCount], target.GetUNSAFERobTargetDeclaration());
+                while (!hasPriority && mHeld)
+                {
+                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 2");
+                }
                 SetRapidDataVarString(RD_vel[virtualStepCounter % virtualRDCount], target.GetSpeedDeclaration());
+                while (!hasPriority && mHeld)
+                {
+                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 3");
+                }
                 SetRapidDataVarString(RD_zone[virtualStepCounter % virtualRDCount], target.GetZoneDeclaration());
+                while (!hasPriority && mHeld)
+                {
+                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 4");
+                }
                 SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);
             }
         }
 
         private void SetRapidDataVarBool(RapidData rd, bool value)
         {
-            using (Mastership.Request(controller.Rapid))
+            try
             {
-                try
+                using (Mastership.Request(controller.Rapid))
                 {
                     Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
                     rd.Value = new Bool(value);
                     Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("    ERROR SetRapidDataVarBool: {0}", ex);
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("    ERROR SetRapidDataVarBool: {0}", ex);
             }
         }
 
         private void SetRapidDataVarString(RapidData rd, string declaration)
         {
-            using (Mastership.Request(controller.Rapid))
+            try
             {
-                try
+                using (Mastership.Request(controller.Rapid))
                 {
                     Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
-                    rd.StringValue = declaration;            
+                    rd.StringValue = declaration;
                     Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("    ERROR SetRapidDataVarString: {0}", ex);
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("    ERROR SetRapidDataVarString: {0}", ex);
             }
         }
 
@@ -1203,7 +1237,9 @@ namespace RobotControl
             if (!rd.StringValue.Equals("-1"))
             {
                 if (DEBUG) Console.WriteLine("Ticking from pnum event handler");
-                TickStreamQueue();
+                mHeld = true;
+                TickStreamQueue(true);
+                mHeld = false;
             }
 
             if (rd != null)
