@@ -15,11 +15,22 @@ using ABB.Robotics.Controllers.FileSystemDomain;
 namespace RobotControl
 {
     /// <summary>
-    /// Different connection modes. 
+    /// Is this Robot connected to the application? 
+    /// Offline mode is used to generate robotic programs offline,
+    /// Online mode is meant to be used to send real-time instructions 
+    /// to a robot connected to the mahcine running the application.
     /// </summary>
-    public enum ConnectionMode : int { Instruct = 1, Stream = 2 };
+    public enum ConnectionMode : int { Offline = 1, Online = 2 };
+
+    /// <summary>
+    /// Different operating modes for Online control. 
+    /// Instruct loads and executes entire modules to the controller (slower), 
+    /// Stream overrides targets on the fly (faster)
+    /// </summary>
+    public enum OnlineMode : int { Instruct = 1, Stream = 2 };
     
 
+    
 
     //██████╗  ██████╗ ██████╗  ██████╗ ████████╗
     //██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
@@ -30,27 +41,53 @@ namespace RobotControl
 
     public class Robot
     {
-        private const bool DEBUG = true;
-        //private static string localBufferFile = @"C:\buffer.mod";
+        /// <summary>
+        /// Dump a bunch of logs?
+        /// </summary>
+        private static bool DEBUG = true;
+
+        /// <summary>
+        /// Come route names to be used for file handling
+        /// </summary>
         private static string localBufferPathname = @"C:\";
         private static string localBufferFilename = "buffer.mod";
         private static string remoteBufferDirectory = "RobotControl";
+
+        /// <summary>
+        /// A shared instance of a Thread to manage uploading modules
+        /// to the controller, which typically takes a lot of resources
+        /// and halts program execution
+        /// </summary>
         private Thread pathExecuter;
 
-        // Private properties
+        /// <summary>
+        /// Instances of the main robot Controller and Task
+        /// </summary>
         public Controller controller;  // @TODO: make this private (made it public for quick debugging)
         public ABB.Robotics.Controllers.RapidDomain.Task mainTask;  // @TODO: make this private (made it public for quick debugging)
 
-        private ConnectionMode connectionMode = ConnectionMode.Instruct;  // Instruct mode by default
+        /// <summary>
+        /// Connection modes by default
+        /// </summary>
+        private ConnectionMode connectionMode = RobotControl.ConnectionMode.Online;  // Try online by default
+        private OnlineMode onlineMode = RobotControl.OnlineMode.Instruct;            // Instruct mode by default
 
+        /// <summary>
+        /// The queue that manages what instructions get sent to the robot
+        /// </summary>
         private Queue queue;
+
+
+        private Point TCPPosition = null;
+
+
 
         // Public properties
         public bool isConnected { get; protected set; }
         public bool isLogged { get; protected set; }
         public bool isMainTaskRetrieved { get; private set; }
-
         public string IP { get; protected set; }
+
 
 
 
@@ -71,40 +108,91 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// In 'online' modes, performs all necessary instructions to connect to the robot controller. 
-        /// </summary>
-        /// <returns></returns>
-        public bool Connect()
-        {
-            return Connect(ConnectionMode.Instruct);
-        }
-
-        //public bool Connect(string mode)
-        //{
-        //    if (mode.ToLower().Equals("stream"))
-        //    {
-        //        return Connect(ConnectionMode.Stream);
-        //    }
-        //    else if (mode.ToLower().Equals("instruct"))
-        //    {
-        //        return Connect(ConnectionMode.Instruct);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Unknown connection mode, please specify 'instruct' or 'stream'");
-        //    }
-        //    return false;
-
-        //}
-
-        /// <summary>
-        /// This will at some point differentiate between 'instruct' and 'stream', not at the moment
+        /// Sets ConnectionMode for this robot.
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public bool Connect(ConnectionMode mode)
+        public bool ConnectionMode(ConnectionMode mode)
         {
             connectionMode = mode;
+            return true;
+        }
+
+        /// <summary>
+        /// Sets ConnectionMode for this robot.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public bool ConnectionMode(string mode)
+        {
+            mode = mode.ToLower();
+            bool success = true;
+            if (mode.Equals("offline"))
+            {
+                connectionMode = RobotControl.ConnectionMode.Offline;
+            }
+            else if (mode.Equals("online"))
+            {
+                connectionMode = RobotControl.ConnectionMode.Online;
+            }
+            else
+            {
+                Console.WriteLine("ConnectionMode '" + mode + "' is not available.");
+                success = false;
+            }
+            return success;
+        }
+
+        /// <summary>
+        /// Sets OnlineMode type for this robot.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public bool OnlineMode(OnlineMode mode)
+        {
+            onlineMode = mode;
+            return true;
+        }
+
+        /// <summary>
+        /// Sets OnlineMode type for this robot.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public bool OnlineMode(string mode)
+        {
+            mode = mode.ToLower();
+            bool success = true;
+            if (mode.Equals("instruct"))
+            {
+                onlineMode = RobotControl.OnlineMode.Instruct;
+            }
+            else if (mode.Equals("stream"))
+            {
+                onlineMode = RobotControl.OnlineMode.Stream;
+            }
+            else
+            {
+                Console.WriteLine("OnlineMode '" + mode + "' is not available.");
+                success = false;
+            }
+            return success;
+        }
+
+
+        /// <summary>
+        /// In 'online' modes, performs all necessary instructions to connect to the robot controller. 
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public bool Connect()
+        {
+            if (DEBUG) Console.WriteLine("Connecting to controller on " + IP);
+            if (connectionMode == RobotControl.ConnectionMode.Offline)
+            {
+                Console.WriteLine("ConnectionMode is currently set to offline");
+                return false;
+            }
             return ConnectToController();
         }
 
@@ -126,6 +214,11 @@ namespace RobotControl
         /// <param name="filepath"></param>
         public void LoadModule(string filename, string filepath)
         {
+            if (connectionMode == RobotControl.ConnectionMode.Offline)
+            {
+                Console.WriteLine("Cannot load modules in Offline mode");
+                return;
+            }
             LoadModuleFromFilename(filename, filepath);
         }
 
@@ -135,6 +228,12 @@ namespace RobotControl
         /// <param name="mode"></param>
         public void RunMode(string mode)
         {
+            if (connectionMode == RobotControl.ConnectionMode.Offline)
+            {
+                Console.WriteLine("Cannot set RunMode in Offline mode");
+                return;
+            }
+
             if (isConnected)
             {
                 using (Mastership.Request(controller.Rapid))
@@ -142,11 +241,16 @@ namespace RobotControl
                     controller.Rapid.Cycle = mode.ToLower().Equals("loop") ? ExecutionCycle.Forever : ExecutionCycle.Once;
                     if (DEBUG) Console.WriteLine("RunMode set to " + controller.Rapid.Cycle);
                 }
+            } 
+            else
+            {
+                Console.WriteLine("Not connected to controller");
             }
         }
 
         /// <summary>
         /// Starts execution of the current module/s in the controller.
+        /// @TODO: The behavior of this method will change depending based on Off/Online mode
         /// </summary>
         public void Start()
         {
@@ -226,6 +330,33 @@ namespace RobotControl
 
 
 
+        public bool Move(double incX, double incY, double incZ)
+        {
+            if (onlineMode != RobotControl.OnlineMode.Stream)
+            {
+                Console.WriteLine("Move() only supported in Stream mode");
+                return false;
+            }
+
+
+            return true;
+        }
+
+        public bool MoveTo(double newX, double newY, double newZ)
+        {
+            if (onlineMode != RobotControl.OnlineMode.Stream)
+            {
+                Console.WriteLine("MoveTo() only supported in Stream mode");
+                return false;
+            }
+
+            
+
+            return true;
+        }
+
+
+
 
 
 
@@ -267,7 +398,6 @@ namespace RobotControl
             ControllerInfo[] controllers = scanner.GetControllers();
             if (controllers.Length > 0)
             {
-
                 controller = ControllerFactory.CreateFrom(controllers[0]);
                 isConnected = true;
                 IP = controller.IPAddress.ToString();
@@ -283,6 +413,13 @@ namespace RobotControl
                 if (DEBUG) Console.WriteLine("No controllers found on the network");
                 isConnected = false;
             }
+
+            // Pick up the state of the robot if doing Stream mode
+            if (onlineMode == RobotControl.OnlineMode.Stream)
+            {
+                TCPPosition = new Point(GetTCPRobTarget().Trans);
+            }
+
             return true;
         }
 
@@ -721,7 +858,7 @@ namespace RobotControl
         private void RunPath(Path path)
         {
             if (DEBUG) Console.WriteLine("RUNNING NEW PATH: " + path.Count);
-            List<string> module = RAPID.UNSAFEModuleFromPath(path, 20, 5);
+            List<string> module = RAPID.UNSAFEModuleFromPath(path, 40, 5);
             SaveModuleToFile(module, localBufferPathname + localBufferFilename);
             LoadModuleFromFilename(localBufferFilename, localBufferPathname);
             ResetProgramPointer();

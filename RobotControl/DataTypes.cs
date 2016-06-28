@@ -1,6 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using ABB.Robotics;
+using ABB.Robotics.Controllers;
+using ABB.Robotics.Controllers.Discovery;
+using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
+using ABB.Robotics.Controllers.EventLogDomain;
+using ABB.Robotics.Controllers.FileSystemDomain;
+
 namespace RobotControl
 {
 
@@ -22,6 +29,20 @@ namespace RobotControl
             this.X = x;
             this.Y = y;
             this.Z = z;
+        }
+
+        public Point(Pos robotPosition)
+        {
+            this.X = robotPosition.X;
+            this.Y = robotPosition.Y;
+            this.Z = robotPosition.Z;
+        }
+
+        public void Add(double incX, double incY, double incZ)
+        {
+            this.X += incX;
+            this.Y += incY;
+            this.Z += incZ;
         }
 
         /// <summary>
