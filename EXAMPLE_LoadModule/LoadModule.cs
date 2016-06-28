@@ -17,9 +17,15 @@ namespace EXAMPLE_LoadModule
         [MTAThread] // "For an application running in a Multi Threaded Apartment (MTA) the Dispose call will remove both managed and native objects"
         static void Main(string[] args)
         {
-            Console.WriteLine("Initializing...");
+            Console.WriteLine("Initializing Load Module Program...");
+
             Robot arm = new Robot();
-            while (!arm.Connect()) { }
+
+            arm.ConnectionMode("online");
+            arm.OnlineMode("instruct");
+            arm.Connect();
+            //while (!arm.Connect()) { }
+
             arm.DebugDump();
 
             Console.WriteLine("Press any key to LOAD module '" + moduleFilepath + moduleFilename + "'...");
@@ -33,10 +39,10 @@ namespace EXAMPLE_LoadModule
             Console.WriteLine("Press any key to STOP program execution...");
             Console.ReadKey();
             arm.Stop();
-            arm.Disconnect();
 
             Console.WriteLine("Press any key to EXIT the program...");
             Console.ReadKey();
+            arm.Disconnect();
         }
 
     }

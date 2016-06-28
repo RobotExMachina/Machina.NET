@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{83F18314-A320-4148-A5A5-D8FD091FC407}</ProjectGuid>
+    <ProjectGuid>{1D5CA94F-0209-4A42-BFBD-8818B5049B6C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TuioDemo</RootNamespace>

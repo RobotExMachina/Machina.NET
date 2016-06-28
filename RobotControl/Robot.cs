@@ -78,7 +78,16 @@ namespace RobotControl
         private Queue queue;
 
 
+        // STUFF NEEDED FOR STREAM MODE
+        // Most of it represents a virtual current state of the robot, to be able to 
+        // issue appropriate relative actions.
         private Point TCPPosition = null;
+        //private Rotation TCPRotation = null;  // @TODO
+        private double currentVelocity = 10;
+        private double currentZone = 5;
+
+        private StreamQueue streamQueue;
+
 
 
 
@@ -187,13 +196,13 @@ namespace RobotControl
         /// <returns></returns>
         public bool Connect()
         {
-            if (DEBUG) Console.WriteLine("Connecting to controller on " + IP);
+            if (DEBUG) Console.WriteLine("Initializing connection to controller...");
             if (connectionMode == RobotControl.ConnectionMode.Offline)
             {
                 Console.WriteLine("ConnectionMode is currently set to offline");
                 return false;
             }
-            return ConnectToController();
+            return ConnectToController(onlineMode);
         }
 
         /// <summary>
@@ -239,7 +248,7 @@ namespace RobotControl
                 using (Mastership.Request(controller.Rapid))
                 {
                     controller.Rapid.Cycle = mode.ToLower().Equals("loop") ? ExecutionCycle.Forever : ExecutionCycle.Once;
-                    if (DEBUG) Console.WriteLine("RunMode set to " + controller.Rapid.Cycle);
+                    //if (DEBUG) Console.WriteLine("RunMode set to " + controller.Rapid.Cycle);
                 }
             } 
             else
@@ -330,6 +339,19 @@ namespace RobotControl
 
 
 
+
+
+
+        public void SetVelocity(double vel)
+        {
+            currentVelocity = vel;
+        }
+
+        public void SetZone(double zone)
+        {
+            currentZone = zone;
+        }
+        
         public bool Move(double incX, double incY, double incZ)
         {
             if (onlineMode != RobotControl.OnlineMode.Stream)
@@ -350,10 +372,31 @@ namespace RobotControl
                 return false;
             }
 
-            
+            TCPPosition.Set(newX, newY, newZ);
+            AddFrameToStreamQueue(new Frame(newX, newY, newZ, currentVelocity, currentZone));
+            TickStreamQueue();
 
             return true;
         }
+
+        public bool MoveTo(string bookmarkTarget)
+        {
+            string str = bookmarkTarget.ToLower();
+
+            bool found = true;
+            if (str.Equals("home"))
+            {
+                MoveTo(300, 0, 550);  // @TODO: this should issue a MoveAbsJ(0,0,0,0,0,0) or similar
+            }
+            else
+            {
+                found = false;
+            }
+
+            return found;
+        }
+
+
 
 
 
@@ -383,6 +426,7 @@ namespace RobotControl
             IP = "";
 
             queue = new Queue();
+            streamQueue = new StreamQueue();
         }
 
         /// <summary>
@@ -390,7 +434,7 @@ namespace RobotControl
         /// Necessary for "online" modes.
         /// </summary>
         /// <returns></returns>
-        private bool ConnectToController()
+        private bool ConnectToController(OnlineMode oMode)
         {
             NetworkScanner scanner = new NetworkScanner();
 
@@ -415,9 +459,12 @@ namespace RobotControl
             }
 
             // Pick up the state of the robot if doing Stream mode
-            if (onlineMode == RobotControl.OnlineMode.Stream)
+            if (oMode == RobotControl.OnlineMode.Stream)
             {
+                LoadStreamingModule();
+                HookUpStreamingVariables();
                 TCPPosition = new Point(GetTCPRobTarget().Trans);
+                if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
             }
 
             return true;
@@ -463,6 +510,7 @@ namespace RobotControl
         /// </summary>
         private void DisconnectFromController()
         {
+            StopProgram(true);  // for security... TODO: implement a flag with a global variable
             DisposeMainTask();
             DisposeController();
             LogOff();
@@ -496,33 +544,27 @@ namespace RobotControl
         /// <summary>
         /// Logs on to the controller with default credentials.
         /// </summary>
-        private void LogOn()
+        private bool LogOn()
         {
             if (isLogged)
             {
                 LogOff();
             }
 
-            Console.WriteLine(UserInfo.DefaultUser.Name);
-            Console.WriteLine(UserInfo.DefaultUser.Password);
-            Console.WriteLine(UserInfo.DefaultUser.ReadOnly);
-            Console.WriteLine(UserInfo.DefaultUser.Application);
             controller.Logon(UserInfo.DefaultUser);
 
-            //UserInfo tmpUser = new UserInfo("tmp0");
             try
             {
-                //controller.Logon(tmpUser);
                 controller.Logon(UserInfo.DefaultUser);
+                isLogged = true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("USER LOGON ERROR: " + ex);
+                isLogged = false;
             }
             
-            Console.WriteLine("connected? " + controller.CurrentUser);
-
-            isLogged = true;
+            return isLogged;
         }
 
         /// <summary>
@@ -593,17 +635,27 @@ namespace RobotControl
                 {
                     foreach (Module m in modules)
                     {
-                        if (DEBUG) Console.WriteLine("Deleting module: " + m.Name);
+                        if (DEBUG) Console.WriteLine("Deleting module: {0}", m.Name);
                         m.Delete();
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("CLEAR MODULES ERROR: " + ex);
+                Console.WriteLine("CLEAR MODULES ERROR: {0}", ex);
             }
 
             return count;
+        }
+
+        /// <summary>
+        /// Loads a module to the robot controller.
+        /// </summary>
+        /// <param name="mod"></param>
+        private void LoadModuleToRobot(List<string> mod)
+        {
+            SaveModuleToFile(mod, localBufferPathname + localBufferFilename);
+            LoadModuleFromFilename(localBufferFilename, localBufferPathname);
         }
 
 
@@ -622,28 +674,18 @@ namespace RobotControl
 
             string fullPath = filepath + filename;
 
-            try
-            {
-                using (Mastership.Request(controller.Rapid))
-                {
-                    Console.WriteLine("LocalDirectory: " + controller.FileSystem.LocalDirectory);
-                    Console.WriteLine("RemoteDirectory: " + controller.FileSystem.RemoteDirectory);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("PATH ERROR: " + ex);
-            }
-
-
             if (!isConnected)
             {
-                Console.WriteLine("Could not load module '" + fullPath + "', not connected to controller");
+                Console.WriteLine("Could not load module '{0}', not connected to controller", fullPath);
                 return false;
             }
 
             // For the time being, we will always whipe out previous modules on load
-            if (ClearAllModules() < 0) return false;
+            if (ClearAllModules() < 0)
+            {
+                Console.WriteLine("Error clearing modules");
+                return false;
+            }
 
             // Load the module
             bool success = false;
@@ -655,17 +697,17 @@ namespace RobotControl
                     FileSystem fs = controller.FileSystem;
                     string remotePath = fs.RemoteDirectory + "/" + remoteBufferDirectory;
                     bool dirExists = fs.DirectoryExists(remoteBufferDirectory);
-                    Console.WriteLine("Exists? " + dirExists);
+                    //Console.WriteLine("Exists? " + dirExists);
                     if (!dirExists)
                     {
-                        Console.WriteLine("Creating " + remotePath);
+                        if (DEBUG) Console.WriteLine("Creating {0} on remote controller", remotePath);
                         fs.CreateDirectory(remoteBufferDirectory);
                     }
                     //@TODO: Should implement some kind of file cleanup at somepoint
 
                     // Copy the file to the remote controller
                     controller.FileSystem.PutFile(fullPath, remoteBufferDirectory + "/" + filename, true);
-                    Console.WriteLine("Copied");
+                    if (DEBUG) Console.WriteLine("Copied {0} to {1}", filename, remoteBufferDirectory);
 
                     // Loads a Rapid module to the task in the robot controller
                     success = mainTask.LoadModuleFromFile(remotePath + "/" + filename, RapidLoadMode.Replace);
@@ -673,7 +715,7 @@ namespace RobotControl
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR: Could not load module: " + ex);
+                Console.WriteLine("ERROR: Could not load module: {0}", ex);
             }
 
             // True if loading succeeds without any errors, otherwise false.  
@@ -698,7 +740,7 @@ namespace RobotControl
             }
             else
             {
-                if (DEBUG) Console.WriteLine("Sucessfully loaded " + filepath + filename);
+                if (DEBUG) Console.WriteLine("Sucessfully loaded {0}{1}", filepath, filename);
             }
 
             return success;
@@ -765,7 +807,7 @@ namespace RobotControl
 
         /// <summary>
         /// Requests stop executing the program in the main task.
-        /// </summary>
+        /// </summary> 
         private void StopProgram(bool immediate)
         {
             if (isMainTaskRetrieved)
@@ -795,6 +837,16 @@ namespace RobotControl
         {
             return controller.MotionSystem.ActiveMechanicalUnit.GetPosition().RobAx;
         }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -845,11 +897,9 @@ namespace RobotControl
                 pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
                 pathExecuter.Start();
 
-                
             }
         }
-
-
+        
         /// <summary>
         /// Generates a module from a path, loads it to the controller and runs it.
         /// It assumes the robot is stopped (does this even matter anyway...?)
@@ -859,8 +909,9 @@ namespace RobotControl
         {
             if (DEBUG) Console.WriteLine("RUNNING NEW PATH: " + path.Count);
             List<string> module = RAPID.UNSAFEModuleFromPath(path, 40, 5);
-            SaveModuleToFile(module, localBufferPathname + localBufferFilename);
-            LoadModuleFromFilename(localBufferFilename, localBufferPathname);
+            //SaveModuleToFile(module, localBufferPathname + localBufferFilename);
+            //LoadModuleFromFilename(localBufferFilename, localBufferPathname);
+            LoadModuleToRobot(module);
             ResetProgramPointer();
             StartProgram();
         }
@@ -873,6 +924,156 @@ namespace RobotControl
         {
             queue.EmptyQueue();
         }
+
+
+
+
+
+
+
+        private static int virtualRDCount = 4;
+        private RapidData
+            RD_aborted,
+            RD_pnum;
+        private RapidData[]
+            RD_vel = new RapidData[virtualRDCount],
+            RD_zone = new RapidData[virtualRDCount],
+            RD_p = new RapidData[virtualRDCount],
+            RD_pset = new RapidData[virtualRDCount];
+
+        private int virtualStepCounter = 0;  // this keeps track of what is the next target index that needs to be assigned. Its %4 should asynchronously be ~4 units ahead of the 'pnum' rapid counter
+
+        private void LoadStreamingModule()
+        {
+            LoadModuleToRobot(StaticData.StreamModule.ToList());
+        }
+
+        private void HookUpStreamingVariables()
+        {
+            // Load RapidData control variables
+            RD_aborted = LoadRapidDataVariable("aborted");
+            RD_pnum = LoadRapidDataVariable("pnum");
+            //RD_pnum.ValueChanged += RD_pnum_ValueChanged;  // add an eventhandler to 'pnum' to track when it changes
+            //RD_pnum.Subscribe(RD_pnum_ValueChanged, EventPriority.High);
+            //RD_pnum.ValueChanged += new EventHandler<DataValueChangedEventArgs>(RD_pnum_ValueChanged);
+            RD_pnum.ValueChanged += OnRD_pnum_ValueChanged;
+
+            if (DEBUG)
+            {
+                Console.WriteLine(RD_aborted.StringValue);
+                Console.WriteLine(RD_pnum.StringValue);
+            }
+
+            // Load and set the first four targets
+            for (int i = 0; i < virtualRDCount; i++)
+            {
+                RD_vel[i] = LoadRapidDataVariable("vel" + i);
+                RD_zone[i] = LoadRapidDataVariable("zone" + i);
+                RD_p[i] = LoadRapidDataVariable("p" + i);
+                RD_pset[i] = LoadRapidDataVariable("pset" + i);
+                //AddVirtualTarget();
+
+                if (DEBUG)
+                {
+                    Console.WriteLine("{0}, {1}, {2}, {3}", 
+                        RD_vel[i].StringValue, 
+                        RD_zone[i].StringValue, 
+                        RD_p[i].StringValue, 
+                        RD_pset[i].StringValue);
+                }
+            }
+
+        }
+
+        private RapidData LoadRapidDataVariable(string varName)
+        {
+            RapidData rd = null;
+            try
+            {
+                rd = mainTask.GetModule("StreamModule").GetRapidData(varName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return rd;
+        }
+
+        private void AddFrameToStreamQueue(Frame frame)
+        {
+            streamQueue.Add(frame);
+        }
+
+        /// <summary>
+        /// This function will look at the state of the program pointer, the streamQueue, 
+        /// and if necessary will add a new target to the stream. This is meant to be called
+        /// to initiate the stream update chain, like when adding a new target, or pnum event handling.
+        /// </summary>
+        private void TickStreamQueue()
+        {
+            if (DEBUG) Console.WriteLine("TICKING StreamQueue");
+            if (streamQueue.AreFramesPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
+            {
+                SetNextVirtualTarget();
+                virtualStepCounter++;
+                TickStreamQueue();
+            }
+        }
+
+        private void SetNextVirtualTarget()
+        {
+            if (DEBUG) Console.WriteLine("Setting frame #{0}", virtualStepCounter);
+
+            Frame target = streamQueue.GetNext();
+            if (target != null)
+            {
+                SetRapidDataVarString(RD_p[virtualStepCounter % virtualRDCount], target.GetUNSAFERobTargetDeclaration());
+                SetRapidDataVarString(RD_vel[virtualStepCounter % virtualRDCount], target.GetSpeedDeclaration());
+                SetRapidDataVarString(RD_zone[virtualStepCounter % virtualRDCount], target.GetZoneDeclaration());
+                SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);
+            }
+        }
+
+        private void SetRapidDataVarBool(RapidData rd, bool value)
+        {
+            using (Mastership.Request(controller.Rapid))
+            {
+                try
+                {
+                    Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
+                    rd.Value = new Bool(value);
+                    Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("    ERROR SetRapidDataVarBool: {0}", ex);
+                }
+            }
+        }
+
+        private void SetRapidDataVarString(RapidData rd, string declaration)
+        {
+            using (Mastership.Request(controller.Rapid))
+            {
+                try
+                {
+                    Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
+                    rd.StringValue = declaration;            
+                    Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("    ERROR SetRapidDataVarString: {0}", ex);
+                }
+            }
+        }
+
+
+
+
+
+
+
 
         /// <summary>
         /// Printlines a "DEBUG" ASCII banner... ;)
@@ -981,9 +1182,34 @@ namespace RobotControl
 
             if (e.Status == ExecutionStatus.Stopped)
             {
-                // Tick queue to move forward
-                TriggerQueue(true);
+                // Only trigger Instruct queue
+                if (onlineMode == RobotControl.OnlineMode.Instruct)
+                {
+                    // Tick queue to move forward
+                    TriggerQueue(true);
+                }
             }
+        }
+
+        private void OnRD_pnum_ValueChanged(object sender, DataValueChangedEventArgs e)
+        {
+            RapidData rd = (RapidData)sender;
+            if (DEBUG) Console.WriteLine("   variable '{0}' changed: {1}", rd.Name, rd.StringValue);
+
+            // Do not add target if pnum is being reset to initial value (like on program load)
+            if (!rd.StringValue.Equals("-1"))
+            {
+                if (DEBUG) Console.WriteLine("Ticking from pnum event handler");
+                TickStreamQueue();
+            }
+
+            if (rd != null)
+            {
+                //Console.WriteLine("Disposing rd");
+                //rd.Dispose();
+                //rd = null;
+            }
+
         }
 
     }

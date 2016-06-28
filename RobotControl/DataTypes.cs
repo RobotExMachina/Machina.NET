@@ -38,6 +38,13 @@ namespace RobotControl
             this.Z = robotPosition.Z;
         }
 
+        public void Set(double newX, double newY, double newz)
+        {
+            this.X = newX;
+            this.Y = newY;
+            this.Z = newz;
+        }
+
         public void Add(double incX, double incY, double incZ)
         {
             this.X += incX;
@@ -104,7 +111,7 @@ namespace RobotControl
 
         /// <summary>
         /// A global XYZ coordinate system rotated 180 degs around its Y axis. 
-        /// Recommended as the easiest orientation for the standard robot end effector to reach in positive X octants.
+        /// Recommended as the easiest orientation for the standard robot end effector to reach in positive XY octants.
         /// </summary>
         public static readonly Rotation FlippedAroundY = new Rotation(0, 0, 1, 0);
 
@@ -145,7 +152,8 @@ namespace RobotControl
     //██║     ██║  ██║██║  ██║██║ ╚═╝ ██║███████╗
     //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝                                      
     /// <summary>
-    /// Represents a location and rotation in 3D space
+    /// Represents a location and rotation in 3D space, with some additional
+    /// metadata representing velocities, zones, etc
     /// </summary>
     public class Frame
     {
@@ -153,39 +161,171 @@ namespace RobotControl
         /// This is the default rotation that will be assigned to Frames constructed only with location properties.
         /// </summary>
         public static Rotation DefaultOrientation = Rotation.FlippedAroundY;
+        public static double DefaultVelocity = 10;
+        public static double DefaultZone = 5;
 
         public Point Position;
         public Rotation Orientation;
+        public double Velocity;
+        public double Zone;
 
         public Frame(double x, double y, double z)
         {
             this.Position = new Point(x, y, z);
             this.Orientation = DefaultOrientation;
+            this.Velocity = DefaultVelocity;
+            this.Zone = DefaultZone;
         }
 
         public Frame(double x, double y, double z, double q1, double q2, double q3, double q4)
         {
             this.Position = new Point(x, y, z);
             this.Orientation = new Rotation(q1, q2, q3, q4);
+            this.Velocity = DefaultVelocity;
+            this.Zone = DefaultZone;
+        }
+
+        public Frame(double x, double y, double z, double vel, double zon)
+        {
+            this.Position = new Point(x, y, z);
+            this.Orientation = DefaultOrientation;
+            this.Velocity = vel;
+            this.Zone = zon;
+        }
+
+        public Frame(double x, double y, double z, double q1, double q2, double q3, double q4, double vel, double zon)
+        {
+            this.Position = new Point(x, y, z);
+            this.Orientation = new Rotation(q1, q2, q3, q4);
+            this.Velocity = vel;
+            this.Zone = zon;
         }
 
         public Frame(Point position)
         {
-            this.Position = position;
+            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = DefaultOrientation;
+            this.Velocity = DefaultVelocity;
+            this.Zone = DefaultZone;
         }
 
         public Frame(Point position, Rotation orientation)
         {
-            this.Position = position;
-            this.Orientation = orientation;
+            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
+            this.Orientation = new Rotation(orientation.Q1, orientation.Q2, orientation.Q3, orientation.Q4);  // shallow copy
+            this.Velocity = DefaultVelocity;
+            this.Zone = DefaultZone;
+        }
+
+        public Frame(Point position, Rotation orientation, double vel, double zon)
+        {
+            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
+            this.Orientation = new Rotation(orientation.Q1, orientation.Q2, orientation.Q3, orientation.Q4);  // shallow copy
+            this.Velocity = vel;
+            this.Zone = zon;
+        }
+
+
+        public string GetPositionDeclaration()
+        {
+            return string.Format("[{0},{1},{2}]", Position.X, Position.Y, Position.Z);
+        }
+
+        public string GetOrientationDeclaration()
+        {
+            return string.Format("[{0},{1},{2},{3}]", Orientation.Q1, Orientation.Q2, Orientation.Q3, Orientation.Q4);
+        }
+
+        /// <summary>
+        /// WARNING: This method still doesn't perform IK calculation, and will always return
+        /// a default declaration for the positive XYZ octant.
+        /// </summary>
+        /// <returns></returns>
+        public string GetUNSAFEConfigurationDeclaration()
+        {
+            return string.Format("[{0},{1},{2},{3}]", 0, 0, 0, 0);
+        }
+
+        /// <summary>
+        /// WARNING: no external axes are taken into account here... 
+        /// </summary>
+        /// <returns></returns>
+        public string GetExternalAxesDeclaration()
+        {
+            return "[9E9,9E9,9E9,9E9,9E9,9E9]";
+        }
+        
+        public string GetSpeedDeclaration()
+        {
+            return string.Format("[{0},{1},{2},{3}]", Velocity, 500, 5000, 1000);
+        }
+
+        public string GetZoneDeclaration()
+        {
+            double high = 1.5 * Zone;
+            double low = 0.15 * Zone;
+            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", Zone, high, high, low, high, low);
+        }
+
+        /// <summary>
+        /// WARNING: This method still doesn't perform IK calculation, and will always return
+        /// a default configuration for the positive XYZ octant.
+        /// </summary>
+        /// <returns></returns>
+        public string GetUNSAFERobTargetDeclaration()
+        {
+            return string.Format("[{0},{1},{2},{3}]", 
+                GetPositionDeclaration(),
+                GetOrientationDeclaration(),
+                GetUNSAFEConfigurationDeclaration(),
+                GetExternalAxesDeclaration()
+            );
         }
 
         public override string ToString()
         {
-            return this.Position + "," + this.Orientation;
+            //return this.Position + "," + this.Orientation;
+            return string.Format("{0},{1},{2},{3}", this.Position, this.Orientation, this.Velocity, this.Zone);
         }
     }
+
+
+
+
+    ////████████╗ █████╗ ██████╗  ██████╗ ███████╗████████╗
+    ////╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
+    ////   ██║   ███████║██████╔╝██║  ███╗█████╗     ██║   
+    ////   ██║   ██╔══██║██╔══██╗██║   ██║██╔══╝     ██║   
+    ////   ██║   ██║  ██║██║  ██║╚██████╔╝███████╗   ██║   
+    ////   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   
+    ///// <summary>
+    ///// Represents a Position + Orientation with some additional 
+    ///// properties such as velocity, zone, etc.
+    ///// </summary>
+    //public class Target
+    //{
+    //    public Point position;
+    //    public Rotation orientation;
+    //    public double velocity;
+    //    public double zone;
+
+    //    public static Rotation DefaultOrientation = Rotation.FlippedAroundY;
+
+    //    public Target(Point pos, Rotation orient, double vel, double zone)
+    //    {
+    //        this.position = pos;
+    //        this.orientation = orient;
+    //        this.velocity = vel;
+    //        this.zone = zone;
+    //    }
+
+    //    public override string ToString()
+    //    {
+    //        return string.Format("[{0},{1},{2},{3}"])
+    //    }
+    //}   
+    
+                                            
 
 
 
