@@ -60,7 +60,8 @@ namespace RobotControl
         /// <returns></returns>
         public static string UNSAFEExplicitRobTargetDeclaration(Frame target)
         {
-            return "[" + target + ",[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]";
+            //return "[" + target + ",[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]";
+            return target.GetUNSAFERobTargetDeclaration();
         }
 
 

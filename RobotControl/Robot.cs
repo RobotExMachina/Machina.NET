@@ -211,7 +211,7 @@ namespace RobotControl
         public void Disconnect()
         {
             if (DEBUG) Console.WriteLine("Disconnecting from controller on " + IP);
-
+            Stop();
             DisconnectFromController();
         }
 
@@ -929,7 +929,7 @@ namespace RobotControl
         private void RunPath(Path path)
         {
             if (DEBUG) Console.WriteLine("RUNNING NEW PATH: " + path.Count);
-            List<string> module = RAPID.UNSAFEModuleFromPath(path, 40, 5);
+            List<string> module = RAPID.UNSAFEModuleFromPath(path, (int) currentVelocity, (int) currentZone);
             //SaveModuleToFile(module, localBufferPathname + localBufferFilename);
             //LoadModuleFromFilename(localBufferFilename, localBufferPathname);
             LoadModuleToRobot(module);

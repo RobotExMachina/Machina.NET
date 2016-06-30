@@ -136,13 +136,16 @@ public class TuioDemo : Form , TuioListener
 		 		fullscreen = false;
 	 		}
  		} else if ( e.KeyData == Keys.Escape) {
+            // ROBOT
             arm.Disconnect();
+
             this.Close();
 
  		} else if ( e.KeyData == Keys.V ) {
  			verbose=!verbose;
 
         } else if ( e.KeyData == Keys.S ) {
+            // ROBOT
             RequestStopAfterCurrentProgram();
 
         }
@@ -165,13 +168,25 @@ public class TuioDemo : Form , TuioListener
         if (verbose) Console.WriteLine("add obj "+o.SymbolID+" ("+o.SessionID+") "+o.X+" "+o.Y+" "+o.Angle);
 
         // ROBOT
-        InitializePath(o);
-        //AddTargetToPath(o, 1);  // added upon path creation (to avoid lead in/out per glitchy poly)
-        AddTargetToPath(o, 0);
+        if (oMode == OnlineMode.Instruct)
+        {
+            InitializePath(o);
+            AddTargetToPath(o, 0);
+        }
+        else if (oMode == OnlineMode.Stream)
+        {     
+            if (UseThisTUIOObject(o))
+            {
+                MakeRobotWakeUp();
+                MoveRobotTo(o, 1);
+                MoveRobotTo(o, 0);
+            }
+        }
+        
     }
 
-
-
+    // NOTE: this only gets invoked when there is significant change in the object.
+    // If the object stays in place with no movement/rotation, it doesn't get called
     public void updateTuioObject(TuioObject o) {
 		lock(objectSync) {
 			objectList[o.SessionID].update(o);
@@ -179,9 +194,19 @@ public class TuioDemo : Form , TuioListener
 		if (verbose) Console.WriteLine("set obj "+o.SymbolID+" "+o.SessionID+" "+o.X+" "+o.Y+" "+o.Angle+" "+o.MotionSpeed+" "+o.RotationSpeed+" "+o.MotionAccel+" "+o.RotationAccel);
 
         // ROBOT
-        AddTargetToPath(o, 0);
+        if (oMode == OnlineMode.Instruct)
+        {
+            AddTargetToPath(o, 0);
+        }
+        else if (oMode == OnlineMode.Stream && UseThisTUIOObject(o))
+        {
+            if (UseThisTUIOObject(o))
+            {
+                MoveRobotTo(o, 0);
+            }
+        }
+        
     }
-
 
     public void removeTuioObject(TuioObject o) {
 		lock(objectSync) {
@@ -190,9 +215,19 @@ public class TuioDemo : Form , TuioListener
 		if (verbose) Console.WriteLine("del obj "+o.SymbolID+" ("+o.SessionID+")");
 
         // ROBOT
-        AddTargetToPath(o, 0);
-        //AddTargetToPath(o, 1);  // added to SendPathToRobot to avoid lead in/out per glitchy segment
-        //SendPathToRobot(o);
+        // Sending the path to the robot or flagging current ID as inactive
+        // is taken care of by TimeTick()
+        if (oMode == OnlineMode.Instruct)
+        {
+            AddTargetToPath(o, 0);
+        }
+        else if (oMode == OnlineMode.Stream && UseThisTUIOObject(o))
+        {
+            if (UseThisTUIOObject(o))
+            {
+                MoveRobotTo(o, 0);
+            }
+        }
     }
 
 	public void addTuioCursor(TuioCursor c) {
@@ -278,7 +313,6 @@ public class TuioDemo : Form , TuioListener
 			}
 		}
 
-        //Console.WriteLine("OnPaintBackground: ");
 	}
 
 	public static void Main(String[] argv) {
@@ -313,31 +347,187 @@ public class TuioDemo : Form , TuioListener
 
     // ROBOT STUFF
     private Robot arm;
-    //private List<double> xpos = new List<double>();
-    //private List<double> ypos = new List<double>();
 
+    // Motion settings for both modes
+    private double velocity = 100;              // For instruct mode, use standard RAPID velocities
+    private double zone = 5;                    // For instruct mode, use standard RAPID zones
+    private bool pathSimpHQ = false;            // use high quality path simplication?
+    private double pathSimpResolution = 0.1;    // simplication precision in world mm 
+
+    // The coordinates, dimensions and reorientations of the physical 3D box
+    // the normalized coordinates will be remapped to
+    private bool flipXY = true;
+    private double worldX = 200;
+    private double worldY = 100;
+    private double worldZ = 200;
+    private double boxX = 240;
+    private double boxY = 320;
+    private double boxZ = 100;
+
+    // In "stream" mode, marker movement will be replicated by the robot in near real-time.
+    // In "instruct" mode, the whole stroke will be sent as a path to the robot.
+    //private string onlineMode = "instruct";
+    private OnlineMode oMode = OnlineMode.Instruct;
+
+    // In "stream" mode, which fiducial ID the app is reading 
+    // (to avoid jumping between multiple simultaneous fiducials
+    private int currentFiduID = -1;
+
+    // In "stream" module, the distance from previous target to trigger sending
+    // a new one to the robot
+    private double thresholdDistance = 25;     // in real-world mm
+    private Frame lastTarget = new Frame(0, 0, 0);
+    private bool awake = false;
+    private long idleTime = 0;                // how long has it been since TUIO has requested to add an object
+       
+    // Buffer Paths in "instruct" mode
     private Dictionary<int, Path> fiduPaths;
     private Dictionary<int, long> fiduTimes;  // stores the time elapsed since last target was added
     private int strokeCount = 0;
 
+    // Allow a time buffer before sending the path to the robot
     private long lastTimeTick = 0;
     private long maxTimeInc = 1000;  // if a path hasn't received a target before this much time, it will be sent to the robot
+
+
+
 
     private void InitializeRobot()
     {
         // ROBOT
         arm = new Robot();
+        arm.ConnectionMode("online");
+        arm.OnlineMode(oMode);
 
-        //arm.Connect("instruct");
         arm.Connect();
         Console.WriteLine(arm.IP);
         Console.WriteLine(arm.GetPosition());
         Console.WriteLine(arm.GetOrientation());
         Console.WriteLine(arm.GetJoints());
 
-        fiduPaths = new Dictionary<int, Path>();
-        fiduTimes = new Dictionary<int, long>();
+        arm.SetVelocity(velocity);
+        arm.SetZone(zone);
+
+        if (oMode == OnlineMode.Instruct)
+        {
+            fiduPaths = new Dictionary<int, Path>();
+            fiduTimes = new Dictionary<int, long>();
+        }
+        else if (oMode == OnlineMode.Stream)
+        {
+            arm.Start();
+        }
+        
     }
+
+    /// <summary>
+    /// Invoked any time the window is refreshed. 
+    /// For every Path, it updates timestamps since last frame was added, 
+    /// and triggers executions if over a certain threshold.
+    /// </summary>
+    private void TimeTick(TuioTime frameTime)
+    {
+        long timeInc = frameTime.TotalMilliseconds - lastTimeTick;
+
+        if (oMode == OnlineMode.Instruct)
+        {
+            var keys = new List<int>(fiduTimes.Keys);       // http://stackoverflow.com/a/2260472
+            foreach (var key in keys)
+            {
+                fiduTimes[key] += timeInc;
+                if (fiduTimes[key] > maxTimeInc)
+                {
+                    SendPathToRobot(key);
+                }
+            }
+        }
+        else if (oMode == OnlineMode.Stream)
+        {
+            idleTime += timeInc;
+            if (awake && idleTime > maxTimeInc)
+            {
+                MakeRobotSleep();
+            }
+            
+        }
+
+        Console.WriteLine("IDLE TIME: " + idleTime);
+        lastTimeTick = frameTime.TotalMilliseconds;
+    }
+
+
+
+
+    // _____ _  __ _
+    //(_  | |_)|_ |_||V|
+    //__) | | \|__| || |
+    private bool UseThisTUIOObject(TuioObject o)
+    {
+        // If no fiducial is on right now, mark this as current
+        if (currentFiduID == -1)
+        {
+            currentFiduID = o.SymbolID;
+            return true;
+        }
+
+        // If was unsing this ID, keep using it
+        else if (currentFiduID == o.SymbolID)
+        {
+            return true;
+        }
+
+        // Otherwise, this marker is a different one from current, and shall not be used
+        return false;
+    }
+
+    private void MakeRobotWakeUp()
+    {
+        awake = true;
+        if (lastTarget == null)
+        {
+            lastTarget = new Frame(0, 0, 0);
+        }
+    }
+
+    private void MoveRobotTo(TuioObject o, double z)
+    {
+        idleTime = 0;
+
+        // Remap the tuioObj
+        Frame target = new Frame(o.X, o.Y, z);
+        if (flipXY) target.FlipXY();
+        target.RemapAxis("x", 0, 1, worldX, worldX + boxX);
+        target.RemapAxis("y", 0, 1, worldY, worldY + boxY);
+        target.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
+
+        if (Frame.DistanceBetween(lastTarget, target) > thresholdDistance)
+        {
+            Console.WriteLine("--> SENDING MOVE REQUEST!");
+            arm.MoveTo(target.Position.X, target.Position.Y, target.Position.Z);  // TODO: should implement a .MoveTo(Frame target) method... also, in this case velocity and zones are inferred from the initial setup on initialization
+            lastTarget = target;
+        }
+
+    }
+
+    private void MakeRobotSleep()
+    {
+        // Release current fiducial ID
+        currentFiduID = -1;
+
+        // TODO: implement some sort of 'slowly retreat back to home position'
+        if (lastTarget != null)
+        {
+            arm.MoveTo(lastTarget.Position.X, lastTarget.Position.Y, worldZ + boxZ);
+        }
+
+        awake = false;
+    }
+
+
+
+    //___    _____ _     _____
+    // | |\|(_  | |_)| |/   | 
+    //_|_| |__) | | \|_|\__ | 
 
     private void InitializePath(TuioObject o)
     {
@@ -363,21 +553,6 @@ public class TuioDemo : Form , TuioListener
         fiduTimes[o.SymbolID] = 0;
     }
 
-    //private void SendPathToRobot(TuioObject o)
-    //{
-    //    Console.WriteLine("--> SENDING PATH");
-
-    //    Path targetPath = fiduPaths[o.SymbolID];
-    //    targetPath.FlipXY();
-    //    targetPath.RemapAxis("x", 0, 1, 200, 440);
-    //    targetPath.RemapAxis("y", 0, 1, 100, 420);
-    //    targetPath.RemapAxis("z", 0, 1, 200, 300);
-
-    //    targetPath.Simplify(0.1, false);
-
-    //    arm.LoadPath(targetPath);
-    //}
-
     private void SendPathToRobot(int objID)
     {
 
@@ -388,14 +563,18 @@ public class TuioDemo : Form , TuioListener
 
         Console.WriteLine("--> SENDING PATH " + targetPath.Name);
 
-        targetPath.FlipXY();
-        targetPath.RemapAxis("x", 0, 1, 200, 440);
-        targetPath.RemapAxis("y", 0, 1, 100, 420);
-        targetPath.RemapAxis("z", 0, 1, 200, 300);
-        targetPath.Simplify(0.1, false);
+        if (flipXY)
+        {
+            targetPath.FlipXY();
+        }
+        targetPath.RemapAxis("x", 0, 1, worldX, worldX + boxX);
+        targetPath.RemapAxis("y", 0, 1, worldY, worldY + boxY);
+        targetPath.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
+        targetPath.Simplify(pathSimpResolution, pathSimpHQ);
 
         arm.LoadPath(targetPath);
         RemovePathFromDicts(objID);
+        
     }
 
 
@@ -404,38 +583,15 @@ public class TuioDemo : Form , TuioListener
         arm.StopAfterProgram();
     }
 
-    /// <summary>
-    /// Invoked any time the window is refreshed. 
-    /// For every Path, it updates timestamps since last frame was added, 
-    /// and triggers executions if over a certain threshold.
-    /// </summary>
-    private void TimeTick(TuioTime frameTime)
-    {
-        long timeInc = frameTime.TotalMilliseconds - lastTimeTick;
-
-        //foreach (var item in fiduTimes)
-        //{
-        //    //item.Value += timeInc;
-        //}
-
-        // http://stackoverflow.com/a/2260472
-        var keys = new List<int>(fiduTimes.Keys);
-        foreach (var key in keys)
-        {
-            fiduTimes[key] += timeInc;
-            if (fiduTimes[key] > maxTimeInc)
-            {
-                SendPathToRobot(key);
-            }
-        }
-        
-        lastTimeTick = frameTime.TotalMilliseconds;
-    }
+    
 
     private void RemovePathFromDicts(int objID)
     {
         fiduPaths.Remove(objID);
         fiduTimes.Remove(objID);
     }
+
+
+
 
 }

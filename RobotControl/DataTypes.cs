@@ -169,6 +169,15 @@ namespace RobotControl
         public double Velocity;
         public double Zone;
 
+        public static double DistanceBetween(Frame f1, Frame f2)
+        {
+            double dx = f2.Position.X - f1.Position.X;
+            double dy = f2.Position.Y - f1.Position.Y;
+            double dz = f2.Position.Z - f1.Position.Z;
+
+            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
         public Frame(double x, double y, double z)
         {
             this.Position = new Point(x, y, z);
@@ -281,6 +290,42 @@ namespace RobotControl
                 GetExternalAxesDeclaration()
             );
         }
+
+        public void FlipXY()
+        {
+            double x = this.Position.X;
+            this.Position.X = this.Position.Y;
+            this.Position.Y = x;
+        }
+
+        public bool RemapAxis(string axis, double prevMin, double prevMax, double newMin, double newMax)
+        {
+            string a = axis.ToLower();
+            //Some sanity
+            if (!a.Equals("x") && !a.Equals("y") && !a.Equals("z"))
+            {
+                Console.WriteLine("Please use 'x', 'y' or 'z' as arguments");
+                return false;
+            }
+
+            int axid = a.Equals("x") ? 0 : a.Equals("y") ? 1 : 2;
+
+            switch (axid)
+            {
+                case 0:
+                    this.Position.X = Util.Remap(this.Position.X, prevMin, prevMax, newMin, newMax);
+                    break;
+                case 1:
+                    this.Position.Y = Util.Remap(this.Position.Y, prevMin, prevMax, newMin, newMax);
+                    break;
+                default:
+                    this.Position.Z = Util.Remap(this.Position.Z, prevMin, prevMax, newMin, newMax);
+                    break;
+            }
+
+            return true;
+        }
+
 
         public override string ToString()
         {
