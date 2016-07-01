@@ -11,8 +11,8 @@ namespace EXAMPLE_KeyboardControl
     class KeyboardControl
     {
         public static double leadSpeed = 200;
-        public static double moveSpeed = 10;
-        public static double inc = 10;
+        public static double moveSpeed = 50;
+        public static double inc = 25;
 
         public static bool input = true;
 
@@ -32,6 +32,7 @@ namespace EXAMPLE_KeyboardControl
             // Move to the positive XYZ octant
             arm.SetVelocity(leadSpeed);
             arm.SetZone(2);
+            arm.RotateTo(Rotation.FlippedAroundY);
             arm.MoveTo(250, 250, 250);
 
             arm.SetVelocity(moveSpeed);

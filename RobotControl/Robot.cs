@@ -41,6 +41,12 @@ namespace RobotControl
 
     public class Robot
     {
+
+        private static readonly bool SafetyStopImmediateOnDisconnect = true;
+        private static readonly bool SafetyCheckTableCollision = true;
+        private static readonly bool SafetyStopOnTableCollision = true;
+        private static readonly double SafetyTableZLimit = 100;  // table security checks will trigger under this z height
+
         /// <summary>
         /// Dump a bunch of logs?
         /// </summary>
@@ -212,7 +218,7 @@ namespace RobotControl
         public void Disconnect()
         {
             if (DEBUG) Console.WriteLine("Disconnecting from controller on " + IP);
-            Stop();
+            if (SafetyStopImmediateOnDisconnect) StopProgram(true);
             DisconnectFromController();
         }
 
@@ -361,6 +367,18 @@ namespace RobotControl
                 return false;
             }
 
+            if (SafetyCheckTableCollision)
+            {
+                if (IsBelowTable(TCPPosition.Z + incZ))
+                {
+                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
+                    if (SafetyStopOnTableCollision)
+                    {
+                        return false;
+                    }
+                }
+            }
+
             TCPPosition.Add(incX, incY, incZ);
             AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
 
@@ -382,6 +400,18 @@ namespace RobotControl
             {
                 Console.WriteLine("MoveTo() only supported in Stream mode");
                 return false;
+            }
+
+            if (SafetyCheckTableCollision)
+            {
+                if (IsBelowTable(newZ))
+                {
+                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
+                    if (SafetyStopOnTableCollision)
+                    {
+                        return false;
+                    }
+                }
             }
 
             TCPPosition.Set(newX, newY, newZ);
@@ -423,6 +453,8 @@ namespace RobotControl
                 Console.WriteLine("RotateTo() only supported in Stream mode");
                 return false;
             }
+
+            // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
 
             TCPRotation.Set(q1, q2, q3, q4);
             AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
@@ -1241,6 +1273,13 @@ namespace RobotControl
         }
 
 
+        // This should be moved somewhere else
+        private static bool IsBelowTable(double z)
+        {
+            return z <= SafetyTableZLimit;
+        }
+
+
 
 
 
@@ -1295,6 +1334,8 @@ namespace RobotControl
             }
 
         }
+
+        
 
     }
 }

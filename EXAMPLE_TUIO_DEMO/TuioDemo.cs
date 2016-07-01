@@ -459,8 +459,6 @@ public class TuioDemo : Form , TuioListener
             arm.Start();
 
             //arm.RotateTo(Rotation.FlippedAroundY);
-            //arm.MoveTo("home");
-            //arm.RotateTo(0, 0, -1, 0, 1, 0, 1, 0, 0);
             arm.RotateTo(0, 1, 0, 0, 0, 1, 1, 0, 0);
 
             MoveRobotTo(0, 0, 0);
@@ -471,10 +469,9 @@ public class TuioDemo : Form , TuioListener
                 MoveRobotTo(0, 1, 0);
                 MoveRobotTo(0, 0, 0);
             }
-
-
+            
         }
-        
+
     }
 
     /// <summary>
