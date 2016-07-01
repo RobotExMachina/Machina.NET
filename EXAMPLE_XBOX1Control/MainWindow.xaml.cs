@@ -22,6 +22,7 @@ using System.Windows.Shapes;
 /// </summary>
 using SharpDX.XInput;
 
+using RobotControl;
 
 namespace EXAMPLE_XBOX1Control
 {
@@ -33,6 +34,9 @@ namespace EXAMPLE_XBOX1Control
         private DispatcherTimer timer = new DispatcherTimer();
         private Controller gameController;
         private int refreshRate = 100;  // in millis
+
+        Robot arm;
+        double relSpeed = 25;  // 
          
         public MainWindow()
         {
@@ -51,6 +55,17 @@ namespace EXAMPLE_XBOX1Control
             timer.Tick += TimerTick;
             timer.Start();
 
+            arm = new Robot();
+            arm.ConnectionMode("online");
+            arm.OnlineMode("stream");
+            arm.Connect();
+
+            arm.Start();
+            arm.SetVelocity(100);
+            arm.SetZone(5);
+            arm.RotateTo(RobotControl.Rotation.FlippedAroundY);
+            arm.MoveTo(200, 200, 200);
+
         }
 
         void TimerTick(object sender, EventArgs e)
@@ -58,13 +73,34 @@ namespace EXAMPLE_XBOX1Control
             //DisplayControllerInformation();
 
             var state = gameController.GetState();
-            Console.WriteLine("LEFT THUMB X:{0}, Y:{1}", state.Gamepad.LeftThumbX, state.Gamepad.LeftThumbY);
-            Console.WriteLine("RIGHT THUMB X:{0}, Y:{1}", state.Gamepad.RightThumbX, state.Gamepad.RightThumbY);
-            Console.WriteLine("BUTTONS: " + state.Gamepad.Buttons);
+            //Console.WriteLine("LEFT THUMB X:{0}, Y:{1}", state.Gamepad.LeftThumbX, state.Gamepad.LeftThumbY);
+            //Console.WriteLine("RIGHT THUMB X:{0}, Y:{1}", state.Gamepad.RightThumbX, state.Gamepad.RightThumbY);
+            //Console.WriteLine("BUTTONS: " + state.Gamepad.Buttons);
+
+            RobotControl.Point dir = new RobotControl.Point(RemapThumb(state.Gamepad.LeftThumbX, 10000, 32767), RemapThumb(state.Gamepad.LeftThumbY, 10000, 32767), RemapThumb(state.Gamepad.RightThumbY, 10000, 32767));
+            dir.Scale(relSpeed);
+            
+            var speed = dir.Length();
+            if (speed > 0)
+            {
+                Console.WriteLine("--> Moving {0}", dir);
+                arm.SetVelocity(speed);
+                arm.Move(dir);
+            }
+            else
+            {
+                Console.WriteLine("idle");
+            }
+            
+
+            //dir.Normalize();
+            //Console.WriteLine("--> Norm mov {0}", dir);
         }
 
         private void MainWindowClosing(object sender, CancelEventArgs e)
         {
+            arm.Disconnect();
+
             gameController = null;
         }
 
@@ -77,6 +113,16 @@ namespace EXAMPLE_XBOX1Control
             App.Current.Shutdown();
         }
 
+
+        private double RemapThumb(short value, double min, double max)
+        {
+            bool neg = value < 0;
+            int intVal = (int) value;
+            double val = (int) Math.Abs(intVal);
+            if (val <= min) return 0;
+            double norm = (val - min) / (max - min);
+            return neg ? -norm : norm;
+        }
 
 
     }

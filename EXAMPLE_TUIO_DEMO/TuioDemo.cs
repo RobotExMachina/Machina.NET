@@ -433,6 +433,9 @@ public class TuioDemo : Form , TuioListener
     private long lastTargetAddedTimestamp = 0;
 
 
+    private bool fastTest = false;
+    private object movementLock = new object();
+
     private void InitializeRobot()
     {
         // ROBOT
@@ -469,7 +472,19 @@ public class TuioDemo : Form , TuioListener
                 MoveRobotTo(0, 1, 0);
                 MoveRobotTo(0, 0, 0);
             }
-            
+
+            // A test on adding a bunch of targets really fast
+            if (fastTest)
+            {
+                for (var i = 0; i < 10; i++)
+                {
+                    for (var j = 0; j < 10; j++)
+                    {
+                        Console.WriteLine("{0} {1} {2}", i, j, DateTime.Now);
+                        MoveRobotTo(0.1 * j, 0.1 * i, 0);
+                    }
+                }
+            }
         }
 
     }
@@ -564,29 +579,33 @@ public class TuioDemo : Form , TuioListener
 
     private void MoveRobotTo(double normX, double normY, double normZ)
     {
-        idleTime = 0;
 
-        //// Remap the tuioObj to flat 2D
-        //Frame target = new Frame(o.X, o.Y, z);
-        //if (flipXY) target.FlipXY();
-        //target.RemapAxis("x", 0, 1, worldX, worldX + boxX);
-        //target.RemapAxis("y", 0, 1, worldY, worldY + boxY);
-        //target.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
-
-        Frame target = new Frame(normX, normY, normZ);
-        target.FlipXY();
-        target.FlipXZ();
-        target.ReverseZ();
-        target.RemapAxis("x", 0, 1, worldX, worldX + boxX);
-        target.RemapAxis("y", 0, 1, worldY, worldY + boxY);
-        target.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
-
-        if (Frame.DistanceBetween(lastTarget, target) > thresholdDistance)
+        lock (movementLock)
         {
-            Console.WriteLine("--> SENDING MOVE REQUEST!");
-            Console.WriteLine("     " + target);
-            arm.MoveTo(target.Position.X, target.Position.Y, target.Position.Z);  // TODO: should implement a .MoveTo(Frame target) method... also, in this case velocity and zones are inferred from the initial setup on initialization
-            lastTarget = target;
+            idleTime = 0;
+
+            //// Remap the tuioObj to flat 2D
+            //Frame target = new Frame(o.X, o.Y, z);
+            //if (flipXY) target.FlipXY();
+            //target.RemapAxis("x", 0, 1, worldX, worldX + boxX);
+            //target.RemapAxis("y", 0, 1, worldY, worldY + boxY);
+            //target.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
+
+            Frame target = new Frame(normX, normY, normZ);
+            target.FlipXY();
+            target.FlipXZ();
+            target.ReverseZ();
+            target.RemapAxis("x", 0, 1, worldX, worldX + boxX);
+            target.RemapAxis("y", 0, 1, worldY, worldY + boxY);
+            target.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
+
+            if (Frame.DistanceBetween(lastTarget, target) > thresholdDistance)
+            {
+                Console.WriteLine("--> SENDING MOVE REQUEST!");
+                Console.WriteLine("     " + target);
+                arm.MoveTo(target.Position.X, target.Position.Y, target.Position.Z);  // TODO: should implement a .MoveTo(Frame target) method... also, in this case velocity and zones are inferred from the initial setup on initialization
+                lastTarget = target;
+            }
         }
     }
 

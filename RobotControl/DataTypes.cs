@@ -52,6 +52,33 @@ namespace RobotControl
             this.Z += incZ;
         }
 
+        public double Length()
+        {
+            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+        }
+
+        public double LengthSq()
+        {
+            return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
+        }
+
+        public bool Normalize()
+        {
+            var len = this.Length();
+            if (len == 0) return false;
+            this.X /= len;
+            this.Y /= len;
+            this.Z /= len;
+            return true;
+        }
+
+        public void Scale(double factor)
+        {
+            this.X *= factor;
+            this.Y *= factor;
+            this.Z *= factor;
+        }
+
         /// <summary>
         /// Equality checks.
         /// </summary>

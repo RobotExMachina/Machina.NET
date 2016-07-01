@@ -359,6 +359,11 @@ namespace RobotControl
         {
             currentZone = zone;
         }
+
+        public bool Move(Point dir)
+        {
+            return Move(dir.X, dir.Y, dir.Z);
+        }
         
         public bool Move(double incX, double incY, double incZ)
         {
