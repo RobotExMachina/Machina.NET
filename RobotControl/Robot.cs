@@ -82,6 +82,7 @@ namespace RobotControl
         // Most of it represents a virtual current state of the robot, to be able to 
         // issue appropriate relative actions.
         private Point TCPPosition = null;
+        private Rotation TCPRotation = null;
         //private Rotation TCPRotation = null;  // @TODO
         private double currentVelocity = 10;
         private double currentZone = 5;
@@ -384,7 +385,10 @@ namespace RobotControl
             }
 
             TCPPosition.Set(newX, newY, newZ);
-            AddFrameToStreamQueue(new Frame(newX, newY, newZ, currentVelocity, currentZone));
+            //AddFrameToStreamQueue(new Frame(newX, newY, newZ, currentVelocity, currentZone));
+            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
+               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
+               currentVelocity, currentZone));
 
             // Only tick queue if there are no targets pending to be streamed
             if (streamQueue.FramesPending() == 1)
@@ -404,19 +408,62 @@ namespace RobotControl
         {
             string str = bookmarkTarget.ToLower();
 
-            bool found = true;
             if (str.Equals("home"))
             {
-                MoveTo(300, 0, 550);  // @TODO: this should issue a MoveAbsJ(0,0,0,0,0,0) or similar
+                return MoveTo(300, 0, 550);  // @TODO: this should issue a MoveAbsJ(0,0,0,0,0,0) or similar
+            }
+
+            return false;
+        }
+
+        public bool RotateTo(double q1, double q2, double q3, double q4)
+        {
+            if (onlineMode != RobotControl.OnlineMode.Stream)
+            {
+                Console.WriteLine("RotateTo() only supported in Stream mode");
+                return false;
+            }
+
+            TCPRotation.Set(q1, q2, q3, q4);
+            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
+               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
+               currentVelocity, currentZone));
+
+            // Only tick queue if there are no targets pending to be streamed
+            if (streamQueue.FramesPending() == 1)
+            {
+                TickStreamQueue(false);
             }
             else
             {
-                found = false;
+                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
             }
 
-            return found;
+            return true;
         }
 
+        public bool RotateTo(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
+        {
+
+            List<double> q = Rotation.PlaneToQuaternions(x1, x2, x3, y1, y2, y3, z1, z2, z3);
+            return RotateTo(q[0], q[1], q[2], q[3]);
+        }
+
+        public bool RotateTo(Rotation rot)
+        {
+            return RotateTo(rot.Q1, rot.Q2, rot.Q3, rot.Q4);
+        }
+
+        public bool RotateTo(string bookmarkRotation)
+        {
+            string str = bookmarkRotation.ToLower();
+
+            if (str.Equals("globalxy"))
+            {
+                return RotateTo(Rotation.GlobalXY);
+            }
+            return false;
+        }
 
 
 
@@ -485,6 +532,7 @@ namespace RobotControl
                 LoadStreamingModule();
                 HookUpStreamingVariables();
                 TCPPosition = new Point(GetTCPRobTarget().Trans);
+                TCPRotation = new Rotation(GetTCPRobTarget().Rot);
                 if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
             }
 
@@ -858,9 +906,6 @@ namespace RobotControl
         {
             return controller.MotionSystem.ActiveMechanicalUnit.GetPosition().RobAx;
         }
-
-
-
 
 
 

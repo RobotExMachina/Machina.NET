@@ -363,12 +363,43 @@ public class TuioDemo : Form , TuioListener
     // The coordinates, dimensions and reorientations of the physical 3D box
     // the normalized coordinates will be remapped to
     private bool flipXY = true;
-    private double worldX = 200;
-    private double worldY = 100;
-    private double worldZ = 200;
-    private double boxX = 240;
+    //private double worldX = 200;
+    //private double worldY = 100;
+    //private double worldZ = 200;
+    //private double boxX = 240;
+    //private double boxY = 320;
+    //private double boxZ = 100;
+
+    //private double worldX = 200;
+    //private double worldY = -200;
+    //private double worldZ = 600;
+    //private double boxX = 100;
+    //private double boxY = 400;
+    //private double boxZ = 300;
+
+    // These should be the right coordinates for a front facing EE
+    //private double worldX = 400;
+    //private double worldY = -300;
+    //private double worldZ = 700;
+    //private double boxX = 100;
+    //private double boxY = 600;
+    //private double boxZ = 400;
+
+    //private double worldX = 400;
+    //private double worldY = -200;
+    //private double worldZ = 700;
+    //private double boxX = 100;
+    //private double boxY = 400;
+    //private double boxZ = 300;
+
+    private double worldX = 300;
+    private double worldY = 150;
+    private double worldZ = 500;
+    private double boxX = 1;
     private double boxY = 320;
-    private double boxZ = 100;
+    private double boxZ = 240;
+
+    private bool calibrateMotionArea = false;
 
     // In "stream" mode, marker movement will be replicated by the robot in near real-time.
     // In "instruct" mode, the whole stroke will be sent as a path to the robot.
@@ -382,6 +413,7 @@ public class TuioDemo : Form , TuioListener
     // In "stream" module, the distance from previous target to trigger sending
     // a new one to the robot
     private double thresholdDistance = 10;     // in real-world mm
+    
     private Frame lastTarget = new Frame(0, 0, 0);
     private bool awake = false;
     
@@ -397,7 +429,8 @@ public class TuioDemo : Form , TuioListener
     private long maxTimeInc = 1000;  // if a path hasn't received a target before this much time, it will be sent to the robot
     private long resetTime = 10000;           // after this much idle time, the robot will go to sleep
 
-
+    private long minTimeBetweenTargets = 250;  // in ms
+    private long lastTargetAddedTimestamp = 0;
 
 
     private void InitializeRobot()
@@ -424,6 +457,22 @@ public class TuioDemo : Form , TuioListener
         else if (oMode == OnlineMode.Stream)
         {
             arm.Start();
+
+            //arm.RotateTo(Rotation.FlippedAroundY);
+            //arm.MoveTo("home");
+            //arm.RotateTo(0, 0, -1, 0, 1, 0, 1, 0, 0);
+            arm.RotateTo(0, 1, 0, 0, 0, 1, 1, 0, 0);
+
+            MoveRobotTo(0, 0, 0);
+            if (calibrateMotionArea)
+            {
+                MoveRobotTo(1, 0, 0);
+                MoveRobotTo(1, 1, 0);
+                MoveRobotTo(0, 1, 0);
+                MoveRobotTo(0, 0, 0);
+            }
+
+
         }
         
     }
@@ -500,13 +549,37 @@ public class TuioDemo : Form , TuioListener
     //    }
     //}
 
-    private void MoveRobotTo(TuioObject o, double z)
+    private void MoveRobotTo(TuioObject o, double normZ)
+    {
+        long inc = o.TuioTime.TotalMilliseconds - lastTargetAddedTimestamp;
+        if (inc > minTimeBetweenTargets)
+        {
+            Console.WriteLine("MOVEMENT WENT THROUGH");
+            lastTargetAddedTimestamp = o.TuioTime.TotalMilliseconds;
+            MoveRobotTo(o.X, o.Y, normZ);
+        }
+        else
+        {
+            Console.WriteLine("Movement skipped");
+        }
+       
+    }
+
+    private void MoveRobotTo(double normX, double normY, double normZ)
     {
         idleTime = 0;
 
-        // Remap the tuioObj
-        Frame target = new Frame(o.X, o.Y, z);
-        if (flipXY) target.FlipXY();
+        //// Remap the tuioObj to flat 2D
+        //Frame target = new Frame(o.X, o.Y, z);
+        //if (flipXY) target.FlipXY();
+        //target.RemapAxis("x", 0, 1, worldX, worldX + boxX);
+        //target.RemapAxis("y", 0, 1, worldY, worldY + boxY);
+        //target.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
+
+        Frame target = new Frame(normX, normY, normZ);
+        target.FlipXY();
+        target.FlipXZ();
+        target.ReverseZ();
         target.RemapAxis("x", 0, 1, worldX, worldX + boxX);
         target.RemapAxis("y", 0, 1, worldY, worldY + boxY);
         target.RemapAxis("z", 0, 1, worldZ, worldZ + boxZ);
@@ -514,11 +587,19 @@ public class TuioDemo : Form , TuioListener
         if (Frame.DistanceBetween(lastTarget, target) > thresholdDistance)
         {
             Console.WriteLine("--> SENDING MOVE REQUEST!");
+            Console.WriteLine("     " + target);
             arm.MoveTo(target.Position.X, target.Position.Y, target.Position.Z);  // TODO: should implement a .MoveTo(Frame target) method... also, in this case velocity and zones are inferred from the initial setup on initialization
             lastTarget = target;
         }
-
     }
+
+    //private double worldX = 200;
+    //private double worldY = 100;
+    //private double worldZ = 200;
+    //private double boxX = 100;
+    //private double boxY = 320;
+    //private double boxZ = 240;
+
 
     //private void MakeRobotSleep()
     //{
@@ -605,7 +686,5 @@ public class TuioDemo : Form , TuioListener
         fiduTimes.Remove(objID);
     }
 
-
-
-
+    
 }
