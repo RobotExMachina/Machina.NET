@@ -148,6 +148,11 @@ public class TuioDemo : Form , TuioListener
             // ROBOT
             RequestStopAfterCurrentProgram();
 
+        } else if ( e.KeyData == Keys.R )
+        {
+            // ROBOT
+            MakeRobotSleep();
+
         }
         
 
@@ -350,6 +355,7 @@ public class TuioDemo : Form , TuioListener
 
     // Motion settings for both modes
     private double velocity = 100;              // For instruct mode, use standard RAPID velocities
+    private double sleepVelocity = 25;          // velocity at which it will retreat to sleep
     private double zone = 5;                    // For instruct mode, use standard RAPID zones
     private bool pathSimpHQ = false;            // use high quality path simplication?
     private double pathSimpResolution = 0.1;    // simplication precision in world mm 
@@ -367,7 +373,7 @@ public class TuioDemo : Form , TuioListener
     // In "stream" mode, marker movement will be replicated by the robot in near real-time.
     // In "instruct" mode, the whole stroke will be sent as a path to the robot.
     //private string onlineMode = "instruct";
-    private OnlineMode oMode = OnlineMode.Instruct;
+    private OnlineMode oMode = OnlineMode.Stream;
 
     // In "stream" mode, which fiducial ID the app is reading 
     // (to avoid jumping between multiple simultaneous fiducials
@@ -378,7 +384,7 @@ public class TuioDemo : Form , TuioListener
     private double thresholdDistance = 25;     // in real-world mm
     private Frame lastTarget = new Frame(0, 0, 0);
     private bool awake = false;
-    private long idleTime = 0;                // how long has it been since TUIO has requested to add an object
+    
        
     // Buffer Paths in "instruct" mode
     private Dictionary<int, Path> fiduPaths;
@@ -387,7 +393,9 @@ public class TuioDemo : Form , TuioListener
 
     // Allow a time buffer before sending the path to the robot
     private long lastTimeTick = 0;
+    private long idleTime = 0;                // how long has it been since TUIO has requested to add an object
     private long maxTimeInc = 1000;  // if a path hasn't received a target before this much time, it will be sent to the robot
+    private long resetTime = 10000;           // after this much idle time, the robot will go to sleep
 
 
 
@@ -482,7 +490,10 @@ public class TuioDemo : Form , TuioListener
 
     private void MakeRobotWakeUp()
     {
+        arm.Stop();
+        arm.Start();
         awake = true;
+        arm.SetVelocity(velocity);
         if (lastTarget == null)
         {
             lastTarget = new Frame(0, 0, 0);
@@ -511,13 +522,16 @@ public class TuioDemo : Form , TuioListener
 
     private void MakeRobotSleep()
     {
+        Console.WriteLine("PUTTING ROBOT TO SLEEP");
         // Release current fiducial ID
         currentFiduID = -1;
 
         // TODO: implement some sort of 'slowly retreat back to home position'
         if (lastTarget != null)
         {
-            arm.MoveTo(lastTarget.Position.X, lastTarget.Position.Y, worldZ + boxZ);
+            //arm.MoveTo(lastTarget.Position.X, lastTarget.Position.Y, worldZ + boxZ);
+            arm.SetVelocity(sleepVelocity);
+            arm.MoveTo(worldX, 0, worldZ + boxZ);
         }
 
         awake = false;
