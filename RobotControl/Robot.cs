@@ -44,7 +44,7 @@ namespace RobotControl
         /// <summary>
         /// Dump a bunch of logs?
         /// </summary>
-        private static bool DEBUG = true;
+        private static bool DEBUG = false;
 
         /// <summary>
         /// Come route names to be used for file handling
@@ -1077,9 +1077,9 @@ namespace RobotControl
             {
                 using (Mastership.Request(controller.Rapid))
                 {
-                    Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
+                    if (DEBUG) Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
                     rd.Value = new Bool(value);
-                    Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
+                    if (DEBUG) Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
                 }
             }
             catch (Exception ex)
@@ -1094,9 +1094,9 @@ namespace RobotControl
             {
                 using (Mastership.Request(controller.Rapid))
                 {
-                    Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
+                    if (DEBUG) Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
                     rd.StringValue = declaration;
-                    Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
+                    if (DEBUG) Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
                 }
             }
             catch (Exception ex)

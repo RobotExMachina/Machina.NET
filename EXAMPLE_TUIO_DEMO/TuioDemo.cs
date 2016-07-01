@@ -151,8 +151,8 @@ public class TuioDemo : Form , TuioListener
         } else if ( e.KeyData == Keys.R )
         {
             // ROBOT
-            MakeRobotSleep();
-
+            //MakeRobotSleep();
+            currentFiduID = -1;
         }
         
 
@@ -182,8 +182,8 @@ public class TuioDemo : Form , TuioListener
         {     
             if (UseThisTUIOObject(o))
             {
-                MakeRobotWakeUp();
-                MoveRobotTo(o, 1);
+                //MakeRobotWakeUp();
+                //MoveRobotTo(o, 1);
                 MoveRobotTo(o, 0);
             }
         }
@@ -381,7 +381,7 @@ public class TuioDemo : Form , TuioListener
 
     // In "stream" module, the distance from previous target to trigger sending
     // a new one to the robot
-    private double thresholdDistance = 25;     // in real-world mm
+    private double thresholdDistance = 10;     // in real-world mm
     private Frame lastTarget = new Frame(0, 0, 0);
     private bool awake = false;
     
@@ -451,15 +451,15 @@ public class TuioDemo : Form , TuioListener
         }
         else if (oMode == OnlineMode.Stream)
         {
-            idleTime += timeInc;
-            if (awake && idleTime > maxTimeInc)
-            {
-                MakeRobotSleep();
-            }
+            //idleTime += timeInc;
+            //if (awake && idleTime > maxTimeInc)
+            //{
+            //    MakeRobotSleep();
+            //}
             
         }
 
-        Console.WriteLine("IDLE TIME: " + idleTime);
+        //Console.WriteLine("IDLE TIME: " + idleTime);
         lastTimeTick = frameTime.TotalMilliseconds;
     }
 
@@ -488,17 +488,17 @@ public class TuioDemo : Form , TuioListener
         return false;
     }
 
-    private void MakeRobotWakeUp()
-    {
-        arm.Stop();
-        arm.Start();
-        awake = true;
-        arm.SetVelocity(velocity);
-        if (lastTarget == null)
-        {
-            lastTarget = new Frame(0, 0, 0);
-        }
-    }
+    //private void MakeRobotWakeUp()
+    //{
+    //    arm.Stop();
+    //    arm.Start();
+    //    awake = true;
+    //    arm.SetVelocity(velocity);
+    //    if (lastTarget == null)
+    //    {
+    //        lastTarget = new Frame(0, 0, 0);
+    //    }
+    //}
 
     private void MoveRobotTo(TuioObject o, double z)
     {
@@ -520,22 +520,22 @@ public class TuioDemo : Form , TuioListener
 
     }
 
-    private void MakeRobotSleep()
-    {
-        Console.WriteLine("PUTTING ROBOT TO SLEEP");
-        // Release current fiducial ID
-        currentFiduID = -1;
+    //private void MakeRobotSleep()
+    //{
+    //    Console.WriteLine("PUTTING ROBOT TO SLEEP");
+    //    // Release current fiducial ID
+    //    currentFiduID = -1;
 
-        // TODO: implement some sort of 'slowly retreat back to home position'
-        if (lastTarget != null)
-        {
-            //arm.MoveTo(lastTarget.Position.X, lastTarget.Position.Y, worldZ + boxZ);
-            arm.SetVelocity(sleepVelocity);
-            arm.MoveTo(worldX, 0, worldZ + boxZ);
-        }
+    //    // TODO: implement some sort of 'slowly retreat back to home position'
+    //    if (lastTarget != null)
+    //    {
+    //        //arm.MoveTo(lastTarget.Position.X, lastTarget.Position.Y, worldZ + boxZ);
+    //        arm.SetVelocity(sleepVelocity);
+    //        arm.MoveTo(worldX, 0, worldZ + boxZ);
+    //    }
 
-        awake = false;
-    }
+    //    awake = false;
+    //}
 
 
 
