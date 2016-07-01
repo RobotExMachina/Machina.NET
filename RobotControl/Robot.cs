@@ -50,7 +50,7 @@ namespace RobotControl
         /// <summary>
         /// Dump a bunch of logs?
         /// </summary>
-        private static bool DEBUG = false;
+        private static bool DEBUG = true;
 
         /// <summary>
         /// Come route names to be used for file handling
@@ -95,6 +95,7 @@ namespace RobotControl
 
         private StreamQueue streamQueue;
         private bool mHeld = false;  // is Mastership currentl held by someone? useful when several threads want to write to the robot...
+        private object rapidDataLock = new object();
 
 
 
@@ -1112,9 +1113,16 @@ namespace RobotControl
             if (DEBUG) Console.WriteLine("TICKING StreamQueue: {0} targets pending", streamQueue.FramesPending());
             if (streamQueue.AreFramesPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
             {
+                Console.WriteLine("About to set targets");
                 SetNextVirtualTarget(hasPriority);
                 virtualStepCounter++;
                 TickStreamQueue(hasPriority);
+            }
+            else
+            {
+                Console.WriteLine("Not setting targets, streamQueue.AreFramesPending() {0} RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals(\"FALSE\") {1}",
+                     streamQueue.AreFramesPending(),
+                    RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"));
             }
         }
 
@@ -1122,30 +1130,39 @@ namespace RobotControl
         {
             if (DEBUG) Console.WriteLine("Setting frame #{0}", virtualStepCounter);
 
-            Frame target = streamQueue.GetNext();
-            if (target != null)
+            lock (rapidDataLock)
             {
-                // When masterhip is held, only priority calls make it through (which are the ones holding mastership)
-                while (!hasPriority && mHeld) {
-                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 1");
-                }  // safety mechanism to not hit held mastership by eventhandlers
-                SetRapidDataVarString(RD_p[virtualStepCounter % virtualRDCount], target.GetUNSAFERobTargetDeclaration());
-                while (!hasPriority && mHeld)
+                Frame target = streamQueue.GetNext();
+                if (target != null)
                 {
-                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 2");
+                    //// When masterhip is held, only priority calls make it through (which are the ones holding mastership)
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 1");
+                    //}  // safety mechanism to not hit held mastership by eventhandlers
+                    SetRapidDataVarString(RD_p[virtualStepCounter % virtualRDCount], target.GetUNSAFERobTargetDeclaration());
+
+                    SetRapidDataVarString(RD_pset[virtualStepCounter % virtualRDCount], "TRUE");
+
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 2");
+                    //}
+                    SetRapidDataVarString(RD_vel[virtualStepCounter % virtualRDCount], target.GetSpeedDeclaration());
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 3");
+                    //}
+                    SetRapidDataVarString(RD_zone[virtualStepCounter % virtualRDCount], target.GetZoneDeclaration());
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 4");
+                    //}
+                    //SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);  // --> Looks like this wasn't working well??
+                    
                 }
-                SetRapidDataVarString(RD_vel[virtualStepCounter % virtualRDCount], target.GetSpeedDeclaration());
-                while (!hasPriority && mHeld)
-                {
-                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 3");
-                }
-                SetRapidDataVarString(RD_zone[virtualStepCounter % virtualRDCount], target.GetZoneDeclaration());
-                while (!hasPriority && mHeld)
-                {
-                    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 4");
-                }
-                SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);
             }
+
         }
 
         private void SetRapidDataVarBool(RapidData rd, bool value)

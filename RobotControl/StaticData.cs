@@ -16,6 +16,9 @@ namespace RobotControl
         {
             "MODULE StreamModule",
             "",
+            //"  ! Table collision prevention",
+            //"  VAR wzstationary table_box;",
+            //"",
             "  PERS bool aborted := FALSE;",
             "  PERS num pnum := -1;",
             "",
@@ -46,6 +49,7 @@ namespace RobotControl
             "    AccSet 10, 10;",
             "    ConfL\\Off;",
             "    ConfJ\\Off;",
+            //"    wzone_power_on;",
             "",
             "    ! MoveAbsJ home1,vel0,zone0,Tool0\\WObj:=WObj0;",
             "    Path0;",
@@ -75,9 +79,16 @@ namespace RobotControl
             "    ENDWHILE",
             "  ENDPROC",
             "",
+            //"  PROC wzone_power_on()",
+            //"    VAR shapedata volume;",
+            //"    CONST pos table_low:=[-1000, -1000, -100];",
+            //"    CONST pos table_high:=[1000, 1000, 25];",
+            //"    WZBoxDef \\Inside, volume, table_low, table_high;",
+            //"    WZLimSup \\Stat, table_box, volume;",
+            //"  ENDPROC",
+            //"",
             "ENDMODULE"
         };
     }
-
 
 }

@@ -10,7 +10,7 @@ namespace EXAMPLE_KeyboardControl
 {
     class KeyboardControl
     {
-        public static double leadSpeed = 200;
+        public static double leadSpeed = 100;
         public static double moveSpeed = 50;
         public static double inc = 25;
 
