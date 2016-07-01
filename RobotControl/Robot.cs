@@ -1140,10 +1140,7 @@ namespace RobotControl
                     //{
                     //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 1");
                     //}  // safety mechanism to not hit held mastership by eventhandlers
-                    SetRapidDataVarString(RD_p[virtualStepCounter % virtualRDCount], target.GetUNSAFERobTargetDeclaration());
-
-                    SetRapidDataVarString(RD_pset[virtualStepCounter % virtualRDCount], "TRUE");
-
+                    SetRapidDataVarString(RD_p[virtualStepCounter % virtualRDCount], target.GetUNSAFERobTargetDeclaration());                   
                     //while (!hasPriority && mHeld)
                     //{
                     //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 2");
@@ -1159,7 +1156,7 @@ namespace RobotControl
                     //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 4");
                     //}
                     //SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);  // --> Looks like this wasn't working well??
-                    
+                    SetRapidDataVarString(RD_pset[virtualStepCounter % virtualRDCount], "TRUE");
                 }
             }
 
