@@ -1,2 +1,2 @@
 # RobotControl
-A generic library for robot control operations
+A library for action + state-based robot control.
