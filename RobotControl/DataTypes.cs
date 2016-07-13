@@ -506,7 +506,6 @@ namespace RobotControl
     }
 
 
-
     //██████╗  █████╗ ████████╗██╗  ██╗
     //██╔══██╗██╔══██╗╚══██╔══╝██║  ██║
     //██████╔╝███████║   ██║   ███████║
@@ -773,6 +772,51 @@ namespace RobotControl
 
             Targets = newTargets;
             UpadateTargetCount();
+        }
+    }
+
+
+
+
+
+
+
+
+
+    //███████╗██████╗  █████╗ ████████╗██╗ █████╗ ██╗         ████████╗██████╗ ██╗ ██████╗  ██████╗ ███████╗██████╗ ███████╗
+    //██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██║██╔══██╗██║         ╚══██╔══╝██╔══██╗██║██╔════╝ ██╔════╝ ██╔════╝██╔══██╗██╔════╝
+    //███████╗██████╔╝███████║   ██║   ██║███████║██║            ██║   ██████╔╝██║██║  ███╗██║  ███╗█████╗  ██████╔╝███████╗
+    //╚════██║██╔═══╝ ██╔══██║   ██║   ██║██╔══██║██║            ██║   ██╔══██╗██║██║   ██║██║   ██║██╔══╝  ██╔══██╗╚════██║
+    //███████║██║     ██║  ██║   ██║   ██║██║  ██║███████╗       ██║   ██║  ██║██║╚██████╔╝╚██████╔╝███████╗██║  ██║███████║
+    //╚══════╝╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝╚═╝  ╚═╝╚══════╝       ╚═╝   ╚═╝  ╚═╝╚═╝ ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝
+
+    public class SpatialTrigger
+    {
+        virtual public void Check(Robot robot)
+        {
+
+        }
+    }
+
+    public class SpatialTriggerBox : SpatialTrigger
+    {
+        Point p0;
+        Point p1;
+
+        public bool isTriggered = false;
+
+        public override void Check(Robot robot)
+        {
+
+        }
+    }
+
+    public class SpatialTriggerPointProximity : SpatialTrigger
+    {
+        Point p0;
+        double r;
+        public override void Check(Robot robot)
+        {
         }
     }
 

@@ -33,8 +33,6 @@ namespace RobotControl
     public enum OnlineMode : int { Instruct = 1, Stream = 2 };
     
 
-    
-
     //██████╗  ██████╗ ██████╗  ██████╗ ████████╗
     //██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
     //██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
@@ -1004,10 +1002,6 @@ namespace RobotControl
 
 
 
-
-
-
-
         //██╗    ██╗██╗██████╗ 
         //██║    ██║██║██╔══██╗
         //██║ █╗ ██║██║██████╔╝
@@ -1107,7 +1101,7 @@ namespace RobotControl
             RD_zone = new RapidData[virtualRDCount],
             RD_p = new RapidData[virtualRDCount],
             RD_pset = new RapidData[virtualRDCount];
-
+       
         private int virtualStepCounter = 0;  // this keeps track of what is the next target index that needs to be assigned. Its %4 should asynchronously be ~4 units ahead of the 'pnum' rapid counter
 
         /// <summary>
@@ -1220,28 +1214,29 @@ namespace RobotControl
                 Frame target = streamQueue.GetNext();
                 if (target != null)
                 {
+                    int fid = virtualStepCounter % virtualRDCount;
                     //// When masterhip is held, only priority calls make it through (which are the ones holding mastership)
                     //while (!hasPriority && mHeld)
                     //{
                     //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 1");
                     //}  // safety mechanism to not hit held mastership by eventhandlers
-                    SetRapidDataVarString(RD_p[virtualStepCounter % virtualRDCount], target.GetUNSAFERobTargetDeclaration());                   
+                    SetRapidDataVarString(RD_p[fid], target.GetUNSAFERobTargetDeclaration());                   
                     //while (!hasPriority && mHeld)
                     //{
                     //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 2");
                     //}
-                    SetRapidDataVarString(RD_vel[virtualStepCounter % virtualRDCount], target.GetSpeedDeclaration());
+                    SetRapidDataVarString(RD_vel[fid], target.GetSpeedDeclaration());
                     //while (!hasPriority && mHeld)
                     //{
                     //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 3");
                     //}
-                    SetRapidDataVarString(RD_zone[virtualStepCounter % virtualRDCount], target.GetZoneDeclaration());
+                    SetRapidDataVarString(RD_zone[fid], target.GetZoneDeclaration());
                     //while (!hasPriority && mHeld)
                     //{
                     //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 4");
                     //}
                     //SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);  // --> Looks like this wasn't working well??
-                    SetRapidDataVarString(RD_pset[virtualStepCounter % virtualRDCount], "TRUE");
+                    SetRapidDataVarString(RD_pset[fid], "TRUE");
                 }
             }
 
