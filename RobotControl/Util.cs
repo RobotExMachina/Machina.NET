@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//██╗   ██╗████████╗██╗██╗     
+//██║   ██║╚══██╔══╝██║██║     
+//██║   ██║   ██║   ██║██║     
+//██║   ██║   ██║   ██║██║     
+//╚██████╔╝   ██║   ██║███████╗
+// ╚═════╝    ╚═╝   ╚═╝╚══════╝
+/// <summary>
+/// A bunch of static utility functions (probably many of them could be moved to certain classes...
+/// </summary>
+
 
 namespace RobotControl
 {

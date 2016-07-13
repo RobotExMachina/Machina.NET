@@ -12,6 +12,9 @@ using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
 
+
+
+
 namespace RobotControl
 {
     /// <summary>
@@ -38,19 +41,18 @@ namespace RobotControl
     //██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   
     //██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   
     //╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
-
+    /// <summary>
+    /// The core Class in RobotControl. Represents a state & action-based virtual robot, 
+    /// and exposes the public API for robot manipulation and control.
+    /// </summary>
     public class Robot
     {
-
+        // Some 'environment variables' to define check states and behavior
         private static readonly bool SafetyStopImmediateOnDisconnect = true;
         private static readonly bool SafetyCheckTableCollision = true;
         private static readonly bool SafetyStopOnTableCollision = true;
-        private static readonly double SafetyTableZLimit = 100;  // table security checks will trigger under this z height
-
-        /// <summary>
-        /// Dump a bunch of logs?
-        /// </summary>
-        private static bool DEBUG = true;
+        private static readonly double SafetyTableZLimit = 100;                     // table security checks will trigger under this z height (mm)
+        private static readonly bool DEBUG = true;                                  // dump a bunch of debug logs
 
         /// <summary>
         /// Come route names to be used for file handling
@@ -69,13 +71,13 @@ namespace RobotControl
         /// <summary>
         /// Instances of the main robot Controller and Task
         /// </summary>
-        public Controller controller;  // @TODO: make this private (made it public for quick debugging)
-        public ABB.Robotics.Controllers.RapidDomain.Task mainTask;  // @TODO: make this private (made it public for quick debugging)
+        public Controller controller;                                               // @TODO: make this private (made it public for quick debugging)
+        public ABB.Robotics.Controllers.RapidDomain.Task mainTask;                  // @TODO: make this private (made it public for quick debugging)
 
         /// <summary>
         /// Connection modes by default
         /// </summary>
-        private ConnectionMode connectionMode = RobotControl.ConnectionMode.Online;  // Try online by default
+        private ConnectionMode connectionMode = RobotControl.ConnectionMode.Online;  // Try online by default (@TODO: at some point 'offline' should be the default)
         private OnlineMode onlineMode = RobotControl.OnlineMode.Instruct;            // Instruct mode by default
 
         /// <summary>
@@ -89,24 +91,21 @@ namespace RobotControl
         // issue appropriate relative actions.
         private Point TCPPosition = null;
         private Rotation TCPRotation = null;
-        //private Rotation TCPRotation = null;  // @TODO
         private double currentVelocity = 10;
         private double currentZone = 5;
 
         private StreamQueue streamQueue;
-        private bool mHeld = false;  // is Mastership currentl held by someone? useful when several threads want to write to the robot...
+        private bool mHeld = false;                                                 // is Mastership currently held by someone? useful when several threads want to write to the robot...
         private object rapidDataLock = new object();
 
-
-
+        
         // Public properties
         public bool isConnected { get; protected set; }
         public bool isLogged { get; protected set; }
         public bool isMainTaskRetrieved { get; private set; }
         public string IP { get; protected set; }
 
-
-
+        
 
 
 
@@ -343,28 +342,42 @@ namespace RobotControl
             DebugControllerDump();
             DebugTaskDump();
         }
-
-
-
-
-
-
-
+        
+        /// <summary>
+        /// Sets the default velocity new actions will be run at.
+        /// </summary>
+        /// <param name="vel"></param>
         public void SetVelocity(double vel)
         {
             currentVelocity = vel;
         }
 
+        /// <summary>
+        /// Sets the default zone value new actions will be given.
+        /// </summary>
+        /// <param name="zone"></param>
         public void SetZone(double zone)
         {
             currentZone = zone;
         }
 
+        /// <summary>
+        /// Issue a relative movement action request.
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <returns></returns>
         public bool Move(Point dir)
         {
             return Move(dir.X, dir.Y, dir.Z);
         }
         
+        /// <summary>
+        /// Issue a relative movement action request.
+        /// </summary>
+        /// <param name="incX"></param>
+        /// <param name="incY"></param>
+        /// <param name="incZ"></param>
+        /// <returns></returns>
         public bool Move(double incX, double incY, double incZ)
         {
             if (onlineMode != RobotControl.OnlineMode.Stream)
@@ -400,6 +413,13 @@ namespace RobotControl
             return true;
         }
 
+        /// <summary>
+        /// Issue an absolute movement action request.
+        /// </summary>
+        /// <param name="newX"></param>
+        /// <param name="newY"></param>
+        /// <param name="newZ"></param>
+        /// <returns></returns>
         public bool MoveTo(double newX, double newY, double newZ)
         {
             if (onlineMode != RobotControl.OnlineMode.Stream)
@@ -436,10 +456,14 @@ namespace RobotControl
                 Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
             }
 
-
             return true;
         }
 
+        /// <summary>
+        /// Issue an absolute movement action request.
+        /// </summary>
+        /// <param name="bookmarkTarget"></param>
+        /// <returns></returns>
         public bool MoveTo(string bookmarkTarget)
         {
             string str = bookmarkTarget.ToLower();
@@ -452,6 +476,14 @@ namespace RobotControl
             return false;
         }
 
+        /// <summary>
+        /// Issue an absolute rotation of the TCP action request.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <param name="q3"></param>
+        /// <param name="q4"></param>
+        /// <returns></returns>
         public bool RotateTo(double q1, double q2, double q3, double q4)
         {
             if (onlineMode != RobotControl.OnlineMode.Stream)
@@ -461,7 +493,6 @@ namespace RobotControl
             }
 
             // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
-
             TCPRotation.Set(q1, q2, q3, q4);
             AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
                TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
@@ -480,6 +511,19 @@ namespace RobotControl
             return true;
         }
 
+        /// <summary>
+        /// Issue an absolute rotation of the TCP action request.
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="x3"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        /// <param name="y3"></param>
+        /// <param name="z1"></param>
+        /// <param name="z2"></param>
+        /// <param name="z3"></param>
+        /// <returns></returns>
         public bool RotateTo(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
         {
 
@@ -487,11 +531,21 @@ namespace RobotControl
             return RotateTo(q[0], q[1], q[2], q[3]);
         }
 
+        /// <summary>
+        /// Issue an absolute rotation of the TCP action request.
+        /// </summary>
+        /// <param name="rot"></param>
+        /// <returns></returns>
         public bool RotateTo(Rotation rot)
         {
             return RotateTo(rot.Q1, rot.Q2, rot.Q3, rot.Q4);
         }
 
+        /// <summary>
+        /// Issue an absolute rotation of the TCP action request.
+        /// </summary>
+        /// <param name="bookmarkRotation"></param>
+        /// <returns></returns>
         public bool RotateTo(string bookmarkRotation)
         {
             string str = bookmarkRotation.ToLower();
@@ -765,6 +819,15 @@ namespace RobotControl
             LoadModuleFromFilename(localBufferFilename, localBufferPathname);
         }
 
+        /// <summary>
+        /// Saves a string representation of a module to a local file. 
+        /// </summary>
+        /// <param name="module"></param>
+        /// <param name="filepath"></param>
+        private void SaveModuleToFile(List<string> module, string filepath)
+        {
+            System.IO.File.WriteAllLines(filepath, module, System.Text.Encoding.ASCII);
+        }
 
         /// <summary>
         /// Loads a module into de controller from a local file. 
@@ -778,7 +841,6 @@ namespace RobotControl
             // When connecting to a real controller, the reference filesystem 
             // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
             // to copy the file to the system first, and then load it. 
-
             string fullPath = filepath + filename;
 
             if (!isConnected)
@@ -787,7 +849,7 @@ namespace RobotControl
                 return false;
             }
 
-            // For the time being, we will always whipe out previous modules on load
+            // For the time being, we will always wipe out previous modules on load
             if (ClearAllModules() < 0)
             {
                 Console.WriteLine("Error clearing modules");
@@ -851,16 +913,6 @@ namespace RobotControl
             }
 
             return success;
-        }
-
-        /// <summary>
-        /// Saves a string representation of a module to a local file. 
-        /// </summary>
-        /// <param name="module"></param>
-        /// <param name="filepath"></param>
-        private void SaveModuleToFile(List<string> module, string filepath)
-        {
-            System.IO.File.WriteAllLines(filepath, module, System.Text.Encoding.ASCII);
         }
 
         /// <summary>
@@ -956,7 +1008,13 @@ namespace RobotControl
 
 
 
-
+        //██╗    ██╗██╗██████╗ 
+        //██║    ██║██║██╔══██╗
+        //██║ █╗ ██║██║██████╔╝
+        //██║███╗██║██║██╔═══╝ 
+        //╚███╔███╔╝██║██║     
+        // ╚══╝╚══╝ ╚═╝╚═╝     
+                     
         /// <summary>
         /// Adds a path to the queue manager.
         /// </summary>
@@ -1000,7 +1058,6 @@ namespace RobotControl
 
                 pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
                 pathExecuter.Start();
-
             }
         }
         
@@ -1034,7 +1091,13 @@ namespace RobotControl
 
 
 
-
+        //███████╗████████╗██████╗ ███████╗ █████╗ ███╗   ███╗██╗███╗   ██╗ ██████╗ 
+        //██╔════╝╚══██╔══╝██╔══██╗██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔════╝ 
+        //███████╗   ██║   ██████╔╝█████╗  ███████║██╔████╔██║██║██╔██╗ ██║██║  ███╗
+        //╚════██║   ██║   ██╔══██╗██╔══╝  ██╔══██║██║╚██╔╝██║██║██║╚██╗██║██║   ██║
+        //███████║   ██║   ██║  ██║███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝
+        //╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+                                                                          
         private static int virtualRDCount = 4;
         private RapidData
             RD_aborted,
@@ -1047,20 +1110,23 @@ namespace RobotControl
 
         private int virtualStepCounter = 0;  // this keeps track of what is the next target index that needs to be assigned. Its %4 should asynchronously be ~4 units ahead of the 'pnum' rapid counter
 
+        /// <summary>
+        /// Loads the default StreamModule designed for streaming.
+        /// </summary>
         private void LoadStreamingModule()
         {
             LoadModuleToRobot(StaticData.StreamModule.ToList());
         }
 
+        /// <summary>
+        /// Loads all relevant Rapid variables
+        /// </summary>
         private void HookUpStreamingVariables()
         {
             // Load RapidData control variables
             RD_aborted = LoadRapidDataVariable("aborted");
             RD_pnum = LoadRapidDataVariable("pnum");
-            //RD_pnum.ValueChanged += RD_pnum_ValueChanged;  // add an eventhandler to 'pnum' to track when it changes
-            //RD_pnum.Subscribe(RD_pnum_ValueChanged, EventPriority.High);
-            //RD_pnum.ValueChanged += new EventHandler<DataValueChangedEventArgs>(RD_pnum_ValueChanged);
-            RD_pnum.ValueChanged += OnRD_pnum_ValueChanged;
+            RD_pnum.ValueChanged += OnRD_pnum_ValueChanged;  // add an eventhandler to 'pnum' to track when it changes
 
             if (DEBUG)
             {
@@ -1089,6 +1155,11 @@ namespace RobotControl
 
         }
 
+        /// <summary>
+        /// Retrieves a Rapid variable in current module and returns it
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <returns></returns>
         private RapidData LoadRapidDataVariable(string varName)
         {
             RapidData rd = null;
@@ -1103,6 +1174,10 @@ namespace RobotControl
             return rd;
         }
 
+        /// <summary>
+        /// Adds a Frame to the streaming queue
+        /// </summary>
+        /// <param name="frame"></param>
         private void AddFrameToStreamQueue(Frame frame)
         {
             streamQueue.Add(frame);
@@ -1131,6 +1206,11 @@ namespace RobotControl
             }
         }
 
+        /// <summary>
+        /// Figures out the appropriate virtual target in the streaming module and 
+        /// sets new values according to the streaming queue.
+        /// </summary>
+        /// <param name="hasPriority"></param>
         private void SetNextVirtualTarget(bool hasPriority)
         {
             if (DEBUG) Console.WriteLine("Setting frame #{0}", virtualStepCounter);
@@ -1167,23 +1247,29 @@ namespace RobotControl
 
         }
 
-        private void SetRapidDataVarBool(RapidData rd, bool value)
-        {
-            try
-            {
-                using (Mastership.Request(controller.Rapid))
-                {
-                    if (DEBUG) Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
-                    rd.Value = new Bool(value);
-                    if (DEBUG) Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("    ERROR SetRapidDataVarBool: {0}", ex);
-            }
-        }
+        // DEPRECATED: use SetRapidDataVarString() instead
+        //private void SetRapidDataVarBool(RapidData rd, bool value)
+        //{
+        //    try
+        //    {
+        //        using (Mastership.Request(controller.Rapid))
+        //        {
+        //            if (DEBUG) Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
+        //            rd.Value = new Bool(value);
+        //            if (DEBUG) Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("    ERROR SetRapidDataVarBool: {0}", ex);
+        //    }
+        //}
 
+        /// <summary>
+        /// Sets the value of a Rapid variable from a string representation
+        /// </summary>
+        /// <param name="rd"></param>
+        /// <param name="declaration"></param>
         private void SetRapidDataVarString(RapidData rd, string declaration)
         {
             try

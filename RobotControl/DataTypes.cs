@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using ABB.Robotics;
-using ABB.Robotics.Controllers;
-using ABB.Robotics.Controllers.Discovery;
-using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
-using ABB.Robotics.Controllers.EventLogDomain;
-using ABB.Robotics.Controllers.FileSystemDomain;
+using ABB.Robotics.Controllers.RapidDomain;
+
+
+//██████╗  █████╗ ████████╗ █████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗
+//██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝
+//██║  ██║███████║   ██║   ███████║   ██║    ╚████╔╝ ██████╔╝█████╗  ███████╗
+//██║  ██║██╔══██║   ██║   ██╔══██║   ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║
+//██████╔╝██║  ██║   ██║   ██║  ██║   ██║      ██║   ██║     ███████╗███████║
+//╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝
+/// <summary>
+/// A bunch of utility classes mostly representing geometry and robot instructions.
+/// </summary>
+
 
 namespace RobotControl
 {
+
 
     //██████╗  ██████╗ ██╗███╗   ██╗████████╗
     //██╔══██╗██╔═══██╗██║████╗  ██║╚══██╔══╝
@@ -181,15 +189,6 @@ namespace RobotControl
             this.Q4 = q[3];
         }
 
-
-
-
-
-        public override string ToString()
-        {
-            return "[" + this.Q1 + "," + this.Q2 + "," + this.Q3 + "," + this.Q4 + "]";
-        }
-
         /// <summary>
         /// Borrowed from DynamoTORO
         /// </summary>
@@ -272,6 +271,11 @@ namespace RobotControl
             //return new Rotation(q1, q2, q3, q4);
         }
 
+        public override string ToString()
+        {
+            return "[" + this.Q1 + "," + this.Q2 + "," + this.Q3 + "," + this.Q4 + "]";
+        }
+
     }
 
 
@@ -284,7 +288,7 @@ namespace RobotControl
     //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝                                      
     /// <summary>
     /// Represents a location and rotation in 3D space, with some additional
-    /// metadata representing velocities, zones, etc
+    /// metadata representing velocities, zones, etc.
     /// </summary>
     public class Frame
     {
@@ -295,11 +299,6 @@ namespace RobotControl
         public static double DefaultVelocity = 10;
         public static double DefaultZone = 5;
 
-        public Point Position;
-        public Rotation Orientation;
-        public double Velocity;
-        public double Zone;
-
         public static double DistanceBetween(Frame f1, Frame f2)
         {
             double dx = f2.Position.X - f1.Position.X;
@@ -309,18 +308,15 @@ namespace RobotControl
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
+        public Point Position;
+        public Rotation Orientation;
+        public double Velocity;
+        public double Zone;
+
         public Frame(double x, double y, double z)
         {
             this.Position = new Point(x, y, z);
             this.Orientation = DefaultOrientation;
-            this.Velocity = DefaultVelocity;
-            this.Zone = DefaultZone;
-        }
-
-        public Frame(double x, double y, double z, double q1, double q2, double q3, double q4)
-        {
-            this.Position = new Point(x, y, z);
-            this.Orientation = new Rotation(q1, q2, q3, q4);
             this.Velocity = DefaultVelocity;
             this.Zone = DefaultZone;
         }
@@ -331,6 +327,14 @@ namespace RobotControl
             this.Orientation = DefaultOrientation;
             this.Velocity = vel;
             this.Zone = zon;
+        }
+
+        public Frame(double x, double y, double z, double q1, double q2, double q3, double q4)
+        {
+            this.Position = new Point(x, y, z);
+            this.Orientation = new Rotation(q1, q2, q3, q4);
+            this.Velocity = DefaultVelocity;
+            this.Zone = DefaultZone;
         }
 
         public Frame(double x, double y, double z, double q1, double q2, double q3, double q4, double vel, double zon)
@@ -349,6 +353,14 @@ namespace RobotControl
             this.Zone = DefaultZone;
         }
 
+        public Frame(Point position, double vel, double zon)
+        {
+            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
+            this.Orientation = DefaultOrientation;
+            this.Velocity = vel;
+            this.Zone = zon;
+        }
+
         public Frame(Point position, Rotation orientation)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
@@ -364,8 +376,7 @@ namespace RobotControl
             this.Velocity = vel;
             this.Zone = zon;
         }
-
-
+        
         public string GetPositionDeclaration()
         {
             return string.Format("[{0},{1},{2}]", Position.X, Position.Y, Position.Z);
@@ -377,8 +388,8 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// WARNING: This method still doesn't perform IK calculation, and will always return
-        /// a default declaration for the positive XYZ octant.
+        /// WARNING: This library still doesn't perform IK calculation, and will always use
+        /// a default [0,0,0,0] axis configuration.
         /// </summary>
         /// <returns></returns>
         public string GetUNSAFEConfigurationDeclaration()
@@ -397,7 +408,7 @@ namespace RobotControl
         
         public string GetSpeedDeclaration()
         {
-            return string.Format("[{0},{1},{2},{3}]", Velocity, 500, 5000, 1000);
+            return string.Format("[{0},{1},{2},{3}]", Velocity, Velocity, 5000, 1000);  // default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). using the same value as lin motion
         }
 
         public string GetZoneDeclaration()
@@ -408,8 +419,8 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// WARNING: This method still doesn't perform IK calculation, and will always return
-        /// a default configuration for the positive XYZ octant.
+        /// WARNING: This library still doesn't perform IK calculation, and will always return
+        /// a default [0,0,0,0] axis configuration.
         /// </summary>
         /// <returns></returns>
         public string GetUNSAFERobTargetDeclaration()
@@ -496,44 +507,6 @@ namespace RobotControl
 
 
 
-
-    ////████████╗ █████╗ ██████╗  ██████╗ ███████╗████████╗
-    ////╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝╚══██╔══╝
-    ////   ██║   ███████║██████╔╝██║  ███╗█████╗     ██║   
-    ////   ██║   ██╔══██║██╔══██╗██║   ██║██╔══╝     ██║   
-    ////   ██║   ██║  ██║██║  ██║╚██████╔╝███████╗   ██║   
-    ////   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   
-    ///// <summary>
-    ///// Represents a Position + Orientation with some additional 
-    ///// properties such as velocity, zone, etc.
-    ///// </summary>
-    //public class Target
-    //{
-    //    public Point position;
-    //    public Rotation orientation;
-    //    public double velocity;
-    //    public double zone;
-
-    //    public static Rotation DefaultOrientation = Rotation.FlippedAroundY;
-
-    //    public Target(Point pos, Rotation orient, double vel, double zone)
-    //    {
-    //        this.position = pos;
-    //        this.orientation = orient;
-    //        this.velocity = vel;
-    //        this.zone = zone;
-    //    }
-
-    //    public override string ToString()
-    //    {
-    //        return string.Format("[{0},{1},{2},{3}"])
-    //    }
-    //}   
-    
-                                            
-
-
-
     //██████╗  █████╗ ████████╗██╗  ██╗
     //██╔══██╗██╔══██╗╚══██╔══╝██║  ██║
     //██████╔╝███████║   ██║   ███████║
@@ -599,20 +572,6 @@ namespace RobotControl
             Count = Targets.Count;
         }
 
-        //public bool Flip(string firstAxis, string secondAxis)
-        //{
-        //    string a = firstAxis.ToLower();
-        //    string b = secondAxis.ToLower();
-
-        //    // Some sanity
-        //    if ( (!a.Equals("x") && !a.Equals("y") && !a.Equals("z")) 
-        //        || (!b.Equals("x") && !b.Equals("y") && !b.Equals("z")))
-        //    {
-        //        Console.WriteLine("Please use 'x', 'y' or 'z' as arguments");
-        //        return false;
-        //    }
-        //}
-
         /// <summary>
         /// Flips the XY coordinates of all target frames.
         /// </summary>
@@ -620,9 +579,10 @@ namespace RobotControl
         {
             foreach (Frame f in Targets)
             {
-                double x = f.Position.X;
-                f.Position.X = f.Position.Y;
-                f.Position.Y = x;
+                //double x = f.Position.X;
+                //f.Position.X = f.Position.Y;
+                //f.Position.Y = x;
+                f.FlipXY();
             }
         }
 
@@ -676,7 +636,7 @@ namespace RobotControl
         /// Simplifies the path using a combination of radial distance and 
         /// Ramer–Douglas–Peucker algorithm. 
         /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net</ref>
+        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
         /// <param name="tolerance"></param>
         /// <param name="highQuality"></param>
         /// <returns></returns>
@@ -708,7 +668,7 @@ namespace RobotControl
         /// <summary>
         /// The RDP algorithm.
         /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net</ref>
+        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
         /// <param name="tolerance"></param>
         /// <param name="highQuality"></param>
         /// <returns></returns>
@@ -784,7 +744,7 @@ namespace RobotControl
         /// Simple distance-based simplification. Consecutive points under 
         /// threshold distance are removed. 
         /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net</ref>
+        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
         /// <param name="tolerance"></param>
         /// <param name="highQuality"></param>
         /// <returns></returns>
