@@ -77,7 +77,11 @@ namespace EXAMPLE_XBOX1Control
             //Console.WriteLine("RIGHT THUMB X:{0}, Y:{1}", state.Gamepad.RightThumbX, state.Gamepad.RightThumbY);
             //Console.WriteLine("BUTTONS: " + state.Gamepad.Buttons);
 
-            RobotControl.Point dir = new RobotControl.Point(RemapThumb(state.Gamepad.LeftThumbX, 10000, 32767), RemapThumb(state.Gamepad.LeftThumbY, 10000, 32767), RemapThumb(state.Gamepad.RightThumbY, 10000, 32767));
+            RobotControl.Point dir = new RobotControl.Point(
+                RemapThumb(state.Gamepad.LeftThumbX, 10000, 32767), 
+                RemapThumb(state.Gamepad.LeftThumbY, 10000, 32767), 
+                RemapThumb(state.Gamepad.RightThumbY, 10000, 32767)
+            );
             dir.Scale(relSpeed);
             
             var speed = dir.Length();

@@ -549,7 +549,7 @@ namespace RobotControl
         private List<Frame> Targets;
         public int Count { get; private set; }
 
-        public Path() : this("") { }
+        public Path() : this("defaultPath") { }
 
         public Path(string name)
         {
