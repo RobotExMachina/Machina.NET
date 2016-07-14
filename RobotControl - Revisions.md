@@ -16,7 +16,7 @@
 
 
 ## BUILD 1101
-- [x] New class structure: 
+- [ ] New class structure: 
     - Split all the public Robot API from all the internal actual operations
     - Centralize private methods into a Control class
     - Create a dedicated Communication class to handle connections to real/virtual controllers
@@ -27,6 +27,7 @@
 - [ ] Big comments review
 - [ ] Split off the Comm object
 - [ ] Deep port of all functionality (make the Robot class basically a very shallow middleware for API purposes)
+- [ ] Dead code cleanup
 
 ## BUILD 1100
 - [x] Recheck all examples are working correctly and nothing is broken before branching

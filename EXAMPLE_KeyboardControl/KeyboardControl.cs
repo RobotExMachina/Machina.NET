@@ -23,8 +23,7 @@ namespace EXAMPLE_KeyboardControl
             Robot arm = new Robot();
 
             // Set connection properties
-            arm.ConnectionMode("online");
-            arm.OnlineMode("stream");
+            arm.ControlMode("stream");
             arm.Connect();
 
             // Start real-time streaming

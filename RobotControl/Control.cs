@@ -27,6 +27,12 @@ namespace RobotControl
         public static readonly double SafetyTableZLimit = 100;                     // table security checks will trigger under this z height (mm)
         public static readonly bool DEBUG = true;                                  // dump a bunch of debug logs
 
+        // Public properties
+        public bool isConnected = false;
+        public bool isLogged = false;
+        public bool isMainTaskRetrieved = false;
+        public string IP = "";
+
         /// <summary>
         /// Come route names to be used for file handling
         /// </summary>
@@ -36,20 +42,17 @@ namespace RobotControl
 
 
 
-        // Public properties
-        public bool isConnected = false;
-        public bool isLogged = false;
-        public bool isMainTaskRetrieved = false;
-        public string IP = "";
+
+
 
         /// <summary>
         /// Operation modes by default
         /// </summary>
-        private ConnectionMode connectionMode = RobotControl.ConnectionMode.Online;  // Try online by default (@TODO: at some point 'offline' should be the default)
-        private OnlineMode onlineMode = RobotControl.OnlineMode.Instruct;
+        //private ConnectionMode connectionMode = RobotControl.ConnectionMode.Online;  // Try online by default (@TODO: at some point 'offline' should be the default)
+        //private OnlineMode onlineMode = RobotControl.OnlineMode.Instruct;
+        private ControlMode controlMode = RobotControl.ControlMode.Offline;
         private RunMode runMode = RobotControl.RunMode.Once;
-
-
+        
 
 
         /// <summary>
@@ -62,6 +65,7 @@ namespace RobotControl
         /// <summary>
         /// Instances of the main robot Controller and Task
         /// </summary>
+        private Communication comm;
         private Controller controller;                                               // @TODO: make this private (made it public for quick debugging)
         private ABB.Robotics.Controllers.RapidDomain.Task mainTask;                  // @TODO: make this private (made it public for quick debugging)
 
@@ -102,6 +106,14 @@ namespace RobotControl
         //██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
         //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝    ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
 
+        
+        public Control()
+        {
+            comm = new CommunicationABB();
+
+        }
+
+
         /// <summary>
         /// Resets all internal state properties to default values. To be invoked upon
         /// an internal robot reset.
@@ -117,29 +129,38 @@ namespace RobotControl
             streamQueue = new StreamQueue();
         }
 
-
-
-        public bool SetConnectionMode(ConnectionMode mode)
+        public bool SetControlMode(ControlMode mode)
         {
-            connectionMode = mode;
+            controlMode = mode;
             return true;
         }
 
-        public ConnectionMode GetConnectionMode()
+        public ControlMode GetControlMode()
         {
-            return connectionMode;
+            return controlMode;
         }
 
-        public bool SetOnlineMode(OnlineMode mode)
-        {
-            onlineMode = mode;
-            return true;
-        }
+        //public bool SetConnectionMode(ConnectionMode mode)
+        //{
+        //    connectionMode = mode;
+        //    return true;
+        //}
 
-        public OnlineMode GetOnlineMode()
-        {
-            return onlineMode;
-        }
+        //public ConnectionMode GetConnectionMode()
+        //{
+        //    return connectionMode;
+        //}
+
+        //public bool SetOnlineMode(OnlineMode mode)
+        //{
+        //    onlineMode = mode;
+        //    return true;
+        //}
+
+        //public OnlineMode GetOnlineMode()
+        //{
+        //    return onlineMode;
+        //}
 
         public bool SetRunMode(RunMode mode)
         {
@@ -220,7 +241,7 @@ namespace RobotControl
         public bool ConnectToController(int robotId)
         {
             // Sanity
-            if (connectionMode == ConnectionMode.Offline)
+            if (controlMode == ControlMode.Offline)
             {
                 if (DEBUG) Console.WriteLine("No robot to connect to in 'offline' mode ;)");
                 return false;
@@ -263,7 +284,7 @@ namespace RobotControl
             }
 
             // Pick up the state of the robot if doing Stream mode
-            if (onlineMode == RobotControl.OnlineMode.Stream)
+            if (controlMode == ControlMode.Stream)
             {
                 LoadStreamingModule();
                 HookUpStreamingVariables();
@@ -498,7 +519,7 @@ namespace RobotControl
         {
 
             // @TODO: all this sanity and checks should probably go into LoadModuleFromFilename() (or basically consolidate everything into one method
-            if (connectionMode == ConnectionMode.Offline)
+            if (controlMode == ControlMode.Offline)
             {
                 Console.WriteLine("Cannot load modules in Offline mode");
                 return false;
@@ -782,7 +803,7 @@ namespace RobotControl
 
         public bool RequestMove(double incX, double incY, double incZ)
         {
-            if (onlineMode != RobotControl.OnlineMode.Stream)
+            if (controlMode != ControlMode.Stream)
             {
                 Console.WriteLine("Move() only supported in Stream mode");
                 return false;
@@ -818,7 +839,7 @@ namespace RobotControl
 
         public bool RequestMoveTo(double newX, double newY, double newZ)
         {
-            if (onlineMode != RobotControl.OnlineMode.Stream)
+            if (controlMode != ControlMode.Stream)
             {
                 Console.WriteLine("MoveTo() only supported in Stream mode");
                 return false;
@@ -857,7 +878,7 @@ namespace RobotControl
 
         public bool RequestRotateTo(double q1, double q2, double q3, double q4)
         {
-            if (onlineMode != RobotControl.OnlineMode.Stream)
+            if (controlMode != ControlMode.Stream)
             {
                 Console.WriteLine("RotateTo() only supported in Stream mode");
                 return false;
@@ -1270,7 +1291,7 @@ namespace RobotControl
             if (e.Status == ExecutionStatus.Stopped)
             {
                 // Only trigger Instruct queue
-                if (onlineMode == RobotControl.OnlineMode.Instruct)
+                if (controlMode == ControlMode.Execute)
                 {
                     // Tick queue to move forward
                     TriggerQueue(true);

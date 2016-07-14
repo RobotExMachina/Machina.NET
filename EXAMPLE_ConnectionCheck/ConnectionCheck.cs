@@ -29,8 +29,7 @@ namespace EXAMPLE_ConnectionCheck
 
             Robot arm = new Robot();
 
-            arm.ConnectionMode("online");
-            arm.OnlineMode("instruct");
+            arm.ControlMode("execute");
             arm.Connect();
 
             arm.DebugDump();

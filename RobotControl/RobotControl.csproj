@@ -65,7 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Comm.cs" />
+    <Compile Include="Communication.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="DataTypes.cs" />
     <Compile Include="Library.cs" />

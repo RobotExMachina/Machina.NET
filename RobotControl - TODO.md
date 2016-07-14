@@ -17,7 +17,7 @@
 ## SOON
 - [ ] Restructured library
 - [ ] Redesigned API
-- [ ] Merged ConnectionMode & OnlineMode into WorkingMode(?) 
+- [x] Merged ConnectionMode & OnlineMode into WorkingMode(?) 
 - [ ] Abstracted TCPPOsition, TCPRotation and stuff into a VirtualRobot object
 - [ ] Created Debug() & Error() utility functions
 - [ ] Ported Util methods as static to their appropriate geometry class 
@@ -27,3 +27,7 @@
 
 ## SOMETIME...
 - [ ] Get my self a nice cold beer and a pat on the back... ;)
+
+
+## DONE
+

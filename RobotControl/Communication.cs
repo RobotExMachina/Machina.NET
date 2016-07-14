@@ -9,7 +9,14 @@ namespace RobotControl
     /// <summary>
     /// A class to handle communication with external controllers, real or virtual
     /// </summary>
-    class Comm
+    class Communication
+    {
+        
+
+
+    }
+
+    class CommunicationABB : Communication
     {
 
     }

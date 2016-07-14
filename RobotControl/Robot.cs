@@ -11,25 +11,51 @@ using System.Threading.Tasks;
 
 namespace RobotControl
 {
-    /// <summary>
-    /// Is this Robot connected to the application? 
-    /// Offline mode is used to generate robotic programs offline,
-    /// Online mode is meant to be used to send real-time instructions 
-    /// to a robot connected to the mahcine running the application.
-    /// </summary>
-    public enum ConnectionMode : int { Offline = 1, Online = 2 };
+    ///// <summary>
+    ///// Is this Robot connected to the application? 
+    ///// Offline mode is used to generate robotic programs offline,
+    ///// Online mode is meant to be used to send real-time instructions 
+    ///// to a robot connected to the mahcine running the application.
+    ///// </summary>
+    //public enum ConnectionMode : int { Offline = 1, Online = 2 };
+
+    ///// <summary>
+    ///// Different operating modes for Online control. 
+    ///// Instruct loads and executes entire modules to the controller (slower), 
+    ///// Stream overrides targets on the fly (faster)
+    ///// </summary>
+    //public enum OnlineMode : int { Instruct = 1, Stream = 2 };
 
     /// <summary>
-    /// Different operating modes for Online control. 
-    /// Instruct loads and executes entire modules to the controller (slower), 
-    /// Stream overrides targets on the fly (faster)
+    /// Represents the type of control that will be performed over the real/virtual robot.
     /// </summary>
-    public enum OnlineMode : int { Instruct = 1, Stream = 2 };
+    public enum ControlMode : int {
+        /// <summary>
+        /// Not connected to any controller. Useful for robot code generation and export.
+        /// </summary>
+        Offline = 0,
+
+        /// <summary>
+        /// Online connection to a controller, the library will upload complete programs 
+        /// and run them. Provides robust and fluid movement, useful on real-time 
+        /// interactivity where response time is not a priority. 
+        /// </summary>
+        Execute = 1,
+
+        /// <summary>
+        /// Online connection to a controller, the library will stream individual targets
+        /// at run time as they get priority. Provides the closest approximation to real-time
+        /// interaction, useful on situations where low latency is required.
+        /// </summary>
+        Stream = 2
+    };
 
     /// <summary>
     /// Defines the different modes a program can be ran.
     /// </summary>
     public enum RunMode : int { None = 0, Once = 1, Loop = 2 };
+
+
 
 
     //██████╗  ██████╗ ██████╗  ██████╗ ████████╗
@@ -69,36 +95,26 @@ namespace RobotControl
             c.Reset();
         }
 
-        /// <summary>
-        /// Sets ConnectionMode for this robot.
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public bool ConnectionMode(ConnectionMode mode)
+        public bool ControlMode(ControlMode mode)
         {
-            //connectionMode = mode;
-            c.SetConnectionMode(mode);
-            return true;
+            return c.SetControlMode(mode);
         }
 
-        /// <summary>
-        /// Sets ConnectionMode for this robot.
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public bool ConnectionMode(string mode)
+        public bool ControlMode(string mode)
         {
             mode = mode.ToLower();
             bool success = true;
             if (mode.Equals("offline"))
             {
-                //connectionMode = RobotControl.ConnectionMode.Offline;
-                return ConnectionMode(RobotControl.ConnectionMode.Offline);
+                return ControlMode(RobotControl.ControlMode.Offline);
             }
-            else if (mode.Equals("online"))
+            else if (mode.Equals("execute"))
             {
-                //connectionMode = RobotControl.ConnectionMode.Online;
-                return ConnectionMode(RobotControl.ConnectionMode.Online);
+                return ControlMode(RobotControl.ControlMode.Execute);
+            }
+            else if (mode.Equals("stream"))
+            {
+                return ControlMode(RobotControl.ControlMode.Stream);
             }
             else
             {
@@ -108,43 +124,82 @@ namespace RobotControl
             return success;
         }
 
-        /// <summary>
-        /// Sets OnlineMode type for this robot.
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public bool OnlineMode(OnlineMode mode)
-        {
-            //onlineMode = mode;
-            return c.SetOnlineMode(mode);
-        }
 
-        /// <summary>
-        /// Sets OnlineMode type for this robot.
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public bool OnlineMode(string mode)
-        {
-            mode = mode.ToLower();
-            bool success = true;
-            if (mode.Equals("instruct"))
-            {
-                //onlineMode = RobotControl.OnlineMode.Instruct;
-                return OnlineMode(RobotControl.OnlineMode.Instruct);
-            }
-            else if (mode.Equals("stream"))
-            {
-                //onlineMode = RobotControl.OnlineMode.Stream;
-                return OnlineMode(RobotControl.OnlineMode.Stream);
-            }
-            else
-            {
-                Console.WriteLine("OnlineMode '" + mode + "' is not available.");
-                success = false;
-            }
-            return success;
-        }
+        ///// <summary>
+        ///// Sets ConnectionMode for this robot.
+        ///// </summary>
+        ///// <param name="mode"></param>
+        ///// <returns></returns>
+        //public bool ConnectionMode(ConnectionMode mode)
+        //{
+        //    //connectionMode = mode;
+        //    return c.SetConnectionMode(mode);
+        //}
+
+        ///// <summary>
+        ///// Sets ConnectionMode for this robot.
+        ///// </summary>
+        ///// <param name="mode"></param>
+        ///// <returns></returns>
+        //public bool ConnectionMode(string mode)
+        //{
+        //    mode = mode.ToLower();
+        //    bool success = true;
+        //    if (mode.Equals("offline"))
+        //    {
+        //        //connectionMode = RobotControl.ConnectionMode.Offline;
+        //        return ConnectionMode(RobotControl.ConnectionMode.Offline);
+        //    }
+        //    else if (mode.Equals("online"))
+        //    {
+        //        //connectionMode = RobotControl.ConnectionMode.Online;
+        //        return ConnectionMode(RobotControl.ConnectionMode.Online);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("ConnectionMode '" + mode + "' is not available.");
+        //        success = false;
+        //    }
+        //    return success;
+        //}
+
+        ///// <summary>
+        ///// Sets OnlineMode type for this robot.
+        ///// </summary>
+        ///// <param name="mode"></param>
+        ///// <returns></returns>
+        //public bool OnlineMode(OnlineMode mode)
+        //{
+        //    //onlineMode = mode;
+        //    return c.SetOnlineMode(mode);
+        //}
+
+        ///// <summary>
+        ///// Sets OnlineMode type for this robot.
+        ///// </summary>
+        ///// <param name="mode"></param>
+        ///// <returns></returns>
+        //public bool OnlineMode(string mode)
+        //{
+        //    mode = mode.ToLower();
+        //    bool success = true;
+        //    if (mode.Equals("instruct"))
+        //    {
+        //        //onlineMode = RobotControl.OnlineMode.Instruct;
+        //        return OnlineMode(RobotControl.OnlineMode.Instruct);
+        //    }
+        //    else if (mode.Equals("stream"))
+        //    {
+        //        //onlineMode = RobotControl.OnlineMode.Stream;
+        //        return OnlineMode(RobotControl.OnlineMode.Stream);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("OnlineMode '" + mode + "' is not available.");
+        //        success = false;
+        //    }
+        //    return success;
+        //}
 
         public bool RunMode(RunMode mode)
         {

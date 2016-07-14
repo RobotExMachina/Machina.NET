@@ -173,12 +173,12 @@ public class TuioDemo : Form , TuioListener
         if (verbose) Console.WriteLine("add obj "+o.SymbolID+" ("+o.SessionID+") "+o.X+" "+o.Y+" "+o.Angle);
 
         // ROBOT
-        if (oMode == OnlineMode.Instruct)
+        if (cMode == ControlMode.Execute)
         {
             InitializePath(o);
             AddTargetToPath(o, 0);
         }
-        else if (oMode == OnlineMode.Stream)
+        else if (cMode == ControlMode.Stream)
         {     
             if (UseThisTUIOObject(o))
             {
@@ -199,11 +199,11 @@ public class TuioDemo : Form , TuioListener
 		if (verbose) Console.WriteLine("set obj "+o.SymbolID+" "+o.SessionID+" "+o.X+" "+o.Y+" "+o.Angle+" "+o.MotionSpeed+" "+o.RotationSpeed+" "+o.MotionAccel+" "+o.RotationAccel);
 
         // ROBOT
-        if (oMode == OnlineMode.Instruct)
+        if (cMode == ControlMode.Execute)
         {
             AddTargetToPath(o, 0);
         }
-        else if (oMode == OnlineMode.Stream && UseThisTUIOObject(o))
+        else if (cMode == ControlMode.Stream && UseThisTUIOObject(o))
         {
             if (UseThisTUIOObject(o))
             {
@@ -222,11 +222,11 @@ public class TuioDemo : Form , TuioListener
         // ROBOT
         // Sending the path to the robot or flagging current ID as inactive
         // is taken care of by TimeTick()
-        if (oMode == OnlineMode.Instruct)
+        if (cMode == ControlMode.Execute)
         {
             AddTargetToPath(o, 0);
         }
-        else if (oMode == OnlineMode.Stream && UseThisTUIOObject(o))
+        else if (cMode == ControlMode.Stream && UseThisTUIOObject(o))
         {
             if (UseThisTUIOObject(o))
             {
@@ -382,7 +382,7 @@ public class TuioDemo : Form , TuioListener
     // In "stream" mode, marker movement will be replicated by the robot in near real-time.
     // In "instruct" mode, the whole stroke will be sent as a path to the robot.
     //private string onlineMode = "instruct";
-    private OnlineMode oMode = OnlineMode.Instruct;
+    private ControlMode cMode = ControlMode.Execute;
 
     // In "stream" mode, which fiducial ID the app is reading 
     // (to avoid jumping between multiple simultaneous fiducials
@@ -418,8 +418,7 @@ public class TuioDemo : Form , TuioListener
     {
         // ROBOT
         arm = new Robot();
-        arm.ConnectionMode("online");
-        arm.OnlineMode(oMode);
+        arm.ControlMode(cMode);
 
         arm.Connect();
         Console.WriteLine(arm.GetIP());
@@ -430,12 +429,12 @@ public class TuioDemo : Form , TuioListener
         arm.SetVelocity(velocity);
         arm.SetZone(zone);
 
-        if (oMode == OnlineMode.Instruct)
+        if (cMode == ControlMode.Execute)
         {
             fiduPaths = new Dictionary<int, Path>();
             fiduTimes = new Dictionary<int, long>();
         }
-        else if (oMode == OnlineMode.Stream)
+        else if (cMode == ControlMode.Stream)
         {
             arm.Start();
 
@@ -476,7 +475,7 @@ public class TuioDemo : Form , TuioListener
     {
         long timeInc = frameTime.TotalMilliseconds - lastTimeTick;
 
-        if (oMode == OnlineMode.Instruct)
+        if (cMode == ControlMode.Execute)
         {
             var keys = new List<int>(fiduTimes.Keys);       // http://stackoverflow.com/a/2260472
             foreach (var key in keys)
@@ -488,7 +487,7 @@ public class TuioDemo : Form , TuioListener
                 }
             }
         }
-        else if (oMode == OnlineMode.Stream)
+        else if (cMode == ControlMode.Stream)
         {
             //idleTime += timeInc;
             //if (awake && idleTime > maxTimeInc)

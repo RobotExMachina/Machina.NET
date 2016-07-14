@@ -59,8 +59,7 @@ namespace EXAMPLE_XBOX1Control
 
             // Robot stuff
             arm = new Robot();
-            arm.ConnectionMode("online");
-            arm.OnlineMode("stream");
+            arm.ControlMode("stream");
             arm.Connect();
 
             arm.Start();
