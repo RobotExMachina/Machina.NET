@@ -279,6 +279,78 @@ namespace RobotControl
     }
 
 
+    //     ██╗ ██████╗ ██╗███╗   ██╗████████╗███████╗
+    //     ██║██╔═══██╗██║████╗  ██║╚══██╔══╝██╔════╝
+    //     ██║██║   ██║██║██╔██╗ ██║   ██║   ███████╗
+    //██   ██║██║   ██║██║██║╚██╗██║   ██║   ╚════██║
+    //╚█████╔╝╚██████╔╝██║██║ ╚████║   ██║   ███████║
+    // ╚════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+    /// <summary>
+    /// Represents the 6 angular rotations of the axes in a 6-axis manipulator
+    /// </summary>
+    public class Joints
+    {
+        public double J1, J2, J3, J4, J5, J6;
+
+        /// <summary>
+        /// Create a Joints configuration from values.
+        /// </summary>
+        /// <param name="j1"></param>
+        /// <param name="j2"></param>
+        /// <param name="j3"></param>
+        /// <param name="j4"></param>
+        /// <param name="j5"></param>
+        /// <param name="j6"></param>
+        public Joints(double j1, double j2, double j3, double j4, double j5, double j6)
+        {
+            this.J1 = j1;
+            this.J2 = j2;
+            this.J3 = j3;
+            this.J4 = j4;
+            this.J5 = j5;
+            this.J6 = j6;
+        }
+
+        /// <summary>
+        /// Create a Joints configuration from an ABB JointTarget object.
+        /// </summary>
+        /// <param name="robJoint"></param>
+        public Joints(RobJoint robJoint)
+        {
+            this.J1 = robJoint.Rax_1;
+            this.J2 = robJoint.Rax_2;
+            this.J3 = robJoint.Rax_3;
+            this.J4 = robJoint.Rax_4;
+            this.J5 = robJoint.Rax_5;
+            this.J6 = robJoint.Rax_6;
+        }
+
+        /// <summary>
+        /// Returns the norm (euclidean length) of this joints as a vector.
+        /// </summary>
+        /// <returns></returns>
+        public double Norm()
+        {
+            return Math.Sqrt(this.NormSq());
+        }
+
+        /// <summary>
+        /// Returns the square norm of this joints as a vector.
+        /// </summary>
+        /// <returns></returns>
+        public double NormSq()
+        {
+            return J1 * J1 + J2 * J2 + J3 * J3 + J4 * J4 + J5 * J5 + J6 * J6;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[{0},{1},{2},{3},{4},{5}]", J1, J2, J3, J4, J5, J6);
+        }
+
+    }
+
+
 
     //███████╗██████╗  █████╗ ███╗   ███╗███████╗
     //██╔════╝██╔══██╗██╔══██╗████╗ ████║██╔════╝
@@ -375,6 +447,15 @@ namespace RobotControl
             this.Orientation = new Rotation(orientation.Q1, orientation.Q2, orientation.Q3, orientation.Q4);  // shallow copy
             this.Velocity = vel;
             this.Zone = zon;
+        }
+
+        public Frame(RobTarget robTarget)
+        {
+            this.Position = new Point(robTarget.Trans);
+            this.Orientation = new Rotation(robTarget.Rot);
+            // temporarily use 'invalid' values to denote this is not getting these values from the robot... 
+            this.Velocity = -1;
+            this.Zone = -1;
         }
         
         public string GetPositionDeclaration()

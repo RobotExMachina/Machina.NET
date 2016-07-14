@@ -11,13 +11,13 @@ namespace EXAMPLE_LoadModule
 
     class LoadModule
     {
-        static string moduleFilepath = @"D:\temp\";
-        static string moduleFilename = "simple_line.mod"; 
 
         [MTAThread] // "For an application running in a Multi Threaded Apartment (MTA) the Dispose call will remove both managed and native objects"
         static void Main(string[] args)
         {
             Console.WriteLine("Initializing Load Module Program...");
+
+            string moduleFilepath = @"D:\temp\simple_line.mod";
 
             Robot arm = new Robot();
 
@@ -27,9 +27,10 @@ namespace EXAMPLE_LoadModule
 
             arm.DebugDump();
 
-            Console.WriteLine("Press any key to LOAD module '" + moduleFilepath + moduleFilename + "'...");
+            Console.WriteLine("Press any key to LOAD module '" + moduleFilepath + "'...");
             Console.ReadKey();
-            arm.LoadModule(moduleFilename, moduleFilepath);
+            //arm.LoadModule(moduleFilename, moduleFilepath);
+            arm.LoadModule(moduleFilepath);
 
             Console.WriteLine("Press any key to START program execution...");
             Console.ReadKey();

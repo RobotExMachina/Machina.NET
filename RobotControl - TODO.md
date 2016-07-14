@@ -6,34 +6,24 @@
 ██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗
 ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
                                                                                                         
-██████╗ ███████╗██╗   ██╗██╗      ██████╗  ██████╗ 
-██╔══██╗██╔════╝██║   ██║██║     ██╔═══██╗██╔════╝ 
-██║  ██║█████╗  ██║   ██║██║     ██║   ██║██║  ███╗
-██║  ██║██╔══╝  ╚██╗ ██╔╝██║     ██║   ██║██║   ██║
-██████╔╝███████╗ ╚████╔╝ ███████╗╚██████╔╝╚██████╔╝
-╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
+████████╗ ██████╗ ██████╗  ██████╗ 
+╚══██╔══╝██╔═══██╗██╔══██╗██╔═══██╗
+   ██║   ██║   ██║██║  ██║██║   ██║
+   ██║   ██║   ██║██║  ██║██║   ██║
+   ██║   ╚██████╔╝██████╔╝╚██████╔╝
+   ╚═╝    ╚═════╝ ╚═════╝  ╚═════╝ 
 ```
 
-
-## BUILD 1101
-- [x] New class structure: 
-    - Split all the public Robot API from all the internal actual operations
-    - Centralize private methods into a Control class
-    - Create a dedicated Communication class to handle connections to real/virtual controllers
-    - Add placeholder classes for future developments (Tool, Library, Solvers, etc.)
-- [x] Port all current functionality into the new structure
-- [x] Make sure everything works as before with the new structure
-- [x] Add Build number 
-- [ ] Big comments review
-- [ ] Split off the Comm object
-- [ ] Deep port of all functionality (make the Robot class basically a very shallow middleware for API purposes)
-
-## BUILD 1100
-- [x] Recheck all examples are working correctly and nothing is broken before branching
-
-## BUILDS 10xx
-- Previous test and prototyping builds
-- Transitioning to a split class architecture and more programmatic implementation
+## SOON
+- [ ] Restructured library
+- [ ] Redesigned API
+- [ ] Merged ConnectionMode & OnlineMode into WorkingMode(?) 
+- [ ] Abstracted TCPPOsition, TCPRotation and stuff into a VirtualRobot object
+- [ ] Created Debug() & Error() utility functions
+- [ ] Ported Util methods as static to their appropriate geometry class 
+- [ ] All the connection properties, runmodes and stuff should belong to the VirtualRobot?
+- [ ] Detect out of position and joint errors and incorporate a soft-restart.
 
 
-
+## SOMETIME...
+- [ ] Get my self a nice cold beer and a pat on the back... ;)
