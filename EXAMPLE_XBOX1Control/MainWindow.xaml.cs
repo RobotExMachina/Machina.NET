@@ -33,10 +33,12 @@ namespace EXAMPLE_XBOX1Control
     {
         private DispatcherTimer timer = new DispatcherTimer();
         private Controller gameController;
-        private int refreshRate = 100;  // in millis
+        private int refreshRate = 33;  // in millis
+
+        double relSpeed = 100;
+        double incDist = 25;
 
         Robot arm;
-        double relSpeed = 25;  // 
          
         public MainWindow()
         {
@@ -55,16 +57,17 @@ namespace EXAMPLE_XBOX1Control
             timer.Tick += TimerTick;
             timer.Start();
 
+            // Robot stuff
             arm = new Robot();
             arm.ConnectionMode("online");
             arm.OnlineMode("stream");
             arm.Connect();
 
             arm.Start();
-            arm.SetVelocity(100);
-            arm.SetZone(5);
-            arm.RotateTo(RobotControl.Rotation.FlippedAroundY);
-            arm.MoveTo(200, 200, 200);
+            arm.SetVelocity(relSpeed);
+            arm.SetZone(2);
+            //arm.RotateTo(RobotControl.Rotation.FlippedAroundY);
+            //arm.MoveTo(200, 200, 200);
 
         }
 
@@ -73,32 +76,70 @@ namespace EXAMPLE_XBOX1Control
             //DisplayControllerInformation();
 
             var state = gameController.GetState();
+            
             //Console.WriteLine("LEFT THUMB X:{0}, Y:{1}", state.Gamepad.LeftThumbX, state.Gamepad.LeftThumbY);
             //Console.WriteLine("RIGHT THUMB X:{0}, Y:{1}", state.Gamepad.RightThumbX, state.Gamepad.RightThumbY);
             //Console.WriteLine("BUTTONS: " + state.Gamepad.Buttons);
 
-            RobotControl.Point dir = new RobotControl.Point(
-                RemapThumb(state.Gamepad.LeftThumbX, 10000, 32767), 
-                RemapThumb(state.Gamepad.LeftThumbY, 10000, 32767), 
-                RemapThumb(state.Gamepad.RightThumbY, 10000, 32767)
-            );
-            dir.Scale(relSpeed);
-            
-            var speed = dir.Length();
-            if (speed > 0)
+            // Can't really test this right now, my controller's thumb is broken... XD
+            //RobotControl.Point dir = new RobotControl.Point(
+            //    RemapThumb(state.Gamepad.LeftThumbX, 10000, 32767),
+            //    RemapThumb(state.Gamepad.LeftThumbY, 10000, 32767),
+            //    RemapThumb(state.Gamepad.RightThumbY, 10000, 32767)
+            //);
+            //dir.Scale(relSpeed);
+
+            //var speed = dir.Length();
+            //if (speed > 0)
+            //{
+            //    Console.WriteLine("--> Moving {0}", dir);
+            //    arm.SetVelocity(speed);
+            //    arm.Move(dir);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("idle");
+            //}
+
+            // A really simple and fast implementation to create a direction vector 
+            // for the next issued movement based on button pressed states. 
+            // This queues a ton of Frames on the robot, would be much better 
+            // implemented when the queue raises events demanding new targets.
+            // Directions are assuming a human controller facing the robot frontally.
+
+            RobotControl.Point dir = new RobotControl.Point(0, 0, 0);
+            GamepadButtonFlags buttons = state.Gamepad.Buttons;
+
+            // Create direction vector based on buttons
+            if (buttons.HasFlag(GamepadButtonFlags.DPadRight))
+                dir.Y = 1;
+            else if (buttons.HasFlag(GamepadButtonFlags.DPadLeft))
+                dir.Y = -1;
+
+            if (buttons.HasFlag(GamepadButtonFlags.DPadUp))
+                dir.X = -1;
+            else if (buttons.HasFlag(GamepadButtonFlags.DPadDown))
+                dir.X = 1;
+
+            if (buttons.HasFlag(GamepadButtonFlags.Y))
+                dir.Z = 1;
+            else if (buttons.HasFlag(GamepadButtonFlags.A))
+                dir.Z = -1;
+
+            // Issue a move command to the robot accordingly (or not)
+            if (dir.Length() > 0)
             {
+                dir.Normalize();
+                dir.Scale(incDist);
+
                 Console.WriteLine("--> Moving {0}", dir);
-                arm.SetVelocity(speed);
                 arm.Move(dir);
             }
             else
             {
-                Console.WriteLine("idle");
+                Console.WriteLine("Idle...");
             }
-            
-
-            //dir.Normalize();
-            //Console.WriteLine("--> Norm mov {0}", dir);
+           
         }
 
         private void MainWindowClosing(object sender, CancelEventArgs e)
@@ -118,7 +159,7 @@ namespace EXAMPLE_XBOX1Control
         }
 
 
-        private double RemapThumb(short value, double min, double max)
+        private double NormalizeThumb(short value, double min, double max)
         {
             bool neg = value < 0;
             int intVal = (int) value;

@@ -24,7 +24,6 @@ namespace EXAMPLE_LoadModule
             arm.ConnectionMode("online");
             arm.OnlineMode("instruct");
             arm.Connect();
-            //while (!arm.Connect()) { }
 
             arm.DebugDump();
 

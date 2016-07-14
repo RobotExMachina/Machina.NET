@@ -7,12 +7,12 @@ namespace EXAMPLE_StreamTargets2
     class StreamTargets2
     {
 
-        public static double leadSpeed = 50;
-        public static double traceSpeed = 20;
-
         [MTAThread]
         static void Main(string[] args)
         {
+            double leadSpeed = 100;
+            double traceSpeed = 50;
+
             Robot arm = new Robot();
 
             // Set connection properties

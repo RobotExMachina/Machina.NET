@@ -10,15 +10,16 @@ namespace EXAMPLE_KeyboardControl
 {
     class KeyboardControl
     {
-        public static double leadSpeed = 100;
-        public static double moveSpeed = 50;
-        public static double inc = 25;
-
-        public static bool input = true;
+        
 
         [MTAThread]
         static void Main(string[] args)
         {
+            double leadSpeed = 100;
+            double moveSpeed = 50;
+            double inc = 25;
+            bool input = true;
+
             Robot arm = new Robot();
 
             // Set connection properties
@@ -72,10 +73,9 @@ namespace EXAMPLE_KeyboardControl
                 {
                     input = false;
                 }
-
             }
 
-            arm.Stop();
+            //arm.Stop();
             arm.Disconnect();
 
             Console.WriteLine("Press any key to EXIT the program...");

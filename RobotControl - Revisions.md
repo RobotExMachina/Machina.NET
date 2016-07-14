@@ -14,10 +14,10 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
-### BUILD 1100
-- [ ] Recheck all examples are working correctly and nothing is broken before branching
+## BUILD 1100
+- [x] Recheck all examples are working correctly and nothing is broken before branching
 
-### BUILDS 10xx
+## BUILDS 10xx
 - Previous test and prototyping builds
 - Transitioning to a split class architecture and more programmatic implementation
 

@@ -363,48 +363,26 @@ public class TuioDemo : Form , TuioListener
     // The coordinates, dimensions and reorientations of the physical 3D box
     // the normalized coordinates will be remapped to
     private bool flipXY = true;
-    //private double worldX = 200;
-    //private double worldY = 100;
-    //private double worldZ = 200;
-    //private double boxX = 240;
-    //private double boxY = 320;
-    //private double boxZ = 100;
-
-    //private double worldX = 200;
-    //private double worldY = -200;
-    //private double worldZ = 600;
-    //private double boxX = 100;
-    //private double boxY = 400;
-    //private double boxZ = 300;
-
-    // These should be the right coordinates for a front facing EE
-    //private double worldX = 400;
-    //private double worldY = -300;
-    //private double worldZ = 700;
-    //private double boxX = 100;
-    //private double boxY = 600;
-    //private double boxZ = 400;
-
-    //private double worldX = 400;
-    //private double worldY = -200;
-    //private double worldZ = 700;
-    //private double boxX = 100;
-    //private double boxY = 400;
-    //private double boxZ = 300;
-
-    private double worldX = 300;
-    private double worldY = 150;
-    private double worldZ = 500;
-    private double boxX = 1;
+    private double worldX = 200;
+    private double worldY = 100;
+    private double worldZ = 200;
+    private double boxX = 240;
     private double boxY = 320;
-    private double boxZ = 240;
+    private double boxZ = 100;
+
+    //private double worldX = 300;
+    //private double worldY = 150;
+    //private double worldZ = 500;
+    //private double boxX = 1;
+    //private double boxY = 320;
+    //private double boxZ = 240;
 
     private bool calibrateMotionArea = false;
 
     // In "stream" mode, marker movement will be replicated by the robot in near real-time.
     // In "instruct" mode, the whole stroke will be sent as a path to the robot.
     //private string onlineMode = "instruct";
-    private OnlineMode oMode = OnlineMode.Stream;
+    private OnlineMode oMode = OnlineMode.Instruct;
 
     // In "stream" mode, which fiducial ID the app is reading 
     // (to avoid jumping between multiple simultaneous fiducials
