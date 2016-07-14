@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 namespace RobotControl
 {
     /// <summary>
-    /// A class featuring FK/IK solvers. 
+    /// A class to store static descriptions of robot manipulators.
     /// </summary>
-    /// <ref>Based on MARVIN</ref>
-    class Solver
+    class Library
     {
-
     }
 }

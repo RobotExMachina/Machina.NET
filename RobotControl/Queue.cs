@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace RobotControl
 {
+    /// <summary>
+    /// A queue manager for 'execution' mode and Path objects
+    /// </summary>
     internal class Queue
     {
         private List<Path> sentPaths;

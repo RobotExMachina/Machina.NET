@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace RobotControl
 {
     /// <summary>
-    /// A class featuring FK/IK solvers. 
+    /// A class to handle communication with external controllers, real or virtual
     /// </summary>
-    /// <ref>Based on MARVIN</ref>
-    class Solver
+    class Comm
     {
 
     }
+
 }

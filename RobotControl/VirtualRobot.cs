@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 namespace RobotControl
 {
     /// <summary>
-    /// A class featuring FK/IK solvers. 
+    /// Represents a virtual robot manipulator, useful to keep track of virtual/real states and actions.
     /// </summary>
-    /// <ref>Based on MARVIN</ref>
-    class Solver
+    class VirtualRobot
     {
-
     }
 }

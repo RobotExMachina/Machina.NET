@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 namespace RobotControl
 {
     /// <summary>
-    /// A class featuring FK/IK solvers. 
+    /// The core class that centralizes all private control .
     /// </summary>
-    /// <ref>Based on MARVIN</ref>
-    class Solver
+    class Control
     {
-
     }
 }

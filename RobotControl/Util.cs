@@ -11,6 +11,9 @@
 
 namespace RobotControl
 {
+    /// <summary>
+    /// Utility static methods
+    /// </summary>
     public class Util
     {
         /// <summary>

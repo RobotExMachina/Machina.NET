@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 namespace RobotControl
 {
     /// <summary>
-    /// A class featuring FK/IK solvers. 
+    /// Represents a tool object that can be attached to the end effector of the robot
     /// </summary>
-    /// <ref>Based on MARVIN</ref>
-    class Solver
+    class Tool
     {
-
     }
 }

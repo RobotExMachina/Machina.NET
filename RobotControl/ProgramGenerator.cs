@@ -3,9 +3,12 @@ using System.Collections.Generic;
 
 namespace RobotControl
 {
-    internal class RAPID
+    /// <summary>
+    /// A class that features methods to translate high-level robot actions into
+    /// platform-specific programs. 
+    /// </summary>
+    internal class ProgramGenerator
     {
-
         /// <summary>
         /// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
         /// WARNING: this method is EXTREMELY UNSAFE, since it performs no IK calculations, assuming all targets are in the positive XYZ octant hence a robot configuration of [0,0,0,0]. To be extended with a proper module creator
@@ -13,7 +16,6 @@ namespace RobotControl
         /// <param name="path"></param>
         /// <param name="velocity"></param>
         /// <param name="zone"></param>
-        /// 
         /// <returns></returns>
         public static List<string> UNSAFEModuleFromPath(Path path, int velocity, int zone)
         {
@@ -63,7 +65,7 @@ namespace RobotControl
             //return "[" + target + ",[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]";
             return target.GetUNSAFERobTargetDeclaration();
         }
-
-
     }
+
+
 }

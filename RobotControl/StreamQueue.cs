@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace RobotControl
 {
+    /// <summary>
+    /// A queue manager for 'stream' mode and Frame objects
+    /// </summary>
     internal class StreamQueue
     {
         private List<Frame> sentTargets;
