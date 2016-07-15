@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-// the control class should not need any ABB controllers...
-using ABB.Robotics;
-using ABB.Robotics.Controllers;
-using ABB.Robotics.Controllers.Discovery;
-using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
-using ABB.Robotics.Controllers.EventLogDomain;
-using ABB.Robotics.Controllers.FileSystemDomain;
+//// the Control class should not need any ABB controllers...
+//using ABB.Robotics;
+//using ABB.Robotics.Controllers;
+//using ABB.Robotics.Controllers.Discovery;
+//using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
+//using ABB.Robotics.Controllers.EventLogDomain;
+//using ABB.Robotics.Controllers.FileSystemDomain;
 
 
 namespace RobotControl
@@ -54,8 +54,6 @@ namespace RobotControl
         /// Instances of the main robot Controller and Task
         /// </summary>
         private Communication comm;
-        //private Controller controller;                                               // @TODO: make this private (made it public for quick debugging)
-        //private ABB.Robotics.Controllers.RapidDomain.Task mainTask;                  // @TODO: make this private (made it public for quick debugging)
 
         /// <summary>
         /// The queue that manages what instructions get sent to the robot
@@ -75,32 +73,26 @@ namespace RobotControl
         public object rapidDataLock = new object();
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-        //██████╗ ██████╗ ██╗██╗   ██╗ █████╗ ████████╗███████╗    ███╗   ███╗███████╗████████╗██╗  ██╗ ██████╗ ██████╗ ███████╗
-        //██╔══██╗██╔══██╗██║██║   ██║██╔══██╗╚══██╔══╝██╔════╝    ████╗ ████║██╔════╝╚══██╔══╝██║  ██║██╔═══██╗██╔══██╗██╔════╝
-        //██████╔╝██████╔╝██║██║   ██║███████║   ██║   █████╗      ██╔████╔██║█████╗     ██║   ███████║██║   ██║██║  ██║███████╗
-        //██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝      ██║╚██╔╝██║██╔══╝     ██║   ██╔══██║██║   ██║██║  ██║╚════██║
-        //██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗    ██║ ╚═╝ ██║███████╗   ██║   ██║  ██║╚██████╔╝██████╔╝███████║
-        //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝    ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-
         
+
+
+
+
+
+        //██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
+        //██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
+        //██████╔╝██║   ██║██████╔╝██║     ██║██║     
+        //██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║     
+        //██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗
+        //╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝
+                                            
+        /// <summary>
+        /// Main constructor.
+        /// </summary>
         public Control()
         {
-            comm = new CommunicationABB();  // @TODO: incorporate smart detection of robot model
             Reset();
         }
-
 
         /// <summary>
         /// Resets all internal state properties to default values. To be invoked upon
@@ -117,109 +109,68 @@ namespace RobotControl
             streamQueue = new StreamQueue();
         }
 
+        /// <summary>
+        /// Sets current Control Mode. 
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public bool SetControlMode(ControlMode mode)
         {
             controlMode = mode;
+
+            // @TODO: Make changes in ControlMode at runtime possible, i.e. resetting controllers and communication, flushing queues, etc.
+            if (mode == ControlMode.Offline)
+            {
+                DropCommunication();
+            }
+            else
+            {
+                InitializeCommunication();  // online modes
+            }
+            
             return true;
         }
 
+        /// <summary>
+        /// Returns current Control Mode.
+        /// </summary>
+        /// <returns></returns>
         public ControlMode GetControlMode()
         {
             return controlMode;
         }
 
-        //public bool SetConnectionMode(ConnectionMode mode)
-        //{
-        //    connectionMode = mode;
-        //    return true;
-        //}
-
-        //public ConnectionMode GetConnectionMode()
-        //{
-        //    return connectionMode;
-        //}
-
-        //public bool SetOnlineMode(OnlineMode mode)
-        //{
-        //    onlineMode = mode;
-        //    return true;
-        //}
-
-        //public OnlineMode GetOnlineMode()
-        //{
-        //    return onlineMode;
-        //}
-
+        /// <summary>
+        /// Sets current RunMode. 
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public bool SetRunMode(RunMode mode)
         {
-            // @TODO: move this to Comm
-            // @TODO: this is ABB specific, abstract it to generic
-            if (isConnected)
+            runMode = mode;
+
+            if (controlMode == ControlMode.Offline)
             {
-                using (Mastership.Request(controller.Rapid))
-                {
-                    //controller.Rapid.Cycle = mode.ToLower().Equals("loop") ? ExecutionCycle.Forever : ExecutionCycle.Once;
-                    controller.Rapid.Cycle = mode == RunMode.Once ? ExecutionCycle.Once : mode == RunMode.Loop ? ExecutionCycle.Forever : ExecutionCycle.None;
-                    runMode = mode;
-                }
+                Console.WriteLine("Remember RunMode.{0} will have no effect in Offline mode", mode);
             }
             else
             {
-                Console.WriteLine("Not connected to controller");
-                return false;
+                return comm.SetRunMode(mode);
             }
 
-            return true;
+            return false;
         }
         
+        /// <summary>
+        /// Returns current RunMode.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public RunMode GetRunMode(RunMode mode)
         {
             return runMode;
         }
 
-
-
-        ///// <summary>
-        ///// Searches the network for a robot controller and establishes a connection with the first one available. 
-        ///// Necessary for "online" modes.
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool ConnectToController(OnlineMode oMode)
-        //{
-        //    NetworkScanner scanner = new NetworkScanner();
-
-        //    //ControllerInfo[] controllers = scanner.GetControllers(NetworkScannerSearchCriterias.Virtual);
-        //    ControllerInfo[] controllers = scanner.GetControllers();
-        //    if (controllers.Length > 0)
-        //    {
-        //        controller = ControllerFactory.CreateFrom(controllers[0]);
-        //        isConnected = true;
-        //        IP = controller.IPAddress.ToString();
-        //        if (DEBUG) Console.WriteLine("Found controller on " + IP);
-
-        //        LogOn();
-        //        RetrieveMainTask();
-        //        if (TestMastership()) RunMode("once");
-        //        SubscribeToEvents();
-        //    }
-        //    else
-        //    {
-        //        if (DEBUG) Console.WriteLine("No controllers found on the network");
-        //        isConnected = false;
-        //    }
-
-        //    // Pick up the state of the robot if doing Stream mode
-        //    if (oMode == RobotControl.OnlineMode.Stream)
-        //    {
-        //        LoadStreamingModule();
-        //        HookUpStreamingVariables();
-        //        TCPPosition = new Point(GetTCPRobTarget().Trans);
-        //        TCPRotation = new Rotation(GetTCPRobTarget().Rot);
-        //        if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
-        //    }
-
-        //    return true;
-        //}
 
         /// <summary>
         /// Searches the network for a robot controller and establishes a connection with the specified one by position. 
@@ -235,7 +186,7 @@ namespace RobotControl
                 return false;
             }
 
-            return comm
+            return comm.ConnectToDevice(robotId);
 
             //// Scan the network and hookup to the specified controller
             //bool success = false;
@@ -284,91 +235,118 @@ namespace RobotControl
             //    TCPRotation = GetTCPRotation();
             //    if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
             //}
-
-            return success;
         }
 
-        ///// <summary>
-        ///// Checks if the controller resource is available for Mastership, or held by someone else. 
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool TestMastership()
+        public bool DisconnectFromController()
+        {
+            // Sanity
+            if (controlMode == ControlMode.Offline)
+            {
+                Console.WriteLine("No robot to disconnect from in 'offline' mode ;)");
+                return false;
+            }
+
+            return comm.DisconnectFromDevice();
+        }
+
+        public bool IsConnectedToController()
+        {
+            return comm.IsConnected();
+        }
+
+        public string GetControllerIP()
+        {
+            return comm.GetIP();
+        }
+
+
+
+        //public bool IsConnected()
         //{
-        //    bool available = false;
-        //    if (isConnected)
-        //    {
-        //        try
-        //        {
-        //            using (Mastership.Request(controller.Rapid))
-        //            {
-        //                // Gets the current execution cycle from the RAPID module and sets it back to the same value
-        //                ExecutionCycle mode = controller.Rapid.Cycle;
-        //                controller.Rapid.Cycle = mode;
-        //                available = true;
-        //            }
-        //        }
-        //        catch (GenericControllerException ex)
-        //        {
-        //            Console.WriteLine("MASTERSHIP ERROR: The controller is held by someone else");
-        //            if (DEBUG) Console.WriteLine(ex);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("TestMastership(): not connected to controller");
-        //    }
-
-        //    if (available && DEBUG) Console.WriteLine("Controller Mastership available");
-
-        //    return available;
+        //    return isConnected;
         //}
 
-        /// <summary>
-        /// Forces disconnection from current controller and manages associated logoffs, disposals, etc.
-        /// </summary>
-        public void DisconnectFromController()
-        {
-            if (DEBUG) Console.WriteLine("Disconnecting from controller on " + IP);
-            if (SafetyStopImmediateOnDisconnect) StopProgram(true);
+            //public string GetIP()
+            //{
+            //    if (!isConnected)
+            //    {
+            //        Console.WriteLine("Not connected to any controller");
+            //        return "";
+            //    }
 
-            LogOff();
-            DisposeMainTask();
-            DisposeController();
+            //    return IP;
+            //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //██████╗ ██████╗ ██╗██╗   ██╗ █████╗ ████████╗███████╗
+        //██╔══██╗██╔══██╗██║██║   ██║██╔══██╗╚══██╔══╝██╔════╝
+        //██████╔╝██████╔╝██║██║   ██║███████║   ██║   █████╗  
+        //██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝  
+        //██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗
+        //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝
+
+        private bool InitializeCommunication()
+        {
+            // If there is already some communication going on
+            if (comm != null)
+            {
+                Console.WriteLine("Communication protocol might be active. Please CloseControllerCommunication() first.");
+                return false;
+            }
             
-            Reset();
+            // @TODO: shim assignment of correct robot model/brand
+            comm = new CommunicationABB();
+            return true;
         }
 
+        private bool DropCommunication()
+        {
+            if (comm == null)
+            {
+                Console.WriteLine("Communication protocol not established.");
+                return false;
+            }
+            bool success = comm.DisconnectFromDevice();
+            comm = null;
+            return success;
+        }
+        
         /// <summary>
-        /// Disposes the controller object. This has to be done manually, since COM objects are not
-        /// automatically garbage collected. 
+        /// If there was a running Communication protocol, drop it and restart it again.
         /// </summary>
         /// <returns></returns>
-        public bool DisposeController()
+        private bool ResetCommunication()
         {
-            if (controller != null)
+            if (comm == null)
             {
-                controller.Dispose();
-                controller = null;
-                return true;
+                Console.WriteLine("Communication protocol not established, please initialize first.");
             }
-            return false;
+            DropCommunication();
+            return InitializeCommunication();
         }
 
-        public bool IsConnected()
-        {
-            return isConnected;
-        }
-
-        public string GetIP()
-        {
-            if (!isConnected)
-            {
-                Console.WriteLine("Not connected to any controller");
-                return "";
-            }
-
-            return IP;
-        }
 
         /// <summary>
         /// Upon connection, subscribe to relevant events and handle them.
@@ -377,77 +355,7 @@ namespace RobotControl
         {
             controller.Rapid.ExecutionStatusChanged += OnExecutionStatusChanged;
         }
-
-        ///// <summary>
-        ///// Logs on to the controller with default credentials.
-        ///// </summary>
-        //public bool LogOn()
-        //{
-        //    if (isLogged)
-        //    {
-        //        LogOff();
-        //    }
-
-        //    controller.Logon(UserInfo.DefaultUser);
-
-        //    try
-        //    {
-        //        controller.Logon(UserInfo.DefaultUser);
-        //        isLogged = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("USER LOGON ERROR: " + ex);
-        //        isLogged = false;
-        //    }
-
-        //    return isLogged;
-        //}
-
-        ///// <summary>
-        ///// Logs off from current controller.
-        ///// </summary>
-        //public void LogOff()
-        //{
-        //    if (controller != null)
-        //    {
-        //        controller.Logoff();
-        //        isLogged = false;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Retrieves main task from the controller. E.g. for ABB robots this would typically be "T_ROB1".
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool RetrieveMainTask()
-        //{
-        //    ABB.Robotics.Controllers.RapidDomain.Task[] tasks = controller.Rapid.GetTasks();
-        //    if (tasks.Length > 0)
-        //    {
-        //        mainTask = tasks[0];
-        //        isMainTaskRetrieved = true;
-        //        return true;
-        //    }
-        //    return false;
-        //}
-
-        ///// <summary>
-        ///// Disposes the task objects. This has to be done manually, since COM objects are not
-        ///// automatically garbage collected. 
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool DisposeMainTask()
-        //{
-        //    if (mainTask != null)
-        //    {
-        //        mainTask.Dispose();
-        //        mainTask = null;
-        //        isMainTaskRetrieved = false;
-        //        return true;
-        //    }
-        //    return false;
-        //}
+        
 
         /// <summary>
         /// Deletes all existing modules from main task in the controller. 

@@ -23,22 +23,8 @@ namespace RobotControl
         protected bool isConnected = false;
         protected string IP = "";
 
-        //// Abstract methods
-        //public abstract bool LogOff();
-        //public abstract bool Disconnect();
-        //public abstract bool DisposeMainTask();
-        //public abstract bool LoadIP();
-
         // Base constructor
-        public Communication()
-        {
-            Reset();
-        }
-
-        public virtual void Reset()
-        {
-
-        }
+        public Communication() { }
 
         public bool IsConnected()
         {
@@ -50,17 +36,11 @@ namespace RobotControl
             return IP;
         }
 
-        /// <summary>
-        /// Reverts the comm object to a clean state.
-        /// </summary>
-        //public void Reset()
-        //{
-        //    LogOff();
-        //    Disconnect();
-        //    DisposeMainTask();
-        //    LoadIP();
-        //}
-        
+        // Abstract methods required in subclasses
+        public abstract void Reset();
+        public abstract bool ConnectToDevice(int deviceId);
+        public abstract bool DisconnectFromDevice();
+        public abstract bool SetRunMode(RunMode mode);
 
 
     }
@@ -76,6 +56,15 @@ namespace RobotControl
         private static string localBufferFilename = "buffer.mod";
         private static string remoteBufferDirectory = "RobotControl";
 
+
+
+        //██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
+        //██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
+        //██████╔╝██║   ██║██████╔╝██║     ██║██║     
+        //██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║     
+        //██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗
+        //╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝
+                                            
         /// <summary>
         /// Main constructor
         /// </summary>
@@ -84,8 +73,13 @@ namespace RobotControl
             Reset();
         }
 
+        /// <summary>
+        /// Reverts the Comm object to a blank state before any connection attempt. 
+        /// </summary>
         public override void Reset()
         {
+            //if (SafetyStopImmediateOnDisconnect) StopProgram(true);
+
             // revert to a pristine state before any connection attempt
             // logoff, disconnect, dispose mainTask, turn flags off...
             ReleaseIP();
@@ -99,7 +93,7 @@ namespace RobotControl
         /// including connecting to the controller, loggin in, etc.
         /// </summary>
         /// <param name="deviceId"></param>
-        public bool ConnectToDevice(int deviceId)
+        public override bool ConnectToDevice(int deviceId)
         {
             isConnected = false;
             bool good = true;
@@ -164,21 +158,56 @@ namespace RobotControl
         /// Forces disconnection from current controller and manages associated logoffs, disposals, etc.
         /// </summary>
         /// <returns></returns>
-        public bool DisconnectFromDevice()
-        {
-            //if (SafetyStopImmediateOnDisconnect) StopProgram(true);
-
-            // All these guys were incorporated to Reset();
-            //LogOff();
-            //DisposeMainTask();
-            //DisposeController();
-            
+        public override bool DisconnectFromDevice()
+        {           
             Reset();
             return true;
         }
 
+        /// <summary>
+        /// Sets the Rapid ExecutionCycle to Once, Forever or None.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public override bool SetRunMode(RunMode mode)
+        {
+            bool success = false;
+            if (isConnected)
+            {
+                try
+                {
+                    using (Mastership.Request(controller.Rapid))
+                    {
+                        controller.Rapid.Cycle = mode == RunMode.Once ? ExecutionCycle.Once : mode == RunMode.Loop ? ExecutionCycle.Forever : ExecutionCycle.None;
+                        success = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error setting RunMode in controller...");
+                    Console.WriteLine(ex);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Cannot set RunMode, not connected to any controller");
+            }
+            return success;
+        }
 
-        
+
+
+
+
+
+
+        //██████╗ ██████╗ ██╗██╗   ██╗ █████╗ ████████╗███████╗
+        //██╔══██╗██╔══██╗██║██║   ██║██╔══██╗╚══██╔══╝██╔════╝
+        //██████╔╝██████╔╝██║██║   ██║███████║   ██║   █████╗  
+        //██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝  
+        //██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗
+        //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝
+
         /// <summary>
         /// Searches the network for a robot controller and establishes a connection with the specified one by position.
         /// Performs no LogOn actions or similar. 
@@ -392,6 +421,10 @@ namespace RobotControl
             }
             return available;
         }
+
+
+        
+
 
     }
 

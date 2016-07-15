@@ -279,16 +279,16 @@ namespace RobotControl
         /// <summary>
         /// In 'online' modes, performs all necessary instructions to disconnect from the controller.
         /// </summary>
-        public void Disconnect()
+        public bool Disconnect()
         {
             //if (DEBUG) Console.WriteLine("Disconnecting from controller on " + IP);
             //if (SafetyStopImmediateOnDisconnect) StopProgram(true);
-            c.DisconnectFromController();
+            return c.DisconnectFromController();
         }
 
         public string GetIP()
         {
-            return c.GetIP();
+            return c.GetControllerIP();
         }
 
         ///// <summary>
@@ -430,7 +430,7 @@ namespace RobotControl
         public void DebugDump()
         {
             c.DebugBanner();
-            c.TestMastership();
+            //c.TesMastership();
             c.DebugControllerDump();
             c.DebugTaskDump();
         }

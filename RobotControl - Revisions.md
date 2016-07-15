@@ -26,6 +26,7 @@
 - [x] Add Build number 
 - [x] Merged ConnectionMode & OnlineMode into ControlMode 
 - [ ] Split off the Comm object
+- [ ] Remove all references to ABB objects from Control class.
 - [ ] Big comments review
 - [ ] Deep port of all functionality (make the Robot class basically a very shallow middleware for API purposes)
 - [ ] Dead code cleanup
