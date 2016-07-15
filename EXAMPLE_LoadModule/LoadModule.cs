@@ -29,7 +29,7 @@ namespace EXAMPLE_LoadModule
             Console.WriteLine("Press any key to LOAD module '" + moduleFilepath + "'...");
             Console.ReadKey();
             //arm.LoadModule(moduleFilename, moduleFilepath);
-            arm.LoadModule(moduleFilepath);
+            arm.LoadProgram(moduleFilepath);
 
             Console.WriteLine("Press any key to START program execution...");
             Console.ReadKey();

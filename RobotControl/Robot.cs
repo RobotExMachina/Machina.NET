@@ -268,12 +268,12 @@ namespace RobotControl
             //    return false;
             //}
             //return ConnectToController(onlineMode);
-            return c.ConnectToController(robotId);
+            return c.ConnectToDevice(robotId);
         }
 
         public bool Connect()
         {
-            return c.ConnectToController(0);
+            return c.ConnectToDevice(0);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace RobotControl
         {
             //if (DEBUG) Console.WriteLine("Disconnecting from controller on " + IP);
             //if (SafetyStopImmediateOnDisconnect) StopProgram(true);
-            return c.DisconnectFromController();
+            return c.DisconnectFromDevice();
         }
 
         public string GetIP()
@@ -308,13 +308,23 @@ namespace RobotControl
         //}
 
         /// <summary>
-        /// Loads a module to the controller from a local file.
+        /// Loads a program to the robot from a local file.
         /// </summary>
-        /// <param name="filepath">Full absolute filepath, including root, folders and filename with extension</param>
+        /// <param name="filepath">Full absolute filepath including root, directory structure, filename and extension</param>
         /// <returns></returns>
-        public bool LoadModule(string filepath)
+        public bool LoadProgram(string filepath)
         {
-            return c.LoadModuleFromFilepath(filepath);
+            return c.LoadProgramToDevice(filepath);
+        }
+
+        /// <summary>
+        /// Loads a program to the robot from a string list of code.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public bool LoadProgram(List<string> code)
+        {
+            return c.LoadProgramToDevice(code);
         }
 
         

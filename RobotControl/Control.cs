@@ -177,7 +177,7 @@ namespace RobotControl
         /// Necessary for "online" modes.
         /// </summary>
         /// <returns></returns>
-        public bool ConnectToController(int robotId)
+        public bool ConnectToDevice(int robotId)
         {
             // Sanity
             if (controlMode == ControlMode.Offline)
@@ -237,7 +237,7 @@ namespace RobotControl
             //}
         }
 
-        public bool DisconnectFromController()
+        public bool DisconnectFromDevice()
         {
             // Sanity
             if (controlMode == ControlMode.Offline)
@@ -249,33 +249,118 @@ namespace RobotControl
             return comm.DisconnectFromDevice();
         }
 
-        public bool IsConnectedToController()
+        /// <summary>
+        /// Is this robot connected to a real/virtual device?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsConnectedToDevice()
         {
             return comm.IsConnected();
         }
 
+        /// <summary>
+        /// If connected to a device, return the IP address
+        /// </summary>
+        /// <returns></returns>
         public string GetControllerIP()
         {
             return comm.GetIP();
         }
 
 
+        /// <summary>
+        /// Loads a programm to the connected device and executes it. 
+        /// </summary>
+        /// <param name="programLines"></param>
+        /// <returns></returns>
+        public bool LoadProgramToDevice(List<string> programLines)
+        {
+            return comm.LoadProgramFromStringList(programLines);
+        }
 
-        //public bool IsConnected()
-        //{
-        //    return isConnected;
-        //}
 
-            //public string GetIP()
-            //{
-            //    if (!isConnected)
-            //    {
-            //        Console.WriteLine("Not connected to any controller");
-            //        return "";
-            //    }
+        /// <summary>
+        /// Loads a programm to the connected device and executes it. 
+        /// </summary>
+        /// <param name="filepath">Full filepath including root, directory structure, filename and extension</param>
+        /// <returns></returns>
+        public bool LoadProgramToDevice(string filepath)
+        {
+            // @TODO: all this sanity and checks should probably go into LoadModuleFromFilename() (or basically consolidate everything into one method
+            if (controlMode == ControlMode.Offline)
+            {
+                Console.WriteLine("Cannot load modules in Offline mode");
+                return false;
+            }
 
-            //    return IP;
-            //}
+
+            // Sanity
+            string fullPath = "";
+
+            // Is the filepath a valid Windows path?
+            try
+            {
+                fullPath = System.IO.Path.GetFullPath(filepath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("'{0}' is not a valid filepath", filepath);
+                Console.WriteLine(e);
+                return false;
+            }
+
+            // Is it an absolute path?
+            try
+            {
+                bool absolute = System.IO.Path.IsPathRooted(fullPath);
+                if (!absolute)
+                {
+                    Console.WriteLine("Relative paths are currently not supported");
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("'{0}' is not a valid absolute filepath", filepath);
+                Console.WriteLine(e);
+                return false;
+            }
+
+            // Split the full path into directory, file and extension names
+            string dirname;     // full directory path
+            string filename;    // filename without extension
+            string extension;   // file extension
+
+            string[] parts = fullPath.Split('\\');
+            int len = parts.Length;
+            if (len < 2)
+            {
+                Console.WriteLine("Weird filepath");
+                return false;
+            }
+            dirname = string.Join("\\", parts, 0, len - 1);
+            string[] fileparts = parts[len - 1].Split('.');
+            if (fileparts.Length != 2)
+            {
+                Console.WriteLine("Weird filename");
+                return false;
+            }
+            filename = fileparts[0];
+            extension = fileparts[1];
+
+            Console.WriteLine("  filename: " + filename);
+            Console.WriteLine("  dirname: " + dirname);
+            Console.WriteLine("  extension: " + extension);
+
+            return comm.LoadProgramFromFilename(dirname, filename, extension);
+        }
+
+
+
+
+
+
+
 
 
 
@@ -347,265 +432,57 @@ namespace RobotControl
             return InitializeCommunication();
         }
 
-
-        /// <summary>
-        /// Upon connection, subscribe to relevant events and handle them.
-        /// </summary>
-        public void SubscribeToEvents()
-        {
-            controller.Rapid.ExecutionStatusChanged += OnExecutionStatusChanged;
-        }
         
 
-        /// <summary>
-        /// Deletes all existing modules from main task in the controller. 
-        /// </summary>
-        /// <returns></returns>
-        public int ClearAllModules()
-        {
-            if (!isConnected)
-            {
-                if (DEBUG) Console.WriteLine("Can't ClearAllModules(), not connected to controller");
-                return -1;
-            }
-
-            int count = -1;
-
-            Module[] modules = mainTask.GetModules();
-            count = modules.Length;
-
-            try
-            {
-                using (Mastership.Request(controller.Rapid))
-                {
-                    foreach (Module m in modules)
-                    {
-                        if (DEBUG) Console.WriteLine("Deleting module: {0}", m.Name);
-                        m.Delete();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("CLEAR MODULES ERROR: {0}", ex);
-            }
-
-            return count;
-        }
-
-        /// <summary>
-        /// Loads a module to the robot controller.
-        /// </summary>
-        /// <param name="mod"></param>
-        public void LoadModuleToRobot(List<string> mod)
-        {
-            SaveModuleToFile(mod, localBufferPathname + localBufferFilename);
-            LoadModuleFromFilename(localBufferFilename, localBufferPathname);
-        }
-
-        /// <summary>
-        /// Saves a string representation of a module to a local file. 
-        /// </summary>
-        /// <param name="module"></param>
-        /// <param name="filepath"></param>
-        public void SaveModuleToFile(List<string> module, string filepath)
-        {
-            System.IO.File.WriteAllLines(filepath, module, System.Text.Encoding.ASCII);
-        }
-
-        public bool LoadModuleFromFilepath(string filepath)
-        {
-
-            // @TODO: all this sanity and checks should probably go into LoadModuleFromFilename() (or basically consolidate everything into one method
-            if (controlMode == ControlMode.Offline)
-            {
-                Console.WriteLine("Cannot load modules in Offline mode");
-                return false;
-            }
-
-            // Sanity
-            string fullPath = "";
-
-            try
-            {
-                fullPath = System.IO.Path.GetFullPath(filepath);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("'{0}' is not a valid filepath", filepath);
-                Console.WriteLine(e);
-                return false;
-            }
-
-            try
-            {
-                bool absolute = System.IO.Path.IsPathRooted(fullPath);
-                if (!absolute)
-                {
-                    Console.WriteLine("Relative paths are currently not supported");
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-                        
-            string filename, dirname;
-            string[] parts = fullPath.Split('\\');
-            int len = parts.Length;
-            if (len < 2)
-            {
-                Console.WriteLine("Weird filepath");
-                return false;
-            }
-            filename = parts[len - 1];
-            dirname = string.Join("\\", parts, 0, len - 1);
-
-            Console.WriteLine("  filename: " + filename);
-            Console.WriteLine("  dirname: " + dirname);
-            
-
-            return LoadModuleFromFilename(filename, dirname);
-        }
-
-        /// <summary>
-        /// Loads a module into de controller from a local file. 
-        /// @TODO: This is an expensive operation, should probably become threaded. 
-        /// @TODO: By default, wipes out all previous modules --> parameterize.
-        /// </summary>
-        /// <param name="dirname"></param>
-        /// <returns></returns>
-        public bool LoadModuleFromFilename(string filename, string dirname)
-        {
-            // When connecting to a real controller, the reference filesystem 
-            // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
-            // to copy the file to the system first, and then load it. 
-            string fullPath = dirname + "\\" + filename;
-
-            if (!isConnected)
-            {
-                Console.WriteLine("Could not load module '{0}', not connected to controller", fullPath);
-                return false;
-            }
-
-            // For the time being, we will always wipe out previous modules on load
-            if (ClearAllModules() < 0)
-            {
-                Console.WriteLine("Error clearing modules");
-                return false;
-            }
-
-            // Load the module
-            bool success = false;
-            try
-            {
-                using (Mastership.Request(controller.Rapid))
-                {
-                    // Create the remoteBufferDirectory if applicable
-                    FileSystem fs = controller.FileSystem;
-                    string remotePath = fs.RemoteDirectory + "/" + remoteBufferDirectory;
-                    bool dirExists = fs.DirectoryExists(remoteBufferDirectory);
-                    //Console.WriteLine("Exists? " + dirExists);
-                    if (!dirExists)
-                    {
-                        if (DEBUG) Console.WriteLine("Creating {0} on remote controller", remotePath);
-                        fs.CreateDirectory(remoteBufferDirectory);
-                    }
-                    //@TODO: Should implement some kind of file cleanup at somepoint
-
-                    // Copy the file to the remote controller
-                    controller.FileSystem.PutFile(fullPath, remoteBufferDirectory + "/" + filename, true);
-                    if (DEBUG) Console.WriteLine("Copied {0} to {1}", filename, remoteBufferDirectory);
-
-                    // Loads a Rapid module to the task in the robot controller
-                    success = mainTask.LoadModuleFromFile(remotePath + "/" + filename, RapidLoadMode.Replace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR: Could not load module: {0}", ex);
-            }
-
-            // True if loading succeeds without any errors, otherwise false.  
-            if (!success)
-            {
-                //// Gets the available categories of the EventLog. 
-                //foreach (EventLogCategory category in controller.EventLog.GetCategories())
-                //{
-                //    if (category.Name == "Common")
-                //    {
-                //        if (category.Messages.Count > 0)
-                //        {
-                //            foreach (EventLogMessage message in category.Messages)
-                //            {
-                //                Console.WriteLine("Program [{1}:{2}({0})] {3} {4}",
-                //                    message.Name, message.SequenceNumber,
-                //                    message.Timestamp, message.Title, message.Body);
-                //            }
-                //        }
-                //    }
-                //}
-            }
-            else
-            {
-                if (DEBUG) Console.WriteLine("Sucessfully loaded {0}{1}", dirname, filename);
-            }
-
-            return success;
-        }
 
 
 
-        /// <summary>
-        /// Resets the program pointer in the controller to the main entry point. Needs to be called
-        /// before starting execution of a program, otherwise the controller will throw an error. 
-        /// </summary>
-        public void ResetProgramPointer()
-        {
-            if (isMainTaskRetrieved)
-            {
-                try
-                {
-                    using (Mastership.Request(controller.Rapid))
-                    {
-                        mainTask.ResetProgramPointer();
-                    }
 
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("POINTER RESET ERROR: " + ex);
-                }
 
-            }
 
-        }
 
-        /// <summary>
-        /// Requests start executing the program in the main task. Remember to call ResetProgramPointer() before. 
-        /// </summary>
-        public void StartProgram()
-        {
-            if (isMainTaskRetrieved)
-            {
 
-                try
-                {
-                    using (Mastership.Request(controller.Rapid))
-                    {
-                        controller.Rapid.Start(true);
-                    }
 
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("PROGRAM START ERROR: " + ex);
-                }
 
-            }
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
 
         /// <summary>
         /// Requests stop executing the program in the main task.
@@ -1177,25 +1054,7 @@ namespace RobotControl
         //███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║       ██║  ██║██║  ██║██║ ╚████║██████╔╝███████╗██║██║ ╚████║╚██████╔╝
         //╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝       ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
-        /// <summary>
-        /// What to do when the robot starts running or stops.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void OnExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
-        {
-            if (DEBUG) Console.WriteLine("EXECUTION STATUS CHANGED: " + e.Status);
-
-            if (e.Status == ExecutionStatus.Stopped)
-            {
-                // Only trigger Instruct queue
-                if (controlMode == ControlMode.Execute)
-                {
-                    // Tick queue to move forward
-                    TriggerQueue(true);
-                }
-            }
-        }
+        
 
         public void OnRD_pnum_ValueChanged(object sender, DataValueChangedEventArgs e)
         {
