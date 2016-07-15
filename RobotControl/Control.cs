@@ -182,7 +182,7 @@ namespace RobotControl
             // Sanity
             if (controlMode == ControlMode.Offline)
             {
-                if (DEBUG) Console.WriteLine("No robot to connect to in 'offline' mode ;)");
+                Console.WriteLine("No robot to connect to in 'offline' mode ;)");
                 return false;
             }
 
@@ -355,6 +355,36 @@ namespace RobotControl
             return comm.LoadProgramFromFilename(dirname, filename, extension);
         }
 
+        /// <summary>
+        /// Triggers start of program on device.
+        /// </summary>
+        /// <returns></returns>
+        public bool StartProgramOnDevice()
+        {
+            if (controlMode == ControlMode.Offline)
+            {
+                Console.WriteLine("No program to start in Offline mode");
+                return false;
+            }
+
+            return comm.StartProgramExecution();
+        }
+
+        /// <summary>
+        /// Stops execution of the running program on device.
+        /// </summary>
+        /// <param name="immediate"></param>
+        /// <returns></returns>
+        public bool StopProgramOnDevice(bool immediate)
+        {
+            if (controlMode == ControlMode.Offline)
+            {
+                Console.WriteLine("No program to stop in Offline mode");
+                return false;
+            }
+
+            return comm.StopProgramExecution(immediate);
+        }
 
 
 
@@ -484,20 +514,7 @@ namespace RobotControl
         
 
 
-        /// <summary>
-        /// Requests stop executing the program in the main task.
-        /// </summary> 
-        public void StopProgram(bool immediate)
-        {
-            if (isMainTaskRetrieved)
-            {
-                using (Mastership.Request(controller.Rapid))
-                {
-                    controller.Rapid.Stop(immediate ? StopMode.Immediate : StopMode.Cycle);
-                    //controller.Rapid.Stop(StopMode.Immediate);
-                }
-            }
-        }
+        
 
         ///// <summary>
         ///// Returns a RobTarget object representing the current robot's TCP.

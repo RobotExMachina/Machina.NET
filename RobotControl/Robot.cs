@@ -333,19 +333,18 @@ namespace RobotControl
         /// Starts execution of the current module/s in the controller.
         /// @TODO: The behavior of this method will change depending based on Off/Online mode
         /// </summary>
-        public void Start()
+        public bool Start()
         {
-            c.ResetProgramPointer();
-            c.StartProgram();
+            return c.StartProgramOnDevice();
         }
 
         /// <summary>
         /// Stops execution of the current module/s in the controller immediately. 
         /// Use StopAfterProgram() to schedule robot atop after completion of current cycle.
         /// </summary>
-        public void Stop()
+        public bool Stop()
         {
-            c.StopProgram(true);
+            return c.StopProgramOnDevice(true);
         }
 
         ///// <summary>
@@ -431,7 +430,7 @@ namespace RobotControl
         public void StopAfterProgram()
         {
             c.ClearQueue();
-            c.StopProgram(false);
+            c.StopProgramOnDevice(false);
         }
 
         /// <summary>

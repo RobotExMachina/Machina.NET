@@ -24,12 +24,61 @@ namespace RobotControl
         protected string IP = "";
 
         // Abstract methods required in subclasses
+
+        /// <summary>
+        /// Reverts the Comm object to a blank state before any connection attempt, objects retrieved, subscriptions, etc,
+        /// </summary>
         public abstract void Reset();
+
+        /// <summary>
+        /// Performs all necessary operations for a successful real-time connection to a real/virtual device.
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <returns></returns>
         public abstract bool ConnectToDevice(int deviceId);
+
+        /// <summary>
+        /// Performs all necessary operations and disposals for a full disconnection (and reset) from a real/virtual device.
+        /// </summary>
+        /// <returns></returns>
         public abstract bool DisconnectFromDevice();
+
+        /// <summary>
+        /// Sets the execution mode on the device to once or loop (useful for ControlMode.Execute)
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public abstract bool SetRunMode(RunMode mode);
+
+        /// <summary>
+        /// Loads a program to the device.
+        /// </summary>
+        /// <param name="dirname"></param>
+        /// <param name="filename"></param>
+        /// <param name="extension"></param>
+        /// <returns></returns>
         public abstract bool LoadProgramFromFilename(string dirname, string filename, string extension);
+
+        /// <summary>
+        /// Loads a program to the device.
+        /// </summary>
+        /// <param name="program"></param>
+        /// <returns></returns>
         public abstract bool LoadProgramFromStringList(List<string> program);
+
+        /// <summary>
+        /// Request the start of the program loaded on the device.
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool StartProgramExecution();
+
+        /// <summary>
+        /// Request immediate or deferred stop of the program running on the device.
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool StopProgramExecution(bool immediate);
+
+
 
         // Base constructor
         public Communication() { }
@@ -193,28 +242,27 @@ namespace RobotControl
         /// <returns></returns>
         public override bool SetRunMode(RunMode mode)
         {
-            bool success = false;
-            if (isConnected)
-            {
-                try
-                {
-                    using (Mastership.Request(controller.Rapid))
-                    {
-                        controller.Rapid.Cycle = mode == RunMode.Once ? ExecutionCycle.Once : mode == RunMode.Loop ? ExecutionCycle.Forever : ExecutionCycle.None;
-                        success = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error setting RunMode in controller...");
-                    Console.WriteLine(ex);
-                }
-            }
-            else
+            if (!isConnected)
             {
                 Console.WriteLine("Cannot set RunMode, not connected to any controller");
+                return false;
             }
-            return success;
+
+            try
+            {
+                using (Mastership.Request(controller.Rapid))
+                {
+                    controller.Rapid.Cycle = mode == RunMode.Once ? ExecutionCycle.Once : mode == RunMode.Loop ? ExecutionCycle.Forever : ExecutionCycle.None;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error setting RunMode in controller...");
+                Console.WriteLine(ex);
+            }
+  
+            return false;
         }
 
         /// <summary>
@@ -224,6 +272,12 @@ namespace RobotControl
         /// <returns></returns>
         public override bool LoadProgramFromStringList(List<string> module)
         {
+            if (!isConnected)
+            {
+                Console.WriteLine("Cannot load program, not connected to controller");
+                return false;
+            }
+
             // Modules can only be uploaded to ABB controllers using a file
             if (!SaveProgramToFilename(module, string.Format(@"{0}\{1}.{2}", localBufferDirname, localBufferFilename, localBufferFileExtension)))
             {
@@ -335,13 +389,88 @@ namespace RobotControl
             return success;
         }
 
+        /// <summary>
+        /// Requests start executing the program in the main task. Remember to call ResetProgramPointer() before. 
+        /// </summary>
+        public override bool StartProgramExecution()
+        {
+            if (!isConnected)
+            {
+                Console.WriteLine("Cannot start program, not connected to controller");
+                return false;
+            }
 
-        
+            try
+            {
+                using (Mastership.Request(controller.Rapid))
+                {
+                    StartResult res = controller.Rapid.Start(true);
+                    if (res != 0)
+                    {
+                        Console.WriteLine("Cannot start program: {0}", res);
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("PROGRAM START ERROR: " + ex);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Requests stop executing the program in the main task.
+        /// </summary>
+        /// <param name="immediate">Stop right now or wait for current cycle to complete?</param>
+        /// <returns></returns>
+        public override bool StopProgramExecution(bool immediate)
+        {
+            if (!isConnected)
+            {
+                Console.WriteLine("Cannot stop program, not connected to controller");
+                return false;
+            }
+
+            try
+            {
+                using (Mastership.Request(controller.Rapid))
+                {
+                    controller.Rapid.Stop(immediate ? StopMode.Immediate : StopMode.Cycle);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Could not stop program...");
+                Console.WriteLine(ex);
+            }
+
+            return false;
+        }
 
 
 
 
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -677,39 +806,7 @@ namespace RobotControl
         }
 
 
-        /// <summary>
-        /// Requests start executing the program in the main task. Remember to call ResetProgramPointer() before. 
-        /// </summary>
-        private bool StartProgram()
-        {
-            if (mainTask == null)
-            {
-                Console.WriteLine("Cannot start program, main task not present");
-                return false;
-            }
-
-            try
-            {
-                using (Mastership.Request(controller.Rapid))
-                {
-                    StartResult res = controller.Rapid.Start(true);
-                    if (res != 0)
-                    {
-                        Console.WriteLine("Cannot start program: {0}", res);
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("PROGRAM START ERROR: " + ex);
-            }
-
-            return false;
-        }
+       
 
 
 
