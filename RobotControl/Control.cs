@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+// the control class should not need any ABB controllers...
 using ABB.Robotics;
 using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
@@ -27,20 +28,7 @@ namespace RobotControl
         public static readonly double SafetyTableZLimit = 100;                     // table security checks will trigger under this z height (mm)
         public static readonly bool DEBUG = true;                                  // dump a bunch of debug logs
 
-        // Public properties
-        public bool isConnected = false;
-        public bool isLogged = false;
-        public bool isMainTaskRetrieved = false;
-        public string IP = "";
-
-        /// <summary>
-        /// Come route names to be used for file handling
-        /// </summary>
-        private static string localBufferPathname = @"C:\";
-        private static string localBufferFilename = "buffer.mod";
-        private static string remoteBufferDirectory = "RobotControl";
-
-
+        
 
 
 
@@ -50,8 +38,8 @@ namespace RobotControl
         /// </summary>
         //private ConnectionMode connectionMode = RobotControl.ConnectionMode.Online;  // Try online by default (@TODO: at some point 'offline' should be the default)
         //private OnlineMode onlineMode = RobotControl.OnlineMode.Instruct;
-        private ControlMode controlMode = RobotControl.ControlMode.Offline;
-        private RunMode runMode = RobotControl.RunMode.Once;
+        private ControlMode controlMode = ControlMode.Offline;
+        private RunMode runMode = RunMode.Once;
         
 
 
@@ -66,8 +54,8 @@ namespace RobotControl
         /// Instances of the main robot Controller and Task
         /// </summary>
         private Communication comm;
-        private Controller controller;                                               // @TODO: make this private (made it public for quick debugging)
-        private ABB.Robotics.Controllers.RapidDomain.Task mainTask;                  // @TODO: make this private (made it public for quick debugging)
+        //private Controller controller;                                               // @TODO: make this private (made it public for quick debugging)
+        //private ABB.Robotics.Controllers.RapidDomain.Task mainTask;                  // @TODO: make this private (made it public for quick debugging)
 
         /// <summary>
         /// The queue that manages what instructions get sent to the robot
@@ -109,8 +97,8 @@ namespace RobotControl
         
         public Control()
         {
-            comm = new CommunicationABB();
-
+            comm = new CommunicationABB();  // @TODO: incorporate smart detection of robot model
+            Reset();
         }
 
 
@@ -120,10 +108,10 @@ namespace RobotControl
         /// </summary>
         public void Reset()
         {
-            isConnected = false;
-            isLogged = false;
-            isMainTaskRetrieved = false;
-            IP = "";
+            //isConnected = false;
+            //isLogged = false;
+            //isMainTaskRetrieved = false;
+            //IP = "";
 
             queue = new Queue();
             streamQueue = new StreamQueue();
@@ -247,91 +235,93 @@ namespace RobotControl
                 return false;
             }
 
-            // Scan the network and hookup to the specified controller
-            bool success = false;
+            return comm
+
+            //// Scan the network and hookup to the specified controller
+            //bool success = false;
             
-            // This is specific to ABB, should become abstracted at some point...
-            NetworkScanner scanner = new NetworkScanner();
-            ControllerInfo[] controllers = scanner.GetControllers();
-            if (controllers.Length > 0)
-            {
-                int id = robotId > controllers.Length ? controllers.Length - 1 :
-                    robotId < 0 ? 0 : robotId;
-                controller = ControllerFactory.CreateFrom(controllers[id]);
-                if (controller != null)
-                {
-                    isConnected = true;
-                    IP = controller.IPAddress.ToString();
-                    if (DEBUG) Console.WriteLine("Found controller on " + IP);
+            //// This is specific to ABB, should become abstracted at some point...
+            //NetworkScanner scanner = new NetworkScanner();
+            //ControllerInfo[] controllers = scanner.GetControllers();
+            //if (controllers.Length > 0)
+            //{
+            //    int id = robotId > controllers.Length ? controllers.Length - 1 :
+            //        robotId < 0 ? 0 : robotId;
+            //    controller = ControllerFactory.CreateFrom(controllers[id]);
+            //    if (controller != null)
+            //    {
+            //        isConnected = true;
+            //        IP = controller.IPAddress.ToString();
+            //        if (DEBUG) Console.WriteLine("Found controller on " + IP);
 
-                    LogOn();
-                    RetrieveMainTask();
-                    if (TestMastership()) SetRunMode(RunMode.Once);  // why was this here? 
-                    SubscribeToEvents();
-                    success = true;
-                }
-                else
-                {
-                    Console.WriteLine("Could not connect to controller");
-                    isConnected = false;
-                }
+            //        LogOn();
+            //        RetrieveMainTask();
+            //        if (TestMastership()) SetRunMode(RunMode.Once);  // why was this here? 
+            //        SubscribeToEvents();
+            //        success = true;
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("Could not connect to controller");
+            //        isConnected = false;
+            //    }
                
-            }
-            else
-            {
-                if (DEBUG) Console.WriteLine("No controllers found on the network");
-                isConnected = false;
-            }
+            //}
+            //else
+            //{
+            //    if (DEBUG) Console.WriteLine("No controllers found on the network");
+            //    isConnected = false;
+            //}
 
-            // Pick up the state of the robot if doing Stream mode
-            if (controlMode == ControlMode.Stream)
-            {
-                LoadStreamingModule();
-                HookUpStreamingVariables();
-                //TCPPosition = new Point(GetTCPRobTarget().Trans);
-                TCPPosition = GetTCPPosition();
-                //TCPRotation = new Rotation(GetTCPRobTarget().Rot);
-                TCPRotation = GetTCPRotation();
-                if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
-            }
+            //// Pick up the state of the robot if doing Stream mode
+            //if (controlMode == ControlMode.Stream)
+            //{
+            //    LoadStreamingModule();
+            //    HookUpStreamingVariables();
+            //    //TCPPosition = new Point(GetTCPRobTarget().Trans);
+            //    TCPPosition = GetTCPPosition();
+            //    //TCPRotation = new Rotation(GetTCPRobTarget().Rot);
+            //    TCPRotation = GetTCPRotation();
+            //    if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
+            //}
 
             return success;
         }
 
-        /// <summary>
-        /// Checks if the controller resource is available for Mastership, or held by someone else. 
-        /// </summary>
-        /// <returns></returns>
-        public bool TestMastership()
-        {
-            bool available = false;
-            if (isConnected)
-            {
-                try
-                {
-                    using (Mastership.Request(controller.Rapid))
-                    {
-                        // Gets the current execution cycle from the RAPID module and sets it back to the same value
-                        ExecutionCycle mode = controller.Rapid.Cycle;
-                        controller.Rapid.Cycle = mode;
-                        available = true;
-                    }
-                }
-                catch (GenericControllerException ex)
-                {
-                    Console.WriteLine("MASTERSHIP ERROR: The controller is held by someone else");
-                    if (DEBUG) Console.WriteLine(ex);
-                }
-            }
-            else
-            {
-                Console.WriteLine("TestMastership(): not connected to controller");
-            }
+        ///// <summary>
+        ///// Checks if the controller resource is available for Mastership, or held by someone else. 
+        ///// </summary>
+        ///// <returns></returns>
+        //public bool TestMastership()
+        //{
+        //    bool available = false;
+        //    if (isConnected)
+        //    {
+        //        try
+        //        {
+        //            using (Mastership.Request(controller.Rapid))
+        //            {
+        //                // Gets the current execution cycle from the RAPID module and sets it back to the same value
+        //                ExecutionCycle mode = controller.Rapid.Cycle;
+        //                controller.Rapid.Cycle = mode;
+        //                available = true;
+        //            }
+        //        }
+        //        catch (GenericControllerException ex)
+        //        {
+        //            Console.WriteLine("MASTERSHIP ERROR: The controller is held by someone else");
+        //            if (DEBUG) Console.WriteLine(ex);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("TestMastership(): not connected to controller");
+        //    }
 
-            if (available && DEBUG) Console.WriteLine("Controller Mastership available");
+        //    if (available && DEBUG) Console.WriteLine("Controller Mastership available");
 
-            return available;
-        }
+        //    return available;
+        //}
 
         /// <summary>
         /// Forces disconnection from current controller and manages associated logoffs, disposals, etc.
@@ -388,76 +378,76 @@ namespace RobotControl
             controller.Rapid.ExecutionStatusChanged += OnExecutionStatusChanged;
         }
 
-        /// <summary>
-        /// Logs on to the controller with default credentials.
-        /// </summary>
-        public bool LogOn()
-        {
-            if (isLogged)
-            {
-                LogOff();
-            }
+        ///// <summary>
+        ///// Logs on to the controller with default credentials.
+        ///// </summary>
+        //public bool LogOn()
+        //{
+        //    if (isLogged)
+        //    {
+        //        LogOff();
+        //    }
 
-            controller.Logon(UserInfo.DefaultUser);
+        //    controller.Logon(UserInfo.DefaultUser);
 
-            try
-            {
-                controller.Logon(UserInfo.DefaultUser);
-                isLogged = true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("USER LOGON ERROR: " + ex);
-                isLogged = false;
-            }
+        //    try
+        //    {
+        //        controller.Logon(UserInfo.DefaultUser);
+        //        isLogged = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("USER LOGON ERROR: " + ex);
+        //        isLogged = false;
+        //    }
 
-            return isLogged;
-        }
+        //    return isLogged;
+        //}
 
-        /// <summary>
-        /// Logs off from current controller.
-        /// </summary>
-        public void LogOff()
-        {
-            if (controller != null)
-            {
-                controller.Logoff();
-                isLogged = false;
-            }
-        }
+        ///// <summary>
+        ///// Logs off from current controller.
+        ///// </summary>
+        //public void LogOff()
+        //{
+        //    if (controller != null)
+        //    {
+        //        controller.Logoff();
+        //        isLogged = false;
+        //    }
+        //}
 
-        /// <summary>
-        /// Retrieves main task from the controller. E.g. for ABB robots this would typically be "T_ROB1".
-        /// </summary>
-        /// <returns></returns>
-        public bool RetrieveMainTask()
-        {
-            ABB.Robotics.Controllers.RapidDomain.Task[] tasks = controller.Rapid.GetTasks();
-            if (tasks.Length > 0)
-            {
-                mainTask = tasks[0];
-                isMainTaskRetrieved = true;
-                return true;
-            }
-            return false;
-        }
+        ///// <summary>
+        ///// Retrieves main task from the controller. E.g. for ABB robots this would typically be "T_ROB1".
+        ///// </summary>
+        ///// <returns></returns>
+        //public bool RetrieveMainTask()
+        //{
+        //    ABB.Robotics.Controllers.RapidDomain.Task[] tasks = controller.Rapid.GetTasks();
+        //    if (tasks.Length > 0)
+        //    {
+        //        mainTask = tasks[0];
+        //        isMainTaskRetrieved = true;
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
-        /// <summary>
-        /// Disposes the task objects. This has to be done manually, since COM objects are not
-        /// automatically garbage collected. 
-        /// </summary>
-        /// <returns></returns>
-        public bool DisposeMainTask()
-        {
-            if (mainTask != null)
-            {
-                mainTask.Dispose();
-                mainTask = null;
-                isMainTaskRetrieved = false;
-                return true;
-            }
-            return false;
-        }
+        ///// <summary>
+        ///// Disposes the task objects. This has to be done manually, since COM objects are not
+        ///// automatically garbage collected. 
+        ///// </summary>
+        ///// <returns></returns>
+        //public bool DisposeMainTask()
+        //{
+        //    if (mainTask != null)
+        //    {
+        //        mainTask.Dispose();
+        //        mainTask = null;
+        //        isMainTaskRetrieved = false;
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         /// <summary>
         /// Deletes all existing modules from main task in the controller. 

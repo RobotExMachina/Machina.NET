@@ -92,7 +92,7 @@ namespace RobotControl
         public Robot()
         {
             c = new Control();
-            c.Reset();
+            //c.Reset();
         }
 
         public bool ControlMode(ControlMode mode)
