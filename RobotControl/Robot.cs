@@ -327,8 +327,6 @@ namespace RobotControl
             return c.LoadProgramToDevice(code);
         }
 
-        
-
         /// <summary>
         /// Starts execution of the current module/s in the controller.
         /// @TODO: The behavior of this method will change depending based on Off/Online mode
@@ -347,34 +345,14 @@ namespace RobotControl
             return c.StopProgramOnDevice(true);
         }
 
-        ///// <summary>
-        ///// Returns a string representation of the end frame's TCP position in mm.
-        ///// </summary>
-        ///// <returns></returns>
-        //public string GetPosition()
-        //{
-        //    RobTarget rt = c.GetTCPRobTarget();
-        //    return rt.Trans.ToString();
-        //}
-
         /// <summary>
         /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
         /// </summary>
         /// <returns></returns>
         public Point GetCurrentPosition()
         {
-            return c.GetTCPPosition();
+            return c.GetCurrentPosition();
         }
-
-        ///// <summary>
-        ///// Returns a string representation of the end frame's TCP orientation in quaterions.
-        ///// </summary>
-        ///// <returns></returns>
-        //public string GetOrientation()
-        //{
-        //    RobTarget rt = GetTCPRobTarget();
-        //    return rt.Rot.ToString();
-        //}
 
         /// <summary>
         /// Returns a Rottaion representation of the Robot's TCP orientation in quaternions.
@@ -382,7 +360,7 @@ namespace RobotControl
         /// <returns></returns>
         public Rotation GetCurrentOrientation()
         {
-            return c.GetTCPRotation();
+            return c.GetCurrentOrientation();
         }
 
         /// <summary>
@@ -392,18 +370,8 @@ namespace RobotControl
         /// <returns></returns>
         public Frame GetCurrentFrame()
         {
-            return c.GetTCPFrame();
+            return c.GetCurrentFrame();
         }
-
-        ///// <summary>
-        ///// Returns a string representation of the robot's joint rotations in degrees.
-        ///// </summary>
-        ///// <returns></returns>
-        //public string GetJoints()
-        //{
-        //    RobJoint rj = c.GetRobotJoints();
-        //    return rj.ToString();
-        //}
 
         /// <summary>
         /// Returns a Joint object representing the current angular rotations of the robot's 6 axes
@@ -411,7 +379,7 @@ namespace RobotControl
         /// <returns></returns>
         public Joints GetCurrentJoints()
         {
-            return c.GetRobotJoints();
+            return c.GetCurrentJoints();
         }
 
         /// <summary>
@@ -450,7 +418,6 @@ namespace RobotControl
         /// <param name="vel"></param>
         public void SetVelocity(double vel)
         {
-            //c.currentVelocity = vel;
             c.SetCurrentVelocity(vel);
         }
 
@@ -460,7 +427,6 @@ namespace RobotControl
         /// <param name="zone"></param>
         public void SetZone(double zone)
         {
-            //c.currentZone = zone;
             c.SetCurrentZone(zone);
         }
 
@@ -483,38 +449,6 @@ namespace RobotControl
         /// <returns></returns>
         public bool Move(double incX, double incY, double incZ)
         {
-            //if (onlineMode != RobotControl.OnlineMode.Stream)
-            //{
-            //    Console.WriteLine("Move() only supported in Stream mode");
-            //    return false;
-            //}
-
-            //if (SafetyCheckTableCollision)
-            //{
-            //    if (IsBelowTable(TCPPosition.Z + incZ))
-            //    {
-            //        Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-            //        if (SafetyStopOnTableCollision)
-            //        {
-            //            return false;
-            //        }
-            //    }
-            //}
-
-            //TCPPosition.Add(incX, incY, incZ);
-            //AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
-
-            //// Only tick queue if there are no targets pending to be streamed
-            //if (streamQueue.FramesPending() == 1 )
-            //{
-            //    TickStreamQueue(false);
-            //} else
-            //{
-            //    Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            //}
-
-            //return true;
-
             return c.RequestMove(incX, incY, incZ);
         }
 
@@ -527,42 +461,6 @@ namespace RobotControl
         /// <returns></returns>
         public bool MoveTo(double newX, double newY, double newZ)
         {
-            //if (onlineMode != RobotControl.OnlineMode.Stream)
-            //{
-            //    Console.WriteLine("MoveTo() only supported in Stream mode");
-            //    return false;
-            //}
-
-            //if (SafetyCheckTableCollision)
-            //{
-            //    if (IsBelowTable(newZ))
-            //    {
-            //        Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-            //        if (SafetyStopOnTableCollision)
-            //        {
-            //            return false;
-            //        }
-            //    }
-            //}
-
-            //TCPPosition.Set(newX, newY, newZ);
-            ////AddFrameToStreamQueue(new Frame(newX, newY, newZ, currentVelocity, currentZone));
-            //AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-            //   TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-            //   currentVelocity, currentZone));
-
-            //// Only tick queue if there are no targets pending to be streamed
-            //if (streamQueue.FramesPending() == 1)
-            //{
-            //    TickStreamQueue(false);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            //}
-
-            //return true;
-
             return c.RequestMoveTo(newX, newY, newZ);
         }
 
@@ -597,30 +495,6 @@ namespace RobotControl
         /// <returns></returns>
         public bool RotateTo(double q1, double q2, double q3, double q4)
         {
-            //if (onlineMode != RobotControl.OnlineMode.Stream)
-            //{
-            //    Console.WriteLine("RotateTo() only supported in Stream mode");
-            //    return false;
-            //}
-
-            //// WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
-            //TCPRotation.Set(q1, q2, q3, q4);
-            //AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-            //   TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-            //   currentVelocity, currentZone));
-
-            //// Only tick queue if there are no targets pending to be streamed
-            //if (streamQueue.FramesPending() == 1)
-            //{
-            //    TickStreamQueue(false);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            //}
-
-            //return true;
-
             return c.RequestRotateTo(q1, q2, q3, q4);
         }
 
@@ -639,7 +513,6 @@ namespace RobotControl
         /// <returns></returns>
         public bool RotateTo(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
         {
-
             List<double> q = Rotation.PlaneToQuaternions(x1, x2, x3, y1, y2, y3, z1, z2, z3);
             return RotateTo(q[0], q[1], q[2], q[3]);
         }

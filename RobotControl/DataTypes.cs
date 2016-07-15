@@ -39,11 +39,18 @@ namespace RobotControl
             this.Z = z;
         }
 
-        public Point(Pos robotPosition)
+        public Point(Pos pos)
         {
-            this.X = robotPosition.X;
-            this.Y = robotPosition.Y;
-            this.Z = robotPosition.Z;
+            this.X = pos.X;
+            this.Y = pos.Y;
+            this.Z = pos.Z;
+        }
+
+        public Point(RobTarget rt)
+        {
+            this.X = rt.Trans.X;
+            this.Y = rt.Trans.Y;
+            this.Z = rt.Trans.Z;
         }
 
         public void Set(double newX, double newY, double newz)
@@ -171,6 +178,14 @@ namespace RobotControl
             this.Q2 = or.Q2;
             this.Q3 = or.Q3;
             this.Q4 = or.Q4;
+        }
+
+        public Rotation(RobTarget rt)
+        {
+            this.Q1 = rt.Rot.Q1;
+            this.Q2 = rt.Rot.Q2;
+            this.Q3 = rt.Rot.Q3;
+            this.Q4 = rt.Rot.Q4;
         }
 
         public void Set(double q1, double q2, double q3, double q4)
@@ -314,15 +329,25 @@ namespace RobotControl
         /// <summary>
         /// Create a Joints configuration from an ABB JointTarget object.
         /// </summary>
-        /// <param name="robJoint"></param>
-        public Joints(RobJoint robJoint)
+        /// <param name="rj"></param>
+        public Joints(RobJoint rj)
         {
-            this.J1 = robJoint.Rax_1;
-            this.J2 = robJoint.Rax_2;
-            this.J3 = robJoint.Rax_3;
-            this.J4 = robJoint.Rax_4;
-            this.J5 = robJoint.Rax_5;
-            this.J6 = robJoint.Rax_6;
+            this.J1 = rj.Rax_1;
+            this.J2 = rj.Rax_2;
+            this.J3 = rj.Rax_3;
+            this.J4 = rj.Rax_4;
+            this.J5 = rj.Rax_5;
+            this.J6 = rj.Rax_6;
+        }
+
+        public Joints(JointTarget jt)
+        {
+            this.J1 = jt.RobAx.Rax_1;
+            this.J2 = jt.RobAx.Rax_2;
+            this.J3 = jt.RobAx.Rax_3;
+            this.J4 = jt.RobAx.Rax_4;
+            this.J5 = jt.RobAx.Rax_5;
+            this.J6 = jt.RobAx.Rax_6;
         }
 
         /// <summary>

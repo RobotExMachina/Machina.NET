@@ -21,6 +21,10 @@ namespace RobotControl
     {
         // Public properties
         protected bool isConnected = false;
+        /// <summary>
+        /// Is the device currently running a program?
+        /// </summary>
+        protected bool isRunning = true;
         protected string IP = "";
 
         // Abstract methods required in subclasses
@@ -78,6 +82,32 @@ namespace RobotControl
         /// <returns></returns>
         public abstract bool StopProgramExecution(bool immediate);
 
+        /// <summary>
+        /// Returns a Point object representing the current robot's TCP position.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Point GetCurrentPosition();
+
+        /// <summary>
+        /// Returns a Rotation object representing the current robot's TCP orientation.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Rotation GetCurrentOrientation();
+
+        /// <summary>
+        /// Returns a Frame object representing the current robot's TCP position and orientation. 
+        /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Frame GetCurrentFrame();
+
+        /// <summary>
+        /// Returns a Joints object representing the rotations of the 6 axes of this robot.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Joints GetCurrentJoints();
+
+
 
 
         // Base constructor
@@ -86,6 +116,11 @@ namespace RobotControl
         public bool IsConnected()
         {
             return isConnected;
+        }
+
+        public bool IsRunning()
+        {
+            return isRunning;
         }
 
         public string GetIP()
@@ -128,7 +163,6 @@ namespace RobotControl
         private static string remoteBufferDirectory = "RobotControl";
 
 
-
         //██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
         //██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
         //██████╔╝██║   ██║██████╔╝██║     ██║██║     
@@ -153,6 +187,7 @@ namespace RobotControl
 
             // revert to a pristine state before any connection attempt
             // logoff, disconnect, dispose mainTask, turn flags off...
+            StopProgramExecution(true);
             ReleaseIP();
             LogOff();
             ReleaseMainTask();
@@ -400,6 +435,12 @@ namespace RobotControl
                 return false;
             }
 
+            if (!ResetProgramPointer())
+            {
+                Console.WriteLine("Cannot start program: cannot reset program pointer");
+                return false;
+            }
+
             try
             {
                 using (Mastership.Request(controller.Rapid))
@@ -411,6 +452,7 @@ namespace RobotControl
                     }
                     else
                     {
+                        isRunning = true;
                         return true;
                     }
                 }
@@ -441,6 +483,7 @@ namespace RobotControl
                 using (Mastership.Request(controller.Rapid))
                 {
                     controller.Rapid.Stop(immediate ? StopMode.Immediate : StopMode.Cycle);
+                    isRunning = false;
                     return true;
                 }
             }
@@ -453,6 +496,66 @@ namespace RobotControl
             return false;
         }
 
+        /// <summary>
+        /// Returns a Point object representing the current robot's TCP position.
+        /// </summary>
+        /// <returns></returns>
+        public override Point GetCurrentPosition()
+        {
+            if (!isConnected)
+            {
+                Console.WriteLine("Cannot GetCurrentPosition, not connected to controller");
+                return null;
+            }
+
+            return new Point(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World));
+        }
+
+        /// <summary>
+        /// Returns a Rotation object representing the current robot's TCP orientation.
+        /// </summary>
+        /// <returns></returns>
+        public override Rotation GetCurrentOrientation()
+        {
+            if (!isConnected)
+            {
+                Console.WriteLine("Cannot GetCurrentRotation, not connected to controller");
+                return null;
+            }
+
+            return new Rotation(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World));
+        }
+
+        /// <summary>
+        /// Returns a Frame object representing the current robot's TCP position and orientation. 
+        /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
+        /// </summary>
+        /// <returns></returns>
+        public override Frame GetCurrentFrame()
+        {
+            if (!isConnected)
+            {
+                Console.WriteLine("Cannot GetCurrentFrame, not connected to controller");
+                return null;
+            }
+
+            return new Frame(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World));
+        }
+
+        /// <summary>
+        /// Returns a Joints object representing the rotations of the 6 axes of this robot.
+        /// </summary>
+        /// <returns></returns>
+        public override Joints GetCurrentJoints()
+        {
+            if (!isConnected)
+            {
+                Console.WriteLine("Cannot GetCurrentJoints, not connected to controller");
+                return null;
+            }
+
+            return new Joints(controller.MotionSystem.ActiveMechanicalUnit.GetPosition());
+        }
 
 
 
@@ -781,6 +884,12 @@ namespace RobotControl
         /// </summary>
         private bool ResetProgramPointer()
         {
+            if (controller == null)
+            {
+                Console.WriteLine("Cannot reset pointer, not connected to controller");
+                return false;
+            }
+
             if (mainTask == null)
             {
                 Console.WriteLine("Cannot reset pointer, mainTask not present");
@@ -857,16 +966,20 @@ namespace RobotControl
         {
             Console.WriteLine("EXECUTION STATUS CHANGED: " + e.Status);
 
-            if (e.Status == ExecutionStatus.Stopped)
+            if (e.Status == ExecutionStatus.Running)
             {
+                isRunning = true;
+            }
+            else 
+            {
+                isRunning = false;
+
                 //// Only trigger Instruct queue
                 //if (controlMode == ControlMode.Execute)
                 //{
                 //    // Tick queue to move forward
                 //    TriggerQueue(true);
                 //}
-
-                // @TODO: add new behavior here when execution changes
             }
         }
 

@@ -386,6 +386,46 @@ namespace RobotControl
             return comm.StopProgramExecution(immediate);
         }
 
+        /// <summary>
+        /// Returns a Point object representing the current robot's TCP position.
+        /// </summary>
+        /// <returns></returns>
+        public Point GetCurrentPosition()
+        {
+            // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
+            // or the virtual one's (like in offline mode).
+
+            return comm.GetCurrentPosition();
+        }
+
+        /// <summary>
+        /// Returns a Rotation object representing the current robot's TCP orientation.
+        /// </summary>
+        /// <returns></returns>
+        public Rotation GetCurrentOrientation()
+        {
+            return comm.GetCurrentOrientation();
+        }
+
+        /// <summary>
+        /// Returns a Frame object representing the current robot's TCP position and orientation. 
+        /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
+        /// </summary>
+        /// <returns></returns>
+        public Frame GetCurrentFrame()
+        {
+            return comm.GetCurrentFrame();
+        }
+
+        /// <summary>
+        /// Returns a Joints object representing the rotations of the 6 axes of this robot.
+        /// </summary>
+        /// <returns></returns>
+        public Joints GetCurrentJoints()
+        {
+            return comm.GetCurrentJoints();
+        }
+
 
 
 
@@ -462,7 +502,6 @@ namespace RobotControl
             return InitializeCommunication();
         }
 
-        
 
 
 
@@ -511,67 +550,12 @@ namespace RobotControl
 
 
 
-        
 
 
-        
 
-        ///// <summary>
-        ///// Returns a RobTarget object representing the current robot's TCP.
-        ///// @TODO: Should not expose the user publicly to platform-specific objects, like RobTargets
-        ///// </summary>
-        ///// <returns></returns>
-        //public RobTarget GetTCPRobTarget()
-        //{
-        //    return controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
-        //}
 
-        /// <summary>
-        /// Returns a Point object representing the current robot's TCP position.
-        /// </summary>
-        /// <returns></returns>
-        public Point GetTCPPosition()
-        {
-            RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
-            return new Point(rt.Trans);
-        }
 
-        /// <summary>
-        /// Returns a Rotation object representing the current robot's TCP orientation.
-        /// </summary>
-        /// <returns></returns>
-        public Rotation GetTCPRotation()
-        {
-            return new Rotation(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World).Rot);
-        }
 
-        /// <summary>
-        /// Returns a Frame object representing the current robot's TCP position and orientation. 
-        /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
-        /// </summary>
-        /// <returns></returns>
-        public Frame GetTCPFrame()
-        {
-            return new Frame(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World));
-        }
-
-        ///// <summary>
-        ///// Returns a RobJoint object representing the current values for joint rotations. 
-        ///// </summary>
-        ///// <returns></returns>
-        //public RobJoint GetRobotJoints()
-        //{
-        //    return controller.MotionSystem.ActiveMechanicalUnit.GetPosition().RobAx;
-        //}
-
-        /// <summary>
-        /// Returns a Joints object representing the rotations of the 6 axes of this robot.
-        /// </summary>
-        /// <returns></returns>
-        public Joints GetRobotJoints()
-        {
-            return new Joints(controller.MotionSystem.ActiveMechanicalUnit.GetPosition().RobAx);
-        }
 
 
 
@@ -650,7 +634,6 @@ namespace RobotControl
             }
 
             TCPPosition.Set(newX, newY, newZ);
-            //AddFrameToStreamQueue(new Frame(newX, newY, newZ, currentVelocity, currentZone));
             AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
                TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
                currentVelocity, currentZone));
@@ -715,25 +698,26 @@ namespace RobotControl
             queue.Add(path);
         }
 
+        ///// <summary>
+        ///// Checks the state of the execution of the robot, and if stopped and if elements 
+        ///// remaining on the queue, starts executing them.
+        ///// </summary>
+        //public void TriggerQueue()
+        //{
+        //    if (controller.Rapid.ExecutionStatus == ExecutionStatus.Stopped)
+        //    {
+        //        TriggerQueue(true);
+        //    }
+        //}
+
         /// <summary>
         /// Checks the state of the execution of the robot, and if stopped and if elements 
         /// remaining on the queue, starts executing them.
         /// </summary>
+        /// <param name="robotIsStopped"></param>
         public void TriggerQueue()
         {
-            if (controller.Rapid.ExecutionStatus == ExecutionStatus.Stopped)
-            {
-                TriggerQueue(true);
-            }
-        }
-
-        /// <summary>
-        /// An overload to bypass ExecutionStatus check.
-        /// </summary>
-        /// <param name="robotIsStopped"></param>
-        public void TriggerQueue(bool robotIsStopped)
-        {
-            if (queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
+            if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
             {
                 Path path = queue.GetNext();
                 // RunPath(path);
@@ -759,13 +743,16 @@ namespace RobotControl
         /// <param name="path"></param>
         public void RunPath(Path path)
         {
-            if (DEBUG) Console.WriteLine("RUNNING NEW PATH: " + path.Count);
+            Console.WriteLine("RUNNING NEW PATH: " + path.Count);
             List<string> module = ProgramGenerator.UNSAFEModuleFromPath(path, (int)currentVelocity, (int)currentZone);
-            //SaveModuleToFile(module, localBufferPathname + localBufferFilename);
-            //LoadModuleFromFilename(localBufferFilename, localBufferPathname);
-            LoadModuleToRobot(module);
-            ResetProgramPointer();
-            StartProgram();
+            ////SaveModuleToFile(module, localBufferPathname + localBufferFilename);
+            ////LoadModuleFromFilename(localBufferFilename, localBufferPathname);
+            //LoadModuleToRobot(module);
+            //ResetProgramPointer();
+            //StartProgram();
+
+            comm.LoadProgramFromStringList(module);
+            comm.StartProgramExecution()
         }
 
 
