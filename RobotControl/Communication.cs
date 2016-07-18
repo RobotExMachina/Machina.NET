@@ -20,6 +20,7 @@ namespace RobotControl
     abstract class Communication
     {
         // Public properties
+        protected ControlMode mode = ControlMode.Offline;
         protected bool isConnected = false;
         /// <summary>
         /// Is the device currently running a program?
@@ -111,7 +112,10 @@ namespace RobotControl
 
 
         // Base constructor
-        public Communication() { }
+        public Communication(ControlMode cmode)
+        {
+            mode = cmode;
+        }
 
         public bool IsConnected()
         {
@@ -173,7 +177,7 @@ namespace RobotControl
         /// <summary>
         /// Main constructor
         /// </summary>
-        public CommunicationABB() : base() 
+        public CommunicationABB(ControlMode cmode) : base(cmode) 
         {
             Reset();
         }
@@ -202,11 +206,9 @@ namespace RobotControl
         public override bool ConnectToDevice(int deviceId)
         {
             isConnected = false;
-            bool good = true;
 
             // Connect to the ABB real/virtual controller
-            good = good && LoadController(deviceId);
-            if (!good)
+            if (!LoadController(deviceId))
             {
                 Console.WriteLine("Could not connect to controller");
                 Reset();
@@ -214,8 +216,7 @@ namespace RobotControl
             }
 
             // Load the controller's IP
-            good = good && LoadIP();
-            if (!good)
+            if (!LoadIP())
             {
                 Console.WriteLine("Could not find the controller's IP");
                 Reset();
@@ -223,8 +224,7 @@ namespace RobotControl
             }
 
             // Log on to the controller
-            good = good && LogOn();
-            if (!good)
+            if (!LogOn())
             {
                 Console.WriteLine("Could not log on to the controller");
                 Reset();
@@ -234,8 +234,7 @@ namespace RobotControl
             // @TODO" IS IN AUTOMODE with motors on?
 
             // Test if Rapid Mastership is available
-            good = good && TestMastershipRapid();
-            if (!good)
+            if (!TestMastershipRapid())
             {
                 Console.WriteLine("Mastership not available");
                 Reset();
@@ -243,18 +242,34 @@ namespace RobotControl
             }
 
             // Load main task from the controller
-            good = good && LoadMainTask();
-            if (!good)
+            if (!LoadMainTask())
             {
                 Console.WriteLine("Could not load main task");
                 Reset();
                 return false;
             }
 
-            // @TODO: SubscribeToEvents(), like execution changed, etc.
+            // Subscribe to relevant events to keep track of robot execution
+            if (!SubscribeToEvents())
+            {
+                Console.WriteLine("Could not subscribe to robot controller events");
+                Reset();
+                return false;
+            }
 
-            // @TODO: deal with isConnected at the end, when everything was successful
-            isConnected = good;
+            // If on 'stream' mode, set up stream connection flow
+            if (mode == ControlMode.Stream)
+            {
+                if (!SetupStreamingMode())
+                {
+                    Console.WriteLine("Could not initialize 'stream' mode in controller");
+                    Reset();
+                    return false;
+                }
+            }
+
+            // If here, everything went well and successfully connected 
+            isConnected = true;
 
             return isConnected;
         }
@@ -915,7 +930,138 @@ namespace RobotControl
         }
 
 
-       
+
+
+
+
+
+
+        //███████╗████████╗██████╗ ███████╗ █████╗ ███╗   ███╗██╗███╗   ██╗ ██████╗ 
+        //██╔════╝╚══██╔══╝██╔══██╗██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔════╝ 
+        //███████╗   ██║   ██████╔╝█████╗  ███████║██╔████╔██║██║██╔██╗ ██║██║  ███╗
+        //╚════██║   ██║   ██╔══██╗██╔══╝  ██╔══██║██║╚██╔╝██║██║██║╚██╗██║██║   ██║
+        //███████║   ██║   ██║  ██║███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝
+        //╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+
+        private static int virtualRDCount = 4;
+        private int virtualStepCounter = 0;  // this keeps track of what is the next target index that needs to be assigned. Its %4 should asynchronously be ~4 units ahead of the 'pnum' rapid counter
+
+        private RapidData
+            RD_aborted,
+            RD_pnum;
+        private RapidData[]
+            RD_vel = new RapidData[virtualRDCount],
+            RD_zone = new RapidData[virtualRDCount],
+            RD_p = new RapidData[virtualRDCount],
+            RD_pset = new RapidData[virtualRDCount];
+        
+        /// <summary>
+        /// Performs necessary operations to set up 'stream' control mode in the controller
+        /// </summary>
+        /// <returns></returns>
+        private bool SetupStreamingMode()
+        {
+            //// Pick up the state of the robot if doing Stream mode
+            //if (controlMode == ControlMode.Stream)
+            //{
+            //    LoadStreamingModule();
+            //    HookUpStreamingVariables();
+            //    //TCPPosition = new Point(GetTCPRobTarget().Trans);
+            //    TCPPosition = GetTCPPosition();
+            //    //TCPRotation = new Rotation(GetTCPRobTarget().Rot);
+            //    TCPRotation = GetTCPRotation();
+            //    if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
+            //}
+
+            if (!LoadStreamingModule())
+            {
+                Console.WriteLine("Could not load streaming module");
+                return false;
+            }
+
+            if (!HookUpStreamingVariables())
+            {
+                Console.WriteLine("Could not load streaming variables");
+                return false;
+            }
+            
+            // @TODO: Control should get here some leads on the robot's position and orientation
+
+
+            return true;
+        }
+        
+        /// <summary>
+        /// Loads the default StreamModule designed for streaming.
+        /// </summary>
+        public bool LoadStreamingModule()
+        {
+            return LoadProgramFromStringList(StaticData.StreamModule.ToList());
+        }
+
+
+        /// <summary>
+        /// Loads all relevant Rapid variables
+        /// </summary>
+        public bool HookUpStreamingVariables()
+        {
+            // Load RapidData control variables
+            RD_aborted = LoadRapidDataVariable("aborted");
+            if (RD_aborted == null)
+                return false;
+
+            RD_pnum = LoadRapidDataVariable("pnum");
+            if (RD_pnum == null)
+                return false;
+
+            RD_pnum.ValueChanged += OnRD_pnum_ValueChanged;  // add an eventhandler to 'pnum' to track when it changes
+
+            Console.WriteLine(RD_aborted.StringValue);
+            Console.WriteLine(RD_pnum.StringValue);
+
+            // Load and set the first four targets
+            for (int i = 0; i < virtualRDCount; i++)
+            {
+                RD_vel[i] = LoadRapidDataVariable("vel" + i);
+                RD_zone[i] = LoadRapidDataVariable("zone" + i);
+                RD_p[i] = LoadRapidDataVariable("p" + i);
+                RD_pset[i] = LoadRapidDataVariable("pset" + i);
+                //AddVirtualTarget();
+
+                if (RD_vel[i] == null || RD_zone[i] == null || RD_p[i] == null || RD_pset[i] == null)
+                    return false;
+
+                Console.WriteLine("{0}, {1}, {2}, {3}",
+                    RD_vel[i].StringValue,
+                    RD_zone[i].StringValue,
+                    RD_p[i].StringValue,
+                    RD_pset[i].StringValue);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Retrieves a Rapid variable in current module and returns it
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <returns></returns>
+        public RapidData LoadRapidDataVariable(string varName)
+        {
+            RapidData rd = null;
+            try
+            {
+                rd = mainTask.GetModule("StreamModule").GetRapidData(varName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return rd;
+        }
+
+
+
 
 
 
@@ -1007,7 +1153,34 @@ namespace RobotControl
 
             // @TODO: add behaviors
         }
-        
+
+        /// <summary>
+        /// What to do when the 'pnum' rapid var changes value
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void OnRD_pnum_ValueChanged(object sender, DataValueChangedEventArgs e)
+        {
+            RapidData rd = (RapidData)sender;
+            Console.WriteLine("   variable '{0}' changed: {1}", rd.Name, rd.StringValue);
+
+            // Do not add target if pnum is being reset to initial value (like on program load)
+            if (!rd.StringValue.Equals("-1"))
+            {
+                Console.WriteLine("Ticking from pnum event handler");
+                //mHeld = true;
+                TickStreamQueue(true);
+                //mHeld = false;
+            }
+
+            if (rd != null)
+            {
+                //Console.WriteLine("Disposing rd");
+                //rd.Dispose();
+                //rd = null;
+            }
+
+        }
 
 
 

@@ -36,13 +36,9 @@ namespace RobotControl
         /// <summary>
         /// Operation modes by default
         /// </summary>
-        //private ConnectionMode connectionMode = RobotControl.ConnectionMode.Online;  // Try online by default (@TODO: at some point 'offline' should be the default)
-        //private OnlineMode onlineMode = RobotControl.OnlineMode.Instruct;
         private ControlMode controlMode = ControlMode.Offline;
         private RunMode runMode = RunMode.Once;
         
-
-
         /// <summary>
         /// A shared instance of a Thread to manage uploading modules
         /// to the controller, which typically takes a lot of resources
@@ -186,7 +182,13 @@ namespace RobotControl
                 return false;
             }
 
-            return comm.ConnectToDevice(robotId);
+            bool success = comm.ConnectToDevice(robotId);
+
+            Frame curr = comm.GetCurrentFrame();
+            TCPPosition = curr.Position;
+            TCPRotation = curr.Orientation;
+
+            return success;
 
             //// Scan the network and hookup to the specified controller
             //bool success = false;
@@ -472,7 +474,7 @@ namespace RobotControl
             }
             
             // @TODO: shim assignment of correct robot model/brand
-            comm = new CommunicationABB();
+            comm = new CommunicationABB(controlMode);
             return true;
         }
 
@@ -752,7 +754,7 @@ namespace RobotControl
             //StartProgram();
 
             comm.LoadProgramFromStringList(module);
-            comm.StartProgramExecution()
+            comm.StartProgramExecution();
         }
 
 
@@ -769,88 +771,38 @@ namespace RobotControl
 
 
 
-        //███████╗████████╗██████╗ ███████╗ █████╗ ███╗   ███╗██╗███╗   ██╗ ██████╗ 
-        //██╔════╝╚══██╔══╝██╔══██╗██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔════╝ 
-        //███████╗   ██║   ██████╔╝█████╗  ███████║██╔████╔██║██║██╔██╗ ██║██║  ███╗
-        //╚════██║   ██║   ██╔══██╗██╔══╝  ██╔══██║██║╚██╔╝██║██║██║╚██╗██║██║   ██║
-        //███████║   ██║   ██║  ██║███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝
-        //╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
-        private static int virtualRDCount = 4;
-        private RapidData
-            RD_aborted,
-            RD_pnum;
-        private RapidData[]
-            RD_vel = new RapidData[virtualRDCount],
-            RD_zone = new RapidData[virtualRDCount],
-            RD_p = new RapidData[virtualRDCount],
-            RD_pset = new RapidData[virtualRDCount];
 
-        private int virtualStepCounter = 0;  // this keeps track of what is the next target index that needs to be assigned. Its %4 should asynchronously be ~4 units ahead of the 'pnum' rapid counter
 
-        /// <summary>
-        /// Loads the default StreamModule designed for streaming.
-        /// </summary>
-        public void LoadStreamingModule()
-        {
-            LoadModuleToRobot(StaticData.StreamModule.ToList());
-        }
 
-        /// <summary>
-        /// Loads all relevant Rapid variables
-        /// </summary>
-        public void HookUpStreamingVariables()
-        {
-            // Load RapidData control variables
-            RD_aborted = LoadRapidDataVariable("aborted");
-            RD_pnum = LoadRapidDataVariable("pnum");
-            RD_pnum.ValueChanged += OnRD_pnum_ValueChanged;  // add an eventhandler to 'pnum' to track when it changes
 
-            if (DEBUG)
-            {
-                Console.WriteLine(RD_aborted.StringValue);
-                Console.WriteLine(RD_pnum.StringValue);
-            }
 
-            // Load and set the first four targets
-            for (int i = 0; i < virtualRDCount; i++)
-            {
-                RD_vel[i] = LoadRapidDataVariable("vel" + i);
-                RD_zone[i] = LoadRapidDataVariable("zone" + i);
-                RD_p[i] = LoadRapidDataVariable("p" + i);
-                RD_pset[i] = LoadRapidDataVariable("pset" + i);
-                //AddVirtualTarget();
 
-                if (DEBUG)
-                {
-                    Console.WriteLine("{0}, {1}, {2}, {3}",
-                        RD_vel[i].StringValue,
-                        RD_zone[i].StringValue,
-                        RD_p[i].StringValue,
-                        RD_pset[i].StringValue);
-                }
-            }
 
-        }
 
-        /// <summary>
-        /// Retrieves a Rapid variable in current module and returns it
-        /// </summary>
-        /// <param name="varName"></param>
-        /// <returns></returns>
-        public RapidData LoadRapidDataVariable(string varName)
-        {
-            RapidData rd = null;
-            try
-            {
-                rd = mainTask.GetModule("StreamModule").GetRapidData(varName);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-            return rd;
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        
+
+        
 
         /// <summary>
         /// Adds a Frame to the streaming queue
@@ -1060,28 +1012,7 @@ namespace RobotControl
 
         
 
-        public void OnRD_pnum_ValueChanged(object sender, DataValueChangedEventArgs e)
-        {
-            RapidData rd = (RapidData)sender;
-            if (DEBUG) Console.WriteLine("   variable '{0}' changed: {1}", rd.Name, rd.StringValue);
-
-            // Do not add target if pnum is being reset to initial value (like on program load)
-            if (!rd.StringValue.Equals("-1"))
-            {
-                if (DEBUG) Console.WriteLine("Ticking from pnum event handler");
-                mHeld = true;
-                TickStreamQueue(true);
-                mHeld = false;
-            }
-
-            if (rd != null)
-            {
-                //Console.WriteLine("Disposing rd");
-                //rd.Dispose();
-                //rd = null;
-            }
-
-        }
+        
 
 
     }
