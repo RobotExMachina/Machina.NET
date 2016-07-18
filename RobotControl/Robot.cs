@@ -408,8 +408,9 @@ namespace RobotControl
         {
             c.DebugBanner();
             //c.TesMastership();
-            c.DebugControllerDump();
-            c.DebugTaskDump();
+            //c.DebugControllerDump();
+            //c.DebugTaskDump();
+            c.DebugDump();
         }
         
         /// <summary>

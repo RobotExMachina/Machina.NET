@@ -19,9 +19,21 @@ namespace RobotControl
     /// </summary>
     abstract class Communication
     {
-        // Public properties
-        protected ControlMode mode = ControlMode.Offline;
+        /// <summary>
+        /// A reference to the Control object commanding this Comm
+        /// </summary>
+        protected Control masterControl = null;
+
+        /// <summary>
+        /// A reference to the shared streamQueue object
+        /// </summary>
+        protected StreamQueue streamQueue = null;
+        
+        /// <summary>
+        /// Is the connection to the controller fully operative?
+        /// </summary>
         protected bool isConnected = false;
+        
         /// <summary>
         /// Is the device currently running a program?
         /// </summary>
@@ -108,13 +120,21 @@ namespace RobotControl
         /// <returns></returns>
         public abstract Joints GetCurrentJoints();
 
+        public abstract void TickStreamQueue(bool priority);
 
+        public abstract void DebugDump();
 
 
         // Base constructor
-        public Communication(ControlMode cmode)
+        public Communication(Control ctrl)
         {
-            mode = cmode;
+            masterControl = ctrl;
+            Reset();
+        }
+
+        public void LinkStreamQueue(StreamQueue q)
+        {
+            streamQueue = q;
         }
 
         public bool IsConnected()
@@ -159,6 +179,7 @@ namespace RobotControl
         // ABB stuff and flags
         private Controller controller;
         private ABB.Robotics.Controllers.RapidDomain.Task mainTask;
+        public object rapidDataLock = new object();
         private bool isLogged = false;
         //private bool isMainTaskRetrieved = false;                         // just do null check on the mainTask object
         private static string localBufferDirname = "C:";                 // Route names to be used for file handling
@@ -177,10 +198,7 @@ namespace RobotControl
         /// <summary>
         /// Main constructor
         /// </summary>
-        public CommunicationABB(ControlMode cmode) : base(cmode) 
-        {
-            Reset();
-        }
+        public CommunicationABB(Control ctrl) : base(ctrl) { }
 
         /// <summary>
         /// Reverts the Comm object to a blank state before any connection attempt. 
@@ -258,7 +276,7 @@ namespace RobotControl
             }
 
             // If on 'stream' mode, set up stream connection flow
-            if (mode == ControlMode.Stream)
+            if (masterControl.GetControlMode() == ControlMode.Stream)
             {
                 if (!SetupStreamingMode())
                 {
@@ -572,8 +590,89 @@ namespace RobotControl
             return new Joints(controller.MotionSystem.ActiveMechanicalUnit.GetPosition());
         }
 
+        /// <summary>
+        /// This function will look at the state of the program pointer, the streamQueue, 
+        /// and if necessary will add a new target to the stream. This is meant to be called
+        /// to initiate the stream update chain, like when adding a new target, or pnum event handling.
+        /// </summary>
+        public override void TickStreamQueue(bool hasPriority)
+        {
+            Console.WriteLine("TICKING StreamQueue: {0} targets pending", streamQueue.FramesPending());
+            if (streamQueue.AreFramesPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
+            {
+                Console.WriteLine("About to set targets");
+                SetNextVirtualTarget(hasPriority);
+                virtualStepCounter++;
+                TickStreamQueue(hasPriority);
+            }
+            else
+            {
+                Console.WriteLine("Not setting targets, streamQueue.AreFramesPending() {0} RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals(\"FALSE\") {1}",
+                     streamQueue.AreFramesPending(),
+                    RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"));
+            }
+        }
 
-
+        /// <summary>
+        /// Dumps a bunch of controller info to the console.
+        /// </summary>
+        public override void DebugDump()
+        {
+            if (isConnected)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("DEBUG CONTROLLER DUMP:");
+                Console.WriteLine("     AuthenticationSystem: " + controller.AuthenticationSystem.Name);
+                Console.WriteLine("     BackupInProgress: " + controller.BackupInProgress);
+                Console.WriteLine("     Configuration: " + controller.Configuration);
+                Console.WriteLine("     Connected: " + controller.Connected);
+                Console.WriteLine("     CurrentUser: " + controller.CurrentUser);
+                Console.WriteLine("     DateTime: " + controller.DateTime);
+                Console.WriteLine("     EventLog: " + controller.EventLog);
+                Console.WriteLine("     FileSystem: " + controller.FileSystem);
+                Console.WriteLine("     IOSystem: " + controller.IOSystem);
+                Console.WriteLine("     IPAddress: " + controller.IPAddress);
+                Console.WriteLine("     Ipc: " + controller.Ipc);
+                Console.WriteLine("     IsMaster: " + controller.IsMaster);
+                Console.WriteLine("     IsVirtual: " + controller.IsVirtual);
+                Console.WriteLine("     MacAddress: " + controller.MacAddress);
+                //Console.WriteLine("     MainComputerServiceInfo: ");
+                //Console.WriteLine("         BoardType: " + controller.MainComputerServiceInfo.BoardType);
+                //Console.WriteLine("         CpuInfo: " + controller.MainComputerServiceInfo.CpuInfo);
+                //Console.WriteLine("         RamSize: " + controller.MainComputerServiceInfo.RamSize);
+                //Console.WriteLine("         Temperature: " + controller.MainComputerServiceInfo.Temperature);
+                Console.WriteLine("     MastershipPolicy: " + controller.MastershipPolicy);
+                Console.WriteLine("     MotionSystem: " + controller.MotionSystem);
+                Console.WriteLine("     Name: " + controller.Name);
+                //Console.WriteLine("     NetworkSettings: " + controller.NetworkSettings);
+                Console.WriteLine("     OperatingMode: " + controller.OperatingMode);
+                Console.WriteLine("     Rapid: " + controller.Rapid);
+                Console.WriteLine("     RobotWare: " + controller.RobotWare);
+                Console.WriteLine("     RobotWareVersion: " + controller.RobotWareVersion);
+                Console.WriteLine("     RunLevel: " + controller.RunLevel);
+                Console.WriteLine("     State: " + controller.State);
+                Console.WriteLine("     SystemId: " + controller.SystemId);
+                Console.WriteLine("     SystemName: " + controller.SystemName);
+                //Console.WriteLine("     TimeServer: " + controller.TimeServer);
+                //Console.WriteLine("     TimeZone: " + controller.TimeZone);
+                //Console.WriteLine("     UICulture: " + controller.UICulture);
+                        
+                Console.WriteLine("");
+                Console.WriteLine("DEBUG TASK DUMP:");
+                Console.WriteLine("    Cycle: " + mainTask.Cycle);
+                Console.WriteLine("    Enabled: " + mainTask.Enabled);
+                Console.WriteLine("    ExecutionStatus: " + mainTask.ExecutionStatus);
+                Console.WriteLine("    ExecutionType: " + mainTask.ExecutionType);
+                Console.WriteLine("    Motion: " + mainTask.Motion);
+                Console.WriteLine("    MotionPointer: " + mainTask.MotionPointer.Module);
+                Console.WriteLine("    Name: " + mainTask.Name);
+                Console.WriteLine("    ProgramPointer: " + mainTask.ProgramPointer.Module);
+                Console.WriteLine("    RemainingCycles: " + mainTask.RemainingCycles);
+                Console.WriteLine("    TaskType: " + mainTask.TaskType);
+                Console.WriteLine("    Type: " + mainTask.Type);
+                Console.WriteLine("");
+            }
+        }
 
 
 
@@ -994,7 +1093,7 @@ namespace RobotControl
         /// <summary>
         /// Loads the default StreamModule designed for streaming.
         /// </summary>
-        public bool LoadStreamingModule()
+        private bool LoadStreamingModule()
         {
             return LoadProgramFromStringList(StaticData.StreamModule.ToList());
         }
@@ -1003,7 +1102,7 @@ namespace RobotControl
         /// <summary>
         /// Loads all relevant Rapid variables
         /// </summary>
-        public bool HookUpStreamingVariables()
+        private bool HookUpStreamingVariables()
         {
             // Load RapidData control variables
             RD_aborted = LoadRapidDataVariable("aborted");
@@ -1046,7 +1145,7 @@ namespace RobotControl
         /// </summary>
         /// <param name="varName"></param>
         /// <returns></returns>
-        public RapidData LoadRapidDataVariable(string varName)
+        private RapidData LoadRapidDataVariable(string varName)
         {
             RapidData rd = null;
             try
@@ -1060,6 +1159,69 @@ namespace RobotControl
             return rd;
         }
 
+        /// <summary>
+        /// Sets the value of a Rapid variable from a string representation
+        /// </summary>
+        /// <param name="rd"></param>
+        /// <param name="declaration"></param>
+        private void SetRapidDataVariable(RapidData rd, string declaration)
+        {
+            try
+            {
+                using (Mastership.Request(controller.Rapid))
+                {
+                    Console.WriteLine("    current value for '{0}': {1}", rd.Name, rd.StringValue);
+                    rd.StringValue = declaration;
+                    Console.WriteLine("        NEW value for '{0}': {1}", rd.Name, rd.StringValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("    ERROR SetRapidDataVarString: {0}", ex);
+            }
+        }
+
+
+        /// <summary>
+        /// Figures out the appropriate virtual target in the streaming module and 
+        /// sets new values according to the streaming queue.
+        /// </summary>
+        /// <param name="hasPriority"></param>
+        private void SetNextVirtualTarget(bool hasPriority)
+        {
+            Console.WriteLine("Setting frame #{0}", virtualStepCounter);
+
+            lock (rapidDataLock)
+            {
+                Frame target = streamQueue.GetNext();
+                if (target != null)
+                {
+                    int fid = virtualStepCounter % virtualRDCount;
+                    //// When masterhip is held, only priority calls make it through (which are the ones holding mastership)
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 1");
+                    //}  // safety mechanism to not hit held mastership by eventhandlers
+                    SetRapidDataVariable(RD_p[fid], target.GetUNSAFERobTargetDeclaration());
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 2");
+                    //}
+                    SetRapidDataVariable(RD_vel[fid], target.GetSpeedDeclaration());
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 3");
+                    //}
+                    SetRapidDataVariable(RD_zone[fid], target.GetZoneDeclaration());
+                    //while (!hasPriority && mHeld)
+                    //{
+                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 4");
+                    //}
+                    //SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);  // --> Looks like this wasn't working well??
+                    SetRapidDataVariable(RD_pset[fid], "TRUE");
+                }
+            }
+        }
 
 
 
@@ -1159,7 +1321,7 @@ namespace RobotControl
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnRD_pnum_ValueChanged(object sender, DataValueChangedEventArgs e)
+        private void OnRD_pnum_ValueChanged(object sender, DataValueChangedEventArgs e)
         {
             RapidData rd = (RapidData)sender;
             Console.WriteLine("   variable '{0}' changed: {1}", rd.Name, rd.StringValue);
@@ -1181,6 +1343,8 @@ namespace RobotControl
             }
 
         }
+
+
 
 
 
