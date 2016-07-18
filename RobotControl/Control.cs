@@ -723,7 +723,6 @@ namespace RobotControl
         /// Checks the state of the execution of the robot, and if stopped and if elements 
         /// remaining on the queue, starts executing them.
         /// </summary>
-        /// <param name="robotIsStopped"></param>
         public void TriggerQueue()
         {
             if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))

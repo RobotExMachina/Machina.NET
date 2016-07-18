@@ -421,10 +421,11 @@ public class TuioDemo : Form , TuioListener
         arm.ControlMode(cMode);
 
         arm.Connect();
-        Console.WriteLine(arm.GetIP());
-        Console.WriteLine(arm.GetCurrentPosition());
-        Console.WriteLine(arm.GetCurrentOrientation());
-        Console.WriteLine(arm.GetCurrentJoints());
+        arm.DebugDump();
+        //Console.WriteLine(arm.GetIP());
+        //Console.WriteLine(arm.GetCurrentPosition());
+        //Console.WriteLine(arm.GetCurrentOrientation());
+        //Console.WriteLine(arm.GetCurrentJoints());
 
         arm.SetVelocity(velocity);
         arm.SetZone(zone);

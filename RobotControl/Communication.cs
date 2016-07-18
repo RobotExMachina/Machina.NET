@@ -1332,12 +1332,12 @@ namespace RobotControl
             {
                 isRunning = false;
 
-                //// Only trigger Instruct queue
-                //if (controlMode == ControlMode.Execute)
-                //{
-                //    // Tick queue to move forward
-                //    TriggerQueue(true);
-                //}
+                // Only trigger Instruct queue
+                if (masterControl.GetControlMode() == ControlMode.Execute)
+                {
+                    // Tick queue to move forward
+                    masterControl.TriggerQueue();
+                }
             }
         }
 
