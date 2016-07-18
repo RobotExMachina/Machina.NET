@@ -5,14 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-//// the Control class should not need any ABB controllers...
-//using ABB.Robotics;
-//using ABB.Robotics.Controllers;
-//using ABB.Robotics.Controllers.Discovery;
-//using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
-//using ABB.Robotics.Controllers.EventLogDomain;
-//using ABB.Robotics.Controllers.FileSystemDomain;
-
 
 namespace RobotControl
 {
@@ -29,9 +21,6 @@ namespace RobotControl
         public static readonly bool DEBUG = true;                                  // dump a bunch of debug logs
 
         
-
-
-
 
         /// <summary>
         /// Operation modes by default
@@ -86,12 +75,13 @@ namespace RobotControl
         /// </summary>
         public Control()
         {
-            Reset();
+            Reset();  // @TODO necessary?
         }
 
         /// <summary>
         /// Resets all internal state properties to default values. To be invoked upon
         /// an internal robot reset.
+        /// @TODO rethink this
         /// </summary>
         public void Reset()
         {
@@ -105,7 +95,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Sets current Control Mode. 
+        /// Sets current Control Mode and establishes communication if applicable.
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
@@ -166,7 +156,6 @@ namespace RobotControl
             return runMode;
         }
 
-
         /// <summary>
         /// Searches the network for a robot controller and establishes a connection with the specified one by position. 
         /// Necessary for "online" modes.
@@ -187,61 +176,18 @@ namespace RobotControl
                 return false;
             }
 
+            // @TODO rework this into Virtual Robots
             Frame curr = comm.GetCurrentFrame();
             TCPPosition = curr.Position;
             TCPRotation = curr.Orientation;
 
             return true;
-
-            //// Scan the network and hookup to the specified controller
-            //bool success = false;
-            
-            //// This is specific to ABB, should become abstracted at some point...
-            //NetworkScanner scanner = new NetworkScanner();
-            //ControllerInfo[] controllers = scanner.GetControllers();
-            //if (controllers.Length > 0)
-            //{
-            //    int id = robotId > controllers.Length ? controllers.Length - 1 :
-            //        robotId < 0 ? 0 : robotId;
-            //    controller = ControllerFactory.CreateFrom(controllers[id]);
-            //    if (controller != null)
-            //    {
-            //        isConnected = true;
-            //        IP = controller.IPAddress.ToString();
-            //        if (DEBUG) Console.WriteLine("Found controller on " + IP);
-
-            //        LogOn();
-            //        RetrieveMainTask();
-            //        if (TestMastership()) SetRunMode(RunMode.Once);  // why was this here? 
-            //        SubscribeToEvents();
-            //        success = true;
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("Could not connect to controller");
-            //        isConnected = false;
-            //    }
-               
-            //}
-            //else
-            //{
-            //    if (DEBUG) Console.WriteLine("No controllers found on the network");
-            //    isConnected = false;
-            //}
-
-            //// Pick up the state of the robot if doing Stream mode
-            //if (controlMode == ControlMode.Stream)
-            //{
-            //    LoadStreamingModule();
-            //    HookUpStreamingVariables();
-            //    //TCPPosition = new Point(GetTCPRobTarget().Trans);
-            //    TCPPosition = GetTCPPosition();
-            //    //TCPRotation = new Rotation(GetTCPRobTarget().Rot);
-            //    TCPRotation = GetTCPRotation();
-            //    if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
-            //}
         }
 
+        /// <summary>
+        /// Requests the Communication object to disconnect from controller and reset.
+        /// </summary>
+        /// <returns></returns>
         public bool DisconnectFromDevice()
         {
             // Sanity
@@ -271,34 +217,30 @@ namespace RobotControl
         {
             return comm.GetIP();
         }
-
-
+        
         /// <summary>
         /// Loads a programm to the connected device and executes it. 
         /// </summary>
-        /// <param name="programLines"></param>
+        /// <param name="programLines">A string list representation of the program's code.</param>
         /// <returns></returns>
         public bool LoadProgramToDevice(List<string> programLines)
         {
-            return comm.LoadProgramFromStringList(programLines);
+            return comm.LoadProgramToController(programLines);
         }
-
 
         /// <summary>
         /// Loads a programm to the connected device and executes it. 
         /// </summary>
-        /// <param name="filepath">Full filepath including root, directory structure, filename and extension</param>
+        /// <param name="filepath">Full filepath including root, directory structure, filename and extension.</param>
         /// <returns></returns>
         public bool LoadProgramToDevice(string filepath)
         {
-            // @TODO: all this sanity and checks should probably go into LoadModuleFromFilename() (or basically consolidate everything into one method
             if (controlMode == ControlMode.Offline)
             {
                 Console.WriteLine("Cannot load modules in Offline mode");
                 return false;
             }
-
-
+            
             // Sanity
             string fullPath = "";
 
@@ -345,23 +287,18 @@ namespace RobotControl
             }
             dirname = string.Join("\\", parts, 0, len - 1);
             string[] fileparts = parts[len - 1].Split('.');
-            if (fileparts.Length != 2)
-            {
-                Console.WriteLine("Weird filename");
-                return false;
-            }
-            filename = fileparts[0];
-            extension = fileparts[1];
+            filename = fileparts.Length > 2 ? string.Join(".", fileparts, 0, fileparts.Length - 1) : fileparts[0];  // account for filenames with multiple dots
+            extension = fileparts[fileparts.Length - 1];
 
             Console.WriteLine("  filename: " + filename);
             Console.WriteLine("  dirname: " + dirname);
             Console.WriteLine("  extension: " + extension);
 
-            return comm.LoadProgramFromFilename(dirname, filename, extension);
+            return comm.LoadProgramToController(dirname, filename, extension);
         }
 
         /// <summary>
-        /// Triggers start of program on device.
+        /// Triggers program start on device.
         /// </summary>
         /// <returns></returns>
         public bool StartProgramOnDevice()
@@ -376,7 +313,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Stops execution of the running program on device.
+        /// Stops execution of running program on device.
         /// </summary>
         /// <param name="immediate"></param>
         /// <returns></returns>
@@ -409,6 +346,8 @@ namespace RobotControl
         /// <returns></returns>
         public Rotation GetCurrentOrientation()
         {
+            // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
+            // or the virtual one's (like in offline mode).
             return comm.GetCurrentOrientation();
         }
 
@@ -419,6 +358,8 @@ namespace RobotControl
         /// <returns></returns>
         public Frame GetCurrentFrame()
         {
+            // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
+            // or the virtual one's (like in offline mode).
             return comm.GetCurrentFrame();
         }
 
@@ -431,6 +372,156 @@ namespace RobotControl
             return comm.GetCurrentJoints();
         }
 
+        // █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
+        //██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
+        //███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
+        //██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
+        //██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
+        //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+
+        /// <summary>
+        /// Sets the velocity parameter for future issued actions.
+        /// </summary>
+        /// <param name="vel">In mm/s</param>
+        public void SetCurrentVelocity(double vel)
+        {
+            currentVelocity = vel;
+        }
+
+        /// <summary>
+        /// Sets the approximation corner radius for future issued actions.
+        /// </summary>
+        /// <param name="zone">In mm.</param>
+        public void SetCurrentZone(double zone)
+        {
+            currentZone = zone;
+        }
+
+        /// <summary>
+        /// Requests relative linear movement based on current virtual position.
+        /// The action will execute based on current ControlMode and priority.
+        /// </summary>
+        /// <param name="incX"></param>
+        /// <param name="incY"></param>
+        /// <param name="incZ"></param>
+        /// <returns></returns>
+        public bool IssueRelativeMovementRequest(double incX, double incY, double incZ)
+        {
+            if (controlMode != ControlMode.Stream)
+            {
+                Console.WriteLine("Move() only supported in Stream mode");
+                return false;
+            }
+
+            if (SafetyCheckTableCollision)
+            {
+                if (IsBelowTable(TCPPosition.Z + incZ))
+                {
+                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
+                    if (SafetyStopOnTableCollision)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            TCPPosition.Add(incX, incY, incZ);
+            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
+
+            // Only tick queue if there are no targets pending to be streamed
+            if (streamQueue.FramesPending() == 1)
+            {
+                comm.TickStreamQueue(false);
+            }
+            else
+            {
+                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Requests absolute linear movement based on current virtual position.
+        /// The action will execute based on current ControlMode and priority.
+        /// </summary>
+        /// <param name="newX"></param>
+        /// <param name="newY"></param>
+        /// <param name="newZ"></param>
+        /// <returns></returns>
+        public bool IssueAbsoluteMovementRequest(double newX, double newY, double newZ)
+        {
+            if (controlMode != ControlMode.Stream)
+            {
+                Console.WriteLine("MoveTo() only supported in Stream mode");
+                return false;
+            }
+
+            if (SafetyCheckTableCollision)
+            {
+                if (IsBelowTable(newZ))
+                {
+                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
+                    if (SafetyStopOnTableCollision)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            TCPPosition.Set(newX, newY, newZ);
+            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
+               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
+               currentVelocity, currentZone));
+
+            // Only tick queue if there are no targets pending to be streamed
+            if (streamQueue.FramesPending() == 1)
+            {
+                comm.TickStreamQueue(false);
+            }
+            else
+            {
+                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Requests absolute rotation movement based on current virtual orientation.
+        /// The action will execute based on current ControlMode and priority.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <param name="q3"></param>
+        /// <param name="q4"></param>
+        /// <returns></returns>
+        public bool IssueAbsoluteRotationRequest(double q1, double q2, double q3, double q4)
+        {
+            if (controlMode != ControlMode.Stream)
+            {
+                Console.WriteLine("RotateTo() only supported in Stream mode");
+                return false;
+            }
+
+            // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
+            TCPRotation.Set(q1, q2, q3, q4);
+            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
+               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
+               currentVelocity, currentZone));
+
+            // Only tick queue if there are no targets pending to be streamed
+            if (streamQueue.FramesPending() == 1)
+            {
+                comm.TickStreamQueue(false);
+            }
+            else
+            {
+                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+            }
+
+            return true;
+        }
 
 
 
@@ -446,15 +537,7 @@ namespace RobotControl
 
 
 
-
-
-
-
-
-
-
-
-
+        
 
 
 
@@ -466,7 +549,11 @@ namespace RobotControl
         //██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝  
         //██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗
         //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝
-
+        
+        /// <summary>
+        /// Initializes the Communication object.
+        /// </summary>
+        /// <returns></returns>
         private bool InitializeCommunication()
         {
             // If there is already some communication going on
@@ -485,6 +572,10 @@ namespace RobotControl
             return true;
         }
 
+        /// <summary>
+        /// Disconnects and resets the Communcation object.
+        /// </summary>
+        /// <returns></returns>
         private bool DropCommunication()
         {
             if (comm == null)
@@ -544,153 +635,7 @@ namespace RobotControl
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
-        //██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
-        //███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
-        //██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
-        //██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
-        //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-                               
-        public void SetCurrentVelocity(double vel)
-        {
-            currentVelocity = vel;
-        }                        
-
-        public void SetCurrentZone(double zone)
-        {
-            currentZone = zone;
-        }
-
-        public bool RequestMove(double incX, double incY, double incZ)
-        {
-            if (controlMode != ControlMode.Stream)
-            {
-                Console.WriteLine("Move() only supported in Stream mode");
-                return false;
-            }
-
-            if (SafetyCheckTableCollision)
-            {
-                if (IsBelowTable(TCPPosition.Z + incZ))
-                {
-                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-                    if (SafetyStopOnTableCollision)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            TCPPosition.Add(incX, incY, incZ);
-            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
-
-            // Only tick queue if there are no targets pending to be streamed
-            if (streamQueue.FramesPending() == 1)
-            {
-                comm.TickStreamQueue(false);
-            }
-            else
-            {
-                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            }
-
-            return true;
-        }
-
-        public bool RequestMoveTo(double newX, double newY, double newZ)
-        {
-            if (controlMode != ControlMode.Stream)
-            {
-                Console.WriteLine("MoveTo() only supported in Stream mode");
-                return false;
-            }
-
-            if (SafetyCheckTableCollision)
-            {
-                if (IsBelowTable(newZ))
-                {
-                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-                    if (SafetyStopOnTableCollision)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            TCPPosition.Set(newX, newY, newZ);
-            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-               currentVelocity, currentZone));
-
-            // Only tick queue if there are no targets pending to be streamed
-            if (streamQueue.FramesPending() == 1)
-            {
-                comm.TickStreamQueue(false);
-            }
-            else
-            {
-                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            }
-
-            return true;
-        }
-
-        public bool RequestRotateTo(double q1, double q2, double q3, double q4)
-        {
-            if (controlMode != ControlMode.Stream)
-            {
-                Console.WriteLine("RotateTo() only supported in Stream mode");
-                return false;
-            }
-
-            // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
-            TCPRotation.Set(q1, q2, q3, q4);
-            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-               currentVelocity, currentZone));
-
-            // Only tick queue if there are no targets pending to be streamed
-            if (streamQueue.FramesPending() == 1)
-            {
-                comm.TickStreamQueue(false);
-            }
-            else
-            {
-                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            }
-
-            return true;
-        }
-
-
-
-
-
+        
         //██╗    ██╗██╗██████╗ 
         //██║    ██║██║██╔══██╗
         //██║ █╗ ██║██║██████╔╝
@@ -699,25 +644,14 @@ namespace RobotControl
         // ╚══╝╚══╝ ╚═╝╚═╝     
 
         /// <summary>
-        /// Adds a path to the queue manager.
+        /// Adds a path to the queue manager and tick it for execution.
         /// </summary>
         /// <param name="path"></param>
         public void AddPathToQueue(Path path)
         {
             queue.Add(path);
+            TriggerQueue();
         }
-
-        ///// <summary>
-        ///// Checks the state of the execution of the robot, and if stopped and if elements 
-        ///// remaining on the queue, starts executing them.
-        ///// </summary>
-        //public void TriggerQueue()
-        //{
-        //    if (controller.Rapid.ExecutionStatus == ExecutionStatus.Stopped)
-        //    {
-        //        TriggerQueue(true);
-        //    }
-        //}
 
         /// <summary>
         /// Checks the state of the execution of the robot, and if stopped and if elements 
@@ -753,16 +687,10 @@ namespace RobotControl
         {
             Console.WriteLine("RUNNING NEW PATH: " + path.Count);
             List<string> module = ProgramGenerator.UNSAFEModuleFromPath(path, (int)currentVelocity, (int)currentZone);
-            ////SaveModuleToFile(module, localBufferPathname + localBufferFilename);
-            ////LoadModuleFromFilename(localBufferFilename, localBufferPathname);
-            //LoadModuleToRobot(module);
-            //ResetProgramPointer();
-            //StartProgram();
 
-            comm.LoadProgramFromStringList(module);
+            comm.LoadProgramToController(module);
             comm.StartProgramExecution();
         }
-
 
         /// <summary>
         /// Remove all pending elements from the queue.
@@ -787,18 +715,6 @@ namespace RobotControl
             DebugBanner();
             comm.DebugDump();
         }
-        
-
-        
-
-
-
-
-
-
-
-
-
 
 
         /// <summary>
@@ -816,18 +732,10 @@ namespace RobotControl
             Console.WriteLine("");
         }
 
-
-
-
         // This should be moved somewhere else
         private static bool IsBelowTable(double z)
         {
             return z <= SafetyTableZLimit;
         }
-
-        
-
-
-
     }
 }

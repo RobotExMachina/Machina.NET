@@ -11,21 +11,6 @@ using System.Threading.Tasks;
 
 namespace RobotControl
 {
-    ///// <summary>
-    ///// Is this Robot connected to the application? 
-    ///// Offline mode is used to generate robotic programs offline,
-    ///// Online mode is meant to be used to send real-time instructions 
-    ///// to a robot connected to the mahcine running the application.
-    ///// </summary>
-    //public enum ConnectionMode : int { Offline = 1, Online = 2 };
-
-    ///// <summary>
-    ///// Different operating modes for Online control. 
-    ///// Instruct loads and executes entire modules to the controller (slower), 
-    ///// Stream overrides targets on the fly (faster)
-    ///// </summary>
-    //public enum OnlineMode : int { Instruct = 1, Stream = 2 };
-
     /// <summary>
     /// Represents the type of control that will be performed over the real/virtual robot.
     /// </summary>
@@ -54,8 +39,7 @@ namespace RobotControl
     /// Defines the different modes a program can be ran.
     /// </summary>
     public enum RunMode : int { None = 0, Once = 1, Loop = 2 };
-
-
+    
 
 
     //██████╗  ██████╗ ██████╗  ██████╗ ████████╗
@@ -71,11 +55,14 @@ namespace RobotControl
     public class Robot
     {
         /// <summary>
-        /// Build number
+        /// Build number.
         /// </summary>
-        public static readonly int Build = 1100;
+        public static readonly int Build = 1101;
 
-        // Private properties
+        /// <summary>
+        /// The main Control object, acts as an interface to all classes that
+        /// manage robot control.
+        /// </summary>
         private Control c;  // the main control object
 
  
@@ -87,19 +74,28 @@ namespace RobotControl
         //██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗    ██║  ██║██║     ██║
         //╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
         /// <summary>
-        /// Base constructor
+        /// Base constructor.
         /// </summary>                                                       
         public Robot()
         {
             c = new Control();
-            //c.Reset();
         }
 
+        /// <summary>
+        /// Sets the control mode the robot will operate under.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public bool ControlMode(ControlMode mode)
         {
             return c.SetControlMode(mode);
         }
 
+        /// <summary>
+        /// Sets the control mode the robot will operate under.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public bool ControlMode(string mode)
         {
             mode = mode.ToLower();
@@ -123,194 +119,84 @@ namespace RobotControl
             }
             return success;
         }
-
-
-        ///// <summary>
-        ///// Sets ConnectionMode for this robot.
-        ///// </summary>
-        ///// <param name="mode"></param>
-        ///// <returns></returns>
-        //public bool ConnectionMode(ConnectionMode mode)
-        //{
-        //    //connectionMode = mode;
-        //    return c.SetConnectionMode(mode);
-        //}
-
-        ///// <summary>
-        ///// Sets ConnectionMode for this robot.
-        ///// </summary>
-        ///// <param name="mode"></param>
-        ///// <returns></returns>
-        //public bool ConnectionMode(string mode)
-        //{
-        //    mode = mode.ToLower();
-        //    bool success = true;
-        //    if (mode.Equals("offline"))
-        //    {
-        //        //connectionMode = RobotControl.ConnectionMode.Offline;
-        //        return ConnectionMode(RobotControl.ConnectionMode.Offline);
-        //    }
-        //    else if (mode.Equals("online"))
-        //    {
-        //        //connectionMode = RobotControl.ConnectionMode.Online;
-        //        return ConnectionMode(RobotControl.ConnectionMode.Online);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("ConnectionMode '" + mode + "' is not available.");
-        //        success = false;
-        //    }
-        //    return success;
-        //}
-
-        ///// <summary>
-        ///// Sets OnlineMode type for this robot.
-        ///// </summary>
-        ///// <param name="mode"></param>
-        ///// <returns></returns>
-        //public bool OnlineMode(OnlineMode mode)
-        //{
-        //    //onlineMode = mode;
-        //    return c.SetOnlineMode(mode);
-        //}
-
-        ///// <summary>
-        ///// Sets OnlineMode type for this robot.
-        ///// </summary>
-        ///// <param name="mode"></param>
-        ///// <returns></returns>
-        //public bool OnlineMode(string mode)
-        //{
-        //    mode = mode.ToLower();
-        //    bool success = true;
-        //    if (mode.Equals("instruct"))
-        //    {
-        //        //onlineMode = RobotControl.OnlineMode.Instruct;
-        //        return OnlineMode(RobotControl.OnlineMode.Instruct);
-        //    }
-        //    else if (mode.Equals("stream"))
-        //    {
-        //        //onlineMode = RobotControl.OnlineMode.Stream;
-        //        return OnlineMode(RobotControl.OnlineMode.Stream);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("OnlineMode '" + mode + "' is not available.");
-        //        success = false;
-        //    }
-        //    return success;
-        //}
-
+        
+        /// <summary>
+        /// Sets the cycle the robot will run program in (Once or Loop).
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public bool RunMode(RunMode mode)
         {
             return c.SetRunMode(mode);
         }
 
-
         /// <summary>
-        /// Allows to toggle between "once" and "loop" modes.
+        /// Sets the cycle the robot will run program in (Once or Loop).
         /// </summary>
         /// <param name="mode"></param>
         public bool RunMode(string mode)
         {
-            //if (connectionMode == RobotControl.ConnectionMode.Offline)
-            //{
-            //    Console.WriteLine("Cannot set RunMode in Offline mode");
-            //    return;
-            //}
-
-            //if (isConnected)
-            //{
-            //    using (Mastership.Request(controller.Rapid))
-            //    {
-            //        controller.Rapid.Cycle = mode.ToLower().Equals("loop") ? ExecutionCycle.Forever : ExecutionCycle.Once;
-            //        //if (DEBUG) Console.WriteLine("RunMode set to " + controller.Rapid.Cycle);
-            //    }
-            //} 
-            //else
-            //{
-            //    Console.WriteLine("Not connected to controller");
-            //}
-
             mode = mode.ToLower();
-            bool success = true;
+
             if (mode.Equals("once"))
             {
-                //onlineMode = RobotControl.OnlineMode.Instruct;
                 return RunMode(RobotControl.RunMode.Once);
             }
             else if (mode.Equals("loop"))
             {
-                //onlineMode = RobotControl.OnlineMode.Stream;
                 return RunMode(RobotControl.RunMode.Once);
             }
             else
             {
                 Console.WriteLine("RunMode '" + mode + "' is not available.");
-                success = false;
             }
-            return success;
 
+            return false;
         }
 
-
         /// <summary>
-        /// In 'online' modes, performs all necessary instructions to connect to the robot controller. 
+        /// Performs all necessary operations to connect to a robot device, real or virtual.
+        /// This is necessary for 'online' modes.
         /// </summary>
-        /// <param name="mode"></param>
+        /// <param name="mode">If multiple devices are connected, choose this id from the list.</param>
         /// <returns></returns>
         public bool Connect(int robotId)
         {
-            //if (DEBUG) Console.WriteLine("Initializing connection to controller...");
-            //if (connectionMode == RobotControl.ConnectionMode.Offline)
-            //{
-            //    Console.WriteLine("ConnectionMode is currently set to offline");
-            //    return false;
-            //}
-            //return ConnectToController(onlineMode);
             return c.ConnectToDevice(robotId);
         }
 
+        /// <summary>
+        /// Performs all necessary operations to connect to the first robot device found on the network, real or virtual.
+        /// This is necessary for 'online' modes.
+        /// </summary>
+        /// <returns></returns>
         public bool Connect()
         {
             return c.ConnectToDevice(0);
         }
 
         /// <summary>
-        /// In 'online' modes, performs all necessary instructions to disconnect from the controller.
+        /// Performs all necessary instructions to disconnect from and dispose a robot device, real or virtual. 
+        /// This is necessary before leaving current execution thread.
         /// </summary>
         public bool Disconnect()
         {
-            //if (DEBUG) Console.WriteLine("Disconnecting from controller on " + IP);
-            //if (SafetyStopImmediateOnDisconnect) StopProgram(true);
             return c.DisconnectFromDevice();
         }
 
+        /// <summary>
+        /// Returns a string representation of the IP of the currently connected robot device.
+        /// </summary>
+        /// <returns></returns>
         public string GetIP()
         {
             return c.GetControllerIP();
         }
 
-        ///// <summary>
-        ///// Loads a module to the controller from a local file. 
-        ///// TODO: By default, it will wipe out any other modules in the task, add the possibility to choose.
-        ///// </summary>
-        ///// <param name="filename"></param>
-        ///// <param name="filepath"></param>
-        //public void LoadModule(string filename, string filepath)
-        //{
-        //    if (connectionMode == RobotControl.ConnectionMode.Offline)
-        //    {
-        //        Console.WriteLine("Cannot load modules in Offline mode");
-        //        return;
-        //    }
-        //    LoadModuleFromFilename(filename, filepath);
-        //}
-
         /// <summary>
         /// Loads a program to the robot from a local file.
         /// </summary>
-        /// <param name="filepath">Full absolute filepath including root, directory structure, filename and extension</param>
+        /// <param name="filepath">Full absolute filepath including root, directory structure, filename and extension.</param>
         /// <returns></returns>
         public bool LoadProgram(string filepath)
         {
@@ -337,8 +223,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Stops execution of the current module/s in the controller immediately. 
-        /// Use StopAfterProgram() to schedule robot atop after completion of current cycle.
+        /// Immediately stops execution of the current program/s in the connected robot. 
         /// </summary>
         public bool Stop()
         {
@@ -364,7 +249,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Returns a Frame object representing the robot's current TCP position and orientation.
+        /// Returns a Frame object representing the Robot's current TCP position and orientation.
         /// NOTE: the Frame's velocity and zone are still not representative of the current state.
         /// </summary>
         /// <returns></returns>
@@ -374,7 +259,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Returns a Joint object representing the current angular rotations of the robot's 6 axes
+        /// Returns a Joint object representing the current angular rotations of the robot's 6 axes.
         /// </summary>
         /// <returns></returns>
         public Joints GetCurrentJoints()
@@ -383,13 +268,12 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Loads the path to the queue manager and triggers execution of the program if applicable
+        /// Loads the path to the queue manager and triggers execution of the program if applicable.
         /// </summary>
         /// <param name="path"></param>
         public void LoadPath(Path path)
         {
             c.AddPathToQueue(path);
-            c.TriggerQueue();
         }
 
         /// <summary>
@@ -402,13 +286,10 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Dumps a ton of information to the console about the controller, the main task, etc.
+        /// Dumps a bunch of information to the console about the controller, the main task, etc.
         /// </summary>
         public void DebugDump()
         {
-            //c.TesMastership();
-            //c.DebugControllerDump();
-            //c.DebugTaskDump();
             c.DebugDump();
         }
         
@@ -449,7 +330,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool Move(double incX, double incY, double incZ)
         {
-            return c.RequestMove(incX, incY, incZ);
+            return c.IssueRelativeMovementRequest(incX, incY, incZ);
         }
 
         /// <summary>
@@ -461,7 +342,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool MoveTo(double newX, double newY, double newZ)
         {
-            return c.RequestMoveTo(newX, newY, newZ);
+            return c.IssueAbsoluteMovementRequest(newX, newY, newZ);
         }
 
         /// <summary>
@@ -495,7 +376,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool RotateTo(double q1, double q2, double q3, double q4)
         {
-            return c.RequestRotateTo(q1, q2, q3, q4);
+            return c.IssueAbsoluteRotationRequest(q1, q2, q3, q4);
         }
 
         /// <summary>

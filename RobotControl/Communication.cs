@@ -14,6 +14,13 @@ using ABB.Robotics.Controllers.FileSystemDomain;
 
 namespace RobotControl
 {
+    //  ██████╗  █████╗ ███████╗███████╗
+    //  ██╔══██╗██╔══██╗██╔════╝██╔════╝
+    //  ██████╔╝███████║███████╗█████╗  
+    //  ██╔══██╗██╔══██║╚════██║██╔══╝  
+    //  ██████╔╝██║  ██║███████║███████╗
+    //  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+    //                                  
     /// <summary>
     /// A class to handle communication with external controllers, real or virtual
     /// </summary>
@@ -40,8 +47,15 @@ namespace RobotControl
         protected bool isRunning = true;
         protected string IP = "";
 
-        // Abstract methods required in subclasses
 
+
+        //  ███████╗██╗ ██████╗ ███╗   ██╗ █████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗
+        //  ██╔════╝██║██╔════╝ ████╗  ██║██╔══██╗╚══██╔══╝██║   ██║██╔══██╗██╔════╝██╔════╝
+        //  ███████╗██║██║  ███╗██╔██╗ ██║███████║   ██║   ██║   ██║██████╔╝█████╗  ███████╗
+        //  ╚════██║██║██║   ██║██║╚██╗██║██╔══██║   ██║   ██║   ██║██╔══██╗██╔══╝  ╚════██║
+        //  ███████║██║╚██████╔╝██║ ╚████║██║  ██║   ██║   ╚██████╔╝██║  ██║███████╗███████║
+        //  ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+        //                                                                                  
         /// <summary>
         /// Reverts the Comm object to a blank state before any connection attempt, objects retrieved, subscriptions, etc,
         /// </summary>
@@ -74,14 +88,14 @@ namespace RobotControl
         /// <param name="filename"></param>
         /// <param name="extension"></param>
         /// <returns></returns>
-        public abstract bool LoadProgramFromFilename(string dirname, string filename, string extension);
+        public abstract bool LoadProgramToController(string dirname, string filename, string extension);
 
         /// <summary>
         /// Loads a program to the device.
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
-        public abstract bool LoadProgramFromStringList(List<string> program);
+        public abstract bool LoadProgramToController(List<string> program);
 
         /// <summary>
         /// Request the start of the program loaded on the device.
@@ -120,8 +134,15 @@ namespace RobotControl
         /// <returns></returns>
         public abstract Joints GetCurrentJoints();
 
+        /// <summary>
+        /// Ticks the queue manager and potentially triggers streaming of targets to the controller.
+        /// </summary>
+        /// <param name="priority"></param>
         public abstract void TickStreamQueue(bool priority);
 
+        /// <summary>
+        /// Dumps a bunch of info to the console.
+        /// </summary>
         public abstract void DebugDump();
 
 
@@ -174,6 +195,17 @@ namespace RobotControl
 
     }
 
+
+
+
+
+    //   █████╗ ██████╗ ██████╗ 
+    //  ██╔══██╗██╔══██╗██╔══██╗
+    //  ███████║██████╔╝██████╔╝
+    //  ██╔══██║██╔══██╗██╔══██╗
+    //  ██║  ██║██████╔╝██████╔╝
+    //  ╚═╝  ╚═╝╚═════╝ ╚═════╝ 
+    //                          
     class CommunicationABB : Communication
     {
         // ABB stuff and flags
@@ -181,20 +213,20 @@ namespace RobotControl
         private ABB.Robotics.Controllers.RapidDomain.Task mainTask;
         public object rapidDataLock = new object();
         private bool isLogged = false;
-        //private bool isMainTaskRetrieved = false;                         // just do null check on the mainTask object
+
         private static string localBufferDirname = "C:";                 // Route names to be used for file handling
         private static string localBufferFilename = "buffer";
         private static string localBufferFileExtension = "mod";
         private static string remoteBufferDirectory = "RobotControl";
 
 
-        //██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
-        //██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
-        //██████╔╝██║   ██║██████╔╝██║     ██║██║     
-        //██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║     
-        //██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗
-        //╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝
-                                            
+        //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
+        //  ██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
+        //  ██████╔╝██║   ██║██████╔╝██║     ██║██║     
+        //  ██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║     
+        //  ██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗
+        //  ╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝
+        //                                                                             
         /// <summary>
         /// Main constructor
         /// </summary>
@@ -205,10 +237,6 @@ namespace RobotControl
         /// </summary>
         public override void Reset()
         {
-            //if (SafetyStopImmediateOnDisconnect) StopProgram(true);
-
-            // revert to a pristine state before any connection attempt
-            // logoff, disconnect, dispose mainTask, turn flags off...
             StopProgramExecution(true);
             ReleaseIP();
             LogOff();
@@ -219,7 +247,7 @@ namespace RobotControl
 
         /// <summary>
         /// Performs all necessary actions to establish a connection to a real/virtual device, 
-        /// including connecting to the controller, loggin in, etc.
+        /// including connecting to the controller, loggin in, checking required states, etc.
         /// </summary>
         /// <param name="deviceId"></param>
         public override bool ConnectToDevice(int deviceId)
@@ -351,7 +379,7 @@ namespace RobotControl
         /// </summary>
         /// <param name="module"></param>
         /// <returns></returns>
-        public override bool LoadProgramFromStringList(List<string> module)
+        public override bool LoadProgramToController(List<string> module)
         {
             if (!isConnected)
             {
@@ -366,7 +394,7 @@ namespace RobotControl
                 return false;
             }
 
-            if (!LoadProgramFromFilename(localBufferDirname, localBufferFilename, localBufferFileExtension))
+            if (!LoadProgramToController(localBufferDirname, localBufferFilename, localBufferFileExtension))
             {
                 Console.WriteLine("Could not load module to controller");
                 return false;
@@ -382,7 +410,7 @@ namespace RobotControl
         /// </summary>
         /// <param name="dirname"></param>
         /// <returns></returns>
-        public override bool LoadProgramFromFilename(string dirname, string filename, string extension)
+        public override bool LoadProgramToController(string dirname, string filename, string extension)
         {
             // When connecting to a real controller, the reference filesystem 
             // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
@@ -687,17 +715,7 @@ namespace RobotControl
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
+        
 
 
 
@@ -743,41 +761,16 @@ namespace RobotControl
                 {
                     //isConnected = true;
                     success = true;
-
-                    // @TODO: create dedicated methods for all this stuff, and invoke them form a generic Connect() method
-                    //IP = controller.IPAddress.ToString();
-                    //if (DEBUG) Console.WriteLine("Found controller on " + IP);
-
-                    //LogOn();
-                    //RetrieveMainTask();
-                    //if (TestMastership()) SetRunMode(RunMode.Once);  // why was this here? 
-                    //SubscribeToEvents();
                 }
                 else
                 {
                     Console.WriteLine("Could not connect to controller...");
-                    //isConnected = false;
                 }
-
             }
             else
             {
                 Console.WriteLine("No controllers found on the network");
-                //isConnected = false;
             }
-
-            // @TODO: abstract all this somewhere else
-            //// Pick up the state of the robot if doing Stream mode
-            //if (controlMode == ControlMode.Stream)
-            //{
-            //    LoadStreamingModule();
-            //    HookUpStreamingVariables();
-            //    //TCPPosition = new Point(GetTCPRobTarget().Trans);
-            //    TCPPosition = GetTCPPosition();
-            //    //TCPRotation = new Rotation(GetTCPRobTarget().Rot);
-            //    TCPRotation = GetTCPRotation();
-            //    if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
-            //}
 
             return success;
         }
@@ -865,7 +858,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Returns true if controller is in automatic mode
+        /// Returns true if controller is in automatic mode.
         /// </summary>
         /// <returns></returns>
         private bool IsControllerInAutoMode()
@@ -892,26 +885,39 @@ namespace RobotControl
             return false;
         }
 
-
         /// <summary>
-        /// Loads the main task in the ABB controller, typically 't_rob1'.
+        /// Retrieves the main task from the ABB controller, typically 't_rob1'.
         /// </summary>
         /// <returns></returns>
         private bool LoadMainTask()
         {
-            bool success = false;
-            ABB.Robotics.Controllers.RapidDomain.Task[] tasks = controller.Rapid.GetTasks();
-            if (tasks.Length > 0)
+            if (controller == null)
             {
-                success = true;
-                mainTask = tasks[0];
+                Console.WriteLine("Cannot retreive main task: no controller available");
+                return false;
             }
-            else
+
+            try
             {
-                Console.WriteLine("Could not retrieve any task from the controller");
-                mainTask = null;
+                ABB.Robotics.Controllers.RapidDomain.Task[] tasks = controller.Rapid.GetTasks();
+                if (tasks.Length > 0)
+                {
+                    mainTask = tasks[0];
+                    return true;
+                }
+                else
+                {
+                    mainTask = null;
+                    Console.WriteLine("Could not retrieve any task from the controller");
+                }
             }
-            return success;
+            catch (Exception ex)
+            {
+                Console.WriteLine("Could not retrieve main task from controller");
+                Console.WriteLine(ex);
+            }
+            
+            return false;
         }
 
         /// <summary>
@@ -937,7 +943,6 @@ namespace RobotControl
         /// <returns></returns>
         private bool TestMastershipRapid()
         {
-            bool available = false;
             if (controller != null)
             {
                 try
@@ -947,7 +952,7 @@ namespace RobotControl
                         // Gets the current execution cycle from the RAPID module and sets it back to the same value
                         ExecutionCycle mode = controller.Rapid.Cycle;
                         controller.Rapid.Cycle = mode;
-                        available = true;
+                        return true;
                     }
                 }
                 catch (Exception ex)
@@ -960,17 +965,17 @@ namespace RobotControl
             {
                 Console.WriteLine("Cannot test Rapid Mastership, no controller available");
             }
-            return available;
+            return false;
         }
 
         /// <summary>
-        /// Upon connection, subscribe to relevant events in the controller and handle them.
+        /// Subscribe to relevant events in the controller and assign them handlers.
         /// </summary>
         private bool SubscribeToEvents()
         {
             if (controller == null)
             {
-                Console.WriteLine("Can't subscribe to controller events, not connected to controller...");
+                Console.WriteLine("Cannot subscribe to controller events: not connected to controller.");
             }
             else
             {
@@ -993,9 +998,7 @@ namespace RobotControl
             }
 
             return false;
-        }
-
-        
+        }   
 
         /// <summary>
         /// Deletes all existing modules from main task in the controller. 
@@ -1005,13 +1008,13 @@ namespace RobotControl
         {
             if (controller == null)
             {
-                Console.WriteLine("Cannot clear modules, not connected to controller");
+                Console.WriteLine("Cannot clear modules: not connected to controller");
                 return -1;
             }
 
             if (mainTask == null)
             {
-                Console.WriteLine("Cannot clear modules, main task not retrieved");
+                Console.WriteLine("Cannot clear modules: main task not retrieved");
                 return -1;
             }
 
@@ -1050,13 +1053,13 @@ namespace RobotControl
         {
             if (controller == null)
             {
-                Console.WriteLine("Cannot reset pointer, not connected to controller");
+                Console.WriteLine("Cannot reset pointer: not connected to controller");
                 return false;
             }
 
             if (mainTask == null)
             {
-                Console.WriteLine("Cannot reset pointer, mainTask not present");
+                Console.WriteLine("Cannot reset pointer: mainTask not present");
                 return false;
             }
 
@@ -1110,18 +1113,6 @@ namespace RobotControl
         /// <returns></returns>
         private bool SetupStreamingMode()
         {
-            //// Pick up the state of the robot if doing Stream mode
-            //if (controlMode == ControlMode.Stream)
-            //{
-            //    LoadStreamingModule();
-            //    HookUpStreamingVariables();
-            //    //TCPPosition = new Point(GetTCPRobTarget().Trans);
-            //    TCPPosition = GetTCPPosition();
-            //    //TCPRotation = new Rotation(GetTCPRobTarget().Rot);
-            //    TCPRotation = GetTCPRotation();
-            //    if (DEBUG) Console.WriteLine("Current TCP Position: {0}", TCPPosition);
-            //}
-
             if (!LoadStreamingModule())
             {
                 Console.WriteLine("Could not load streaming module");
@@ -1134,9 +1125,6 @@ namespace RobotControl
                 return false;
             }
             
-            // @TODO: Control should get here some leads on the robot's position and orientation
-
-
             return true;
         }
         
@@ -1145,9 +1133,8 @@ namespace RobotControl
         /// </summary>
         private bool LoadStreamingModule()
         {
-            return LoadProgramFromStringList(StaticData.StreamModule.ToList());
+            return LoadProgramToController(StaticData.StreamModule.ToList());
         }
-
 
         /// <summary>
         /// Loads all relevant Rapid variables
@@ -1247,27 +1234,10 @@ namespace RobotControl
                 if (target != null)
                 {
                     int fid = virtualStepCounter % virtualRDCount;
-                    //// When masterhip is held, only priority calls make it through (which are the ones holding mastership)
-                    //while (!hasPriority && mHeld)
-                    //{
-                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 1");
-                    //}  // safety mechanism to not hit held mastership by eventhandlers
+
                     SetRapidDataVariable(RD_p[fid], target.GetUNSAFERobTargetDeclaration());
-                    //while (!hasPriority && mHeld)
-                    //{
-                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 2");
-                    //}
                     SetRapidDataVariable(RD_vel[fid], target.GetSpeedDeclaration());
-                    //while (!hasPriority && mHeld)
-                    //{
-                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 3");
-                    //}
                     SetRapidDataVariable(RD_zone[fid], target.GetZoneDeclaration());
-                    //while (!hasPriority && mHeld)
-                    //{
-                    //    Console.WriteLine("TRAPPED IN MASTERHIP CONFLICT 4");
-                    //}
-                    //SetRapidDataVarBool(RD_pset[virtualStepCounter % virtualRDCount], true);  // --> Looks like this wasn't working well??
                     SetRapidDataVariable(RD_pset[fid], "TRUE");
                 }
             }
