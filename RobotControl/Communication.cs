@@ -214,6 +214,7 @@ namespace RobotControl
             LogOff();
             ReleaseMainTask();
             ReleaseController();
+            isConnected = false;
         }
 
         /// <summary>
@@ -249,7 +250,19 @@ namespace RobotControl
                 return false;
             }
 
-            // @TODO" IS IN AUTOMODE with motors on?
+            // Is controller in Automatic mode with motors on?
+            if (!IsControllerInAutoMode())
+            {
+                Console.WriteLine("Please set up controller to AUTOMATIC MODE and try again.");
+                Reset();
+                return false;
+            }
+            if (!IsControllerMotorsOn())
+            {
+                Console.WriteLine("Please set up Motors On mode in controller");
+                Reset();
+                return false;
+            }
 
             // Test if Rapid Mastership is available
             if (!TestMastershipRapid())
@@ -275,6 +288,9 @@ namespace RobotControl
                 return false;
             }
 
+            // If here, everything went well and successfully connected 
+            isConnected = true;
+
             // If on 'stream' mode, set up stream connection flow
             if (masterControl.GetControlMode() == ControlMode.Stream)
             {
@@ -285,9 +301,6 @@ namespace RobotControl
                     return false;
                 }
             }
-
-            // If here, everything went well and successfully connected 
-            isConnected = true;
 
             return isConnected;
         }
@@ -852,6 +865,35 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// Returns true if controller is in automatic mode
+        /// </summary>
+        /// <returns></returns>
+        private bool IsControllerInAutoMode()
+        {
+            if (controller != null)
+            {
+                if (controller.OperatingMode == ControllerOperatingMode.Auto)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if controller has Motors On
+        /// </summary>
+        /// <returns></returns>
+        private bool IsControllerMotorsOn()
+        {
+            if (controller != null)
+            {
+                if (controller.State == ControllerState.MotorsOn)
+                    return true;
+            }
+            return false;
+        }
+
+
+        /// <summary>
         /// Loads the main task in the ABB controller, typically 't_rob1'.
         /// </summary>
         /// <returns></returns>
@@ -932,20 +974,28 @@ namespace RobotControl
             }
             else
             {
+                // Suscribe to changes in the controller
+                controller.OperatingModeChanged += OnOperatingModeChanged;
+                controller.ConnectionChanged += OnConnectionChanged;
+                //controller.MastershipChanged += OnMastershipChanged;
+                controller.StateChanged += OnStateChanged;
+
                 // Suscribe to Rapid program execution (Start, Stop...)
-                controller.Rapid.ExecutionStatusChanged += OnExecutionStatusChanged;
+                controller.Rapid.ExecutionStatusChanged += OnRapidExecutionStatusChanged;
 
                 // Suscribe to Mastership changes 
-                controller.Rapid.MastershipChanged += OnMastershipChanged;
+                controller.Rapid.MastershipChanged += OnRapidMastershipChanged;
 
                 // Suscribe to Task Enabled changes
-                controller.Rapid.TaskEnabledChanged += OnTaskEnabledChanged;
+                controller.Rapid.TaskEnabledChanged += OnRapidTaskEnabledChanged;
 
                 return true;
             }
 
             return false;
         }
+
+        
 
         /// <summary>
         /// Deletes all existing modules from main task in the controller. 
@@ -1270,7 +1320,7 @@ namespace RobotControl
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
+        private void OnRapidExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
         {
             Console.WriteLine("EXECUTION STATUS CHANGED: " + e.Status);
 
@@ -1297,9 +1347,9 @@ namespace RobotControl
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnMastershipChanged(object sender, MastershipChangedEventArgs e)
+        private void OnRapidMastershipChanged(object sender, MastershipChangedEventArgs e)
         {
-            Console.WriteLine("MASTERSHIP STATUS CHANGED: {0}", e.Status);
+            Console.WriteLine("RAPID MASTERSHIP STATUS CHANGED: {0}", e.Status);
 
             // @TODO: what to do when mastership changes
         }
@@ -1309,11 +1359,21 @@ namespace RobotControl
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnTaskEnabledChanged(object sender, TaskEnabledChangedEventArgs e)
+        private void OnRapidTaskEnabledChanged(object sender, TaskEnabledChangedEventArgs e)
         {
             Console.WriteLine("TASK ENABLED CHANGED: {0}", e.Enabled);
 
             // @TODO: add behaviors
+        }
+
+        /// <summary>
+        /// What to do when the controller changes Operating Mode.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnOperatingModeChanged(object sender, OperatingModeChangeEventArgs e)
+        {
+            Console.WriteLine("OPERATING MODE CHANGED: {0}", e.NewMode);
         }
 
         /// <summary>
@@ -1344,6 +1404,20 @@ namespace RobotControl
 
         }
 
+        private void OnStateChanged(object sender, StateChangedEventArgs e)
+        {
+            Console.WriteLine("CONTROLLER STATECHANGED: {0}", e.NewState);
+        }
+
+        private void OnMastershipChanged(object sender, MastershipChangedEventArgs e)
+        {
+            Console.WriteLine("CONTROLLER MASTERSHIP CHANGED: {0}", e.Status);
+        }
+
+        private void OnConnectionChanged(object sender, ConnectionChangedEventArgs e)
+        {
+            Console.WriteLine("CONTROLLER CONNECTION CHANGED: {0}", e.Connected);
+        }
 
 
 

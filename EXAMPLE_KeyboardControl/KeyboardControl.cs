@@ -26,6 +26,8 @@ namespace EXAMPLE_KeyboardControl
             arm.ControlMode("stream");
             arm.Connect();
 
+            arm.DebugDump();
+
             // Start real-time streaming
             arm.Start();
 
@@ -33,7 +35,7 @@ namespace EXAMPLE_KeyboardControl
             arm.SetVelocity(leadSpeed);
             arm.SetZone(2);
             arm.RotateTo(Rotation.FlippedAroundY);
-            arm.MoveTo(250, 250, 250);
+            //arm.MoveTo(250, 250, 250);
 
             arm.SetVelocity(moveSpeed);
 

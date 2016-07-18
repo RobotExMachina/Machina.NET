@@ -406,7 +406,6 @@ namespace RobotControl
         /// </summary>
         public void DebugDump()
         {
-            c.DebugBanner();
             //c.TesMastership();
             //c.DebugControllerDump();
             //c.DebugTaskDump();

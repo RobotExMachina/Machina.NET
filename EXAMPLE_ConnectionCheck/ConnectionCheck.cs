@@ -36,7 +36,6 @@ namespace EXAMPLE_ConnectionCheck
 
             arm.Disconnect();
             
-            
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();

@@ -19,6 +19,8 @@ namespace EXAMPLE_StreamTargets2
             arm.ControlMode("stream");
             arm.Connect();
 
+            arm.DebugDump();
+
             // Start real-time streaming
             arm.Start();
 

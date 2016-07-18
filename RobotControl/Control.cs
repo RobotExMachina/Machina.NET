@@ -181,13 +181,17 @@ namespace RobotControl
                 return false;
             }
 
-            bool success = comm.ConnectToDevice(robotId);
+            if (!comm.ConnectToDevice(robotId))
+            {
+                Console.WriteLine("Cannot connect to device");
+                return false;
+            }
 
             Frame curr = comm.GetCurrentFrame();
             TCPPosition = curr.Position;
             TCPRotation = curr.Orientation;
 
-            return success;
+            return true;
 
             //// Scan the network and hookup to the specified controller
             //bool success = false;
