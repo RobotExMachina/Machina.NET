@@ -246,6 +246,8 @@ bot.RotateTo();
 bot.Transform();        // movement and rotation combined
 bot.TransformTo();      
 
+/*
+--> JOINT MOVEMENT BECOMES A SETTING! --> arm.SetMotionType("joint"); arm.SetMotionType("linear");
 // Joint movements
 bot.JMove();
 bot.JMoveTo();
@@ -255,6 +257,7 @@ bot.JRotateTo();
 
 bot.JTransform();
 bot.JTransformTo();
+*/
 
 // Joint manipulation
 bot.Joints(incj1..j6);  // issues relative increments of joints

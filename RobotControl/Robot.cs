@@ -57,7 +57,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1102;
+        public static readonly int Build = 1103;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -292,12 +292,21 @@ namespace RobotControl
         {
             c.DebugDump();
         }
-        
+
+
+
+        //  ███████╗███████╗████████╗████████╗██╗███╗   ██╗ ██████╗ ███████╗
+        //  ██╔════╝██╔════╝╚══██╔══╝╚══██╔══╝██║████╗  ██║██╔════╝ ██╔════╝
+        //  ███████╗█████╗     ██║      ██║   ██║██╔██╗ ██║██║  ███╗███████╗
+        //  ╚════██║██╔══╝     ██║      ██║   ██║██║╚██╗██║██║   ██║╚════██║
+        //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
+        //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
+        //                                                                  
         /// <summary>
         /// Sets the default velocity new actions will be run at.
         /// </summary>
         /// <param name="vel"></param>
-        public void SetVelocity(double vel)
+        public void SetVelocity(int vel)
         {
             c.SetCurrentVelocity(vel);
         }
@@ -306,128 +315,162 @@ namespace RobotControl
         /// Sets the default zone value new actions will be given.
         /// </summary>
         /// <param name="zone"></param>
-        public void SetZone(double zone)
+        public void SetZone(int zone)
         {
             c.SetCurrentZone(zone);
         }
 
-        /// <summary>
-        /// Issue a relative movement action request.
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <returns></returns>
-        public bool Move(Point dir)
-        {
-            return Move(dir.X, dir.Y, dir.Z);
-        }
+
+
+        //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
+        //  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
+        //  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
+        //  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
+        //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
+        //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+        //                                                         
+        ///// <summary>
+        ///// Issue a relative movement action request.
+        ///// </summary>
+        ///// <param name="dir"></param>
+        ///// <returns></returns>
+        //public bool Move(Point dir)
+        //{
+        //    return Move(dir.X, dir.Y, dir.Z);
+        //}
+
+
+        ///// <summary>
+        ///// Issue a relative movement action request.
+        ///// </summary>
+        ///// <param name="incX"></param>
+        ///// <param name="incY"></param>
+        ///// <param name="incZ"></param>
+        ///// <returns></returns>
+        //public bool Move(double incX, double incY, double incZ)
+        //{
+        //    return c.IssueRelativeMovementRequest(incX, incY, incZ);
+        //}
         
-        /// <summary>
-        /// Issue a relative movement action request.
-        /// </summary>
-        /// <param name="incX"></param>
-        /// <param name="incY"></param>
-        /// <param name="incZ"></param>
-        /// <returns></returns>
+
+        ///// <summary>
+        ///// Issue an absolute movement action request.
+        ///// </summary>
+        ///// <param name="newX"></param>
+        ///// <param name="newY"></param>
+        ///// <param name="newZ"></param>
+        ///// <returns></returns>
+        //public bool MoveTo(double newX, double newY, double newZ)
+        //{
+        //    return c.IssueAbsoluteMovementRequest(newX, newY, newZ);
+        //}
+
+        ///// <summary>
+        ///// Issue an absolute movement action request.
+        ///// </summary>
+        ///// <param name="bookmarkTarget"></param>
+        ///// <returns></returns>
+        //public bool MoveTo(string bookmarkTarget)
+        //{
+        //    string str = bookmarkTarget.ToLower();
+
+        //    if (str.Equals("home"))
+        //    {
+        //        return MoveTo(300, 0, 550);  // @TODO: this should issue a MoveAbsJ(0,0,0,0,0,0) or similar
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Named position '{0}' not found", bookmarkTarget);
+        //    }
+
+        //    return false;
+        //}
+
+
+        public bool Move(Point direction)
+        {
+            return c.IssueTranslationRequest(direction, true);
+        }
+
         public bool Move(double incX, double incY, double incZ)
         {
-            return c.IssueRelativeMovementRequest(incX, incY, incZ);
+            return Move(new Point(incX, incY, incZ));
         }
 
-        /// <summary>
-        /// Issue an absolute movement action request.
-        /// </summary>
-        /// <param name="newX"></param>
-        /// <param name="newY"></param>
-        /// <param name="newZ"></param>
-        /// <returns></returns>
-        public bool MoveTo(double newX, double newY, double newZ)
+        public bool MoveTo(Point position)
         {
-            return c.IssueAbsoluteMovementRequest(newX, newY, newZ);
+            return c.IssueTranslationRequest(position, false);
         }
 
-        /// <summary>
-        /// Issue an absolute movement action request.
-        /// </summary>
-        /// <param name="bookmarkTarget"></param>
-        /// <returns></returns>
-        public bool MoveTo(string bookmarkTarget)
+        public bool MoveTo(double x, double y, double z)
         {
-            string str = bookmarkTarget.ToLower();
-
-            if (str.Equals("home"))
-            {
-                return MoveTo(300, 0, 550);  // @TODO: this should issue a MoveAbsJ(0,0,0,0,0,0) or similar
-            }
-            else
-            {
-                Console.WriteLine("Named position '{0}' not found", bookmarkTarget);
-            }
-
-            return false;
+            return MoveTo(new Point(x, y, z));
         }
 
-        /// <summary>
-        /// Issue an absolute rotation of the TCP action request.
-        /// </summary>
-        /// <param name="q1"></param>
-        /// <param name="q2"></param>
-        /// <param name="q3"></param>
-        /// <param name="q4"></param>
-        /// <returns></returns>
-        public bool RotateTo(double q1, double q2, double q3, double q4)
-        {
-            return c.IssueAbsoluteRotationRequest(q1, q2, q3, q4);
-        }
 
-        /// <summary>
-        /// Issue an absolute rotation of the TCP action request.
-        /// </summary>
-        /// <param name="x1"></param>
-        /// <param name="x2"></param>
-        /// <param name="x3"></param>
-        /// <param name="y1"></param>
-        /// <param name="y2"></param>
-        /// <param name="y3"></param>
-        /// <param name="z1"></param>
-        /// <param name="z2"></param>
-        /// <param name="z3"></param>
-        /// <returns></returns>
-        public bool RotateTo(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
-        {
-            List<double> q = Rotation.PlaneToQuaternions(x1, x2, x3, y1, y2, y3, z1, z2, z3);
-            return RotateTo(q[0], q[1], q[2], q[3]);
-        }
 
-        /// <summary>
-        /// Issue an absolute rotation of the TCP action request.
-        /// </summary>
-        /// <param name="rot"></param>
-        /// <returns></returns>
-        public bool RotateTo(Rotation rot)
-        {
-            return RotateTo(rot.Q1, rot.Q2, rot.Q3, rot.Q4);
-        }
+        ///// <summary>
+        ///// Issue an absolute rotation of the TCP action request.
+        ///// </summary>
+        ///// <param name="q1"></param>
+        ///// <param name="q2"></param>
+        ///// <param name="q3"></param>
+        ///// <param name="q4"></param>
+        ///// <returns></returns>
+        //public bool RotateTo(double q1, double q2, double q3, double q4)
+        //{
+        //    return c.IssueAbsoluteRotationRequest(q1, q2, q3, q4);
+        //}
 
-        /// <summary>
-        /// Issue an absolute rotation of the TCP action request.
-        /// </summary>
-        /// <param name="bookmarkRotation"></param>
-        /// <returns></returns>
-        public bool RotateTo(string bookmarkRotation)
-        {
-            string str = bookmarkRotation.ToLower();
+        ///// <summary>
+        ///// Issue an absolute rotation of the TCP action request.
+        ///// </summary>
+        ///// <param name="x1"></param>
+        ///// <param name="x2"></param>
+        ///// <param name="x3"></param>
+        ///// <param name="y1"></param>
+        ///// <param name="y2"></param>
+        ///// <param name="y3"></param>
+        ///// <param name="z1"></param>
+        ///// <param name="z2"></param>
+        ///// <param name="z3"></param>
+        ///// <returns></returns>
+        //public bool RotateTo(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
+        //{
+        //    List<double> q = Rotation.PlaneToQuaternions(x1, x2, x3, y1, y2, y3, z1, z2, z3);
+        //    return RotateTo(q[0], q[1], q[2], q[3]);
+        //}
 
-            if (str.Equals("globalxy"))
-            {
-                return RotateTo(Rotation.GlobalXY);
-            }
-            else
-            {
-                Console.WriteLine("Named rotation '{0}' not found", bookmarkRotation);
-            }
+        ///// <summary>
+        ///// Issue an absolute rotation of the TCP action request.
+        ///// </summary>
+        ///// <param name="rot"></param>
+        ///// <returns></returns>
+        //public bool RotateTo(Rotation rot)
+        //{
+        //    return RotateTo(rot.Q1, rot.Q2, rot.Q3, rot.Q4);
+        //}
 
-            return false;
-        }
+        ///// <summary>
+        ///// Issue an absolute rotation of the TCP action request.
+        ///// </summary>
+        ///// <param name="bookmarkRotation"></param>
+        ///// <returns></returns>
+        //public bool RotateTo(string bookmarkRotation)
+        //{
+        //    string str = bookmarkRotation.ToLower();
+
+        //    if (str.Equals("globalxy"))
+        //    {
+        //        return RotateTo(Rotation.GlobalXY);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Named rotation '{0}' not found", bookmarkRotation);
+        //    }
+
+        //    return false;
+        //}
 
         
 

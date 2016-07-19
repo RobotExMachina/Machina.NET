@@ -20,12 +20,13 @@ namespace RobotControl
             bufferedActions = new List<Action>();
         }
 
-        void Add(Action act)
+        public bool Add(Action act)
         {
-            bufferedActions.Add(act);
+            bufferedActions.Add(act); 
+            return true;
         }
 
-        Action GetNext()
+        public Action GetNext()
         {
             if (bufferedActions.Count == 0) return null;
 
@@ -35,12 +36,12 @@ namespace RobotControl
             return pastActions.Last();
         }
 
-        bool AreActionsPending()
+        public bool AreActionsPending()
         {
             return bufferedActions.Count > 0;
         }
 
-        void Flush()
+        public void Flush()
         {
             pastActions.Clear();
             bufferedActions.Clear();

@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EXAMPLE_StreamTargets", "EX
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EXAMPLE_XBOX1Control", "EXAMPLE_XBOX1Control\EXAMPLE_XBOX1Control.csproj", "{D85F7A35-B2DB-4840-A6B2-2E04FE3CA55F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_NewAPITests", "TEST_NewAPITests\TEST_NewAPITests.csproj", "{6208C235-4E73-48A9-B50E-4433584A1B89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{D85F7A35-B2DB-4840-A6B2-2E04FE3CA55F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D85F7A35-B2DB-4840-A6B2-2E04FE3CA55F}.Release|x64.ActiveCfg = Release|Any CPU
 		{D85F7A35-B2DB-4840-A6B2-2E04FE3CA55F}.Release|x64.Build.0 = Release|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Debug|x64.Build.0 = Debug|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Release|x64.ActiveCfg = Release|Any CPU
+		{6208C235-4E73-48A9-B50E-4433584A1B89}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

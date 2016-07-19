@@ -56,10 +56,11 @@ namespace RobotControl
         // @TODO: move all of this to a VirtualRobot object and to the Comm + QueueManager objects
         public Point TCPPosition = null;
         public Rotation TCPRotation = null;
-        public double currentVelocity = 10;
-        public double currentZone = 5;
+        public int currentVelocity = 10;
+        public int currentZone = 5;
+        public MotionType currentMotionType = MotionType.Linear;        // linear motion by default
         public StreamQueue streamQueue;
-        public bool mHeld = false;                                                 // is Mastership currently held by someone? useful when several threads want to write to the robot...
+        public bool mHeld = false;                                      // is Mastership currently held by someone? useful when several threads want to write to the robot...
         
 
         
@@ -388,7 +389,7 @@ namespace RobotControl
         /// Sets the velocity parameter for future issued actions.
         /// </summary>
         /// <param name="vel">In mm/s</param>
-        public void SetCurrentVelocity(double vel)
+        public void SetCurrentVelocity(int vel)
         {
             currentVelocity = vel;
         }
@@ -397,152 +398,196 @@ namespace RobotControl
         /// Sets the approximation corner radius for future issued actions.
         /// </summary>
         /// <param name="zone">In mm.</param>
-        public void SetCurrentZone(double zone)
+        public void SetCurrentZone(int zone)
         {
             currentZone = zone;
         }
 
-        /// <summary>
-        /// Requests relative linear movement based on current virtual position.
-        /// The action will execute based on current ControlMode and priority.
-        /// </summary>
-        /// <param name="incX"></param>
-        /// <param name="incY"></param>
-        /// <param name="incZ"></param>
-        /// <returns></returns>
-        public bool IssueRelativeMovementRequest(double incX, double incY, double incZ)
+
+
+        ///// <summary>
+        ///// Requests relative linear movement based on current virtual position.
+        ///// The action will execute based on current ControlMode and priority.
+        ///// </summary>
+        ///// <param name="incX"></param>
+        ///// <param name="incY"></param>
+        ///// <param name="incZ"></param>
+        ///// <returns></returns>
+        //public bool IssueRelativeMovementRequest(double incX, double incY, double incZ)
+        //{
+        //    if (controlMode != ControlMode.Stream)
+        //    {
+        //        Console.WriteLine("Move() only supported in Stream mode");
+        //        return false;
+        //    }
+
+        //    if (SafetyCheckTableCollision)
+        //    {
+        //        if (IsBelowTable(TCPPosition.Z + incZ))
+        //        {
+        //            Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
+        //            if (SafetyStopOnTableCollision)
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //    }
+
+        //    TCPPosition.Add(incX, incY, incZ);
+        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
+
+        //    // Only tick queue if there are no targets pending to be streamed
+        //    if (streamQueue.FramesPending() == 1)
+        //    {
+        //        comm.TickStreamQueue(false);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+        //    }
+
+        //    return true;
+        //}
+
+        ///// <summary>
+        ///// Requests absolute linear movement based on current virtual position.
+        ///// The action will execute based on current ControlMode and priority.
+        ///// </summary>
+        ///// <param name="newX"></param>
+        ///// <param name="newY"></param>
+        ///// <param name="newZ"></param>
+        ///// <returns></returns>
+        //public bool IssueAbsoluteMovementRequest(double newX, double newY, double newZ)
+        //{
+        //    if (controlMode != ControlMode.Stream)
+        //    {
+        //        Console.WriteLine("MoveTo() only supported in Stream mode");
+        //        return false;
+        //    }
+
+        //    if (SafetyCheckTableCollision)
+        //    {
+        //        if (IsBelowTable(newZ))
+        //        {
+        //            Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
+        //            if (SafetyStopOnTableCollision)
+        //            {
+        //                return false;
+        //            }
+        //        }
+        //    }
+
+        //    TCPPosition.Set(newX, newY, newZ);
+        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
+        //       TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
+        //       currentVelocity, currentZone));
+
+        //    // Only tick queue if there are no targets pending to be streamed
+        //    if (streamQueue.FramesPending() == 1)
+        //    {
+        //        comm.TickStreamQueue(false);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+        //    }
+
+        //    return true;
+        //}
+
+        ///// <summary>
+        ///// Requests absolute rotation movement based on current virtual orientation.
+        ///// The action will execute based on current ControlMode and priority.
+        ///// </summary>
+        ///// <param name="q1"></param>
+        ///// <param name="q2"></param>
+        ///// <param name="q3"></param>
+        ///// <param name="q4"></param>
+        ///// <returns></returns>
+        //public bool IssueAbsoluteRotationRequest(double q1, double q2, double q3, double q4)
+        //{
+        //    if (controlMode != ControlMode.Stream)
+        //    {
+        //        Console.WriteLine("RotateTo() only supported in Stream mode");
+        //        return false;
+        //    }
+
+        //    // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
+        //    TCPRotation.Set(q1, q2, q3, q4);
+        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
+        //       TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
+        //       currentVelocity, currentZone));
+
+        //    // Only tick queue if there are no targets pending to be streamed
+        //    if (streamQueue.FramesPending() == 1)
+        //    {
+        //        comm.TickStreamQueue(false);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+        //    }
+
+        //    return true;
+        //}
+
+
+        //public bool IssueMovementRequest()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public bool IssueRotationRequest()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+
+
+        public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon, MotionType mType)
         {
-            if (controlMode != ControlMode.Stream)
-            {
-                Console.WriteLine("Move() only supported in Stream mode");
-                return false;
-            }
-
-            if (SafetyCheckTableCollision)
-            {
-                if (IsBelowTable(TCPPosition.Z + incZ))
-                {
-                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-                    if (SafetyStopOnTableCollision)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            TCPPosition.Add(incX, incY, incZ);
-            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
-
-            // Only tick queue if there are no targets pending to be streamed
-            if (streamQueue.FramesPending() == 1)
-            {
-                comm.TickStreamQueue(false);
-            }
-            else
-            {
-                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            }
-
-            return true;
+            return actionBuffer.Add(new ActionTranslation(trans, relative, vel, zon, mType));
         }
 
-        /// <summary>
-        /// Requests absolute linear movement based on current virtual position.
-        /// The action will execute based on current ControlMode and priority.
-        /// </summary>
-        /// <param name="newX"></param>
-        /// <param name="newY"></param>
-        /// <param name="newZ"></param>
-        /// <returns></returns>
-        public bool IssueAbsoluteMovementRequest(double newX, double newY, double newZ)
+        public bool IssueTranslationRequest(Point trans, bool relative)
         {
-            if (controlMode != ControlMode.Stream)
-            {
-                Console.WriteLine("MoveTo() only supported in Stream mode");
-                return false;
-            }
-
-            if (SafetyCheckTableCollision)
-            {
-                if (IsBelowTable(newZ))
-                {
-                    Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-                    if (SafetyStopOnTableCollision)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            TCPPosition.Set(newX, newY, newZ);
-            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-               currentVelocity, currentZone));
-
-            // Only tick queue if there are no targets pending to be streamed
-            if (streamQueue.FramesPending() == 1)
-            {
-                comm.TickStreamQueue(false);
-            }
-            else
-            {
-                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            }
-
-            return true;
+            return IssueTranslationRequest(trans, relative, currentVelocity, currentZone, currentMotionType);
         }
 
-        /// <summary>
-        /// Requests absolute rotation movement based on current virtual orientation.
-        /// The action will execute based on current ControlMode and priority.
-        /// </summary>
-        /// <param name="q1"></param>
-        /// <param name="q2"></param>
-        /// <param name="q3"></param>
-        /// <param name="q4"></param>
-        /// <returns></returns>
-        public bool IssueAbsoluteRotationRequest(double q1, double q2, double q3, double q4)
+        public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon)
         {
-            if (controlMode != ControlMode.Stream)
-            {
-                Console.WriteLine("RotateTo() only supported in Stream mode");
-                return false;
-            }
-
-            // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
-            TCPRotation.Set(q1, q2, q3, q4);
-            AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-               TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-               currentVelocity, currentZone));
-
-            // Only tick queue if there are no targets pending to be streamed
-            if (streamQueue.FramesPending() == 1)
-            {
-                comm.TickStreamQueue(false);
-            }
-            else
-            {
-                Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-            }
-
-            return true;
+            return IssueTranslationRequest(trans, relative, vel, zon, currentMotionType);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         
+
+
+        //public bool IssueTransformationRequest(Point trans, bool relTrans, Rotation rot, bool relRot, int vel, int zon, MotionType mType)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public bool IssueConfigurationRequest()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -554,7 +599,7 @@ namespace RobotControl
         //██╔═══╝ ██╔══██╗██║╚██╗ ██╔╝██╔══██║   ██║   ██╔══╝  
         //██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗
         //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝
-        
+
         /// <summary>
         /// Initializes the Communication object.
         /// </summary>
