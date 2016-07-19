@@ -518,7 +518,7 @@ namespace RobotControl
         {
             return "[9E9,9E9,9E9,9E9,9E9,9E9]";
         }
-        
+
         public string GetSpeedDeclaration()
         {
             return string.Format("[{0},{1},{2},{3}]", Velocity, Velocity, 5000, 1000);  // default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). using the same value as lin motion

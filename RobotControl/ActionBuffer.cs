@@ -36,6 +36,15 @@ namespace RobotControl
             return pastActions.Last();
         }
 
+        public List<Action> GetAllPending()
+        {
+            List<Action> pending = new List<Action>();
+            foreach (Action a in bufferedActions) pending.Add(a);  // shallow copy
+            pastActions.AddRange(bufferedActions);
+            bufferedActions.Clear();
+            return pending;
+        }
+
         public bool AreActionsPending()
         {
             return bufferedActions.Count > 0;

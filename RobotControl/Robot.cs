@@ -285,7 +285,12 @@ namespace RobotControl
             c.StopProgramOnDevice(false);
         }
 
-        
+        public bool Export(string filepath)
+        {
+            return c.Export(filepath);
+        }
+
+
 
 
 
@@ -312,6 +317,44 @@ namespace RobotControl
         public void SetZone(int zone)
         {
             c.SetCurrentZone(zone);
+        }
+
+        /// <summary>
+        /// Sets the motion type (linear, joint...) for future issued actions.
+        /// </summary>
+        /// <param name="type"></param>
+        public void SetMotionType(MotionType type)
+        {
+            c.SetCurrentMotionType(type);
+        }
+
+        /// <summary>
+        /// Sets the motion type (linear, joint...) for future issued actions.
+        /// </summary>
+        /// <param name="type">"linear", "joint" or "joints"</param>
+        public void SetMotionType(string type)
+        {
+            MotionType t = MotionType.Undefined;
+            type = type.ToLower();
+            if (type.Equals("linear")) {
+                t = MotionType.Linear;
+            }
+            else if (type.Equals("joint"))
+            {
+                t = MotionType.Joint;
+            }
+            else if (type.Equals("joints"))
+            {
+                t = MotionType.Joints;
+            }
+
+            if (t == MotionType.Undefined)
+            {
+                Console.WriteLine("Invalid motion type");
+                return;
+            }
+
+            SetMotionType(t);
         }
 
 
@@ -400,6 +443,7 @@ namespace RobotControl
         {
             return MoveTo(new Point(x, y, z));
         }
+
 
 
 

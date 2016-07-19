@@ -19,7 +19,7 @@ namespace RobotControl
         public static readonly bool SafetyStopOnTableCollision = true;
         public static readonly double SafetyTableZLimit = 100;                     // table security checks will trigger under this z height (mm)
         public static readonly bool DEBUG = true;                                  // dump a bunch of debug logs
-        public static readonly int DefaultVelocity = 25;
+        public static readonly int DefaultVelocity = 20;
         public static readonly int DefaultZone = 5;
         public static readonly MotionType DefaultMotionType = MotionType.Linear;
         
@@ -51,6 +51,9 @@ namespace RobotControl
         /// A buffer that stores issued actions pending to be released to controllers, exports, etc.
         /// </summary>
         private ActionBuffer actionBuffer;
+
+
+        private ProgramGenerator programGenerator = new ProgramGeneratorABB();  // @TODO: this must be more programmatic and shimmed
 
         // STUFF NEEDED FOR STREAM MODE
         // Most of it represents a virtual current state of the robot, to be able to 
@@ -385,6 +388,29 @@ namespace RobotControl
             return comm.GetCurrentJoints();
         }
 
+        public bool Export(string filepath)
+        {
+            List<Action> actions = actionBuffer.GetAllPending();
+
+            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", actions);
+
+            // @TODO: add some filepath sanity here
+
+            return SaveStringListToFile(programCode, filepath);
+        }
+
+
+
+        
+
+
+
+
+
+
+
+
+
         // █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
         //██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
         //███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
@@ -408,6 +434,15 @@ namespace RobotControl
         public void SetCurrentZone(int zone)
         {
             currentSettings.Zone = zone;
+        }
+
+        /// <summary>
+        /// Sets the motion type (linear, joint...) for future issued actions.
+        /// </summary>
+        /// <param name="type"></param>
+        public void SetCurrentMotionType(MotionType type)
+        {
+            currentSettings.MotionType = type;
         }
 
 
@@ -679,6 +714,20 @@ namespace RobotControl
             return pointer.Initialize(position, rotation);
         }
 
+        private bool SaveStringListToFile(List<string> lines, string filepath)
+        {
+            try
+            {
+                System.IO.File.WriteAllLines(filepath, lines, System.Text.Encoding.ASCII);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Could not save file...");
+                Console.WriteLine(ex);
+            }
+            return false;
+        }
 
 
 
@@ -711,17 +760,17 @@ namespace RobotControl
 
 
 
-            //██╗    ██╗██╗██████╗ 
-            //██║    ██║██║██╔══██╗
-            //██║ █╗ ██║██║██████╔╝
-            //██║███╗██║██║██╔═══╝ 
-            //╚███╔███╔╝██║██║     
-            // ╚══╝╚══╝ ╚═╝╚═╝     
+        //██╗    ██╗██╗██████╗ 
+        //██║    ██║██║██╔══██╗
+        //██║ █╗ ██║██║██████╔╝
+        //██║███╗██║██║██╔═══╝ 
+        //╚███╔███╔╝██║██║     
+        // ╚══╝╚══╝ ╚═╝╚═╝     
 
-            /// <summary>
-            /// Adds a path to the queue manager and tick it for execution.
-            /// </summary>
-            /// <param name="path"></param>
+        /// <summary>
+        /// Adds a path to the queue manager and tick it for execution.
+        /// </summary>
+        /// <param name="path"></param>
         public void AddPathToQueue(Path path)
         {
             queue.Add(path);

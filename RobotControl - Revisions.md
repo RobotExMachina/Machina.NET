@@ -18,9 +18,9 @@
 - [ ] Develop 'Offline' mode with the new framework
 
 ## BUILD 1104
-- [ ] Implement RobotPointers class
-    - [ ] Low-level state description of Virtual, Streaming and Real robots
-    - [ ] Link the virtual one to API-level instructions
+- [x] Implement RobotPointers class
+    - [x] Low-level state description of Virtual, Streaming and Real robots
+    - [x] Link the virtual one to API-level instructions
 
 ## BUILD 1103
 - [ ] Implement API-level instructions

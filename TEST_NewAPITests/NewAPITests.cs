@@ -15,7 +15,7 @@ namespace TEST_NewAPITests
             Robot arm = new Robot();
             arm.ControlMode("offline");
 
-            arm.DebugVirtualPointer();
+            //arm.DebugVirtualPointer();
 
             arm.MoveTo(100, 0, 100);
             arm.DebugVirtualPointer();
@@ -31,6 +31,8 @@ namespace TEST_NewAPITests
             arm.Move(0, 50, 0);
             arm.DebugVirtualPointer();
 
+            arm.SetMotionType("joint");
+
             arm.Move(-50, 0, 0);
             arm.DebugVirtualPointer();
 
@@ -38,11 +40,13 @@ namespace TEST_NewAPITests
             arm.DebugVirtualPointer();
 
             arm.SetVelocity(200);
-            arm.SetZone(10);
+            arm.SetZone(8);
             arm.MoveTo(300, 50, 300);
             arm.DebugVirtualPointer();
 
             arm.DebugBuffer();
+
+            arm.Export(@"C:\offlineTests.mod");
 
 
             Console.WriteLine(" ");

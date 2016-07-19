@@ -15,7 +15,7 @@ namespace RobotControl
     /// <summary>
     /// The type of Movement for robotic Actions
     /// </summary>
-    internal enum MotionType : int 
+    public enum MotionType : int 
     {
         Undefined = 0,       // a null default
         Linear = 1,     // linear movement
@@ -32,6 +32,14 @@ namespace RobotControl
     internal class Action
     {
         public ActionType type = ActionType.Undefined;
+
+        public Point translation;
+        public bool relative;
+        public MotionType motionType;
+        public int velocity;
+        public int zone;
+
+
     }
 
     /// <summary>
@@ -39,12 +47,7 @@ namespace RobotControl
     /// </summary>
     internal class ActionTranslation : Action
     {
-        public Point translation;
-        public bool relative;
-        public MotionType motionType;
-        public int velocity;
-        public int zone;
-
+        
         public ActionTranslation(Point trans, bool relTrans, int vel, int zon, MotionType mType)
         {
             type = ActionType.Translation;
@@ -71,7 +74,14 @@ namespace RobotControl
         
         public override string ToString()
         {
-            return string.Format("MOVE: {0} {1} {2}\\{3}", relative ? "rel" : "abs", translation, velocity, zone);
+            return string.Format("{0}: {1} {2} {3}-{4}",
+                motionType == MotionType.Linear ? "MOVEL" :
+                    motionType == MotionType.Joint ? "MOVEJ" :
+                        motionType == MotionType.Joints ? "JOINTS" : "UNDEFINED",
+                relative ? "rel" : "abs", 
+                translation, 
+                velocity, 
+                zone);
         }
 
     }
