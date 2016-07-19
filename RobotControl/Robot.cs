@@ -285,18 +285,7 @@ namespace RobotControl
             c.StopProgramOnDevice(false);
         }
 
-        /// <summary>
-        /// Dumps a bunch of information to the console about the controller, the main task, etc.
-        /// </summary>
-        public void DebugDump()
-        {
-            c.DebugDump();
-        }
-
-        public void DebugBuffer()
-        {
-            c.DebugBuffer();
-        }
+        
 
 
 
@@ -477,7 +466,30 @@ namespace RobotControl
         //    return false;
         //}
 
-        
 
+        //  ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
+        //  ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
+        //  ██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗
+        //  ██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║
+        //  ██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝
+        //  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ 
+        //                                            
+        /// <summary>
+        /// Dumps a bunch of information to the console about the controller, the main task, etc.
+        /// </summary>
+        public void DebugDump()
+        {
+            c.DebugDump();
+        }
+
+        public void DebugBuffer()
+        {
+            c.DebugBuffer();
+        }
+
+        public void DebugVirtualPointer()
+        {
+            c.DebugVirtualPointer();
+        }
     }
 }

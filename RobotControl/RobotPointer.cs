@@ -67,5 +67,10 @@ namespace RobotControl
             return true;
         }
 
+        public override string ToString()
+        {
+            return string.Format("pointer: {0} {1},{2},{3}\\{4}", motionType, position, rotation, velocity, zone);
+        }
+
     }
 }

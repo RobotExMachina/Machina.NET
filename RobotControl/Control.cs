@@ -784,7 +784,27 @@ namespace RobotControl
             streamQueue.Add(frame);
         }
 
+        // This should be moved somewhere else
+        private static bool IsBelowTable(double z)
+        {
+            return z <= SafetyTableZLimit;
+        }
 
+
+
+
+
+
+
+
+
+        //  ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
+        //  ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
+        //  ██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗
+        //  ██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║
+        //  ██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝
+        //  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ 
+        //                                            
         public void DebugDump()
         {
             DebugBanner();
@@ -796,6 +816,13 @@ namespace RobotControl
             actionBuffer.LogBufferedActions();
         }
 
+        public void DebugVirtualPointer()
+        {
+            if (virtualRobotPointer == null)
+                Console.WriteLine("Virtual pointer not initialized");
+            else
+                Console.WriteLine(virtualRobotPointer);
+        }
 
         /// <summary>
         /// Printlines a "DEBUG" ASCII banner... ;)
@@ -812,10 +839,6 @@ namespace RobotControl
             Console.WriteLine("");
         }
 
-        // This should be moved somewhere else
-        private static bool IsBelowTable(double z)
-        {
-            return z <= SafetyTableZLimit;
-        }
+        
     }
 }
