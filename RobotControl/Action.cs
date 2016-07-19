@@ -48,6 +48,11 @@ namespace RobotControl
             type = mType;
         }
 
+        public override string ToString()
+        {
+            return string.Format("MOVE: {0} {1} {2}\\{3}", relative ? "rel" : "abs", translation, velocity, zone);
+        }
+
     }
 
 

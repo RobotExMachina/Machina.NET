@@ -14,7 +14,7 @@ namespace RobotControl
         private List<Action> pastActions;
         private List<Action> bufferedActions;
 
-        ActionBuffer()
+        public ActionBuffer()
         {
             pastActions = new List<Action>();
             bufferedActions = new List<Action>();
@@ -45,6 +45,11 @@ namespace RobotControl
         {
             pastActions.Clear();
             bufferedActions.Clear();
+        }
+
+        public void LogBufferedActions()
+        {
+            foreach (Action a in bufferedActions) Console.WriteLine(a);
         }
 
         public override string ToString()

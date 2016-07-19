@@ -21,6 +21,7 @@ namespace TEST_NewAPITests
             arm.Move(-50, 0, 0);
             arm.Move(0, -50, 0);
 
+            arm.DebugBuffer();
 
 
             Console.WriteLine(" ");

@@ -95,9 +95,12 @@ namespace RobotControl
             //isLogged = false;
             //isMainTaskRetrieved = false;
             //IP = "";
-
+            
+            // @TODO: to deprecate
             queue = new Queue();
             streamQueue = new StreamQueue();
+
+            actionBuffer = new ActionBuffer();
         }
 
         /// <summary>
@@ -764,6 +767,11 @@ namespace RobotControl
         {
             DebugBanner();
             comm.DebugDump();
+        }
+
+        public void DebugBuffer()
+        {
+            actionBuffer.LogBufferedActions();
         }
 
 

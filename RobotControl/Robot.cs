@@ -293,6 +293,11 @@ namespace RobotControl
             c.DebugDump();
         }
 
+        public void DebugBuffer()
+        {
+            c.DebugBuffer();
+        }
+
 
 
         //  ███████╗███████╗████████╗████████╗██╗███╗   ██╗ ██████╗ ███████╗
