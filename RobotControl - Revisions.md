@@ -14,6 +14,34 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+## BUILD 1105
+- [ ] Develop 'Offline' mode with the new framework
+
+## BUILD 1104
+- [ ] Implement RobotPointers class
+    - [ ] Low-level state description of Virtual, Streaming and Real robots
+    - [ ] Link the virtual one to API-level instructions
+
+## BUILD 1103
+- [ ] Implement API-level instructions
+    - [ ] .Move()
+    - [ ] .MoveTo()
+    - [ ] .Rotate()
+    - [ ] .RotateTo()
+    - [ ] .Transform()  // movement and rotation combined
+    - [ ] .TRansformTo()
+    - [ ] All the above in J mode (joint movement)
+    - [ ] .Joints()    // relative joint movement
+    - [ ] .JointsTo()  // absolute joint movement
+    - [ ] .FullTransform()  // a full constructor with all 
+    - [ ] .FullJoint()      // a full constructor
+
+## BUILD 1102
+- [ ] Create a framework for abstract Actions
+    - [ ] Create Action class, very low-level: mostly just primitive properties.
+    - [ ] Design it to be either two types (transform vs joints) or a single one (how?)
+    - [ ] Add properties for abs/rel Pos, abs/rel Rot, abs/rel Joint, movement type (lin/joint), vel, zone.
+    - [ ] Create an ActionBuffer class where issued actions get buffered until released somewhere (to a file as a module, to the controller as an uploaded program, to he controller as individual targets).
 
 ## BUILD 1101
 - [x] New class structure: 
