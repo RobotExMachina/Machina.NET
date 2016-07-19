@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace RobotControl
 {
     /// <summary>
-    /// The core class that centralizes all private control .
+    /// The core class that centralizes all private control.
     /// </summary>
     class Control
     {
@@ -44,6 +44,11 @@ namespace RobotControl
         /// The queue that manages what instructions get sent to the robot
         /// </summary>
         private Queue queue;
+
+        /// <summary>
+        /// A buffer that stores issued actions pending to be released to controllers, exports, etc.
+        /// </summary>
+        private ActionBuffer actionBuffer;
 
         // STUFF NEEDED FOR STREAM MODE
         // Most of it represents a virtual current state of the robot, to be able to 

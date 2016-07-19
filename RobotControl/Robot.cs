@@ -57,7 +57,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1101;
+        public static readonly int Build = 1102;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that

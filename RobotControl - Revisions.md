@@ -37,11 +37,11 @@
     - [ ] .FullJoint()      // a full constructor
 
 ## BUILD 1102
-- [ ] Create a framework for abstract Actions
-    - [ ] Create Action class, very low-level: mostly just primitive properties.
-    - [ ] Design it to be either two types (transform vs joints) or a single one (how?)
-    - [ ] Add properties for abs/rel Pos, abs/rel Rot, abs/rel Joint, movement type (lin/joint), vel, zone.
-    - [ ] Create an ActionBuffer class where issued actions get buffered until released somewhere (to a file as a module, to the controller as an uploaded program, to he controller as individual targets).
+- [x] Create a framework for abstract Actions
+    - [x] Create Action class, very low-level: mostly just primitive properties.
+    - [x] Design it to be either two types (transform vs joints) or a single one (how?)
+    - [x] Add properties for abs/rel Pos, abs/rel Rot, abs/rel Joint, movement type (lin/joint), vel, zone.
+    - [x] Create an ActionBuffer class where issued actions get buffered until released somewhere (to a file as a module, to the controller as an uploaded program, to he controller as individual targets).
 
 ## BUILD 1101
 - [x] New class structure: 
