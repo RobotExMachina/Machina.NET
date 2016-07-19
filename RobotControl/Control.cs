@@ -19,7 +19,9 @@ namespace RobotControl
         public static readonly bool SafetyStopOnTableCollision = true;
         public static readonly double SafetyTableZLimit = 100;                     // table security checks will trigger under this z height (mm)
         public static readonly bool DEBUG = true;                                  // dump a bunch of debug logs
-
+        public static readonly int DefaultVelocity = 25;
+        public static readonly int DefaultZone = 5;
+        public static readonly MotionType DefaultMotionType = MotionType.Linear;
         
 
         /// <summary>
@@ -54,16 +56,16 @@ namespace RobotControl
         // Most of it represents a virtual current state of the robot, to be able to 
         // issue appropriate relative actions.
         // @TODO: move all of this to a VirtualRobot object and to the Comm + QueueManager objects
-        public Point TCPPosition = null;
-        public Rotation TCPRotation = null;
-        public int currentVelocity = 10;
-        public int currentZone = 5;
-        public MotionType currentMotionType = MotionType.Linear;        // linear motion by default
+        //public Point TCPPosition = null;
+        //public Rotation TCPRotation = null;
+        //public int currentVelocity = 10;
+        //public int currentZone = 5;
+        //public MotionType currentMotionType = MotionType.Linear;        // linear motion by default
         public StreamQueue streamQueue;
         public bool mHeld = false;                                      // is Mastership currently held by someone? useful when several threads want to write to the robot...
-        
 
-        
+        private RobotPointer virtualRobotPointer;
+        private Settings currentSettings;
 
 
 
@@ -101,6 +103,8 @@ namespace RobotControl
             streamQueue = new StreamQueue();
 
             actionBuffer = new ActionBuffer();
+            virtualRobotPointer = null;
+            currentSettings = new Settings(DefaultVelocity, DefaultZone, DefaultMotionType);
         }
 
         /// <summary>
@@ -185,10 +189,10 @@ namespace RobotControl
                 return false;
             }
 
-            // @TODO rework this into Virtual Robots
-            Frame curr = comm.GetCurrentFrame();
-            TCPPosition = curr.Position;
-            TCPRotation = curr.Orientation;
+            //// @TODO rework this into Virtual Robots
+            //Frame curr = comm.GetCurrentFrame();
+            //TCPPosition = curr.Position;
+            //TCPRotation = curr.Orientation;
 
             return true;
         }
@@ -394,7 +398,7 @@ namespace RobotControl
         /// <param name="vel">In mm/s</param>
         public void SetCurrentVelocity(int vel)
         {
-            currentVelocity = vel;
+            currentSettings.Velocity = vel;
         }
 
         /// <summary>
@@ -403,7 +407,7 @@ namespace RobotControl
         /// <param name="zone">In mm.</param>
         public void SetCurrentZone(int zone)
         {
-            currentZone = zone;
+            currentSettings.Zone = zone;
         }
 
 
@@ -546,24 +550,33 @@ namespace RobotControl
         //}
 
 
-
         public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon, MotionType mType)
         {
-            return actionBuffer.Add(new ActionTranslation(trans, relative, vel, zon, mType));
+            if (virtualRobotPointer == null)
+            {
+                InitializeRobotPointer(trans, Frame.DefaultOrientation, out virtualRobotPointer);  // @TODO: defaults should depend on robot make/model
+            }
+            
+            ActionTranslation act = new ActionTranslation(trans, relative, vel, zon, mType);
+            virtualRobotPointer.ApplyAction(act);
+            return actionBuffer.Add(act);
         }
-
+    
+        // Overloads falling back on current settings values
         public bool IssueTranslationRequest(Point trans, bool relative)
         {
-            return IssueTranslationRequest(trans, relative, currentVelocity, currentZone, currentMotionType);
+            return IssueTranslationRequest(trans, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
         }
-
         public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon)
         {
-            return IssueTranslationRequest(trans, relative, vel, zon, currentMotionType);
+            return IssueTranslationRequest(trans, relative, vel, zon, currentSettings.MotionType);
+        }
+        public bool IssueTranslationRequest(Point trans, bool relative, MotionType mType)
+        {
+            return IssueTranslationRequest(trans, relative, currentSettings.Velocity, currentSettings.Zone, mType);
         }
 
 
-        
 
 
         //public bool IssueTransformationRequest(Point trans, bool relTrans, Rotation rot, bool relRot, int vel, int zon, MotionType mType)
@@ -655,51 +668,60 @@ namespace RobotControl
             return InitializeCommunication();
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        //██╗    ██╗██╗██████╗ 
-        //██║    ██║██║██╔══██╗
-        //██║ █╗ ██║██║██████╔╝
-        //██║███╗██║██║██╔═══╝ 
-        //╚███╔███╔╝██║██║     
-        // ╚══╝╚══╝ ╚═╝╚═╝     
-
         /// <summary>
-        /// Adds a path to the queue manager and tick it for execution.
+        /// Initializes 
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="pointer"></param>
+        /// <returns></returns>
+        private bool InitializeRobotPointer(Point position, Rotation rotation, out RobotPointer pointer)
+        {
+            pointer = new RobotPointerABB(); // @TODO: shim brand/model
+            return pointer.Initialize(position, rotation);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //██╗    ██╗██╗██████╗ 
+            //██║    ██║██║██╔══██╗
+            //██║ █╗ ██║██║██████╔╝
+            //██║███╗██║██║██╔═══╝ 
+            //╚███╔███╔╝██║██║     
+            // ╚══╝╚══╝ ╚═╝╚═╝     
+
+            /// <summary>
+            /// Adds a path to the queue manager and tick it for execution.
+            /// </summary>
+            /// <param name="path"></param>
         public void AddPathToQueue(Path path)
         {
             queue.Add(path);
@@ -739,7 +761,7 @@ namespace RobotControl
         public void RunPath(Path path)
         {
             Console.WriteLine("RUNNING NEW PATH: " + path.Count);
-            List<string> module = ProgramGenerator.UNSAFEModuleFromPath(path, (int)currentVelocity, (int)currentZone);
+            List<string> module = ProgramGenerator.UNSAFEModuleFromPath(path, currentSettings.Velocity, currentSettings.Zone);
 
             comm.LoadProgramToController(module);
             comm.StartProgramExecution();

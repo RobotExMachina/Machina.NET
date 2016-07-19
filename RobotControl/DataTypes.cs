@@ -67,6 +67,13 @@ namespace RobotControl
             this.Z += incZ;
         }
 
+        public void Add(Point p)
+        {
+            this.X += p.X;
+            this.Y += p.Y;
+            this.Z += p.Z;
+        }
+
         public double Length()
         {
             return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);

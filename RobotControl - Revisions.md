@@ -24,8 +24,8 @@
 
 ## BUILD 1103
 - [ ] Implement API-level instructions
-    - [ ] .Move()
-    - [ ] .MoveTo()
+    - [x] .Move()
+    - [x] .MoveTo()
     - [ ] .Rotate()
     - [ ] .RotateTo()
     - [ ] .Transform()  // movement and rotation combined

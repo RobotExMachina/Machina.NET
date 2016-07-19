@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace RobotControl
 {
+    internal enum ActionType : int
+    {
+        Undefined = 0, 
+        Translation = 1
+    }
+    
     /// <summary>
     /// The type of Movement for robotic Actions
     /// </summary>
     internal enum MotionType : int 
     {
-        None = 0,       // a null default
+        Undefined = 0,       // a null default
         Linear = 1,     // linear movement
         Joint = 2,      // joint movement
         Joints = 3      // direct joints manipulation
@@ -25,7 +31,7 @@ namespace RobotControl
     /// </summary>
     internal class Action
     {
-
+        public ActionType type = ActionType.Undefined;
     }
 
     /// <summary>
@@ -33,21 +39,36 @@ namespace RobotControl
     /// </summary>
     internal class ActionTranslation : Action
     {
-        Point translation;
-        bool relative;
-        MotionType type;
-        int velocity;
-        int zone;
+        public Point translation;
+        public bool relative;
+        public MotionType motionType;
+        public int velocity;
+        public int zone;
 
-        public ActionTranslation(Point trans, bool relativeTrans, int vel, int zon, MotionType mType)
+        public ActionTranslation(Point trans, bool relTrans, int vel, int zon, MotionType mType)
         {
+            type = ActionType.Translation;
+
             translation = trans;
-            relative = relativeTrans;
+            relative = relTrans;
             velocity = vel;
             zone = zon;
-            type = mType;
+            motionType = mType;
         }
+        
+        // Overloads with default invalid flags
+        public ActionTranslation(Point trans, bool relTrans, int vel, int zon) :
+            this(trans, relTrans, vel, zon, MotionType.Undefined)
+        { }
 
+        public ActionTranslation(Point trans, bool relTrans, MotionType mType) :
+            this(trans, relTrans, -1, -1, mType)
+        { }
+
+        public ActionTranslation(Point trans, bool relTrans) :
+            this(trans, relTrans, -1, -1, MotionType.Undefined)
+        { }
+        
         public override string ToString()
         {
             return string.Format("MOVE: {0} {1} {2}\\{3}", relative ? "rel" : "abs", translation, velocity, zone);

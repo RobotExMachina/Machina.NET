@@ -41,6 +41,20 @@ namespace RobotControl
             return bufferedActions.Count > 0;
         }
 
+        public int ActionsPending()
+        {
+            return bufferedActions.Count;
+        }
+
+        /// <summary>
+        /// Has any action ever been issued to this buffer?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsVirgin()
+        {
+            return pastActions.Count == 0 && bufferedActions.Count == 0;
+        }
+
         public void Flush()
         {
             pastActions.Clear();
