@@ -16,7 +16,7 @@
 
 ## BUILD 1105
 - [x] Develop 'Offline' mode with the new framework 
-    --> Still shaky and narrow, but the main foundation is there...
+    + Still shaky and narrow, but the main foundation is there... :)
 
 ## BUILD 1104
 - [x] Implement RobotPointers class
