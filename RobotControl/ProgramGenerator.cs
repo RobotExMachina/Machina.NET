@@ -10,7 +10,7 @@ namespace RobotControl
     internal abstract class ProgramGenerator
     {
 
-        public abstract List<string> UNSAFEProgramFromActions(string programName, List<Action> actions);
+        public abstract List<string> UNSAFEProgramFromActions(string programName, RobotPointer writePointer, List<Action> actions);
 
 
         /// <summary>
@@ -79,8 +79,12 @@ namespace RobotControl
         };
 
 
-        public override List<string> UNSAFEProgramFromActions(string programName, List<Action> actions)
+        public override List<string> UNSAFEProgramFromActions(string programName, RobotPointer writePointer, List<Action> actions)
         {
+            // Cast the robotPointer to the correct subclass
+            RobotPointerABB writer = (RobotPointerABB)writePointer;  // @TODO: ask @PAN
+
+            // Initialize a module list
             List<string> module = new List<string>();
 
             // Module header
@@ -126,12 +130,23 @@ namespace RobotControl
             }
             module.Add("");
 
+            // Target declarations
+            // Use a virtual robot pointer to generate instructions
+            int it = 0;
+            foreach (Action a in actions)
+            {
+                writer.ApplyAction(a);
+                module.Add( string.Format("  CONST robtarget target{0}:={1};", 
+                    it++,
+                    writer.GetUNSAFERobTargetDeclaration()) );
+            }
+            module.Add("");
 
 
 
             module.Add("  ENDPROC");
 
-            // Moudle footer
+            // Module footer
             module.Add("ENDMODULE");
 
             return module;

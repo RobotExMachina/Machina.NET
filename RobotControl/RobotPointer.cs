@@ -41,6 +41,20 @@ namespace RobotControl
             initialized = true;
             return initialized;
         }
+
+        public bool ApplyAction(Action action)
+        {
+            // @TODO: ask @PAN
+            //return ApplyAction((action.GetType())action);
+
+            // This will need a lot of maintenance, add new cases for each actiontype
+            switch (action.type)
+            {
+                case ActionType.Translation: return ApplyAction((ActionTranslation)action);
+            }
+            return false;
+        } 
+
     }
 
 
@@ -67,9 +81,19 @@ namespace RobotControl
             return true;
         }
 
+
+        public string GetUNSAFERobTargetDeclaration()
+        {
+            return string.Format("[{0},{1},[0,0,0,0],[9E9,9E9,9E9,9E9,9E9,9E9]]",
+                position,
+                rotation
+            );
+        }
+
+
         public override string ToString()
         {
-            return string.Format("pointer: {0} {1} {2} {3}-{4}", motionType, position, rotation, velocity, zone);
+            return string.Format("pointer: {0} {1} {2} v{3} z{4}", motionType, position, rotation, velocity, zone);
         }
 
     }

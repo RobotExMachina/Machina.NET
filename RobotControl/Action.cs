@@ -39,7 +39,6 @@ namespace RobotControl
         public int velocity;
         public int zone;
 
-
     }
 
     /// <summary>
@@ -74,7 +73,7 @@ namespace RobotControl
         
         public override string ToString()
         {
-            return string.Format("{0}: {1} {2} {3}-{4}",
+            return string.Format("{0}: {1} {2} v{3} z{4}",
                 motionType == MotionType.Linear ? "MOVEL" :
                     motionType == MotionType.Joint ? "MOVEJ" :
                         motionType == MotionType.Joints ? "JOINTS" : "UNDEFINED",

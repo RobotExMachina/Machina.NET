@@ -53,6 +53,13 @@ namespace RobotControl
             this.Z = rt.Trans.Z;
         }
 
+        public Point()
+        {
+            this.X = 0;
+            this.Y = 0;
+            this.Z = 0;
+        }
+
         public void Set(double newX, double newY, double newz)
         {
             this.X = newX;
@@ -193,6 +200,14 @@ namespace RobotControl
             this.Q2 = rt.Rot.Q2;
             this.Q3 = rt.Rot.Q3;
             this.Q4 = rt.Rot.Q4;
+        }
+
+        public Rotation()
+        {
+            this.Q1 = 0;
+            this.Q2 = 0;
+            this.Q3 = 0;
+            this.Q4 = 0;
         }
 
         public void Set(double q1, double q2, double q3, double q4)

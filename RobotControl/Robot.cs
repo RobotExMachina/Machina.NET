@@ -535,5 +535,10 @@ namespace RobotControl
         {
             c.DebugVirtualPointer();
         }
+
+        public void DebugWritePointer()
+        {
+            c.DebugWritePointer();
+        }
     }
 }

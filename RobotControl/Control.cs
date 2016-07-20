@@ -67,7 +67,10 @@ namespace RobotControl
         public StreamQueue streamQueue;
         public bool mHeld = false;                                      // is Mastership currently held by someone? useful when several threads want to write to the robot...
 
+        private bool arePointersInitialized = false;
         private RobotPointer virtualRobotPointer;
+        private RobotPointer writeRobotPointer;
+
         private Settings currentSettings;
 
 
@@ -106,7 +109,11 @@ namespace RobotControl
             streamQueue = new StreamQueue();
 
             actionBuffer = new ActionBuffer();
+
+            arePointersInitialized = false;
             virtualRobotPointer = null;
+            writeRobotPointer = null;
+
             currentSettings = new Settings(DefaultVelocity, DefaultZone, DefaultMotionType);
         }
 
@@ -392,7 +399,7 @@ namespace RobotControl
         {
             List<Action> actions = actionBuffer.GetAllPending();
 
-            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", actions);
+            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", writeRobotPointer, actions);
 
             // @TODO: add some filepath sanity here
 
@@ -587,9 +594,12 @@ namespace RobotControl
 
         public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon, MotionType mType)
         {
-            if (virtualRobotPointer == null)
+            if (!arePointersInitialized)
             {
-                InitializeRobotPointer(trans, Frame.DefaultOrientation, out virtualRobotPointer);  // @TODO: defaults should depend on robot make/model
+                InitializeRobotPointers(trans, Frame.DefaultOrientation);
+
+                //InitializeRobotPointer(trans, Frame.DefaultOrientation, out virtualRobotPointer);  // @TODO: defaults should depend on robot make/model
+                //InitializeRobotPointer(trans, Frame.DefaultOrientation, out writeRobotPointer);  // @TODO: defaults should depend on robot make/model
             }
             
             ActionTranslation act = new ActionTranslation(trans, relative, vel, zon, mType);
@@ -708,10 +718,27 @@ namespace RobotControl
         /// </summary>
         /// <param name="pointer"></param>
         /// <returns></returns>
-        private bool InitializeRobotPointer(Point position, Rotation rotation, out RobotPointer pointer)
+        //private bool InitializeRobotPointer(Point position, Rotation rotation, out RobotPointer pointer)
+        //{
+        //    pointer = new RobotPointerABB(); // @TODO: shim brand/model
+        //    return pointer.Initialize(position, rotation);
+        //}
+
+        private bool InitializeRobotPointers(Point position, Rotation rotation)
         {
-            pointer = new RobotPointerABB(); // @TODO: shim brand/model
-            return pointer.Initialize(position, rotation);
+            bool success = true;
+            if (controlMode == ControlMode.Offline)
+            {
+                virtualRobotPointer = new RobotPointerABB();
+                success = success && virtualRobotPointer.Initialize(position, rotation);
+
+                writeRobotPointer = new RobotPointerABB();
+                success = success && writeRobotPointer.Initialize(position, rotation);
+            }
+
+            arePointersInitialized = success;
+
+            return success;
         }
 
         private bool SaveStringListToFile(List<string> lines, string filepath)
@@ -871,6 +898,14 @@ namespace RobotControl
                 Console.WriteLine("Virtual pointer not initialized");
             else
                 Console.WriteLine(virtualRobotPointer);
+        }
+
+        public void DebugWritePointer()
+        {
+            if (writeRobotPointer == null)
+                Console.WriteLine("Write pointer not initialized");
+            else
+                Console.WriteLine(writeRobotPointer);
         }
 
         /// <summary>

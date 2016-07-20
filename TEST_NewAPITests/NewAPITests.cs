@@ -46,8 +46,9 @@ namespace TEST_NewAPITests
 
             arm.DebugBuffer();
 
+            arm.DebugWritePointer();
             arm.Export(@"C:\offlineTests.mod");
-
+            arm.DebugWritePointer();
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
