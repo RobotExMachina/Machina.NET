@@ -128,14 +128,16 @@ namespace RobotControl
             }
             module.Add("");
 
+            bool anyNonPredef = false;
             foreach (int z in zoneNames.Keys)
             {
                 if(!zonePredef[z])  // no need to add declarations for predefined zones
                 {
                     module.Add(string.Format("  CONST zonedata {0}:={1};", zoneNames[z], zoneDecs[z]));
+                    anyNonPredef = true;
                 }
             }
-            module.Add("");
+            if (anyNonPredef) module.Add("");
 
             // TARGET DECLARATIONS
             // Use the write robot pointer to generate instructions

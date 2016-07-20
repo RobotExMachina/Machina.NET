@@ -39,6 +39,13 @@ namespace RobotControl
             this.Z = z;
         }
 
+        public Point(Point p)
+        {
+            this.X = p.X;
+            this.Y = p.Y;
+            this.Z = p.Z;
+        }
+
         public Point(Pos pos)
         {
             this.X = pos.X;
@@ -65,6 +72,13 @@ namespace RobotControl
             this.X = newX;
             this.Y = newY;
             this.Z = newz;
+        }
+
+        public void Set(Point p)
+        {
+            this.X = p.X;
+            this.Y = p.Y;
+            this.Z = p.Z;
         }
 
         public void Add(double incX, double incY, double incZ)
@@ -186,6 +200,14 @@ namespace RobotControl
             this.Q4 = q4;
         }
 
+        public Rotation(Rotation r)
+        {
+            this.Q1 = r.Q1;
+            this.Q2 = r.Q2;
+            this.Q3 = r.Q3;
+            this.Q4 = r.Q4;
+        }
+
         public Rotation(Orient or)
         {
             this.Q1 = or.Q1;
@@ -216,6 +238,14 @@ namespace RobotControl
             this.Q2 = q2;
             this.Q3 = q3;
             this.Q4 = q4;
+        }
+
+        public void Set(Rotation r)
+        {
+            this.Q1 = r.Q1;
+            this.Q2 = r.Q2;
+            this.Q3 = r.Q3;
+            this.Q4 = r.Q4;
         }
 
         public void Set(List<double> q)

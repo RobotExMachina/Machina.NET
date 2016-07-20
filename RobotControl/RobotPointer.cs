@@ -32,8 +32,8 @@ namespace RobotControl
         /// <param name="rot"></param>
         public bool Initialize(Point pos, Rotation rot)
         {
-            position = pos;
-            rotation = rot;
+            position = new Point(pos);
+            rotation = new Rotation(rot);
             velocity = -1;
             zone = -1;
             motionType = MotionType.Undefined;
@@ -71,7 +71,7 @@ namespace RobotControl
             if (action.relative)
                 position.Add(action.translation);
             else
-                position = action.translation;
+                position.Set(action.translation);
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;
