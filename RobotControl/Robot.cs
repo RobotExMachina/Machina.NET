@@ -437,18 +437,17 @@ namespace RobotControl
 
 
 
-
+        public bool Rotate(Rotation rotation)
+        {
+            throw new NotImplementedException();
+        }
 
         public bool Rotate(double q1, double q2, double q3, double q4)
         {
             throw new NotImplementedException();
         }
 
-        public bool Rotate(Rotation rotation)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public bool Rotate(
             double x0, double x1, double x2, 
             double y0, double y1, double y2, 
@@ -463,14 +462,17 @@ namespace RobotControl
         }
 
 
-        public bool RotateTo(double q1, double q2, double q3, double q4)
-        {
-            throw new NotImplementedException();
-        }
+
+
 
         public bool RotateTo(Rotation rotation)
         {
-            throw new NotImplementedException();
+            return c.IssueRotationRequest(rotation, false);
+        }
+
+        public bool RotateTo(double q1, double q2, double q3, double q4)
+        {
+            return RotateTo( new Rotation(q1, q2, q3, q4) );
         }
 
         public bool RotateTo(
@@ -478,7 +480,7 @@ namespace RobotControl
             double y0, double y1, double y2,
             double z0, double z1, double z2)
         {
-            throw new NotImplementedException();
+            return RotateTo( new Rotation(x0, x1, x2, y0, y1, y2, z0, z1, z2) );
         }
 
         public bool RotateTo(Point vecX, Point vecY, Point vecZ)

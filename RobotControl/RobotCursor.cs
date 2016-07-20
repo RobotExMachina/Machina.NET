@@ -36,7 +36,11 @@ namespace RobotControl
             this.name = name;
         }
 
-        public abstract bool ApplyAction(ActionTranslation translation);
+        // Abstract methods
+        public abstract bool ApplyAction(ActionTranslation action);
+        public abstract bool ApplyAction(ActionRotation action);
+        
+
 
         /// <summary>
         /// Minimum information necessary to initialize a robot object.
@@ -62,14 +66,18 @@ namespace RobotControl
         /// <returns></returns>
         public bool ApplyAction(Action action)
         {
-            // @TODO: ask @PAN
+            // @TOPAN: is there a better way to choose the subclass?
             //return ApplyAction((action.GetType())action);
 
             // This will need a lot of maintenance, add new cases for each actiontype. 
             // Better way to do it?
             switch (action.type)
             {
-                case ActionType.Translation: return ApplyAction((ActionTranslation)action);
+                case ActionType.Translation:
+                    return ApplyAction((ActionTranslation)action);
+
+                case ActionType.Rotation:
+                    return ApplyAction((ActionRotation)action);
             }
             return false;
         } 
@@ -96,7 +104,7 @@ namespace RobotControl
             // @TODO: this must be more programmatically implemented 
             if (Control.SAFETY_CHECK_TABLE_COLLISION)
             {
-                double newZ = action.relative ? position.Z + action.translation.Z : action.translation.Z;
+                double newZ = action.relativeTranslation ? position.Z + action.translation.Z : action.translation.Z;
                 if (Control.IsBelowTable(newZ))
                 {
                     if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
@@ -111,7 +119,7 @@ namespace RobotControl
                 }
             }
 
-            if (action.relative)
+            if (action.relativeTranslation)
                 position.Add(action.translation);
             else
                 position.Set(action.translation);
@@ -128,6 +136,25 @@ namespace RobotControl
         //{
 
         //}
+
+
+        public override bool ApplyAction(ActionRotation action)
+        {
+            // @TODO: implement some kind of security check here...
+
+            if (action.relativeRotation)
+                rotation.Multiply(action.rotation);
+            else
+                rotation.Set(action.rotation);
+
+            // If valid inputs, update, otherwise stick with previous values
+            if (action.velocity != -1) velocity = action.velocity;
+            if (action.zone != -1) zone = action.zone;
+            if (action.motionType != MotionType.Undefined) motionType = action.motionType;
+
+            return true;
+        }
+
 
         /// <summary>
         /// Returns an ABB robtarget representation of the current state of the cursor.

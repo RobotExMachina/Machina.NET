@@ -205,6 +205,15 @@ namespace RobotControl
             this.Q4 = q4;
         }
 
+        public Rotation(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
+        {
+            List<double> q = PlaneToQuaternions(x1, x2, x3, y1, y2, y3, z1, z2, z3);
+            this.Q1 = q[0];
+            this.Q2 = q[1];
+            this.Q3 = q[2];
+            this.Q4 = q[3];
+        }
+
         public Rotation(Rotation r)
         {
             this.Q1 = r.Q1;
@@ -231,10 +240,11 @@ namespace RobotControl
 
         public Rotation()
         {
+            // Returns an identity quaternion
             this.Q1 = 0;
             this.Q2 = 0;
             this.Q3 = 0;
-            this.Q4 = 0;
+            this.Q4 = 1;
         }
 
         public void Set(double q1, double q2, double q3, double q4)
@@ -259,6 +269,26 @@ namespace RobotControl
             this.Q2 = q[1];
             this.Q3 = q[2];
             this.Q4 = q[3];
+        }
+
+        // From gl-matrix.quat.js
+        public void Multiply(Rotation r)
+        {
+            this.Q1 = this.Q1 * r.Q4 + this.Q4 * r.Q1 + this.Q2 * r.Q3 - this.Q3 * r.Q2;
+            this.Q2 = this.Q2 * r.Q4 + this.Q4 * r.Q2 + this.Q3 * r.Q1 - this.Q1 * r.Q3;
+            this.Q3 = this.Q3 * r.Q4 + this.Q4 * r.Q3 + this.Q1 * r.Q2 - this.Q2 * r.Q1;
+            this.Q4 = this.Q4 * r.Q4 - this.Q1 * r.Q1 - this.Q2 * r.Q2 - this.Q3 * r.Q3;
+        }
+        
+        // From gl-matrix.quat.js
+        public static Rotation Multiply(Rotation r1, Rotation r2)
+        {
+            double x = r1.Q1 * r2.Q4 + r1.Q4 * r2.Q1 + r1.Q2 * r2.Q3 - r1.Q3 * r2.Q2;
+            double y = r1.Q2 * r2.Q4 + r1.Q4 * r2.Q2 + r1.Q3 * r2.Q1 - r1.Q1 * r2.Q3;
+            double z = r1.Q3 * r2.Q4 + r1.Q4 * r2.Q3 + r1.Q1 * r2.Q2 - r1.Q2 * r2.Q1;
+            double w = r1.Q4 * r2.Q4 - r1.Q1 * r2.Q1 - r1.Q2 * r2.Q2 - r1.Q3 * r2.Q3;
+
+            return new Rotation(x, y, z, w);
         }
 
         /// <summary>
@@ -342,6 +372,7 @@ namespace RobotControl
 
             //return new Rotation(q1, q2, q3, q4);
         }
+
 
         public override string ToString()
         {

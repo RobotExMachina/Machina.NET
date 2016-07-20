@@ -13,7 +13,8 @@ namespace RobotControl
     internal enum ActionType : int
     {
         Undefined = 0, 
-        Translation = 1
+        Translation = 1,
+        Rotation = 2
     }
     
     /// <summary>
@@ -52,11 +53,14 @@ namespace RobotControl
         public ActionType type = ActionType.Undefined;
 
         public Point translation;
-        public bool relative;
-        public MotionType motionType;
+        public bool relativeTranslation;
+        public Rotation rotation;
+        public bool relativeRotation;
+        
+        // @TOTHINK: Wrap this into a Settings object instead?
         public int velocity;
         public int zone;
-
+        public MotionType motionType;
     }
 
 
@@ -89,7 +93,7 @@ namespace RobotControl
             type = ActionType.Translation;
 
             translation = trans;
-            relative = relTrans;
+            relativeTranslation = relTrans;
             velocity = vel;
             zone = zon;
             motionType = mType;
@@ -110,15 +114,65 @@ namespace RobotControl
         
         public override string ToString()
         {
-            return string.Format("{0}: {1} {2} v{3} z{4}",
-                motionType == MotionType.Linear ? "MOVEL" :
-                    motionType == MotionType.Joint ? "MOVEJ" :
-                        motionType == MotionType.Joints ? "JOINTS" : "UNDEFINED",
-                relative ? "rel" : "abs", 
+            return string.Format("TRNS: {0} {1} {2} v{3} z{4}",
+                motionType == MotionType.Linear ? "lin" :
+                    motionType == MotionType.Joint ? "jnt" :
+                        motionType == MotionType.Joints ? "jjj" : "und",
+                relativeTranslation ? "rel" : "abs", 
                 translation, 
                 velocity, 
                 zone);
         }
+    }
+
+
+    //  ██████╗  ██████╗ ████████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+    //  ██╔══██╗██╔═══██╗╚══██╔══╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+    //  ██████╔╝██║   ██║   ██║   ███████║   ██║   ██║██║   ██║██╔██╗ ██║
+    //  ██╔══██╗██║   ██║   ██║   ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+    //  ██║  ██║╚██████╔╝   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+    //  ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //                                                                   
+    internal class ActionRotation : Action
+    {
+        public ActionRotation(Rotation rot, bool relRot, int vel, int zon, MotionType mType)
+        {
+            type = ActionType.Rotation;
+
+            rotation = rot;
+            relativeRotation = relRot;
+
+            velocity = vel;
+            zone = zon;
+            motionType = mType;
+        }
+
+        // Overloads with default invalid flags
+        public ActionRotation(Rotation rot, bool relRot, int vel, int zon) :
+            this(rot, relRot, vel, zon, MotionType.Undefined)
+        { }
+
+        public ActionRotation(Rotation rot, bool relRot, MotionType mType) :
+            this(rot, relRot, -1, -1, mType)
+        { }
+
+        public ActionRotation(Rotation rot, bool relRot) :
+            this(rot, relRot, -1, -1, MotionType.Undefined)
+        { }
+
+
+        public override string ToString()
+        {
+            return string.Format("ROTN: {0} {1} {2} v{3} z{4}",
+                motionType == MotionType.Linear ? "lin" :
+                    motionType == MotionType.Joint ? "jnt" :
+                        motionType == MotionType.Joints ? "jjj" : "und",
+                relativeRotation ? "rel" : "abs",
+                rotation,
+                velocity,
+                zone);
+        }
+
     }
 
 

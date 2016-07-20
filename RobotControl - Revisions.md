@@ -18,8 +18,9 @@
 - [ ] Add Joints() actions (think of a new name?)
 
 ## BUILD 1107
-- [ ] Implement bot.PushSettings() & bot.PopSettings();
-- [ ] Add Rotate() and Transform() actions
+- [x] Implement bot.PushSettings() & bot.PopSettings();
+- [ ] Add Rotate() actions
+- [ ] Add Transform() actions
 
 ## BUILD 1106
 - [x] Code cleanup and commenting

@@ -25,7 +25,10 @@ namespace TEST_NewAPITests
             //// Test security table check
             //ApproachBaseXYPlane(arm, 300, 25);
 
-            PushAndPopSettingsTest(arm);
+            //// Use Push & PopSettings ;)
+            //PushAndPopSettingsTest(arm);
+
+            RotationTests(arm);
             
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -114,6 +117,28 @@ namespace TEST_NewAPITests
             arm.MoveTo(300, 0, 500);
 
             arm.DebugSettingsBuffer();
+        }
+
+        public static void RotationTests(Robot arm)
+        {
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+
+            // Move to a more dexterous area
+            arm.MoveTo(300, -100, 400);
+
+            // Velocity is expresses in both mm/s and °/s
+            arm.SetVelocity(45);
+
+            arm.RotateTo(0, 1, 0, 1, 0, 0, 0, 0, -1);   // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
+            arm.RotateTo(0, 0, 1, 1, 0, 0, 0, 1, 0);    // 'rotate 90° around global X'
+            arm.RotateTo(0, 0, 1, 0, -1, 0, 1, 0, 0);   // 'rotate -90° around global Z'
+
+            arm.RotateTo(0, 0, 1, 0);  // revert back to base flipped Z
+
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+
         }
 
     }

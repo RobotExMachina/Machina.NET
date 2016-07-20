@@ -509,6 +509,64 @@ namespace RobotControl
 
 
 
+
+
+
+
+        ///// <summary>
+        ///// Requests absolute rotation movement based on current virtual orientation.
+        ///// The action will execute based on current ControlMode and priority.
+        ///// </summary>
+        ///// <param name="q1"></param>
+        ///// <param name="q2"></param>
+        ///// <param name="q3"></param>
+        ///// <param name="q4"></param>
+        ///// <returns></returns>
+        //public bool IssueAbsoluteRotationRequest(double q1, double q2, double q3, double q4)
+        //{
+        //    if (controlMode != ControlMode.Stream)
+        //    {
+        //        Console.WriteLine("RotateTo() only supported in Stream mode");
+        //        return false;
+        //    }
+
+        //    // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
+        //    TCPRotation.Set(q1, q2, q3, q4);
+        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
+        //       TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
+        //       currentVelocity, currentZone));
+
+        //    // Only tick queue if there are no targets pending to be streamed
+        //    if (streamQueue.FramesPending() == 1)
+        //    {
+        //        comm.TickStreamQueue(false);
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
+        //    }
+
+        //    return true;
+        //}
+
+
+        //public bool IssueMovementRequest()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public bool IssueRotationRequest()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+
+
+
+
+
+
+
         ///// <summary>
         ///// Requests relative linear movement based on current virtual position.
         ///// The action will execute based on current ControlMode and priority.
@@ -599,53 +657,6 @@ namespace RobotControl
         //    return true;
         //}
 
-        ///// <summary>
-        ///// Requests absolute rotation movement based on current virtual orientation.
-        ///// The action will execute based on current ControlMode and priority.
-        ///// </summary>
-        ///// <param name="q1"></param>
-        ///// <param name="q2"></param>
-        ///// <param name="q3"></param>
-        ///// <param name="q4"></param>
-        ///// <returns></returns>
-        //public bool IssueAbsoluteRotationRequest(double q1, double q2, double q3, double q4)
-        //{
-        //    if (controlMode != ControlMode.Stream)
-        //    {
-        //        Console.WriteLine("RotateTo() only supported in Stream mode");
-        //        return false;
-        //    }
-
-        //    // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
-        //    TCPRotation.Set(q1, q2, q3, q4);
-        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-        //       TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-        //       currentVelocity, currentZone));
-
-        //    // Only tick queue if there are no targets pending to be streamed
-        //    if (streamQueue.FramesPending() == 1)
-        //    {
-        //        comm.TickStreamQueue(false);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-        //    }
-
-        //    return true;
-        //}
-
-
-        //public bool IssueMovementRequest()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public bool IssueRotationRequest()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         /// <summary>
         /// Issue a customized simple Translation action request.
         /// </summary>
@@ -680,7 +691,7 @@ namespace RobotControl
             if (success) actionBuffer.Add(act);
             return success;
         }
-    
+
         // Overloads falling back on current settings values
         public bool IssueTranslationRequest(Point trans, bool relative)
         {
@@ -694,6 +705,57 @@ namespace RobotControl
         {
             return IssueTranslationRequest(trans, relative, currentSettings.Velocity, currentSettings.Zone, mType);
         }
+
+
+
+
+        public bool IssueRotationRequest(Rotation rot, bool relative, int vel, int zon, MotionType mType)
+        {
+            if (!areCursorsInitialized)
+            {
+                if (controlMode == ControlMode.Offline)
+                {
+                    if (!InitializeRobotPointers(new Point(), rot))  // @TODO: defaults should depend on robot make/model
+                    {
+                        Console.WriteLine("Could not initialize cursors...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Still only working in Offline mode");
+                    return false;
+                }
+            }
+
+            ActionRotation act = new ActionRotation(rot, relative, vel, zon, mType);
+            bool success = virtualCursor.ApplyAction(act);
+            // Only add this action to the queue if it was successfuly applied to the virtualCursor
+            if (success) actionBuffer.Add(act);
+            return success;
+        }
+
+        // Overloads falling back on current settings values
+        public bool IssueRotationRequest(Rotation rot, bool relative)
+        {
+            return IssueRotationRequest(rot, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+        }
+        public bool IssueRotationRequest(Rotation rot, bool relative, int vel, int zon)
+        {
+            return IssueRotationRequest(rot, relative, vel, zon, currentSettings.MotionType);
+        }
+        public bool IssueRotationRequest(Rotation rot, bool relative, MotionType mType)
+        {
+            return IssueRotationRequest(rot, relative, currentSettings.Velocity, currentSettings.Zone, mType);
+        }
+
+
+
+
+
+
+
+
 
 
 
