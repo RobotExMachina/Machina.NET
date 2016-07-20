@@ -12,9 +12,10 @@ namespace RobotControl
     /// current speed, velocity, etc.
     /// Useful as virtual representation of a simulated or controller robot actuator. 
     /// </summary>
-    abstract class RobotPointer
+    abstract class RobotCursor
     {
         // Public props
+        public string name;
         public Point position;
         public Rotation rotation;
         public Joints joints;
@@ -22,6 +23,11 @@ namespace RobotControl
         public int zone;
         public MotionType motionType;
         protected bool initialized = false;
+
+        public RobotCursor(string name)
+        {
+            this.name = name;
+        }
 
         public abstract bool ApplyAction(ActionTranslation translation);
 
@@ -61,10 +67,10 @@ namespace RobotControl
 
 
 
-    internal class RobotPointerABB : RobotPointer
+    internal class RobotCursorABB : RobotCursor
     {
         
-        public RobotPointerABB() { }
+        public RobotCursorABB(string name) : base(name) { }
 
         public override bool ApplyAction(ActionTranslation action)
         {
@@ -93,7 +99,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("pointer: {0} {1} {2} v{3} z{4}", motionType, position, rotation, velocity, zone);
+            return string.Format("{5}: {0} {1} {2} v{3} z{4}", motionType, position, rotation, velocity, zone, name);
         }
 
     }

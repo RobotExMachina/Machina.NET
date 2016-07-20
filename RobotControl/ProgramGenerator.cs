@@ -10,7 +10,7 @@ namespace RobotControl
     internal abstract class ProgramGenerator
     {
 
-        public abstract List<string> UNSAFEProgramFromActions(string programName, RobotPointer writePointer, List<Action> actions);
+        public abstract List<string> UNSAFEProgramFromActions(string programName, RobotCursor writePointer, List<Action> actions);
 
 
         /// <summary>
@@ -86,10 +86,10 @@ namespace RobotControl
         };
 
 
-        public override List<string> UNSAFEProgramFromActions(string programName, RobotPointer writePointer, List<Action> actions)
+        public override List<string> UNSAFEProgramFromActions(string programName, RobotCursor writePointer, List<Action> actions)
         {
             // Cast the robotPointer to the correct subclass
-            RobotPointerABB writer = (RobotPointerABB)writePointer;  // @TODO: ask @PAN
+            RobotCursorABB writer = (RobotCursorABB)writePointer;  // @TODO: ask @PAN
 
             // Initialize a module list
             List<string> module = new List<string>();

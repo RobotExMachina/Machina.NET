@@ -16,9 +16,9 @@
 
 ## HIGH-LEVEL
 - [x] Merged ConnectionMode & OnlineMode into ControlMode
-- [ ] Restructured library
-- [ ] Redesigned API
-- [ ] Abstracted TCPPOsition, TCPRotation and stuff into a VirtualRobot object
+- [x] Restructured library
+- [x] Redesigned API
+- [x] Abstracted TCPPOsition, TCPRotation and stuff into a VirtualRobot object
 - [ ] Created Debug() & Error() utility functions
 - [ ] Ported Util methods as static to their appropriate geometry class 
 - [ ] All the connection properties, runmodes and stuff should belong to the VirtualRobot?

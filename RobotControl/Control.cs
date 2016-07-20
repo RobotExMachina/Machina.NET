@@ -68,8 +68,8 @@ namespace RobotControl
         public bool mHeld = false;                                      // is Mastership currently held by someone? useful when several threads want to write to the robot...
 
         private bool arePointersInitialized = false;
-        private RobotPointer virtualRobotPointer;
-        private RobotPointer writeRobotPointer;
+        private RobotCursor virtualRobotCursor;
+        private RobotCursor writeRobotCursor;
 
         private Settings currentSettings;
 
@@ -111,8 +111,8 @@ namespace RobotControl
             actionBuffer = new ActionBuffer();
 
             arePointersInitialized = false;
-            virtualRobotPointer = null;
-            writeRobotPointer = null;
+            virtualRobotCursor = null;
+            writeRobotCursor = null;
 
             currentSettings = new Settings(DefaultVelocity, DefaultZone, DefaultMotionType);
         }
@@ -399,7 +399,7 @@ namespace RobotControl
         {
             List<Action> actions = actionBuffer.GetAllPending();
 
-            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", writeRobotPointer, actions);
+            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", writeRobotCursor, actions);
 
             // @TODO: add some filepath sanity here
 
@@ -603,7 +603,7 @@ namespace RobotControl
             }
             
             ActionTranslation act = new ActionTranslation(trans, relative, vel, zon, mType);
-            virtualRobotPointer.ApplyAction(act);
+            virtualRobotCursor.ApplyAction(act);
             return actionBuffer.Add(act);
         }
     
@@ -729,11 +729,11 @@ namespace RobotControl
             bool success = true;
             if (controlMode == ControlMode.Offline)
             {
-                virtualRobotPointer = new RobotPointerABB();
-                success = success && virtualRobotPointer.Initialize(position, rotation);
+                virtualRobotCursor = new RobotCursorABB("virtualCursor");
+                success = success && virtualRobotCursor.Initialize(position, rotation);
 
-                writeRobotPointer = new RobotPointerABB();
-                success = success && writeRobotPointer.Initialize(position, rotation);
+                writeRobotCursor = new RobotCursorABB("writeCursor");
+                success = success && writeRobotCursor.Initialize(position, rotation);
             }
 
             arePointersInitialized = success;
@@ -889,23 +889,21 @@ namespace RobotControl
 
         public void DebugBuffer()
         {
+            Console.WriteLine("BUFFERED ACTIONS:");
             actionBuffer.LogBufferedActions();
         }
 
-        public void DebugVirtualPointer()
+        public void DebugRobotCursors()
         {
-            if (virtualRobotPointer == null)
+            if (virtualRobotCursor == null)
                 Console.WriteLine("Virtual pointer not initialized");
             else
-                Console.WriteLine(virtualRobotPointer);
-        }
+                Console.WriteLine(virtualRobotCursor);
 
-        public void DebugWritePointer()
-        {
-            if (writeRobotPointer == null)
+            if (writeRobotCursor == null)
                 Console.WriteLine("Write pointer not initialized");
             else
-                Console.WriteLine(writeRobotPointer);
+                Console.WriteLine(writeRobotCursor);
         }
 
         /// <summary>

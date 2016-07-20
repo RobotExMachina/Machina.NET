@@ -57,7 +57,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1105;
+        public static readonly int Build = 1106;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -366,83 +366,122 @@ namespace RobotControl
         //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
         //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
         //                                                         
-        ///// <summary>
-        ///// Issue a relative movement action request.
-        ///// </summary>
-        ///// <param name="dir"></param>
-        ///// <returns></returns>
-        //public bool Move(Point dir)
-        //{
-        //    return Move(dir.X, dir.Y, dir.Z);
-        //}
-
-
-        ///// <summary>
-        ///// Issue a relative movement action request.
-        ///// </summary>
-        ///// <param name="incX"></param>
-        ///// <param name="incY"></param>
-        ///// <param name="incZ"></param>
-        ///// <returns></returns>
-        //public bool Move(double incX, double incY, double incZ)
-        //{
-        //    return c.IssueRelativeMovementRequest(incX, incY, incZ);
-        //}
         
-
-        ///// <summary>
-        ///// Issue an absolute movement action request.
-        ///// </summary>
-        ///// <param name="newX"></param>
-        ///// <param name="newY"></param>
-        ///// <param name="newZ"></param>
-        ///// <returns></returns>
-        //public bool MoveTo(double newX, double newY, double newZ)
-        //{
-        //    return c.IssueAbsoluteMovementRequest(newX, newY, newZ);
-        //}
-
-        ///// <summary>
-        ///// Issue an absolute movement action request.
-        ///// </summary>
-        ///// <param name="bookmarkTarget"></param>
-        ///// <returns></returns>
-        //public bool MoveTo(string bookmarkTarget)
-        //{
-        //    string str = bookmarkTarget.ToLower();
-
-        //    if (str.Equals("home"))
-        //    {
-        //        return MoveTo(300, 0, 550);  // @TODO: this should issue a MoveAbsJ(0,0,0,0,0,0) or similar
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Named position '{0}' not found", bookmarkTarget);
-        //    }
-
-        //    return false;
-        //}
-
-
+        /// <summary>
+        /// Issue a relative movement action request.
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <returns></returns>
         public bool Move(Point direction)
         {
             return c.IssueTranslationRequest(direction, true);
         }
 
+        /// <summary>
+        /// Issue a relative movement action request.
+        /// </summary>
+        /// <param name="incX"></param>
+        /// <param name="incY"></param>
+        /// <param name="incZ"></param>
+        /// <returns></returns>
         public bool Move(double incX, double incY, double incZ)
         {
             return Move(new Point(incX, incY, incZ));
         }
 
+        /// <summary>
+        /// Issue an absolute movement action request.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public bool MoveTo(Point position)
         {
             return c.IssueTranslationRequest(position, false);
         }
 
+        /// <summary>
+        /// Issue an absolute movement action request.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
         public bool MoveTo(double x, double y, double z)
         {
             return MoveTo(new Point(x, y, z));
         }
+
+        /// <summary>
+        /// Issue an absolute movement action request to a tagged position. 
+        /// </summary>
+        /// <param name="bookmarkedPosition"></param>
+        /// <returns></returns>
+        public bool MoveTo(string bookmarkedPosition)
+        {
+            throw new NotImplementedException();
+        }
+
+        // @TODO: add overloads with custom velocity and speed?
+
+
+
+
+
+
+
+        public bool Rotate(double q1, double q2, double q3, double q4)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Rotate(Rotation rotation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Rotate(
+            double x0, double x1, double x2, 
+            double y0, double y1, double y2, 
+            double z0, double z1, double z2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Rotate(Point vecX, Point vecY, Point vecZ)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public bool RotateTo(double q1, double q2, double q3, double q4)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RotateTo(Rotation rotation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RotateTo(
+            double x0, double x1, double x2,
+            double y0, double y1, double y2,
+            double z0, double z1, double z2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RotateTo(Point vecX, Point vecY, Point vecZ)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RotateTo(string bookmarkedRotation)
+        {
+            throw new NotImplementedException();
+        }
+
+        // @TODO: add overloads with custom velocity and speed?
 
 
 
@@ -510,6 +549,60 @@ namespace RobotControl
         //    return false;
         //}
 
+        
+
+
+        // @TODO: not quite sure yet about how compound relative transformations should work, since sequence order matters a lot here
+        
+        public bool TransformTo(Point position, Rotation rotation)
+        {
+            throw new NotImplementedException();
+        }       
+
+        public bool TransformTo(double x, double y, double z, double q1, double q2, double q3, double q4)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+
+
+        public bool Joints(Joints incJoints)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool JointsTo(Joints joints)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         //  ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
         //  ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
@@ -526,19 +619,21 @@ namespace RobotControl
             c.DebugDump();
         }
 
+        /// <summary>
+        /// Dumps a list of the remaining buffered actions.
+        /// </summary>
         public void DebugBuffer()
         {
             c.DebugBuffer();
         }
 
-        public void DebugVirtualPointer()
+        /// <summary>
+        /// Dumps the state of the internal RobotPointers
+        /// </summary>
+        public void DebugRobotCursors()
         {
-            c.DebugVirtualPointer();
+            c.DebugRobotCursors();
         }
-
-        public void DebugWritePointer()
-        {
-            c.DebugWritePointer();
-        }
+        
     }
 }
