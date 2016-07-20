@@ -14,6 +14,22 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+## BUILD 1108
+- [ ] Add Joints() actions (think of a new name?)
+
+## BUILD 1107
+- [ ] Implement bot.PushSettings() & bot.PopSettings();
+- [ ] Add Rotate() and Transform() actions
+
+## BUILD 1106
+- [x] Code cleanup and commenting
+- [ ] Restructure crappy barfed code more programmatically --> Wait till a more complete scope arises.
+- [ ] Create a basic offline example
+- [ ] Fix broken examples
+- [x] Added placeholder API actions
+- [x] Add internal names to VirtualPointers
+- [x] Renamed RobotPointer to RobotCursor
+
 ## BUILD 1105
 - [x] Develop 'Offline' mode with the new framework 
     + Still shaky and narrow, but the main foundation is there... :)

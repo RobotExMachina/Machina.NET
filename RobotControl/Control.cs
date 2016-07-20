@@ -14,14 +14,14 @@ namespace RobotControl
     class Control
     {
         // Some 'environment variables' to define check states and behavior
-        public static readonly bool SafetyStopImmediateOnDisconnect = true;
-        public static readonly bool SafetyCheckTableCollision = true;
-        public static readonly bool SafetyStopOnTableCollision = true;
-        public static readonly double SafetyTableZLimit = 100;                     // table security checks will trigger under this z height (mm)
-        public static readonly bool DEBUG = true;                                  // dump a bunch of debug logs
-        public static readonly int DefaultVelocity = 20;
-        public static readonly int DefaultZone = 5;
-        public static readonly MotionType DefaultMotionType = MotionType.Linear;
+        public static readonly bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
+        public static readonly bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
+        public static readonly bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
+        public static readonly double SAFETY_TABLE_Z_LIMIT = 100;                       // table security checks will trigger below this z height (mm)
+
+        public static readonly int DEFAULT_VELOCITY = 20;                               // default velocity for new actions
+        public static readonly int DEFAULT_ZONE = 5;                                    // default zone for new actions
+        public static readonly MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         
 
         /// <summary>
@@ -52,26 +52,40 @@ namespace RobotControl
         /// </summary>
         private ActionBuffer actionBuffer;
 
-
+        /// <summary>
+        /// An 'interface' to create robot programs based on platform-specific languages and descriptions.
+        /// </summary>
         private ProgramGenerator programGenerator = new ProgramGeneratorABB();  // @TODO: this must be more programmatic and shimmed
 
-        // STUFF NEEDED FOR STREAM MODE
-        // Most of it represents a virtual current state of the robot, to be able to 
-        // issue appropriate relative actions.
-        // @TODO: move all of this to a VirtualRobot object and to the Comm + QueueManager objects
-        //public Point TCPPosition = null;
-        //public Rotation TCPRotation = null;
-        //public int currentVelocity = 10;
-        //public int currentZone = 5;
-        //public MotionType currentMotionType = MotionType.Linear;        // linear motion by default
-        public StreamQueue streamQueue;
-        public bool mHeld = false;                                      // is Mastership currently held by someone? useful when several threads want to write to the robot...
-
-        private bool arePointersInitialized = false;
-        private RobotCursor virtualRobotCursor;
-        private RobotCursor writeRobotCursor;
-
+        /// <summary>
+        /// Represents the current values for velocity, zone and MotionType.
+        /// </summary>
         private Settings currentSettings;
+
+        /// <summary>
+        /// Keeps track of the state of a virtual robot immediately following all the actions issued to Control.
+        /// </summary>
+        private RobotCursor virtualCursor;
+
+        /// <summary>
+        /// Keeps track of the state of a virtual robot immediately following all the actions released from the 
+        /// actionsbuffer to target device defined by controlMode, like an offline program, a full intruction execution 
+        /// or a streamed target.
+        /// </summary>
+        private RobotCursor writeCursor;
+
+        /// <summary>
+        /// Are cursors ready to start working?
+        /// </summary>
+        private bool areCursorsInitialized = false;
+
+        // @TODO: this will need to get reallocated when fixing stream mode...
+        public StreamQueue streamQueue;
+
+
+        
+
+        
 
 
 
@@ -99,10 +113,6 @@ namespace RobotControl
         /// </summary>
         public void Reset()
         {
-            //isConnected = false;
-            //isLogged = false;
-            //isMainTaskRetrieved = false;
-            //IP = "";
             
             // @TODO: to deprecate
             queue = new Queue();
@@ -110,11 +120,11 @@ namespace RobotControl
 
             actionBuffer = new ActionBuffer();
 
-            arePointersInitialized = false;
-            virtualRobotCursor = null;
-            writeRobotCursor = null;
+            areCursorsInitialized = false;
+            virtualCursor = null;
+            writeCursor = null;
 
-            currentSettings = new Settings(DefaultVelocity, DefaultZone, DefaultMotionType);
+            currentSettings = new Settings(DEFAULT_VELOCITY, DEFAULT_ZONE, DEFAULT_MOTION_TYPE);
         }
 
         /// <summary>
@@ -371,6 +381,7 @@ namespace RobotControl
         {
             // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
             // or the virtual one's (like in offline mode).
+
             return comm.GetCurrentOrientation();
         }
 
@@ -383,6 +394,7 @@ namespace RobotControl
         {
             // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
             // or the virtual one's (like in offline mode).
+
             return comm.GetCurrentFrame();
         }
 
@@ -392,16 +404,28 @@ namespace RobotControl
         /// <returns></returns>
         public Joints GetCurrentJoints()
         {
+            // @TODO: same here as above
+
             return comm.GetCurrentJoints();
         }
 
+        /// <summary>
+        /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program as a text file.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
         public bool Export(string filepath)
         {
-            List<Action> actions = actionBuffer.GetAllPending();
-
-            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", writeRobotCursor, actions);
+            if (controlMode != ControlMode.Offline)
+            {
+                Console.WriteLine("Export() only works in Offline mode");
+                return false;
+            }
 
             // @TODO: add some filepath sanity here
+
+            List<Action> actions = actionBuffer.GetAllPending();
+            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", writeCursor, actions);
 
             return SaveStringListToFile(programCode, filepath);
         }
@@ -591,20 +615,39 @@ namespace RobotControl
         //    throw new NotImplementedException();
         //}
 
-
+        /// <summary>
+        /// Issue a customized simple Translation action request.
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <param name="relative"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon, MotionType mType)
         {
-            if (!arePointersInitialized)
+            if (!areCursorsInitialized)
             {
-                InitializeRobotPointers(trans, Frame.DefaultOrientation);
-
-                //InitializeRobotPointer(trans, Frame.DefaultOrientation, out virtualRobotPointer);  // @TODO: defaults should depend on robot make/model
-                //InitializeRobotPointer(trans, Frame.DefaultOrientation, out writeRobotPointer);  // @TODO: defaults should depend on robot make/model
+                if (controlMode == ControlMode.Offline)
+                {  
+                    if ( !InitializeRobotPointers(trans, Frame.DefaultOrientation) )  // @TODO: defaults should depend on robot make/model
+                    {
+                        Console.WriteLine("Could not initialize cursors...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Still only working in Offline mode");
+                    return false;
+                }
             }
             
             ActionTranslation act = new ActionTranslation(trans, relative, vel, zon, mType);
-            virtualRobotCursor.ApplyAction(act);
-            return actionBuffer.Add(act);
+            bool success = virtualCursor.ApplyAction(act);
+            // Only add this action to the queue if it was successfuly applied to the virtualCursor
+            if (success) actionBuffer.Add(act);
+            return success;
         }
     
         // Overloads falling back on current settings values
@@ -718,29 +761,29 @@ namespace RobotControl
         /// </summary>
         /// <param name="pointer"></param>
         /// <returns></returns>
-        //private bool InitializeRobotPointer(Point position, Rotation rotation, out RobotPointer pointer)
-        //{
-        //    pointer = new RobotPointerABB(); // @TODO: shim brand/model
-        //    return pointer.Initialize(position, rotation);
-        //}
-
         private bool InitializeRobotPointers(Point position, Rotation rotation)
         {
             bool success = true;
             if (controlMode == ControlMode.Offline)
             {
-                virtualRobotCursor = new RobotCursorABB("virtualCursor");
-                success = success && virtualRobotCursor.Initialize(position, rotation);
+                virtualCursor = new RobotCursorABB("virtualCursor");
+                success = success && virtualCursor.Initialize(position, rotation);
 
-                writeRobotCursor = new RobotCursorABB("writeCursor");
-                success = success && writeRobotCursor.Initialize(position, rotation);
-            }
+                writeCursor = new RobotCursorABB("writeCursor");
+                success = success && writeCursor.Initialize(position, rotation);
 
-            arePointersInitialized = success;
+                areCursorsInitialized = success;
+            }    
 
             return success;
         }
 
+        /// <summary>
+        /// Saves a string List to a file.
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
         private bool SaveStringListToFile(List<string> lines, string filepath)
         {
             try
@@ -861,9 +904,9 @@ namespace RobotControl
         }
 
         // This should be moved somewhere else
-        private static bool IsBelowTable(double z)
+        public static bool IsBelowTable(double z)
         {
-            return z <= SafetyTableZLimit;
+            return z < SAFETY_TABLE_Z_LIMIT;
         }
 
 
@@ -895,15 +938,15 @@ namespace RobotControl
 
         public void DebugRobotCursors()
         {
-            if (virtualRobotCursor == null)
+            if (virtualCursor == null)
                 Console.WriteLine("Virtual pointer not initialized");
             else
-                Console.WriteLine(virtualRobotCursor);
+                Console.WriteLine(virtualCursor);
 
-            if (writeRobotCursor == null)
+            if (writeCursor == null)
                 Console.WriteLine("Write pointer not initialized");
             else
-                Console.WriteLine(writeRobotCursor);
+                Console.WriteLine(writeCursor);
         }
 
         /// <summary>

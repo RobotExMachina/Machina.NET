@@ -357,6 +357,16 @@ namespace RobotControl
             SetMotionType(t);
         }
 
+        public void PushSettings()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PopSettings()
+        {
+            throw new NotImplementedException();
+        }
+
 
 
         //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
@@ -590,6 +600,26 @@ namespace RobotControl
         }
 
 
+
+
+
+        // @TODO: feels like Path is too much of a spatial geometry description. 
+        // Should it become something more action-related? Like Instructions, Program, Commands?
+        public bool Follow(Path path)
+        {
+            throw new NotImplementedException();
+        }
+
+        
+
+
+
+
+
+        public bool Wait(long millis)
+        {
+            throw new NotImplementedException();
+        }
 
 
 

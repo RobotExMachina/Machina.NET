@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace RobotControl
 {
+    /// <summary>
+    /// Defines an Action Type, like Translation, Rotation, Wait... 
+    /// Useful to flag base Actions into children classes.
+    /// </summary>
     internal enum ActionType : int
     {
         Undefined = 0, 
@@ -13,16 +17,30 @@ namespace RobotControl
     }
     
     /// <summary>
-    /// The type of Movement for robotic Actions
+    /// If an Action implies movement, what type it is. 
     /// </summary>
     public enum MotionType : int 
     {
-        Undefined = 0,       // a null default
+        Undefined = 0,  // a null default
         Linear = 1,     // linear movement
         Joint = 2,      // joint movement
         Joints = 3      // direct joints manipulation
     }
 
+
+
+
+
+
+
+
+    //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗
+    //  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║
+    //  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║
+    //  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║
+    //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║
+    //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //                                                 
     /// <summary>
     /// Actions represent high-level abstract operations such as movements, rotations, 
     /// transformations or joint manipulations, both in absolute and relative terms. 
@@ -41,12 +59,31 @@ namespace RobotControl
 
     }
 
+
+
+
+
+
+    //  ████████╗██████╗  █████╗ ███╗   ██╗███████╗██╗      █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+    //  ╚══██╔══╝██╔══██╗██╔══██╗████╗  ██║██╔════╝██║     ██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+    //     ██║   ██████╔╝███████║██╔██╗ ██║███████╗██║     ███████║   ██║   ██║██║   ██║██╔██╗ ██║
+    //     ██║   ██╔══██╗██╔══██║██║╚██╗██║╚════██║██║     ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+    //     ██║   ██║  ██║██║  ██║██║ ╚████║███████║███████╗██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+    //     ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //                                                                                            
     /// <summary>
     /// An action representing a translation movement in cartesiam world coordinates.
     /// </summary>
     internal class ActionTranslation : Action
     {
-        
+        /// <summary>
+        /// Full constructor.
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <param name="mType"></param>
         public ActionTranslation(Point trans, bool relTrans, int vel, int zon, MotionType mType)
         {
             type = ActionType.Translation;
@@ -82,10 +119,33 @@ namespace RobotControl
                 velocity, 
                 zone);
         }
-
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // NOT USEFUL ANY MORE?
 
 
     //internal class Action

@@ -3,19 +3,34 @@ using System.Collections.Generic;
 
 namespace RobotControl
 {
+    //  ██████╗  ██████╗ ███████╗███╗   ██╗
+    //  ██╔══██╗██╔════╝ ██╔════╝████╗  ██║
+    //  ██████╔╝██║  ███╗█████╗  ██╔██╗ ██║
+    //  ██╔═══╝ ██║   ██║██╔══╝  ██║╚██╗██║
+    //  ██║     ╚██████╔╝███████╗██║ ╚████║
+    //  ╚═╝      ╚═════╝ ╚══════╝╚═╝  ╚═══╝
+    //                                     
     /// <summary>
     /// A class that features methods to translate high-level robot actions into
     /// platform-specific programs. 
     /// </summary>
     internal abstract class ProgramGenerator
     {
-
+        /// <summary>
+        /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
+        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        /// robot configuration and assumes the robot controller will figure out the correct one.
+        /// </summary>
+        /// <param name="programName"></param>
+        /// <param name="writePointer"></param>
+        /// <param name="actions"></param>
+        /// <returns></returns>
         public abstract List<string> UNSAFEProgramFromActions(string programName, RobotCursor writePointer, List<Action> actions);
-
 
         /// <summary>
         /// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
-        /// WARNING: this method is EXTREMELY UNSAFE, since it performs no IK calculations, assuming all targets are in the positive XYZ octant hence a robot configuration of [0,0,0,0]. To be extended with a proper module creator
+        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="velocity"></param>
@@ -59,8 +74,8 @@ namespace RobotControl
 
         /// <summary>
         /// Returns a quick and dirty RobTarget declaration out of a Frame object.
-        /// WARNING: this method is extremely unsafe! It assumes the target is in the positive XYZ octant 
-        /// and assigns a [0,0,0,0] robot configuration to the target. Also, it performs no FK/IK nor security checks.
+        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
@@ -71,13 +86,27 @@ namespace RobotControl
         }
     }
 
+
+    //   █████╗ ██████╗ ██████╗ 
+    //  ██╔══██╗██╔══██╗██╔══██╗
+    //  ███████║██████╔╝██████╔╝
+    //  ██╔══██║██╔══██╗██╔══██╗
+    //  ██║  ██║██████╔╝██████╔╝
+    //  ╚═╝  ╚═╝╚═════╝ ╚═════╝ 
+    //                          
     internal class ProgramGeneratorABB : ProgramGenerator
     {
+        /// <summary>
+        /// A Set of ABB's predefined zone values. 
+        /// </summary>
         private static HashSet<int> PredefinedZones = new HashSet<int>()
         {
             0, 1, 5, 10, 15, 20, 30, 40, 50, 60, 80, 100, 150, 200 
         };
 
+        /// <summary>
+        /// ABB's correspondance of MotionTypes to instructions.
+        /// </summary>
         private static Dictionary<MotionType, string> MotionInstructions = new Dictionary<MotionType, string>()
         {
             { MotionType.Linear, "MOVEL" },
@@ -85,7 +114,15 @@ namespace RobotControl
             { MotionType.Joints, "MoveAbsJ" }
         };
 
-
+        /// <summary>
+        /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
+        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        /// robot configuration and assumes the robot controller will figure out the correct one.
+        /// </summary>
+        /// <param name="programName"></param>
+        /// <param name="writePointer"></param>
+        /// <param name="actions"></param>
+        /// <returns></returns>
         public override List<string> UNSAFEProgramFromActions(string programName, RobotCursor writePointer, List<Action> actions)
         {
             // Cast the robotPointer to the correct subclass
@@ -174,7 +211,11 @@ namespace RobotControl
             return module;
         }
 
-
+        /// <summary>
+        /// Returns a speeddata value. 
+        /// </summary>
+        /// <param name="velocity"></param>
+        /// <returns></returns>
         public string GenerateSpeedDeclaration(int velocity)
         {
             // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
@@ -182,6 +223,11 @@ namespace RobotControl
             return string.Format("[{0},{1},{2},{3}]", velocity, velocity, 5000, 1000);  
         }
 
+        /// <summary>
+        /// Returns a zonedata value.
+        /// </summary>
+        /// <param name="zone"></param>
+        /// <returns></returns>
         public string GenerateZoneDeclaration(int zone)
         {
             // Following conventions for default RAPID zones.

@@ -14,13 +14,18 @@ namespace TEST_NewAPITests
         {
             Robot arm = new Robot();
             arm.ControlMode("offline");
-            
+
             //// Trace a planar square in space
             //TracePlanarRectangle(arm);
 
-            // Trace a straight line in Linear and Joint movement modes
-            TraceYLine(arm, false);
-            TraceYLine(arm, true);
+            //// Trace a straight line in Linear and Joint movement modes
+            //TraceYLine(arm, false);
+            //TraceYLine(arm, true);
+
+            // Test security table check
+            ApproachBaseXYPlane(arm, 300, 25);
+
+
             
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -69,6 +74,20 @@ namespace TEST_NewAPITests
             if (jointMovement) arm.SetMotionType("linear");  // back to where it was... this will improve with arm.PushSettings(); 
         }
 
+        static public void ApproachBaseXYPlane(Robot arm, double height, double zStep)
+        {
+            double h = height;
+            zStep = Math.Abs(zStep);
+            arm.MoveTo(300, 0, h);
+            while (h > 0)
+            {
+                arm.Move(0, 0, -zStep);
+                h -= zStep;
+            }
+
+            // if here, height should be zero, so move back to initial position
+            arm.MoveTo(300, 0, height);
+        }
 
     }
 }
