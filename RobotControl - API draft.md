@@ -234,6 +234,12 @@ path.Move(...);
 arm.Follow(path);  // adds the path to the buffer
 ```
 
+- Can implement time:
+```csharp
+arm.Wait(2000);  // in ms
+```
+
+
 - Full list of actions:
 ```csharp
 // Linear movements

@@ -78,6 +78,13 @@ namespace RobotControl
             0, 1, 5, 10, 15, 20, 30, 40, 50, 60, 80, 100, 150, 200 
         };
 
+        private static Dictionary<MotionType, string> MotionInstructions = new Dictionary<MotionType, string>()
+        {
+            { MotionType.Linear, "MOVEL" },
+            { MotionType.Joint, "MOVEJ" },
+            { MotionType.Joints, "MoveAbsJ" }
+        };
+
 
         public override List<string> UNSAFEProgramFromActions(string programName, RobotPointer writePointer, List<Action> actions)
         {
@@ -87,11 +94,11 @@ namespace RobotControl
             // Initialize a module list
             List<string> module = new List<string>();
 
-            // Module header
+            // MODULE HEADER
             module.Add("MODULE " + programName);
             module.Add("");
 
-            // Velocity & zone declarations
+            // VELOCITY & ZONE DECLARATIONS
             // Figure out how many different ones are there first
             Dictionary<int, string> velNames = new Dictionary<int, string>();
             Dictionary<int, string> velDecs = new Dictionary<int, string>();
@@ -110,7 +117,7 @@ namespace RobotControl
                 {
                     bool predef = PredefinedZones.Contains(a.zone);
                     zonePredef.Add(a.zone, predef);
-                    zoneNames.Add(a.zone, (predef ? "z" : "zon") + a.zone);
+                    zoneNames.Add(a.zone, (predef ? "z" : "zone") + a.zone);  // use predef syntax or clean new one
                     zoneDecs.Add(a.zone, predef ? "" : GenerateZoneDeclaration(a.zone));
                 }
             }
@@ -130,8 +137,8 @@ namespace RobotControl
             }
             module.Add("");
 
-            // Target declarations
-            // Use a virtual robot pointer to generate instructions
+            // TARGET DECLARATIONS
+            // Use the write robot pointer to generate instructions
             int it = 0;
             foreach (Action a in actions)
             {
@@ -142,11 +149,24 @@ namespace RobotControl
             }
             module.Add("");
 
-
-
+            // MAIN PROCEDURE
+            module.Add("  PROC main()");
+            module.Add(@"    ConfJ \Off;");
+            module.Add(@"    ConfL \Off;");
+            it = 0;
+            foreach (Action a in actions)
+            {
+                module.Add(string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
+                    MotionInstructions[a.motionType],
+                    it++,
+                    velNames[a.velocity],
+                    zoneNames[a.zone]
+                    ));
+            }
             module.Add("  ENDPROC");
-
-            // Module footer
+            module.Add("");
+            
+            // MODULE FOOTER
             module.Add("ENDMODULE");
 
             return module;
