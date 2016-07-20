@@ -35,7 +35,7 @@ namespace EXAMPLE_XBOX1Control
         private Controller gameController;
         private int refreshRate = 33;  // in millis
 
-        double relSpeed = 100;
+        int relSpeed = 100;
         double incDist = 25;
 
         Robot arm;

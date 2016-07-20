@@ -24,7 +24,7 @@
 ## BUILD 1106
 - [x] Code cleanup and commenting
 - [ ] Restructure crappy barfed code more programmatically --> Wait till a more complete scope arises.
-- [ ] Create a basic offline example
+- [x] Create a basic offline example
 - [ ] Fix broken examples
 - [x] Added placeholder API actions
 - [x] Add internal names to VirtualPointers

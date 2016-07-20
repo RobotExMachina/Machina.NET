@@ -15,8 +15,8 @@ namespace EXAMPLE_KeyboardControl
         [MTAThread]
         static void Main(string[] args)
         {
-            double leadSpeed = 100;
-            double moveSpeed = 50;
+            int leadSpeed = 100;
+            int moveSpeed = 50;
             double inc = 25;
             bool input = true;
 
@@ -34,7 +34,7 @@ namespace EXAMPLE_KeyboardControl
             // Move to the positive XYZ octant
             arm.SetVelocity(leadSpeed);
             arm.SetZone(2);
-            arm.RotateTo(Rotation.FlippedAroundY);
+            //arm.RotateTo(Rotation.FlippedAroundY);
             //arm.MoveTo(250, 250, 250);
 
             arm.SetVelocity(moveSpeed);

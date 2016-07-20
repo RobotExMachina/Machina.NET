@@ -10,8 +10,8 @@ namespace EXAMPLE_StreamTargets2
         [MTAThread]
         static void Main(string[] args)
         {
-            double leadSpeed = 100;
-            double traceSpeed = 50;
+            int leadSpeed = 100;
+            int traceSpeed = 50;
 
             Robot arm = new Robot();
 
@@ -29,7 +29,8 @@ namespace EXAMPLE_StreamTargets2
             arm.SetZone(20);                // in mm
 
             // A set of horizontal squares
-            arm.MoveTo("home");             // a 'bbokmarked' target
+            //arm.MoveTo("home");             // a 'bookmarked' target
+            arm.MoveTo(300, 0, 500);
 
             arm.SetVelocity(leadSpeed);
             arm.MoveTo(250, 250, 250);      // absolute movement
@@ -60,7 +61,8 @@ namespace EXAMPLE_StreamTargets2
             arm.Move(-50, 0, 0);
 
             arm.SetVelocity(leadSpeed);
-            arm.MoveTo("home");
+            //arm.MoveTo("home");
+            arm.MoveTo(300, 0, 500);
 
             Console.WriteLine("Press any key to STOP the program...");
             Console.ReadKey();

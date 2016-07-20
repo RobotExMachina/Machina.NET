@@ -354,9 +354,9 @@ public class TuioDemo : Form , TuioListener
     private Robot arm;
 
     // Motion settings for both modes
-    private double velocity = 100;              // For instruct mode, use standard RAPID velocities
-    private double sleepVelocity = 25;          // velocity at which it will retreat to sleep
-    private double zone = 5;                    // For instruct mode, use standard RAPID zones
+    private int velocity = 100;              // For instruct mode, use standard RAPID velocities
+    private int sleepVelocity = 25;          // velocity at which it will retreat to sleep
+    private int zone = 5;                    // For instruct mode, use standard RAPID zones
     private bool pathSimpHQ = false;            // use high quality path simplication?
     private double pathSimpResolution = 0.1;    // simplication precision in world mm 
 
