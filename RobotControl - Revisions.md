@@ -15,7 +15,8 @@
 ```
 
 ## BUILD 1105
-- [ ] Develop 'Offline' mode with the new framework
+- [x] Develop 'Offline' mode with the new framework 
+    --> Still shaky and narrow, but the main foundation is there...
 
 ## BUILD 1104
 - [x] Implement RobotPointers class
