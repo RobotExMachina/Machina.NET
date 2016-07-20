@@ -22,10 +22,10 @@ namespace TEST_NewAPITests
             //TraceYLine(arm, false);
             //TraceYLine(arm, true);
 
-            // Test security table check
-            ApproachBaseXYPlane(arm, 300, 25);
+            //// Test security table check
+            //ApproachBaseXYPlane(arm, 300, 25);
 
-
+            PushAndPopSettingsTest(arm);
             
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -87,6 +87,33 @@ namespace TEST_NewAPITests
 
             // if here, height should be zero, so move back to initial position
             arm.MoveTo(300, 0, height);
+        }
+
+        static public void PushAndPopSettingsTest(Robot arm)
+        {
+            arm.PushSettings();
+
+            arm.SetVelocity(222);
+            arm.PushSettings();
+
+            arm.SetZone(4);
+            arm.PushSettings();
+
+            arm.SetMotionType("joint");
+            arm.PushSettings();
+
+            arm.MoveTo(300, 300, 300);
+
+            arm.DebugSettingsBuffer();
+
+            arm.PopSettings();
+            arm.PopSettings();
+            arm.PopSettings();
+            arm.PopSettings();
+
+            arm.MoveTo(300, 0, 500);
+
+            arm.DebugSettingsBuffer();
         }
 
     }

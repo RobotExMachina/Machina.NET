@@ -57,7 +57,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1106;
+        public static readonly int Build = 1107;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -359,12 +359,12 @@ namespace RobotControl
 
         public void PushSettings()
         {
-            throw new NotImplementedException();
+            c.PushCurrentSettings();
         }
 
         public void PopSettings()
         {
-            throw new NotImplementedException();
+            c.PopCurrentSettings();
         }
 
 
@@ -664,6 +664,12 @@ namespace RobotControl
         {
             c.DebugRobotCursors();
         }
-        
+
+        public void DebugSettingsBuffer()
+        {
+            c.DebugSettingsBuffer();
+        }
+
+
     }
 }

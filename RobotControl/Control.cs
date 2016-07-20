@@ -63,6 +63,11 @@ namespace RobotControl
         private Settings currentSettings;
 
         /// <summary>
+        /// A buffer that stores Push and PopSettings() states.
+        /// </summary>
+        private SettingsBuffer settingsBuffer;
+
+        /// <summary>
         /// Keeps track of the state of a virtual robot immediately following all the actions issued to Control.
         /// </summary>
         private RobotCursor virtualCursor;
@@ -113,7 +118,6 @@ namespace RobotControl
         /// </summary>
         public void Reset()
         {
-            
             // @TODO: to deprecate
             queue = new Queue();
             streamQueue = new StreamQueue();
@@ -125,6 +129,7 @@ namespace RobotControl
             writeCursor = null;
 
             currentSettings = new Settings(DEFAULT_VELOCITY, DEFAULT_ZONE, DEFAULT_MOTION_TYPE);
+            settingsBuffer = new SettingsBuffer();
         }
 
         /// <summary>
@@ -475,6 +480,32 @@ namespace RobotControl
         {
             currentSettings.MotionType = type;
         }
+
+
+        public void PushCurrentSettings()
+        {
+            Console.WriteLine("Pushing {0}", currentSettings);
+            settingsBuffer.Push(currentSettings);
+            //Settings newSettings = currentSettings.Clone();  // create a new object
+            //currentSettings = newSettings;
+            currentSettings = currentSettings.Clone();
+        }
+
+
+        public void PopCurrentSettings()
+        {
+            currentSettings = settingsBuffer.Pop();
+            Console.WriteLine("Reverted to {0}", currentSettings);
+        }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -947,6 +978,11 @@ namespace RobotControl
                 Console.WriteLine("Write pointer not initialized");
             else
                 Console.WriteLine(writeCursor);
+        }
+
+        public void DebugSettingsBuffer()
+        {
+            settingsBuffer.LogBuffer();
         }
 
         /// <summary>
