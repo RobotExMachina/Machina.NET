@@ -15,11 +15,27 @@
 ```
 
 ## BUILD 1108
-- [ ] Add Joints() actions (think of a new name?)
+- [ ] Add Joints() actions (think of a new name?) --> .ArmJoints(); .ArmJointsTo(); || .RotateArm(); .RotateArmTo()
+- [ ] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
+- [ ] Refactor .setvel and .setzone to .speed and .zone
+- [ ] List<string> .exportcode(bool flush)
 
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();
+- [ ] Necessary geometry implementations for Rotations:
+    - [ ] Quaternion unitization
+    - [ ] Quaternion from vector and angle, including unit vector checks
+    - [ ] Quaternion multiplication
+    - [ ] A robust Quaternion from vecX, vecY with internal checks
+    - [ ] Transformation of a Point by a Quaternion rotation.
+    - [ ] Get Vector and Angle from a rotation: always return the positive angle solution?
+    - [ ] CHANGE FUCKING Q1..Q4 CONVENTION FOR ABB ROBOTS... XD
 - [ ] Add Rotate() actions
+    - [ ] RotateTo(q1..q4);                     // hardcode quat rotation
+    - [ ] RotateTo(vecX, vecY);                 // note this method should take care of normalizing ang orthogonizing the vectors, with Z being unnecessary
+    - [ ] Rotate(q1..q4, bool global);          // apply quaternion to current rotation
+    - [ ] Rotate(vector, angle, bool global);   // rotate current orientation 'angle' degrees around vector 
+
 - [ ] Add Transform() actions
 
 ## BUILD 1106

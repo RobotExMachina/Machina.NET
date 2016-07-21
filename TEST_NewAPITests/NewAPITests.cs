@@ -28,7 +28,11 @@ namespace TEST_NewAPITests
             //// Use Push & PopSettings ;)
             //PushAndPopSettingsTest(arm);
 
-            RotationTests(arm);
+            //// Rotation tests
+            //RotationTests(arm);
+
+            // Advanced rotation tests
+            RotationTestsAdvanced(arm);
             
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -138,6 +142,58 @@ namespace TEST_NewAPITests
 
             arm.SetVelocity(100);
             arm.MoveTo(300, 0, 500);
+        }
+
+        public static void RotationTestsAdvanced(Robot arm)
+        {
+            Rotation r1 = new Rotation(new Point(0, 0, 1), 0);
+            Rotation r2 = new Rotation(new Point(0, 0, 1), 45);
+            Rotation r3 = new Rotation(new Point(0, 0, 1), 90);
+            Rotation r4 = new Rotation(new Point(0, 0, 1), 145);
+            Rotation r5 = new Rotation(new Point(0, 0, 1), 180);
+            Rotation r6 = new Rotation(new Point(0, 0, 1), -45);
+            Rotation r7 = new Rotation(new Point(0, 0, 1), -90);
+            Rotation r8 = new Rotation(new Point(0, 0, 1), -145);
+            Rotation r9 = new Rotation(new Point(0, 0, 1), -180);
+
+            Rotation rx45 = new Rotation(new Point(1, 0, 0), 45);
+            Rotation rx90 = new Rotation(new Point(1, 0, 0), 90);
+            Rotation rx180 = new Rotation(new Point(1, 0, 0), 180);
+
+            Rotation ry45 = new Rotation(new Point(0, 1, 0), 45);
+            Rotation ry90 = new Rotation(new Point(0, 1, 0), 90);
+            Rotation ry180 = new Rotation(new Point(0, 1, 0), 180);
+
+            Rotation rz45 = new Rotation(new Point(0, 0, 1), 45);
+            Rotation rz90 = new Rotation(new Point(0, 0, 1), 90);
+            Rotation rz180 = new Rotation(new Point(0, 0, 1), 180);
+
+            Rotation rzn45 = new Rotation(new Point(0, 0, 1), -45);
+            Rotation rzn90 = new Rotation(new Point(0, 0, 1), -90);
+
+            Point xAxis = rx45.RotationVector();
+            Point yAxis = ry45.RotationVector();
+            Point zAxis = rz45.RotationVector();
+
+            double val45 = rx45.RotationAngle();
+            double val90 = rx90.RotationAngle();
+
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+
+            // Move to a more dexterous area
+            arm.MoveTo(300, -100, 400);
+
+            // Velocity is expresses in both mm/s and °/s
+            arm.SetVelocity(45);
+
+            arm.RotateTo(ry180);
+
+            arm.RotateTo(r5);
+
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+
 
         }
 

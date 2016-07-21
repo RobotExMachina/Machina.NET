@@ -17,7 +17,18 @@ using ABB.Robotics.Controllers.RapidDomain;
 
 namespace RobotControl
 {
+    public  abstract class Geometry
+    {
+        /// <summary>
+        /// Precision for floating-point comparisons.
+        /// </summary>
+        protected static readonly double EPSILON = 0.0000000001;
 
+        /// <summary>
+        /// Amount of digits for floating-point comparisons precision.
+        /// </summary>
+        protected static readonly int EPSILON_DECIMALS = 10;  
+    }
 
     //██████╗  ██████╗ ██╗███╗   ██╗████████╗
     //██╔══██╗██╔═══██╗██║████╗  ██║╚══██╔══╝
@@ -28,7 +39,7 @@ namespace RobotControl
     /// <summary>
     /// Represents three coordinates in space.
     /// </summary>
-    public class Point
+    public class Point : Geometry
     {
         public double X, Y, Z;
 
@@ -128,6 +139,40 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// Rotates this Point by speficied Quaterion.
+        /// </summary>
+        /// <param name="r"></param>
+        public bool Rotate(Rotation r)
+        {
+            if (!r.IsUnit())
+            {
+                Console.WriteLine("Please use unit Quaternions to perform rotations");
+                return false;
+            }
+
+            // P.out = Q * P.in * conj(Q);
+            // From gl-matrix.js
+            double ix =  r.Q4 * X + r.Q2 * Z - r.Q3 * Y,
+                   iy =  r.Q4 * Y + r.Q3 * X - r.Q1 * Z,
+                   iz =  r.Q4 * Z + r.Q1 * Y - r.Q2 * X,
+                   iw = -r.Q1 * X - r.Q2 * Y - r.Q3 * Z;
+
+            this.X = ix * r.Q4 - iw * r.Q1 - iy * r.Q3 + iz * r.Q2;
+            this.Y = iy * r.Q4 - iw * r.Q2 - iz * r.Q1 + ix * r.Q3;
+            this.Z = iz * r.Q4 - iw * r.Q3 - ix * r.Q2 + iy * r.Q1;
+
+            return true;
+        }
+
+        public bool Rotate(Point vec, double angDegs)
+        {
+            Rotation r = new Rotation(vec, angDegs);
+            return this.Rotate(r);
+        }
+
+
+
+        /// <summary>
         /// Equality checks.
         /// </summary>
         /// <ref>https://github.com/imshz/simplify-net</ref>
@@ -158,7 +203,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return "[" + this.X + "," + this.Y + "," + this.Z + "]";
+            return string.Format("[{0},{1},{2}]", X, Y, Z);
         }
     }
 
@@ -172,7 +217,7 @@ namespace RobotControl
     /// <summary>
     /// Represents a rotation using quaternions.
     /// </summary>
-    public class Rotation
+    public class Rotation : Geometry
     {
         /// <summary>
         /// The orientation of a global XYZ coordinate system.
@@ -207,13 +252,17 @@ namespace RobotControl
 
         public Rotation(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
         {
-            List<double> q = PlaneToQuaternions(x1, x2, x3, y1, y2, y3, z1, z2, z3);
+            List<double> q = PlaneToQuaternion(x1, x2, x3, y1, y2, y3, z1, z2, z3);
             this.Q1 = q[0];
             this.Q2 = q[1];
             this.Q3 = q[2];
             this.Q4 = q[3];
         }
 
+        /// <summary>
+        /// Creates a new Rotation as a shallow copy of the passed one.
+        /// </summary>
+        /// <param name="r"></param>
         public Rotation(Rotation r)
         {
             this.Q1 = r.Q1;
@@ -238,9 +287,29 @@ namespace RobotControl
             this.Q4 = rt.Rot.Q4;
         }
 
+        /// <summary>
+        /// Creates a unit Quaternion representing a rotation of n degrees around a 
+        /// vector, with right-hand positive convention.
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="angDegs"></param>
+        public Rotation(Point vec, double angDegs)
+        {
+            double rad2 = Math.PI * angDegs / 360.0;  // ang / 2
+            double s = Math.Sin(rad2);
+            Point u = new Point(vec);
+            u.Normalize();
+            this.Q1 = s * u.X;
+            this.Q2 = s * u.Y;
+            this.Q3 = s * u.Z;
+            this.Q4 = Math.Cos(rad2);
+        }
+
+        /// <summary>
+        /// Creates an identity Quaternion
+        /// </summary>
         public Rotation()
         {
-            // Returns an identity quaternion
             this.Q1 = 0;
             this.Q2 = 0;
             this.Q3 = 0;
@@ -271,7 +340,117 @@ namespace RobotControl
             this.Q4 = q[3];
         }
 
-        // From gl-matrix.quat.js
+        /// <summary>
+        /// Returns the length (norm) of this Quaternion.
+        /// </summary>
+        /// <returns></returns>
+        public double Length()
+        {
+            return Math.Sqrt(Q1 * Q1 + Q2 * Q2 + Q3 * Q3 + Q4 * Q4);
+        }
+
+        /// <summary>
+        /// Returns the square length of this Quaternion.
+        /// </summary>
+        /// <returns></returns>
+        public double SqLength()
+        {
+            return Q1 * Q1 + Q2 * Q2 + Q3 * Q3 + Q4 * Q4;
+        }
+
+        /// <summary>
+        /// Turns this Quaternion into a <a href="https://en.wikipedia.org/wiki/Versor">Versor</a> (unit length quaternion).
+        /// </summary>
+        public void Normalize()
+        {
+            double len = this.Length();
+            this.Q1 /= len;
+            this.Q2 /= len;
+            this.Q3 /= len;
+            this.Q4 /= len;
+        }
+
+        /// <summary>
+        /// Is this a unit length quaternion?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsUnit()
+        {
+            double sqlen = this.SqLength();
+            //return sqlen > 0.999999999 && sqlen < 1.000000001;
+            return Math.Abs(sqlen - 1) > EPSILON;
+        }
+
+        /// <summary>
+        /// Is this a zero length quaternion?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsZero()
+        {
+            double sqlen = this.SqLength();
+            //return sqlen > -0.000000001 && sqlen < 0.000000001;
+            return Math.Abs(sqlen) > EPSILON;
+        }
+
+        /// <summary>
+        /// Add a Quaternion to this one. 
+        /// </summary>
+        /// <param name="r"></param>
+        public void Add(Rotation r)
+        {
+            this.Q1 += r.Q1;
+            this.Q2 += r.Q2;
+            this.Q3 += r.Q3;
+            this.Q4 += r.Q4;
+        }
+
+        /// <summary>
+        /// Returns the addition of two quaternions.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
+        public static Rotation Addition(Rotation r1, Rotation r2)
+        {
+            return new Rotation(
+                r1.Q1 + r2.Q1,
+                r1.Q2 + r2.Q2,
+                r1.Q3 + r2.Q3,
+                r1.Q4 + r2.Q4);
+        }
+        
+        /// <summary>
+        /// Subtract a quaternion to this one. 
+        /// </summary>
+        /// <param name="r"></param>
+        public void Subtract(Rotation r)
+        {
+            this.Q1 -= r.Q1;
+            this.Q2 -= r.Q2;
+            this.Q3 -= r.Q3;
+            this.Q4 -= r.Q4;
+        }
+
+        /// <summary>
+        /// Returns the subtraction of two quaternions.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
+        public static Rotation Subtraction(Rotation r1, Rotation r2)
+        {
+            return new Rotation(
+                r1.Q1 - r2.Q1,
+                r1.Q2 - r2.Q2,
+                r1.Q3 - r2.Q3,
+                r1.Q4 - r2.Q4);
+        }
+
+        /// <summary>
+        /// Post-multiply this quaternion by another one.
+        /// Remember quaternion multiplication is non-commutative.
+        /// </summary>
+        /// <param name="r"></param>
         public void Multiply(Rotation r)
         {
             this.Q1 = this.Q1 * r.Q4 + this.Q4 * r.Q1 + this.Q2 * r.Q3 - this.Q3 * r.Q2;
@@ -279,8 +458,19 @@ namespace RobotControl
             this.Q3 = this.Q3 * r.Q4 + this.Q4 * r.Q3 + this.Q1 * r.Q2 - this.Q2 * r.Q1;
             this.Q4 = this.Q4 * r.Q4 - this.Q1 * r.Q1 - this.Q2 * r.Q2 - this.Q3 * r.Q3;
         }
+
+        public void PreMultiply(Rotation r)
+        {
+            throw new NotImplementedException();
+        }
         
-        // From gl-matrix.quat.js
+        /// <summary>
+        /// Returns the multiplication of the first quaternion by the second.
+        /// Remember quaternion multiplication is non-commutative.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
         public static Rotation Multiply(Rotation r1, Rotation r2)
         {
             double x = r1.Q1 * r2.Q4 + r1.Q4 * r2.Q1 + r1.Q2 * r2.Q3 - r1.Q3 * r2.Q2;
@@ -292,13 +482,141 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// Divide this quaternion by another one. 
+        /// In reality, this quaternion is post-multiplied by the inverse of the provided one.
+        /// </summary>
+        /// <param name="r"></param>
+        public void Divide(Rotation r)
+        {
+            Rotation arg = new Rotation(r);
+            arg.Invert();
+            this.Multiply(arg);
+        }
+
+        /// <summary>
+        /// Returns the division of r1 by r2.
+        /// In reality, r1 is post-multiplied by the inverse of r2.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
+        public static Rotation Division(Rotation r1, Rotation r2)
+        {
+            Rotation a = new Rotation(r1),
+                     b = new Rotation(r2);
+            b.Invert();
+            a.Multiply(b);
+            return a;
+        }
+
+        /// <summary>
+        /// Turns this Rotation into its conjugate.
+        /// </summary>
+        public void Conjugate()
+        {
+            this.Q1 = -this.Q1;
+            this.Q2 = -this.Q2;
+            this.Q3 = -this.Q3;
+            // Q4 stays the same
+        }
+
+        /// <summary>
+        /// Returns the conjugate of given quaternion.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public static Rotation Conjugate(Rotation r)
+        {
+            return new Rotation(-r.Q1, -r.Q2, -r.Q3, r.Q4);
+        }
+
+        /// <summary>
+        /// Inverts this quaternion.
+        /// </summary>
+        public void Invert()
+        {
+            if (this.IsUnit())
+            {
+                // The inverse of unit vectors is its conjugate
+                this.Q1 = -this.Q1;
+                this.Q2 = -this.Q2;
+                this.Q3 = -this.Q3;
+            }
+            else if (this.IsZero())
+            {
+                // The inverse of a zero quat is itself
+            }
+            else
+            {
+                // The inverse of a quaternion is its conjugate divided by the sqaured norm.
+                double sqlen = this.SqLength();
+                this.Q1 /= -sqlen;
+                this.Q2 /= -sqlen;
+                this.Q3 /= -sqlen;
+                this.Q4 /= sqlen;
+            }
+        }
+
+        /// <summary>
+        /// Returns the inverse of given quaternion.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public static Rotation Inverse(Rotation r)
+        {
+            Rotation rot = new Rotation(r);
+            rot.Invert();
+            return rot;
+        }
+
+        /// <summary>
+        /// Returns the rotation axis represented by this Quaternion. 
+        /// Note it will always return the vector corresponding to a positive rotation, 
+        /// even if the quaternion was created from a negative one (flipped vector).
+        /// </summary>
+        /// <returns></returns>
+        public Point RotationVector()
+        {
+            double theta2 = 2 * Math.Acos(Q4);
+            if (theta2 < EPSILON)
+            {
+                return new Point();
+            }
+
+            double s = Math.Sin(0.5 * theta2);
+
+            return new Point(Q1 / s, Q2 / s, Q3 / s);
+        }
+
+        /// <summary>
+        /// Returns the rotation angle represented by this Quaternion in degrees.
+        /// Note it will always yield the positive rotation.
+        /// </summary>
+        /// <returns></returns>
+        public double RotationAngle()
+        {
+            double theta2 = 2 * Math.Acos(Q4);
+            return theta2 < EPSILON ? 0 : Math.Round( 180 * theta2 / Math.PI, EPSILON_DECIMALS);
+        }
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
         /// Borrowed from DynamoTORO
         /// </summary>
         /// <param name="XAxis"></param>
         /// <param name="YAxis"></param>
         /// <param name="Normal"></param>
         /// <returns></returns>
-        public static List<double> PlaneToQuaternions(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
+        public static List<double> PlaneToQuaternion(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
         {
 
             //Point origin = plane.Origin;
@@ -322,7 +640,8 @@ namespace RobotControl
 
             trace = x1 + y2 + z3 + 1;
 
-            if (trace > 0.00001)
+            //if (trace > 0.00001)
+            if (trace > EPSILON)
             {
                 // s = (trace) ^ (1 / 2) * 2
                 s = Math.Sqrt(trace) * 2;
@@ -376,7 +695,11 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return "[" + this.Q1 + "," + this.Q2 + "," + this.Q3 + "," + this.Q4 + "]";
+            return string.Format("[{0},{1},{2},{3}]",
+                Math.Round(Q1, EPSILON_DECIMALS),
+                Math.Round(Q2, EPSILON_DECIMALS),
+                Math.Round(Q3, EPSILON_DECIMALS),
+                Math.Round(Q4, EPSILON_DECIMALS));
         }
 
     }
@@ -391,7 +714,7 @@ namespace RobotControl
     /// <summary>
     /// Represents the 6 angular rotations of the axes in a 6-axis manipulator
     /// </summary>
-    public class Joints
+    public class Joints : Geometry
     {
         public double J1, J2, J3, J4, J5, J6;
 
@@ -475,7 +798,7 @@ namespace RobotControl
     /// Represents a location and rotation in 3D space, with some additional
     /// metadata representing velocities, zones, etc.
     /// </summary>
-    public class Frame
+    public class Frame : Geometry
     {
         /// <summary>
         /// This is the default rotation that will be assigned to Frames constructed only with location properties.
@@ -709,7 +1032,7 @@ namespace RobotControl
     /// <summary>
     /// Represents an ordered sequence of target Frames
     /// </summary>
-    public class Path
+    public class Path : Geometry
     {
         public string Name;
         private List<Frame> Targets;

@@ -30,7 +30,7 @@
 - [ ] Low-level methods in Communication should not check for !isConnected, but rather just the object they need to perform their function. Only high-level functions should operate based on connection status.
 - [ ] Fuse Path and Frame Queue into the same thing --> Rethink the role of the Queue manager
 - [ ] Clarify the role of queue manager andits relation to Control and Comm.
-- [ ] 
+- [ ] Unsuscribe from controller events on .Disconnect()
 
 ## FUTURE WISHLIST
 - [ ] Bring back 'bookmarked' absolute positions.
