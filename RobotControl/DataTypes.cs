@@ -696,10 +696,15 @@ namespace RobotControl
         /// <param name="r"></param>
         public void Multiply(Rotation r)
         {
-            this.W = this.W * r.W - this.X * r.X - this.Y * r.Y - this.Z * r.Z;
-            this.X = this.X * r.W + this.W * r.X + this.Y * r.Z - this.Z * r.Y;
-            this.Y = this.Y * r.W + this.W * r.Y + this.Z * r.X - this.X * r.Z;
-            this.Z = this.Z * r.W + this.W * r.Z + this.X * r.Y - this.Y * r.X;
+            double w = this.W,
+                   x = this.X,
+                   y = this.Y,
+                   z = this.Z;
+
+            this.W = w * r.W - x * r.X - y * r.Y - z * r.Z;
+            this.X = x * r.W + w * r.X + y * r.Z - z * r.Y;
+            this.Y = y * r.W + w * r.Y + z * r.X - x * r.Z;
+            this.Z = z * r.W + w * r.Z + x * r.Y - y * r.X;
         }
 
         /// <summary>
@@ -710,10 +715,15 @@ namespace RobotControl
         /// <param name="r"></param>
         public void PreMultiply(Rotation r)
         {
-            this.W = r.W * this.W - r.X * this.X - r.Y * this.Y - r.Z * this.Z;
-            this.X = r.X * this.W + r.W * this.X + r.Y * this.Z - r.Z * this.Y;
-            this.Y = r.Y * this.W + r.W * this.Y + r.Z * this.X - r.X * this.Z;
-            this.Z = r.Z * this.W + r.W * this.Z + r.X * this.Y - r.Y * this.X;
+            double w = this.W,
+                   x = this.X,
+                   y = this.Y,
+                   z = this.Z;
+
+            this.W = r.W * w - r.X * x - r.Y * y - r.Z * z;
+            this.X = r.X * w + r.W * x + r.Y * z - r.Z * y;
+            this.Y = r.Y * w + r.W * y + r.Z * x - r.X * z;
+            this.Z = r.Z * w + r.W * z + r.X * y - r.Y * x;
         }
 
         /// <summary>
