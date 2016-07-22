@@ -164,6 +164,12 @@ namespace RobotControl
             return true;
         }
 
+        /// <summary>
+        /// Rotates this Point specified degrees around specified vector. 
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="angDegs"></param>
+        /// <returns></returns>
         public bool Rotate(Point vec, double angDegs)
         {
             Rotation r = new Rotation(vec, angDegs);
@@ -219,6 +225,9 @@ namespace RobotControl
     /// </summary>
     public class Rotation : Geometry
     {
+        /// @TODO: THESE ARE VERY WRONG! They were based on q1 + q2*i + q3*j + q4*k notation, 
+        /// while in fact they were taken as q1*i + q2*j + q3*k + q4 notation...
+
         /// <summary>
         /// The orientation of a global XYZ coordinate system.
         /// </summary>
@@ -295,14 +304,15 @@ namespace RobotControl
         /// <param name="angDegs"></param>
         public Rotation(Point vec, double angDegs)
         {
-            double rad2 = Math.PI * angDegs / 360.0;  // ang / 2
-            double s = Math.Sin(rad2);
+            double halfAngRad = Math.PI * angDegs / 360.0;   // ang / 2
+            double s = Math.Sin(halfAngRad);
             Point u = new Point(vec);
-            u.Normalize();
+            u.Normalize();  // rotation quaternion must be unit
+
             this.Q1 = s * u.X;
             this.Q2 = s * u.Y;
             this.Q3 = s * u.Z;
-            this.Q4 = Math.Cos(rad2);
+            this.Q4 = Math.Cos(halfAngRad);
         }
 
         /// <summary>
@@ -447,7 +457,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Post-multiply this quaternion by another one.
+        /// <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> of this quaternion by specified one.
         /// Remember quaternion multiplication is non-commutative.
         /// </summary>
         /// <param name="r"></param>
@@ -463,9 +473,10 @@ namespace RobotControl
         {
             throw new NotImplementedException();
         }
-        
+
         /// <summary>
-        /// Returns the multiplication of the first quaternion by the second.
+        /// Returns the <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> 
+        /// of the first quaternion by the second.
         /// Remember quaternion multiplication is non-commutative.
         /// </summary>
         /// <param name="r1"></param>
@@ -578,13 +589,14 @@ namespace RobotControl
         public Point RotationVector()
         {
             double theta2 = 2 * Math.Acos(Q4);
+
+            // If angle == 0, no rotation is performed and this quat is identity
             if (theta2 < EPSILON)
             {
                 return new Point();
             }
 
             double s = Math.Sin(0.5 * theta2);
-
             return new Point(Q1 / s, Q2 / s, Q3 / s);
         }
 

@@ -23,13 +23,13 @@
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();
 - [ ] Necessary geometry implementations for Rotations:
-    - [ ] Quaternion unitization
-    - [ ] Quaternion from vector and angle, including unit vector checks
-    - [ ] Quaternion multiplication
-    - [ ] A robust Quaternion from vecX, vecY with internal checks
-    - [ ] Transformation of a Point by a Quaternion rotation.
-    - [ ] Get Vector and Angle from a rotation: always return the positive angle solution?
+    - [x] Quaternion unitization
+    - [x] Quaternion from vector and angle, including unit vector checks
+    - [x] Quaternion multiplication
+    - [x] Transformation of a Point by a Quaternion rotation.
+    - [x] Get Vector and Angle from a rotation: always return the positive angle solution?
     - [ ] CHANGE FUCKING Q1..Q4 CONVENTION FOR ABB ROBOTS... XD
+    - [ ] A robust Quaternion from vecX, vecY with internal checks
 - [ ] Add Rotate() actions
     - [ ] RotateTo(q1..q4);                     // hardcode quat rotation
     - [ ] RotateTo(vecX, vecY);                 // note this method should take care of normalizing ang orthogonizing the vectors, with Z being unnecessary
