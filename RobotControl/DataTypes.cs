@@ -849,18 +849,18 @@ namespace RobotControl
             this.Zone = zon;
         }
 
-        public Frame(double x, double y, double z, double q1, double q2, double q3, double q4)
+        public Frame(double x, double y, double z, double qw, double qx, double qy, double qz)
         {
             this.Position = new Point(x, y, z);
-            this.Orientation = new Rotation(q4, q1, q2, q3);
+            this.Orientation = new Rotation(qw, qx, qy, qz);
             this.Velocity = DefaultVelocity;
             this.Zone = DefaultZone;
         }
 
-        public Frame(double x, double y, double z, double q1, double q2, double q3, double q4, double vel, double zon)
+        public Frame(double x, double y, double z, double qw, double qx, double qy, double qz, double vel, double zon)
         {
             this.Position = new Point(x, y, z);
-            this.Orientation = new Rotation(q4, q1, q2, q3);
+            this.Orientation = new Rotation(qw, qx, qy, qz);
             this.Velocity = vel;
             this.Zone = zon;
         }
@@ -913,7 +913,7 @@ namespace RobotControl
 
         public string GetOrientationDeclaration()
         {
-            return string.Format("[{0},{1},{2},{3}]", Orientation.X, Orientation.Y, Orientation.Z, Orientation.W);
+            return string.Format("[{0},{1},{2},{3}]", Orientation.W, Orientation.X, Orientation.Y, Orientation.Z);
         }
 
         /// <summary>
