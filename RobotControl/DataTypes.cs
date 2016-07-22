@@ -50,6 +50,23 @@ namespace RobotControl
             return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
         }
 
+        public static Point operator - (Point p1, Point p2)
+        {
+            return new Point(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
+        }
+
+        /// <summary>
+        /// Returns the dot product of specified Vectors. 
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double operator * (Point p1, Point p2)
+        {
+            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
+        }
+
+
         /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
         /// of specified Points (Vectors).
@@ -414,6 +431,30 @@ namespace RobotControl
         public static readonly Rotation FlippedAroundZ = new Rotation(0, 0, 0, 1);
 
         public double W, X, Y, Z;
+
+
+        public static Rotation operator + (Rotation r1, Rotation r2)
+        {
+            return Rotation.Addition(r1, r2);
+        }
+
+        public static Rotation operator - (Rotation r1, Rotation r2)
+        {
+            return Rotation.Subtraction(r1, r2);
+        }
+
+        /// <summary>
+        /// Returns the <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> 
+        /// of the first quaternion by the second.
+        /// Remember quaternion multiplication is non-commutative.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
+        public static Rotation operator * (Rotation r1, Rotation r2)
+        {
+            return Rotation.Multiply(r1, r2);
+        }
 
         /// <summary>
         /// Create a Rotation object from its Quaternion parameters: 

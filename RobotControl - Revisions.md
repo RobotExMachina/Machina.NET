@@ -14,12 +14,19 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
-## BUILD 1108
+## BUILD 1109
 - [ ] Add Joints() actions (think of a new name?) --> .ArmJoints(); .ArmJointsTo(); || .RotateArm(); .RotateArmTo()
 - [ ] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
 - [ ] Refactor .setvel and .setzone to .speed and .zone
 - [ ] List<string> .exportcode(bool flush)
 - [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)
+
+## BUILD 1108
+- [ ] Rewrite relative .Move actions:
+    - [ ] Implement .MoveGlobal() --> moves the TCP this increment in World coordinates
+    - [ ] Implement .MoveLocal() --> moves the TCP this increment in TCP coordinates
+
+- [ ] Add Transform() actions
 
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();
@@ -39,7 +46,6 @@
     - [ ] Rotate(q1..q4, bool global);          // apply quaternion to current rotation
     - [ ] Rotate(vector, angle, bool global);   // rotate current orientation 'angle' degrees around vector 
 
-- [ ] Add Transform() actions
 
 ## BUILD 1106
 - [x] Code cleanup and commenting

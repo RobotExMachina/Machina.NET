@@ -437,30 +437,82 @@ namespace RobotControl
 
 
 
-        public bool Rotate(Rotation rotation)
-        {
-            throw new NotImplementedException();
-        }
+        //public bool Rotate(Rotation rotation)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public bool Rotate(double q1, double q2, double q3, double q4)
-        {
-            throw new NotImplementedException();
-        }
+        //public bool Rotate(double q1, double q2, double q3, double q4)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         
-        public bool Rotate(
-            double x0, double x1, double x2, 
-            double y0, double y1, double y2, 
-            double z0, double z1, double z2)
+        //public bool Rotate(
+        //    double x0, double x1, double x2, 
+        //    double y0, double y1, double y2, 
+        //    double z0, double z1, double z2)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public bool Rotate(Point vecX, Point vecY, Point vecZ)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public bool RotateLocal(double vec, double vecY, double vecX, double angDegs)
         {
-            throw new NotImplementedException();
+
         }
 
-        public bool Rotate(Point vecX, Point vecY, Point vecZ)
+        public bool RotateLocal(Point vector, double angDegs)
         {
-            throw new NotImplementedException();
+
         }
 
+        public bool RotateLocal(Rotation rotation)
+        {
+
+        }
+
+
+
+        public bool RotateGlobal(double vec, double vecY, double vecX, double angDegs)
+        {
+
+        }
+
+        public bool RotateGlobal(Point vector, double angDegs)
+        {
+
+        }
+
+        public bool RotateGlobal(Rotation rotation)
+        {
+
+        }
+
+
+        public bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)
+        {
+
+        }
+
+        public bool RotateTo(Point vecX, Point vecY)
+        {
+
+        }
+
+        public bool RotateTo(CoordinateSystem cs)
+        {
+
+        }
+        
+        public bool RotateTo(Rotation rotation)
+        {
+
+        }
 
 
 

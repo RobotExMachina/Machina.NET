@@ -31,8 +31,10 @@ namespace TEST_NewAPITests
             //// Rotation tests
             //RotationTests(arm);
 
-            // Advanced rotation tests
-            RotationTestsAdvanced(arm);
+            //// Advanced rotation tests
+            //RotationTestsAdvanced(arm);
+
+            RotationTests2(arm);
             
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -134,9 +136,9 @@ namespace TEST_NewAPITests
             // Velocity is expresses in both mm/s and °/s
             arm.SetVelocity(45);
 
-            arm.RotateTo(0, 1, 0, 1, 0, 0, 0, 0, -1);   // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
-            arm.RotateTo(0, 0, 1, 1, 0, 0, 0, 1, 0);    // 'rotate 90° around global X'
-            arm.RotateTo(0, 0, 1, 0, -1, 0, 1, 0, 0);   // 'rotate -90° around global Z'
+            arm.RotateTo(0, 1, 0, 1, 0, 0;      // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
+            arm.RotateTo(0, 0, 1, 1, 0, 0);     // 'rotate 90° around global X'
+            arm.RotateTo(0, 0, 1, 0, -1, 0);    // 'rotate -90° around global Z'
 
             arm.RotateTo(0, 0, 1, 0);  // revert back to base flipped Z
 
@@ -193,6 +195,27 @@ namespace TEST_NewAPITests
 
             arm.SetVelocity(100);
             arm.MoveTo(300, 0, 500);
+        }
+
+        public static void RotationTests2(Robot arm)
+        {
+            Rotation xyz = new Rotation();
+            Rotation x45 = new Rotation(new Point(1, 0, 0), 45);
+            Rotation x90 = new Rotation(new Point(1, 0, 0), 90);
+            Rotation x180 = new Rotation(new Point(1, 0, 0), 180);
+            Rotation xn45 = new Rotation(new Point(1, 0, 0), -45);
+            Rotation xn90 = new Rotation(new Point(1, 0, 0), -90);
+
+            Rotation y45 = new Rotation(new Point(0, 1, 0), 45);
+            Rotation y90 = new Rotation(new Point(0, 1, 0), 90);
+            Rotation y180 = new Rotation(new Point(0, 1, 0), 180);
+
+            Rotation z45 = new Rotation(new Point(0, 0, 1), 45);
+            Rotation z90 = new Rotation(new Point(0, 0, 1), 90);
+            Rotation z190 = new Rotation(new Point(0, 0, 1), 180);
+
+            Rotation zn45 = new Rotation(new Point(0, 0, 1), -45);
+            Rotation zn90 = new Rotation(new Point(0, 0, 1), -90);
 
 
         }
