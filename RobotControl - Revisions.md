@@ -19,6 +19,7 @@
 - [ ] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
 - [ ] Refactor .setvel and .setzone to .speed and .zone
 - [ ] List<string> .exportcode(bool flush)
+- [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)
 
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();
@@ -28,8 +29,10 @@
     - [x] Quaternion multiplication
     - [x] Transformation of a Point by a Quaternion rotation.
     - [x] Get Vector and Angle from a rotation: always return the positive angle solution?
-    - [ ] CHANGE FUCKING Q1..Q4 CONVENTION FOR ABB ROBOTS... XD
-    - [ ] A robust Quaternion from vecX, vecY with internal checks
+    - [x] CHANGE FUCKING Q1..Q4 CONVENTION FOR ABB ROBOTS... XD
+    - [x] CoordinateSystem class, representing a 3x3 rotation matrix
+    - [x] A robust Quaternion from vecX, vecY with internal checks
+    - [x] And back to CS from Quaternion! ;)
 - [ ] Add Rotate() actions
     - [ ] RotateTo(q1..q4);                     // hardcode quat rotation
     - [ ] RotateTo(vecX, vecY);                 // note this method should take care of normalizing ang orthogonizing the vectors, with Z being unnecessary

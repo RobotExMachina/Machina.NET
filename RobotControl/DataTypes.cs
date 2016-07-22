@@ -43,11 +43,101 @@ namespace RobotControl
     {
         public double X, Y, Z;
 
+
+
         public static Point operator + (Point p1, Point p2)
         {
             return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
         }
 
+        /// <summary>
+        /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
+        /// of specified Points (Vectors).
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double DotProduct(Point p1, Point p2)
+        {
+            // A · B = Ax * Bx + Ay * By + Az * Bz
+            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z; 
+        }
+
+        /// <summary>
+        /// Returns the angle between two vectors in radians.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double AngleBetween(Point p1, Point p2)
+        {
+            // A · B = ||A|| * ||B|| * cos(ang);
+            double lens = p1.Length() * p2.Length();
+
+            if (lens < EPSILON)
+                return 0.5 * Math.PI;
+           
+            return Math.Acos( DotProduct(p1, p2) / lens );
+        }
+
+        /// <summary>
+        /// Returns the <a href="https://en.wikipedia.org/wiki/Cross_product">Cross Product</a>
+        /// of specified Vectors (Points).
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static Point CrossProduct(Point p1, Point p2)
+        {
+            return new Point(
+                p1.Y * p2.Z - p1.Z * p2.Y,
+                p1.Z * p2.X - p1.X * p2.Z,
+                p1.X * p2.Y - p1.Y * p2.X);
+        }
+        
+        /// <summary>
+        /// Returns a unit Vector orthogonal to specified guiding Vector, contained
+        /// in the plane defined by guiding Vector and Point. The direction of the 
+        /// resulting Vector will be on the side of the guiding Point.
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static Point OrthogonalTo(Point vec, Point p)
+        {
+            return new CoordinateSystem(vec, p).YAxis;
+        }
+
+        /// <summary>
+        /// Are specified vectors parallel?
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static bool AreParallel(Point vec1, Point vec2)
+        {
+            double alpha = AngleBetween(vec1, vec2);
+            return alpha < EPSILON || (alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON);
+        }
+
+        /// <summary>
+        /// Are specified vectors orthogonal?
+        /// </summary>
+        /// <param name="vec1"></param>
+        /// <param name="vec2"></param>
+        /// <returns></returns>
+        public static bool AreOrthogonal(Point vec1, Point vec2)
+        {
+            double alpha = AngleBetween(vec1, vec2);
+            return alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON;
+        }
+
+        /// <summary>
+        /// Create a Point from its XYZ coordinates.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public Point(double x, double y, double z)
         {
             this.X = x;
@@ -55,6 +145,10 @@ namespace RobotControl
             this.Z = z;
         }
 
+        /// <summary>
+        /// Creates a shallow copy of the specified Point.
+        /// </summary>
+        /// <param name="p"></param>
         public Point(Point p)
         {
             this.X = p.X;
@@ -90,6 +184,10 @@ namespace RobotControl
             this.Z = newz;
         }
 
+        /// <summary>
+        /// Shallow-copies the values of specified Point.
+        /// </summary>
+        /// <param name="p"></param>
         public void Set(Point p)
         {
             this.X = p.X;
@@ -97,6 +195,12 @@ namespace RobotControl
             this.Z = p.Z;
         }
 
+        /// <summary>
+        /// Add specified values to this Point.
+        /// </summary>
+        /// <param name="incX"></param>
+        /// <param name="incY"></param>
+        /// <param name="incZ"></param>
         public void Add(double incX, double incY, double incZ)
         {
             this.X += incX;
@@ -104,6 +208,10 @@ namespace RobotControl
             this.Z += incZ;
         }
 
+        /// <summary>
+        /// Add the coordinates of specified Point to this one.
+        /// </summary>
+        /// <param name="p"></param>
         public void Add(Point p)
         {
             this.X += p.X;
@@ -111,26 +219,79 @@ namespace RobotControl
             this.Z += p.Z;
         }
 
+        /// <summary>
+        /// Returns the length of this Vector.
+        /// </summary>
+        /// <returns></returns>
         public double Length()
         {
             return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
         }
 
+        /// <summary>
+        /// Returns the squared length of this Vector.
+        /// </summary>
+        /// <returns></returns>
         public double LengthSq()
         {
             return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
         }
 
+        /// <summary>
+        /// Unitizes this Vector. Will return false if Vector is not unitizable
+        /// (zero length Vector).
+        /// </summary>
+        /// <returns></returns>
         public bool Normalize()
         {
-            var len = this.Length();
-            if (len == 0) return false;
+            double len = this.Length();
+            if (len < EPSILON) return false;
             this.X /= len;
             this.Y /= len;
             this.Z /= len;
             return true;
         }
 
+        /// <summary>
+        /// Is this a unit Vector?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsUnit()
+        {
+            double zero = Math.Abs(this.Length() - 1);
+            return zero < EPSILON;
+        }
+
+        /// <summary>
+        /// Reverses the direction of this Vector.
+        /// </summary>
+        public void Invert()
+        {
+            this.X = -this.X;
+            this.Y = -this.Y;
+            this.Z = -this.Z;
+        }
+
+        /// <summary>
+        /// An alias for Invert().
+        /// </summary>
+        public void Flip()
+        {
+            Invert();
+        }
+
+        /// <summary>
+        /// An alias for Invert().
+        /// </summary>
+        public void Reverse()
+        {
+            Invert();
+        }
+
+        /// <summary>
+        /// Multiplies this Vector by a scalar. 
+        /// </summary>
+        /// <param name="factor"></param>
         public void Scale(double factor)
         {
             this.X *= factor;
@@ -175,7 +336,7 @@ namespace RobotControl
             Rotation r = new Rotation(vec, angDegs);
             return this.Rotate(r);
         }
-
+        
 
 
         /// <summary>
@@ -204,7 +365,10 @@ namespace RobotControl
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return other.X.Equals(X) && other.Y.Equals(Y) && other.Z.Equals(Z);
+            //return other.X.Equals(X) && other.Y.Equals(Y) && other.Z.Equals(Z);
+            return Math.Abs(X - other.X) < EPSILON &&
+                   Math.Abs(Y - other.Y) < EPSILON &&
+                   Math.Abs(Z - other.Z) < EPSILON;
         }
 
         public override string ToString()
@@ -248,6 +412,14 @@ namespace RobotControl
 
         public double W, X, Y, Z;
 
+        /// <summary>
+        /// Create a Rotation object from its Quaternion parameters: 
+        /// w + x * i + y * j + z * k
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public Rotation(double w, double x, double y, double z)
         {
             this.W = w;
@@ -256,14 +428,63 @@ namespace RobotControl
             this.Z = z;
         }
 
-        public Rotation(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
-        {
-            List<double> q = PlaneToQuaternion(x1, x2, x3, y1, y2, y3, z1, z2, z3);
-            this.W = q[3];
-            this.X = q[0];
-            this.Y = q[1];
-            this.Z = q[2];
-        }
+        ///// @DEPRECATED
+        ///// <summary>
+        ///// Create a Rotation object from a coordinate system defined by
+        ///// the coordinates of its main X vector and the coordiantes of 
+        ///// a guiding Y vector.
+        ///// </summary>
+        ///// <param name="x1"></param>
+        ///// <param name="x2"></param>
+        ///// <param name="x3"></param>
+        ///// <param name="y1"></param>
+        ///// <param name="y2"></param>
+        ///// <param name="y3"></param>
+        ///// <param name="z1"></param>
+        ///// <param name="z2"></param>
+        ///// <param name="z3"></param>
+        //public Rotation(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
+        //{
+        //    List<double> q = PlaneToQuaternion(x1, x2, x3, y1, y2, y3, z1, z2, z3);
+        //    this.W = q[3];
+        //    this.X = q[0];
+        //    this.Y = q[1];
+        //    this.Z = q[2];
+        //}
+
+        /// <summary>
+        /// Create a Rotation object from a CoordinateSystem defined by
+        /// the coordinates of its main X vector and the coordiantes of 
+        /// a guiding Y vector.
+        /// Vectors don't need to be normalized or orthogonal, the constructor 
+        /// will generate the best-fitting CoordinateSystem with this information. 
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        public Rotation(double x0, double x1, double x2, double y0, double y1, double y2) :
+            this(new CoordinateSystem(x0, x1, x2, y0, y1, y2).GetQuaternion())
+        { }
+
+        /// <summary>
+        /// Create a Rotation object from a CoordinateSystem defined by
+        /// the coordinates of its main X vector and the coordiantes of 
+        /// a guiding Y vector.
+        /// Vectors don't need to be normalized or orthogonal, the constructor 
+        /// will generate the best-fitting CoordinateSystem with this information. 
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        public Rotation(CoordinateSystem cs) :
+            this(cs.GetQuaternion())
+        { }
 
         /// <summary>
         /// Creates a new Rotation as a shallow copy of the passed one.
@@ -315,7 +536,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Creates an identity Quaternion
+        /// Creates an identity Quaternion (no rotation).
         /// </summary>
         public Rotation()
         {
@@ -325,6 +546,13 @@ namespace RobotControl
             this.Z = 0;
         }
 
+        /// <summary>
+        /// Sets the values of this Quaternion's components.
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public void Set(double w, double x, double y, double z)
         {
             this.W = w;
@@ -333,6 +561,10 @@ namespace RobotControl
             this.Z = z;
         }
 
+        /// <summary>
+        /// Shallow-copies the values of specified Quaternion.
+        /// </summary>
+        /// <param name="r"></param>
         public void Set(Rotation r)
         {
             this.W = r.W;
@@ -341,13 +573,14 @@ namespace RobotControl
             this.Z = r.Z;
         }
 
-        public void Set(List<double> q)
-        {
-            this.W = q[3];
-            this.X = q[0];
-            this.Y = q[1];
-            this.Z = q[2];
-        }
+        //// @DEPRECATED
+        //public void Set(List<double> q)
+        //{
+        //    this.W = q[3];
+        //    this.X = q[0];
+        //    this.Y = q[1];
+        //    this.Z = q[2];
+        //}
 
         /// <summary>
         /// Returns the length (norm) of this Quaternion.
@@ -385,9 +618,8 @@ namespace RobotControl
         /// <returns></returns>
         public bool IsUnit()
         {
-            double sqlen = this.SqLength();
-            //return sqlen > 0.999999999 && sqlen < 1.000000001;
-            return Math.Abs(sqlen - 1) > EPSILON;
+            double zero = Math.Abs(this.SqLength() - 1);
+            return zero < EPSILON;
         }
 
         /// <summary>
@@ -397,7 +629,6 @@ namespace RobotControl
         public bool IsZero()
         {
             double sqlen = this.SqLength();
-            //return sqlen > -0.000000001 && sqlen < 0.000000001;
             return Math.Abs(sqlen) > EPSILON;
         }
 
@@ -429,7 +660,7 @@ namespace RobotControl
         }
         
         /// <summary>
-        /// Subtract a quaternion to this one. 
+        /// Subtract a quaternion from this one. 
         /// </summary>
         /// <param name="r"></param>
         public void Subtract(Rotation r)
@@ -456,7 +687,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> of this quaternion by specified one.
+        /// <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> of this Quaternion by specified one.
         /// Remember quaternion multiplication is non-commutative.
         /// </summary>
         /// <param name="r"></param>
@@ -468,10 +699,10 @@ namespace RobotControl
             this.Z = this.Z * r.W + this.W * r.Z + this.X * r.Y - this.Y * r.X;
         }
 
-        public void PreMultiply(Rotation r)
-        {
-            throw new NotImplementedException();
-        }
+        //public void PreMultiply(Rotation r)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> 
@@ -492,7 +723,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Divide this quaternion by another one. 
+        /// Divide this Quaternion by another one. 
         /// In reality, this quaternion is post-multiplied by the inverse of the provided one.
         /// </summary>
         /// <param name="r"></param>
@@ -505,7 +736,7 @@ namespace RobotControl
 
         /// <summary>
         /// Returns the division of r1 by r2.
-        /// In reality, r1 is post-multiplied by the inverse of r2.
+        /// Under the hood, r1 is post-multiplied by the inverse of r2.
         /// </summary>
         /// <param name="r1"></param>
         /// <param name="r2"></param>
@@ -569,6 +800,34 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// Returns a CoordinateSystem representation of current Quaternion
+        /// (a 3x3 rotation matrix).
+        /// </summary>
+        /// <returns></returns>
+        public CoordinateSystem GetCoordinateSystem()
+        {
+            // From gl-matrix.js
+            double x2 = this.X + this.X,
+                   y2 = this.Y + this.Y,
+                   z2 = this.Z + this.Z;
+
+            double xx = this.X * x2,
+                   yx = this.Y * x2,
+                   yy = this.Y * y2,
+                   zx = this.Z * x2,
+                   zy = this.Z * y2,
+                   zz = this.Z * z2,
+                   wx = this.W * x2,
+                   wy = this.W * y2,
+                   wz = this.W * z2;
+
+            return CoordinateSystem.FromComponents(
+                1 - yy - zz,     yx + wz,     zx - wy,
+                    yx - wz, 1 - xx - zz,     zy + wx,
+                    zx + wy,     zy - wx, 1 - xx - yy);
+        }
+
+        /// <summary>
         /// Returns the inverse of given quaternion.
         /// </summary>
         /// <param name="r"></param>
@@ -590,7 +849,7 @@ namespace RobotControl
         {
             double theta2 = 2 * Math.Acos(W);
 
-            // If angle == 0, no rotation is performed and this quat is identity
+            // If angle == 0, no rotation is performed and this Quat is identity
             if (theta2 < EPSILON)
             {
                 return new Point();
@@ -619,90 +878,72 @@ namespace RobotControl
 
 
 
+        ///// @DEPRECATED
+        ///// <summary>
+        ///// Borrowed from DynamoTORO
+        ///// </summary>
+        ///// <param name="XAxis"></param>
+        ///// <param name="YAxis"></param>
+        ///// <param name="Normal"></param>
+        ///// <returns></returns>
+        //public static List<double> PlaneToQuaternion(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
+        //{
+        //    double s, trace;
+        //    double q1, q2, q3, q4;
 
+        //    trace = x1 + y2 + z3 + 1;
 
-        /// <summary>
-        /// Borrowed from DynamoTORO
-        /// </summary>
-        /// <param name="XAxis"></param>
-        /// <param name="YAxis"></param>
-        /// <param name="Normal"></param>
-        /// <returns></returns>
-        public static List<double> PlaneToQuaternion(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
-        {
+        //    //if (trace > 0.00001)
+        //    if (trace > EPSILON)
+        //    {
+        //        // s = (trace) ^ (1 / 2) * 2
+        //        s = Math.Sqrt(trace) * 2;
+        //        q1 = s / 4;
+        //        q2 = (-z2 + y3) / s;
+        //        q3 = (-x3 + z1) / s;
+        //        q4 = (-y1 + x2) / s;
 
-            //Point origin = plane.Origin;
-            //Vector xVect = plane.XAxis;
-            //Vector yVect = plane.YAxis;
-            //Vector zVect = plane.Normal;
+        //    }
+        //    else if (x1 > y2 && x1 > z3)
+        //    {
+        //        //s = (x1 - y2 - z3 + 1) ^ (1 / 2) * 2
+        //        s = Math.Sqrt(x1 - y2 - z3 + 1) * 2;
+        //        q1 = (z2 - y3) / s;
+        //        q2 = s / 4;
+        //        q3 = (y1 + x2) / s;
+        //        q4 = (x3 + z1) / s;
 
-            double s, trace;
-            //double x1, x2, x3, y1, y2, y3, z1, z2, z3;
-            double q1, q2, q3, q4;
+        //    }
+        //    else if (y2 > z3)
+        //    {
+        //        //s = (-x1 + y2 - z3 + 1) ^ (1 / 2) * 2
+        //        s = Math.Sqrt(-x1 + y2 - z3 + 1) * 2;
+        //        q1 = (x3 - z1) / s;
+        //        q2 = (y1 + x2) / s;
+        //        q3 = s / 4;
+        //        q4 = (z2 + y3) / s;
+        //    }
 
-            //x1 = xVect.X;
-            //x2 = xVect.Y;
-            //x3 = xVect.Z;
-            //y1 = yVect.X;
-            //y2 = yVect.Y;
-            //y3 = yVect.Z;
-            //z1 = zVect.X;
-            //z2 = zVect.Y;
-            //z3 = zVect.Z;
+        //    else
+        //    {
+        //        //s = (-x1 - y2 + z3 + 1) ^ (1 / 2) * 2
+        //        s = Math.Sqrt(-x1 - y2 + z3 + 1) * 2;
+        //        q1 = (y1 - x2) / s;
+        //        q2 = (x3 + z1) / s;
+        //        q3 = (z2 + y3) / s;
+        //        q4 = s / 4;
 
-            trace = x1 + y2 + z3 + 1;
+        //    }
 
-            //if (trace > 0.00001)
-            if (trace > EPSILON)
-            {
-                // s = (trace) ^ (1 / 2) * 2
-                s = Math.Sqrt(trace) * 2;
-                q1 = s / 4;
-                q2 = (-z2 + y3) / s;
-                q3 = (-x3 + z1) / s;
-                q4 = (-y1 + x2) / s;
+        //    List<double> quatDoubles = new List<double>();
+        //    quatDoubles.Add(q1);
+        //    quatDoubles.Add(q2);
+        //    quatDoubles.Add(q3);
+        //    quatDoubles.Add(q4);
+        //    return quatDoubles;
 
-            }
-            else if (x1 > y2 && x1 > z3)
-            {
-                //s = (x1 - y2 - z3 + 1) ^ (1 / 2) * 2
-                s = Math.Sqrt(x1 - y2 - z3 + 1) * 2;
-                q1 = (z2 - y3) / s;
-                q2 = s / 4;
-                q3 = (y1 + x2) / s;
-                q4 = (x3 + z1) / s;
-
-            }
-            else if (y2 > z3)
-            {
-                //s = (-x1 + y2 - z3 + 1) ^ (1 / 2) * 2
-                s = Math.Sqrt(-x1 + y2 - z3 + 1) * 2;
-                q1 = (x3 - z1) / s;
-                q2 = (y1 + x2) / s;
-                q3 = s / 4;
-                q4 = (z2 + y3) / s;
-            }
-
-            else
-            {
-                //s = (-x1 - y2 + z3 + 1) ^ (1 / 2) * 2
-                s = Math.Sqrt(-x1 - y2 + z3 + 1) * 2;
-                q1 = (y1 - x2) / s;
-                q2 = (x3 + z1) / s;
-                q3 = (z2 + y3) / s;
-                q4 = s / 4;
-
-            }
-
-            List<double> quatDoubles = new List<double>();
-            quatDoubles.Add(q1);
-            quatDoubles.Add(q2);
-            quatDoubles.Add(q3);
-            quatDoubles.Add(q4);
-            return quatDoubles;
-
-            //return new Rotation(q1, q2, q3, q4);
-        }
+        //    //return new Rotation(q1, q2, q3, q4);
+        //}
 
 
         public override string ToString()
@@ -798,6 +1039,150 @@ namespace RobotControl
 
     }
 
+
+
+
+
+    //   ██████╗███████╗██╗   ██╗███████╗
+    //  ██╔════╝██╔════╝╚██╗ ██╔╝██╔════╝
+    //  ██║     ███████╗ ╚████╔╝ ███████╗
+    //  ██║     ╚════██║  ╚██╔╝  ╚════██║
+    //  ╚██████╗███████║   ██║   ███████║
+    //   ╚═════╝╚══════╝   ╚═╝   ╚══════╝
+    //                                   
+    /// <summary>
+    /// Represents a Coordinate System composed of a triplet of orthogonal XYZ unit vectors
+    /// following right-hand rule orientations. Useful for spatial and rotational orientation
+    /// operations. 
+    /// </summary>
+    public class CoordinateSystem : Geometry
+    {
+        public Point XAxis, YAxis, ZAxis;
+
+        /// <summary>
+        /// Creates a global XYZ reference system.
+        /// </summary>
+        public CoordinateSystem()
+        {
+            XAxis = new Point(1, 0, 0);
+            YAxis = new Point(0, 1, 0);
+            ZAxis = new Point(0, 0, 1);
+        }
+
+        /// <summary>
+        /// Createa a CoordinateSystem based on the specified guiding Vecots. 
+        /// Vectors don't need to be normalized or orthogonal, the constructor 
+        /// will generate the best-fitting CoordinateSystem with this information. 
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        public CoordinateSystem(Point vecX, Point vecY)
+        {
+            // Some sanity
+            if (Point.AreParallel(vecX, vecY))
+            {
+                throw new Exception("Cannot create a CoordinateSystem with two parallel vectors");
+            }
+
+            // Create unit X axis
+            XAxis = new Point(vecX);
+            XAxis.Normalize();
+                       
+            // Find normal vector to plane
+            ZAxis = Point.CrossProduct(vecX, vecY);
+            ZAxis.Normalize();
+
+            // Y axis is the cross product of both
+            YAxis = Point.CrossProduct(ZAxis, XAxis);
+        }
+
+        /// <summary>
+        /// Create a CoordinateSystem based on the specified guiding Vecots. 
+        /// Vectors don't need to be normalized or orthogonal, the constructor 
+        /// will generate the best-fitting CoordinateSystem with this information. 
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        public CoordinateSystem(double x0, double x1, double x2, double y0, double y1, double y2) :
+            this( new Point(x0, x1, x2), new Point(y0, y1, y2) )
+        { }
+
+        /// <summary>
+        /// A static constructor that returns a CoordinateSystem from specified vector components. 
+        /// It will return null if provided components do not form a valid 3x3 rotation matrix.
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        /// <param name="z0"></param>
+        /// <param name="z1"></param>
+        /// <param name="z2"></param>
+        /// <returns></returns>
+        public static CoordinateSystem FromComponents(double x0, double x1, double x2, double y0, double y1, double y2, double z0, double z1, double z2)
+        {
+            CoordinateSystem cs = new CoordinateSystem();
+
+            cs.XAxis.Set(x0, x1, x2);
+            cs.YAxis.Set(y0, y1, y2);
+            cs.ZAxis.Set(z0, z1, z2);
+
+            if (cs.IsValid())
+                return cs;
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Returns a Quaternion representation of the current CoordinateSystem. 
+        /// </summary>
+        /// <returns></returns>
+        public Rotation GetQuaternion()
+        {
+            // From the ABB Rapid manual p.1151
+            double w = 0.5 * Math.Sqrt(1 + XAxis.X + YAxis.Y + ZAxis.Z);
+
+            double x = 0.5 * Math.Sqrt(1 + XAxis.X - YAxis.Y - ZAxis.Z)
+                * (YAxis.Z - ZAxis.Y >= 0 ? 1 : -1);
+            double y = 0.5 * Math.Sqrt(1 - XAxis.X + YAxis.Y - ZAxis.Z)
+                * (ZAxis.X - XAxis.Z >= 0 ? 1 : -1);
+            double z = 0.5 * Math.Sqrt(1 - XAxis.X - YAxis.Y + ZAxis.Z)
+                * (XAxis.Y - YAxis.X >= 0 ? 1 : -1);
+
+            return new Rotation(w, x, y, z);
+        }
+
+        /// <summary>
+        /// Are the three axes unit vectors, and form a right-handed orthogonal CS?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsValid()
+        {
+            bool valid = this.XAxis.IsUnit() && this.YAxis.IsUnit() && this.ZAxis.IsUnit();
+            //Console.WriteLine("Unit axes: " + valid);
+            //if (!valid) Console.WriteLine("{0}-{1} {2}-{3} {4}-{5}", this.XAxis, this.XAxis.IsUnit(), this.YAxis, this.YAxis.IsUnit(), this.ZAxis, this.ZAxis.IsUnit());
+
+            Point z = Point.CrossProduct(this.XAxis, this.YAxis);
+            valid = valid && this.ZAxis.Equals(z);
+            //Console.WriteLine("Orthogonal axes: " + valid);
+            //if (!valid) Console.WriteLine("{0} {1}", this.ZAxis, z);
+
+            return valid;            
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[{0},{1},{2}]", XAxis, YAxis, ZAxis);
+        }
+
+    }
 
 
     //███████╗██████╗  █████╗ ███╗   ███╗███████╗

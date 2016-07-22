@@ -470,28 +470,27 @@ namespace RobotControl
             return c.IssueRotationRequest(rotation, false);
         }
 
-        public bool RotateTo(double q1, double q2, double q3, double q4)
+        public bool RotateTo(double w, double x, double y, double z)
         {
-            return RotateTo( new Rotation(q4, q1, q2, q3));
+            return RotateTo( new Rotation(w, x, y, z));
         }
 
         public bool RotateTo(
             double x0, double x1, double x2,
-            double y0, double y1, double y2,
-            double z0, double z1, double z2)
+            double y0, double y1, double y2)
         {
-            return RotateTo( new Rotation(x0, x1, x2, y0, y1, y2, z0, z1, z2) );
+            return RotateTo( new Rotation(x0, x1, x2, y0, y1, y2) );
         }
 
-        public bool RotateTo(Point vecX, Point vecY, Point vecZ)
-        {
-            throw new NotImplementedException();
-        }
+        //public bool RotateTo(Point vecX, Point vecY)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public bool RotateTo(string bookmarkedRotation)
-        {
-            throw new NotImplementedException();
-        }
+        //public bool RotateTo(string bookmarkedRotation)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         // @TODO: add overloads with custom velocity and speed?
 

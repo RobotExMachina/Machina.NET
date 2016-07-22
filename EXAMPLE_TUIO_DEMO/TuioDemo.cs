@@ -440,7 +440,7 @@ public class TuioDemo : Form , TuioListener
             arm.Start();
 
             //arm.RotateTo(Rotation.FlippedAroundY);
-            arm.RotateTo(0, 1, 0, 0, 0, 1, 1, 0, 0);
+            arm.RotateTo(0, 1, 0, 0, 0, 1);
 
             MoveRobotTo(0, 0, 0);
             if (calibrateMotionArea)
