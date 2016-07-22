@@ -373,7 +373,10 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("[{0},{1},{2}]", X, Y, Z);
+            return string.Format("[{0},{1},{2}]",
+                Math.Round(X, EPSILON_DECIMALS),
+                Math.Round(Y, EPSILON_DECIMALS),
+                Math.Round(Z, EPSILON_DECIMALS));
         }
     }
 
@@ -699,10 +702,19 @@ namespace RobotControl
             this.Z = this.Z * r.W + this.W * r.Z + this.X * r.Y - this.Y * r.X;
         }
 
-        //public void PreMultiply(Rotation r)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        /// <summary>
+        /// Premultiplies this Quaternion by the specified one, a.k.a. this = r * this. 
+        /// Conceptually, this means that a Rotation 'r' in Global coordinates is applied 
+        /// to this Rotation.
+        /// </summary>
+        /// <param name="r"></param>
+        public void PreMultiply(Rotation r)
+        {
+            this.W = r.W * this.W - r.X * this.X - r.Y * this.Y - r.Z * this.Z;
+            this.X = r.X * this.W + r.W * this.X + r.Y * this.Z - r.Z * this.Y;
+            this.Y = r.Y * this.W + r.W * this.Y + r.Z * this.X - r.X * this.Z;
+            this.Z = r.Z * this.W + r.W * this.Z + r.X * this.Y - r.Y * this.X;
+        }
 
         /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> 
@@ -871,6 +883,25 @@ namespace RobotControl
         }
 
 
+        /// <summary>
+        /// Rotate this Quaternion by specified Rotation around GLOBAL reference system.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public void RotateGlobal(Rotation r)
+        {
+            this.PreMultiply(r);
+        }
+
+        /// <summary>
+        /// Rotate this Quaternion by specified Rotation around LOCAL reference system.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public void RotateLocal(Rotation r)
+        {
+            this.Multiply(r);
+        }
 
 
 
@@ -1160,7 +1191,7 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// Are the three axes unit vectors, and form a right-handed orthogonal CS?
+        /// Are the three axes unit vectors and orthonormal?
         /// </summary>
         /// <returns></returns>
         public bool IsValid()
@@ -1171,7 +1202,7 @@ namespace RobotControl
 
             Point z = Point.CrossProduct(this.XAxis, this.YAxis);
             valid = valid && this.ZAxis.Equals(z);
-            //Console.WriteLine("Orthogonal axes: " + valid);
+            //Console.WriteLine("Orthonormal axes: " + valid);
             //if (!valid) Console.WriteLine("{0} {1}", this.ZAxis, z);
 
             return valid;            
