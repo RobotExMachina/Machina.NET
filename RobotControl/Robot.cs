@@ -472,7 +472,7 @@ namespace RobotControl
 
         public bool RotateTo(double q1, double q2, double q3, double q4)
         {
-            return RotateTo( new Rotation(q1, q2, q3, q4) );
+            return RotateTo( new Rotation(q4, q1, q2, q3));
         }
 
         public bool RotateTo(

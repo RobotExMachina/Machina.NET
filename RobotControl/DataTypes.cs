@@ -152,14 +152,14 @@ namespace RobotControl
 
             // P.out = Q * P.in * conj(Q);
             // From gl-matrix.js
-            double ix =  r.Q4 * X + r.Q2 * Z - r.Q3 * Y,
-                   iy =  r.Q4 * Y + r.Q3 * X - r.Q1 * Z,
-                   iz =  r.Q4 * Z + r.Q1 * Y - r.Q2 * X,
-                   iw = -r.Q1 * X - r.Q2 * Y - r.Q3 * Z;
+            double ix =  r.W * X + r.Y * Z - r.Z * Y,
+                   iy =  r.W * Y + r.Z * X - r.X * Z,
+                   iz =  r.W * Z + r.X * Y - r.Y * X,
+                   iw = -r.X * X - r.Y * Y - r.Z * Z;
 
-            this.X = ix * r.Q4 - iw * r.Q1 - iy * r.Q3 + iz * r.Q2;
-            this.Y = iy * r.Q4 - iw * r.Q2 - iz * r.Q1 + ix * r.Q3;
-            this.Z = iz * r.Q4 - iw * r.Q3 - ix * r.Q2 + iy * r.Q1;
+            this.X = ix * r.W - iw * r.X - iy * r.Z + iz * r.Y;
+            this.Y = iy * r.W - iw * r.Y - iz * r.X + ix * r.Z;
+            this.Z = iz * r.W - iw * r.Z - ix * r.Y + iy * r.X;
 
             return true;
         }
@@ -225,11 +225,8 @@ namespace RobotControl
     /// </summary>
     public class Rotation : Geometry
     {
-        /// @TODO: THESE ARE VERY WRONG! They were based on q1 + q2*i + q3*j + q4*k notation, 
-        /// while in fact they were taken as q1*i + q2*j + q3*k + q4 notation...
-
         /// <summary>
-        /// The orientation of a global XYZ coordinate system.
+        /// The orientation of a global XYZ coordinate system (aka an identity rotation).
         /// </summary>
         public static readonly Rotation GlobalXY = new Rotation(1, 0, 0, 0);
 
@@ -249,23 +246,23 @@ namespace RobotControl
         /// </summary>
         public static readonly Rotation FlippedAroundZ = new Rotation(0, 0, 0, 1);
 
-        public double Q1, Q2, Q3, Q4;
+        public double W, X, Y, Z;
 
-        public Rotation(double q1, double q2, double q3, double q4)
+        public Rotation(double w, double x, double y, double z)
         {
-            this.Q1 = q1;
-            this.Q2 = q2;
-            this.Q3 = q3;
-            this.Q4 = q4;
+            this.W = w;
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
         }
 
         public Rotation(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
         {
             List<double> q = PlaneToQuaternion(x1, x2, x3, y1, y2, y3, z1, z2, z3);
-            this.Q1 = q[0];
-            this.Q2 = q[1];
-            this.Q3 = q[2];
-            this.Q4 = q[3];
+            this.W = q[3];
+            this.X = q[0];
+            this.Y = q[1];
+            this.Z = q[2];
         }
 
         /// <summary>
@@ -274,26 +271,28 @@ namespace RobotControl
         /// <param name="r"></param>
         public Rotation(Rotation r)
         {
-            this.Q1 = r.Q1;
-            this.Q2 = r.Q2;
-            this.Q3 = r.Q3;
-            this.Q4 = r.Q4;
+            this.W = r.W;
+            this.X = r.X;
+            this.Y = r.Y;
+            this.Z = r.Z;
         }
 
         public Rotation(Orient or)
         {
-            this.Q1 = or.Q1;
-            this.Q2 = or.Q2;
-            this.Q3 = or.Q3;
-            this.Q4 = or.Q4;
+            // ABB's convention is [Q1,Q2,Q3,Q4] as [W,X,Y,Z]
+            this.W = or.Q1;
+            this.X = or.Q2;
+            this.Y = or.Q3;
+            this.Z = or.Q4;
         }
 
         public Rotation(RobTarget rt)
         {
-            this.Q1 = rt.Rot.Q1;
-            this.Q2 = rt.Rot.Q2;
-            this.Q3 = rt.Rot.Q3;
-            this.Q4 = rt.Rot.Q4;
+            // ABB's convention is [Q1,Q2,Q3,Q4] as [W,X,Y,Z]
+            this.W = rt.Rot.Q1;
+            this.X = rt.Rot.Q2;
+            this.Y = rt.Rot.Q3;
+            this.Z = rt.Rot.Q4;
         }
 
         /// <summary>
@@ -309,10 +308,10 @@ namespace RobotControl
             Point u = new Point(vec);
             u.Normalize();  // rotation quaternion must be unit
 
-            this.Q1 = s * u.X;
-            this.Q2 = s * u.Y;
-            this.Q3 = s * u.Z;
-            this.Q4 = Math.Cos(halfAngRad);
+            this.W = Math.Cos(halfAngRad);
+            this.X = s * u.X;
+            this.Y = s * u.Y;
+            this.Z = s * u.Z;
         }
 
         /// <summary>
@@ -320,34 +319,34 @@ namespace RobotControl
         /// </summary>
         public Rotation()
         {
-            this.Q1 = 0;
-            this.Q2 = 0;
-            this.Q3 = 0;
-            this.Q4 = 1;
+            this.W = 1;
+            this.X = 0;
+            this.Y = 0;
+            this.Z = 0;
         }
 
-        public void Set(double q1, double q2, double q3, double q4)
+        public void Set(double w, double x, double y, double z)
         {
-            this.Q1 = q1;
-            this.Q2 = q2;
-            this.Q3 = q3;
-            this.Q4 = q4;
+            this.W = w;
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
         }
 
         public void Set(Rotation r)
         {
-            this.Q1 = r.Q1;
-            this.Q2 = r.Q2;
-            this.Q3 = r.Q3;
-            this.Q4 = r.Q4;
+            this.W = r.W;
+            this.X = r.X;
+            this.Y = r.Y;
+            this.Z = r.Z;
         }
 
         public void Set(List<double> q)
         {
-            this.Q1 = q[0];
-            this.Q2 = q[1];
-            this.Q3 = q[2];
-            this.Q4 = q[3];
+            this.W = q[3];
+            this.X = q[0];
+            this.Y = q[1];
+            this.Z = q[2];
         }
 
         /// <summary>
@@ -356,7 +355,7 @@ namespace RobotControl
         /// <returns></returns>
         public double Length()
         {
-            return Math.Sqrt(Q1 * Q1 + Q2 * Q2 + Q3 * Q3 + Q4 * Q4);
+            return Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
         }
 
         /// <summary>
@@ -365,7 +364,7 @@ namespace RobotControl
         /// <returns></returns>
         public double SqLength()
         {
-            return Q1 * Q1 + Q2 * Q2 + Q3 * Q3 + Q4 * Q4;
+            return W * W + X * X + Y * Y + Z * Z;
         }
 
         /// <summary>
@@ -374,10 +373,10 @@ namespace RobotControl
         public void Normalize()
         {
             double len = this.Length();
-            this.Q1 /= len;
-            this.Q2 /= len;
-            this.Q3 /= len;
-            this.Q4 /= len;
+            this.W /= len;
+            this.X /= len;
+            this.Y /= len;
+            this.Z /= len;
         }
 
         /// <summary>
@@ -408,10 +407,10 @@ namespace RobotControl
         /// <param name="r"></param>
         public void Add(Rotation r)
         {
-            this.Q1 += r.Q1;
-            this.Q2 += r.Q2;
-            this.Q3 += r.Q3;
-            this.Q4 += r.Q4;
+            this.W += r.W;
+            this.X += r.X;
+            this.Y += r.Y;
+            this.Z += r.Z;
         }
 
         /// <summary>
@@ -423,10 +422,10 @@ namespace RobotControl
         public static Rotation Addition(Rotation r1, Rotation r2)
         {
             return new Rotation(
-                r1.Q1 + r2.Q1,
-                r1.Q2 + r2.Q2,
-                r1.Q3 + r2.Q3,
-                r1.Q4 + r2.Q4);
+                r1.W + r2.W,
+                r1.X + r2.X,
+                r1.Y + r2.Y,
+                r1.Z + r2.Z);
         }
         
         /// <summary>
@@ -435,10 +434,10 @@ namespace RobotControl
         /// <param name="r"></param>
         public void Subtract(Rotation r)
         {
-            this.Q1 -= r.Q1;
-            this.Q2 -= r.Q2;
-            this.Q3 -= r.Q3;
-            this.Q4 -= r.Q4;
+            this.W -= r.W;
+            this.X -= r.X;
+            this.Y -= r.Y;
+            this.Z -= r.Z;
         }
 
         /// <summary>
@@ -450,10 +449,10 @@ namespace RobotControl
         public static Rotation Subtraction(Rotation r1, Rotation r2)
         {
             return new Rotation(
-                r1.Q1 - r2.Q1,
-                r1.Q2 - r2.Q2,
-                r1.Q3 - r2.Q3,
-                r1.Q4 - r2.Q4);
+                r1.W - r2.W,
+                r1.X - r2.X,
+                r1.Y - r2.Y,
+                r1.Z - r2.Z);
         }
 
         /// <summary>
@@ -463,10 +462,10 @@ namespace RobotControl
         /// <param name="r"></param>
         public void Multiply(Rotation r)
         {
-            this.Q1 = this.Q1 * r.Q4 + this.Q4 * r.Q1 + this.Q2 * r.Q3 - this.Q3 * r.Q2;
-            this.Q2 = this.Q2 * r.Q4 + this.Q4 * r.Q2 + this.Q3 * r.Q1 - this.Q1 * r.Q3;
-            this.Q3 = this.Q3 * r.Q4 + this.Q4 * r.Q3 + this.Q1 * r.Q2 - this.Q2 * r.Q1;
-            this.Q4 = this.Q4 * r.Q4 - this.Q1 * r.Q1 - this.Q2 * r.Q2 - this.Q3 * r.Q3;
+            this.W = this.W * r.W - this.X * r.X - this.Y * r.Y - this.Z * r.Z;
+            this.X = this.X * r.W + this.W * r.X + this.Y * r.Z - this.Z * r.Y;
+            this.Y = this.Y * r.W + this.W * r.Y + this.Z * r.X - this.X * r.Z;
+            this.Z = this.Z * r.W + this.W * r.Z + this.X * r.Y - this.Y * r.X;
         }
 
         public void PreMultiply(Rotation r)
@@ -484,12 +483,12 @@ namespace RobotControl
         /// <returns></returns>
         public static Rotation Multiply(Rotation r1, Rotation r2)
         {
-            double x = r1.Q1 * r2.Q4 + r1.Q4 * r2.Q1 + r1.Q2 * r2.Q3 - r1.Q3 * r2.Q2;
-            double y = r1.Q2 * r2.Q4 + r1.Q4 * r2.Q2 + r1.Q3 * r2.Q1 - r1.Q1 * r2.Q3;
-            double z = r1.Q3 * r2.Q4 + r1.Q4 * r2.Q3 + r1.Q1 * r2.Q2 - r1.Q2 * r2.Q1;
-            double w = r1.Q4 * r2.Q4 - r1.Q1 * r2.Q1 - r1.Q2 * r2.Q2 - r1.Q3 * r2.Q3;
+            double w = r1.W * r2.W - r1.X * r2.X - r1.Y * r2.Y - r1.Z * r2.Z;
+            double x = r1.X * r2.W + r1.W * r2.X + r1.Y * r2.Z - r1.Z * r2.Y;
+            double y = r1.Y * r2.W + r1.W * r2.Y + r1.Z * r2.X - r1.X * r2.Z;
+            double z = r1.Z * r2.W + r1.W * r2.Z + r1.X * r2.Y - r1.Y * r2.X;
 
-            return new Rotation(x, y, z, w);
+            return new Rotation(w, x, y, z);
         }
 
         /// <summary>
@@ -525,10 +524,10 @@ namespace RobotControl
         /// </summary>
         public void Conjugate()
         {
-            this.Q1 = -this.Q1;
-            this.Q2 = -this.Q2;
-            this.Q3 = -this.Q3;
-            // Q4 stays the same
+            // W stays the same
+            this.X = -this.X;
+            this.Y = -this.Y;
+            this.Z = -this.Z;
         }
 
         /// <summary>
@@ -538,7 +537,7 @@ namespace RobotControl
         /// <returns></returns>
         public static Rotation Conjugate(Rotation r)
         {
-            return new Rotation(-r.Q1, -r.Q2, -r.Q3, r.Q4);
+            return new Rotation(r.W, -r.X, -r.Y, -r.Z);
         }
 
         /// <summary>
@@ -549,9 +548,9 @@ namespace RobotControl
             if (this.IsUnit())
             {
                 // The inverse of unit vectors is its conjugate
-                this.Q1 = -this.Q1;
-                this.Q2 = -this.Q2;
-                this.Q3 = -this.Q3;
+                this.X = -this.X;
+                this.Y = -this.Y;
+                this.Z = -this.Z;
             }
             else if (this.IsZero())
             {
@@ -561,10 +560,11 @@ namespace RobotControl
             {
                 // The inverse of a quaternion is its conjugate divided by the sqaured norm.
                 double sqlen = this.SqLength();
-                this.Q1 /= -sqlen;
-                this.Q2 /= -sqlen;
-                this.Q3 /= -sqlen;
-                this.Q4 /= sqlen;
+
+                this.W /= sqlen;
+                this.X /= -sqlen;
+                this.Y /= -sqlen;
+                this.Z /= -sqlen;
             }
         }
 
@@ -588,7 +588,7 @@ namespace RobotControl
         /// <returns></returns>
         public Point RotationVector()
         {
-            double theta2 = 2 * Math.Acos(Q4);
+            double theta2 = 2 * Math.Acos(W);
 
             // If angle == 0, no rotation is performed and this quat is identity
             if (theta2 < EPSILON)
@@ -597,7 +597,7 @@ namespace RobotControl
             }
 
             double s = Math.Sin(0.5 * theta2);
-            return new Point(Q1 / s, Q2 / s, Q3 / s);
+            return new Point(this.X / s, this.Y / s, this.Z / s);
         }
 
         /// <summary>
@@ -607,7 +607,7 @@ namespace RobotControl
         /// <returns></returns>
         public double RotationAngle()
         {
-            double theta2 = 2 * Math.Acos(Q4);
+            double theta2 = 2 * Math.Acos(W);
             return theta2 < EPSILON ? 0 : Math.Round( 180 * theta2 / Math.PI, EPSILON_DECIMALS);
         }
 
@@ -708,10 +708,10 @@ namespace RobotControl
         public override string ToString()
         {
             return string.Format("[{0},{1},{2},{3}]",
-                Math.Round(Q1, EPSILON_DECIMALS),
-                Math.Round(Q2, EPSILON_DECIMALS),
-                Math.Round(Q3, EPSILON_DECIMALS),
-                Math.Round(Q4, EPSILON_DECIMALS));
+                Math.Round(W, EPSILON_DECIMALS),
+                Math.Round(X, EPSILON_DECIMALS),
+                Math.Round(Y, EPSILON_DECIMALS),
+                Math.Round(Z, EPSILON_DECIMALS));
         }
 
     }
@@ -852,7 +852,7 @@ namespace RobotControl
         public Frame(double x, double y, double z, double q1, double q2, double q3, double q4)
         {
             this.Position = new Point(x, y, z);
-            this.Orientation = new Rotation(q1, q2, q3, q4);
+            this.Orientation = new Rotation(q4, q1, q2, q3);
             this.Velocity = DefaultVelocity;
             this.Zone = DefaultZone;
         }
@@ -860,7 +860,7 @@ namespace RobotControl
         public Frame(double x, double y, double z, double q1, double q2, double q3, double q4, double vel, double zon)
         {
             this.Position = new Point(x, y, z);
-            this.Orientation = new Rotation(q1, q2, q3, q4);
+            this.Orientation = new Rotation(q4, q1, q2, q3);
             this.Velocity = vel;
             this.Zone = zon;
         }
@@ -884,7 +884,7 @@ namespace RobotControl
         public Frame(Point position, Rotation orientation)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
-            this.Orientation = new Rotation(orientation.Q1, orientation.Q2, orientation.Q3, orientation.Q4);  // shallow copy
+            this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z);  // shallow copy
             this.Velocity = DefaultVelocity;
             this.Zone = DefaultZone;
         }
@@ -892,7 +892,7 @@ namespace RobotControl
         public Frame(Point position, Rotation orientation, double vel, double zon)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
-            this.Orientation = new Rotation(orientation.Q1, orientation.Q2, orientation.Q3, orientation.Q4);  // shallow copy
+            this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z);  // shallow copy
             this.Velocity = vel;
             this.Zone = zon;
         }
@@ -913,7 +913,7 @@ namespace RobotControl
 
         public string GetOrientationDeclaration()
         {
-            return string.Format("[{0},{1},{2},{3}]", Orientation.Q1, Orientation.Q2, Orientation.Q3, Orientation.Q4);
+            return string.Format("[{0},{1},{2},{3}]", Orientation.X, Orientation.Y, Orientation.Z, Orientation.W);
         }
 
         /// <summary>
