@@ -136,11 +136,12 @@ namespace TEST_NewAPITests
             // Velocity is expresses in both mm/s and °/s
             arm.SetVelocity(45);
 
-            arm.RotateTo(0, 1, 0, 1, 0, 0;      // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
+            arm.RotateTo(0, 1, 0, 1, 0, 0);     // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
             arm.RotateTo(0, 0, 1, 1, 0, 0);     // 'rotate 90° around global X'
             arm.RotateTo(0, 0, 1, 0, -1, 0);    // 'rotate -90° around global Z'
 
-            arm.RotateTo(0, 0, 1, 0);  // revert back to base flipped Z
+            //arm.RotateTo(0, 0, 1, 0);  // revert back to base flipped Z
+            arm.RotateTo(1, 0, 0, 0, -1, 0);
 
             arm.SetVelocity(100);
             arm.MoveTo(300, 0, 500);
@@ -217,6 +218,35 @@ namespace TEST_NewAPITests
             Rotation zn45 = new Rotation(new Point(0, 0, 1), -45);
             Rotation zn90 = new Rotation(new Point(0, 0, 1), -90);
 
+            // Reset
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+            arm.RotateTo(1, 0, 0, 0, -1, 0);
+
+            // Move to a more dexterous area
+            arm.MoveTo(300, -100, 400);
+
+            // Make the TCP face the user
+            arm.SetVelocity(30);
+            arm.RotateTo(0, 0, -1, 1, 0, 0);
+
+            // Rotate it around its local Z (joint 6)
+            arm.RotateLocal(0, 0, 1, 45);
+            arm.RotateLocal(0, 0, 1, -90);
+            arm.RotateLocal(0, 0, 1, 45);
+
+            // Now lets try world Z
+            arm.RotateGlobal(0, 0, 1, 45);
+            arm.RotateGlobal(0, 0, 1, -90);
+            //arm.RotateGlobal(0, 0, 1, 45);
+
+            // Move to the user
+            arm.Move(100, 0, 0);
+
+            // Back home
+            arm.SetVelocity(100);
+            arm.RotateTo(1, 0, 0, 0, -1, 0);
+            arm.MoveTo(300, 0, 500);
 
         }
 

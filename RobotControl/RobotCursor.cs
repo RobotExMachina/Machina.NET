@@ -143,9 +143,20 @@ namespace RobotControl
             // @TODO: implement some kind of security check here...
 
             if (action.relativeRotation)
-                rotation.Multiply(action.rotation);
+            {
+                if (action.worldRotation)
+                {
+                    rotation.PreMultiply(action.rotation);
+                }
+                else
+                {
+                    rotation.Multiply(action.rotation);
+                }
+            }
             else
+            {
                 rotation.Set(action.rotation);
+            }
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;

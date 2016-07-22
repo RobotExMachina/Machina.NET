@@ -52,19 +52,22 @@ namespace RobotControl
     {
         public ActionType type = ActionType.Undefined;
 
-        public Point translation;
-        public bool relativeTranslation;
-        public Rotation rotation;
-        public bool relativeRotation;
-        
         // @TOTHINK: Wrap this into a Settings object instead?
         public int velocity;
         public int zone;
         public MotionType motionType;
+
+        // Translation properties
+        public Point translation;
+        public bool relativeTranslation;
+        public bool worldTranslation;
+
+        // Rotation properties
+        public Rotation rotation;
+        public bool relativeRotation;
+        public bool worldRotation;
     }
-
-
-
+    
 
 
 
@@ -83,45 +86,49 @@ namespace RobotControl
         /// <summary>
         /// Full constructor.
         /// </summary>
+        /// <param name="world"></param>
         /// <param name="trans"></param>
         /// <param name="relTrans"></param>
         /// <param name="vel"></param>
         /// <param name="zon"></param>
         /// <param name="mType"></param>
-        public ActionTranslation(Point trans, bool relTrans, int vel, int zon, MotionType mType)
+        public ActionTranslation(bool world, Point trans, bool relTrans, int vel, int zon, MotionType mType)
         {
             type = ActionType.Translation;
 
+            worldTranslation = world;
             translation = trans;
             relativeTranslation = relTrans;
+
             velocity = vel;
             zone = zon;
             motionType = mType;
         }
         
         // Overloads with default invalid flags
-        public ActionTranslation(Point trans, bool relTrans, int vel, int zon) :
-            this(trans, relTrans, vel, zon, MotionType.Undefined)
+        public ActionTranslation(bool world, Point trans, bool relTrans, int vel, int zon) :
+            this(world, trans, relTrans, vel, zon, MotionType.Undefined)
         { }
 
-        public ActionTranslation(Point trans, bool relTrans, MotionType mType) :
-            this(trans, relTrans, -1, -1, mType)
+        public ActionTranslation(bool world, Point trans, bool relTrans, MotionType mType) :
+            this(world, trans, relTrans, -1, -1, mType)
         { }
 
-        public ActionTranslation(Point trans, bool relTrans) :
-            this(trans, relTrans, -1, -1, MotionType.Undefined)
+        public ActionTranslation(bool world, Point trans, bool relTrans) :
+            this(world, trans, relTrans, -1, -1, MotionType.Undefined)
         { }
         
         public override string ToString()
         {
-            return string.Format("TRNS: {0} {1} {2} v{3} z{4}",
+            return string.Format("TRNS: {0} {5} {1} {2} v{3} z{4}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
                 relativeTranslation ? "rel" : "abs", 
                 translation, 
                 velocity, 
-                zone);
+                zone, 
+                worldTranslation ? "world" : "local");
         }
     }
 
@@ -135,10 +142,11 @@ namespace RobotControl
     //                                                                   
     internal class ActionRotation : Action
     {
-        public ActionRotation(Rotation rot, bool relRot, int vel, int zon, MotionType mType)
+        public ActionRotation(bool world, Rotation rot, bool relRot, int vel, int zon, MotionType mType)
         {
             type = ActionType.Rotation;
 
+            worldRotation = world;
             rotation = rot;
             relativeRotation = relRot;
 
@@ -148,29 +156,30 @@ namespace RobotControl
         }
 
         // Overloads with default invalid flags
-        public ActionRotation(Rotation rot, bool relRot, int vel, int zon) :
-            this(rot, relRot, vel, zon, MotionType.Undefined)
+        public ActionRotation(bool world, Rotation rot, bool relRot, int vel, int zon) :
+            this(world, rot, relRot, vel, zon, MotionType.Undefined)
         { }
 
-        public ActionRotation(Rotation rot, bool relRot, MotionType mType) :
-            this(rot, relRot, -1, -1, mType)
+        public ActionRotation(bool world, Rotation rot, bool relRot, MotionType mType) :
+            this(world, rot, relRot, -1, -1, mType)
         { }
 
-        public ActionRotation(Rotation rot, bool relRot) :
-            this(rot, relRot, -1, -1, MotionType.Undefined)
+        public ActionRotation(bool world, Rotation rot, bool relRot) :
+            this(world, rot, relRot, -1, -1, MotionType.Undefined)
         { }
 
 
         public override string ToString()
         {
-            return string.Format("ROTN: {0} {1} {2} v{3} z{4}",
+            return string.Format("ROTN: {0} {5} {1} {2} v{3} z{4}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
                 relativeRotation ? "rel" : "abs",
                 rotation,
                 velocity,
-                zone);
+                zone,
+                worldRotation ? "world" : "local");
         }
 
     }

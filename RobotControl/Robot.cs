@@ -384,7 +384,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool Move(Point direction)
         {
-            return c.IssueTranslationRequest(direction, true);
+            return c.IssueTranslationRequest(true, direction, true);
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool MoveTo(Point position)
         {
-            return c.IssueTranslationRequest(position, false);
+            return c.IssueTranslationRequest(true, position, false);
         }
 
         /// <summary>
@@ -421,15 +421,15 @@ namespace RobotControl
             return MoveTo(new Point(x, y, z));
         }
 
-        /// <summary>
-        /// Issue an absolute movement action request to a tagged position. 
-        /// </summary>
-        /// <param name="bookmarkedPosition"></param>
-        /// <returns></returns>
-        public bool MoveTo(string bookmarkedPosition)
-        {
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// Issue an absolute movement action request to a tagged position. 
+        ///// </summary>
+        ///// <param name="bookmarkedPosition"></param>
+        ///// <returns></returns>
+        //public bool MoveTo(string bookmarkedPosition)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         // @TODO: add overloads with custom velocity and speed?
 
@@ -447,7 +447,7 @@ namespace RobotControl
         //    throw new NotImplementedException();
         //}
 
-        
+
         //public bool Rotate(
         //    double x0, double x1, double x2, 
         //    double y0, double y1, double y2, 
@@ -461,78 +461,94 @@ namespace RobotControl
         //    throw new NotImplementedException();
         //}
 
-        public bool RotateLocal(double vec, double vecY, double vecX, double angDegs)
-        {
 
+
+
+        public bool RotateLocal(Rotation rotation)
+        {
+            return c.IssueRotationRequest(false, rotation, true);
         }
 
         public bool RotateLocal(Point vector, double angDegs)
         {
-
+            return RotateLocal(new Rotation(vector, angDegs));
         }
 
-        public bool RotateLocal(Rotation rotation)
+        public bool RotateLocal(double vecX, double vecY, double vecZ, double angDegs)
         {
-
+            return RotateLocal(new Rotation(new Point(vecX, vecY, vecX), angDegs));
         }
 
 
 
-        public bool RotateGlobal(double vec, double vecY, double vecX, double angDegs)
-        {
 
+
+
+
+        public bool RotateGlobal(Rotation rotation)
+        {
+            return c.IssueRotationRequest(true, rotation, true);
         }
 
         public bool RotateGlobal(Point vector, double angDegs)
         {
-
+            return RotateLocal(new Rotation(vector, angDegs));
         }
 
-        public bool RotateGlobal(Rotation rotation)
+        public bool RotateGlobal(double vecX, double vecY, double vecZ, double angDegs)
         {
-
+            return RotateLocal(new Rotation(new Point(vecX, vecY, vecX), angDegs));
         }
 
 
-        public bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)
+        public bool RotateTo(Rotation rotation)
         {
-
-        }
-
-        public bool RotateTo(Point vecX, Point vecY)
-        {
-
+            return c.IssueRotationRequest(true, rotation, false);
         }
 
         public bool RotateTo(CoordinateSystem cs)
         {
-
+            return RotateTo(cs.GetQuaternion());
         }
+
+        public bool RotateTo(Point vecX, Point vecY)
+        {
+            return RotateTo(new Rotation(vecX, vecY));
+        }
+
+        public bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)
+        {
+            return RotateTo(new Rotation(x0, x1, x2, y0, y1, y2));
+        }
+
         
-        public bool RotateTo(Rotation rotation)
-        {
 
-        }
-
-
+        
+        
+        
 
 
-        public bool RotateTo(Rotation rotation)
-        {
-            return c.IssueRotationRequest(rotation, false);
-        }
 
-        public bool RotateTo(double w, double x, double y, double z)
-        {
-            return RotateTo( new Rotation(w, x, y, z));
-        }
 
-        public bool RotateTo(
-            double x0, double x1, double x2,
-            double y0, double y1, double y2)
-        {
-            return RotateTo( new Rotation(x0, x1, x2, y0, y1, y2) );
-        }
+        //public bool RotateTo(Rotation rotation)
+        //{
+        //    return c.IssueRotationRequest(rotation, false);
+        //}
+
+        //public bool RotateTo(double w, double x, double y, double z)
+        //{
+        //    return RotateTo( new Rotation(w, x, y, z));
+        //}
+
+        //public bool RotateTo(
+        //    double x0, double x1, double x2,
+        //    double y0, double y1, double y2)
+        //{
+        //    return RotateTo( new Rotation(x0, x1, x2, y0, y1, y2) );
+        //}
+
+
+
 
         //public bool RotateTo(Point vecX, Point vecY)
         //{

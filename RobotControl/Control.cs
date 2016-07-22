@@ -660,13 +660,14 @@ namespace RobotControl
         /// <summary>
         /// Issue a customized simple Translation action request.
         /// </summary>
+        /// <param name="world"></param>
         /// <param name="trans"></param>
         /// <param name="relative"></param>
         /// <param name="vel"></param>
         /// <param name="zon"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
-        public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon, MotionType mType)
+        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int vel, int zon, MotionType mType)
         {
             if (!areCursorsInitialized)
             {
@@ -685,7 +686,7 @@ namespace RobotControl
                 }
             }
             
-            ActionTranslation act = new ActionTranslation(trans, relative, vel, zon, mType);
+            ActionTranslation act = new ActionTranslation(world, trans, relative, vel, zon, mType);
             bool success = virtualCursor.ApplyAction(act);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (success) actionBuffer.Add(act);
@@ -693,23 +694,23 @@ namespace RobotControl
         }
 
         // Overloads falling back on current settings values
-        public bool IssueTranslationRequest(Point trans, bool relative)
+        public bool IssueTranslationRequest(bool world, Point trans, bool relative)
         {
-            return IssueTranslationRequest(trans, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+            return IssueTranslationRequest(world, trans, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
         }
-        public bool IssueTranslationRequest(Point trans, bool relative, int vel, int zon)
+        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int vel, int zon)
         {
-            return IssueTranslationRequest(trans, relative, vel, zon, currentSettings.MotionType);
+            return IssueTranslationRequest(world, trans, relative, vel, zon, currentSettings.MotionType);
         }
-        public bool IssueTranslationRequest(Point trans, bool relative, MotionType mType)
+        public bool IssueTranslationRequest(bool world, Point trans, bool relative, MotionType mType)
         {
-            return IssueTranslationRequest(trans, relative, currentSettings.Velocity, currentSettings.Zone, mType);
+            return IssueTranslationRequest(world, trans, relative, currentSettings.Velocity, currentSettings.Zone, mType);
         }
 
 
 
 
-        public bool IssueRotationRequest(Rotation rot, bool relative, int vel, int zon, MotionType mType)
+        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int vel, int zon, MotionType mType)
         {
             if (!areCursorsInitialized)
             {
@@ -728,7 +729,7 @@ namespace RobotControl
                 }
             }
 
-            ActionRotation act = new ActionRotation(rot, relative, vel, zon, mType);
+            ActionRotation act = new ActionRotation(world, rot, relative, vel, zon, mType);
             bool success = virtualCursor.ApplyAction(act);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (success) actionBuffer.Add(act);
@@ -736,17 +737,17 @@ namespace RobotControl
         }
 
         // Overloads falling back on current settings values
-        public bool IssueRotationRequest(Rotation rot, bool relative)
+        public bool IssueRotationRequest(bool world, Rotation rot, bool relative)
         {
-            return IssueRotationRequest(rot, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+            return IssueRotationRequest(world, rot, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
         }
-        public bool IssueRotationRequest(Rotation rot, bool relative, int vel, int zon)
+        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int vel, int zon)
         {
-            return IssueRotationRequest(rot, relative, vel, zon, currentSettings.MotionType);
+            return IssueRotationRequest(world, rot, relative, vel, zon, currentSettings.MotionType);
         }
-        public bool IssueRotationRequest(Rotation rot, bool relative, MotionType mType)
+        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, MotionType mType)
         {
-            return IssueRotationRequest(rot, relative, currentSettings.Velocity, currentSettings.Zone, mType);
+            return IssueRotationRequest(world, rot, relative, currentSettings.Velocity, currentSettings.Zone, mType);
         }
 
 

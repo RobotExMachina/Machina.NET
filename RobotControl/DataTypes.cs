@@ -515,17 +515,24 @@ namespace RobotControl
 
         /// <summary>
         /// Create a Rotation object from a CoordinateSystem defined by
+        /// the main Vector X and the guiding Vector Y.
+        /// Vectors don't need to be normalized or orthogonal, the constructor 
+        /// will generate the best-fitting CoordinateSystem with this information.
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        public Rotation(Point vecX, Point vecY) :
+            this(new CoordinateSystem(vecX, vecY).GetQuaternion())
+        { }
+
+        /// <summary>
+        /// Create a Rotation object from a CoordinateSystem defined by
         /// the coordinates of its main X vector and the coordiantes of 
         /// a guiding Y vector.
         /// Vectors don't need to be normalized or orthogonal, the constructor 
-        /// will generate the best-fitting CoordinateSystem with this information. 
+        /// will generate the best-fitting CoordinateSystem with this information.
         /// </summary>
-        /// <param name="x0"></param>
-        /// <param name="x1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y0"></param>
-        /// <param name="y1"></param>
-        /// <param name="y2"></param>
+        /// <param name="cs"></param>
         public Rotation(CoordinateSystem cs) :
             this(cs.GetQuaternion())
         { }
@@ -731,8 +738,10 @@ namespace RobotControl
         }
 
         /// <summary>
-        /// <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> of this Quaternion by specified one.
-        /// Remember quaternion multiplication is non-commutative.
+        /// Multiply this Quaternion by the specified one, a.k.a. this = this * r. 
+        /// Conceptually, this means that a Rotation 'r' in Local coordinates is applied 
+        /// to this Rotation.
+        /// See https://en.wikipedia.org/wiki/Quaternion#Hamilton_product
         /// </summary>
         /// <param name="r"></param>
         public void Multiply(Rotation r)
@@ -752,6 +761,7 @@ namespace RobotControl
         /// Premultiplies this Quaternion by the specified one, a.k.a. this = r * this. 
         /// Conceptually, this means that a Rotation 'r' in Global coordinates is applied 
         /// to this Rotation.
+        /// See https://en.wikipedia.org/wiki/Quaternion#Hamilton_product
         /// </summary>
         /// <param name="r"></param>
         public void PreMultiply(Rotation r)
@@ -954,9 +964,7 @@ namespace RobotControl
             this.Multiply(r);
         }
 
-
-
-
+        
 
 
 
