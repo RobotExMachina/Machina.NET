@@ -476,7 +476,7 @@ namespace RobotControl
 
         public bool RotateLocal(double vecX, double vecY, double vecZ, double angDegs)
         {
-            return RotateLocal(new Rotation(new Point(vecX, vecY, vecX), angDegs));
+            return RotateLocal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
         }
 
 
@@ -492,12 +492,12 @@ namespace RobotControl
 
         public bool RotateGlobal(Point vector, double angDegs)
         {
-            return RotateLocal(new Rotation(vector, angDegs));
+            return RotateGlobal(new Rotation(vector, angDegs));
         }
 
         public bool RotateGlobal(double vecX, double vecY, double vecZ, double angDegs)
         {
-            return RotateLocal(new Rotation(new Point(vecX, vecY, vecX), angDegs));
+            return RotateGlobal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
         }
 
 

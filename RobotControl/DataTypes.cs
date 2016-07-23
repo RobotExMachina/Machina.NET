@@ -41,13 +41,22 @@ namespace RobotControl
     /// </summary>
     public class Point : Geometry
     {
+
+        
         public double X, Y, Z;
 
-
+        public static Point XAxis = new Point(1, 0, 0);
+        public static Point YAxis = new Point(0, 1, 0);
+        public static Point ZAxis = new Point(0, 0, 1);
 
         public static Point operator + (Point p1, Point p2)
         {
             return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
+        }
+
+        public static Point operator - (Point p)
+        {
+            return new Point(-p.X, -p.Y, -p.Z);
         }
 
         public static Point operator - (Point p1, Point p2)

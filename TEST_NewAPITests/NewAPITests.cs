@@ -221,31 +221,34 @@ namespace TEST_NewAPITests
             // Reset
             arm.SetVelocity(100);
             arm.MoveTo(300, 0, 500);
-            arm.RotateTo(1, 0, 0, 0, -1, 0);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
             // Move to a more dexterous area
-            arm.MoveTo(300, -100, 400);
+            arm.MoveTo(300, 100, 400);
 
             // Make the TCP face the user
             arm.SetVelocity(30);
-            arm.RotateTo(0, 0, -1, 1, 0, 0);
+            arm.RotateTo(0, 0, -1, 0, 1, 0);
 
-            // Rotate it around its local Z (joint 6)
-            arm.RotateLocal(0, 0, 1, 45);
-            arm.RotateLocal(0, 0, 1, -90);
-            arm.RotateLocal(0, 0, 1, 45);
+            //// Rotate it around its local Z (joint 6)
+            //arm.RotateLocal(0, 0, 1, 45);
+            //arm.RotateLocal(0, 0, 1, -90);
+            //arm.RotateLocal(0, 0, 1, 45);
 
             // Now lets try world Z
-            arm.RotateGlobal(0, 0, 1, 45);
             arm.RotateGlobal(0, 0, 1, -90);
+            //arm.RotateGlobal(0, 0, 1, -90);
             //arm.RotateGlobal(0, 0, 1, 45);
 
-            // Move to the user
-            arm.Move(100, 0, 0);
+            for (int i = 0; i < 10; i++)
+            {
+                arm.Move(0, -40, 0);
+                arm.RotateLocal(Point.YAxis, 9);
+            }
 
             // Back home
             arm.SetVelocity(100);
-            arm.RotateTo(1, 0, 0, 0, -1, 0);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
             arm.MoveTo(300, 0, 500);
 
         }

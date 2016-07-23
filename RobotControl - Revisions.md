@@ -30,7 +30,7 @@
 
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();
-- [ ] Necessary geometry implementations for Rotations:
+- [x] Necessary geometry implementations for Rotations:
     - [x] Quaternion unitization
     - [x] Quaternion from vector and angle, including unit vector checks
     - [x] Quaternion multiplication
@@ -40,12 +40,13 @@
     - [x] CoordinateSystem class, representing a 3x3 rotation matrix
     - [x] A robust Quaternion from vecX, vecY with internal checks
     - [x] And back to CS from Quaternion! ;)
-- [ ] Add Rotate() actions
-    - [ ] RotateTo(q1..q4);                     // hardcode quat rotation
-    - [ ] RotateTo(vecX, vecY);                 // note this method should take care of normalizing ang orthogonizing the vectors, with Z being unnecessary
-    - [ ] Rotate(q1..q4, bool global);          // apply quaternion to current rotation
-    - [ ] Rotate(vector, angle, bool global);   // rotate current orientation 'angle' degrees around vector 
-
+- [x] Add Rotate() actions
+    - [ ] RotateTo(q1..q4);                     // hardcode quat rotation --> NO, not intuitive for the user... 
+    - [x] RotateTo(vecX, vecY);                 // note this method should take care of normalizing and orthogonizing the vectors, with Z being unnecessary
+    - [x] RotateTo(Rotation)
+    - [x] RotateTo(CoordinateSystem)
+    - [x] RotateGlobal();  // rotates current TCP around world axis
+    - [x] RotateLocal();   // rotates current TCP aroung local axis
 
 ## BUILD 1106
 - [x] Code cleanup and commenting
