@@ -26,6 +26,7 @@
 - [ ] Make changes in ControlMode at runtime possible, i.e. resetting controllers and communication, flushing queues, etc.
 - [ ] Streamline 'bookmarked' positions with a dictionary in Control or similar 
 - [ ] Implement .PointAt() (as in 'look' at somewhere)
+- [ ] Rename the project to BroBot ;)
 
 ## LOW-LEVEL
 - [ ] Low-level methods in Communication should not check for !isConnected, but rather just the object they need to perform their function. Only high-level functions should operate based on connection status.
