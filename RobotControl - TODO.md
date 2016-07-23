@@ -19,8 +19,8 @@
 - [x] Restructured library
 - [x] Redesigned API
 - [x] Abstracted TCPPOsition, TCPRotation and stuff into a VirtualRobot object
+- [x] Ported Util methods as static to their appropriate geometry class 
 - [ ] Created Debug() & Error() utility functions
-- [ ] Ported Util methods as static to their appropriate geometry class 
 - [ ] All the connection properties, runmodes and stuff should belong to the VirtualRobot?
 - [ ] Detect out of position and joint errors and incorporate a soft-restart.
 - [ ] Make changes in ControlMode at runtime possible, i.e. resetting controllers and communication, flushing queues, etc.

@@ -20,7 +20,7 @@
 - [ ] Refactor .setvel and .setzone to .speed and .zone
 - [ ] List<string> .exportcode(bool flush)
 - [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)
-
+- [x] Port Util methods as static to their appropriate geometry class 
 ## BUILD 1108
 - [ ] Rewrite relative .Move actions:
     - [ ] Implement .MoveGlobal() --> moves the TCP this increment in World coordinates

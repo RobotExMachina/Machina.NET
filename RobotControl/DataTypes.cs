@@ -135,10 +135,40 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// Returns the distance between two Points.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double Distance(Point p1, Point p2)
+        {
+            double dx = p1.X - p2.X,
+                dy = p1.Y - p2.Y,
+                dz = p1.Z - p2.Z;
+
+            return Math.Sqrt( (dx * dx) + (dy * dy) + (dz * dz) );
+        }
+
+        /// <summary>
+        /// Returns the squarde distance between two Points.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double SqDistance(Point p1, Point p2)
+        {
+            double dx = p1.X - p2.X,
+                dy = p1.Y - p2.Y,
+                dz = p1.Z - p2.Z;
+
+            return (dx * dx) + (dy * dy) + (dz * dz);
+        }
+
+        /// <summary>
         /// Are specified vectors parallel?
         /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="p"></param>
+        /// <param name="vec1"></param>
+        /// <param name="vec2"></param>
         /// <returns></returns>
         public static bool AreParallel(Point vec1, Point vec2)
         {
@@ -156,6 +186,48 @@ namespace RobotControl
         {
             double alpha = AngleBetween(vec1, vec2);
             return alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON;
+        }
+
+        /// <summary>
+        /// Returns the sqaured distance from 'p' to the segment 'p1-p2'.
+        /// </summary>
+        /// <ref>https://github.com/imshz/simplify-net</ref>
+        /// <param name="p"></param>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double SqSegmentDistance(Point p, Point p1, Point p2)
+        {
+            var x = p1.X;
+            var y = p1.Y;
+            var z = p1.Z;
+            var dx = p2.X - x;
+            var dy = p2.Y - y;
+            var dz = p2.Z - z;
+
+            if (!dx.Equals(0.0) || !dy.Equals(0.0) || !dz.Equals(0.0))
+            {
+                var t = ((p.X - x) * dx + (p.Y - y) * dy + (p.Z - z) * dz) / (dx * dx + dy * dy + dz * dz);
+
+                if (t > 1)
+                {
+                    x = p2.X;
+                    y = p2.Y;
+                    z = p2.Z;
+                }
+                else if (t > 0)
+                {
+                    x += dx * t;
+                    y += dy * t;
+                    z += dz * t;
+                }
+            }
+
+            dx = p.X - x;
+            dy = p.Y - y;
+            dz = p.Z - z;
+
+            return (dx * dx) + (dy * dy) + (dz * dz);
         }
 
         /// <summary>
@@ -1681,8 +1753,7 @@ namespace RobotControl
         /// The RDP algorithm.
         /// </summary>
         /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="tolerance"></param>
-        /// <param name="highQuality"></param>
+        /// <param name="sqTolerance"></param>
         /// <returns></returns>
         private void SimplifyDouglasPeucker(double sqTolerance)
         {
@@ -1702,7 +1773,7 @@ namespace RobotControl
 
                 for (int? i = first + 1; i < last; i++)
                 {
-                    var sqDist = Util.GetSquareSegmentDistance(Targets[i.Value].Position,
+                    var sqDist = Point.SqSegmentDistance(Targets[i.Value].Position,
                         Targets[first.Value].Position, Targets[last.Value].Position);
 
                     if (sqDist > maxSqDist)
@@ -1757,8 +1828,7 @@ namespace RobotControl
         /// threshold distance are removed. 
         /// </summary>
         /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="tolerance"></param>
-        /// <param name="highQuality"></param>
+        /// <param name="sqTolerance"></param>
         /// <returns></returns>
         private void SimplifyRadialDistance(double sqTolerance)
         {
@@ -1770,7 +1840,7 @@ namespace RobotControl
             {
                 frame = Targets[i];
 
-                if (Util.GetSquareDistance(frame.Position, prevFrame.Position) > sqTolerance)
+                if (Point.SqDistance(frame.Position, prevFrame.Position) > sqTolerance)
                 {
                     newTargets.Add(frame);
                     prevFrame = frame;
