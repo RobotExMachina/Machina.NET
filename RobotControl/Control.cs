@@ -753,6 +753,71 @@ namespace RobotControl
 
 
 
+        public bool IssueTranslationAndRotationRequest(
+            bool worldTrans, Point trans, bool relTrans, 
+            bool worldRot, Rotation rot, bool relRot, 
+            int vel, int zon, MotionType mType)
+        {
+            if (!areCursorsInitialized)
+            {
+                if (controlMode == ControlMode.Offline)
+                {
+                    if (!InitializeRobotPointers(new Point(), rot))  // @TODO: defaults should depend on robot make/model
+                    {
+                        Console.WriteLine("Could not initialize cursors...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Still only working in Offline mode");
+                    return false;
+                }
+            }
+
+            ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, vel, zon, mType);
+            // Only add this action to the queue if it was successfuly applied to the virtualCursor
+            if (virtualCursor.ApplyAction(act))
+            {
+                actionBuffer.Add(act);
+                return true;
+            }
+            return false;
+        }
+
+        // Overloads falling back on current settings values
+        public bool IssueTranslationAndRotationRequest(
+            bool worldTrans, Point trans, bool relTrans,
+            bool worldRot, Rotation rot, bool relRot)
+        {
+            return IssueTranslationAndRotationRequest(
+                worldTrans, trans, relTrans, 
+                worldRot, rot, relRot, 
+                currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+        }
+        public bool IssueTranslationAndRotationRequest(
+            bool worldTrans, Point trans, bool relTrans,
+            bool worldRot, Rotation rot, bool relRot, 
+            int vel, int zon)
+        {
+            return IssueTranslationAndRotationRequest(
+                worldTrans, trans, relTrans,
+                worldRot, rot, relRot,
+                vel, zon, currentSettings.MotionType);
+        }
+        public bool IssueTranslationAndRotationRequest(
+            bool worldTrans, Point trans, bool relTrans,
+            bool worldRot, Rotation rot, bool relRot, 
+            MotionType mType)
+        {
+            return IssueTranslationAndRotationRequest(
+                worldTrans, trans, relTrans,
+                worldRot, rot, relRot,
+                currentSettings.Velocity, currentSettings.Zone, mType);
+        }
+
+
+
 
 
 

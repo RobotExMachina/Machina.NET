@@ -27,7 +27,12 @@ namespace RobotControl
         /// <summary>
         /// Amount of digits for floating-point comparisons precision.
         /// </summary>
-        protected static readonly int EPSILON_DECIMALS = 10;  
+        protected static readonly int EPSILON_DECIMALS = 10;
+
+        /// <summary>
+        /// Amount of decimals for rounding on ToString() operations.
+        /// </summary>
+        protected static readonly int STRING_ROUND_DECIMALS = 8;
     }
 
     //██████╗  ██████╗ ██╗███╗   ██╗████████╗
@@ -503,9 +508,9 @@ namespace RobotControl
         public override string ToString()
         {
             return string.Format("[{0},{1},{2}]",
-                Math.Round(X, EPSILON_DECIMALS),
-                Math.Round(Y, EPSILON_DECIMALS),
-                Math.Round(Z, EPSILON_DECIMALS));
+                Math.Round(X, STRING_ROUND_DECIMALS),
+                Math.Round(Y, STRING_ROUND_DECIMALS),
+                Math.Round(Z, STRING_ROUND_DECIMALS));
         }
     }
 
@@ -1151,10 +1156,10 @@ namespace RobotControl
         public override string ToString()
         {
             return string.Format("[{0},{1},{2},{3}]",
-                Math.Round(W, EPSILON_DECIMALS),
-                Math.Round(X, EPSILON_DECIMALS),
-                Math.Round(Y, EPSILON_DECIMALS),
-                Math.Round(Z, EPSILON_DECIMALS));
+                Math.Round(W, STRING_ROUND_DECIMALS),
+                Math.Round(X, STRING_ROUND_DECIMALS),
+                Math.Round(Y, STRING_ROUND_DECIMALS),
+                Math.Round(Z, STRING_ROUND_DECIMALS));
         }
 
     }

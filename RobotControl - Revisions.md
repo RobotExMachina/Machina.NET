@@ -14,19 +14,24 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
-## BUILD 1109
-- [ ] Add Joints() actions (think of a new name?) --> .ArmJoints(); .ArmJointsTo(); || .RotateArm(); .RotateArmTo()
+## BUILD 1110
 - [ ] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
 - [ ] Refactor .setvel and .setzone to .speed and .zone
 - [ ] List<string> .exportcode(bool flush)
 - [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)
 
+## BUILD 1109
+- [ ] Add Joints() actions (think of a new name?) --> .ArmJoints(); .ArmJointsTo(); || .RotateArm(); .RotateArmTo()
+
 ## BUILD 1108
 - [x] Port Util methods as static to their appropriate geometry class 
-- [ ] Rewrite relative .Move actions:
-    - [ ] Implement .MoveGlobal() --> moves the TCP this increment in World coordinates
-    - [ ] Implement .MoveLocal() --> moves the TCP this increment in TCP coordinates
+- [x] Rewrite relative .Move actions:
+    - [x] Implement .MoveGlobal() --> moves the TCP this increment in World coordinates
+    - [x] Implement .MoveLocal() --> moves the TCP this increment in TCP coordinates
 - [ ] Add Transform() actions: a combination of Move and Rotate at the same time
+    - [x] .TransformTo()
+    - [ ] .TransformLocal()
+    - [ ] .TransformGlobal()
 
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();

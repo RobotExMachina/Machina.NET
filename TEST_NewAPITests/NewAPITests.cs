@@ -38,8 +38,11 @@ namespace TEST_NewAPITests
             //// Rel/abs movements
             //MovementTest(arm);
 
-            // Generative circle movement
-            TestCircle(arm);
+            //// Generative circle movement
+            //TestCircle(arm);
+
+            // Transformations
+            TestCircleTransformAbsolute(arm);
 
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -310,5 +313,48 @@ namespace TEST_NewAPITests
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
         }
 
+        public static void TestCircleTransformAbsolute(Robot arm)
+        {
+            // Reset
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+            
+            double r = 50;
+            double x = 450;
+            double y = 0;
+            double z = 400;
+            Rotation y180 = new Rotation(new Point(0, 1, 0), 180);
+
+            arm.MoveTo(x, y, z);
+            // Trace a circle with absolute coordinates and rotations
+            for (var i = 0; i < 36; i++)
+            {
+                Point target = new Point(
+                    x + r * Math.Cos(2 * Math.PI * i / 36.0),
+                    y + r * Math.Sin(2 * Math.PI * i / 36.0),
+                    z);
+                Rotation rot = Rotation.Multiply(new Rotation(Point.ZAxis, 360 * i / 36.0), y180);
+                arm.TransformTo(target, rot);
+            }
+
+            // Trace it back (and 'disentagle' Axis 6...)
+            for (var i = 0; i > -36; i--)
+            {
+                Point target = new Point(
+                    x + r * Math.Cos(2 * Math.PI * i / 36.0),
+                    y + r * Math.Sin(2 * Math.PI * i / 36.0),
+                    z);
+                Rotation rot = Rotation.Multiply(new Rotation(Point.ZAxis, 360 * i / 36.0), y180);
+                arm.TransformTo(target, rot);
+            }
+
+
+
+            // Back home
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+        }
     }
 }

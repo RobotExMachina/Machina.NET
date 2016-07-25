@@ -61,7 +61,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1107;
+        public static readonly int Build = 1108;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -606,16 +606,20 @@ namespace RobotControl
 
 
         // @TODO: not quite sure yet about how compound relative transformations should work, since sequence order matters a lot here
-        
         public bool TransformTo(Point position, Rotation rotation)
         {
-            throw new NotImplementedException();
-        }       
-
-        public bool TransformTo(double x, double y, double z, double q1, double q2, double q3, double q4)
-        {
-            throw new NotImplementedException();
+            return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
         }
+
+        public bool TransformTo(Rotation rotation, Point position)
+        {
+            return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+        }
+
+        //public bool TransformTo(double x, double y, double z, double q1, double q2, double q3, double q4)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
 
 
