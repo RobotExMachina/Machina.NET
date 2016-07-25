@@ -22,6 +22,7 @@
 
 ## BUILD 1109
 - [ ] Add Joints() actions (think of a new name?) --> .ArmJoints(); .ArmJointsTo(); || .RotateArm(); .RotateArmTo()
+- [ ] .Message(string) action ;)
 
 ## BUILD 1108
 - [x] Port Util methods as static to their appropriate geometry class 

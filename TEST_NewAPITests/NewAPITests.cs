@@ -42,11 +42,13 @@ namespace TEST_NewAPITests
             //TestCircle(arm);
 
             // Transformations
-            TransformTests(arm);
+            //TransformTests(arm);
             //TestCircleTransformAbsolute(arm, 50);
             //TestCircleTransformLocal(arm, 10);
             //TestCircleTransformGlobal(arm, 10);
 
+            // Snake
+            TestSnake(arm);
 
 
             arm.DebugBuffer();  // read all pending buffered actions
@@ -345,7 +347,6 @@ namespace TEST_NewAPITests
             arm.TransformGlobal(z30, 50 * Point.XAxis);
             arm.TransformGlobal(Rotation.Conjugate(z30), -50 * Point.XAxis);
 
-
             // Back home
             arm.SetVelocity(100);
             arm.TransformTo(home, homeXYZ);
@@ -359,7 +360,7 @@ namespace TEST_NewAPITests
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
             arm.SetVelocity(100);
             arm.TransformTo(home, homeXYZ);
-            
+
             double x = 450;
             double y = 0;
             double z = 400;
@@ -449,7 +450,7 @@ namespace TEST_NewAPITests
             {
                 // A 'rotating' direction vector of length 'side'
                 Point forward = new Point(
-                    - side * Math.Sin(2 * Math.PI * i / 36.0),
+                    -side * Math.Sin(2 * Math.PI * i / 36.0),
                     side * Math.Cos(2 * Math.PI * i / 36.0),
                     0);
                 arm.TransformGlobal(forward, z10);
@@ -461,7 +462,7 @@ namespace TEST_NewAPITests
             {
                 Point forward = new Point(
                     side * Math.Sin(2 * Math.PI * i / 36.0),
-                    - side * Math.Cos(2 * Math.PI * i / 36.0),
+                    -side * Math.Cos(2 * Math.PI * i / 36.0),
                     0);
                 arm.TransformGlobal(forward, zn10);
             }
@@ -473,5 +474,26 @@ namespace TEST_NewAPITests
         }
 
 
+        public static void TestSnake(Robot arm)
+        {
+            // Reset
+            Point home = new Point(300, 0, 500);
+            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+            
+            arm.MoveTo(300, -300, 250);
+
+            arm.SetVelocity(200);
+            for (int i = 0; i < 100; i++)
+            {
+                Rotation rz = new Rotation(Point.ZAxis, 15 * Math.Cos(2.0 * Math.PI * i / 25.0));
+                arm.TransformLocal(rz, 8  * Point.YAxis);
+            }
+
+            // Back home
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+        }
     }
 }
