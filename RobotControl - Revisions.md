@@ -28,10 +28,10 @@
 - [x] Rewrite relative .Move actions:
     - [x] Implement .MoveGlobal() --> moves the TCP this increment in World coordinates
     - [x] Implement .MoveLocal() --> moves the TCP this increment in TCP coordinates
-- [ ] Add Transform() actions: a combination of Move and Rotate at the same time
+- [x] Add Transform() actions: a combination of Move and Rotate at the same time
     - [x] .TransformTo()
-    - [ ] .TransformLocal()
-    - [ ] .TransformGlobal()
+    - [x] .TransformLocal()
+    - [x] .TransformGlobal()
 
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();

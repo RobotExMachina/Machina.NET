@@ -182,16 +182,6 @@ namespace RobotControl
                 velocity,
                 zone,
                 worldRotation ? "globl" : "local");
-
-            //return string.Format("TRS: {0} {5} {1} {2} v{3} z{4}",
-            //    motionType == MotionType.Linear ? "lin" :
-            //        motionType == MotionType.Joint ? "jnt" :
-            //            motionType == MotionType.Joints ? "jjj" : "und",
-            //    relativeTranslation ? "rel" : "abs",
-            //    translation,
-            //    velocity,
-            //    zone,
-            //    worldTranslation ? "world" : "local");
         }
 
     }
@@ -241,8 +231,45 @@ namespace RobotControl
                 velocity,
                 zone);
         }
+    }
 
+    internal class ActionRotationAndTranslation : Action
+    {
+        public ActionRotationAndTranslation(
+            bool worldRot, Rotation rot, bool relRot,
+            bool worldTrans, Point trans, bool relTrans,
+            int vel, int zon, MotionType mType)
+        {
+            type = ActionType.RotationAndTranslation;
 
+            worldRotation = worldRot;
+            rotation = rot;
+            relativeRotation = relRot;
+
+            worldTranslation = worldTrans;
+            translation = trans;
+            relativeTranslation = relTrans;
+
+            velocity = vel;
+            zone = zon;
+            motionType = mType;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("R+T: {0}, {1} {2} {3}, {4} {5} {6}, v{3} z{4}",
+                motionType == MotionType.Linear ? "lin" :
+                    motionType == MotionType.Joint ? "jnt" :
+                        motionType == MotionType.Joints ? "jjj" : "und",
+                worldRotation ? "globl" : "local",
+                relativeRotation ? "rel" : "abs",
+                rotation,
+                worldTranslation ? "globl" : "local",
+                relativeTranslation ? "rel" : "abs",
+                translation,
+                velocity,
+                zone);
+        }
     }
 
 

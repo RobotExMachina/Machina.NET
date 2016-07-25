@@ -608,42 +608,36 @@ namespace RobotControl
             return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
         }
 
-        public bool TransformLocal(Rotation rotation, Point position)
+        public bool TransformLocal (Rotation rotation, Point position)
         {
             // Note the R+T action order
-            //return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
-            throw new NotImplementedException();
+            return c.IssueRotationAndTranslationRequest(false, rotation, true, false, position, true);
         }
 
         public bool TransformGlobal(Point position, Rotation rotation)
         {
-            // Note the T+R action order
+            // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
             return c.IssueTranslationAndRotationRequest(true, position, true, true, rotation, true);
         }
 
         public bool TransformGlobal(Rotation rotation, Point position)
         {
-            // Note the R+T action order
-            //return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
-            throw new NotImplementedException();
+            // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
+            return c.IssueRotationAndTranslationRequest(true, rotation, true, true, position, true);
         }
 
         public bool TransformTo(Point position, Rotation rotation)
         {
-            // Action order is irrelevant in absolute mode
+            // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
             return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
         }
 
         public bool TransformTo(Rotation rotation, Point position)
         {
-            // Action order is irrelevant in absolute mode
+            // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
             return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
         }
 
-        //public bool TransformTo(double x, double y, double z, double q1, double q2, double q3, double q4)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
 
 

@@ -42,9 +42,12 @@ namespace TEST_NewAPITests
             //TestCircle(arm);
 
             // Transformations
-            //TestCircleTransformAbsolute(arm);
-            //TestCircleTransformLocal(arm);
-            TestCircleTransformGlobal(arm);
+            TransformTests(arm);
+            //TestCircleTransformAbsolute(arm, 50);
+            //TestCircleTransformLocal(arm, 10);
+            //TestCircleTransformGlobal(arm, 10);
+
+
 
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -315,7 +318,41 @@ namespace TEST_NewAPITests
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
         }
 
-        public static void TestCircleTransformAbsolute(Robot arm)
+
+        public static void TransformTests(Robot arm)
+        {
+            // Reset
+            Point home = new Point(300, 0, 500);
+            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+
+            arm.MoveGlobal(150, 0, -100);
+            arm.SetVelocity(25);
+
+            Rotation z30 = new Rotation(Point.ZAxis, 30);
+
+            // Local tests, TR vs RT:
+            arm.TransformLocal(50 * Point.XAxis, z30);                          // Note the T+R action order
+            arm.TransformLocal(-50 * Point.XAxis, Rotation.Conjugate(z30));
+            arm.TransformLocal(z30, 50 * Point.XAxis);                          // Note the R+T action order
+            arm.TransformLocal(Rotation.Conjugate(z30), -50 * Point.XAxis);
+
+            // Global tests, TR vs RT:
+            // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
+            arm.TransformGlobal(50 * Point.XAxis, z30);
+            arm.TransformGlobal(-50 * Point.XAxis, Rotation.Conjugate(z30));
+            arm.TransformGlobal(z30, 50 * Point.XAxis);
+            arm.TransformGlobal(Rotation.Conjugate(z30), -50 * Point.XAxis);
+
+
+            // Back home
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+        }
+
+
+        public static void TestCircleTransformAbsolute(Robot arm, double r)
         {
             // Reset
             Point home = new Point(300, 0, 500);
@@ -323,7 +360,6 @@ namespace TEST_NewAPITests
             arm.SetVelocity(100);
             arm.TransformTo(home, homeXYZ);
             
-            double r = 50;
             double x = 450;
             double y = 0;
             double z = 400;
@@ -356,7 +392,7 @@ namespace TEST_NewAPITests
             arm.TransformTo(home, homeXYZ);
         }
 
-        public static void TestCircleTransformLocal(Robot arm)
+        public static void TestCircleTransformLocal(Robot arm, double side)
         {
             // Reset
             Point home = new Point(300, 0, 500);
@@ -364,11 +400,9 @@ namespace TEST_NewAPITests
             arm.SetVelocity(100);
             arm.TransformTo(home, homeXYZ);
 
-            //double r = 50;
             double x = 450;
             double y = 0;
             double z = 400;
-            double side = 5;
 
             arm.MoveTo(x, y, z);
 
@@ -393,7 +427,7 @@ namespace TEST_NewAPITests
             arm.TransformTo(home, homeXYZ);
         }
 
-        public static void TestCircleTransformGlobal(Robot arm)
+        public static void TestCircleTransformGlobal(Robot arm, double side)
         {
             // Reset
             Point home = new Point(300, 0, 500);
@@ -401,11 +435,9 @@ namespace TEST_NewAPITests
             arm.SetVelocity(100);
             arm.TransformTo(home, homeXYZ);
 
-            //double r = 50;
             double x = 450;
             double y = 0;
             double z = 400;
-            double side = 5;
 
             arm.MoveTo(x, y, z);
 

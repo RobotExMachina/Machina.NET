@@ -40,7 +40,7 @@ namespace RobotControl
         public abstract bool ApplyAction(ActionTranslation action);
         public abstract bool ApplyAction(ActionRotation action);
         public abstract bool ApplyAction(ActionTranslationAndRotation action);
-
+        public abstract bool ApplyAction(ActionRotationAndTranslation action);
 
 
         /// <summary>
@@ -82,6 +82,9 @@ namespace RobotControl
 
                 case ActionType.TranslationAndRotation:
                     return ApplyAction((ActionTranslationAndRotation)action);
+
+                case ActionType.RotationAndTranslation:
+                    return ApplyAction((ActionRotationAndTranslation)action);
 
             }
             return false;
@@ -188,43 +191,43 @@ namespace RobotControl
 
         public override bool ApplyAction(ActionTranslationAndRotation action)
         {
-            Point newPosition = new Point();
+            Point newPos = new Point();
 
             if (action.relativeTranslation)
             {
                 if (action.worldTranslation)
                 {
-                    newPosition = position + action.translation;
+                    newPos = position + action.translation;
                 }
                 else
                 {
                     Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
-                    newPosition = position + worldVector;
+                    newPos = position + worldVector;
                 }
             }
             else
             {
-                newPosition.Set(action.translation);
+                newPos.Set(action.translation);
             }
 
             // @TODO: this must be more programmatically implemented 
             if (Control.SAFETY_CHECK_TABLE_COLLISION)
             {
-                if (Control.IsBelowTable(newPosition.Z))
+                if (Control.IsBelowTable(newPos.Z))
                 {
                     if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
                     {
-                        Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPosition.Z);
+                        Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPos.Z);
                         return false;
                     }
                     else
                     {
-                        Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPosition.Z);
+                        Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPos.Z);
                     }
                 }
             }
 
-            position = newPosition;
+            position = newPos;
 
             // @TODO: implement some kind of security check here...
             if (action.relativeRotation)
@@ -242,6 +245,75 @@ namespace RobotControl
             {
                 rotation.Set(action.rotation);
             }
+
+            // If valid inputs, update, otherwise stick with previous values
+            if (action.velocity != -1) velocity = action.velocity;
+            if (action.zone != -1) zone = action.zone;
+            if (action.motionType != MotionType.Undefined) motionType = action.motionType;
+
+            return true;
+        }
+
+
+        public override bool ApplyAction(ActionRotationAndTranslation action)
+        {
+            // @TODO: implement some kind of security check here...
+            Rotation newRot = new Rotation();
+            if (action.relativeRotation)
+            {
+                if (action.worldRotation)
+                {
+                    //rotation.PreMultiply(action.rotation);
+                    newRot = Rotation.Multiply(action.rotation, rotation);
+                }
+                else
+                {
+                    //rotation.Multiply(action.rotation);
+                    newRot = Rotation.Multiply(rotation, action.rotation);
+                }
+            }
+            else
+            {
+                newRot.Set(action.rotation);
+            }
+
+            Point newPos = new Point();
+            if (action.relativeTranslation)
+            {
+                if (action.worldTranslation)
+                {
+                    newPos = position + action.translation;
+                }
+                else
+                {
+                    Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(newRot));
+                    newPos = position + worldVector;
+                }
+            }
+            else
+            {
+                newPos.Set(action.translation);
+            }
+
+            // @TODO: this must be more programmatically implemented 
+            if (Control.SAFETY_CHECK_TABLE_COLLISION)
+            {
+                if (Control.IsBelowTable(newPos.Z))
+                {
+                    if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
+                    {
+                        Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPos.Z);
+                        return false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPos.Z);
+                    }
+                }
+            }
+
+            rotation = newRot;
+            position = newPos;
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;
