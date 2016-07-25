@@ -32,6 +32,7 @@
     - [x] .TransformTo()
     - [x] .TransformLocal()
     - [x] .TransformGlobal()
+    - [x] Inverse Rot + Trans action
 
 ## BUILD 1107
 - [x] Implement bot.PushSettings() & bot.PopSettings();
