@@ -602,17 +602,41 @@ namespace RobotControl
         
 
 
-        
+        public bool TransformLocal(Point position, Rotation rotation)
+        {
+            // Note the T+R action order
+            return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
+        }
 
+        public bool TransformLocal(Rotation rotation, Point position)
+        {
+            // Note the R+T action order
+            //return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
+            throw new NotImplementedException();
+        }
 
-        // @TODO: not quite sure yet about how compound relative transformations should work, since sequence order matters a lot here
+        public bool TransformGlobal(Point position, Rotation rotation)
+        {
+            // Note the T+R action order
+            return c.IssueTranslationAndRotationRequest(true, position, true, true, rotation, true);
+        }
+
+        public bool TransformGlobal(Rotation rotation, Point position)
+        {
+            // Note the R+T action order
+            //return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
+            throw new NotImplementedException();
+        }
+
         public bool TransformTo(Point position, Rotation rotation)
         {
+            // Action order is irrelevant in absolute mode
             return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
         }
 
         public bool TransformTo(Rotation rotation, Point position)
         {
+            // Action order is irrelevant in absolute mode
             return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
         }
 

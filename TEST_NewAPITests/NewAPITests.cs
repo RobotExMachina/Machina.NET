@@ -42,7 +42,9 @@ namespace TEST_NewAPITests
             //TestCircle(arm);
 
             // Transformations
-            TestCircleTransformAbsolute(arm);
+            //TestCircleTransformAbsolute(arm);
+            //TestCircleTransformLocal(arm);
+            TestCircleTransformGlobal(arm);
 
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -316,9 +318,10 @@ namespace TEST_NewAPITests
         public static void TestCircleTransformAbsolute(Robot arm)
         {
             // Reset
+            Point home = new Point(300, 0, 500);
+            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
             arm.SetVelocity(100);
-            arm.MoveTo(300, 0, 500);
-            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+            arm.TransformTo(home, homeXYZ);
             
             double r = 50;
             double x = 450;
@@ -349,12 +352,94 @@ namespace TEST_NewAPITests
                 arm.TransformTo(target, rot);
             }
 
+            // Back home
+            arm.TransformTo(home, homeXYZ);
+        }
 
+        public static void TestCircleTransformLocal(Robot arm)
+        {
+            // Reset
+            Point home = new Point(300, 0, 500);
+            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+
+            //double r = 50;
+            double x = 450;
+            double y = 0;
+            double z = 400;
+            double side = 5;
+
+            arm.MoveTo(x, y, z);
+
+            Point forward = side * Point.YAxis;
+            Rotation zn10 = new Rotation(Point.ZAxis, -10);
+            // Trace a circle with local coordinates and rotations
+            for (var i = 0; i < 36; i++)
+            {
+                arm.TransformLocal(forward, zn10);
+            }
+
+            // Trace it back (and 'disentagle' Axis 6...)
+            Point backward = -side * Point.YAxis;
+            Rotation z10 = new Rotation(Point.ZAxis, 10);
+            for (var i = 0; i < 36; i++)
+            {
+                arm.TransformLocal(backward, z10);
+            }
 
             // Back home
             arm.SetVelocity(100);
-            arm.MoveTo(300, 0, 500);
-            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+            arm.TransformTo(home, homeXYZ);
         }
+
+        public static void TestCircleTransformGlobal(Robot arm)
+        {
+            // Reset
+            Point home = new Point(300, 0, 500);
+            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+
+            //double r = 50;
+            double x = 450;
+            double y = 0;
+            double z = 400;
+            double side = 5;
+
+            arm.MoveTo(x, y, z);
+
+            Rotation noRot = new Rotation();
+
+            Rotation z10 = new Rotation(Point.ZAxis, 10);  // note the rotation sign here is inverted from the 'local' example because Zaxis is flipped in local coordinates
+            // Trace a circle with relative global coordinates and rotations
+            for (var i = 0; i < 36; i++)
+            {
+                // A 'rotating' direction vector of length 'side'
+                Point forward = new Point(
+                    - side * Math.Sin(2 * Math.PI * i / 36.0),
+                    side * Math.Cos(2 * Math.PI * i / 36.0),
+                    0);
+                arm.TransformGlobal(forward, z10);
+            }
+
+            // Trace it back (and 'disentagle' Axis 6...)
+            Rotation zn10 = new Rotation(Point.ZAxis, -10);
+            for (var i = 0; i > -36; i--)
+            {
+                Point forward = new Point(
+                    side * Math.Sin(2 * Math.PI * i / 36.0),
+                    - side * Math.Cos(2 * Math.PI * i / 36.0),
+                    0);
+                arm.TransformGlobal(forward, zn10);
+            }
+
+            // Back home
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+
+        }
+
+
     }
 }
