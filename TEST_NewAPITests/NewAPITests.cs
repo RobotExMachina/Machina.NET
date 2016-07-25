@@ -58,10 +58,10 @@ namespace TEST_NewAPITests
 
             arm.SetVelocity(50);
             arm.SetZone(2);  // non predef zone
-            arm.Move(50, 0, 0);
-            arm.Move(0, 50, 0);
-            arm.Move(-50, 0, 0);
-            arm.Move(0, -50, 50);
+            arm.MoveGlobal(50, 0, 0);
+            arm.MoveGlobal(0, 50, 0);
+            arm.MoveGlobal(-50, 0, 0);
+            arm.MoveGlobal(0, -50, 50);
 
             arm.SetVelocity(500);
             arm.SetZone(10);
@@ -77,7 +77,7 @@ namespace TEST_NewAPITests
             arm.SetZone(1);
             arm.MoveTo(300, 0, 600);
             arm.MoveTo(200, -200, 400);
-            arm.Move(0, 378, 0);
+            arm.MoveGlobal(0, 378, 0);
             arm.MoveTo(300, 0, 600);
 
             if (jointMovement) arm.SetMotionType("linear");  // back to where it was... this will improve with arm.PushSettings(); 
@@ -90,7 +90,7 @@ namespace TEST_NewAPITests
             arm.MoveTo(300, 0, h);
             while (h > 0)
             {
-                arm.Move(0, 0, -zStep);
+                arm.MoveGlobal(0, 0, -zStep);
                 h -= zStep;
             }
 
@@ -242,7 +242,7 @@ namespace TEST_NewAPITests
 
             for (int i = 0; i < 10; i++)
             {
-                arm.Move(0, -40, 0);
+                arm.MoveGlobal(0, -40, 0);
                 arm.RotateLocal(Point.YAxis, 9);
             }
 

@@ -47,28 +47,28 @@ namespace EXAMPLE_KeyboardControl
                 // Thinking of an orientation corresponding to an user facing the robot frontally
                 if (key == ConsoleKey.UpArrow || key == ConsoleKey.W)
                 {
-                    arm.Move(-inc, 0, 0);
+                    arm.MoveGlobal(-inc, 0, 0);
                 }
                 else if (key == ConsoleKey.DownArrow || key == ConsoleKey.S)
                 {
-                    arm.Move(inc, 0, 0);
+                    arm.MoveGlobal(inc, 0, 0);
 
                 }
                 else if (key == ConsoleKey.LeftArrow || key == ConsoleKey.A)
                 {
-                    arm.Move(0, -inc, 0);
+                    arm.MoveGlobal(0, -inc, 0);
                 }
                 else if (key == ConsoleKey.RightArrow || key == ConsoleKey.D)
                 {
-                    arm.Move(0, inc, 0);
+                    arm.MoveGlobal(0, inc, 0);
                 }
                 else if (key == ConsoleKey.Q)
                 {
-                    arm.Move(0, 0, inc);
+                    arm.MoveGlobal(0, 0, inc);
                 }
                 else if (key == ConsoleKey.E)
                 {
-                    arm.Move(0, 0, -inc);
+                    arm.MoveGlobal(0, 0, -inc);
                 }
                 else if (key == ConsoleKey.Escape)
                 {

@@ -378,26 +378,53 @@ namespace RobotControl
         //                                                         
         
         /// <summary>
-        /// Issue a relative movement action request.
+        /// Issue a relative movement on local coordinates action request.
         /// </summary>
         /// <param name="direction"></param>
         /// <returns></returns>
-        public bool Move(Point direction)
+        public bool MoveLocal(Point direction)
         {
-            return c.IssueTranslationRequest(true, direction, true);
+            return c.IssueTranslationRequest(false, direction, true);
         }
 
         /// <summary>
-        /// Issue a relative movement action request.
+        /// Issue a relative movement on local coordinates action request.
         /// </summary>
         /// <param name="incX"></param>
         /// <param name="incY"></param>
         /// <param name="incZ"></param>
         /// <returns></returns>
-        public bool Move(double incX, double incY, double incZ)
+        public bool MoveLocal(double incX, double incY, double incZ)
         {
-            return Move(new Point(incX, incY, incZ));
+            return MoveLocal(new Point(incX, incY, incZ));
         }
+
+        /// <summary>
+        /// Issue a relative movement on world coordinates action request.
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public bool MoveGlobal(Point direction)
+        {
+            return c.IssueTranslationRequest(true, direction, true);
+        }
+
+        /// <summary>
+        /// Issue a relative movement on world coordinates action request.
+        /// </summary>
+        /// <param name="incX"></param>
+        /// <param name="incY"></param>
+        /// <param name="incZ"></param>
+        /// <returns></returns>
+        public bool MoveGlobal(double incX, double incY, double incZ)
+        {
+            return MoveGlobal(new Point(incX, incY, incZ));
+        }
+
+
+
+
+
 
         /// <summary>
         /// Issue an absolute movement action request.

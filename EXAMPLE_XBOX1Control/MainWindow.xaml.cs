@@ -132,7 +132,7 @@ namespace EXAMPLE_XBOX1Control
                 dir.Scale(incDist);
 
                 Console.WriteLine("--> Moving {0}", dir);
-                arm.Move(dir);
+                arm.MoveGlobal(dir);
             }
             else
             {

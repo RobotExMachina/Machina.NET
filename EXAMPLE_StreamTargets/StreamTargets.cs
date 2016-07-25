@@ -35,30 +35,30 @@ namespace EXAMPLE_StreamTargets2
             arm.SetVelocity(leadSpeed);
             arm.MoveTo(250, 250, 250);      // absolute movement
             arm.SetVelocity(traceSpeed);
-            arm.Move(50, 0, 0);             // relative movement
-            arm.Move(0, 50, 0);
-            arm.Move(-50, 0, 0);
+            arm.MoveGlobal(50, 0, 0);             // relative movement
+            arm.MoveGlobal(0, 50, 0);
+            arm.MoveGlobal(-50, 0, 0);
 
             arm.SetVelocity(leadSpeed);
-            arm.Move(0, -50, 50);
+            arm.MoveGlobal(0, -50, 50);
             arm.SetVelocity(traceSpeed);
-            arm.Move(50, 0, 0);
-            arm.Move(0, 50, 0);
-            arm.Move(-50, 0, 0);
+            arm.MoveGlobal(50, 0, 0);
+            arm.MoveGlobal(0, 50, 0);
+            arm.MoveGlobal(-50, 0, 0);
 
             arm.SetVelocity(leadSpeed);
-            arm.Move(0, -50, 50);
+            arm.MoveGlobal(0, -50, 50);
             arm.SetVelocity(traceSpeed);
-            arm.Move(50, 0, 0);
-            arm.Move(0, 50, 0);
-            arm.Move(-50, 0, 0);
+            arm.MoveGlobal(50, 0, 0);
+            arm.MoveGlobal(0, 50, 0);
+            arm.MoveGlobal(-50, 0, 0);
 
             arm.SetVelocity(leadSpeed);
-            arm.Move(0, -50, 50);
+            arm.MoveGlobal(0, -50, 50);
             arm.SetVelocity(traceSpeed);
-            arm.Move(50, 0, 0);
-            arm.Move(0, 50, 0);
-            arm.Move(-50, 0, 0);
+            arm.MoveGlobal(50, 0, 0);
+            arm.MoveGlobal(0, 50, 0);
+            arm.MoveGlobal(-50, 0, 0);
 
             arm.SetVelocity(leadSpeed);
             //arm.MoveTo("home");

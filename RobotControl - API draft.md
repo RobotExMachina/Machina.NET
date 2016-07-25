@@ -1,3 +1,133 @@
+---
+### 2016.07.25
+- Added Local and Global overloads for movement/rotation:
+```csharp
+arm.MoveLocal(x, y, z);     // relative movement in local axes  
+arm.MoveGlobal(x, y, z);    // relative movement in global axes
+arm.MoveTo(x, y, z);        // absolute movement in global coordinates
+
+arm.RotateLocal(rot);       // relative rotation in local axes  
+arm.RotateGlobal(rot);      // relative rotation in global axes
+arm.RotateTo(rot);          // absolute rotation in global coordinates
+```
+
+- Could this be wrapped into a default simpler instruction, and specific additions:
+```csharp
+arm.Move(x, y, z);  // this defaults to what?
+
+arm.Move.Local(x, y, z);
+arm.Move.Global(x, y, z);
+arm.Move.To(x, y, z);
+```
+
+- What if movement/rotation types were a state?
+```csharp
+arm.MovementType("local");
+arm.Move(...);                  // relative local movement
+arm.MovementType("global");
+arm.Move(...);                  // relative global movement
+arm.MovementType("absolute");
+arm.Move(...);                  // absolute global movement
+
+arm.RotationType("local");
+arm.RotationType("global");
+arm.RotationType("absolute");
+```
+
+- Can both be combined? Aka, the base .Move() instruction follows current state, but specific instructions temporarily bypass it:
+```csharp
+arm.Movement("local");          // sets current state
+arm.Move(...);                  // relative local movement
+arm.MoveAbsolute(...);          // performs absolute global mov, keeps state the same
+arm.Move(...);                  // still performs relative local movement
+arm.Movement("absolute");       // sets state
+arm.Move(...);                  // .Move() now behaves absolute 
+```
+
+- State-based movement would make .Transform() very straightforward to implement:
+```csharp
+arm.Movement("local");
+arm.Rotation("absolute");
+arm.Transform(vec, rot);        // perform local movement, then absolute rotation. Note the param order defines operation order
+
+arm.Movement("absolute");
+arm.Rotation("global");
+arm.Transform(rot, vec);        // perform global rotation, then absolute movement
+```
+
+- Local/Global/Absolute sounds a little confusing. I wonder if the 'relative global' setting is marginal: in most cases, performing a relative operation in global CS is strange. Maybe would just be simpler to keep it pure local (everything relative to local CS) and pure global (everything absolute to global CS...).
+```csharp
+arm.Movement("local");
+arm.Rotation("local");
+// Arc-like movement
+for (int i = 0; i < 10; i++) {
+    arm.Transform(new Rotation(ZAxis, 5), new Vector(10, 0, 0));
+}
+
+arm.Movement("absolute");
+arm.Rotation("absolute");
+// Go back home
+arm.Transform(new Vector(300, 0, 500), new CoordinateSystem(YAxis, -XAxis));
+```
+
+- Split settings between "absolute/relative" and "global/local"...?
+
+- How does this affect Joints movement? If this was rephrased 'relative/absolute', then it would fit perfectly:
+```csharp
+arm.Joints("relative");
+arm.Joints(0, 0, 0, 30, -45, 10);   // relative incrase
+
+arm.Joints("absolute");  
+arm.Joints(0, 0, 0, 0, 0, 0);       // go home
+
+```
+
+- Doesn't 'relative/absolute' at the end of the day read the same as .Move() and .MoveTo(), .Rotate() and .RotateTo(), .Joints() and .JointsTo()...? If we eliminate the relative+global state, we can go back to not using states.
+- If so, overloads and flags for .Transform() would be needed?
+```csharp
+// Using flags:
+arm.Transform(vec, bool relativeM, rot, bool relativeR);  // and viceversa with order?
+
+// Keeping the 'To' convention:
+arm.Transform(vec, rot);        // relative movements
+arm.Transform(rot, vec);        
+arm.TransformTo(vec, rot);      // absolute transform (order here doesn't matter)
+```
+
+- Hybrid model:
+```csharp
+// arm.RelativeMovement("local");   // default is global
+arm.Move(...);      // issues a relative movement. By default it is in world coordinates
+arm.MoveTo(...);    // issues an absolute movement. It is always in world coordinates, no settings for this...
+
+// arm.RelativeRotation("world");
+arm.Rotate(...);    // issues a relative rotation. By default it is in local coordinates
+arm.RotateTo(...);  // issues an absolute roation. Always world rotation, no settings
+
+arm.Joints(...);    // relative joints, no option for local or global
+arm.JointsTo(...);  // absolute joint setting
+
+arm.Transform(...);     // mov + rot in whatever current settings. This might be confusing if one is world and the other is local...
+arm.TransformTo(...);   // abs move + rot, no confusion here
+```
+
+- Relative actions have an overload to set their behavior:
+```csharp
+arm.Move("local");          // sets option for future move actions. It is also the overload for bookmarked positions?
+arm.Move(x, y, z);
+
+arm.Move("world");
+arm.Move(x, y, z);
+
+arm.MoveTo(x, y, z);        // this is independent from relative settings
+
+arm.Transform("local");     // sets both transform params to local. doesn't affect the independents settings for move or rotate 
+
+```
+
+
+
+---
 ```text
  ██████╗ ███████╗███████╗██╗     ██╗███╗   ██╗███████╗
 ██╔═══██╗██╔════╝██╔════╝██║     ██║████╗  ██║██╔════╝
@@ -302,4 +432,8 @@ bot.FullJoint(bool absJoints, params double[] axes);
 bot.IO(int id, bool activate);
 bot.IOToggle(int id);   // whatever it was, !
 ```
+
+
+
+
 
