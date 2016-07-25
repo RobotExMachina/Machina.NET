@@ -38,7 +38,11 @@ namespace RobotControl
     /// <summary>
     /// Defines the different modes a program can be ran.
     /// </summary>
-    public enum RunMode : int { None = 0, Once = 1, Loop = 2 };
+    public enum RunMode : int {
+        None = 0,
+        Once = 1,
+        Loop = 2
+    };
     
 
 

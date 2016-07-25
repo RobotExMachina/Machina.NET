@@ -33,9 +33,14 @@ namespace TEST_NewAPITests
 
             //// Advanced rotation tests
             //RotationTestsAdvanced(arm);
+            //RotationTests2(arm);
 
-            RotationTests2(arm);
-            
+            //// Rel/abs movements
+            //MovementTest(arm);
+
+            // Generative circle movement
+            TestCircle(arm);
+
             arm.DebugBuffer();  // read all pending buffered actions
 
             arm.DebugRobotCursors();
@@ -251,6 +256,58 @@ namespace TEST_NewAPITests
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
             arm.MoveTo(300, 0, 500);
 
+        }
+
+        public static void MovementTest(Robot arm)
+        {
+            // Reset
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+
+            arm.SetVelocity(25);
+
+            // Rotate TCP
+            arm.RotateLocal(Point.XAxis, 45);
+
+            // Do global movement
+            arm.MoveGlobal(50, 0, 0);
+            arm.MoveGlobal(0, 50, 0);
+            arm.MoveGlobal(0, 0, 50);
+            arm.MoveGlobal(-50, -50, -50);
+
+            // Do local movement
+            arm.MoveLocal(50, 0, 0);
+            arm.MoveLocal(0, 50, 0);
+            arm.MoveLocal(0, 0, 50);
+            arm.MoveLocal(-50, -50, -50);
+
+            // Back home
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+        }
+
+        public static void TestCircle(Robot arm)
+        {
+            // Reset
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+
+            arm.MoveGlobal(150, 0, -100);
+
+            for (var i = 0; i < 36; i++)
+            {
+                arm.MoveLocal(5 * Point.YAxis);
+                arm.RotateLocal(Point.ZAxis, 10);
+                arm.RotateLocal(Point.YAxis, -2);  // add some off plane movement ;)
+            }
+
+            // Back home
+            arm.SetVelocity(100);
+            arm.MoveTo(300, 0, 500);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);
         }
 
     }

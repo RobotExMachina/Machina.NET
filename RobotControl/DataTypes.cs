@@ -45,8 +45,19 @@ namespace RobotControl
         
         public double X, Y, Z;
 
+        /// <summary>
+        /// Unit X Vector.
+        /// </summary>
         public static Point XAxis = new Point(1, 0, 0);
+
+        /// <summary>
+        /// Unit Y Vector.
+        /// </summary>
         public static Point YAxis = new Point(0, 1, 0);
+
+        /// <summary>
+        /// Unit Z Vector.
+        /// </summary>
         public static Point ZAxis = new Point(0, 0, 1);
 
         public static Point operator + (Point p1, Point p2)
@@ -64,6 +75,16 @@ namespace RobotControl
             return new Point(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
         }
 
+        public static Point operator * (Double s, Point p)
+        {
+            return new Point(s * p.X, s * p.Y, s * p.Z);
+        }
+
+        public static Point operator * (Point p, Double s)
+        {
+            return new Point(s * p.X, s * p.Y, s * p.Z);
+        }
+
         /// <summary>
         /// Returns the dot product of specified Vectors. 
         /// </summary>
@@ -74,7 +95,6 @@ namespace RobotControl
         {
             return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
         }
-
 
         /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
@@ -435,7 +455,18 @@ namespace RobotControl
             return this.Rotate(r);
         }
         
-
+        /// <summary>
+        /// Returns a new Point as the rotation of 'p' by 'r'
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public static Point Rotation(Point p, Rotation r)
+        {
+            Point v = new Point(p);
+            v.Rotate(r);
+            return v;
+        }
 
         /// <summary>
         /// Equality checks.

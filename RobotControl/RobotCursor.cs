@@ -101,28 +101,47 @@ namespace RobotControl
 
         public override bool ApplyAction(ActionTranslation action)
         {
+            Point newPosition = new Point();
+
+            if (action.relativeTranslation)
+            {
+                if (action.worldTranslation)
+                {
+                    newPosition = position + action.translation;
+                }
+                else
+                {
+                    Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
+                    newPosition = position + worldVector;
+                }
+            }
+            else
+            {
+                newPosition.Set(action.translation);
+            }
+
             // @TODO: this must be more programmatically implemented 
             if (Control.SAFETY_CHECK_TABLE_COLLISION)
             {
-                double newZ = action.relativeTranslation ? position.Z + action.translation.Z : action.translation.Z;
-                if (Control.IsBelowTable(newZ))
+                if (Control.IsBelowTable(newPosition.Z))
                 {
                     if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
                     {
-                        Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newZ);
+                        Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPosition.Z);
                         return false;
                     }
                     else
                     {
-                        Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newZ);
+                        Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPosition.Z);
                     }
                 }
             }
 
-            if (action.relativeTranslation)
-                position.Add(action.translation);
-            else
-                position.Set(action.translation);
+            //if (action.relativeTranslation)
+            //    position.Add(action.translation);
+            //else
+            //    position.Set(action.translation);
+            position = newPosition;
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;
