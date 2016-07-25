@@ -16,9 +16,9 @@ namespace RobotControl
         Translation = 1,
         Rotation = 2
     }
-    
+
     /// <summary>
-    /// If an Action implies movement, what type it is. 
+    /// If an Action implies movement, what type it is.
     /// </summary>
     public enum MotionType : int 
     {

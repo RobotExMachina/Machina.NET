@@ -27,6 +27,8 @@
 - [ ] Streamline 'bookmarked' positions with a dictionary in Control or similar 
 - [ ] Implement .PointAt() (as in 'look' at somewhere)
 - [ ] Rename the project to BroBot ;)
+- [ ] Rename Point to Vector (or add an empty subclass of sorts)
+- [ ] Split off Quaternion from Rotation? API-wise, make the difference more explicit between a Rotation and a Quaternion...?
 
 ## LOW-LEVEL
 - [ ] Low-level methods in Communication should not check for !isConnected, but rather just the object they need to perform their function. Only high-level functions should operate based on connection status.

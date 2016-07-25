@@ -433,47 +433,37 @@ namespace RobotControl
 
         // @TODO: add overloads with custom velocity and speed?
 
+            
 
-
-
-
-        //public bool Rotate(Rotation rotation)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public bool Rotate(double q1, double q2, double q3, double q4)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-
-        //public bool Rotate(
-        //    double x0, double x1, double x2, 
-        //    double y0, double y1, double y2, 
-        //    double z0, double z1, double z2)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public bool Rotate(Point vecX, Point vecY, Point vecZ)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-
-
-
+        /// <summary>
+        /// Issue a relative rotation around local axes request.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
         public bool RotateLocal(Rotation rotation)
         {
             return c.IssueRotationRequest(false, rotation, true);
         }
 
+        /// <summary>
+        /// Issue a relative rotation around local axes request.
+        /// </summary>
+        /// <param name="vector"></param>
+        /// <param name="angDegs"></param>
+        /// <returns></returns>
         public bool RotateLocal(Point vector, double angDegs)
         {
             return RotateLocal(new Rotation(vector, angDegs));
         }
 
+        /// <summary>
+        /// Issue a relative rotation around local axes request.
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        /// <param name="vecZ"></param>
+        /// <param name="angDegs"></param>
+        /// <returns></returns>
         public bool RotateLocal(double vecX, double vecY, double vecZ, double angDegs)
         {
             return RotateLocal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
@@ -484,38 +474,84 @@ namespace RobotControl
 
 
 
-
+        /// <summary>
+        /// Issue a relative rotation around global axes request.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
         public bool RotateGlobal(Rotation rotation)
         {
             return c.IssueRotationRequest(true, rotation, true);
         }
 
+        /// <summary>
+        /// Issue a relative rotation around global axes request.
+        /// </summary>
+        /// <param name="vector"></param>
+        /// <param name="angDegs"></param>
+        /// <returns></returns>
         public bool RotateGlobal(Point vector, double angDegs)
         {
             return RotateGlobal(new Rotation(vector, angDegs));
         }
 
+        /// <summary>
+        /// Issue a relative rotation around global axes request.
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        /// <param name="vecZ"></param>
+        /// <param name="angDegs"></param>
+        /// <returns></returns>
         public bool RotateGlobal(double vecX, double vecY, double vecZ, double angDegs)
         {
             return RotateGlobal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
         }
 
 
+
+
+        /// <summary>
+        /// Issue an absolute global reorientation request.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
         public bool RotateTo(Rotation rotation)
         {
             return c.IssueRotationRequest(true, rotation, false);
         }
 
+        /// <summary>
+        /// Issue an absolute global reorientation request.
+        /// </summary>
+        /// <param name="cs"></param>
+        /// <returns></returns>
         public bool RotateTo(CoordinateSystem cs)
         {
             return RotateTo(cs.GetQuaternion());
         }
 
+        /// <summary>
+        /// Issue an absolute global reorientation request.
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        /// <returns></returns>
         public bool RotateTo(Point vecX, Point vecY)
         {
             return RotateTo(new Rotation(vecX, vecY));
         }
 
+        /// <summary>
+        /// Issue an absolute global reorientation request.
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        /// <returns></returns>
         public bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)
         {
             return RotateTo(new Rotation(x0, x1, x2, y0, y1, y2));
@@ -528,105 +564,12 @@ namespace RobotControl
         
 
 
-
-
-        //public bool RotateTo(Rotation rotation)
-        //{
-        //    return c.IssueRotationRequest(rotation, false);
-        //}
-
-        //public bool RotateTo(double w, double x, double y, double z)
-        //{
-        //    return RotateTo( new Rotation(w, x, y, z));
-        //}
-
-        //public bool RotateTo(
-        //    double x0, double x1, double x2,
-        //    double y0, double y1, double y2)
-        //{
-        //    return RotateTo( new Rotation(x0, x1, x2, y0, y1, y2) );
-        //}
+        
 
 
 
+        
 
-        //public bool RotateTo(Point vecX, Point vecY)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public bool RotateTo(string bookmarkedRotation)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        // @TODO: add overloads with custom velocity and speed?
-
-
-
-
-        ///// <summary>
-        ///// Issue an absolute rotation of the TCP action request.
-        ///// </summary>
-        ///// <param name="q1"></param>
-        ///// <param name="q2"></param>
-        ///// <param name="q3"></param>
-        ///// <param name="q4"></param>
-        ///// <returns></returns>
-        //public bool RotateTo(double q1, double q2, double q3, double q4)
-        //{
-        //    return c.IssueAbsoluteRotationRequest(q1, q2, q3, q4);
-        //}
-
-        ///// <summary>
-        ///// Issue an absolute rotation of the TCP action request.
-        ///// </summary>
-        ///// <param name="x1"></param>
-        ///// <param name="x2"></param>
-        ///// <param name="x3"></param>
-        ///// <param name="y1"></param>
-        ///// <param name="y2"></param>
-        ///// <param name="y3"></param>
-        ///// <param name="z1"></param>
-        ///// <param name="z2"></param>
-        ///// <param name="z3"></param>
-        ///// <returns></returns>
-        //public bool RotateTo(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
-        //{
-        //    List<double> q = Rotation.PlaneToQuaternions(x1, x2, x3, y1, y2, y3, z1, z2, z3);
-        //    return RotateTo(q[0], q[1], q[2], q[3]);
-        //}
-
-        ///// <summary>
-        ///// Issue an absolute rotation of the TCP action request.
-        ///// </summary>
-        ///// <param name="rot"></param>
-        ///// <returns></returns>
-        //public bool RotateTo(Rotation rot)
-        //{
-        //    return RotateTo(rot.Q1, rot.Q2, rot.Q3, rot.Q4);
-        //}
-
-        ///// <summary>
-        ///// Issue an absolute rotation of the TCP action request.
-        ///// </summary>
-        ///// <param name="bookmarkRotation"></param>
-        ///// <returns></returns>
-        //public bool RotateTo(string bookmarkRotation)
-        //{
-        //    string str = bookmarkRotation.ToLower();
-
-        //    if (str.Equals("globalxy"))
-        //    {
-        //        return RotateTo(Rotation.GlobalXY);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Named rotation '{0}' not found", bookmarkRotation);
-        //    }
-
-        //    return false;
-        //}
 
         
 
