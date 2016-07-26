@@ -61,7 +61,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1108;
+        public static readonly int Build = 1109;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -646,22 +646,22 @@ namespace RobotControl
 
         public bool Joints(Joints incJoints)
         {
-            throw new NotImplementedException();
+            return c.IssueJointsRequest(incJoints, true);
         }
 
         public bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
         {
-            throw new NotImplementedException();
+            return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
         }
 
         public bool JointsTo(Joints joints)
         {
-            throw new NotImplementedException();
+            return c.IssueJointsRequest(joints, false);
         }
 
         public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
         {
-            throw new NotImplementedException();
+            return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
         }
 
 
@@ -675,13 +675,12 @@ namespace RobotControl
             throw new NotImplementedException();
         }
 
-        
-
-
-
-
-
         public bool Wait(long millis)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Message(string msg)
         {
             throw new NotImplementedException();
         }

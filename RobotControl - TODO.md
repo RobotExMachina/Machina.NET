@@ -36,6 +36,8 @@
 - [ ] Clarify the role of queue manager andits relation to Control and Comm.
 - [ ] Unsuscribe from controller events on .Disconnect()
 
+
+
 ## FUTURE WISHLIST
 - [ ] Bring back 'bookmarked' absolute positions.
 

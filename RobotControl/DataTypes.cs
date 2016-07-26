@@ -1172,11 +1172,48 @@ namespace RobotControl
     //╚█████╔╝╚██████╔╝██║██║ ╚████║   ██║   ███████║
     // ╚════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
     /// <summary>
-    /// Represents the 6 angular rotations of the axes in a 6-axis manipulator
+    /// Represents the 6 angular rotations of the axes in a 6-axis manipulator, in degrees.
     /// </summary>
     public class Joints : Geometry
     {
         public double J1, J2, J3, J4, J5, J6;
+
+        public double this[int i]
+        {   
+            get
+            {
+                if (i < 0 || i > 5)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+                switch (i)
+                {
+                    case 0: return J1;
+                    case 1: return J2;
+                    case 2: return J3;
+                    case 3: return J4;
+                    case 4: return J5;
+                    case 5: return J6;
+                }
+                return 0;
+            }
+            set
+            {
+                if (i < 0 || i > 5)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+                switch (i)
+                {
+                    case 0: J1 = value; break;
+                    case 1: J2 = value; break;
+                    case 2: J3 = value; break;
+                    case 3: J4 = value; break;
+                    case 4: J5 = value; break;
+                    case 5: J6 = value; break;
+                }
+            }
+        }
 
         /// <summary>
         /// Create a Joints configuration from values.
@@ -1197,6 +1234,15 @@ namespace RobotControl
             this.J6 = j6;
         }
 
+        public Joints(Joints j)
+        {
+            this.J1 = j.J1;
+            this.J2 = j.J2;
+            this.J3 = j.J3;
+            this.J4 = j.J4;
+            this.J5 = j.J5;
+            this.J6 = j.J6;
+        }
         /// <summary>
         /// Create a Joints configuration from an ABB JointTarget object.
         /// </summary>
@@ -1219,6 +1265,26 @@ namespace RobotControl
             this.J4 = jt.RobAx.Rax_4;
             this.J5 = jt.RobAx.Rax_5;
             this.J6 = jt.RobAx.Rax_6;
+        }
+
+        public void Add(Joints j)
+        {
+            this.J1 += j.J1;
+            this.J2 += j.J2;
+            this.J3 += j.J3;
+            this.J4 += j.J4;
+            this.J5 += j.J5;
+            this.J6 += j.J6;
+        }
+
+        public void Set(Joints j)
+        {
+            this.J1 = j.J1;
+            this.J2 = j.J2;
+            this.J3 = j.J3;
+            this.J4 = j.J4;
+            this.J5 = j.J5;
+            this.J6 = j.J6;
         }
 
         /// <summary>

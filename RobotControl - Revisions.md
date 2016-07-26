@@ -14,15 +14,21 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
-## BUILD 1110
+## BUILD 1111
 - [ ] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
 - [ ] Refactor .setvel and .setzone to .speed and .zone
 - [ ] List<string> .exportcode(bool flush)
 - [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)
+- [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
+- [ ] Remove MointType.Joints: there is only one type of ActionJoint, so there is no need to specify this
+
+## BUILD 1110
+- [ ] Rewrite program generation to accept non-movement actions (or even the ones that don't apply at all)
+- [ ] .Message(string) action ;)
 
 ## BUILD 1109
 - [ ] Add Joints() actions (think of a new name?) --> .ArmJoints(); .ArmJointsTo(); || .RotateArm(); .RotateArmTo()
-- [ ] .Message(string) action ;)
+- [ ] Refine Actions checks on first type issued as absolute... 
 
 ## BUILD 1108
 - [x] Port Util methods as static to their appropriate geometry class 

@@ -41,6 +41,7 @@ namespace RobotControl
         public abstract bool ApplyAction(ActionRotation action);
         public abstract bool ApplyAction(ActionTranslationAndRotation action);
         public abstract bool ApplyAction(ActionRotationAndTranslation action);
+        public abstract bool ApplyAction(ActionJoints action);
 
 
         /// <summary>
@@ -85,6 +86,9 @@ namespace RobotControl
 
                 case ActionType.RotationAndTranslation:
                     return ApplyAction((ActionRotationAndTranslation)action);
+
+                case ActionType.Joints:
+                    return ApplyAction((ActionJoints)action);
 
             }
             return false;
@@ -146,6 +150,7 @@ namespace RobotControl
             }
 
             position = newPosition;
+            joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;
@@ -179,6 +184,8 @@ namespace RobotControl
             {
                 rotation.Set(action.rotation);
             }
+
+            joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;
@@ -245,6 +252,8 @@ namespace RobotControl
             {
                 rotation.Set(action.rotation);
             }
+
+            joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;
@@ -314,6 +323,42 @@ namespace RobotControl
 
             rotation = newRot;
             position = newPos;
+            joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
+
+            // If valid inputs, update, otherwise stick with previous values
+            if (action.velocity != -1) velocity = action.velocity;
+            if (action.zone != -1) zone = action.zone;
+            if (action.motionType != MotionType.Undefined) motionType = action.motionType;
+
+            return true;
+        }
+
+
+        public override bool ApplyAction(ActionJoints action)
+        {
+            // If user issued a relative action, make sure there are absolute values to work with. 
+            // (This limitation is due to current lack of FK/IK solvers)
+            if (action.relativeJoints && joints == null)  // could also check for motionType == MotionType.Joints
+            {
+                Console.WriteLine("Sorry, must provide absolute Joints values first before applying relative ones...");
+                return false;
+            }
+
+            // @TODO: implement joint limits checks and general safety...
+
+            // Modify current Joints
+            if (action.relativeJoints)
+            {
+                joints.Add(action.joints);
+            }
+            else
+            {
+                joints = new Joints(action.joints);
+            }
+
+            // Flag the lack of other geometric data
+            position = null;
+            rotation = null;
 
             // If valid inputs, update, otherwise stick with previous values
             if (action.velocity != -1) velocity = action.velocity;
@@ -329,18 +374,31 @@ namespace RobotControl
 
 
 
+
+
+
         /// <summary>
         /// Returns an ABB robtarget representation of the current state of the cursor.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <returns></returns>
-        public string GetUNSAFERobTargetDeclaration()
+        public string GetUNSAFETargetDeclaration(Action a)
         {
-            return string.Format("[{0},{1},[0,0,0,0],[9E9,9E9,9E9,9E9,9E9,9E9]]",
-                position,
-                rotation
-            );
+            if (a.motionType == MotionType.Joints)
+            {
+                return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]",
+                                joints
+                            );
+            }
+            else
+            {
+                return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]",
+                                position,
+                                rotation
+                            );
+            }
+            
         }
 
 

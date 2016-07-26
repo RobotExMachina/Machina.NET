@@ -105,6 +105,16 @@ namespace RobotControl
         };
 
         /// <summary>
+        /// ABB's correspondance of MotionTypes to datatypes.
+        /// </summary>
+        private static Dictionary<MotionType, string> MotionData = new Dictionary<MotionType, string>()
+        {
+            { MotionType.Linear, "robtarget" },
+            { MotionType.Joint, "robtarget" },
+            { MotionType.Joints, "jointtarget" }
+        };
+
+        /// <summary>
         /// ABB's correspondance of MotionTypes to instructions.
         /// </summary>
         private static Dictionary<MotionType, string> MotionInstructions = new Dictionary<MotionType, string>()
@@ -182,9 +192,11 @@ namespace RobotControl
             foreach (Action a in actions)
             {
                 writer.ApplyAction(a);
-                module.Add( string.Format("  CONST robtarget target{0}:={1};", 
+                module.Add(string.Format("  CONST {2} target{0}:={1};",
                     it++,
-                    writer.GetUNSAFERobTargetDeclaration()) );
+                    writer.GetUNSAFETargetDeclaration(a),
+                    MotionData[a.motionType]));
+
             }
             module.Add("");
 

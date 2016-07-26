@@ -885,27 +885,46 @@ namespace RobotControl
 
 
 
+        public bool IssueJointsRequest(Joints joints, bool relJnts, int vel, int zon)
+        {
+            if (!areCursorsInitialized)
+            {
+                if (controlMode == ControlMode.Offline)
+                {
+                    if (relJnts)
+                    {
+                        Console.WriteLine("Sorry, first Joints action upon offline robot initialization must be in absolute values");
+                        return false;
+                    }
 
+                    if (!InitializeRobotPointers(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                    {
+                        Console.WriteLine("Could not initialize cursors...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Still only working in Offline mode");
+                    return false;
+                }
+            }
 
+            ActionJoints act = new ActionJoints(joints, relJnts, vel, zon, MotionType.Joints);
+            // Only add this action to the queue if it was successfuly applied to the virtualCursor
+            if (virtualCursor.ApplyAction(act))
+            {
+                actionBuffer.Add(act);
+                return true;
+            }
+            return false;
+        }
 
-
-
-        //public bool IssueTransformationRequest(Point trans, bool relTrans, Rotation rot, bool relRot, int vel, int zon, MotionType mType)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public bool IssueConfigurationRequest()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-
-
-
-
-
-
+        // Overloads falling back on current settings values
+        public bool IssueJointsRequest(Joints joints, bool relJnts)
+        {
+            return IssueJointsRequest(joints, relJnts, currentSettings.Velocity, currentSettings.Zone);
+        }
 
 
 

@@ -12,17 +12,18 @@ namespace RobotControl
     /// </summary>
     internal enum ActionType : int
     {
-        Undefined = 0, 
+        Undefined = 0,
         Translation = 1,
-        Rotation = 2, 
+        Rotation = 2,
         TranslationAndRotation = 3,
-        RotationAndTranslation = 4
+        RotationAndTranslation = 4,
+        Joints = 5
     }
 
     /// <summary>
     /// If an Action implies movement, what type it is.
     /// </summary>
-    public enum MotionType : int 
+    public enum MotionType : int
     {
         Undefined = 0,  // a null default
         Linear = 1,     // linear movement
@@ -68,8 +69,13 @@ namespace RobotControl
         public Rotation rotation;
         public bool relativeRotation;
         public bool worldRotation;
+
+        // Joint properties
+        public Joints joints;
+        public bool relativeJoints;
+
     }
-    
+
 
 
 
@@ -106,7 +112,7 @@ namespace RobotControl
             zone = zon;
             motionType = mType;
         }
-        
+
         //// Overloads with default invalid flags
         //public ActionTranslation(bool world, Point trans, bool relTrans, int vel, int zon) :
         //    this(world, trans, relTrans, vel, zon, MotionType.Undefined)
@@ -119,18 +125,18 @@ namespace RobotControl
         //public ActionTranslation(bool world, Point trans, bool relTrans) :
         //    this(world, trans, relTrans, -1, -1, MotionType.Undefined)
         //{ }
-        
+
         public override string ToString()
         {
-            return string.Format("TRS: {0}, {5} {1} {2}, v{3} z{4}",
+            return string.Format("TRS: {0}, {1} {2} {3}, v{4} z{5}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
-                relativeTranslation ? "rel" : "abs", 
-                translation, 
-                velocity, 
-                zone, 
-                worldTranslation ? "globl" : "local");
+                worldTranslation ? "globl" : "local",
+                relativeTranslation ? "rel" : "abs",
+                translation,
+                velocity,
+                zone);
         }
     }
 
@@ -173,15 +179,15 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("ROT: {0}, {5} {1} {2}, v{3} z{4}",
+            return string.Format("ROT: {0}, {1} {2} {3}, v{4} z{5}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
+                worldRotation ? "globl" : "local",
                 relativeRotation ? "rel" : "abs",
                 rotation,
                 velocity,
-                zone,
-                worldRotation ? "globl" : "local");
+                zone);
         }
 
     }
@@ -218,7 +224,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("T+R: {0}, {1} {2} {3}, {4} {5} {6}, v{3} z{4}",
+            return string.Format("T+R: {0}, {1} {2} {3}, {4} {5} {6}, v{7} z{8}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
@@ -257,7 +263,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("R+T: {0}, {1} {2} {3}, {4} {5} {6}, v{3} z{4}",
+            return string.Format("R+T: {0}, {1} {2} {3}, {4} {5} {6}, v{7} z{8}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
@@ -270,133 +276,46 @@ namespace RobotControl
                 velocity,
                 zone);
         }
+
     }
 
 
 
 
+    //       ██╗ ██████╗ ██╗███╗   ██╗████████╗███████╗
+    //       ██║██╔═══██╗██║████╗  ██║╚══██╔══╝██╔════╝
+    //       ██║██║   ██║██║██╔██╗ ██║   ██║   ███████╗
+    //  ██   ██║██║   ██║██║██║╚██╗██║   ██║   ╚════██║
+    //  ╚█████╔╝╚██████╔╝██║██║ ╚████║   ██║   ███████║
+    //   ╚════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+    //                                                 
 
+    internal class ActionJoints : Action
+    {
+        public ActionJoints(Joints js, bool relJnts, int vel, int zon, MotionType mType)
+        {
+            type = ActionType.Joints;
 
+            joints = js;
+            relativeJoints = relJnts;
 
+            velocity = vel;
+            zone = zon;
+            motionType = mType;
+        }
 
+        public override string ToString()
+        {
+            return string.Format("JNT: {0}, {1} {2}, v{3} z{4}",
+                motionType == MotionType.Linear ? "lin" :
+                    motionType == MotionType.Joint ? "jnt" :
+                        motionType == MotionType.Joints ? "jjj" : "und",
+                relativeJoints ? "rel" : "abs",
+                joints,
+                velocity,
+                zone);
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // NOT USEFUL ANY MORE?
-
-
-    //internal class Action
-    //{
-    //    bool relativeTranslation = false;
-    //    Point translation = null;
-
-    //    bool relativeRotation = false;
-    //    Rotation rotation = null;
-
-    //    bool relativeJoints = false;
-    //    Joints joints = null;
-
-    //    MotionType motionType = MotionType.None;
-
-    //    // For the time being, constrain motion settings to integers. 
-    //    /// -1 as 'unset' flag.
-    //    int velocity = -1;   
-    //    int zone = -1; 
-
-    //    /// <summary>
-    //    /// Base constructor for Work/Cartesian space movements.
-    //    /// </summary>
-    //    /// <param name="trans"></param>
-    //    /// <param name="relTrans"></param>
-    //    /// <param name="rot"></param>
-    //    /// <param name="relRot"></param>
-    //    /// <param name="mType"></param>
-    //    internal Action(Point trans, bool relTrans, Rotation rot, bool relRot, int vel, int zon, MotionType mType)
-    //    {
-    //        // @TODO: check if mType != MotionType.Joints?
-
-    //        translation = trans;
-    //        relativeTranslation = relTrans;
-
-    //        rotation = rot;
-    //        relativeRotation = relRot;
-
-    //        velocity = vel;
-    //        zone = zon;
-
-    //        motionType = mType;
-    //    }
-
-    //    /// <summary>
-    //    /// Itemized overload.
-    //    /// </summary>
-    //    /// <param name="x"></param>
-    //    /// <param name="y"></param>
-    //    /// <param name="z"></param>
-    //    /// <param name="relTrans"></param>
-    //    /// <param name="q1"></param>
-    //    /// <param name="q2"></param>
-    //    /// <param name="q3"></param>
-    //    /// <param name="q4"></param>
-    //    /// <param name="relRot"></param>
-    //    /// <param name="mType"></param>
-    //    Action(double x, double y, double z, bool relTrans, double q1, double q2, double q3, double q4, bool relRot, int vel, int zon, MotionType mType) :
-    //        this(new Point(x, y, z), relTrans, new Rotation(q1, q2, q3, q4), relRot, vel, zon, mType) {  }
-
-    //    /// <summary>
-    //    /// Base constructor for Joints/Configuration space movements.
-    //    /// </summary>
-    //    /// <param name="jointConfiguration"></param>
-    //    /// <param name="relJoints"></param>
-    //    /// <param name="mType"></param>
-    //    Action(Joints jointConfiguration, bool relJoints, int vel, int zon, MotionType mType)
-    //    {
-    //        // @TODO: check if mType == MotionType.Joints?
-
-    //        joints = jointConfiguration;
-    //        relativeJoints = relJoints;
-
-    //        velocity = vel;
-    //        zone = zon;
-
-    //        motionType = mType;
-    //    }
-
-    //    /// <summary>
-    //    /// Itemized overload.
-    //    /// </summary>
-    //    /// <param name="j1"></param>
-    //    /// <param name="j2"></param>
-    //    /// <param name="j3"></param>
-    //    /// <param name="j4"></param>
-    //    /// <param name="j5"></param>
-    //    /// <param name="j6"></param>
-    //    /// <param name="relJoints"></param>
-    //    /// <param name="mType"></param>
-    //    Action(double j1, double j2, double j3, double j4, double j5, double j6, bool relJoints, int vel, int zon, MotionType mType) :
-    //        this(new Joints(j1, j2, j3, j4, j5, j6), relJoints, vel, zon, mType) {  }
-
-
-    //    public override string ToString()
-    //    {
-    //        if (motionType == MotionType.Joints)
-    //            return string.Format("ACTION: {0} {1}-{2} {3}\\{4}", motionType, relativeJoints, joints, velocity, zone);
-
-    //        return string.Format("ACTION: {0} {1}-{2} {3}-{4} {5}\\6}", motionType, relativeTranslation, translation, relativeRotation, rotation, velocity, zone);
-    //    }
-    //}
-
+    }
 
 }

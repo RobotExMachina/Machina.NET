@@ -47,8 +47,12 @@ namespace TEST_NewAPITests
             //TestCircleTransformLocal(arm, 10);
             //TestCircleTransformGlobal(arm, 10);
 
-            // Snake
-            TestSnake(arm);
+            //// Snake
+            //TestSnake(arm);
+
+            // Joint movements
+            TestJointMovementRange(arm);
+            TestRandomJointMovements(arm);
 
 
             arm.DebugBuffer();  // read all pending buffered actions
@@ -495,5 +499,61 @@ namespace TEST_NewAPITests
             arm.SetVelocity(100);
             arm.TransformTo(home, homeXYZ);
         }
+
+        // DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF
+        public static void TestJointMovementRange(Robot arm)
+        {
+            Console.WriteLine("WARNING: DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF");
+
+            // Reset
+            arm.SetVelocity(500);
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+
+            // Go from lower to higher configuration space (ABB IRB120)
+            arm.JointsTo(-164, -109, -109, -159, -119, -399);
+            arm.JointsTo(164, 109, 69, 159, 119, 399);
+
+            // Now sweep all spectrum for each joint
+            arm.JointsTo(-164, -109, -109, -159, -119, -399);
+            arm.Joints(328, 0, 0, 0, 0, 0);
+            arm.Joints(0, 218, 0, 0, 0, 0);
+            arm.Joints(0, 0, 178, 0, 0, 0);
+            arm.Joints(0, 0, 0, 318, 0, 0);
+            arm.Joints(0, 0, 0, 0, 238, 0);
+            arm.Joints(0, 0, 0, 0, 0, 798);
+
+            // Back home
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+        }
+
+        // DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF
+        public static void TestRandomJointMovements(Robot arm)
+        {
+            Console.WriteLine("WARNING: DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF");
+         
+            // Reset
+            arm.SetVelocity(300);
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+
+            // DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF
+            Random rnd = new Random();
+            for (var i = 0; i < 10; i++)
+            {
+                arm.JointsTo(
+                    rnd.Next(-164, 164),
+                    rnd.Next(-109, 109),
+                    rnd.Next(-109, 69),
+                    rnd.Next(-159, 159),
+                    rnd.Next(-119, 119),
+                    rnd.Next(-399, 399));
+            }
+
+            // Back home
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+        }
+
+
+
+
     }
 }
