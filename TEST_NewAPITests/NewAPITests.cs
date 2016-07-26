@@ -46,6 +46,7 @@ namespace TEST_NewAPITests
             //TestCircleTransformAbsolute(arm, 50);
             //TestCircleTransformLocal(arm, 10);
             //TestCircleTransformGlobal(arm, 10);
+            TestZTableLimitations(arm);
 
             //// Snake
             //TestSnake(arm);
@@ -54,8 +55,8 @@ namespace TEST_NewAPITests
             //TestJointMovementRange(arm);
             //TestRandomJointMovements(arm);
 
-            // Absolute vs relative movement buffers
-            TestChangesInMovementModes(arm);
+            //// Absolute vs relative movement buffers
+            //TestChangesInMovementModes(arm);
 
 
             arm.DebugBuffer();  // read all pending buffered actions
@@ -478,6 +479,28 @@ namespace TEST_NewAPITests
             arm.SetVelocity(100);
             arm.TransformTo(home, homeXYZ);
 
+        }
+
+        static public void TestZTableLimitations(Robot arm)
+        {
+            // Reset
+            Point home = new Point(300, 0, 500);
+            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            Rotation noRot = new Rotation();
+
+            arm.SetVelocity(100);
+            arm.TransformTo(home, homeXYZ);
+
+            // Bring close to limit (100 by default)
+            arm.TransformTo(new Point(300, 0, 101), homeXYZ);
+
+            // Try to go trough (should not work)
+            arm.TransformTo(new Point(300, 0, 99), homeXYZ);
+            arm.TransformLocal(new Point(0, 0, 2), noRot);
+            arm.TransformGlobal(new Point(0, 0, -2), noRot);
+
+            // Back home
+            arm.TransformTo(home, homeXYZ);
         }
 
 
