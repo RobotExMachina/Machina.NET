@@ -50,9 +50,12 @@ namespace TEST_NewAPITests
             //// Snake
             //TestSnake(arm);
 
-            // Joint movements
-            TestJointMovementRange(arm);
-            TestRandomJointMovements(arm);
+            //// Joint movements
+            //TestJointMovementRange(arm);
+            //TestRandomJointMovements(arm);
+
+            // Absolute vs relative movement buffers
+            TestChangesInMovementModes(arm);
 
 
             arm.DebugBuffer();  // read all pending buffered actions
@@ -549,6 +552,48 @@ namespace TEST_NewAPITests
             }
 
             // Back home
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+        }
+
+        public static void TestChangesInMovementModes(Robot arm)
+        {
+            // Go home
+            arm.SetVelocity(100);
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+
+            // Issue an absolute RT movement (should work)
+            arm.TransformTo(new Point(200, 200, 200), Rotation.FlippedAroundY);
+
+            // Issue a relative one (should work)
+            arm.TransformGlobal(new Point(50, 0, 0), new Rotation(Point.XAxis, 45));
+
+            // Issue a relative Joints one (SHOULDN'T WORK)
+            arm.Joints(-45, 0, 0, 0, 0, 0);
+
+            // Issue abs joints (should work)
+            arm.JointsTo(45, 0, 0, 0, 90, 0);
+
+            // Issue rel Joints (should work)
+            arm.Joints(30, 0, 0, 0, 0, 0);
+
+            // Issue a bunch of relative ones (NONE SHOULD WORK)
+            arm.MoveLocal(100, 0, 0);
+            arm.MoveGlobal(100, 0, 0);
+            arm.RotateLocal(Point.XAxis, 45);
+            arm.RotateGlobal(Point.XAxis, 45);
+            arm.TransformLocal(new Point(100, 0, 0), new Rotation(Point.XAxis, 45));
+            arm.TransformLocal(new Rotation(Point.XAxis, 45), new Point(100, 0, 0));
+            arm.TransformGlobal(new Point(100, 0, 0), new Rotation(Point.XAxis, 45));
+            arm.TransformGlobal(new Rotation(Point.XAxis, 45), new Point(100, 0, 0));
+
+            // Rel joints (should work)
+            arm.Joints(0, 30, 0, 0, 0, 0);
+
+            // Issue absolute movement (SHOULD NOT WORK)
+            arm.MoveTo(400, 0, 200);                // missing rotation information
+            arm.RotateTo(Rotation.FlippedAroundY);  // missing point information
+
+            // Back home (should work)
             arm.JointsTo(0, 0, 0, 0, 90, 0);
         }
 

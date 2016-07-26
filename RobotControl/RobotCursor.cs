@@ -117,6 +117,13 @@ namespace RobotControl
 
             if (action.relativeTranslation)
             {
+                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null || rotation == null)
+                {
+                    Console.WriteLine("Sorry, must provide absolute position values first before applying relative ones...");
+                    return false;
+                }
+
                 if (action.worldTranslation)
                 {
                     newPosition = position + action.translation;
@@ -129,6 +136,13 @@ namespace RobotControl
             }
             else
             {
+                // Fail if issued abs movement without prior rotation info. (This limitation is due to current lack of FK/IK solvers)
+                if (rotation == null)
+                {
+                    Console.WriteLine("Sorry, currently missing TCP orientation to work with...");
+                    return false;
+                }
+
                 newPosition.Set(action.translation);
             }
 
@@ -171,6 +185,13 @@ namespace RobotControl
             // @TODO: implement some kind of security check here...
             if (action.relativeRotation)
             {
+                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null || rotation == null)
+                {
+                    Console.WriteLine("Sorry, must provide absolute rotation values first before applying relative ones...");
+                    return false;
+                }
+
                 if (action.worldRotation)
                 {
                     rotation.PreMultiply(action.rotation);
@@ -182,7 +203,14 @@ namespace RobotControl
             }
             else
             {
-                rotation.Set(action.rotation);
+                // Fail if issued abs rotation without prior position info. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null)
+                {
+                    Console.WriteLine("Sorry, currently missing TCP position to work with...");
+                    return false;
+                }
+
+                rotation = new Rotation(action.rotation);
             }
 
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
@@ -202,6 +230,13 @@ namespace RobotControl
 
             if (action.relativeTranslation)
             {
+                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null || rotation == null)
+                {
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    return false;
+                }
+
                 if (action.worldTranslation)
                 {
                     newPos = position + action.translation;
@@ -234,11 +269,16 @@ namespace RobotControl
                 }
             }
 
-            position = newPos;
-
             // @TODO: implement some kind of security check here...
             if (action.relativeRotation)
             {
+                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null || rotation == null)
+                {
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    return false;
+                }
+
                 if (action.worldRotation)
                 {
                     rotation.PreMultiply(action.rotation);
@@ -250,9 +290,11 @@ namespace RobotControl
             }
             else
             {
-                rotation.Set(action.rotation);
+                //rotation.Set(action.rotation);
+                rotation = new Rotation(action.rotation);
             }
 
+            position = newPos;
             joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
@@ -267,9 +309,16 @@ namespace RobotControl
         public override bool ApplyAction(ActionRotationAndTranslation action)
         {
             // @TODO: implement some kind of security check here...
-            Rotation newRot = new Rotation();
+            Rotation newRot;
             if (action.relativeRotation)
             {
+                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null || rotation == null)
+                {
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    return false;
+                }
+
                 if (action.worldRotation)
                 {
                     //rotation.PreMultiply(action.rotation);
@@ -283,12 +332,20 @@ namespace RobotControl
             }
             else
             {
-                newRot.Set(action.rotation);
+                //newRot.Set(action.rotation);
+                newRot = new Rotation(action.rotation);
             }
 
-            Point newPos = new Point();
+            Point newPos;
             if (action.relativeTranslation)
             {
+                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null || rotation == null)
+                {
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    return false;
+                }
+
                 if (action.worldTranslation)
                 {
                     newPos = position + action.translation;
@@ -301,7 +358,8 @@ namespace RobotControl
             }
             else
             {
-                newPos.Set(action.translation);
+                //newPos.Set(action.translation);
+                newPos = new Point(action.translation);
             }
 
             // @TODO: this must be more programmatically implemented 
@@ -336,24 +394,24 @@ namespace RobotControl
 
         public override bool ApplyAction(ActionJoints action)
         {
-            // If user issued a relative action, make sure there are absolute values to work with. 
-            // (This limitation is due to current lack of FK/IK solvers)
-            if (action.relativeJoints && joints == null)  // could also check for motionType == MotionType.Joints
-            {
-                Console.WriteLine("Sorry, must provide absolute Joints values first before applying relative ones...");
-                return false;
-            }
-
+            
             // @TODO: implement joint limits checks and general safety...
 
             // Modify current Joints
             if (action.relativeJoints)
             {
+                // If user issued a relative action, make sure there are absolute values to work with. 
+                // (This limitation is due to current lack of FK/IK solvers)
+                if (joints == null)  // could also check for motionType == MotionType.Joints
+                {
+                    Console.WriteLine("Sorry, must provide absolute Joints values first before applying relative ones...");
+                    return false;
+                }
                 joints.Add(action.joints);
             }
             else
             {
-                joints = new Joints(action.joints);
+                joints = new Joints(action.joints);  // create a new object since it was probably null
             }
 
             // Flag the lack of other geometric data
