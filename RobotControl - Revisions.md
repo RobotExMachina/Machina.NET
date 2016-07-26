@@ -24,12 +24,12 @@
 
 ## BUILD 1110
 - [ ] Rewrite program generation to accept non-movement actions (or even the ones that don't apply at all)
-- [ ] .Message(string) action ;)
+- [ ] .Message(string) action ;) (will be a good test for program generation with non-movement actions)
 
 ## BUILD 1109
 - [x] Add .Joints() and .JointsTo() actions
 - [x] Refine Actions checks on first type issued as absolute... 
-- [ ] Test Z table limitations with RT + TR transformations
+- [x] Test Z table limitations with RT + TR transformations
 
 ## BUILD 1108
 - [x] Port Util methods as static to their appropriate geometry class 
