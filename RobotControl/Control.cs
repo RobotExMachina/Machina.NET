@@ -444,29 +444,54 @@ namespace RobotControl
         //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
         //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
         //   
+        
+        /// <summary>
+        /// Gets current speed setting.
+        /// </summary>
+        /// <returns></returns>
+        public int GetCurrentSpeedSetting()
+        {
+            // @TODO: will need to decide if this returns the current virtual, write or motion speed
+            return currentSettings.Speed;
+        }
+            
         /// <summary>
         /// Sets the speed parameter for future issued actions.
         /// </summary>
         /// <param name="speed">In mm/s</param>
-        public void SetCurrentSpeed(int speed)
+        public void SetCurrentSpeedSetting(int speed)
         {
             currentSettings.Speed = speed;
+        }
+
+        /// <summary>
+        /// Gets current zone setting.
+        /// </summary>
+        /// <returns></returns>
+        public int GetCurrentZoneSetting()
+        {
+            return currentSettings.Zone;
         }
 
         /// <summary>
         /// Sets the approximation corner radius for future issued actions.
         /// </summary>
         /// <param name="zone">In mm.</param>
-        public void SetCurrentZone(int zone)
+        public void SetCurrentZoneSetting(int zone)
         {
             currentSettings.Zone = zone;
+        }
+
+        public MotionType GetCurrentMotionTypeSetting()
+        {
+            return currentSettings.MotionType;
         }
 
         /// <summary>
         /// Sets the motion type (linear, joint...) for future issued actions.
         /// </summary>
         /// <param name="type"></param>
-        public void SetCurrentMotionType(MotionType type)
+        public void SetCurrentMotionTypeSetting(MotionType type)
         {
             currentSettings.MotionType = type;
         }
@@ -909,7 +934,7 @@ namespace RobotControl
                 }
             }
 
-            ActionJoints act = new ActionJoints(joints, relJnts, speed, zone, MotionType.Joints);
+            ActionJoints act = new ActionJoints(joints, relJnts, speed, zone);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (virtualCursor.ApplyAction(act))
             {

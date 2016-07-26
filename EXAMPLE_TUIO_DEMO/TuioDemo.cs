@@ -427,8 +427,8 @@ public class TuioDemo : Form , TuioListener
         //Console.WriteLine(arm.GetCurrentOrientation());
         //Console.WriteLine(arm.GetCurrentJoints());
 
-        arm.SetVelocity(velocity);
-        arm.SetZone(zone);
+        arm.Speed(velocity);
+        arm.Zone(zone);
 
         if (cMode == ControlMode.Execute)
         {

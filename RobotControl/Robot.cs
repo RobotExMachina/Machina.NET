@@ -304,39 +304,63 @@ namespace RobotControl
         //  ╚════██║██╔══╝     ██║      ██║   ██║██║╚██╗██║██║   ██║╚════██║
         //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
         //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
-        //                                                                  
+        //           
+        
+        /// <summary>
+        /// Gets the current speed setting.
+        /// </summary>
+        /// <returns></returns>
+        public int Speed()
+        {
+            return c.GetCurrentSpeedSetting();
+        }   
+                                                            
         /// <summary>
         /// Sets the default velocity new actions will be run at.
         /// </summary>
-        /// <param name="vel"></param>
-        public void SetVelocity(int vel)
+        /// <param name="speed"></param>
+        public void Speed(int speed)
         {
-            c.SetCurrentSpeed(vel);
+            c.SetCurrentSpeedSetting(speed);
+        }
+
+        public int Zone()
+        {
+            return c.GetCurrentZoneSetting();
         }
 
         /// <summary>
         /// Sets the default zone value new actions will be given.
         /// </summary>
         /// <param name="zone"></param>
-        public void SetZone(int zone)
+        public void Zone(int zone)
         {
-            c.SetCurrentZone(zone);
+            c.SetCurrentZoneSetting(zone);
+        }
+
+        /// <summary>
+        /// Gets the current MotionType setting.
+        /// </summary>
+        /// <returns></returns>
+        public MotionType Motion()
+        {
+            return c.GetCurrentMotionTypeSetting();
         }
 
         /// <summary>
         /// Sets the motion type (linear, joint...) for future issued actions.
         /// </summary>
         /// <param name="type"></param>
-        public void SetMotionType(MotionType type)
+        public void Motion(MotionType type)
         {
-            c.SetCurrentMotionType(type);
+            c.SetCurrentMotionTypeSetting(type);
         }
 
         /// <summary>
         /// Sets the motion type (linear, joint...) for future issued actions.
         /// </summary>
         /// <param name="type">"linear", "joint" or "joints"</param>
-        public void SetMotionType(string type)
+        public void Motion(string type)
         {
             MotionType t = MotionType.Undefined;
             type = type.ToLower();
@@ -347,10 +371,6 @@ namespace RobotControl
             {
                 t = MotionType.Joint;
             }
-            else if (type.Equals("joints"))
-            {
-                t = MotionType.Joints;
-            }
 
             if (t == MotionType.Undefined)
             {
@@ -358,7 +378,7 @@ namespace RobotControl
                 return;
             }
 
-            SetMotionType(t);
+            Motion(t);
         }
 
         /// <summary>

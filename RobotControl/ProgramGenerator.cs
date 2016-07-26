@@ -104,27 +104,53 @@ namespace RobotControl
             0, 1, 5, 10, 15, 20, 30, 40, 50, 60, 80, 100, 150, 200 
         };
 
-        /// <summary>
-        /// ABB's correspondance of MotionTypes to datatypes.
-        /// </summary>
-        private static Dictionary<MotionType, string> MotionData = new Dictionary<MotionType, string>()
-        {
-            { MotionType.Linear, "robtarget" },
-            { MotionType.Joint, "robtarget" },
-            { MotionType.Joints, "jointtarget" }
-        };
+        ///// <summary>
+        ///// ABB's correspondance of MotionTypes to datatypes.
+        ///// </summary>
+        //private static Dictionary<MotionType, string> MotionData = new Dictionary<MotionType, string>()
+        //{
+        //    { MotionType.Linear, "robtarget" },
+        //    { MotionType.Joint, "robtarget" },
+        //    { MotionType.Joints, "jointtarget" }
+        //};
 
-        /// <summary>
-        /// ABB's correspondance of MotionTypes to instructions.
-        /// </summary>
-        private static Dictionary<MotionType, string> MotionInstructions = new Dictionary<MotionType, string>()
-        {
-            { MotionType.Linear, "MOVEL" },
-            { MotionType.Joint, "MOVEJ" },
-            { MotionType.Joints, "MoveAbsJ" }
-        };
+        ///// <summary>
+        ///// ABB's correspondance of ActionTypes to datatypes.
+        ///// </summary>
+        //private static Dictionary<ActionType, string> ActionData = new Dictionary<ActionType, string>()
+        //{
+        //    { ActionType.Translation, "robtarget" },
+        //    { ActionType.Rotation, "robtarget" },
+        //    { ActionType.TranslationAndRotation, "robtarget" },
+        //    { ActionType.RotationAndTranslation, "robtarget" },
+        //    { ActionType.Joints, "jointtarget" },
+        //    { ActionType.Message, null },
+        //    { ActionType.Wait, null },
+        //};
+
+        ///// <summary>
+        ///// ABB's correspondance of MotionTypes to instructions.
+        ///// </summary>
+        //private static Dictionary<MotionType, string> ActionInstructions = new Dictionary<MotionType, string>()
+        //{
+        //    { MotionType.Linear, "MOVEL" },
+        //    { MotionType.Joint, "MOVEJ" },
+        //    { MotionType.Joints, "MoveAbsJ" }
+        //};
+
+        //static private Dictionary<ActionType, string> ActionInstructions = new Dictionary<ActionType, string>()
+        //{
+        //    { ActionType.Translation, "MOVEL" },
+        //    { ActionType.Rotation, "MOVEL" },
+        //    { ActionType.TranslationAndRotation, "MOVEL" },
+        //    { ActionType.RotationAndTranslation, "MOVEL" },
+        //    { ActionType.Joints, "MoveAbsJ" },
+        //    { ActionType.Message, "TPWrite" },
+        //    { ActionType.Wait, null },
+        //}
 
 
+        
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
@@ -191,18 +217,16 @@ namespace RobotControl
             // TARGET DECLARATIONS
             // Use the write robot pointer to generate instructions
             int it = 0;
+            string line = null;
             foreach (Action a in actions)
             {
                 writer.ApplyAction(a);
 
-                // Transform and Joints actions. @TODO: be more programmatic here...
-                if (a.type >= ActionType.Translation && a.type <= ActionType.Joints)
-                {
-                    module.Add(string.Format("  CONST {2} target{0}:={1};",
-                    it++,
-                    writer.GetUNSAFETargetDeclaration(a),
-                    MotionData[a.motionType]));
-                }
+                if (GenerateVariableDeclaration(a, writer, it++, out line))  // there will be a number jump on target-less instructions, but oh well...
+                {   
+                    module.Add(line);
+                };
+                
             }
             module.Add("");
 
@@ -211,27 +235,15 @@ namespace RobotControl
             module.Add(@"    ConfJ \Off;");
             module.Add(@"    ConfL \Off;");
             it = 0;
+            line = null;
             foreach (Action a in actions)
             {
-                // Transform and Joints actions. @TODO: be MUCH more programmatic here...
-                if (a.type >= ActionType.Translation && a.type <= ActionType.Joints)
+                writer.ApplyAction(a);
+
+                if (GenerateInstructionDeclaration(a, writer, it++, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
                 {
-                    module.Add(string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
-                    MotionInstructions[a.motionType],
-                    it++,
-                    velNames[a.speed],
-                    zoneNames[a.zone]
-                    ));
-                }
-                else if (a.type == ActionType.Message)
-                {
-                    module.Add(string.Format("    TPWrite \"{0}\";", a.message));
-                }
-                else if (a.type == ActionType.Wait)
-                {
-                    // May have to modify last move instruction to zonedata fine (Rapid manual p.696)
-                    module.Add(string.Format("    WaitTime {0};", 0.001 * a.waitMillis));
-                }
+                    module.Add(line);
+                };
             }
             module.Add("  ENDPROC");
             module.Add("");
@@ -265,6 +277,67 @@ namespace RobotControl
             double high = 1.5 * zone;
             double low = 0.15 * zone;
             return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
+        }
+
+
+        static private bool GenerateVariableDeclaration(Action action, RobotCursorABB cursor, int id, out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.TranslationAndRotation:
+                case ActionType.RotationAndTranslation:
+                    dec = string.Format("  CONST robtarget target{0}:={1};", id, cursor.GetUNSAFERobTargetDeclaration());
+                    break;
+
+                case ActionType.Joints:
+                    dec = string.Format("  CONST jointtarget target{0}:={1};", id, cursor.GetJointTargetDeclaration());
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
+        }
+
+        static private bool GenerateInstructionDeclaration(
+            Action action, RobotCursorABB cursor, int id, 
+            Dictionary<int, string> velNames, Dictionary<int, string> zoneNames, 
+            out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.TranslationAndRotation:
+                case ActionType.RotationAndTranslation:
+                    dec = string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
+                        action.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
+                        id,
+                        velNames[action.speed],
+                        zoneNames[action.zone]);
+                    break;
+
+                case ActionType.Joints:
+                    dec = string.Format("    MoveAbsJ target{0},{1},{2},Tool0\\WObj:=WObj0;",
+                        id,
+                        velNames[action.speed],
+                        zoneNames[action.zone]);
+                    break;
+
+                case ActionType.Message:
+                    dec = string.Format("    TPWrite \"{0}\";", action.message);
+                    break;
+
+                case ActionType.Wait:
+                    dec = string.Format("    WaitTime {0};", 0.001 * action.waitMillis);
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
         }
 
     }

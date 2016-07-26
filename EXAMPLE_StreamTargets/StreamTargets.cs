@@ -25,42 +25,42 @@ namespace EXAMPLE_StreamTargets2
             arm.Start();
 
             // Set some properties from here on
-            arm.SetVelocity(traceSpeed);    // in mm/s
-            arm.SetZone(20);                // in mm
+            arm.Speed(traceSpeed);    // in mm/s
+            arm.Zone(20);                // in mm
 
             // A set of horizontal squares
             //arm.MoveTo("home");             // a 'bookmarked' target
             arm.MoveTo(300, 0, 500);
 
-            arm.SetVelocity(leadSpeed);
+            arm.Speed(leadSpeed);
             arm.MoveTo(250, 250, 250);      // absolute movement
-            arm.SetVelocity(traceSpeed);
+            arm.Speed(traceSpeed);
             arm.MoveGlobal(50, 0, 0);             // relative movement
             arm.MoveGlobal(0, 50, 0);
             arm.MoveGlobal(-50, 0, 0);
 
-            arm.SetVelocity(leadSpeed);
+            arm.Speed(leadSpeed);
             arm.MoveGlobal(0, -50, 50);
-            arm.SetVelocity(traceSpeed);
+            arm.Speed(traceSpeed);
             arm.MoveGlobal(50, 0, 0);
             arm.MoveGlobal(0, 50, 0);
             arm.MoveGlobal(-50, 0, 0);
 
-            arm.SetVelocity(leadSpeed);
+            arm.Speed(leadSpeed);
             arm.MoveGlobal(0, -50, 50);
-            arm.SetVelocity(traceSpeed);
+            arm.Speed(traceSpeed);
             arm.MoveGlobal(50, 0, 0);
             arm.MoveGlobal(0, 50, 0);
             arm.MoveGlobal(-50, 0, 0);
 
-            arm.SetVelocity(leadSpeed);
+            arm.Speed(leadSpeed);
             arm.MoveGlobal(0, -50, 50);
-            arm.SetVelocity(traceSpeed);
+            arm.Speed(traceSpeed);
             arm.MoveGlobal(50, 0, 0);
             arm.MoveGlobal(0, 50, 0);
             arm.MoveGlobal(-50, 0, 0);
 
-            arm.SetVelocity(leadSpeed);
+            arm.Speed(leadSpeed);
             //arm.MoveTo("home");
             arm.MoveTo(300, 0, 500);
 

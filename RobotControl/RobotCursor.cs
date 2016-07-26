@@ -461,23 +461,18 @@ namespace RobotControl
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <returns></returns>
-        public string GetUNSAFETargetDeclaration(Action a)
+        public string GetUNSAFERobTargetDeclaration()
         {
-            if (a.motionType == MotionType.Joints)
-            {
-                return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]",
-                                joints
-                            );
-            }
-            else
-            {
-                return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]",
-                                position,
-                                rotation
-                            );
-            }
-            
+            return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
         }
+
+        public string GetJointTargetDeclaration()
+        {
+            return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", joints);
+        }
+        
+
+
 
         public override string ToString()
         {

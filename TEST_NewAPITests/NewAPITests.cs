@@ -41,10 +41,10 @@ namespace TEST_NewAPITests
             //// Generative circle movement
             //TestCircle(arm);
 
-            // Transformations
+            //// Transformations
             //TransformTests(arm);
             //TestCircleTransformAbsolute(arm, 50);
-            //TestCircleTransformLocal(arm, 10);
+            //TestCircleTransformLocal(arm, 10); 
             //TestCircleTransformGlobal(arm, 10);
             //TestZTableLimitations(arm);
 
@@ -55,11 +55,11 @@ namespace TEST_NewAPITests
             //TestJointMovementRange(arm);
             //TestRandomJointMovements(arm);
 
-            //// Absolute vs relative movement buffers
-            //TestChangesInMovementModes(arm);
-
-            // Wait and Message
-            TestWaitAndMessage(arm);
+            // Absolute vs relative movement buffers
+            TestChangesInMovementModes(arm);  
+             
+            //// Wait and Message
+            //TestWaitAndMessage(arm);  
 
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -77,35 +77,35 @@ namespace TEST_NewAPITests
 
         static public void TracePlanarRectangle(Robot arm)
         {
-            arm.SetVelocity(200);
-            arm.SetZone(20);
+            arm.Speed(200); 
+            arm.Zone(20);
             arm.MoveTo(300, 300, 300);
 
-            arm.SetVelocity(50);
-            arm.SetZone(2);  // non predef zone
+            arm.Speed(50);
+            arm.Zone(2);  // non predef zone
             arm.MoveGlobal(50, 0, 0);
             arm.MoveGlobal(0, 50, 0);
             arm.MoveGlobal(-50, 0, 0);
             arm.MoveGlobal(0, -50, 50);
 
-            arm.SetVelocity(500);
-            arm.SetZone(10);
+            arm.Speed(500);
+            arm.Zone(10);
             arm.MoveTo(300, 0, 500);
         }
 
 
         static public void TraceYLine(Robot arm, bool jointMovement)
         {
-            if (jointMovement) arm.SetMotionType("joint");
+            if (jointMovement) arm.Motion("joint");
 
-            arm.SetVelocity(100);
-            arm.SetZone(1);
+            arm.Speed(100);
+            arm.Zone(1);
             arm.MoveTo(300, 0, 600);
             arm.MoveTo(200, -200, 400);
             arm.MoveGlobal(0, 378, 0);
             arm.MoveTo(300, 0, 600);
 
-            if (jointMovement) arm.SetMotionType("linear");  // back to where it was... this will improve with arm.PushSettings(); 
+            if (jointMovement) arm.Motion("linear");  // back to where it was... this will improve with arm.PushSettings(); 
         }
 
         static public void ApproachBaseXYPlane(Robot arm, double height, double zStep)
@@ -127,13 +127,13 @@ namespace TEST_NewAPITests
         {
             arm.PushSettings();
 
-            arm.SetVelocity(222);
+            arm.Speed(222);
             arm.PushSettings();
 
-            arm.SetZone(4);
+            arm.Zone(4);
             arm.PushSettings();
 
-            arm.SetMotionType("joint");
+            arm.Motion("joint");
             arm.PushSettings();
 
             arm.MoveTo(300, 300, 300);
@@ -152,14 +152,14 @@ namespace TEST_NewAPITests
 
         public static void RotationTests(Robot arm)
         {
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
 
             // Move to a more dexterous area
             arm.MoveTo(300, -100, 400);
 
             // Velocity is expresses in both mm/s and °/s
-            arm.SetVelocity(45);
+            arm.Speed(45);
 
             arm.RotateTo(0, 1, 0, 1, 0, 0);     // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
             arm.RotateTo(0, 0, 1, 1, 0, 0);     // 'rotate 90° around global X'
@@ -168,7 +168,7 @@ namespace TEST_NewAPITests
             //arm.RotateTo(0, 0, 1, 0);  // revert back to base flipped Z
             arm.RotateTo(1, 0, 0, 0, -1, 0);
 
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
         }
 
@@ -206,20 +206,20 @@ namespace TEST_NewAPITests
             double val45 = rx45.RotationAngle();
             double val90 = rx90.RotationAngle();
 
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
 
             // Move to a more dexterous area
             arm.MoveTo(300, -100, 400);
 
             // Velocity is expresses in both mm/s and °/s
-            arm.SetVelocity(45);
+            arm.Speed(45);
 
             arm.RotateTo(ry180);
 
             arm.RotateTo(r5);
 
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
         }
 
@@ -244,7 +244,7 @@ namespace TEST_NewAPITests
             Rotation zn90 = new Rotation(new Point(0, 0, 1), -90);
 
             // Reset
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
@@ -252,7 +252,7 @@ namespace TEST_NewAPITests
             arm.MoveTo(300, 100, 400);
 
             // Make the TCP face the user
-            arm.SetVelocity(30);
+            arm.Speed(30);
             arm.RotateTo(0, 0, -1, 0, 1, 0);
 
             //// Rotate it around its local Z (joint 6)
@@ -272,7 +272,7 @@ namespace TEST_NewAPITests
             }
 
             // Back home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
             arm.MoveTo(300, 0, 500);
 
@@ -281,11 +281,11 @@ namespace TEST_NewAPITests
         public static void MovementTest(Robot arm)
         {
             // Reset
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
-            arm.SetVelocity(25);
+            arm.Speed(25);
 
             // Rotate TCP
             arm.RotateLocal(Point.XAxis, 45);
@@ -303,7 +303,7 @@ namespace TEST_NewAPITests
             arm.MoveLocal(-50, -50, -50);
 
             // Back home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
         }
@@ -311,7 +311,7 @@ namespace TEST_NewAPITests
         public static void TestCircle(Robot arm)
         {
             // Reset
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
@@ -325,7 +325,7 @@ namespace TEST_NewAPITests
             }
 
             // Back home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
         }
@@ -336,11 +336,11 @@ namespace TEST_NewAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
 
             arm.MoveGlobal(150, 0, -100);
-            arm.SetVelocity(25);
+            arm.Speed(25);
 
             Rotation z30 = new Rotation(Point.ZAxis, 30);
 
@@ -358,7 +358,7 @@ namespace TEST_NewAPITests
             arm.TransformGlobal(Rotation.Conjugate(z30), -50 * Point.XAxis);
 
             // Back home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
         }
 
@@ -368,7 +368,7 @@ namespace TEST_NewAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
 
             double x = 450;
@@ -408,7 +408,7 @@ namespace TEST_NewAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
 
             double x = 450;
@@ -434,7 +434,7 @@ namespace TEST_NewAPITests
             }
 
             // Back home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
         }
 
@@ -443,7 +443,7 @@ namespace TEST_NewAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
 
             double x = 450;
@@ -478,7 +478,7 @@ namespace TEST_NewAPITests
             }
 
             // Back home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
 
         }
@@ -490,7 +490,7 @@ namespace TEST_NewAPITests
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
             Rotation noRot = new Rotation();
 
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
 
             // Bring close to limit (100 by default)
@@ -511,12 +511,12 @@ namespace TEST_NewAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
             
             arm.MoveTo(300, -300, 250);
 
-            arm.SetVelocity(200);
+            arm.Speed(200);
             for (int i = 0; i < 100; i++)
             {
                 Rotation rz = new Rotation(Point.ZAxis, 15 * Math.Cos(2.0 * Math.PI * i / 25.0));
@@ -524,7 +524,7 @@ namespace TEST_NewAPITests
             }
 
             // Back home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
         }
 
@@ -534,7 +534,7 @@ namespace TEST_NewAPITests
             Console.WriteLine("WARNING: DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF");
 
             // Reset
-            arm.SetVelocity(500);
+            arm.Speed(500);
             arm.JointsTo(0, 0, 0, 0, 90, 0);
 
             // Go from lower to higher configuration space (ABB IRB120)
@@ -560,7 +560,7 @@ namespace TEST_NewAPITests
             Console.WriteLine("WARNING: DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF");
          
             // Reset
-            arm.SetVelocity(300);
+            arm.Speed(300);
             arm.JointsTo(0, 0, 0, 0, 90, 0);
 
             // DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF
@@ -583,7 +583,7 @@ namespace TEST_NewAPITests
         public static void TestChangesInMovementModes(Robot arm)
         {
             // Go home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.JointsTo(0, 0, 0, 0, 90, 0);
 
             // Issue an absolute RT movement (should work)
@@ -625,7 +625,7 @@ namespace TEST_NewAPITests
         static public void TestWaitAndMessage(Robot arm)
         {
             // Go home
-            arm.SetVelocity(100);
+            arm.Speed(100);
             arm.Message("Going home");
             arm.MoveTo(300, 0, 500);
 

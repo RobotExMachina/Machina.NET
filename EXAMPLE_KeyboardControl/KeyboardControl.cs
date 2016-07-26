@@ -32,12 +32,12 @@ namespace EXAMPLE_KeyboardControl
             arm.Start();
 
             // Move to the positive XYZ octant
-            arm.SetVelocity(leadSpeed);
-            arm.SetZone(2);
+            arm.Speed(leadSpeed);
+            arm.Zone(2);
             //arm.RotateTo(Rotation.FlippedAroundY);
             //arm.MoveTo(250, 250, 250);
 
-            arm.SetVelocity(moveSpeed);
+            arm.Speed(moveSpeed);
 
             while (input)
             {

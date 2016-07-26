@@ -63,8 +63,8 @@ namespace EXAMPLE_XBOX1Control
             arm.Connect();
 
             arm.Start();
-            arm.SetVelocity(relSpeed);
-            arm.SetZone(2);
+            arm.Speed(relSpeed);
+            arm.Zone(2);
             //arm.RotateTo(RobotControl.Rotation.FlippedAroundY);
             //arm.MoveTo(200, 200, 200);
 
