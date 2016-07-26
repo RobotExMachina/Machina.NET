@@ -950,7 +950,40 @@ namespace RobotControl
             }
 
             ActionMessage act = new ActionMessage(message);
+            if (virtualCursor.ApplyAction(act))
+            {
+                actionBuffer.Add(act);
+                return true;
+            }
+            return false;
+        }
 
+        public bool IssueWaitRequest(long millis)
+        {
+            if (!areCursorsInitialized)
+            {
+                if (controlMode == ControlMode.Offline)
+                {
+                    if (!InitializeRobotPointers(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                    {
+                        Console.WriteLine("Could not initialize cursors...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Still only working in Offline mode");
+                    return false;
+                }
+            }
+
+            ActionWait act = new ActionWait(millis);
+            if (virtualCursor.ApplyAction(act))
+            {
+                actionBuffer.Add(act);
+                return true;
+            }
+            return false;
         }
 
 

@@ -18,7 +18,8 @@ namespace RobotControl
         TranslationAndRotation = 3,
         RotationAndTranslation = 4,
         Joints = 5,
-        Message = 6
+        Message = 6, 
+        Wait = 7
     }
 
     /// <summary>
@@ -78,6 +79,9 @@ namespace RobotControl
         // Message properties
         public string message;
 
+        // Wait properties
+        public long waitMillis;
+
     }
 
 
@@ -132,7 +136,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("TRS: {0}, {1} {2} {3}, v{4} z{5}",
+            return string.Format("TRNS: {0}, {1} {2} {3}, v{4} z{5}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
@@ -183,7 +187,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("ROT: {0}, {1} {2} {3}, v{4} z{5}",
+            return string.Format("ROTA: {0}, {1} {2} {3}, v{4} z{5}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
@@ -228,7 +232,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("T+R: {0}, {1} {2} {3}, {4} {5} {6}, v{7} z{8}",
+            return string.Format("T+R_: {0}, {1} {2} {3}, {4} {5} {6}, v{7} z{8}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
@@ -267,7 +271,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("R+T: {0}, {1} {2} {3}, {4} {5} {6}, v{7} z{8}",
+            return string.Format("R+T_: {0}, {1} {2} {3}, {4} {5} {6}, v{7} z{8}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
@@ -310,7 +314,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("JNT: {0}, {1} {2}, v{3} z{4}",
+            return string.Format("JNTS: {0}, {1} {2}, v{3} z{4}",
                 motionType == MotionType.Linear ? "lin" :
                     motionType == MotionType.Joint ? "jnt" :
                         motionType == MotionType.Joints ? "jjj" : "und",
@@ -321,7 +325,13 @@ namespace RobotControl
         }
     }
 
-
+    //  ███╗   ███╗███████╗███████╗███████╗ █████╗  ██████╗ ███████╗
+    //  ████╗ ████║██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝ ██╔════╝
+    //  ██╔████╔██║█████╗  ███████╗███████╗███████║██║  ███╗█████╗  
+    //  ██║╚██╔╝██║██╔══╝  ╚════██║╚════██║██╔══██║██║   ██║██╔══╝  
+    //  ██║ ╚═╝ ██║███████╗███████║███████║██║  ██║╚██████╔╝███████╗
+    //  ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+    //                                                              
     internal class ActionMessage : Action
     {
         public ActionMessage(string msg)
@@ -333,7 +343,30 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("MSG: '{0}", message);
+            return string.Format("MSSG: '{0}", message);
+        }
+    }
+
+
+    //  ██╗    ██╗ █████╗ ██╗████████╗
+    //  ██║    ██║██╔══██╗██║╚══██╔══╝
+    //  ██║ █╗ ██║███████║██║   ██║   
+    //  ██║███╗██║██╔══██║██║   ██║   
+    //  ╚███╔███╔╝██║  ██║██║   ██║   
+    //   ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝   ╚═╝   
+    //                                
+    internal class ActionWait : Action
+    {
+        public ActionWait(long millis)
+        {
+            type = ActionType.Wait;
+
+            waitMillis = millis;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("WAIT: {0}ms", waitMillis);
         }
     }
 

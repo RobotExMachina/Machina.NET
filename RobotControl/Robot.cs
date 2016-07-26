@@ -666,7 +666,7 @@ namespace RobotControl
 
         public bool Wait(long millis)
         {
-            throw new NotImplementedException();
+            return c.IssueWaitRequest(millis);
         }
 
         /// <summary>

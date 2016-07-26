@@ -46,7 +46,7 @@ namespace TEST_NewAPITests
             //TestCircleTransformAbsolute(arm, 50);
             //TestCircleTransformLocal(arm, 10);
             //TestCircleTransformGlobal(arm, 10);
-            TestZTableLimitations(arm);
+            //TestZTableLimitations(arm);
 
             //// Snake
             //TestSnake(arm);
@@ -58,6 +58,8 @@ namespace TEST_NewAPITests
             //// Absolute vs relative movement buffers
             //TestChangesInMovementModes(arm);
 
+            // Wait and Message
+            TestWaitAndMessage(arm);
 
             arm.DebugBuffer();  // read all pending buffered actions
 
@@ -620,6 +622,25 @@ namespace TEST_NewAPITests
             arm.JointsTo(0, 0, 0, 0, 90, 0);
         }
 
+        static public void TestWaitAndMessage(Robot arm)
+        {
+            // Go home
+            arm.SetVelocity(100);
+            arm.Message("Going home");
+            arm.MoveTo(300, 0, 500);
+
+            arm.Message("Waiting 2s to go start");
+            arm.Wait(2000);   
+
+            arm.Message("Starting first path");
+            arm.MoveGlobal(0, 200, -100);
+
+            arm.Message("Waiting 2s to go back");
+            arm.Wait(2000);
+
+            arm.Message("Going home");
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+        }
 
 
 

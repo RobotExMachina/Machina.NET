@@ -43,6 +43,7 @@ namespace RobotControl
         public abstract bool ApplyAction(ActionRotationAndTranslation action);
         public abstract bool ApplyAction(ActionJoints action);
         public abstract bool ApplyAction(ActionMessage action);
+        public abstract bool ApplyAction(ActionWait action);
 
 
         /// <summary>
@@ -90,6 +91,12 @@ namespace RobotControl
 
                 case ActionType.Joints:
                     return ApplyAction((ActionJoints)action);
+
+                case ActionType.Message:
+                    return ApplyAction((ActionMessage)action);
+
+                case ActionType.Wait:
+                    return ApplyAction((ActionWait)action);
 
             }
             return false;
@@ -427,12 +434,17 @@ namespace RobotControl
             return true;
         }
 
-
-
+        
         public override bool ApplyAction(ActionMessage action)
         {
             // There is basically nothing to do here! Leave the state of the robot as-is.
             // Maybe do some Console output?
+            return true;
+        }
+
+        public override bool ApplyAction(ActionWait action)
+        {
+            // There is basically nothing to do here! Leave the state of the robot as-is.
             return true;
         }
 
@@ -466,7 +478,6 @@ namespace RobotControl
             }
             
         }
-
 
         public override string ToString()
         {
