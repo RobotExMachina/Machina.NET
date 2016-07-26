@@ -437,23 +437,13 @@ namespace RobotControl
 
 
 
-        
-
-
-
-
-
-
-
-
-
-        // █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
-        //██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
-        //███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
-        //██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
-        //██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
-        //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-
+        //  ███████╗███████╗████████╗████████╗██╗███╗   ██╗ ██████╗ ███████╗
+        //  ██╔════╝██╔════╝╚══██╔══╝╚══██╔══╝██║████╗  ██║██╔════╝ ██╔════╝
+        //  ███████╗█████╗     ██║      ██║   ██║██╔██╗ ██║██║  ███╗███████╗
+        //  ╚════██║██╔══╝     ██║      ██║   ██║██║╚██╗██║██║   ██║╚════██║
+        //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
+        //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
+        //   
         /// <summary>
         /// Sets the velocity parameter for future issued actions.
         /// </summary>
@@ -481,17 +471,21 @@ namespace RobotControl
             currentSettings.MotionType = type;
         }
 
-
+        /// <summary>
+        /// Buffers current state settings (speed, zone, motion type...), and opens up for 
+        /// temporary settings changes to be reverted by PopSettings().
+        /// </summary>
         public void PushCurrentSettings()
         {
             Console.WriteLine("Pushing {0}", currentSettings);
             settingsBuffer.Push(currentSettings);
-            //Settings newSettings = currentSettings.Clone();  // create a new object
-            //currentSettings = newSettings;
             currentSettings = currentSettings.Clone();
         }
 
-
+        /// <summary>
+        /// Reverts the state settings (speed, zone, motion type...) to the previously buffered
+        /// state by PushSettings().
+        /// </summary>
         public void PopCurrentSettings()
         {
             currentSettings = settingsBuffer.Pop();
@@ -505,160 +499,14 @@ namespace RobotControl
 
 
 
-
-
-
-
-
-
-
-
-        ///// <summary>
-        ///// Requests absolute rotation movement based on current virtual orientation.
-        ///// The action will execute based on current ControlMode and priority.
-        ///// </summary>
-        ///// <param name="q1"></param>
-        ///// <param name="q2"></param>
-        ///// <param name="q3"></param>
-        ///// <param name="q4"></param>
-        ///// <returns></returns>
-        //public bool IssueAbsoluteRotationRequest(double q1, double q2, double q3, double q4)
-        //{
-        //    if (controlMode != ControlMode.Stream)
-        //    {
-        //        Console.WriteLine("RotateTo() only supported in Stream mode");
-        //        return false;
-        //    }
-
-        //    // WARNING: NO TABLE COLLISIONS ARE PERFORMED HERE YET!
-        //    TCPRotation.Set(q1, q2, q3, q4);
-        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-        //       TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-        //       currentVelocity, currentZone));
-
-        //    // Only tick queue if there are no targets pending to be streamed
-        //    if (streamQueue.FramesPending() == 1)
-        //    {
-        //        comm.TickStreamQueue(false);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-        //    }
-
-        //    return true;
-        //}
-
-
-        //public bool IssueMovementRequest()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public bool IssueRotationRequest()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-
-
-
-
-
-
-
-        ///// <summary>
-        ///// Requests relative linear movement based on current virtual position.
-        ///// The action will execute based on current ControlMode and priority.
-        ///// </summary>
-        ///// <param name="incX"></param>
-        ///// <param name="incY"></param>
-        ///// <param name="incZ"></param>
-        ///// <returns></returns>
-        //public bool IssueRelativeMovementRequest(double incX, double incY, double incZ)
-        //{
-        //    if (controlMode != ControlMode.Stream)
-        //    {
-        //        Console.WriteLine("Move() only supported in Stream mode");
-        //        return false;
-        //    }
-
-        //    if (SafetyCheckTableCollision)
-        //    {
-        //        if (IsBelowTable(TCPPosition.Z + incZ))
-        //        {
-        //            Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-        //            if (SafetyStopOnTableCollision)
-        //            {
-        //                return false;
-        //            }
-        //        }
-        //    }
-
-        //    TCPPosition.Add(incX, incY, incZ);
-        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z, currentVelocity, currentZone));
-
-        //    // Only tick queue if there are no targets pending to be streamed
-        //    if (streamQueue.FramesPending() == 1)
-        //    {
-        //        comm.TickStreamQueue(false);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-        //    }
-
-        //    return true;
-        //}
-
-        ///// <summary>
-        ///// Requests absolute linear movement based on current virtual position.
-        ///// The action will execute based on current ControlMode and priority.
-        ///// </summary>
-        ///// <param name="newX"></param>
-        ///// <param name="newY"></param>
-        ///// <param name="newZ"></param>
-        ///// <returns></returns>
-        //public bool IssueAbsoluteMovementRequest(double newX, double newY, double newZ)
-        //{
-        //    if (controlMode != ControlMode.Stream)
-        //    {
-        //        Console.WriteLine("MoveTo() only supported in Stream mode");
-        //        return false;
-        //    }
-
-        //    if (SafetyCheckTableCollision)
-        //    {
-        //        if (IsBelowTable(newZ))
-        //        {
-        //            Console.WriteLine("WARNING: TCP ABOUT TO HIT THE TABLE");
-        //            if (SafetyStopOnTableCollision)
-        //            {
-        //                return false;
-        //            }
-        //        }
-        //    }
-
-        //    TCPPosition.Set(newX, newY, newZ);
-        //    AddFrameToStreamQueue(new Frame(TCPPosition.X, TCPPosition.Y, TCPPosition.Z,
-        //       TCPRotation.Q1, TCPRotation.Q2, TCPRotation.Q3, TCPRotation.Q4,
-        //       currentVelocity, currentZone));
-
-        //    // Only tick queue if there are no targets pending to be streamed
-        //    if (streamQueue.FramesPending() == 1)
-        //    {
-        //        comm.TickStreamQueue(false);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("{0} frames pending", streamQueue.FramesPending());
-        //    }
-
-        //    return true;
-        //}
-
+        // █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
+        //██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
+        //███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
+        //██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
+        //██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
+        //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
         /// <summary>
-        /// Issue a customized simple Translation action request.
+        /// Issue a Translation action request with fully customized parameters.
         /// </summary>
         /// <param name="world"></param>
         /// <param name="trans"></param>
@@ -693,15 +541,38 @@ namespace RobotControl
             return success;
         }
 
-        // Overloads falling back on current settings values
+        /// <summary>
+        /// Issue a Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="trans"></param>
+        /// <param name="relative"></param>
+        /// <returns></returns>
         public bool IssueTranslationRequest(bool world, Point trans, bool relative)
         {
             return IssueTranslationRequest(world, trans, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="trans"></param>
+        /// <param name="relative"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <returns></returns>
         public bool IssueTranslationRequest(bool world, Point trans, bool relative, int vel, int zon)
         {
             return IssueTranslationRequest(world, trans, relative, vel, zon, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="trans"></param>
+        /// <param name="relative"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueTranslationRequest(bool world, Point trans, bool relative, MotionType mType)
         {
             return IssueTranslationRequest(world, trans, relative, currentSettings.Velocity, currentSettings.Zone, mType);
@@ -710,6 +581,16 @@ namespace RobotControl
 
 
 
+        /// <summary>
+        /// Issue a Rotation action request with fully customized parameters.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="rot"></param>
+        /// <param name="relative"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int vel, int zon, MotionType mType)
         {
             if (!areCursorsInitialized)
@@ -736,15 +617,38 @@ namespace RobotControl
             return success;
         }
 
-        // Overloads falling back on current settings values
+        /// <summary>
+        /// Issue a Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="rot"></param>
+        /// <param name="relative"></param>
+        /// <returns></returns>
         public bool IssueRotationRequest(bool world, Rotation rot, bool relative)
         {
             return IssueRotationRequest(world, rot, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="rot"></param>
+        /// <param name="relative"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <returns></returns>
         public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int vel, int zon)
         {
             return IssueRotationRequest(world, rot, relative, vel, zon, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="rot"></param>
+        /// <param name="relative"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueRotationRequest(bool world, Rotation rot, bool relative, MotionType mType)
         {
             return IssueRotationRequest(world, rot, relative, currentSettings.Velocity, currentSettings.Zone, mType);
@@ -752,7 +656,19 @@ namespace RobotControl
 
 
 
-
+        /// <summary>
+        /// Issue a Translation + Rotation action request with fully customized parameters.
+        /// </summary>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueTranslationAndRotationRequest(
             bool worldTrans, Point trans, bool relTrans, 
             bool worldRot, Rotation rot, bool relRot, 
@@ -785,7 +701,16 @@ namespace RobotControl
             return false;
         }
 
-        // Overloads falling back on current settings values
+        /// <summary>
+        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <returns></returns>
         public bool IssueTranslationAndRotationRequest(
             bool worldTrans, Point trans, bool relTrans,
             bool worldRot, Rotation rot, bool relRot)
@@ -795,6 +720,18 @@ namespace RobotControl
                 worldRot, rot, relRot, 
                 currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <returns></returns>
         public bool IssueTranslationAndRotationRequest(
             bool worldTrans, Point trans, bool relTrans,
             bool worldRot, Rotation rot, bool relRot, 
@@ -805,6 +742,17 @@ namespace RobotControl
                 worldRot, rot, relRot,
                 vel, zon, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueTranslationAndRotationRequest(
             bool worldTrans, Point trans, bool relTrans,
             bool worldRot, Rotation rot, bool relRot, 
@@ -818,7 +766,19 @@ namespace RobotControl
 
 
 
-
+        /// <summary>
+        /// Issue a Rotation + Translation action request with fully customized parameters.
+        /// </summary>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueRotationAndTranslationRequest(
             bool worldRot, Rotation rot, bool relRot,
             bool worldTrans, Point trans, bool relTrans,
@@ -851,7 +811,16 @@ namespace RobotControl
             return false;
         }
 
-        // Overloads falling back on current settings values
+        /// <summary>
+        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <returns></returns>
         public bool IssueRotationAndTranslationRequest(
             bool worldRot, Rotation rot, bool relRot,
             bool worldTrans, Point trans, bool relTrans)
@@ -861,6 +830,18 @@ namespace RobotControl
                 worldTrans, trans, relTrans,
                 currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <returns></returns>
         public bool IssueRotationAndTranslationRequest(
             bool worldRot, Rotation rot, bool relRot,
             bool worldTrans, Point trans, bool relTrans,
@@ -871,6 +852,17 @@ namespace RobotControl
                 worldTrans, trans, relTrans,
                 vel, zon, currentSettings.MotionType);
         }
+        /// <summary>
+        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="mType"></param>
+        /// <returns></returns>
         public bool IssueRotationAndTranslationRequest(
             bool worldRot, Rotation rot, bool relRot,
             bool worldTrans, Point trans, bool relTrans,
@@ -884,7 +876,14 @@ namespace RobotControl
 
 
 
-
+        /// <summary>
+        /// Issue a request to set the values of joint angles in configuration space. 
+        /// </summary>
+        /// <param name="joints"></param>
+        /// <param name="relJnts"></param>
+        /// <param name="vel"></param>
+        /// <param name="zon"></param>
+        /// <returns></returns>
         public bool IssueJointsRequest(Joints joints, bool relJnts, int vel, int zon)
         {
             if (!areCursorsInitialized)
@@ -919,8 +918,12 @@ namespace RobotControl
             }
             return false;
         }
-
-        // Overloads falling back on current settings values
+        /// <summary>
+        /// Issue a request to set the values of joint angles in configuration space. 
+        /// </summary>
+        /// <param name="joints"></param>
+        /// <param name="relJnts"></param>
+        /// <returns></returns>
         public bool IssueJointsRequest(Joints joints, bool relJnts)
         {
             return IssueJointsRequest(joints, relJnts, currentSettings.Velocity, currentSettings.Zone);
@@ -929,7 +932,11 @@ namespace RobotControl
 
 
 
-
+        /// <summary>
+        /// Issue a request to display a string message on the device.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public bool IssueMessageRequest(string message)
         {
             if (!areCursorsInitialized)
@@ -958,6 +965,13 @@ namespace RobotControl
             return false;
         }
 
+
+
+        /// <summary>
+        /// Issue a request for the device to stay idle for a certain amount of time.
+        /// </summary>
+        /// <param name="millis"></param>
+        /// <returns></returns>
         public bool IssueWaitRequest(long millis)
         {
             if (!areCursorsInitialized)

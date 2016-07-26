@@ -95,7 +95,7 @@ namespace RobotControl
     //     ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
     //                                                                                            
     /// <summary>
-    /// An action representing a translation movement in cartesiam world coordinates.
+    /// An action representing a Translation transform in along a guiding vector.
     /// </summary>
     internal class ActionTranslation : Action
     {
@@ -121,19 +121,6 @@ namespace RobotControl
             motionType = mType;
         }
 
-        //// Overloads with default invalid flags
-        //public ActionTranslation(bool world, Point trans, bool relTrans, int vel, int zon) :
-        //    this(world, trans, relTrans, vel, zon, MotionType.Undefined)
-        //{ }
-
-        //public ActionTranslation(bool world, Point trans, bool relTrans, MotionType mType) :
-        //    this(world, trans, relTrans, -1, -1, mType)
-        //{ }
-
-        //public ActionTranslation(bool world, Point trans, bool relTrans) :
-        //    this(world, trans, relTrans, -1, -1, MotionType.Undefined)
-        //{ }
-
         public override string ToString()
         {
             return string.Format("TRNS: {0}, {1} {2} {3}, v{4} z{5}",
@@ -156,6 +143,9 @@ namespace RobotControl
     //  ██║  ██║╚██████╔╝   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
     //  ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
     //                                                                   
+    /// <summary>
+    /// An Action representing a Rotation transformation in Quaternion represnetation.
+    /// </summary>
     internal class ActionRotation : Action
     {
         public ActionRotation(bool world, Rotation rot, bool relRot, int vel, int zon, MotionType mType)
@@ -170,20 +160,6 @@ namespace RobotControl
             zone = zon;
             motionType = mType;
         }
-
-        //// Overloads with default invalid flags
-        //public ActionRotation(bool world, Rotation rot, bool relRot, int vel, int zon) :
-        //    this(world, rot, relRot, vel, zon, MotionType.Undefined)
-        //{ }
-
-        //public ActionRotation(bool world, Rotation rot, bool relRot, MotionType mType) :
-        //    this(world, rot, relRot, -1, -1, mType)
-        //{ }
-
-        //public ActionRotation(bool world, Rotation rot, bool relRot) :
-        //    this(world, rot, relRot, -1, -1, MotionType.Undefined)
-        //{ }
-
 
         public override string ToString()
         {
@@ -207,7 +183,10 @@ namespace RobotControl
     //  ██╔══██╗   ██║╚════╝██║   ██╔══██╗
     //  ██║  ██║   ██║      ██║   ██║  ██║
     //  ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝
-    //                                    
+    //          
+    /// <summary>
+    /// An Action representing a combined Translation then Rotation transformation.
+    /// </summary>
     internal class ActionTranslationAndRotation : Action
     {
         public ActionTranslationAndRotation(
@@ -247,6 +226,9 @@ namespace RobotControl
         }
     }
 
+    /// <summary>
+    /// An Action representing a combined Rotation then Translation transformation.
+    /// </summary>
     internal class ActionRotationAndTranslation : Action
     {
         public ActionRotationAndTranslation(
@@ -297,7 +279,9 @@ namespace RobotControl
     //  ╚█████╔╝╚██████╔╝██║██║ ╚████║   ██║   ███████║
     //   ╚════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
     //                                                 
-
+    /// <summary>
+    /// An Action representing the raw angular values of the device's joint rotations.
+    /// </summary>
     internal class ActionJoints : Action
     {
         public ActionJoints(Joints js, bool relJnts, int vel, int zon, MotionType mType)
@@ -332,6 +316,9 @@ namespace RobotControl
     //  ██║ ╚═╝ ██║███████╗███████║███████║██║  ██║╚██████╔╝███████╗
     //  ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
     //                                                              
+    /// <summary>
+    /// An Action representing a string message sent to the device to be displayed.
+    /// </summary>
     internal class ActionMessage : Action
     {
         public ActionMessage(string msg)
@@ -355,6 +342,9 @@ namespace RobotControl
     //  ╚███╔███╔╝██║  ██║██║   ██║   
     //   ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝   ╚═╝   
     //                                
+    /// <summary>
+    /// An Action represening the device staying idle for a period of time.
+    /// </summary>
     internal class ActionWait : Action
     {
         public ActionWait(long millis)

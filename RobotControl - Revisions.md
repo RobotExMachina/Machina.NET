@@ -14,12 +14,16 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+## BUILD 1112
+- [ ] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
+- [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
+
 ## BUILD 1111
+- [x] Add comments to all missing actions
 - [ ] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
 - [ ] Refactor .setvel and .setzone to .speed and .zone
 - [ ] List<string> .exportcode(bool flush)
 - [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)
-- [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
 - [ ] Remove MointType.Joints: there is only one type of ActionJoint, so there is no need to specify this
 
 ## BUILD 1110

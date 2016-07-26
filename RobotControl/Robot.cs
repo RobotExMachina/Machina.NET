@@ -61,7 +61,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1110;
+        public static readonly int Build = 1111;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -361,11 +361,19 @@ namespace RobotControl
             SetMotionType(t);
         }
 
+        /// <summary>
+        /// Buffers current state settings (speed, zone, motion type...), and opens up for 
+        /// temporary settings changes to be reverted by PopSettings().
+        /// </summary>
         public void PushSettings()
         {
             c.PushCurrentSettings();
         }
 
+        /// <summary>
+        /// Reverts the state settings (speed, zone, motion type...) to the previously buffered
+        /// state by PushSettings().
+        /// </summary>
         public void PopSettings()
         {
             c.PopCurrentSettings();
@@ -424,12 +432,7 @@ namespace RobotControl
         {
             return MoveGlobal(new Point(incX, incY, incZ));
         }
-
-
-
-
-
-
+                
         /// <summary>
         /// Issue an absolute movement action request.
         /// </summary>
@@ -461,11 +464,7 @@ namespace RobotControl
         //{
         //    throw new NotImplementedException();
         //}
-
-        // @TODO: add overloads with custom velocity and speed?
-
-            
-
+        
         /// <summary>
         /// Issue a relative rotation around local axes request.
         /// </summary>
@@ -499,12 +498,7 @@ namespace RobotControl
         {
             return RotateLocal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
         }
-
-
-
-
-
-
+        
         /// <summary>
         /// Issue a relative rotation around global axes request.
         /// </summary>
@@ -538,10 +532,7 @@ namespace RobotControl
         {
             return RotateGlobal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
         }
-
-
-
-
+        
         /// <summary>
         /// Issue an absolute global reorientation request.
         /// </summary>
@@ -590,37 +581,74 @@ namespace RobotControl
 
                 
 
-
+        /// <summary>
+        /// Issue a compound relative local Translation + Rotation request.
+        /// Note that for relative local transformations order of actions matters. 
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
         public bool TransformLocal(Point position, Rotation rotation)
         {
             // Note the T+R action order
             return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
         }
 
+        /// <summary>
+        /// Issue a compound relative local Rotation + Translation request.
+        /// Note that for relative local transformations order of actions matters. 
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public bool TransformLocal (Rotation rotation, Point position)
         {
             // Note the R+T action order
             return c.IssueRotationAndTranslationRequest(false, rotation, true, false, position, true);
         }
 
+        /// <summary>
+        /// Issue a compound relative global Translation + Rotation request.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
         public bool TransformGlobal(Point position, Rotation rotation)
         {
             // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
             return c.IssueTranslationAndRotationRequest(true, position, true, true, rotation, true);
         }
 
+        /// <summary>
+        /// Issue a compound relative global Translation + Rotation request.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public bool TransformGlobal(Rotation rotation, Point position)
         {
             // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
             return c.IssueRotationAndTranslationRequest(true, rotation, true, true, position, true);
         }
 
+        /// <summary>
+        /// Issue a compound absolute global Translation + Rotation request.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
         public bool TransformTo(Point position, Rotation rotation)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
             return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
         }
 
+        /// <summary>
+        /// Issue a compound absolute global Translation + Rotation request.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public bool TransformTo(Rotation rotation, Point position)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
@@ -628,30 +656,80 @@ namespace RobotControl
         }
 
 
-
-
-
-
-
+        /// <summary>
+        /// Issue a request to increment the angular values of the robot joint rotations.
+        /// Values expressed in degrees.
+        /// </summary>
+        /// <param name="incJoints"></param>
+        /// <returns></returns>
         public bool Joints(Joints incJoints)
         {
             return c.IssueJointsRequest(incJoints, true);
         }
 
+        /// <summary>
+        /// Issue a request to increment the angular values of the robot joint rotations.
+        /// Values expressed in degrees.
+        /// </summary>
+        /// <param name="incJ1"></param>
+        /// <param name="incJ2"></param>
+        /// <param name="incJ3"></param>
+        /// <param name="incJ4"></param>
+        /// <param name="incJ5"></param>
+        /// <param name="incJ6"></param>
+        /// <returns></returns>
         public bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
         {
             return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
         }
 
+        /// <summary>
+        /// Issue a request to set the angular values of the robot joint rotations.
+        /// Values expressed in degrees.
+        /// </summary>
+        /// <param name="joints"></param>
+        /// <returns></returns>
         public bool JointsTo(Joints joints)
         {
             return c.IssueJointsRequest(joints, false);
         }
 
+        /// <summary>
+        /// Issue a request to set the angular values of the robot joint rotations.
+        /// Values expressed in degrees.
+        /// </summary>
+        /// <param name="j1"></param>
+        /// <param name="j2"></param>
+        /// <param name="j3"></param>
+        /// <param name="j4"></param>
+        /// <param name="j5"></param>
+        /// <param name="j6"></param>
+        /// <returns></returns>
         public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
         {
             return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
         }
+
+        /// <summary>
+        /// Issue a request to wait idle before moving to next action. 
+        /// </summary>
+        /// <param name="timeMillis">Time expressed in milliseconds</param>
+        /// <returns></returns>
+        public bool Wait(long timeMillis)
+        {
+            return c.IssueWaitRequest(timeMillis);
+        }
+
+        /// <summary>
+        /// Send a string message to the device, to be displayed based on device's capacities.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public bool Message(string message)
+        {
+            return c.IssueMessageRequest(message);
+        }
+
 
 
 
@@ -663,22 +741,6 @@ namespace RobotControl
         {
             throw new NotImplementedException();
         }
-
-        public bool Wait(long millis)
-        {
-            return c.IssueWaitRequest(millis);
-        }
-
-        /// <summary>
-        /// Send a string message to the device, to be displayed based on device's capacities
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public bool Message(string message)
-        {
-            return c.IssueMessageRequest(message);
-        }
-
 
 
 
@@ -723,6 +785,9 @@ namespace RobotControl
             c.DebugRobotCursors();
         }
 
+        /// <summary>
+        /// Dumps current Settings values
+        /// </summary>
         public void DebugSettingsBuffer()
         {
             c.DebugSettingsBuffer();
