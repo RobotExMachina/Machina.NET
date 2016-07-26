@@ -27,8 +27,9 @@
 - [ ] .Message(string) action ;)
 
 ## BUILD 1109
-- [ ] Add Joints() actions (think of a new name?) --> .ArmJoints(); .ArmJointsTo(); || .RotateArm(); .RotateArmTo()
-- [ ] Refine Actions checks on first type issued as absolute... 
+- [x] Add .Joints() and .JointsTo() actions
+- [x] Refine Actions checks on first type issued as absolute... 
+- [ ] Test Z table limitations with RT + TR transformations
 
 ## BUILD 1108
 - [x] Port Util methods as static to their appropriate geometry class 
