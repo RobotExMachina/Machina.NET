@@ -17,6 +17,7 @@
 ## BUILD 1112
 - [ ] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
 - [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
+- [ ] Write a full 'unit test' program to verify functionality doesn't break
 
 ## BUILD 1111
 - [x] Add comments to all missing actions

@@ -1,3 +1,172 @@
+```text
+ █████╗ ██████╗ ██╗    ██████╗ ███████╗███████╗██╗ ██████╗ ███╗   ██╗
+██╔══██╗██╔══██╗██║    ██╔══██╗██╔════╝██╔════╝██║██╔════╝ ████╗  ██║
+███████║██████╔╝██║    ██║  ██║█████╗  ███████╗██║██║  ███╗██╔██╗ ██║
+██╔══██║██╔═══╝ ██║    ██║  ██║██╔══╝  ╚════██║██║██║   ██║██║╚██╗██║
+██║  ██║██║     ██║    ██████╔╝███████╗███████║██║╚██████╔╝██║ ╚████║
+╚═╝  ╚═╝╚═╝     ╚═╝    ╚═════╝ ╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+```
+---
+### 2016.07.26 - FORMAL API DRAFT
+
+- OFFLINE MODE
+```csharp
+// Initializtion
+BRobot arm = new BRobot("ABB", "IRB120");   // initialize brobots with make and model
+
+// Set control mode
+arm.ControlMode("offline");     // offline/execute/stream
+
+// Settings
+arm.PushSettings();             // buffers current state for speed, zone, modes, etc. To be reverted by .PopSettings();
+arm.Speed(200);                 // no args returns current value
+arm.Zone(10);                   // idem
+
+// Basic transformations
+arm.MoveTo(300, 0, 500);        // absolute movement is always in world coordinates
+arm.Move(100, 0, 0);            // relative movement in global coordinates (default). robot is now at (400, 0, 500)
+
+arm.RotateTo(-1, 0, 0, 0, 1, 0);    // absolute orientation based on X and Y vectors. robot is now with XYZ rotated 180 around Y
+arm.Rotate(0, 0, 1, 45);        // relative rotation in global coordinates (default). robot rotates 45 degrees around Z axis
+
+arm.TransformTo(new Point(300, 0, 500), new Rotation(-1, 0, 0, 0, 1, 0));  // absolute trans + rot. order doesn't matter here
+arm.Transform(new Point(100, 0, 0), new Rotation(1, 0, 0, 45));             // relative trans + rot in world coords (default). Because using world, order still doesn't matter here
+
+// ALL THE ABOVE HAVE .ActionJ() versions with joint movement instead of linear
+
+// Local transformations
+arm.Coordinates("local");       // for relative actions like .Move(), .Rotate() or .Transform(), sets either local or global/world reference system. This is also buffered by PushSettings.  --> How about .Coordinates("robot/base/TCP")
+arm.MoveTo(300, 0, 500);        // absolute transformations are unaffected by .Coordinates()
+arm.Move(100, 0, 0);            // relative movement in (now) local TCP coordinates
+arm.Rotate(0, 0, 1, 45);        // relative rotation around poitive TCP Z axis
+arm.Transform(pos, rot);        // same here
+arm.Transform(rot, pos);        // note that for local transformations, the order of actions matters ;)
+
+// Joint rotations
+arm.JointsTo(0, 0, 0, 0, 90, 0);    // sets absolute joint positions. uses settings speed and zone params
+arm.Joints(45, -15, 0, 0, 0, 0);    // adds these values to current joint rotations.  
+
+// Settings
+arm.PushSettings();             // reverts settings back to speed, zone, etc state before .Push()
+
+// Other stuff
+arm.MoveTo(200, 0, 200);
+arm.Message("Waiting...");      // send a message to the device to be displayed. E.g., for ABBs this will show up on the FlexPendant
+arm.Wait(2500);                 // wait 2.5 secs before performing next action
+arm.Move(100, 0, 0);            // relative movement in (default) global coordinates
+```
+
+- EXECUTE MODE
+```csharp
+// Initializtion
+BRobot arm = new BRobot("ABB", "IRB120");   // initialize brobots with make and model
+
+// Set control mode
+arm.ControlMode("execute");     // offline/execute/stream
+
+// Connect to a controller
+arm.Connect();
+
+// Do some stuff
+arm.MoveTo(300, 0, 500);
+arm.Move(50, 0);
+arm.Move(0, 50);
+arm.Move(-50, 0);
+arm.Move(0, -50);
+arm.Move(0, 0, 50);
+arm.JointsTo(0, 0, 0, 0, 90, 0);
+
+arm.Execute();  // flushes all the instructions and sends all pending actions to the controller to be run
+
+// Anytime the program is running, it can be paused with 
+arm.Stop();
+
+// And resumed with 
+arm.Start();
+
+// And sent to the beginning with
+arm.Rewind();
+
+// And toggle looping execution:
+arm.Loop();
+arm.NoLoop();  // default (is this part of settings?)
+
+// Events can be attached:
+arm.Stop += OnStopHandler;
+
+arm.Disconnect();
+```
+
+- STREAM MODE
+```csharp
+// Initializtion
+BRobot arm = new BRobot("ABB", "IRB120");   // initialize brobots with make and model
+
+// Set control mode
+arm.ControlMode("stream");     // offline/execute/stream
+
+// Connect to a controller
+arm.Connect();
+
+// Start rolling!
+arm.Start();
+
+// Do some stuff
+arm.MoveTo(300, 0, 500);
+arm.Move(50, 0);
+arm.Move(0, 50);
+arm.Move(-50, 0);
+arm.Move(0, -50);
+arm.Move(0, 0, 50);
+arm.JointsTo(0, 0, 0, 0, 90, 0);
+
+// Anytime the program is running, it can be paused with 
+arm.Stop();
+
+// kthxbye 
+arm.Disconnect();
+
+// The stream queue has an event when the controller requests a new target
+arm.NextAction += OnNextAction;
+
+private void OnNextAction(object sender, NextActionEventArgs e) {
+    // Infinitely move forward
+    arm.PushSettings();
+    arm.Coordinates("local");
+    arm.Move(10, 0, 0);
+    arm.PopSettings();
+}
+
+```
+
+
+
+
+
+- Relative actions have an overload to set their behavior:
+```csharp
+arm.Move("local");          // sets option for future move actions. It is also the overload for bookmarked positions?
+arm.Move(x, y, z);
+
+arm.Move("world");
+arm.Move(x, y, z);
+
+arm.MoveTo(x, y, z);        // this is independent from relative settings
+
+arm.Transform("local");     // sets both transform params to local. doesn't affect the independents settings for move or rotate 
+
+```
+
+
+
+
+
+
+
+
+
+
+
 ---
 ### 2016.07.25
 - Added Local and Global overloads for movement/rotation:
