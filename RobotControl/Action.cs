@@ -17,7 +17,8 @@ namespace RobotControl
         Rotation = 2,
         TranslationAndRotation = 3,
         RotationAndTranslation = 4,
-        Joints = 5
+        Joints = 5,
+        Message = 6
     }
 
     /// <summary>
@@ -73,6 +74,9 @@ namespace RobotControl
         // Joint properties
         public Joints joints;
         public bool relativeJoints;
+
+        // Message properties
+        public string message;
 
     }
 
@@ -315,7 +319,23 @@ namespace RobotControl
                 velocity,
                 zone);
         }
-
     }
+
+
+    internal class ActionMessage : Action
+    {
+        public ActionMessage(string msg)
+        {
+            type = ActionType.Message;
+
+            message = msg; 
+        }
+
+        public override string ToString()
+        {
+            return string.Format("MSG: '{0}", message);
+        }
+    }
+
 
 }

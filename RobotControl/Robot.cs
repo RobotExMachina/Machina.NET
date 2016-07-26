@@ -61,7 +61,7 @@ namespace RobotControl
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1109;
+        public static readonly int Build = 1110;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -588,18 +588,7 @@ namespace RobotControl
             return RotateTo(new Rotation(x0, x1, x2, y0, y1, y2));
         }
 
-        
-
-        
-        
-        
-
-
-        
-
-
-
-        
+                
 
 
         public bool TransformLocal(Point position, Rotation rotation)
@@ -680,9 +669,14 @@ namespace RobotControl
             throw new NotImplementedException();
         }
 
-        public bool Message(string msg)
+        /// <summary>
+        /// Send a string message to the device, to be displayed based on device's capacities
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public bool Message(string message)
         {
-            throw new NotImplementedException();
+            return c.IssueMessageRequest(message);
         }
 
 

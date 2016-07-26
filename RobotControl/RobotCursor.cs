@@ -42,6 +42,7 @@ namespace RobotControl
         public abstract bool ApplyAction(ActionTranslationAndRotation action);
         public abstract bool ApplyAction(ActionRotationAndTranslation action);
         public abstract bool ApplyAction(ActionJoints action);
+        public abstract bool ApplyAction(ActionMessage action);
 
 
         /// <summary>
@@ -427,6 +428,13 @@ namespace RobotControl
         }
 
 
+
+        public override bool ApplyAction(ActionMessage action)
+        {
+            // There is basically nothing to do here! Leave the state of the robot as-is.
+            // Maybe do some Console output?
+            return true;
+        }
 
 
 

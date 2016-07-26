@@ -23,8 +23,9 @@
 - [ ] Remove MointType.Joints: there is only one type of ActionJoint, so there is no need to specify this
 
 ## BUILD 1110
+- [x] Add .Message(string) action ;) (will be a good test for program generation with non-movement actions)
+- [ ] Add .Wait(long millis) action
 - [ ] Rewrite program generation to accept non-movement actions (or even the ones that don't apply at all)
-- [ ] .Message(string) action ;) (will be a good test for program generation with non-movement actions)
 
 ## BUILD 1109
 - [x] Add .Joints() and .JointsTo() actions

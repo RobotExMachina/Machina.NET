@@ -930,6 +930,30 @@ namespace RobotControl
 
 
 
+        public bool IssueMessageRequest(string message)
+        {
+            if (!areCursorsInitialized)
+            {
+                if (controlMode == ControlMode.Offline)
+                {
+                    if (!InitializeRobotPointers(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                    {
+                        Console.WriteLine("Could not initialize cursors...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Still only working in Offline mode");
+                    return false;
+                }
+            }
+
+            ActionMessage act = new ActionMessage(message);
+
+        }
+
+
 
 
 
