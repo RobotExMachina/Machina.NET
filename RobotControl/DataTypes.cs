@@ -1466,7 +1466,7 @@ namespace RobotControl
     //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝                                      
     /// <summary>
     /// Represents a location and rotation in 3D space, with some additional
-    /// metadata representing velocities, zones, etc.
+    /// metadata representing speeds, zones, etc.
     /// </summary>
     public class Frame : Geometry
     {
@@ -1474,7 +1474,7 @@ namespace RobotControl
         /// This is the default rotation that will be assigned to Frames constructed only with location properties.
         /// </summary>
         public static Rotation DefaultOrientation = Rotation.FlippedAroundY;
-        public static double DefaultVelocity = 10;
+        public static double DefaultSpeed = 10;
         public static double DefaultZone = 5;
 
         public static double DistanceBetween(Frame f1, Frame f2)
@@ -1488,71 +1488,71 @@ namespace RobotControl
 
         public Point Position;
         public Rotation Orientation;
-        public double Velocity;
+        public double Speed;
         public double Zone;
 
         public Frame(double x, double y, double z)
         {
             this.Position = new Point(x, y, z);
             this.Orientation = DefaultOrientation;
-            this.Velocity = DefaultVelocity;
+            this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
 
-        public Frame(double x, double y, double z, double vel, double zon)
+        public Frame(double x, double y, double z, double speed, double zone)
         {
             this.Position = new Point(x, y, z);
             this.Orientation = DefaultOrientation;
-            this.Velocity = vel;
-            this.Zone = zon;
+            this.Speed = speed;
+            this.Zone = zone;
         }
 
         public Frame(double x, double y, double z, double qw, double qx, double qy, double qz)
         {
             this.Position = new Point(x, y, z);
             this.Orientation = new Rotation(qw, qx, qy, qz);
-            this.Velocity = DefaultVelocity;
+            this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
 
-        public Frame(double x, double y, double z, double qw, double qx, double qy, double qz, double vel, double zon)
+        public Frame(double x, double y, double z, double qw, double qx, double qy, double qz, double speed, double zone)
         {
             this.Position = new Point(x, y, z);
             this.Orientation = new Rotation(qw, qx, qy, qz);
-            this.Velocity = vel;
-            this.Zone = zon;
+            this.Speed = speed;
+            this.Zone = zone;
         }
 
         public Frame(Point position)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = DefaultOrientation;
-            this.Velocity = DefaultVelocity;
+            this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
 
-        public Frame(Point position, double vel, double zon)
+        public Frame(Point position, double speed, double zone)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = DefaultOrientation;
-            this.Velocity = vel;
-            this.Zone = zon;
+            this.Speed = speed;
+            this.Zone = zone;
         }
 
         public Frame(Point position, Rotation orientation)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z);  // shallow copy
-            this.Velocity = DefaultVelocity;
+            this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
 
-        public Frame(Point position, Rotation orientation, double vel, double zon)
+        public Frame(Point position, Rotation orientation, double speed, double zone)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z);  // shallow copy
-            this.Velocity = vel;
-            this.Zone = zon;
+            this.Speed = speed;
+            this.Zone = zone;
         }
 
         public Frame(RobTarget robTarget)
@@ -1560,7 +1560,7 @@ namespace RobotControl
             this.Position = new Point(robTarget.Trans);
             this.Orientation = new Rotation(robTarget.Rot);
             // temporarily use 'invalid' values to denote this is not getting these values from the robot... 
-            this.Velocity = -1;
+            this.Speed = -1;
             this.Zone = -1;
         }
         
@@ -1595,7 +1595,7 @@ namespace RobotControl
 
         public string GetSpeedDeclaration()
         {
-            return string.Format("[{0},{1},{2},{3}]", Velocity, Velocity, 5000, 1000);  // default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). using the same value as lin motion
+            return string.Format("[{0},{1},{2},{3}]", Speed, Speed, 5000, 1000);  // default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). using the same value as lin motion
         }
 
         public string GetZoneDeclaration()
@@ -1688,7 +1688,7 @@ namespace RobotControl
         public override string ToString()
         {
             //return this.Position + "," + this.Orientation;
-            return string.Format("{0},{1},{2},{3}", this.Position, this.Orientation, this.Velocity, this.Zone);
+            return string.Format("{0},{1},{2},{3}", this.Position, this.Orientation, this.Speed, this.Zone);
         }
     }
 

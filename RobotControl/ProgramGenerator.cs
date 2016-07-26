@@ -156,10 +156,10 @@ namespace RobotControl
             Dictionary<int, bool> zonePredef = new Dictionary<int, bool>();
             foreach (Action a in actions)
             {
-                if (!velNames.ContainsKey(a.velocity))
+                if (!velNames.ContainsKey(a.speed))
                 {
-                    velNames.Add(a.velocity, "vel" + a.velocity);
-                    velDecs.Add(a.velocity, GenerateSpeedDeclaration(a.velocity));
+                    velNames.Add(a.speed, "vel" + a.speed);
+                    velDecs.Add(a.speed, GenerateSpeedDeclaration(a.speed));
                 }
 
                 if (!zoneNames.ContainsKey(a.zone))
@@ -219,7 +219,7 @@ namespace RobotControl
                     module.Add(string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
                     MotionInstructions[a.motionType],
                     it++,
-                    velNames[a.velocity],
+                    velNames[a.speed],
                     zoneNames[a.zone]
                     ));
                 }

@@ -311,7 +311,7 @@ namespace RobotControl
         /// <param name="vel"></param>
         public void SetVelocity(int vel)
         {
-            c.SetCurrentVelocity(vel);
+            c.SetCurrentSpeed(vel);
         }
 
         /// <summary>

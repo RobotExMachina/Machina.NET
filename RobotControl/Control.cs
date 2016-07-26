@@ -19,7 +19,7 @@ namespace RobotControl
         public static readonly bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
         public static readonly double SAFETY_TABLE_Z_LIMIT = 100;                       // table security checks will trigger below this z height (mm)
 
-        public static readonly int DEFAULT_VELOCITY = 20;                               // default velocity for new actions
+        public static readonly int DEFAULT_SPEED = 20;                                  // default speed for new actions
         public static readonly int DEFAULT_ZONE = 5;                                    // default zone for new actions
         public static readonly MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         
@@ -58,7 +58,7 @@ namespace RobotControl
         private ProgramGenerator programGenerator = new ProgramGeneratorABB();  // @TODO: this must be more programmatic and shimmed
 
         /// <summary>
-        /// Represents the current values for velocity, zone and MotionType.
+        /// Represents the current values for speed, zone and MotionType.
         /// </summary>
         private Settings currentSettings;
 
@@ -128,7 +128,7 @@ namespace RobotControl
             virtualCursor = null;
             writeCursor = null;
 
-            currentSettings = new Settings(DEFAULT_VELOCITY, DEFAULT_ZONE, DEFAULT_MOTION_TYPE);
+            currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE);
             settingsBuffer = new SettingsBuffer();
         }
 
@@ -392,7 +392,7 @@ namespace RobotControl
 
         /// <summary>
         /// Returns a Frame object representing the current robot's TCP position and orientation. 
-        /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
+        /// NOTE: the Frame object's speed and zone still do not represent the acutal state of the robot.
         /// </summary>
         /// <returns></returns>
         public Frame GetCurrentFrame()
@@ -445,12 +445,12 @@ namespace RobotControl
         //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
         //   
         /// <summary>
-        /// Sets the velocity parameter for future issued actions.
+        /// Sets the speed parameter for future issued actions.
         /// </summary>
-        /// <param name="vel">In mm/s</param>
-        public void SetCurrentVelocity(int vel)
+        /// <param name="speed">In mm/s</param>
+        public void SetCurrentSpeed(int speed)
         {
-            currentSettings.Velocity = vel;
+            currentSettings.Speed = speed;
         }
 
         /// <summary>
@@ -511,11 +511,11 @@ namespace RobotControl
         /// <param name="world"></param>
         /// <param name="trans"></param>
         /// <param name="relative"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
-        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int vel, int zon, MotionType mType)
+        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int speed, int zone, MotionType mType)
         {
             if (!areCursorsInitialized)
             {
@@ -534,7 +534,7 @@ namespace RobotControl
                 }
             }
             
-            ActionTranslation act = new ActionTranslation(world, trans, relative, vel, zon, mType);
+            ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
             bool success = virtualCursor.ApplyAction(act);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (success) actionBuffer.Add(act);
@@ -550,7 +550,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool IssueTranslationRequest(bool world, Point trans, bool relative)
         {
-            return IssueTranslationRequest(world, trans, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+            return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Translation action request that falls back on the state of current settings.
@@ -558,12 +558,12 @@ namespace RobotControl
         /// <param name="world"></param>
         /// <param name="trans"></param>
         /// <param name="relative"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int vel, int zon)
+        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int speed, int zone)
         {
-            return IssueTranslationRequest(world, trans, relative, vel, zon, currentSettings.MotionType);
+            return IssueTranslationRequest(world, trans, relative, speed, zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Translation action request that falls back on the state of current settings.
@@ -575,7 +575,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool IssueTranslationRequest(bool world, Point trans, bool relative, MotionType mType)
         {
-            return IssueTranslationRequest(world, trans, relative, currentSettings.Velocity, currentSettings.Zone, mType);
+            return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, mType);
         }
 
 
@@ -587,11 +587,11 @@ namespace RobotControl
         /// <param name="world"></param>
         /// <param name="rot"></param>
         /// <param name="relative"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
-        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int vel, int zon, MotionType mType)
+        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int speed, int zone, MotionType mType)
         {
             if (!areCursorsInitialized)
             {
@@ -610,7 +610,7 @@ namespace RobotControl
                 }
             }
 
-            ActionRotation act = new ActionRotation(world, rot, relative, vel, zon, mType);
+            ActionRotation act = new ActionRotation(world, rot, relative, speed, zone, mType);
             bool success = virtualCursor.ApplyAction(act);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (success) actionBuffer.Add(act);
@@ -626,7 +626,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool IssueRotationRequest(bool world, Rotation rot, bool relative)
         {
-            return IssueRotationRequest(world, rot, relative, currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+            return IssueRotationRequest(world, rot, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Rotation action request that falls back on the state of current settings.
@@ -634,12 +634,12 @@ namespace RobotControl
         /// <param name="world"></param>
         /// <param name="rot"></param>
         /// <param name="relative"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int vel, int zon)
+        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int speed, int zone)
         {
-            return IssueRotationRequest(world, rot, relative, vel, zon, currentSettings.MotionType);
+            return IssueRotationRequest(world, rot, relative, speed, zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Rotation action request that falls back on the state of current settings.
@@ -651,7 +651,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool IssueRotationRequest(bool world, Rotation rot, bool relative, MotionType mType)
         {
-            return IssueRotationRequest(world, rot, relative, currentSettings.Velocity, currentSettings.Zone, mType);
+            return IssueRotationRequest(world, rot, relative, currentSettings.Speed, currentSettings.Zone, mType);
         }
 
 
@@ -665,14 +665,14 @@ namespace RobotControl
         /// <param name="worldRot"></param>
         /// <param name="rot"></param>
         /// <param name="relRot"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
         public bool IssueTranslationAndRotationRequest(
             bool worldTrans, Point trans, bool relTrans, 
             bool worldRot, Rotation rot, bool relRot, 
-            int vel, int zon, MotionType mType)
+            int speed, int zone, MotionType mType)
         {
             if (!areCursorsInitialized)
             {
@@ -691,7 +691,7 @@ namespace RobotControl
                 }
             }
 
-            ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, vel, zon, mType);
+            ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (virtualCursor.ApplyAction(act))
             {
@@ -718,7 +718,7 @@ namespace RobotControl
             return IssueTranslationAndRotationRequest(
                 worldTrans, trans, relTrans, 
                 worldRot, rot, relRot, 
-                currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Translation + Rotation action request that falls back on the state of current settings.
@@ -729,18 +729,18 @@ namespace RobotControl
         /// <param name="worldRot"></param>
         /// <param name="rot"></param>
         /// <param name="relRot"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
         public bool IssueTranslationAndRotationRequest(
             bool worldTrans, Point trans, bool relTrans,
             bool worldRot, Rotation rot, bool relRot, 
-            int vel, int zon)
+            int speed, int zone)
         {
             return IssueTranslationAndRotationRequest(
                 worldTrans, trans, relTrans,
                 worldRot, rot, relRot,
-                vel, zon, currentSettings.MotionType);
+                speed, zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Translation + Rotation action request that falls back on the state of current settings.
@@ -761,7 +761,7 @@ namespace RobotControl
             return IssueTranslationAndRotationRequest(
                 worldTrans, trans, relTrans,
                 worldRot, rot, relRot,
-                currentSettings.Velocity, currentSettings.Zone, mType);
+                currentSettings.Speed, currentSettings.Zone, mType);
         }
 
 
@@ -775,14 +775,14 @@ namespace RobotControl
         /// <param name="worldTrans"></param>
         /// <param name="trans"></param>
         /// <param name="relTrans"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
         public bool IssueRotationAndTranslationRequest(
             bool worldRot, Rotation rot, bool relRot,
             bool worldTrans, Point trans, bool relTrans,
-            int vel, int zon, MotionType mType)
+            int speed, int zone, MotionType mType)
         {
             if (!areCursorsInitialized)
             {
@@ -801,7 +801,7 @@ namespace RobotControl
                 }
             }
 
-            ActionRotationAndTranslation act = new ActionRotationAndTranslation(worldRot, rot, relRot, worldTrans, trans, relTrans, vel, zon, mType);
+            ActionRotationAndTranslation act = new ActionRotationAndTranslation(worldRot, rot, relRot, worldTrans, trans, relTrans, speed, zone, mType);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (virtualCursor.ApplyAction(act))
             {
@@ -828,7 +828,7 @@ namespace RobotControl
             return IssueRotationAndTranslationRequest(
                 worldRot, rot, relRot,
                 worldTrans, trans, relTrans,
-                currentSettings.Velocity, currentSettings.Zone, currentSettings.MotionType);
+                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Rotation + Translation action request that falls back on the state of current settings.
@@ -839,18 +839,18 @@ namespace RobotControl
         /// <param name="worldTrans"></param>
         /// <param name="trans"></param>
         /// <param name="relTrans"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
         public bool IssueRotationAndTranslationRequest(
             bool worldRot, Rotation rot, bool relRot,
             bool worldTrans, Point trans, bool relTrans,
-            int vel, int zon)
+            int speed, int zone)
         {
             return IssueRotationAndTranslationRequest(
                 worldRot, rot, relRot,
                 worldTrans, trans, relTrans,
-                vel, zon, currentSettings.MotionType);
+                speed, zone, currentSettings.MotionType);
         }
         /// <summary>
         /// Issue a Rotation + Translation action request that falls back on the state of current settings.
@@ -871,7 +871,7 @@ namespace RobotControl
             return IssueRotationAndTranslationRequest(
                 worldRot, rot, relRot,
                 worldTrans, trans, relTrans,
-                currentSettings.Velocity, currentSettings.Zone, mType);
+                currentSettings.Speed, currentSettings.Zone, mType);
         }
 
 
@@ -881,10 +881,10 @@ namespace RobotControl
         /// </summary>
         /// <param name="joints"></param>
         /// <param name="relJnts"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <returns></returns>
-        public bool IssueJointsRequest(Joints joints, bool relJnts, int vel, int zon)
+        public bool IssueJointsRequest(Joints joints, bool relJnts, int speed, int zone)
         {
             if (!areCursorsInitialized)
             {
@@ -909,7 +909,7 @@ namespace RobotControl
                 }
             }
 
-            ActionJoints act = new ActionJoints(joints, relJnts, vel, zon, MotionType.Joints);
+            ActionJoints act = new ActionJoints(joints, relJnts, speed, zone, MotionType.Joints);
             // Only add this action to the queue if it was successfuly applied to the virtualCursor
             if (virtualCursor.ApplyAction(act))
             {
@@ -926,7 +926,7 @@ namespace RobotControl
         /// <returns></returns>
         public bool IssueJointsRequest(Joints joints, bool relJnts)
         {
-            return IssueJointsRequest(joints, relJnts, currentSettings.Velocity, currentSettings.Zone);
+            return IssueJointsRequest(joints, relJnts, currentSettings.Speed, currentSettings.Zone);
         }
 
 
@@ -1193,7 +1193,7 @@ namespace RobotControl
         public void RunPath(Path path)
         {
             Console.WriteLine("RUNNING NEW PATH: " + path.Count);
-            List<string> module = ProgramGenerator.UNSAFEModuleFromPath(path, currentSettings.Velocity, currentSettings.Zone);
+            List<string> module = ProgramGenerator.UNSAFEModuleFromPath(path, currentSettings.Speed, currentSettings.Zone);
 
             comm.LoadProgramToController(module);
             comm.StartProgramExecution();

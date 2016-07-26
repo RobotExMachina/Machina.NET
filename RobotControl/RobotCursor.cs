@@ -16,7 +16,7 @@ namespace RobotControl
     /// <summary>
     /// Represents an abstraction of the state of a robotic device. 
     /// Keeps track of things such as position, orientation, joint configuration,
-    /// current speed, velocity, etc.
+    /// current speed, zone, etc.
     /// Useful as virtual representation of a simulated or controller robot actuator. 
     /// </summary>
     abstract class RobotCursor
@@ -26,7 +26,7 @@ namespace RobotControl
         public Point position;
         public Rotation rotation;
         public Joints joints;
-        public int velocity;
+        public int speed;
         public int zone;
         public MotionType motionType;
         protected bool initialized = false;
@@ -55,7 +55,7 @@ namespace RobotControl
         {
             position = new Point(pos);
             rotation = new Rotation(rot);
-            velocity = -1;
+            speed = -1;
             zone = -1;
             motionType = MotionType.Undefined;
 
@@ -175,7 +175,7 @@ namespace RobotControl
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
-            if (action.velocity != -1) velocity = action.velocity;
+            if (action.speed != -1) speed = action.speed;
             if (action.zone != -1) zone = action.zone;
             if (action.motionType != MotionType.Undefined) motionType = action.motionType;
 
@@ -224,7 +224,7 @@ namespace RobotControl
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
-            if (action.velocity != -1) velocity = action.velocity;
+            if (action.speed != -1) speed = action.speed;
             if (action.zone != -1) zone = action.zone;
             if (action.motionType != MotionType.Undefined) motionType = action.motionType;
 
@@ -306,7 +306,7 @@ namespace RobotControl
             joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
-            if (action.velocity != -1) velocity = action.velocity;
+            if (action.speed != -1) speed = action.speed;
             if (action.zone != -1) zone = action.zone;
             if (action.motionType != MotionType.Undefined) motionType = action.motionType;
 
@@ -392,7 +392,7 @@ namespace RobotControl
             joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             // If valid inputs, update, otherwise stick with previous values
-            if (action.velocity != -1) velocity = action.velocity;
+            if (action.speed != -1) speed = action.speed;
             if (action.zone != -1) zone = action.zone;
             if (action.motionType != MotionType.Undefined) motionType = action.motionType;
 
@@ -427,7 +427,7 @@ namespace RobotControl
             rotation = null;
 
             // If valid inputs, update, otherwise stick with previous values
-            if (action.velocity != -1) velocity = action.velocity;
+            if (action.speed != -1) speed = action.speed;
             if (action.zone != -1) zone = action.zone;
             if (action.motionType != MotionType.Undefined) motionType = action.motionType;
 
@@ -481,7 +481,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("{5}: {0} {1} {2} v{3} z{4}", motionType, position, rotation, velocity, zone, name);
+            return string.Format("{5}: {0} {1} {2} v{3} z{4}", motionType, position, rotation, speed, zone, name);
         }
 
     }

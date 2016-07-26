@@ -58,7 +58,7 @@ namespace RobotControl
         public ActionType type = ActionType.Undefined;
 
         // @TOTHINK: Wrap this into a Settings object instead?
-        public int velocity;
+        public int speed;
         public int zone;
         public MotionType motionType;
 
@@ -105,10 +105,10 @@ namespace RobotControl
         /// <param name="world"></param>
         /// <param name="trans"></param>
         /// <param name="relTrans"></param>
-        /// <param name="vel"></param>
-        /// <param name="zon"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
         /// <param name="mType"></param>
-        public ActionTranslation(bool world, Point trans, bool relTrans, int vel, int zon, MotionType mType)
+        public ActionTranslation(bool world, Point trans, bool relTrans, int speed, int zone, MotionType mType)
         {
             type = ActionType.Translation;
 
@@ -116,8 +116,8 @@ namespace RobotControl
             translation = trans;
             relativeTranslation = relTrans;
 
-            velocity = vel;
-            zone = zon;
+            base.speed = speed;
+            base.zone = zone;
             motionType = mType;
         }
 
@@ -130,7 +130,7 @@ namespace RobotControl
                 worldTranslation ? "globl" : "local",
                 relativeTranslation ? "rel" : "abs",
                 translation,
-                velocity,
+                speed,
                 zone);
         }
     }
@@ -148,7 +148,7 @@ namespace RobotControl
     /// </summary>
     internal class ActionRotation : Action
     {
-        public ActionRotation(bool world, Rotation rot, bool relRot, int vel, int zon, MotionType mType)
+        public ActionRotation(bool world, Rotation rot, bool relRot, int speed, int zone, MotionType mType)
         {
             type = ActionType.Rotation;
 
@@ -156,8 +156,8 @@ namespace RobotControl
             rotation = rot;
             relativeRotation = relRot;
 
-            velocity = vel;
-            zone = zon;
+            base.speed = speed;
+            base.zone = zone;
             motionType = mType;
         }
 
@@ -170,7 +170,7 @@ namespace RobotControl
                 worldRotation ? "globl" : "local",
                 relativeRotation ? "rel" : "abs",
                 rotation,
-                velocity,
+                speed,
                 zone);
         }
 
@@ -192,7 +192,7 @@ namespace RobotControl
         public ActionTranslationAndRotation(
             bool worldTrans, Point trans, bool relTrans,
             bool worldRot, Rotation rot, bool relRot,
-            int vel, int zon, MotionType mType)
+            int speed, int zone, MotionType mType)
         {
             type = ActionType.TranslationAndRotation;
 
@@ -204,8 +204,8 @@ namespace RobotControl
             rotation = rot;
             relativeRotation = relRot;
 
-            velocity = vel;
-            zone = zon;
+            base.speed = speed;
+            base.zone = zone;
             motionType = mType;
         }
 
@@ -221,7 +221,7 @@ namespace RobotControl
                 worldRotation ? "globl" : "local",
                 relativeRotation ? "rel" : "abs",
                 rotation,
-                velocity,
+                speed,
                 zone);
         }
     }
@@ -234,7 +234,7 @@ namespace RobotControl
         public ActionRotationAndTranslation(
             bool worldRot, Rotation rot, bool relRot,
             bool worldTrans, Point trans, bool relTrans,
-            int vel, int zon, MotionType mType)
+            int speed, int zone, MotionType mType)
         {
             type = ActionType.RotationAndTranslation;
 
@@ -246,8 +246,8 @@ namespace RobotControl
             translation = trans;
             relativeTranslation = relTrans;
 
-            velocity = vel;
-            zone = zon;
+            base.speed = speed;
+            base.zone = zone;
             motionType = mType;
         }
 
@@ -263,7 +263,7 @@ namespace RobotControl
                 worldTranslation ? "globl" : "local",
                 relativeTranslation ? "rel" : "abs",
                 translation,
-                velocity,
+                speed,
                 zone);
         }
 
@@ -284,15 +284,15 @@ namespace RobotControl
     /// </summary>
     internal class ActionJoints : Action
     {
-        public ActionJoints(Joints js, bool relJnts, int vel, int zon, MotionType mType)
+        public ActionJoints(Joints js, bool relJnts, int speed, int zone, MotionType mType)
         {
             type = ActionType.Joints;
 
             joints = js;
             relativeJoints = relJnts;
 
-            velocity = vel;
-            zone = zon;
+            base.speed = speed;
+            base.zone = zone;
             motionType = mType;
         }
 
@@ -304,7 +304,7 @@ namespace RobotControl
                         motionType == MotionType.Joints ? "jjj" : "und",
                 relativeJoints ? "rel" : "abs",
                 joints,
-                velocity,
+                speed,
                 zone);
         }
     }

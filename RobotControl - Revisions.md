@@ -20,7 +20,7 @@
 
 ## BUILD 1111
 - [x] Add comments to all missing actions
-- [ ] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
+- [x] Rename all syntax instances of 'velocity' (vector) to 'speed' (scalar)
 - [ ] Refactor .setvel and .setzone to .speed and .zone
 - [ ] List<string> .exportcode(bool flush)
 - [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)

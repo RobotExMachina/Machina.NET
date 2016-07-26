@@ -8,25 +8,25 @@ namespace RobotControl
 {
     class Settings
     {
-        public int Velocity;
+        public int Speed;
         public int Zone;
         public MotionType MotionType;
 
-        public Settings(int vel, int zon, MotionType mType)
+        public Settings(int speed, int zone, MotionType mType)
         {
-            Velocity = vel;
-            Zone = zon;
+            Speed = speed;
+            Zone = zone;
             MotionType = mType;
         }
 
         public Settings Clone()
         {
-            return new Settings(Velocity, Zone, MotionType);
+            return new Settings(Speed, Zone, MotionType);
         }
 
         public override string ToString()
         {
-            return string.Format("{0} {1}-{2}", MotionType, Velocity, Zone);
+            return string.Format("{0} {1}-{2}", MotionType, Speed, Zone);
         }
     }
 
