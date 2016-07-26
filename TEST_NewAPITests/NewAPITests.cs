@@ -56,8 +56,8 @@ namespace TEST_NewAPITests
             //TestRandomJointMovements(arm);
 
             // Absolute vs relative movement buffers
-            TestChangesInMovementModes(arm);  
-             
+            TestChangesInMovementModes(arm);
+                         
             //// Wait and Message
             //TestWaitAndMessage(arm);  
 
