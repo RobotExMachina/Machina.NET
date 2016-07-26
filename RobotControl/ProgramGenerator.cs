@@ -124,6 +124,8 @@ namespace RobotControl
             { MotionType.Joints, "MoveAbsJ" }
         };
 
+
+
         /// <summary>
         /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
@@ -192,11 +194,15 @@ namespace RobotControl
             foreach (Action a in actions)
             {
                 writer.ApplyAction(a);
-                module.Add(string.Format("  CONST {2} target{0}:={1};",
+
+                // Transform and Joints actions. @TODO: be more programmatic here...
+                if (a.type >= ActionType.Translation && a.type <= ActionType.Joints)
+                {
+                    module.Add(string.Format("  CONST {2} target{0}:={1};",
                     it++,
                     writer.GetUNSAFETargetDeclaration(a),
                     MotionData[a.motionType]));
-
+                }
             }
             module.Add("");
 
@@ -207,12 +213,25 @@ namespace RobotControl
             it = 0;
             foreach (Action a in actions)
             {
-                module.Add(string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
+                // Transform and Joints actions. @TODO: be MUCH more programmatic here...
+                if (a.type >= ActionType.Translation && a.type <= ActionType.Joints)
+                {
+                    module.Add(string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
                     MotionInstructions[a.motionType],
                     it++,
                     velNames[a.velocity],
                     zoneNames[a.zone]
                     ));
+                }
+                else if (a.type == ActionType.Message)
+                {
+                    module.Add(string.Format("    TPWrite \"{0}\";", a.message));
+                }
+                else if (a.type == ActionType.Wait)
+                {
+                    // May have to modify last move instruction to zonedata fine (Rapid manual p.696)
+                    module.Add(string.Format("    WaitTime {0};", 0.001 * a.waitMillis));
+                }
             }
             module.Add("  ENDPROC");
             module.Add("");

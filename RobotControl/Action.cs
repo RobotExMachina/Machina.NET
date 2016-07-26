@@ -343,7 +343,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("MSSG: '{0}", message);
+            return string.Format("MSSG: \"{0}\"", message);
         }
     }
 

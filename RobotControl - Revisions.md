@@ -25,7 +25,7 @@
 ## BUILD 1110
 - [x] Add .Message(string) action ;) (will be a good test for program generation with non-movement actions)
 - [x] Add .Wait(long millis) action
-- [ ] Rewrite program generation to accept non-movement actions (or even the ones that don't apply at all)
+- [x] Rewrite program generation to accept non-movement actions (or even the ones that don't apply at all) --> This could be done more programmatically, but moving on... :)
 
 ## BUILD 1109
 - [x] Add .Joints() and .JointsTo() actions

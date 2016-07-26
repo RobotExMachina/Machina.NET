@@ -629,14 +629,14 @@ namespace TEST_NewAPITests
             arm.Message("Going home");
             arm.MoveTo(300, 0, 500);
 
-            arm.Message("Waiting 2s to go start");
-            arm.Wait(2000);   
+            arm.Message("Waiting 1.5s to go start");
+            arm.Wait(1500); 
 
             arm.Message("Starting first path");
             arm.MoveGlobal(0, 200, -100);
 
-            arm.Message("Waiting 2s to go back");
-            arm.Wait(2000);
+            arm.Message("Waiting 5s to go back");
+            arm.Wait(5000);
 
             arm.Message("Going home");
             arm.JointsTo(0, 0, 0, 0, 90, 0);
