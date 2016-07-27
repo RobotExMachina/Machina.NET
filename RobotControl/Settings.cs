@@ -11,22 +11,24 @@ namespace RobotControl
         public int Speed;
         public int Zone;
         public MotionType MotionType;
-
-        public Settings(int speed, int zone, MotionType mType)
+        public ReferenceCS RefCS;
+        
+        public Settings(int speed, int zone, MotionType mType, ReferenceCS refcs)
         {
             Speed = speed;
             Zone = zone;
             MotionType = mType;
+            RefCS = refcs;
         }
 
         public Settings Clone()
         {
-            return new Settings(Speed, Zone, MotionType);
+            return new Settings(Speed, Zone, MotionType, RefCS);
         }
 
         public override string ToString()
         {
-            return string.Format("{0} {1}-{2}", MotionType, Speed, Zone);
+            return string.Format("{0} {1} {2}-{3}", RefCS, MotionType, Speed, Zone);
         }
     }
 

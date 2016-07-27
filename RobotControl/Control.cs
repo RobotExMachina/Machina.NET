@@ -22,6 +22,7 @@ namespace RobotControl
         public static readonly int DEFAULT_SPEED = 20;                                  // default speed for new actions
         public static readonly int DEFAULT_ZONE = 5;                                    // default zone for new actions
         public static readonly MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
+        public static readonly ReferenceCS DEFAULT_REF_CS = ReferenceCS.World;          // default reference coordinate system for relative transform actions
         
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace RobotControl
             virtualCursor = null;
             writeCursor = null;
 
-            currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE);
+            currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REF_CS);
             settingsBuffer = new SettingsBuffer();
         }
 
@@ -514,6 +515,24 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// Gets the reference coordinate system used for relative transform actions.
+        /// </summary>
+        /// <returns></returns>
+        public ReferenceCS GetCurrentReferenceCS()
+        {
+            return currentSettings.RefCS;
+        }
+
+        /// <summary>
+        /// Sets the default reference coordinate system to use for relative transform actions.
+        /// </summary>
+        /// <param name="refcs"></param>
+        public void SetCurrentReferenceCS(ReferenceCS refcs)
+        {
+            currentSettings.RefCS = refcs;
+        }
+        
+        /// <summary>
         /// Buffers current state settings (speed, zone, motion type...), and opens up for 
         /// temporary settings changes to be reverted by PopSettings().
         /// </summary>
@@ -521,7 +540,7 @@ namespace RobotControl
         {
             Console.WriteLine("Pushing {0}", currentSettings);
             settingsBuffer.Push(currentSettings);
-            currentSettings = currentSettings.Clone();
+            currentSettings = currentSettings.Clone();  // sets currentS to a new object
         }
 
         /// <summary>
@@ -583,6 +602,17 @@ namespace RobotControl
             return success;
         }
 
+        /// <summary>
+        /// Issue a Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="trans"></param>
+        /// <param name="relative"></param>
+        /// <returns></returns>
+        public bool IssueTranslationRequest(Point trans, bool relative)
+        {
+            return IssueTranslationRequest(currentSettings.RefCS == ReferenceCS.World, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        }
         /// <summary>
         /// Issue a Translation action request that falls back on the state of current settings.
         /// </summary>
@@ -659,6 +689,17 @@ namespace RobotControl
             return success;
         }
 
+        /// <summary>
+        /// Issue a Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="rot"></param>
+        /// <param name="relative"></param>
+        /// <returns></returns>
+        public bool IssueRotationRequest(Rotation rot, bool relative)
+        {
+            return IssueRotationRequest(currentSettings.RefCS == ReferenceCS.World, rot, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        }
         /// <summary>
         /// Issue a Rotation action request that falls back on the state of current settings.
         /// </summary>
@@ -743,6 +784,25 @@ namespace RobotControl
             return false;
         }
 
+        /// <summary>
+        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <returns></returns>
+        public bool IssueTranslationAndRotationRequest(
+            Point trans, bool relTrans,
+            Rotation rot, bool relRot)
+        {
+            return IssueTranslationAndRotationRequest(
+                currentSettings.RefCS == ReferenceCS.World, trans, relTrans,
+                currentSettings.RefCS == ReferenceCS.World, rot, relRot,
+                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        }
         /// <summary>
         /// Issue a Translation + Rotation action request that falls back on the state of current settings.
         /// </summary>
@@ -853,6 +913,25 @@ namespace RobotControl
             return false;
         }
 
+        /// <summary>
+        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        /// </summary>
+        /// <param name="worldRot"></param>
+        /// <param name="rot"></param>
+        /// <param name="relRot"></param>
+        /// <param name="worldTrans"></param>
+        /// <param name="trans"></param>
+        /// <param name="relTrans"></param>
+        /// <returns></returns>
+        public bool IssueRotationAndTranslationRequest(
+            Rotation rot, bool relRot,
+            Point trans, bool relTrans)
+        {
+            return IssueRotationAndTranslationRequest(
+                currentSettings.RefCS == ReferenceCS.World, rot, relRot,
+                currentSettings.RefCS == ReferenceCS.World, trans, relTrans,
+                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        }
         /// <summary>
         /// Issue a Rotation + Translation action request that falls back on the state of current settings.
         /// </summary>

@@ -23,6 +23,11 @@
 
 ## BUILD 1112
 - [x] List<string> .Export()
+- [ ] API implementations:  
+    - [ ] .Coordinates()
+    - [ ] back to .Move() relying on current CS and .MoveTo() as absolute
+    - [ ] same with .Rotate() and .Transform()
+    - [ ] transform J options
 - [ ] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
 - [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
 - [ ] Write a full 'unit test' program to verify functionality doesn't break

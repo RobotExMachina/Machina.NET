@@ -43,6 +43,15 @@ namespace RobotControl
         Once = 1,
         Loop = 2
     };
+
+    /// <summary>
+    /// Defines which reference coordinate system to use for transform actions.
+    /// </summary>
+    public enum ReferenceCS : int
+    {
+        World = 0,
+        Local = 1
+    }
     
 
 
@@ -396,6 +405,49 @@ namespace RobotControl
             }
 
             Motion(t);
+        }
+
+        /// <summary>
+        /// Gets current ReferenceCS setting.
+        /// </summary>
+        /// <returns></returns>
+        public ReferenceCS Coordinates()
+        {
+            return c.GetCurrentReferenceCS();
+        }
+
+        /// <summary>
+        /// Sets the reference system used for relative transformations.
+        /// </summary>
+        /// <param name="refcs"></param>
+        public void Coordinates(ReferenceCS refcs)
+        {
+            c.SetCurrentReferenceCS(refcs);
+        }
+
+        /// <summary>
+        /// Sets the reference system used for relative transformations ('local', 'global'...)
+        /// </summary>
+        /// <param name="type"></param>
+        public void Coordinates(string type)
+        {
+            ReferenceCS refcs;
+            type = type.ToLower();
+            if (type.Equals("global") || type.Equals("world"))
+            {
+                refcs = ReferenceCS.World;
+            }
+            else if (type.Equals("local"))
+            {
+                refcs = ReferenceCS.Local;
+            }
+            else
+            {
+                Console.WriteLine("Invalid reference coordinate system");
+                return;
+            }
+
+            Coordinates(refcs);
         }
 
         /// <summary>
