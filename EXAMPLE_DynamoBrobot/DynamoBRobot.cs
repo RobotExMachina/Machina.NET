@@ -22,14 +22,17 @@ namespace EXAMPLE_DynamoBRobot
             return bot;
         }
 
-        public static List<string> GenerateCode(Robot bot, int speed, int zone, Plane plane)
+        public static List<string> GenerateCode(Robot bot, int speed, int zone, List<Plane> planes)
         {
             bot.ControlMode("offline");
 
             bot.Speed(speed);
             bot.Zone(zone);
             bot.JointsTo(0, 0, 0, 0, 90, 0);
-            bot.TransformTo(DynamoPlaneToBRobotRotation(plane), DynamoPlaneToBRobotPoint(plane));
+            foreach (Plane p in planes)
+            {
+                bot.TransformTo(DynamoPlaneToBRobotRotation(p), DynamoPlaneToBRobotPoint(p));
+            }
             bot.JointsTo(0, 0, 0, 0, 90, 0);
 
             return bot.Export();
