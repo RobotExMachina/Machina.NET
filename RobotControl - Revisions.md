@@ -29,8 +29,7 @@
     - [x] same with .Rotate() and .Transform()
     - [ ] ~~transform J options~~ --> will use .Motion(strType) as a setting instead
 - [x] Fixed ProgramGenerator bug running actions twice on writeCursor.
-- [ ] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
-- [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
+- [X] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
 - [ ] Write a full 'unit test' program to verify functionality doesn't break
 
 ## BUILD 1111
