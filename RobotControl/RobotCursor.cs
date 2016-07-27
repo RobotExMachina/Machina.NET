@@ -128,7 +128,7 @@ namespace RobotControl
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute position values first before applying relative ones...");
+                    Console.WriteLine("Sorry, must provide absolute position values first before applying relative ones..." + this);
                     return false;
                 }
 
@@ -147,7 +147,7 @@ namespace RobotControl
                 // Fail if issued abs movement without prior rotation info. (This limitation is due to current lack of FK/IK solvers)
                 if (rotation == null)
                 {
-                    Console.WriteLine("Sorry, currently missing TCP orientation to work with...");
+                    Console.WriteLine("Sorry, currently missing TCP orientation to work with..." + this);
                     return false;
                 }
 
@@ -196,7 +196,7 @@ namespace RobotControl
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute rotation values first before applying relative ones...");
+                    Console.WriteLine("Sorry, must provide absolute rotation values first before applying relative ones..." + this);
                     return false;
                 }
 
@@ -214,7 +214,7 @@ namespace RobotControl
                 // Fail if issued abs rotation without prior position info. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null)
                 {
-                    Console.WriteLine("Sorry, currently missing TCP position to work with...");
+                    Console.WriteLine("Sorry, currently missing TCP position to work with..." + this);
                     return false;
                 }
 
@@ -241,7 +241,7 @@ namespace RobotControl
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
                     return false;
                 }
 
@@ -283,7 +283,7 @@ namespace RobotControl
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
                     return false;
                 }
 
@@ -323,7 +323,7 @@ namespace RobotControl
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
                     return false;
                 }
 
@@ -350,7 +350,7 @@ namespace RobotControl
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones...");
+                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
                     return false;
                 }
 
@@ -412,7 +412,7 @@ namespace RobotControl
                 // (This limitation is due to current lack of FK/IK solvers)
                 if (joints == null)  // could also check for motionType == MotionType.Joints
                 {
-                    Console.WriteLine("Sorry, must provide absolute Joints values first before applying relative ones...");
+                    Console.WriteLine("Sorry, must provide absolute Joints values first before applying relative ones..." + this);
                     return false;
                 }
                 joints.Add(action.joints);
@@ -476,7 +476,7 @@ namespace RobotControl
 
         public override string ToString()
         {
-            return string.Format("{5}: {0} {1} {2} v{3} z{4}", motionType, position, rotation, speed, zone, name);
+            return string.Format("{5}: {0} p{1} r{2} j{6} v{3} z{4}", motionType, position, rotation, speed, zone, name, joints);
         }
 
     }

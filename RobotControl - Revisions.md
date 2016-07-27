@@ -23,11 +23,12 @@
 
 ## BUILD 1112
 - [x] List<string> .Export()
-- [ ] API implementations:  
-    - [ ] .Coordinates()
-    - [ ] back to .Move() relying on current CS and .MoveTo() as absolute
-    - [ ] same with .Rotate() and .Transform()
-    - [ ] transform J options
+- [x] API implementations:  
+    - [x] .Coordinates()
+    - [x] back to .Move() relying on current CS and .MoveTo() as absolute
+    - [x] same with .Rotate() and .Transform()
+    - [ ] ~~transform J options~~ --> will use .Motion(strType) as a setting instead
+- [x] Fixed ProgramGenerator bug running actions twice on writeCursor.
 - [ ] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
 - [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
 - [ ] Write a full 'unit test' program to verify functionality doesn't break
@@ -38,7 +39,7 @@
 - [x] Refactor .setvel and .setzone to .speed and .zone
 - [x] Remove MointType.Joints: there is only one type of ActionJoint, so there is no need to specify this
 - [x] Improved ProgramGenerator workflow 
-- [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?) --> Hybrid: all inputs are degs, all return values are radians... 
+- [ ] ~~Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?)~~ --> Hybrid: all inputs are degs, all return values are radians... 
 
 ## BUILD 1110
 - [x] Add .Message(string) action ;) (will be a good test for program generation with non-movement actions)

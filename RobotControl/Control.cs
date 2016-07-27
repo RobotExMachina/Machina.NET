@@ -1386,6 +1386,7 @@ namespace RobotControl
         public void DebugSettingsBuffer()
         {
             settingsBuffer.LogBuffer();
+            Console.WriteLine("Current settings: " + currentSettings);
         }
 
         /// <summary>

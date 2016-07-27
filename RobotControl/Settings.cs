@@ -59,7 +59,8 @@ namespace RobotControl
 
         public void LogBuffer()
         {
-            foreach (Settings s in buffer) Console.WriteLine(s);
+            int it = 0;
+            foreach (Settings s in buffer) Console.WriteLine(it++ + ": " +s);
         }
 
     }

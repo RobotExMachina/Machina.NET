@@ -166,12 +166,7 @@ namespace RobotControl
             // Cast the robotPointer to the correct subclass
             RobotCursorABB writer = (RobotCursorABB)writePointer;  // @TODO: ask @PAN
 
-            // Initialize a module list
-            List<string> module = new List<string>();
-
-            // MODULE HEADER
-            module.Add("MODULE " + programName);
-            module.Add("");
+            // CODE LINES GENERATION
 
             // VELOCITY & ZONE DECLARATIONS
             // Figure out how many different ones are there first
@@ -197,54 +192,100 @@ namespace RobotControl
                 }
             }
 
-            foreach(int v in velNames.Keys)
+            List<string> velocityLines = new List<string>();
+            foreach (int v in velNames.Keys)
             {
-                module.Add(string.Format("  CONST speeddata {0}:={1};", velNames[v], velDecs[v]));
+                velocityLines.Add(string.Format("  CONST speeddata {0}:={1};", velNames[v], velDecs[v]));
             }
-            module.Add("");
 
-            bool anyNonPredef = false;
+            List<string> zoneLines = new List<string>();
             foreach (int z in zoneNames.Keys)
             {
-                if(!zonePredef[z])  // no need to add declarations for predefined zones
+                if (!zonePredef[z])  // no need to add declarations for predefined zones
                 {
-                    module.Add(string.Format("  CONST zonedata {0}:={1};", zoneNames[z], zoneDecs[z]));
-                    anyNonPredef = true;
+                    zoneLines.Add(string.Format("  CONST zonedata {0}:={1};", zoneNames[z], zoneDecs[z]));
                 }
             }
-            if (anyNonPredef) module.Add("");
 
-            // TARGET DECLARATIONS
-            // Use the write robot pointer to generate instructions
+
+            // TARGETS AND INSTRUCTIONS
+            //Dictionary<int, string> variableLines = new Dictionary<int, string>();
+            //Dictionary<int, string> instructionLines = new Dictionary<int, string>();
+            List<string> variableLines = new List<string>();
+            List<string> instructionLines = new List<string>();
+
+            // Use the write robot pointer to generate the data
             int it = 0;
             string line = null;
             foreach (Action a in actions)
             {
+                // Move writerCursor to this action state
                 writer.ApplyAction(a);
 
-                if (GenerateVariableDeclaration(a, writer, it++, out line))  // there will be a number jump on target-less instructions, but oh well...
-                {   
-                    module.Add(line);
+                // Generate lines of code
+                if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                {
+                    //variableLines.Add(it, line);
+                    variableLines.Add(line);
                 };
-                
+                if (GenerateInstructionDeclaration(a, writer, it, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
+                {
+                    //variableLines.Add(it, line);
+                    instructionLines.Add(line);
+                };
+
+                // Move on
+                it++;
             }
+            
+
+
+            
+
+            // PROGRAM ASSEMBLY
+            // Initialize a module list
+            List<string> module = new List<string>();
+
+            // MODULE HEADER
+            module.Add("MODULE " + programName);
             module.Add("");
 
+            // VARIABLE DECLARATIONS
+            // Velocities
+            if (velocityLines.Count != 0)
+            {
+                module.AddRange(velocityLines);
+                module.Add("");
+            }
+
+            // Zones
+            if (zoneLines.Count != 0)
+            {
+                module.AddRange(zoneLines);
+                module.Add("");
+            }
+
+            // Targets
+            if (variableLines.Count != 0)
+            {
+                module.AddRange(variableLines);
+                module.Add("");
+            }
+            
+            
             // MAIN PROCEDURE
             module.Add("  PROC main()");
             module.Add(@"    ConfJ \Off;");
             module.Add(@"    ConfL \Off;");
-            it = 0;
-            line = null;
-            foreach (Action a in actions)
-            {
-                writer.ApplyAction(a);
+            module.Add("");
 
-                if (GenerateInstructionDeclaration(a, writer, it++, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
-                {
-                    module.Add(line);
-                };
+            // Instructions
+            if (instructionLines.Count != 0)
+            {
+                module.AddRange(instructionLines);
+                module.Add("");
             }
+
             module.Add("  ENDPROC");
             module.Add("");
             

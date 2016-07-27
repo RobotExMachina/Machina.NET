@@ -32,7 +32,10 @@ arm.Rotate(0, 0, 1, 45);        // relative rotation in global coordinates (defa
 arm.TransformTo(new Point(300, 0, 500), new Rotation(-1, 0, 0, 0, 1, 0));  // absolute trans + rot. order doesn't matter here
 arm.Transform(new Point(100, 0, 0), new Rotation(1, 0, 0, 45));             // relative trans + rot in world coords (default). Because using world, order still doesn't matter here
 
-// ALL THE ABOVE HAVE .ActionJ() versions with joint movement instead of linear
+// Joint motion
+arm.Motion("joint");            // sets current motion type to 'joints' (as opposed to default linear)
+arm.MoveTo(300, 0, 500);        // performs a MoveJ action
+arm.Motion("linear");           // back to default
 
 // Local transformations
 arm.Coordinates("local");       // for relative actions like .Move(), .Rotate() or .Transform(), sets either local or global/world reference system. This is also buffered by PushSettings.  --> How about .Coordinates("robot/base/TCP")

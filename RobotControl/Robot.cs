@@ -479,49 +479,49 @@ namespace RobotControl
         //                                                         
         
         /// <summary>
-        /// Issue a relative movement on local coordinates action request.
+        /// Issue a relative movement action request on current coordinate system.
         /// </summary>
         /// <param name="direction"></param>
         /// <returns></returns>
-        public bool MoveLocal(Point direction)
+        public bool Move(Point direction)
         {
-            return c.IssueTranslationRequest(false, direction, true);
+            return c.IssueTranslationRequest(direction, true);
         }
 
         /// <summary>
-        /// Issue a relative movement on local coordinates action request.
+        /// Issue a relative movement action request on current coordinate system.
         /// </summary>
         /// <param name="incX"></param>
         /// <param name="incY"></param>
         /// <param name="incZ"></param>
         /// <returns></returns>
-        public bool MoveLocal(double incX, double incY, double incZ)
+        public bool Move(double incX, double incY, double incZ)
         {
-            return MoveLocal(new Point(incX, incY, incZ));
+            return Move(new Point(incX, incY, incZ));
         }
 
-        /// <summary>
-        /// Issue a relative movement on world coordinates action request.
-        /// </summary>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        public bool MoveGlobal(Point direction)
-        {
-            return c.IssueTranslationRequest(true, direction, true);
-        }
+        ///// <summary>
+        ///// Issue a relative movement on world coordinates action request.
+        ///// </summary>
+        ///// <param name="direction"></param>
+        ///// <returns></returns>
+        //public bool MoveGlobal(Point direction)
+        //{
+        //    return c.IssueTranslationRequest(true, direction, true);
+        //}
 
-        /// <summary>
-        /// Issue a relative movement on world coordinates action request.
-        /// </summary>
-        /// <param name="incX"></param>
-        /// <param name="incY"></param>
-        /// <param name="incZ"></param>
-        /// <returns></returns>
-        public bool MoveGlobal(double incX, double incY, double incZ)
-        {
-            return MoveGlobal(new Point(incX, incY, incZ));
-        }
-                
+        ///// <summary>
+        ///// Issue a relative movement on world coordinates action request.
+        ///// </summary>
+        ///// <param name="incX"></param>
+        ///// <param name="incY"></param>
+        ///// <param name="incZ"></param>
+        ///// <returns></returns>
+        //public bool MoveGlobal(double incX, double incY, double incZ)
+        //{
+        //    return MoveGlobal(new Point(incX, incY, incZ));
+        //}
+
         /// <summary>
         /// Issue an absolute movement action request.
         /// </summary>
@@ -555,72 +555,72 @@ namespace RobotControl
         //}
         
         /// <summary>
-        /// Issue a relative rotation around local axes request.
+        /// Issue a relative rotation action request around local/global axes.
         /// </summary>
         /// <param name="rotation"></param>
         /// <returns></returns>
-        public bool RotateLocal(Rotation rotation)
+        public bool Rotate(Rotation rotation)
         {
-            return c.IssueRotationRequest(false, rotation, true);
+            return c.IssueRotationRequest(rotation, true);
         }
 
         /// <summary>
-        /// Issue a relative rotation around local axes request.
+        /// Issue a relative rotation action request around local/global axes.
         /// </summary>
         /// <param name="vector"></param>
         /// <param name="angDegs"></param>
         /// <returns></returns>
-        public bool RotateLocal(Point vector, double angDegs)
+        public bool Rotate(Point vector, double angDegs)
         {
-            return RotateLocal(new Rotation(vector, angDegs));
+            return Rotate(new Rotation(vector, angDegs));
         }
 
         /// <summary>
-        /// Issue a relative rotation around local axes request.
+        /// Issue a relative rotation action request around local/global axes.
         /// </summary>
-        /// <param name="vecX"></param>
-        /// <param name="vecY"></param>
-        /// <param name="vecZ"></param>
+        /// <param name="rotVecX"></param>
+        /// <param name="rotVecY"></param>
+        /// <param name="rotVecZ"></param>
         /// <param name="angDegs"></param>
         /// <returns></returns>
-        public bool RotateLocal(double vecX, double vecY, double vecZ, double angDegs)
+        public bool Rotate(double rotVecX, double rotVecY, double rotVecZ, double angDegs)
         {
-            return RotateLocal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
+            return Rotate(new Rotation(new Point(rotVecX, rotVecY, rotVecZ), angDegs));
         }
         
-        /// <summary>
-        /// Issue a relative rotation around global axes request.
-        /// </summary>
-        /// <param name="rotation"></param>
-        /// <returns></returns>
-        public bool RotateGlobal(Rotation rotation)
-        {
-            return c.IssueRotationRequest(true, rotation, true);
-        }
+        ///// <summary>
+        ///// Issue a relative rotation around global axes request.
+        ///// </summary>
+        ///// <param name="rotation"></param>
+        ///// <returns></returns>
+        //public bool RotateGlobal(Rotation rotation)
+        //{
+        //    return c.IssueRotationRequest(true, rotation, true);
+        //}
 
-        /// <summary>
-        /// Issue a relative rotation around global axes request.
-        /// </summary>
-        /// <param name="vector"></param>
-        /// <param name="angDegs"></param>
-        /// <returns></returns>
-        public bool RotateGlobal(Point vector, double angDegs)
-        {
-            return RotateGlobal(new Rotation(vector, angDegs));
-        }
+        ///// <summary>
+        ///// Issue a relative rotation around global axes request.
+        ///// </summary>
+        ///// <param name="vector"></param>
+        ///// <param name="angDegs"></param>
+        ///// <returns></returns>
+        //public bool RotateGlobal(Point vector, double angDegs)
+        //{
+        //    return RotateGlobal(new Rotation(vector, angDegs));
+        //}
 
-        /// <summary>
-        /// Issue a relative rotation around global axes request.
-        /// </summary>
-        /// <param name="vecX"></param>
-        /// <param name="vecY"></param>
-        /// <param name="vecZ"></param>
-        /// <param name="angDegs"></param>
-        /// <returns></returns>
-        public bool RotateGlobal(double vecX, double vecY, double vecZ, double angDegs)
-        {
-            return RotateGlobal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
-        }
+        ///// <summary>
+        ///// Issue a relative rotation around global axes request.
+        ///// </summary>
+        ///// <param name="vecX"></param>
+        ///// <param name="vecY"></param>
+        ///// <param name="vecZ"></param>
+        ///// <param name="angDegs"></param>
+        ///// <returns></returns>
+        //public bool RotateGlobal(double vecX, double vecY, double vecZ, double angDegs)
+        //{
+        //    return RotateGlobal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
+        //}
         
         /// <summary>
         /// Issue an absolute global reorientation request.
@@ -671,54 +671,54 @@ namespace RobotControl
                 
 
         /// <summary>
-        /// Issue a compound relative local Translation + Rotation request.
-        /// Note that for relative local transformations order of actions matters. 
+        /// Issue a compound relative local Translation + Rotation request. 
+        /// Note that, if using local coordinates, order of actions will matter.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <returns></returns>
-        public bool TransformLocal(Point position, Rotation rotation)
+        public bool Transform(Point position, Rotation rotation)
         {
             // Note the T+R action order
-            return c.IssueTranslationAndRotationRequest(false, position, true, false, rotation, true);
+            return c.IssueTranslationAndRotationRequest(position, true, rotation, true);
         }
 
         /// <summary>
         /// Issue a compound relative local Rotation + Translation request.
-        /// Note that for relative local transformations order of actions matters. 
+        /// Note that, if using local coordinates, order of actions will matter.
         /// </summary>
         /// <param name="rotation"></param>
         /// <param name="position"></param>
         /// <returns></returns>
-        public bool TransformLocal (Rotation rotation, Point position)
+        public bool Transform(Rotation rotation, Point position)
         {
             // Note the R+T action order
-            return c.IssueRotationAndTranslationRequest(false, rotation, true, false, position, true);
+            return c.IssueRotationAndTranslationRequest(rotation, true, position, true);
         }
 
-        /// <summary>
-        /// Issue a compound relative global Translation + Rotation request.
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <returns></returns>
-        public bool TransformGlobal(Point position, Rotation rotation)
-        {
-            // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
-            return c.IssueTranslationAndRotationRequest(true, position, true, true, rotation, true);
-        }
+        ///// <summary>
+        ///// Issue a compound relative global Translation + Rotation request.
+        ///// </summary>
+        ///// <param name="position"></param>
+        ///// <param name="rotation"></param>
+        ///// <returns></returns>
+        //public bool TransformGlobal(Point position, Rotation rotation)
+        //{
+        //    // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
+        //    return c.IssueTranslationAndRotationRequest(true, position, true, true, rotation, true);
+        //}
 
-        /// <summary>
-        /// Issue a compound relative global Translation + Rotation request.
-        /// </summary>
-        /// <param name="rotation"></param>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        public bool TransformGlobal(Rotation rotation, Point position)
-        {
-            // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
-            return c.IssueRotationAndTranslationRequest(true, rotation, true, true, position, true);
-        }
+        ///// <summary>
+        ///// Issue a compound relative global Translation + Rotation request.
+        ///// </summary>
+        ///// <param name="rotation"></param>
+        ///// <param name="position"></param>
+        ///// <returns></returns>
+        //public bool TransformGlobal(Rotation rotation, Point position)
+        //{
+        //    // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
+        //    return c.IssueRotationAndTranslationRequest(true, rotation, true, true, position, true);
+        //}
 
         /// <summary>
         /// Issue a compound absolute global Translation + Rotation request.
@@ -824,12 +824,12 @@ namespace RobotControl
 
 
 
-        // @TODO: feels like Path is too much of a spatial geometry description. 
-        // Should it become something more action-related? Like Instructions, Program, Commands?
-        public bool Follow(Path path)
-        {
-            throw new NotImplementedException();
-        }
+        //// @TODO: feels like Path is too much of a spatial geometry description. 
+        //// Should it become something more action-related? Like Instructions, Program, Commands?
+        //public bool Follow(Path path)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
 
 

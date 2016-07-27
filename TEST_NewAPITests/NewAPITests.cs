@@ -36,7 +36,7 @@ namespace TEST_NewAPITests
             //RotationTests2(arm);
 
             //// Rel/abs movements
-            //MovementTest(arm);
+            //TestLocalWorldMovements(arm);
 
             //// Generative circle movement
             //TestCircle(arm);
@@ -44,7 +44,7 @@ namespace TEST_NewAPITests
             //// Transformations
             //TransformTests(arm);
             //TestCircleTransformAbsolute(arm, 50);
-            //TestCircleTransformLocal(arm, 10); 
+            //TestCircleTransformLocal(arm, 10);
             //TestCircleTransformGlobal(arm, 10);
             //TestZTableLimitations(arm);
 
@@ -55,11 +55,11 @@ namespace TEST_NewAPITests
             //TestJointMovementRange(arm);
             //TestRandomJointMovements(arm);
 
-            // Absolute vs relative movement buffers
-            TestChangesInMovementModes(arm);
-                         
+            //// Absolute vs relative movement buffers
+            //TestChangesInMovementModes(arm);
+
             //// Wait and Message
-            //TestWaitAndMessage(arm);  
+            //TestWaitAndMessage(arm);
 
             arm.DebugBuffer();  // read all pending buffered actions
             arm.DebugRobotCursors();
@@ -85,10 +85,10 @@ namespace TEST_NewAPITests
 
             arm.Speed(50);
             arm.Zone(2);  // non predef zone
-            arm.MoveGlobal(50, 0, 0);
-            arm.MoveGlobal(0, 50, 0);
-            arm.MoveGlobal(-50, 0, 0);
-            arm.MoveGlobal(0, -50, 50);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
+            arm.Move(0, -50, 50);
 
             arm.Speed(500);
             arm.Zone(10);
@@ -104,7 +104,7 @@ namespace TEST_NewAPITests
             arm.Zone(1);
             arm.MoveTo(300, 0, 600);
             arm.MoveTo(200, -200, 400);
-            arm.MoveGlobal(0, 378, 0);
+            arm.Move(0, 378, 0);
             arm.MoveTo(300, 0, 600);
 
             if (jointMovement) arm.Motion("linear");  // back to where it was... this will improve with arm.PushSettings(); 
@@ -114,10 +114,11 @@ namespace TEST_NewAPITests
         {
             double h = height;
             zStep = Math.Abs(zStep);
+            arm.Speed(100);
             arm.MoveTo(300, 0, h);
             while (h > 0)
             {
-                arm.MoveGlobal(0, 0, -zStep);
+                arm.Move(0, 0, -zStep);
                 h -= zStep;
             }
 
@@ -127,26 +128,33 @@ namespace TEST_NewAPITests
 
         static public void PushAndPopSettingsTest(Robot arm)
         {
+            arm.MoveTo(300, -200, 300);
+
             arm.PushSettings();
-
-            arm.Speed(222);
-            arm.PushSettings();
-
-            arm.Zone(4);
-            arm.PushSettings();
-
-            arm.Motion("joint");
-            arm.PushSettings();
-
-            arm.MoveTo(300, 300, 300);
-
+            arm.Speed(52);
+            arm.Move(0, 200, 0);
             arm.DebugSettingsBuffer();
-
-            arm.PopSettings();
-            arm.PopSettings();
-            arm.PopSettings();
             arm.PopSettings();
 
+            arm.PushSettings();
+            arm.Zone(4);
+            arm.Move(0, 200, 0);
+            arm.DebugSettingsBuffer();
+            arm.PopSettings();
+
+            arm.PushSettings();
+            arm.Motion("joint");
+            arm.Speed(150);
+            arm.Move(0, 0, 200);
+            arm.DebugSettingsBuffer();
+            arm.PopSettings();
+
+            arm.PushSettings();
+            arm.Coordinates("LOCAL");
+            arm.Move(0, 0, 200);
+            arm.DebugSettingsBuffer();
+            arm.PopSettings();
+            
             arm.MoveTo(300, 0, 500);
 
             arm.DebugSettingsBuffer();
@@ -192,6 +200,7 @@ namespace TEST_NewAPITests
 
             Rotation ry45 = new Rotation(new Point(0, 1, 0), 45);
             Rotation ry90 = new Rotation(new Point(0, 1, 0), 90);
+            Rotation ry135 = new Rotation(new Point(0, 1, 0), 135);
             Rotation ry180 = new Rotation(new Point(0, 1, 0), 180);
 
             Rotation rz45 = new Rotation(new Point(0, 0, 1), 45);
@@ -217,9 +226,11 @@ namespace TEST_NewAPITests
             // Velocity is expresses in both mm/s and °/s
             arm.Speed(45);
 
+            
+            arm.RotateTo(ry135);
             arm.RotateTo(ry180);
-
-            arm.RotateTo(r5);
+            arm.RotateTo(ry90);
+            arm.RotateTo(ry180);
 
             arm.Speed(100);
             arm.MoveTo(300, 0, 500);
@@ -257,30 +268,23 @@ namespace TEST_NewAPITests
             arm.Speed(30);
             arm.RotateTo(0, 0, -1, 0, 1, 0);
 
-            //// Rotate it around its local Z (joint 6)
-            //arm.RotateLocal(0, 0, 1, 45);
-            //arm.RotateLocal(0, 0, 1, -90);
-            //arm.RotateLocal(0, 0, 1, 45);
-
-            // Now lets try world Z
-            arm.RotateGlobal(0, 0, 1, -90);
-            //arm.RotateGlobal(0, 0, 1, -90);
-            //arm.RotateGlobal(0, 0, 1, 45);
-
+            // Now lets try relative rotation over world Z
+            arm.Rotate(0, 0, 1, -90);
+            
+            // Now a series of relative transforms on world coordinates
             for (int i = 0; i < 10; i++)
             {
-                arm.MoveGlobal(0, -40, 0);
-                arm.RotateLocal(Point.YAxis, 9);
+                arm.Move(0, -40, 0);
+                arm.Rotate(Point.YAxis, 9);
             }
 
             // Back home
             arm.Speed(100);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
             arm.MoveTo(300, 0, 500);
-
         }
 
-        public static void MovementTest(Robot arm)
+        public static void TestLocalWorldMovements(Robot arm)
         {
             // Reset
             arm.Speed(100);
@@ -290,19 +294,29 @@ namespace TEST_NewAPITests
             arm.Speed(25);
 
             // Rotate TCP
-            arm.RotateLocal(Point.XAxis, 45);
+            arm.PushSettings();
+            arm.Coordinates("local");
+            arm.Rotate(Point.XAxis, 45);
+            arm.PopSettings();
 
             // Do global movement
-            arm.MoveGlobal(50, 0, 0);
-            arm.MoveGlobal(0, 50, 0);
-            arm.MoveGlobal(0, 0, 50);
-            arm.MoveGlobal(-50, -50, -50);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(0, 0, 50);
+            arm.Move(-50, 0, 0);
+            arm.Move(0, -50, 0);
+            arm.Move(0, 0, -50);
 
             // Do local movement
-            arm.MoveLocal(50, 0, 0);
-            arm.MoveLocal(0, 50, 0);
-            arm.MoveLocal(0, 0, 50);
-            arm.MoveLocal(-50, -50, -50);
+            arm.PushSettings();
+            arm.Coordinates("local");
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(0, 0, 50);
+            arm.Move(-50, 0, 0);
+            arm.Move(0, -50, 0);
+            arm.Move(0, 0, -50);
+            arm.PopSettings();
 
             // Back home
             arm.Speed(100);
@@ -317,19 +331,26 @@ namespace TEST_NewAPITests
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
-            arm.MoveGlobal(150, 0, -100);
+            arm.Move(150, 0, -100);
 
+            arm.PushSettings();
+            arm.Coordinates("local");
             for (var i = 0; i < 36; i++)
             {
-                arm.MoveLocal(5 * Point.YAxis);
-                arm.RotateLocal(Point.ZAxis, 10);
-                arm.RotateLocal(Point.YAxis, -2);  // add some off plane movement ;)
+                arm.Move(5 * Point.YAxis);
+                arm.Rotate(Point.ZAxis, 10);
+                arm.Rotate(Point.YAxis, -2);  // add some off plane movement ;)
             }
+            arm.PopSettings();
 
             // Back home
             arm.Speed(100);
             arm.MoveTo(300, 0, 500);
-            arm.RotateTo(-1, 0, 0, 0, 1, 0);
+
+            // 'Disentangle' axis 6
+            //arm.RotateTo(-1, 0, 0, 0, 1, 0);
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            //arm.TransformTo(new Point(300, 0, 500), new Rotation(new Point(0, 1, 0), 180));
         }
 
 
@@ -341,23 +362,26 @@ namespace TEST_NewAPITests
             arm.Speed(100);
             arm.TransformTo(home, homeXYZ);
 
-            arm.MoveGlobal(150, 0, -100);
+            arm.Move(150, 0, -100);
             arm.Speed(25);
 
             Rotation z30 = new Rotation(Point.ZAxis, 30);
 
             // Local tests, TR vs RT:
-            arm.TransformLocal(50 * Point.XAxis, z30);                          // Note the T+R action order
-            arm.TransformLocal(-50 * Point.XAxis, Rotation.Conjugate(z30));
-            arm.TransformLocal(z30, 50 * Point.XAxis);                          // Note the R+T action order
-            arm.TransformLocal(Rotation.Conjugate(z30), -50 * Point.XAxis);
+            arm.PushSettings();
+            arm.Coordinates("local");
+            arm.Transform(50 * Point.XAxis, z30);                          // Note the T+R action order
+            arm.Transform(-50 * Point.XAxis, Rotation.Conjugate(z30));
+            arm.Transform(z30, 50 * Point.XAxis);                          // Note the R+T action order
+            arm.Transform(Rotation.Conjugate(z30), -50 * Point.XAxis);
+            arm.PopSettings();
 
             // Global tests, TR vs RT:
             // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
-            arm.TransformGlobal(50 * Point.XAxis, z30);
-            arm.TransformGlobal(-50 * Point.XAxis, Rotation.Conjugate(z30));
-            arm.TransformGlobal(z30, 50 * Point.XAxis);
-            arm.TransformGlobal(Rotation.Conjugate(z30), -50 * Point.XAxis);
+            arm.Transform(50 * Point.XAxis, z30);
+            arm.Transform(-50 * Point.XAxis, Rotation.Conjugate(z30));
+            arm.Transform(z30, 50 * Point.XAxis);
+            arm.Transform(Rotation.Conjugate(z30), -50 * Point.XAxis);
 
             // Back home
             arm.Speed(100);
@@ -419,12 +443,15 @@ namespace TEST_NewAPITests
 
             arm.MoveTo(x, y, z);
 
+            arm.PushSettings();
+            arm.Coordinates("local");
+
             Point forward = side * Point.YAxis;
             Rotation zn10 = new Rotation(Point.ZAxis, -10);
             // Trace a circle with local coordinates and rotations
             for (var i = 0; i < 36; i++)
             {
-                arm.TransformLocal(forward, zn10);
+                arm.Transform(forward, zn10);
             }
 
             // Trace it back (and 'disentagle' Axis 6...)
@@ -432,8 +459,10 @@ namespace TEST_NewAPITests
             Rotation z10 = new Rotation(Point.ZAxis, 10);
             for (var i = 0; i < 36; i++)
             {
-                arm.TransformLocal(backward, z10);
+                arm.Transform(backward, z10);
             }
+
+            arm.PopSettings();
 
             // Back home
             arm.Speed(100);
@@ -465,7 +494,7 @@ namespace TEST_NewAPITests
                     -side * Math.Sin(2 * Math.PI * i / 36.0),
                     side * Math.Cos(2 * Math.PI * i / 36.0),
                     0);
-                arm.TransformGlobal(forward, z10);
+                arm.Transform(forward, z10);
             }
 
             // Trace it back (and 'disentagle' Axis 6...)
@@ -476,7 +505,7 @@ namespace TEST_NewAPITests
                     side * Math.Sin(2 * Math.PI * i / 36.0),
                     -side * Math.Cos(2 * Math.PI * i / 36.0),
                     0);
-                arm.TransformGlobal(forward, zn10);
+                arm.Transform(forward, zn10);
             }
 
             // Back home
@@ -500,9 +529,11 @@ namespace TEST_NewAPITests
 
             // Try to go trough (should not work)
             arm.TransformTo(new Point(300, 0, 99), homeXYZ);
-            arm.TransformLocal(new Point(0, 0, 2), noRot);
-            arm.TransformGlobal(new Point(0, 0, -2), noRot);
-
+            arm.Coordinates("local");
+            arm.Transform(new Point(0, 0, 2), noRot);
+            arm.Coordinates("global");
+            arm.Transform(new Point(0, 0, -2), noRot);
+            
             // Back home
             arm.TransformTo(home, homeXYZ);
         }
@@ -519,10 +550,11 @@ namespace TEST_NewAPITests
             arm.MoveTo(300, -300, 250);
 
             arm.Speed(200);
+            arm.Coordinates("local");
             for (int i = 0; i < 100; i++)
             {
                 Rotation rz = new Rotation(Point.ZAxis, 15 * Math.Cos(2.0 * Math.PI * i / 25.0));
-                arm.TransformLocal(rz, 8  * Point.YAxis);
+                arm.Transform(rz, 8  * Point.YAxis);
             }
 
             // Back home
@@ -592,7 +624,7 @@ namespace TEST_NewAPITests
             arm.TransformTo(new Point(200, 200, 200), Rotation.FlippedAroundY);
 
             // Issue a relative one (should work)
-            arm.TransformGlobal(new Point(50, 0, 0), new Rotation(Point.XAxis, 45));
+            arm.Transform(new Point(50, 0, 0), new Rotation(Point.XAxis, 45));
 
             // Issue a relative Joints one (SHOULDN'T WORK)
             arm.Joints(-45, 0, 0, 0, 0, 0);
@@ -604,14 +636,16 @@ namespace TEST_NewAPITests
             arm.Joints(30, 0, 0, 0, 0, 0);
 
             // Issue a bunch of relative ones (NONE SHOULD WORK)
-            arm.MoveLocal(100, 0, 0);
-            arm.MoveGlobal(100, 0, 0);
-            arm.RotateLocal(Point.XAxis, 45);
-            arm.RotateGlobal(Point.XAxis, 45);
-            arm.TransformLocal(new Point(100, 0, 0), new Rotation(Point.XAxis, 45));
-            arm.TransformLocal(new Rotation(Point.XAxis, 45), new Point(100, 0, 0));
-            arm.TransformGlobal(new Point(100, 0, 0), new Rotation(Point.XAxis, 45));
-            arm.TransformGlobal(new Rotation(Point.XAxis, 45), new Point(100, 0, 0));
+            arm.Coordinates("local");
+            arm.Move(100, 0, 0);
+            arm.Rotate(Point.XAxis, 45);
+            arm.Transform(new Point(100, 0, 0), new Rotation(Point.XAxis, 45));
+            arm.Transform(new Rotation(Point.XAxis, 45), new Point(100, 0, 0));
+            arm.Coordinates("world");
+            arm.Move(100, 0, 0);
+            arm.Rotate(Point.XAxis, 45);
+            arm.Transform(new Point(100, 0, 0), new Rotation(Point.XAxis, 45));
+            arm.Transform(new Rotation(Point.XAxis, 45), new Point(100, 0, 0));
 
             // Rel joints (should work)
             arm.Joints(0, 30, 0, 0, 0, 0);
@@ -635,7 +669,7 @@ namespace TEST_NewAPITests
             arm.Wait(1500); 
 
             arm.Message("Starting first path");
-            arm.MoveGlobal(0, 200, -100);
+            arm.Move(0, 200, -100);
 
             arm.Message("Waiting 5s to go back");
             arm.Wait(5000);
