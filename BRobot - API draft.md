@@ -12,7 +12,7 @@
 - OFFLINE MODE
 ```csharp
 // Initializtion
-BRobot arm = new BRobot("ABB", "IRB120");   // initialize brobots with make and model
+Robot arm = new Robot("ABB", "IRB120");   // initialize brobots with make and model
 
 // Set control mode
 arm.ControlMode("offline");     // offline/execute/stream

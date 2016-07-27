@@ -1,10 +1,10 @@
 ```text
-██████╗  ██████╗ ██████╗  ██████╗ ████████╗ ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     
-██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██╔═══██╗████╗  ██║╚══██╔══╝██╔══██╗██╔═══██╗██║     
-██████╔╝██║   ██║██████╔╝██║   ██║   ██║   ██║     ██║   ██║██╔██╗ ██║   ██║   ██████╔╝██║   ██║██║     
-██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   ██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██║   ██║██║     
-██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   ╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║╚██████╔╝███████╗
-╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+██████╗ ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
+██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
+██████╔╝██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
+██╔══██╗██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   
+██████╔╝██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   
+╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
                                                                                                         
 ██████╗ ███████╗██╗   ██╗██╗      ██████╗  ██████╗ 
 ██╔══██╗██╔════╝██║   ██║██║     ██╔═══██╗██╔════╝ 
@@ -19,7 +19,7 @@
 - [ ] Get Execute mode working again
 
 ## BUILD 1113
-- [ ] Rename the project ;)
+- [x] Rename the project ;)
 
 ## BUILD 1112
 - [x] List<string> .Export()
@@ -29,7 +29,7 @@
     - [x] same with .Rotate() and .Transform()
     - [ ] ~~transform J options~~ --> will use .Motion(strType) as a setting instead
 - [x] Fixed ProgramGenerator bug running actions twice on writeCursor.
-- [X] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
+- [x] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
 - [ ] Write a full 'unit test' program to verify functionality doesn't break
 
 ## BUILD 1111

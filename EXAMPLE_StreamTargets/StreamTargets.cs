@@ -1,6 +1,6 @@
 ﻿using System;
 
-using RobotControl;
+using BRobot;
 
 namespace EXAMPLE_StreamTargets2
 {
@@ -35,30 +35,30 @@ namespace EXAMPLE_StreamTargets2
             arm.Speed(leadSpeed);
             arm.MoveTo(250, 250, 250);      // absolute movement
             arm.Speed(traceSpeed);
-            arm.MoveGlobal(50, 0, 0);             // relative movement
-            arm.MoveGlobal(0, 50, 0);
-            arm.MoveGlobal(-50, 0, 0);
+            arm.Move(50, 0, 0);             // relative movement
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
 
             arm.Speed(leadSpeed);
-            arm.MoveGlobal(0, -50, 50);
+            arm.Move(0, -50, 50);
             arm.Speed(traceSpeed);
-            arm.MoveGlobal(50, 0, 0);
-            arm.MoveGlobal(0, 50, 0);
-            arm.MoveGlobal(-50, 0, 0);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
 
             arm.Speed(leadSpeed);
-            arm.MoveGlobal(0, -50, 50);
+            arm.Move(0, -50, 50);
             arm.Speed(traceSpeed);
-            arm.MoveGlobal(50, 0, 0);
-            arm.MoveGlobal(0, 50, 0);
-            arm.MoveGlobal(-50, 0, 0);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
 
             arm.Speed(leadSpeed);
-            arm.MoveGlobal(0, -50, 50);
+            arm.Move(0, -50, 50);
             arm.Speed(traceSpeed);
-            arm.MoveGlobal(50, 0, 0);
-            arm.MoveGlobal(0, 50, 0);
-            arm.MoveGlobal(-50, 0, 0);
+            arm.Move(50, 0, 0);
+            arm.Move(0, 50, 0);
+            arm.Move(-50, 0, 0);
 
             arm.Speed(leadSpeed);
             //arm.MoveTo("home");

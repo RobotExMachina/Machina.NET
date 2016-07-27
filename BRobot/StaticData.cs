@@ -6,7 +6,7 @@
 //╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
 
 
-namespace RobotControl
+namespace BRobot
 {
     internal class StaticData
     {

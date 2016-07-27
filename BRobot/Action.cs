@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RobotControl
+namespace BRobot
 {
     /// <summary>
     /// Defines an Action Type, like Translation, Rotation, Wait... 

@@ -12,7 +12,7 @@ using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
 
 
-namespace RobotControl
+namespace BRobot
 {
     //  ██████╗  █████╗ ███████╗███████╗
     //  ██╔══██╗██╔══██╗██╔════╝██╔════╝
@@ -217,7 +217,7 @@ namespace RobotControl
         private static string localBufferDirname = "C:";                 // Route names to be used for file handling
         private static string localBufferFilename = "buffer";
         private static string localBufferFileExtension = "mod";
-        private static string remoteBufferDirectory = "RobotControl";
+        private static string remoteBufferDirectory = "BRobot";
 
 
         //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗

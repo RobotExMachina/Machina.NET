@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace RobotControl
+namespace BRobot
 {
     /// <summary>
     /// The core class that centralizes all private control.

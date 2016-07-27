@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RobotControl
+namespace BRobot
 {
     /// <summary>
-    /// A class to store static descriptions of robot manipulators.
+    /// Represents a tool object that can be attached to the end effector of the robot
     /// </summary>
-    class Library
+    class Tool
     {
     }
 }

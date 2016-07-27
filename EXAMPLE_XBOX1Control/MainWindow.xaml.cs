@@ -22,7 +22,7 @@ using System.Windows.Shapes;
 /// </summary>
 using SharpDX.XInput;
 
-using RobotControl;
+using BRobot;
 
 namespace EXAMPLE_XBOX1Control
 {
@@ -65,7 +65,7 @@ namespace EXAMPLE_XBOX1Control
             arm.Start();
             arm.Speed(relSpeed);
             arm.Zone(2);
-            //arm.RotateTo(RobotControl.Rotation.FlippedAroundY);
+            //arm.RotateTo(BRobot.Rotation.FlippedAroundY);
             //arm.MoveTo(200, 200, 200);
 
         }
@@ -81,7 +81,7 @@ namespace EXAMPLE_XBOX1Control
             //Console.WriteLine("BUTTONS: " + state.Gamepad.Buttons);
 
             // Can't really test this right now, my controller's thumb is broken... XD
-            //RobotControl.Point dir = new RobotControl.Point(
+            //BRobot.Point dir = new BRobot.Point(
             //    RemapThumb(state.Gamepad.LeftThumbX, 10000, 32767),
             //    RemapThumb(state.Gamepad.LeftThumbY, 10000, 32767),
             //    RemapThumb(state.Gamepad.RightThumbY, 10000, 32767)
@@ -106,7 +106,7 @@ namespace EXAMPLE_XBOX1Control
             // implemented when the queue raises events demanding new targets.
             // Directions are assuming a human controller facing the robot frontally.
 
-            RobotControl.Point dir = new RobotControl.Point(0, 0, 0);
+            BRobot.Point dir = new BRobot.Point(0, 0, 0);
             GamepadButtonFlags buttons = state.Gamepad.Buttons;
 
             // Create direction vector based on buttons
@@ -132,7 +132,7 @@ namespace EXAMPLE_XBOX1Control
                 dir.Scale(incDist);
 
                 Console.WriteLine("--> Moving {0}", dir);
-                arm.MoveGlobal(dir);
+                arm.Move(dir);
             }
             else
             {

@@ -50,9 +50,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RobotControl\RobotControl.csproj">
+    <ProjectReference Include="..\BRobot\BRobot.csproj">
       <Project>{12d4098e-2f9e-4e15-892b-fded71da4b47}</Project>
-      <Name>RobotControl</Name>
+      <Name>BRobot</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

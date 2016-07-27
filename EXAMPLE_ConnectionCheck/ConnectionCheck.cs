@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RobotControl;
+using BRobot;
 
 
 namespace EXAMPLE_ConnectionCheck

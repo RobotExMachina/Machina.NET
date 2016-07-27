@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotControl", "RobotControl\RobotControl.csproj", "{12D4098E-2F9E-4E15-892B-FDED71DA4B47}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EXAMPLE_ConnectionCheck", "EXAMPLE_ConnectionCheck\EXAMPLE_ConnectionCheck.csproj", "{4BCCB734-043B-4270-B8DE-D3960B17D0E0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EXAMPLE_LoadModule", "EXAMPLE_LoadModule\EXAMPLE_LoadModule.csproj", "{32F8C481-D31F-49C3-9AD5-8D847F549540}"
@@ -21,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_NewAPITests", "TEST_Ne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EXAMPLE_OfflineCodeGeneration", "EXAMPLE_OfflineCodeGeneration\EXAMPLE_OfflineCodeGeneration.csproj", "{9E155754-5524-45C8-A72E-43F472F502C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BRobot", "BRobot\BRobot.csproj", "{12D4098E-2F9E-4E15-892B-FDED71DA4B47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,14 +29,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|x64.Build.0 = Debug|Any CPU
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|x64.ActiveCfg = Release|x64
-		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|x64.Build.0 = Release|x64
 		{4BCCB734-043B-4270-B8DE-D3960B17D0E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4BCCB734-043B-4270-B8DE-D3960B17D0E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BCCB734-043B-4270-B8DE-D3960B17D0E0}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -101,6 +93,14 @@ Global
 		{9E155754-5524-45C8-A72E-43F472F502C0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9E155754-5524-45C8-A72E-43F472F502C0}.Release|x64.ActiveCfg = Release|Any CPU
 		{9E155754-5524-45C8-A72E-43F472F502C0}.Release|x64.Build.0 = Release|Any CPU
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|x64.ActiveCfg = Debug|x64
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Debug|x64.Build.0 = Debug|x64
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|x64.ActiveCfg = Release|x64
+		{12D4098E-2F9E-4E15-892B-FDED71DA4B47}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

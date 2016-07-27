@@ -1,6 +1,6 @@
 ﻿/*
  * ROBOTCONTROL - TUIO_DEMO
- * A quick implementation of the RobotControl library using ReacTIVision.
+ * A quick implementation of the BRobot library using ReacTIVision.
  * This example reads Tuio packages sent from a running instance of ReacTIVision,
  * generates 2D paths for each fiducial and uploads them to a Robot Controller
  * in real time to be immediate executed.
@@ -41,7 +41,7 @@ using System.Collections;
 using System.Threading;
 using TUIO;
 
-using RobotControl;
+using BRobot;
 using System.Text;
 
 public class TuioDemo : Form , TuioListener

@@ -15,7 +15,7 @@ using ABB.Robotics.Controllers.RapidDomain;
 /// </summary>
 
 
-namespace RobotControl
+namespace BRobot
 {
     public  abstract class Geometry
     {

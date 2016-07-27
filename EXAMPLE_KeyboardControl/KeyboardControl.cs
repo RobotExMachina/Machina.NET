@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RobotControl;
+using BRobot;
 
 namespace EXAMPLE_KeyboardControl
 {
@@ -47,28 +47,28 @@ namespace EXAMPLE_KeyboardControl
                 // Thinking of an orientation corresponding to an user facing the robot frontally
                 if (key == ConsoleKey.UpArrow || key == ConsoleKey.W)
                 {
-                    arm.MoveGlobal(-inc, 0, 0);
+                    arm.Move(-inc, 0, 0);
                 }
                 else if (key == ConsoleKey.DownArrow || key == ConsoleKey.S)
                 {
-                    arm.MoveGlobal(inc, 0, 0);
+                    arm.Move(inc, 0, 0);
 
                 }
                 else if (key == ConsoleKey.LeftArrow || key == ConsoleKey.A)
                 {
-                    arm.MoveGlobal(0, -inc, 0);
+                    arm.Move(0, -inc, 0);
                 }
                 else if (key == ConsoleKey.RightArrow || key == ConsoleKey.D)
                 {
-                    arm.MoveGlobal(0, inc, 0);
+                    arm.Move(0, inc, 0);
                 }
                 else if (key == ConsoleKey.Q)
                 {
-                    arm.MoveGlobal(0, 0, inc);
+                    arm.Move(0, 0, inc);
                 }
                 else if (key == ConsoleKey.E)
                 {
-                    arm.MoveGlobal(0, 0, -inc);
+                    arm.Move(0, 0, -inc);
                 }
                 else if (key == ConsoleKey.Escape)
                 {

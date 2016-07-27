@@ -9,7 +9,7 @@
 /// </summary>
 
 
-namespace RobotControl
+namespace BRobot
 {
     /// <summary>
     /// Utility static methods

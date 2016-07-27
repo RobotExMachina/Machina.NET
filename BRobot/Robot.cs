@@ -6,10 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-
-
-
-namespace RobotControl
+namespace BRobot
 {
     /// <summary>
     /// Represents the type of control that will be performed over the real/virtual robot.
@@ -52,17 +49,18 @@ namespace RobotControl
         World = 0,
         Local = 1
     }
-    
 
 
-    //██████╗  ██████╗ ██████╗  ██████╗ ████████╗
-    //██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
-    //██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
-    //██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   
-    //██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   
-    //╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
+
+    //  ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
+    //  ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
+    //  ██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
+    //  ██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   
+    //  ██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   
+    //  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
+    //                                             
     /// <summary>
-    /// The core Class in RobotControl. Represents a state & action-based virtual robot, 
+    /// The core Class in BRobot. Represents a state & action-based virtual robot, 
     /// and exposes the public API for robot manipulation and control.
     /// </summary>
     public class Robot
@@ -115,15 +113,15 @@ namespace RobotControl
             bool success = true;
             if (mode.Equals("offline"))
             {
-                return ControlMode(RobotControl.ControlMode.Offline);
+                return ControlMode(global::BRobot.ControlMode.Offline);
             }
             else if (mode.Equals("execute"))
             {
-                return ControlMode(RobotControl.ControlMode.Execute);
+                return ControlMode(global::BRobot.ControlMode.Execute);
             }
             else if (mode.Equals("stream"))
             {
-                return ControlMode(RobotControl.ControlMode.Stream);
+                return ControlMode(global::BRobot.ControlMode.Stream);
             }
             else
             {
@@ -153,11 +151,11 @@ namespace RobotControl
 
             if (mode.Equals("once"))
             {
-                return RunMode(RobotControl.RunMode.Once);
+                return RunMode(global::BRobot.RunMode.Once);
             }
             else if (mode.Equals("loop"))
             {
-                return RunMode(RobotControl.RunMode.Once);
+                return RunMode(global::BRobot.RunMode.Once);
             }
             else
             {

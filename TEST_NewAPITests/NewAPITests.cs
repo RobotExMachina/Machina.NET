@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RobotControl;
+using BRobot;
 
 namespace TEST_NewAPITests
 {
@@ -58,8 +58,8 @@ namespace TEST_NewAPITests
             //// Absolute vs relative movement buffers
             //TestChangesInMovementModes(arm);
 
-            //// Wait and Message
-            //TestWaitAndMessage(arm);
+            // Wait and Message
+            TestWaitAndMessage(arm);
 
             arm.DebugBuffer();  // read all pending buffered actions
             arm.DebugRobotCursors();
