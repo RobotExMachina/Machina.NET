@@ -19,7 +19,7 @@
 - [ ] Get Execute mode working again
 
 ## BUILD 1113
-- [x] Rename the project ;)
+- [x] Rename the project ;) 
 
 ## BUILD 1112
 - [x] List<string> .Export()
