@@ -48,7 +48,7 @@ namespace BRobot
     {
         World = 0,
         Local = 1
-    }
+    };
 
 
 
@@ -113,15 +113,15 @@ namespace BRobot
             bool success = true;
             if (mode.Equals("offline"))
             {
-                return ControlMode(global::BRobot.ControlMode.Offline);
+                return ControlMode(BRobot.ControlMode.Offline);
             }
             else if (mode.Equals("execute"))
             {
-                return ControlMode(global::BRobot.ControlMode.Execute);
+                return ControlMode(BRobot.ControlMode.Execute);
             }
             else if (mode.Equals("stream"))
             {
-                return ControlMode(global::BRobot.ControlMode.Stream);
+                return ControlMode(BRobot.ControlMode.Stream);
             }
             else
             {

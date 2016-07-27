@@ -20,13 +20,13 @@
 - [x] Redesigned API
 - [x] Abstracted TCPPOsition, TCPRotation and stuff into a VirtualRobot object
 - [x] Ported Util methods as static to their appropriate geometry class 
+- [x] Rename the project to BRobot ;)
 - [ ] Created Debug() & Error() utility functions
 - [ ] All the connection properties, runmodes and stuff should belong to the VirtualRobot?
 - [ ] Detect out of position and joint errors and incorporate a soft-restart.
 - [ ] Make changes in ControlMode at runtime possible, i.e. resetting controllers and communication, flushing queues, etc.
 - [ ] Streamline 'bookmarked' positions with a dictionary in Control or similar 
 - [ ] Implement .PointAt() (as in 'look' at somewhere)
-- [ ] Rename the project to BroBot ;)
 - [ ] Rename Point to Vector (or add an empty subclass of sorts)
 - [ ] Split off Quaternion from Rotation? API-wise, make the difference more explicit between a Rotation and a Quaternion...?
 
