@@ -289,10 +289,27 @@ namespace RobotControl
             c.StopProgramOnDevice(false);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public List<string> Export()
+        {
+            return c.Export();
+        }
+
+        /// <summary>
+        /// Create a program with all the buffered actions and save it to a file. 
+        /// Note all buffered actions will be removed from the queue.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
         public bool Export(string filepath)
         {
             return c.Export(filepath);
         }
+
+        
 
 
 

@@ -415,6 +415,23 @@ namespace RobotControl
         }
 
         /// <summary>
+        /// For Offline modes, it flushes all pending actions and returns a devide-specific program 
+        /// as a stringList representation.
+        /// </summary>
+        /// <returns></returns>
+        public List<string> Export()
+        {
+            if (controlMode != ControlMode.Offline)
+            {
+                Console.WriteLine("Export() only works in Offline mode");
+                return null;
+            }
+            
+            List<Action> actions = actionBuffer.GetAllPending();
+            return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
+        }
+
+        /// <summary>
         /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program as a text file.
         /// </summary>
         /// <param name="filepath"></param>
@@ -430,7 +447,7 @@ namespace RobotControl
             // @TODO: add some filepath sanity here
 
             List<Action> actions = actionBuffer.GetAllPending();
-            List<string> programCode = programGenerator.UNSAFEProgramFromActions("offlineTests", writeCursor, actions);
+            List<string> programCode = programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
 
             return SaveStringListToFile(programCode, filepath);
         }

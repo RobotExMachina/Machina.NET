@@ -14,7 +14,15 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+## PENDING 
+- [ ] Get stream mode working again
+- [ ] Get Execute mode working again
+
+## BUILD 1113
+- [ ] Rename the project ;)
+
 ## BUILD 1112
+- [x] List<string> .Export()
 - [ ] API consolidation: make a decision about the final syntax of rel/abs/local/world transforms 
 - [ ] Bring back ._Action_J() actions (where did they go?!?!) --> May want to redesign API first for this.
 - [ ] Write a full 'unit test' program to verify functionality doesn't break
@@ -26,7 +34,6 @@
 - [x] Remove MointType.Joints: there is only one type of ActionJoint, so there is no need to specify this
 - [x] Improved ProgramGenerator workflow 
 - [ ] Resolve inconsistencies between degree and radian angle representation (make everything radians by standard, with special overloads for degrees?) --> Hybrid: all inputs are degs, all return values are radians... 
-- [ ] List<string> .exportcode(bool flush) --> Not prioritary
 
 ## BUILD 1110
 - [x] Add .Message(string) action ;) (will be a good test for program generation with non-movement actions)

@@ -62,11 +62,13 @@ namespace TEST_NewAPITests
             //TestWaitAndMessage(arm);  
 
             arm.DebugBuffer();  // read all pending buffered actions
-
             arm.DebugRobotCursors();
+
             arm.Export(@"C:\offlineTests.mod");
-            arm.DebugRobotCursors();
+            //List<string> code = arm.Export();
+            //foreach (string s in code) Console.WriteLine(s);
 
+            arm.DebugRobotCursors();
             arm.DebugBuffer();  // at this point, the buffer should be empty and nothing should show up
 
             Console.WriteLine(" ");
