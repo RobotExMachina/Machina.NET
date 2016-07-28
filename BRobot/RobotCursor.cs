@@ -38,6 +38,8 @@ namespace BRobot
 
         public Compiler compiler;
 
+        public object bufferLock = new object();
+
         public RobotCursor(string name, bool applyImmediately)
         {
             this.name = name;
@@ -84,12 +86,16 @@ namespace BRobot
         /// <param name="action"></param>
         public bool Issue(Action action)
         {
-            buffer.Add(action);
-            if (applyImmediately)
+            lock(bufferLock)
             {
-                return ApplyNextAction();
+                buffer.Add(action);
+                if (applyImmediately)
+                {
+                    return ApplyNextAction();
+                }
+                return true;
             }
-            return true;
+            
         }
 
         /// <summary>
@@ -98,14 +104,33 @@ namespace BRobot
         /// <returns></returns>
         public bool ApplyNextAction()
         {
-            Action next = buffer.GetNext();
-            bool success = ApplyAction(next);
-            if (success)
+            lock(bufferLock)
             {
-                child.Issue(next);
+                Action next = buffer.GetNext();
+                if (next == null) return false;
+                bool success = ApplyAction(next);
+                if (success)
+                {
+                    child.Issue(next);
+                }
+                return success;
             }
-            return success;
         }
+
+        ///// <summary>
+        ///// Applies next action pending in the buffer.
+        ///// </summary>
+        ///// <returns></returns>
+        //public bool ApplyNextActionInQueue()
+        //{
+        //    Action next = buffer.GetNextInQueue();
+        //    bool success = ApplyAction(next);
+        //    if (success)
+        //    {
+        //        child.Issue(next);
+        //    }
+        //    return success;
+        //}
 
         /// <summary>
         /// Applies the directives of an Action to this Cursor.
@@ -151,9 +176,23 @@ namespace BRobot
 
         public List<string> ProgramFromBuffer()
         {
-            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this);
+            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, false);
         }
 
+        public List<string> ProgramFromBlock()
+        {
+            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, true);
+        }
+
+        public void QueueActions()
+        {
+            buffer.SetBlock();
+        }
+
+        public bool AreActionsPending()
+        {
+            return buffer.AreActionsPending();
+        }
 
 
 

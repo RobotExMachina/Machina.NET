@@ -25,7 +25,7 @@ namespace BRobot
         /// <param name="writePointer"></param>
         /// 
         /// <returns></returns>
-        public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer);
+        public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block);
 
         ///// <summary>
         ///// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
@@ -103,7 +103,7 @@ namespace BRobot
         {
             0, 1, 5, 10, 15, 20, 30, 40, 50, 60, 80, 100, 150, 200 
         };
-        
+
         /// <summary>
         /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
@@ -111,15 +111,17 @@ namespace BRobot
         /// </summary>
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
-        /// 
+        /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         {
             // Cast the robotPointer to the correct subclass
             RobotCursorABB writer = (RobotCursorABB)writePointer;  // @TODO: ask @PAN
 
-            List<Action> actions = writePointer.buffer.GetAllPending(false);  // copy pending actions without flushing them from the buffer
-            
+            List<Action> actions = block ? 
+                writePointer.buffer.GetBlockPending(false) : 
+                writePointer.buffer.GetAllPending(false);  // copy pending actions without flushing them from the buffer
+
             // CODE LINES GENERATION
             // VELOCITY & ZONE DECLARATIONS
             // Figure out how many different ones are there first
@@ -174,7 +176,10 @@ namespace BRobot
             {
                 // Move writerCursor to this action state
                 //writer.ApplyAction(a);
-                writer.ApplyNextAction();  // for the buffer to correctly manage them 
+                //writer.ApplyNextAction();  // for the buffer to correctly manage them 
+                //if (block) writer.ApplyNextActionInQueue();
+                //else writer.ApplyNextAction();
+                writer.ApplyNextAction();
 
                 // Generate lines of code
                 if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...

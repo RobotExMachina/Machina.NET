@@ -1292,23 +1292,24 @@ namespace BRobot
         /// <param name="e"></param>
         private void OnRapidExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
         {
-            //Console.WriteLine("EXECUTION STATUS CHANGED: " + e.Status);
+            Console.WriteLine("EXECUTION STATUS CHANGED: " + e.Status);
 
-            //if (e.Status == ExecutionStatus.Running)
-            //{
-            //    isRunning = true;
-            //}
-            //else 
-            //{
-            //    isRunning = false;
+            if (e.Status == ExecutionStatus.Running)
+            {
+                isRunning = true;
+            }
+            else
+            {
+                isRunning = false;
 
-            //    // Only trigger Instruct queue
-            //    if (masterControl.GetControlMode() == ControlMode.Execute)
-            //    {
-            //        // Tick queue to move forward
-            //        masterControl.TriggerQueue();
-            //    }
-            //}
+                // Only trigger Instruct queue
+                if (masterControl.GetControlMode() == ControlMode.Execute)
+                {
+                    // Tick queue to move forward
+                    //masterControl.TriggerQueue();
+                    masterControl.TickWriteCursor();
+                }
+            }
         }
 
         /// <summary>

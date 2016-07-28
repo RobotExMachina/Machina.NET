@@ -21,6 +21,10 @@ namespace BRobot
         /// </summary>
         private List<Action> released;
 
+        private List<int> blockCounts;
+
+        
+
         /// <summary>
         /// Main constructor.
         /// </summary>
@@ -28,6 +32,7 @@ namespace BRobot
         {
             released = new List<Action>();
             pending = new List<Action>();
+            blockCounts = new List<int>();
         }
 
         /// <summary>
@@ -52,17 +57,26 @@ namespace BRobot
             released.Add(pending[0]);
             pending.RemoveAt(0);
 
+            // update blockcounts
+            if (blockCounts.Count > 0)
+            {
+                if (--blockCounts[0] <= 0)
+                {
+                    blockCounts.RemoveAt(0);
+                }
+            }
+
             return released.Last();
         }
 
-        /// <summary>
-        /// Stores especified action in the released buffer.
-        /// </summary>
-        /// <param name="action"></param>
-        public void Save(Action action)
-        {
-            released.Add(action);
-        }
+        ///// <summary>
+        ///// Stores especified action in the released buffer.
+        ///// </summary>
+        ///// <param name="action"></param>
+        //public void Save(Action action)
+        //{
+        //    released.Add(action);
+        //}
 
         /// <summary>
         /// Release all pending Actions in the order they were issued.
@@ -71,14 +85,14 @@ namespace BRobot
         /// <returns></returns>
         public List<Action> GetAllPending(bool flush)
         {
-            List<Action> pending = new List<Action>();
-            foreach (Action a in this.pending) pending.Add(a);  // shallow copy
+            List<Action> proc = new List<Action>();
+            foreach (Action a in pending) proc.Add(a);  // shallow copy
             if (flush)
             {
-                released.AddRange(this.pending);
-                this.pending.Clear();
+                released.AddRange(pending);
+                pending.Clear();
             }
-            return pending;
+            return proc;
         }
 
         /// <summary>
@@ -89,7 +103,38 @@ namespace BRobot
         {
             return GetAllPending(true);
         }
-        
+
+        /// <summary>
+        /// Wraps all pending actions outside a release block into one.
+        /// </summary>
+        public void SetBlock()
+        {
+            int sum = 0;
+            foreach (var i in blockCounts) sum += i;
+            blockCounts.Add(pending.Count - sum);
+        }
+
+
+        public List<Action> GetBlockPending(bool flush)
+        {
+            List<Action> acts;
+            if (blockCounts.Count > 0 && blockCounts[0] > 0)
+            {
+                acts = pending.GetRange(0, blockCounts[0]);
+                if (flush)
+                {
+                    pending.RemoveRange(0, blockCounts[0]);
+                    released.AddRange(acts);
+                    blockCounts.RemoveAt(0);
+                }
+            }
+            else
+            {
+                acts = GetAllPending(flush);
+            }
+            return acts;
+        }
+
         /// <summary>
         /// Is there any Action pending in the buffer?
         /// </summary>
@@ -131,7 +176,47 @@ namespace BRobot
         /// </summary>
         public void LogBufferedActions()
         {
-            foreach (Action a in pending) Console.WriteLine(a);
+            
+            Console.WriteLine("--> RELEASED:" );
+            foreach (Action a in released) Console.WriteLine("    " + a);
+
+            Console.Write("--> PENDING: ");
+            foreach (var i in blockCounts) Console.Write(i + ",");
+            Console.WriteLine("");
+            int it = -1;
+            int b = 0;
+            foreach (Action a in pending)
+            {
+                if (blockCounts.Count > 0 && b < blockCounts.Count)                {
+                    it++;
+                    if(it >= blockCounts[b])
+                    {
+                        b++;
+                        if (b >= blockCounts.Count)
+                        {
+                            it = -1;
+                        }
+                        else
+                        {
+                            it = 0;
+                        }
+                    }
+                }
+
+                if (it == 0)
+                {
+                    Console.WriteLine("    Block " + b + ":");
+                }
+                
+                if (it >= 0)
+                {
+                    Console.WriteLine("        " + a);
+                }
+                else
+                {
+                    Console.WriteLine("    " + a);
+                }
+            }
         }
 
         public override string ToString()

@@ -469,9 +469,14 @@ namespace BRobot
         /// <returns></returns>
         public void Execute()
         {
-            //actionsExecuter = new Thread(() => ExecuteActionsInController());  // http://stackoverflow.com/a/3360582
-            //actionsExecuter.Start();
-            ExecuteActionsInController();
+            if (controlMode != ControlMode.Execute)
+            {
+                Console.WriteLine("Execute() only works in Execute mode");
+                return;
+            }
+
+            writeCursor.QueueActions();
+            TickWriteCursor();
         }
 
 
@@ -1268,19 +1273,31 @@ namespace BRobot
         }
 
 
+
+
+
+        public void TickWriteCursor()
+        {
+            if (controlMode == ControlMode.Execute)
+            {
+                if (!comm.IsRunning() && areCursorsInitialized && writeCursor.AreActionsPending() && (actionsExecuter == null || !actionsExecuter.IsAlive))
+                {
+                    actionsExecuter = new Thread(() => ExecuteActionsInController());  // http://stackoverflow.com/a/3360582
+                    actionsExecuter.Start();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Still not implemented");
+            }
+        }
+
         private void ExecuteActionsInController()
         {
-            List<string> program = writeCursor.ProgramFromBuffer();
+            List<string> program = writeCursor.ProgramFromBlock();
             comm.LoadProgramToController(program);
             comm.StartProgramExecution();
         }
-
-
-
-
-
-
-
 
 
 
@@ -1412,7 +1429,7 @@ namespace BRobot
             virtualCursor.buffer.LogBufferedActions();
 
             Console.WriteLine("WRITE BUFFER:");
-            virtualCursor.buffer.LogBufferedActions();
+            writeCursor.buffer.LogBufferedActions();
         }
 
         public void DebugRobotCursors()
