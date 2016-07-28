@@ -287,17 +287,18 @@ namespace BRobot
         //    c.AddPathToQueue(path);
         //}
 
-        /// <summary>
-        /// Stops the robot after execution of current program. This will also clear the queue.
-        /// </summary>
-        public void StopAfterProgram()
-        {
-            c.ClearQueue();
-            c.StopProgramOnDevice(false);
-        }
+        ///// <summary>
+        ///// Stops the robot after execution of current program. This will also clear the queue.
+        ///// </summary>
+        //public void StopAfterProgram()
+        //{
+        //    c.ClearQueue();
+        //    c.StopProgramOnDevice(false);
+        //}
 
         /// <summary>
-        /// 
+        /// Create a program with all the buffered actions and return it as a string List.
+        /// Note all buffered actions will be removed from the queue.
         /// </summary>
         /// <returns></returns>
         public List<string> Export()
@@ -316,6 +317,15 @@ namespace BRobot
             return c.Export(filepath);
         }
 
+        /// <summary>
+        /// In 'execute' mode, flushes all pending actions, creates a program, 
+        /// uploads it to the controller and runs it.
+        /// </summary>
+        /// <returns></returns>
+        public void Execute()
+        {
+            c.Execute();
+        }
         
 
 
@@ -491,34 +501,23 @@ namespace BRobot
         /// </summary>
         /// <param name="incX"></param>
         /// <param name="incY"></param>
+        /// <returns></returns>
+        public bool Move(double incX, double incY)
+        {
+            return Move(new Point(incX, incY, 0));
+        }
+
+        /// <summary>
+        /// Issue a relative movement action request on current coordinate system.
+        /// </summary>
+        /// <param name="incX"></param>
+        /// <param name="incY"></param>
         /// <param name="incZ"></param>
         /// <returns></returns>
         public bool Move(double incX, double incY, double incZ)
         {
             return Move(new Point(incX, incY, incZ));
         }
-
-        ///// <summary>
-        ///// Issue a relative movement on world coordinates action request.
-        ///// </summary>
-        ///// <param name="direction"></param>
-        ///// <returns></returns>
-        //public bool MoveGlobal(Point direction)
-        //{
-        //    return c.IssueTranslationRequest(true, direction, true);
-        //}
-
-        ///// <summary>
-        ///// Issue a relative movement on world coordinates action request.
-        ///// </summary>
-        ///// <param name="incX"></param>
-        ///// <param name="incY"></param>
-        ///// <param name="incZ"></param>
-        ///// <returns></returns>
-        //public bool MoveGlobal(double incX, double incY, double incZ)
-        //{
-        //    return MoveGlobal(new Point(incX, incY, incZ));
-        //}
 
         /// <summary>
         /// Issue an absolute movement action request.
@@ -541,16 +540,6 @@ namespace BRobot
         {
             return MoveTo(new Point(x, y, z));
         }
-
-        ///// <summary>
-        ///// Issue an absolute movement action request to a tagged position. 
-        ///// </summary>
-        ///// <param name="bookmarkedPosition"></param>
-        ///// <returns></returns>
-        //public bool MoveTo(string bookmarkedPosition)
-        //{
-        //    throw new NotImplementedException();
-        //}
         
         /// <summary>
         /// Issue a relative rotation action request around local/global axes.
@@ -585,41 +574,7 @@ namespace BRobot
         {
             return Rotate(new Rotation(new Point(rotVecX, rotVecY, rotVecZ), angDegs));
         }
-        
-        ///// <summary>
-        ///// Issue a relative rotation around global axes request.
-        ///// </summary>
-        ///// <param name="rotation"></param>
-        ///// <returns></returns>
-        //public bool RotateGlobal(Rotation rotation)
-        //{
-        //    return c.IssueRotationRequest(true, rotation, true);
-        //}
-
-        ///// <summary>
-        ///// Issue a relative rotation around global axes request.
-        ///// </summary>
-        ///// <param name="vector"></param>
-        ///// <param name="angDegs"></param>
-        ///// <returns></returns>
-        //public bool RotateGlobal(Point vector, double angDegs)
-        //{
-        //    return RotateGlobal(new Rotation(vector, angDegs));
-        //}
-
-        ///// <summary>
-        ///// Issue a relative rotation around global axes request.
-        ///// </summary>
-        ///// <param name="vecX"></param>
-        ///// <param name="vecY"></param>
-        ///// <param name="vecZ"></param>
-        ///// <param name="angDegs"></param>
-        ///// <returns></returns>
-        //public bool RotateGlobal(double vecX, double vecY, double vecZ, double angDegs)
-        //{
-        //    return RotateGlobal(new Rotation(new Point(vecX, vecY, vecZ), angDegs));
-        //}
-        
+                
         /// <summary>
         /// Issue an absolute global reorientation request.
         /// </summary>
@@ -693,31 +648,7 @@ namespace BRobot
             // Note the R+T action order
             return c.IssueRotationAndTranslationRequest(rotation, true, position, true);
         }
-
-        ///// <summary>
-        ///// Issue a compound relative global Translation + Rotation request.
-        ///// </summary>
-        ///// <param name="position"></param>
-        ///// <param name="rotation"></param>
-        ///// <returns></returns>
-        //public bool TransformGlobal(Point position, Rotation rotation)
-        //{
-        //    // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
-        //    return c.IssueTranslationAndRotationRequest(true, position, true, true, rotation, true);
-        //}
-
-        ///// <summary>
-        ///// Issue a compound relative global Translation + Rotation request.
-        ///// </summary>
-        ///// <param name="rotation"></param>
-        ///// <param name="position"></param>
-        ///// <returns></returns>
-        //public bool TransformGlobal(Rotation rotation, Point position)
-        //{
-        //    // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
-        //    return c.IssueRotationAndTranslationRequest(true, rotation, true, true, position, true);
-        //}
-
+        
         /// <summary>
         /// Issue a compound absolute global Translation + Rotation request.
         /// </summary>

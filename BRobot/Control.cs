@@ -31,12 +31,7 @@ namespace BRobot
         private ControlMode controlMode = ControlMode.Offline;
         private RunMode runMode = RunMode.Once;
         
-        /// <summary>
-        /// A shared instance of a Thread to manage uploading modules
-        /// to the controller, which typically takes a lot of resources
-        /// and halts program execution
-        /// </summary>
-        private Thread pathExecuter;
+        
 
         /// <summary>
         /// Instances of the main robot Controller and Task
@@ -79,6 +74,16 @@ namespace BRobot
         /// or a streamed target.
         /// </summary>
         private RobotCursor writeCursor;
+
+
+        private RobotCursor motionCursor;
+
+        /// <summary>
+        /// A shared instance of a Thread to manage sending and executing actions
+        /// in the controller, which typically takes a lot of resources
+        /// and halts program execution
+        /// </summary>
+        private Thread actionsExecuter;
 
         /// <summary>
         /// Are cursors ready to start working?
@@ -128,6 +133,7 @@ namespace BRobot
             areCursorsInitialized = false;
             virtualCursor = null;
             writeCursor = null;
+            motionCursor = null;
 
             currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REF_CS);
             settingsBuffer = new SettingsBuffer();
@@ -213,6 +219,13 @@ namespace BRobot
             {
                 Console.WriteLine("Cannot connect to device");
                 return false;
+            }
+            else
+            {
+                // If successful, initialize robot cursors to mirror the state of the device
+                Point currPos = comm.GetCurrentPosition();
+                Rotation currRot = comm.GetCurrentOrientation();
+                InitializeRobotCursors(currPos, currRot);
             }
 
             //// @TODO rework this into Virtual Robots
@@ -439,18 +452,23 @@ namespace BRobot
         /// <returns></returns>
         public bool Export(string filepath)
         {
-            if (controlMode != ControlMode.Offline)
-            {
-                Console.WriteLine("Export() only works in Offline mode");
-                return false;
-            }
-
             // @TODO: add some filepath sanity here
 
-            List<Action> actions = actionBuffer.GetAllPending();
-            List<string> programCode = programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
-
+            List<string> programCode = Export();
+            if (programCode == null) return false;
             return SaveStringListToFile(programCode, filepath);
+        }
+
+        /// <summary>
+        /// In 'execute' mode, flushes all pending actions, creates a program, 
+        /// uploads it to the controller and runs it.
+        /// </summary>
+        /// <returns></returns>
+        public void Execute()
+        {
+            List<Action> actions = actionBuffer.GetAllPending();
+            actionsExecuter = new Thread(() => ExecuteActionsInController(actions));  // http://stackoverflow.com/a/3360582
+            actionsExecuter.Start();
         }
 
 
@@ -462,7 +480,7 @@ namespace BRobot
         //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
         //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
         //   
-        
+
         /// <summary>
         /// Gets current speed setting.
         /// </summary>
@@ -582,7 +600,7 @@ namespace BRobot
             {
                 if (controlMode == ControlMode.Offline)
                 {  
-                    if ( !InitializeRobotPointers(trans, Frame.DefaultOrientation) )  // @TODO: defaults should depend on robot make/model
+                    if ( !InitializeRobotCursors(trans, Frame.DefaultOrientation) )  // @TODO: defaults should depend on robot make/model
                     {
                         Console.WriteLine("Could not initialize cursors...");
                         return false;
@@ -669,7 +687,7 @@ namespace BRobot
             {
                 if (controlMode == ControlMode.Offline)
                 {
-                    if (!InitializeRobotPointers(new Point(), rot))  // @TODO: defaults should depend on robot make/model
+                    if (!InitializeRobotCursors(new Point(), rot))  // @TODO: defaults should depend on robot make/model
                     {
                         Console.WriteLine("Could not initialize cursors...");
                         return false;
@@ -761,7 +779,7 @@ namespace BRobot
             {
                 if (controlMode == ControlMode.Offline)
                 {
-                    if (!InitializeRobotPointers(trans, rot))  // @TODO: defaults should depend on robot make/model
+                    if (!InitializeRobotCursors(trans, rot))  // @TODO: defaults should depend on robot make/model
                     {
                         Console.WriteLine("Could not initialize cursors...");
                         return false;
@@ -890,7 +908,7 @@ namespace BRobot
             {
                 if (controlMode == ControlMode.Offline)
                 {
-                    if (!InitializeRobotPointers(trans, rot))  // @TODO: defaults should depend on robot make/model
+                    if (!InitializeRobotCursors(trans, rot))  // @TODO: defaults should depend on robot make/model
                     {
                         Console.WriteLine("Could not initialize cursors...");
                         return false;
@@ -1017,7 +1035,7 @@ namespace BRobot
                         return false;
                     }
 
-                    if (!InitializeRobotPointers(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
                     {
                         Console.WriteLine("Could not initialize cursors...");
                         return false;
@@ -1064,7 +1082,7 @@ namespace BRobot
             {
                 if (controlMode == ControlMode.Offline)
                 {
-                    if (!InitializeRobotPointers(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
                     {
                         Console.WriteLine("Could not initialize cursors...");
                         return false;
@@ -1099,7 +1117,7 @@ namespace BRobot
             {
                 if (controlMode == ControlMode.Offline)
                 {
-                    if (!InitializeRobotPointers(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
                     {
                         Console.WriteLine("Could not initialize cursors...");
                         return false;
@@ -1191,23 +1209,25 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Initializes 
+        /// Initializes all instances of robotCursors with base information
         /// </summary>
-        /// <param name="pointer"></param>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
         /// <returns></returns>
-        private bool InitializeRobotPointers(Point position, Rotation rotation)
+        internal bool InitializeRobotCursors(Point position, Rotation rotation)
         {
             bool success = true;
-            if (controlMode == ControlMode.Offline)
-            {
-                virtualCursor = new RobotCursorABB("virtualCursor");
-                success = success && virtualCursor.Initialize(position, rotation);
 
-                writeCursor = new RobotCursorABB("writeCursor");
-                success = success && writeCursor.Initialize(position, rotation);
+            virtualCursor = new RobotCursorABB("virtualCursor");
+            success = success && virtualCursor.Initialize(position, rotation);
 
-                areCursorsInitialized = success;
-            }    
+            writeCursor = new RobotCursorABB("writeCursor");
+            success = success && writeCursor.Initialize(position, rotation);
+
+            motionCursor = new RobotCursorABB("motionCursor");
+            success = success && motionCursor.Initialize(position, rotation);
+
+            areCursorsInitialized = success;
 
             return success;
         }
@@ -1231,6 +1251,14 @@ namespace BRobot
                 Console.WriteLine(ex);
             }
             return false;
+        }
+
+
+        private void ExecuteActionsInController(List<Action> actions)
+        {
+            List<string> program = programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
+            comm.LoadProgramToController(program);
+            comm.StartProgramExecution();
         }
 
 
@@ -1281,30 +1309,30 @@ namespace BRobot
         //    TriggerQueue();
         //}
 
-        /// <summary>
-        /// Checks the state of the execution of the robot, and if stopped and if elements 
-        /// remaining on the queue, starts executing them.
-        /// </summary>
-        public void TriggerQueue()
-        {
-            if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
-            {
-                Path path = queue.GetNext();
-                // RunPath(path);
+        ///// <summary>
+        ///// Checks the state of the execution of the robot, and if stopped and if elements 
+        ///// remaining on the queue, starts executing them.
+        ///// </summary>
+        //public void TriggerQueue()
+        //{
+        //    if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
+        //    {
+        //        Path path = queue.GetNext();
+        //        // RunPath(path);
 
-                // https://msdn.microsoft.com/en-us/library/aa645740(v=vs.71).aspx
-                // Thread oThread = new Thread(new ThreadStart(oAlpha.Beta));
-                // http://stackoverflow.com/a/3360582
-                // Thread thread = new Thread(() => download(filename));
+        //        // https://msdn.microsoft.com/en-us/library/aa645740(v=vs.71).aspx
+        //        // Thread oThread = new Thread(new ThreadStart(oAlpha.Beta));
+        //        // http://stackoverflow.com/a/3360582
+        //        // Thread thread = new Thread(() => download(filename));
 
-                // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
-                //Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
-                //runPathThread.Start();
+        //        // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
+        //        //Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
+        //        //runPathThread.Start();
 
-                pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
-                pathExecuter.Start();
-            }
-        }
+        //        pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
+        //        pathExecuter.Start();
+        //    }
+        //}
 
         ///// <summary>
         ///// Generates a module from a path, loads it to the controller and runs it.
@@ -1320,13 +1348,13 @@ namespace BRobot
         //    comm.StartProgramExecution();
         //}
 
-        /// <summary>
-        /// Remove all pending elements from the queue.
-        /// </summary>
-        public void ClearQueue()
-        {
-            queue.EmptyQueue();
-        }
+        ///// <summary>
+        ///// Remove all pending elements from the queue.
+        ///// </summary>
+        //public void ClearQueue()
+        //{
+        //    queue.EmptyQueue();
+        //}
 
         /// <summary>
         /// Adds a Frame to the streaming queue
@@ -1373,12 +1401,17 @@ namespace BRobot
         public void DebugRobotCursors()
         {
             if (virtualCursor == null)
-                Console.WriteLine("Virtual pointer not initialized");
+                Console.WriteLine("Virtual cursor not initialized");
             else
                 Console.WriteLine(virtualCursor);
 
             if (writeCursor == null)
-                Console.WriteLine("Write pointer not initialized");
+                Console.WriteLine("Write cursor not initialized");
+            else
+                Console.WriteLine(writeCursor);
+
+            if (motionCursor == null)
+                Console.WriteLine("Motion cursor not initialized");
             else
                 Console.WriteLine(writeCursor);
         }
