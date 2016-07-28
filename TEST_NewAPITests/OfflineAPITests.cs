@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using BRobot;
 
-namespace TEST_NewAPITests
+namespace TEST_OfflineAPITests
 {
     class Program
     {

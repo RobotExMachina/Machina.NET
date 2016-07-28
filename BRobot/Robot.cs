@@ -287,14 +287,14 @@ namespace BRobot
         //    c.AddPathToQueue(path);
         //}
 
-        ///// <summary>
-        ///// Stops the robot after execution of current program. This will also clear the queue.
-        ///// </summary>
-        //public void StopAfterProgram()
-        //{
-        //    c.ClearQueue();
-        //    c.StopProgramOnDevice(false);
-        //}
+        /// <summary>
+        /// Stops the robot after execution of current program. This will also clear the queue.
+        /// </summary>
+        public void StopAfterProgram()
+        {
+            c.ClearQueue();
+            c.StopProgramOnDevice(false);
+        }
 
         /// <summary>
         /// 

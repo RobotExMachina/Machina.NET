@@ -1281,30 +1281,30 @@ namespace BRobot
         //    TriggerQueue();
         //}
 
-        ///// <summary>
-        ///// Checks the state of the execution of the robot, and if stopped and if elements 
-        ///// remaining on the queue, starts executing them.
-        ///// </summary>
-        //public void TriggerQueue()
-        //{
-        //    if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
-        //    {
-        //        Path path = queue.GetNext();
-        //        // RunPath(path);
+        /// <summary>
+        /// Checks the state of the execution of the robot, and if stopped and if elements 
+        /// remaining on the queue, starts executing them.
+        /// </summary>
+        public void TriggerQueue()
+        {
+            if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
+            {
+                Path path = queue.GetNext();
+                // RunPath(path);
 
-        //        // https://msdn.microsoft.com/en-us/library/aa645740(v=vs.71).aspx
-        //        // Thread oThread = new Thread(new ThreadStart(oAlpha.Beta));
-        //        // http://stackoverflow.com/a/3360582
-        //        // Thread thread = new Thread(() => download(filename));
+                // https://msdn.microsoft.com/en-us/library/aa645740(v=vs.71).aspx
+                // Thread oThread = new Thread(new ThreadStart(oAlpha.Beta));
+                // http://stackoverflow.com/a/3360582
+                // Thread thread = new Thread(() => download(filename));
 
-        //        // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
-        //        //Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
-        //        //runPathThread.Start();
+                // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
+                //Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
+                //runPathThread.Start();
 
-        //        pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
-        //        pathExecuter.Start();
-        //    }
-        //}
+                pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
+                pathExecuter.Start();
+            }
+        }
 
         ///// <summary>
         ///// Generates a module from a path, loads it to the controller and runs it.
@@ -1320,13 +1320,13 @@ namespace BRobot
         //    comm.StartProgramExecution();
         //}
 
-        ///// <summary>
-        ///// Remove all pending elements from the queue.
-        ///// </summary>
-        //public void ClearQueue()
-        //{
-        //    queue.EmptyQueue();
-        //}
+        /// <summary>
+        /// Remove all pending elements from the queue.
+        /// </summary>
+        public void ClearQueue()
+        {
+            queue.EmptyQueue();
+        }
 
         /// <summary>
         /// Adds a Frame to the streaming queue
