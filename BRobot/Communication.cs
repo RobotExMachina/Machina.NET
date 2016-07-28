@@ -27,7 +27,7 @@ namespace BRobot
     abstract class Communication
     {
         /// <summary>
-        /// A reference to the Control object commanding this Comm
+        /// A reference to parent BRobot Control object commanding this Comm.
         /// </summary>
         protected Control masterControl = null;
 

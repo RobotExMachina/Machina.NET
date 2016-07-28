@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace BRobot
 {
-    //  ██████╗  ██████╗ ███████╗███╗   ██╗
-    //  ██╔══██╗██╔════╝ ██╔════╝████╗  ██║
-    //  ██████╔╝██║  ███╗█████╗  ██╔██╗ ██║
-    //  ██╔═══╝ ██║   ██║██╔══╝  ██║╚██╗██║
-    //  ██║     ╚██████╔╝███████╗██║ ╚████║
-    //  ╚═╝      ╚═════╝ ╚══════╝╚═╝  ╚═══╝
-    //                                     
+    //   ██████╗ ██████╗ ███╗   ███╗██████╗ ██╗██╗     ███████╗██████╗ 
+    //  ██╔════╝██╔═══██╗████╗ ████║██╔══██╗██║██║     ██╔════╝██╔══██╗
+    //  ██║     ██║   ██║██╔████╔██║██████╔╝██║██║     █████╗  ██████╔╝
+    //  ██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║██║     ██╔══╝  ██╔══██╗
+    //  ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║███████╗███████╗██║  ██║
+    //   ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
+    //                                                                 
     /// <summary>
     /// A class that features methods to translate high-level robot actions into
     /// platform-specific programs. 
     /// </summary>
-    internal abstract class ProgramGenerator
+    internal abstract class Compiler
     {
         /// <summary>
         /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
@@ -27,63 +27,63 @@ namespace BRobot
         /// <returns></returns>
         public abstract List<string> UNSAFEProgramFromActions(string programName, RobotCursor writePointer, List<Action> actions);
 
-        /// <summary>
-        /// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
-        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        /// robot configuration and assumes the robot controller will figure out the correct one.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="velocity"></param>
-        /// <param name="zone"></param>
-        /// <returns></returns>
-        public static List<string> UNSAFEModuleFromPath(Path path, int velocity, int zone)
-        {
-            string vel = "v" + velocity;
-            string zon = "z" + zone;
+        ///// <summary>
+        ///// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
+        ///// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        ///// robot configuration and assumes the robot controller will figure out the correct one.
+        ///// </summary>
+        ///// <param name="path"></param>
+        ///// <param name="velocity"></param>
+        ///// <param name="zone"></param>
+        ///// <returns></returns>
+        //public static List<string> UNSAFEModuleFromPath(Path path, int velocity, int zone)
+        //{
+        //    string vel = "v" + velocity;
+        //    string zon = "z" + zone;
 
-            List<string> module = new List<string>();
+        //    List<string> module = new List<string>();
 
-            module.Add("MODULE " + path.Name);
-            module.Add("");
+        //    module.Add("MODULE " + path.Name);
+        //    module.Add("");
 
-            for (int i = 0; i < path.Count; i++)
-            {
-                Frame t = path.GetTarget(i);
-                module.Add("  CONST robtarget Target_" + i
-                    + ":=" + UNSAFEExplicitRobTargetDeclaration(path.GetTarget(i)) + ";");
-            }
+        //    for (int i = 0; i < path.Count; i++)
+        //    {
+        //        Frame t = path.GetTarget(i);
+        //        module.Add("  CONST robtarget Target_" + i
+        //            + ":=" + UNSAFEExplicitRobTargetDeclaration(path.GetTarget(i)) + ";");
+        //    }
 
-            module.Add("");
-            module.Add("  PROC main()");
-            module.Add(@"    ConfJ \Off;");
-            module.Add(@"    ConfL \Off;");
+        //    module.Add("");
+        //    module.Add("  PROC main()");
+        //    module.Add(@"    ConfJ \Off;");
+        //    module.Add(@"    ConfL \Off;");
 
-            for (int i = 0; i < path.Count; i++)
-            {
-                module.Add("    MoveL Target_" + i
-                    + "," + vel
-                    + "," + zon
-                    + @",Tool0\WObj:=WObj0;");
-            }
+        //    for (int i = 0; i < path.Count; i++)
+        //    {
+        //        module.Add("    MoveL Target_" + i
+        //            + "," + vel
+        //            + "," + zon
+        //            + @",Tool0\WObj:=WObj0;");
+        //    }
 
-            module.Add("  ENDPROC");
-            module.Add("ENDMODULE");
+        //    module.Add("  ENDPROC");
+        //    module.Add("ENDMODULE");
 
-            return module;
-        }
+        //    return module;
+        //}
 
-        /// <summary>
-        /// Returns a quick and dirty RobTarget declaration out of a Frame object.
-        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        /// robot configuration and assumes the robot controller will figure out the correct one.
-        /// </summary>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public static string UNSAFEExplicitRobTargetDeclaration(Frame target)
-        {
-            //return "[" + target + ",[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]";
-            return target.GetUNSAFERobTargetDeclaration();
-        }
+        ///// <summary>
+        ///// Returns a quick and dirty RobTarget declaration out of a Frame object.
+        ///// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        ///// robot configuration and assumes the robot controller will figure out the correct one.
+        ///// </summary>
+        ///// <param name="target"></param>
+        ///// <returns></returns>
+        //public static string UNSAFEExplicitRobTargetDeclaration(Frame target)
+        //{
+        //    //return "[" + target + ",[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]";
+        //    return target.GetUNSAFERobTargetDeclaration();
+        //}
     }
 
 
@@ -94,7 +94,7 @@ namespace BRobot
     //  ██║  ██║██████╔╝██████╔╝
     //  ╚═╝  ╚═╝╚═════╝ ╚═════╝ 
     //                          
-    internal class ProgramGeneratorABB : ProgramGenerator
+    internal class CompilerABB : Compiler
     {
         /// <summary>
         /// A Set of ABB's predefined zone values. 
@@ -103,55 +103,7 @@ namespace BRobot
         {
             0, 1, 5, 10, 15, 20, 30, 40, 50, 60, 80, 100, 150, 200 
         };
-
-        ///// <summary>
-        ///// ABB's correspondance of MotionTypes to datatypes.
-        ///// </summary>
-        //private static Dictionary<MotionType, string> MotionData = new Dictionary<MotionType, string>()
-        //{
-        //    { MotionType.Linear, "robtarget" },
-        //    { MotionType.Joint, "robtarget" },
-        //    { MotionType.Joints, "jointtarget" }
-        //};
-
-        ///// <summary>
-        ///// ABB's correspondance of ActionTypes to datatypes.
-        ///// </summary>
-        //private static Dictionary<ActionType, string> ActionData = new Dictionary<ActionType, string>()
-        //{
-        //    { ActionType.Translation, "robtarget" },
-        //    { ActionType.Rotation, "robtarget" },
-        //    { ActionType.TranslationAndRotation, "robtarget" },
-        //    { ActionType.RotationAndTranslation, "robtarget" },
-        //    { ActionType.Joints, "jointtarget" },
-        //    { ActionType.Message, null },
-        //    { ActionType.Wait, null },
-        //};
-
-        ///// <summary>
-        ///// ABB's correspondance of MotionTypes to instructions.
-        ///// </summary>
-        //private static Dictionary<MotionType, string> ActionInstructions = new Dictionary<MotionType, string>()
-        //{
-        //    { MotionType.Linear, "MOVEL" },
-        //    { MotionType.Joint, "MOVEJ" },
-        //    { MotionType.Joints, "MoveAbsJ" }
-        //};
-
-        //static private Dictionary<ActionType, string> ActionInstructions = new Dictionary<ActionType, string>()
-        //{
-        //    { ActionType.Translation, "MOVEL" },
-        //    { ActionType.Rotation, "MOVEL" },
-        //    { ActionType.TranslationAndRotation, "MOVEL" },
-        //    { ActionType.RotationAndTranslation, "MOVEL" },
-        //    { ActionType.Joints, "MoveAbsJ" },
-        //    { ActionType.Message, "TPWrite" },
-        //    { ActionType.Wait, null },
-        //}
-
-
         
-
         /// <summary>
         /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 

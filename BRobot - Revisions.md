@@ -18,6 +18,11 @@
 - [ ] Get stream mode working again
 - [ ] Get Execute mode working again
 
+## BUILD 1115
+- [x] ProgramGenerator class is now Compiler
+- [x] Deactivated Queue class
+- [x] Deactivated Path class and all related methods 
+
 ## BUILD 1114
 - [x] Quick Dynamo ZeroTouchNodes test
 

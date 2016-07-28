@@ -46,215 +46,9 @@ namespace BRobot
     /// </summary>
     public class Point : Geometry
     {
-
-        
+       
         public double X, Y, Z;
-
-        /// <summary>
-        /// Unit X Vector.
-        /// </summary>
-        public static Point XAxis = new Point(1, 0, 0);
-
-        /// <summary>
-        /// Unit Y Vector.
-        /// </summary>
-        public static Point YAxis = new Point(0, 1, 0);
-
-        /// <summary>
-        /// Unit Z Vector.
-        /// </summary>
-        public static Point ZAxis = new Point(0, 0, 1);
-
-        public static Point operator + (Point p1, Point p2)
-        {
-            return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
-        }
-
-        public static Point operator - (Point p)
-        {
-            return new Point(-p.X, -p.Y, -p.Z);
-        }
-
-        public static Point operator - (Point p1, Point p2)
-        {
-            return new Point(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
-        }
-
-        public static Point operator * (Double s, Point p)
-        {
-            return new Point(s * p.X, s * p.Y, s * p.Z);
-        }
-
-        public static Point operator * (Point p, Double s)
-        {
-            return new Point(s * p.X, s * p.Y, s * p.Z);
-        }
-
-        /// <summary>
-        /// Returns the dot product of specified Vectors. 
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double operator * (Point p1, Point p2)
-        {
-            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
-        }
-
-        /// <summary>
-        /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
-        /// of specified Points (Vectors).
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double DotProduct(Point p1, Point p2)
-        {
-            // A · B = Ax * Bx + Ay * By + Az * Bz
-            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z; 
-        }
-
-        /// <summary>
-        /// Returns the angle between two vectors in radians.
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double AngleBetween(Point p1, Point p2)
-        {
-            // A · B = ||A|| * ||B|| * cos(ang);
-            double lens = p1.Length() * p2.Length();
-
-            if (lens < EPSILON)
-                return 0.5 * Math.PI;
-           
-            return Math.Acos( DotProduct(p1, p2) / lens );
-        }
-
-        /// <summary>
-        /// Returns the <a href="https://en.wikipedia.org/wiki/Cross_product">Cross Product</a>
-        /// of specified Vectors (Points).
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static Point CrossProduct(Point p1, Point p2)
-        {
-            return new Point(
-                p1.Y * p2.Z - p1.Z * p2.Y,
-                p1.Z * p2.X - p1.X * p2.Z,
-                p1.X * p2.Y - p1.Y * p2.X);
-        }
         
-        /// <summary>
-        /// Returns a unit Vector orthogonal to specified guiding Vector, contained
-        /// in the plane defined by guiding Vector and Point. The direction of the 
-        /// resulting Vector will be on the side of the guiding Point.
-        /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public static Point OrthogonalTo(Point vec, Point p)
-        {
-            return new CoordinateSystem(vec, p).YAxis;
-        }
-
-        /// <summary>
-        /// Returns the distance between two Points.
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double Distance(Point p1, Point p2)
-        {
-            double dx = p1.X - p2.X,
-                dy = p1.Y - p2.Y,
-                dz = p1.Z - p2.Z;
-
-            return Math.Sqrt( (dx * dx) + (dy * dy) + (dz * dz) );
-        }
-
-        /// <summary>
-        /// Returns the squarde distance between two Points.
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double SqDistance(Point p1, Point p2)
-        {
-            double dx = p1.X - p2.X,
-                dy = p1.Y - p2.Y,
-                dz = p1.Z - p2.Z;
-
-            return (dx * dx) + (dy * dy) + (dz * dz);
-        }
-
-        /// <summary>
-        /// Are specified vectors parallel?
-        /// </summary>
-        /// <param name="vec1"></param>
-        /// <param name="vec2"></param>
-        /// <returns></returns>
-        public static bool AreParallel(Point vec1, Point vec2)
-        {
-            double alpha = AngleBetween(vec1, vec2);
-            return alpha < EPSILON || (alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON);
-        }
-
-        /// <summary>
-        /// Are specified vectors orthogonal?
-        /// </summary>
-        /// <param name="vec1"></param>
-        /// <param name="vec2"></param>
-        /// <returns></returns>
-        public static bool AreOrthogonal(Point vec1, Point vec2)
-        {
-            double alpha = AngleBetween(vec1, vec2);
-            return alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON;
-        }
-
-        /// <summary>
-        /// Returns the sqaured distance from 'p' to the segment 'p1-p2'.
-        /// </summary>
-        /// <ref>https://github.com/imshz/simplify-net</ref>
-        /// <param name="p"></param>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double SqSegmentDistance(Point p, Point p1, Point p2)
-        {
-            var x = p1.X;
-            var y = p1.Y;
-            var z = p1.Z;
-            var dx = p2.X - x;
-            var dy = p2.Y - y;
-            var dz = p2.Z - z;
-
-            if (!dx.Equals(0.0) || !dy.Equals(0.0) || !dz.Equals(0.0))
-            {
-                var t = ((p.X - x) * dx + (p.Y - y) * dy + (p.Z - z) * dz) / (dx * dx + dy * dy + dz * dz);
-
-                if (t > 1)
-                {
-                    x = p2.X;
-                    y = p2.Y;
-                    z = p2.Z;
-                }
-                else if (t > 0)
-                {
-                    x += dx * t;
-                    y += dy * t;
-                    z += dz * t;
-                }
-            }
-
-            dx = p.X - x;
-            dy = p.Y - y;
-            dz = p.Z - z;
-
-            return (dx * dx) + (dy * dy) + (dz * dz);
-        }
-
         /// <summary>
         /// Create a Point from its XYZ coordinates.
         /// </summary>
@@ -460,8 +254,181 @@ namespace BRobot
             return this.Rotate(r);
         }
         
+        
+
+
+
+
+
+
+
+
+
         /// <summary>
-        /// Returns a new Point as the rotation of 'p' by 'r'
+        /// Unit X Vector.
+        /// </summary>
+        public static Point XAxis = new Point(1, 0, 0);
+
+        /// <summary>
+        /// Unit Y Vector.
+        /// </summary>
+        public static Point YAxis = new Point(0, 1, 0);
+
+        /// <summary>
+        /// Unit Z Vector.
+        /// </summary>
+        public static Point ZAxis = new Point(0, 0, 1);
+
+        public static Point operator +(Point p1, Point p2)
+        {
+            return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
+        }
+
+        public static Point operator -(Point p)
+        {
+            return new Point(-p.X, -p.Y, -p.Z);
+        }
+
+        public static Point operator -(Point p1, Point p2)
+        {
+            return new Point(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
+        }
+
+        public static Point operator *(Double s, Point p)
+        {
+            return new Point(s * p.X, s * p.Y, s * p.Z);
+        }
+
+        public static Point operator *(Point p, Double s)
+        {
+            return new Point(s * p.X, s * p.Y, s * p.Z);
+        }
+
+        /// <summary>
+        /// Returns the dot product of specified Vectors. 
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double operator *(Point p1, Point p2)
+        {
+            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
+        }
+
+        /// <summary>
+        /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
+        /// of specified Points (Vectors).
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double DotProduct(Point p1, Point p2)
+        {
+            // A · B = Ax * Bx + Ay * By + Az * Bz
+            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
+        }
+
+        /// <summary>
+        /// Returns the angle between two vectors in radians.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double AngleBetween(Point p1, Point p2)
+        {
+            // A · B = ||A|| * ||B|| * cos(ang);
+            double lens = p1.Length() * p2.Length();
+
+            if (lens < EPSILON)
+                return 0.5 * Math.PI;
+
+            return Math.Acos(DotProduct(p1, p2) / lens);
+        }
+
+        /// <summary>
+        /// Returns the <a href="https://en.wikipedia.org/wiki/Cross_product">Cross Product</a>
+        /// of specified Vectors (Points).
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static Point CrossProduct(Point p1, Point p2)
+        {
+            return new Point(
+                p1.Y * p2.Z - p1.Z * p2.Y,
+                p1.Z * p2.X - p1.X * p2.Z,
+                p1.X * p2.Y - p1.Y * p2.X);
+        }
+
+        /// <summary>
+        /// Returns a unit Vector orthogonal to specified guiding Vector, contained
+        /// in the plane defined by guiding Vector and Point. The direction of the 
+        /// resulting Vector will be on the side of the guiding Point.
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static Point OrthogonalTo(Point vec, Point p)
+        {
+            return new CoordinateSystem(vec, p).YAxis;
+        }
+
+        /// <summary>
+        /// Returns the distance between two Points.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double Distance(Point p1, Point p2)
+        {
+            double dx = p1.X - p2.X,
+                dy = p1.Y - p2.Y,
+                dz = p1.Z - p2.Z;
+
+            return Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
+        }
+
+        /// <summary>
+        /// Returns the squarde distance between two Points.
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double SqDistance(Point p1, Point p2)
+        {
+            double dx = p1.X - p2.X,
+                dy = p1.Y - p2.Y,
+                dz = p1.Z - p2.Z;
+
+            return (dx * dx) + (dy * dy) + (dz * dz);
+        }
+
+        /// <summary>
+        /// Are specified vectors parallel?
+        /// </summary>
+        /// <param name="vec1"></param>
+        /// <param name="vec2"></param>
+        /// <returns></returns>
+        public static bool AreParallel(Point vec1, Point vec2)
+        {
+            double alpha = AngleBetween(vec1, vec2);
+            return alpha < EPSILON || (alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON);
+        }
+
+        /// <summary>
+        /// Are specified vectors orthogonal?
+        /// </summary>
+        /// <param name="vec1"></param>
+        /// <param name="vec2"></param>
+        /// <returns></returns>
+        public static bool AreOrthogonal(Point vec1, Point vec2)
+        {
+            double alpha = AngleBetween(vec1, vec2);
+            return alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON;
+        }
+
+        /// <summary>
+        /// Returns a new Point as the rotation of Point 'p' by Rotation 'r'
         /// </summary>
         /// <param name="p"></param>
         /// <param name="r"></param>
@@ -472,6 +439,202 @@ namespace BRobot
             v.Rotate(r);
             return v;
         }
+
+        /// <summary>
+        /// Returns the squared distance from 'p' to the segment 'p1-p2'.
+        /// </summary>
+        /// <ref>https://github.com/imshz/simplify-net</ref>
+        /// <param name="p"></param>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <returns></returns>
+        public static double SqSegmentDistance(Point p, Point p1, Point p2)
+        {
+            var x = p1.X;
+            var y = p1.Y;
+            var z = p1.Z;
+            var dx = p2.X - x;
+            var dy = p2.Y - y;
+            var dz = p2.Z - z;
+
+            if (!dx.Equals(0.0) || !dy.Equals(0.0) || !dz.Equals(0.0))
+            {
+                var t = ((p.X - x) * dx + (p.Y - y) * dy + (p.Z - z) * dz) / (dx * dx + dy * dy + dz * dz);
+
+                if (t > 1)
+                {
+                    x = p2.X;
+                    y = p2.Y;
+                    z = p2.Z;
+                }
+                else if (t > 0)
+                {
+                    x += dx * t;
+                    y += dy * t;
+                    z += dz * t;
+                }
+            }
+
+            dx = p.X - x;
+            dy = p.Y - y;
+            dz = p.Z - z;
+
+            return (dx * dx) + (dy * dy) + (dz * dz);
+        }
+        
+        /// <summary>
+        /// Simplifies the path using a combination of radial distance and 
+        /// Ramer–Douglas–Peucker algorithm. 
+        /// </summary>
+        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
+        /// <param name="points"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="highQuality"></param>
+        /// <returns></returns>
+        public static List<Point> SimplifyPointList(List<Point> points, double tolerance, bool highQuality)
+        {
+            if (points.Count < 1)
+            {
+                Console.WriteLine("List contains no points.");
+            }
+
+            int prev = points.Count;
+            List<Point> simplified;
+
+            double sqTolerance = tolerance * tolerance;
+
+            if (!highQuality)
+            {
+                simplified = Point.SimplifyRadialDistance(points, sqTolerance);
+                simplified = Point.SimplifyDouglasPeucker(simplified, sqTolerance);
+            }
+            else
+            {
+                simplified = SimplifyDouglasPeucker(points, sqTolerance);
+            }
+
+            Console.WriteLine("Point list simplified from " + prev + " to " + simplified.Count + " Points.");
+
+            return simplified;
+        }
+
+        /// <summary>
+        /// The Ramer-Douglas-Peucker algorithm.
+        /// </summary>
+        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
+        /// <param name="points"></param>
+        /// <param name="sqTolerance"></param>
+        /// <returns></returns>
+        public static List<Point> SimplifyDouglasPeucker(List<Point> points, double sqTolerance)
+        {
+            var len = points.Count;
+            var markers = new int?[len];
+            int? first = 0;
+            int? last = len - 1;
+            int? index = 0;
+            var stack = new List<int?>();
+            var newPoints = new List<Point>();
+
+            markers[first.Value] = markers[last.Value] = 1;
+
+            while (last != null)
+            {
+                var maxSqDist = 0.0d;
+
+                for (int? i = first + 1; i < last; i++)
+                {
+                    var sqDist = Point.SqSegmentDistance(points[i.Value], points[first.Value], points[last.Value]);
+
+                    if (sqDist > maxSqDist)
+                    {
+                        index = i;
+                        maxSqDist = sqDist;
+                    }
+                }
+
+                if (maxSqDist > sqTolerance)
+                {
+                    markers[index.Value] = 1;
+                    stack.AddRange(new[] { first, index, index, last });
+                }
+
+                if (stack.Count > 0)
+                {
+                    last = stack[stack.Count - 1];
+                    stack.RemoveAt(stack.Count - 1);
+                }
+                else
+                {
+                    last = null;
+                }
+
+                if (stack.Count > 0)
+                {
+                    first = stack[stack.Count - 1];
+                    stack.RemoveAt(stack.Count - 1);
+                }
+                else
+                {
+                    first = null;
+                }
+            }
+
+            for (int i = 0; i < len; i++)
+            {
+                if (markers[i] != null)
+                {
+                    newPoints.Add(points[i]);
+                }
+            }
+
+            return newPoints;
+        }
+
+        /// <summary>
+        /// Simple distance-based simplification. Consecutive points under 
+        /// threshold distance are removed. 
+        /// </summary>
+        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
+        /// <param name="points"></param>
+        /// <param name="sqTolerance"></param>
+        /// <returns></returns>
+        public static List<Point> SimplifyRadialDistance(List<Point> points, double sqTolerance)
+        {
+            Point prevPoint = points[0];
+            List<Point> newPoints = new List<Point> { prevPoint };
+            Point pt = null;
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                pt = points[i];
+
+                if (Point.SqDistance(pt, prevPoint) > sqTolerance)
+                {
+                    newPoints.Add(pt);
+                    prevPoint = pt;
+                }
+            }
+
+            // Add the last frame of the path (?)
+            if (pt != null && !prevPoint.Equals(pt))
+            {
+                newPoints.Add(pt);
+            }
+
+            return newPoints;
+        }
+
+        
+
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// Equality checks.
@@ -512,6 +675,7 @@ namespace BRobot
                 Math.Round(Y, STRING_ROUND_DECIMALS),
                 Math.Round(Z, STRING_ROUND_DECIMALS));
         }
+
     }
 
 
@@ -1458,6 +1622,38 @@ namespace BRobot
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //███████╗██████╗  █████╗ ███╗   ███╗███████╗
     //██╔════╝██╔══██╗██╔══██╗████╗ ████║██╔════╝
     //█████╗  ██████╔╝███████║██╔████╔██║█████╗  
@@ -1693,272 +1889,272 @@ namespace BRobot
     }
 
 
-    //██████╗  █████╗ ████████╗██╗  ██╗
-    //██╔══██╗██╔══██╗╚══██╔══╝██║  ██║
-    //██████╔╝███████║   ██║   ███████║
-    //██╔═══╝ ██╔══██║   ██║   ██╔══██║
-    //██║     ██║  ██║   ██║   ██║  ██║
-    //╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
-    /// <summary>
-    /// Represents an ordered sequence of target Frames
-    /// </summary>
-    public class Path : Geometry
-    {
-        public string Name;
-        private List<Frame> Targets;
-        public int Count { get; private set; }
+    ////██████╗  █████╗ ████████╗██╗  ██╗
+    ////██╔══██╗██╔══██╗╚══██╔══╝██║  ██║
+    ////██████╔╝███████║   ██║   ███████║
+    ////██╔═══╝ ██╔══██║   ██║   ██╔══██║
+    ////██║     ██║  ██║   ██║   ██║  ██║
+    ////╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
+    ///// <summary>
+    ///// Represents an ordered sequence of target Frames
+    ///// </summary>
+    //public class Path : Geometry
+    //{
+    //    public string Name;
+    //    private List<Frame> Targets;
+    //    public int Count { get; private set; }
 
-        public Path() : this("defaultPath") { }
+    //    public Path() : this("defaultPath") { }
 
-        public Path(string name)
-        {
-            this.Name = name;
-            this.Targets = new List<Frame>();
-            Count = 0;
-        }
+    //    public Path(string name)
+    //    {
+    //        this.Name = name;
+    //        this.Targets = new List<Frame>();
+    //        Count = 0;
+    //    }
 
-        public void Add(Frame target)
-        {
-            this.Targets.Add(target);
-            Count++;
-        }
+    //    public void Add(Frame target)
+    //    {
+    //        this.Targets.Add(target);
+    //        Count++;
+    //    }
 
-        public void Add(Point position)
-        {
-            this.Add(new Frame(position));
-        }
+    //    public void Add(Point position)
+    //    {
+    //        this.Add(new Frame(position));
+    //    }
 
-        public void Add(double x, double y, double z)
-        {
-            this.Add(new Frame(x, y, z));
-        }
+    //    public void Add(double x, double y, double z)
+    //    {
+    //        this.Add(new Frame(x, y, z));
+    //    }
 
-        public void Add(Point position, Rotation orientation)
-        {
-            this.Add(new Frame(position, orientation));
-        }
+    //    public void Add(Point position, Rotation orientation)
+    //    {
+    //        this.Add(new Frame(position, orientation));
+    //    }
 
-        public Frame GetTarget(int index)
-        {
-            return this.Targets[index];
-        }
+    //    public Frame GetTarget(int index)
+    //    {
+    //        return this.Targets[index];
+    //    }
 
-        public Frame GetFirstTarget()
-        {
-            return this.Targets[0];
-        }
+    //    public Frame GetFirstTarget()
+    //    {
+    //        return this.Targets[0];
+    //    }
 
-        public Frame GetLastTarget()
-        {
-            return this.Targets[this.Targets.Count - 1];
-        }
+    //    public Frame GetLastTarget()
+    //    {
+    //        return this.Targets[this.Targets.Count - 1];
+    //    }
 
-        private void UpadateTargetCount()
-        {
-            Count = Targets.Count;
-        }
+    //    private void UpadateTargetCount()
+    //    {
+    //        Count = Targets.Count;
+    //    }
 
-        /// <summary>
-        /// Flips the XY coordinates of all target frames.
-        /// </summary>
-        public void FlipXY()
-        {
-            foreach (Frame f in Targets)
-            {
-                //double x = f.Position.X;
-                //f.Position.X = f.Position.Y;
-                //f.Position.Y = x;
-                f.FlipXY();
-            }
-        }
+    //    /// <summary>
+    //    /// Flips the XY coordinates of all target frames.
+    //    /// </summary>
+    //    public void FlipXY()
+    //    {
+    //        foreach (Frame f in Targets)
+    //        {
+    //            //double x = f.Position.X;
+    //            //f.Position.X = f.Position.Y;
+    //            //f.Position.Y = x;
+    //            f.FlipXY();
+    //        }
+    //    }
 
-        /// <summary>
-        /// Remaps the coordinates of all target frames from a source to a target domain.
-        /// </summary>
-        /// <param name="axis"></param>
-        /// <param name="prevMin"></param>
-        /// <param name="prevMax"></param>
-        /// <param name="newMin"></param>
-        /// <param name="newMax"></param>
-        /// <returns></returns>
-        public bool RemapAxis(string axis, double prevMin, double prevMax, double newMin, double newMax)
-        {
-            string a = axis.ToLower();
-            //Some sanity
-            if (!a.Equals("x") && !a.Equals("y") && !a.Equals("z"))
-            {
-                Console.WriteLine("Please use 'x', 'y' or 'z' as arguments");
-                return false;
-            }
+    //    /// <summary>
+    //    /// Remaps the coordinates of all target frames from a source to a target domain.
+    //    /// </summary>
+    //    /// <param name="axis"></param>
+    //    /// <param name="prevMin"></param>
+    //    /// <param name="prevMax"></param>
+    //    /// <param name="newMin"></param>
+    //    /// <param name="newMax"></param>
+    //    /// <returns></returns>
+    //    public bool RemapAxis(string axis, double prevMin, double prevMax, double newMin, double newMax)
+    //    {
+    //        string a = axis.ToLower();
+    //        //Some sanity
+    //        if (!a.Equals("x") && !a.Equals("y") && !a.Equals("z"))
+    //        {
+    //            Console.WriteLine("Please use 'x', 'y' or 'z' as arguments");
+    //            return false;
+    //        }
 
-            int axid = a.Equals("x") ? 0 : a.Equals("y") ? 1 : 2;
+    //        int axid = a.Equals("x") ? 0 : a.Equals("y") ? 1 : 2;
 
-            switch (axid)
-            {
-                case 0:
-                    foreach (Frame f in Targets)
-                    {
-                        f.Position.X = Util.Remap(f.Position.X, prevMin, prevMax, newMin, newMax);
-                    }
-                    break;
-                case 1:
-                    foreach (Frame f in Targets)
-                    {
-                        f.Position.Y = Util.Remap(f.Position.Y, prevMin, prevMax, newMin, newMax);
-                    }
-                    break;
-                default:
-                    foreach (Frame f in Targets)
-                    {
-                        f.Position.Z = Util.Remap(f.Position.Z, prevMin, prevMax, newMin, newMax);
-                    }
-                    break;
-            }
+    //        switch (axid)
+    //        {
+    //            case 0:
+    //                foreach (Frame f in Targets)
+    //                {
+    //                    f.Position.X = Util.Remap(f.Position.X, prevMin, prevMax, newMin, newMax);
+    //                }
+    //                break;
+    //            case 1:
+    //                foreach (Frame f in Targets)
+    //                {
+    //                    f.Position.Y = Util.Remap(f.Position.Y, prevMin, prevMax, newMin, newMax);
+    //                }
+    //                break;
+    //            default:
+    //                foreach (Frame f in Targets)
+    //                {
+    //                    f.Position.Z = Util.Remap(f.Position.Z, prevMin, prevMax, newMin, newMax);
+    //                }
+    //                break;
+    //        }
 
-            return true;
-        }
+    //        return true;
+    //    }
 
-        /// <summary>
-        /// Simplifies the path using a combination of radial distance and 
-        /// Ramer–Douglas–Peucker algorithm. 
-        /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="tolerance"></param>
-        /// <param name="highQuality"></param>
-        /// <returns></returns>
-        public bool Simplify(double tolerance, bool highQuality)
-        {
+    //    /// <summary>
+    //    /// Simplifies the path using a combination of radial distance and 
+    //    /// Ramer–Douglas–Peucker algorithm. 
+    //    /// </summary>
+    //    /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
+    //    /// <param name="tolerance"></param>
+    //    /// <param name="highQuality"></param>
+    //    /// <returns></returns>
+    //    public bool Simplify(double tolerance, bool highQuality)
+    //    {
 
-            if (Count < 1)
-            {
-                Console.WriteLine("Path contains no targets.");
-                return false;
-            }
+    //        if (Count < 1)
+    //        {
+    //            Console.WriteLine("Path contains no targets.");
+    //            return false;
+    //        }
 
-            int prev = Count;
+    //        int prev = Count;
 
-            double sqTolerance = tolerance * tolerance;
+    //        double sqTolerance = tolerance * tolerance;
 
-            if (!highQuality)
-            {
-                SimplifyRadialDistance(sqTolerance);
-            }
+    //        if (!highQuality)
+    //        {
+    //            SimplifyRadialDistance(sqTolerance);
+    //        }
 
-            SimplifyDouglasPeucker(sqTolerance);
+    //        SimplifyDouglasPeucker(sqTolerance);
 
-            Console.WriteLine("Path " + this.Name + " simplified from " + prev + " to " + Count +" targets.");
+    //        Console.WriteLine("Path " + this.Name + " simplified from " + prev + " to " + Count +" targets.");
 
-            return true;
-        }
+    //        return true;
+    //    }
 
-        /// <summary>
-        /// The RDP algorithm.
-        /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="sqTolerance"></param>
-        /// <returns></returns>
-        private void SimplifyDouglasPeucker(double sqTolerance)
-        {
-            var len = Count;
-            var markers = new int?[len];
-            int? first = 0;
-            int? last = len - 1;
-            int? index = 0;
-            var stack = new List<int?>();
-            var newTargets = new List<Frame>();
+    //    /// <summary>
+    //    /// The RDP algorithm.
+    //    /// </summary>
+    //    /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
+    //    /// <param name="sqTolerance"></param>
+    //    /// <returns></returns>
+    //    private void SimplifyDouglasPeucker(double sqTolerance)
+    //    {
+    //        var len = Count;
+    //        var markers = new int?[len];
+    //        int? first = 0;
+    //        int? last = len - 1;
+    //        int? index = 0;
+    //        var stack = new List<int?>();
+    //        var newTargets = new List<Frame>();
 
-            markers[first.Value] = markers[last.Value] = 1;
+    //        markers[first.Value] = markers[last.Value] = 1;
 
-            while (last != null)
-            {
-                var maxSqDist = 0.0d;
+    //        while (last != null)
+    //        {
+    //            var maxSqDist = 0.0d;
 
-                for (int? i = first + 1; i < last; i++)
-                {
-                    var sqDist = Point.SqSegmentDistance(Targets[i.Value].Position,
-                        Targets[first.Value].Position, Targets[last.Value].Position);
+    //            for (int? i = first + 1; i < last; i++)
+    //            {
+    //                var sqDist = Point.SqSegmentDistance(Targets[i.Value].Position,
+    //                    Targets[first.Value].Position, Targets[last.Value].Position);
 
-                    if (sqDist > maxSqDist)
-                    {
-                        index = i;
-                        maxSqDist = sqDist;
-                    }
-                }
+    //                if (sqDist > maxSqDist)
+    //                {
+    //                    index = i;
+    //                    maxSqDist = sqDist;
+    //                }
+    //            }
 
-                if (maxSqDist > sqTolerance)
-                {
-                    markers[index.Value] = 1;
-                    stack.AddRange(new[] { first, index, index, last });
-                }
+    //            if (maxSqDist > sqTolerance)
+    //            {
+    //                markers[index.Value] = 1;
+    //                stack.AddRange(new[] { first, index, index, last });
+    //            }
 
-                if (stack.Count > 0)
-                {
-                    last = stack[stack.Count - 1];
-                    stack.RemoveAt(stack.Count - 1);
-                }
-                else
-                {
-                    last = null;
-                }
+    //            if (stack.Count > 0)
+    //            {
+    //                last = stack[stack.Count - 1];
+    //                stack.RemoveAt(stack.Count - 1);
+    //            }
+    //            else
+    //            {
+    //                last = null;
+    //            }
 
-                if (stack.Count > 0)
-                {
-                    first = stack[stack.Count - 1];
-                    stack.RemoveAt(stack.Count - 1);
-                }
-                else
-                {
-                    first = null;
-                }
-            }
+    //            if (stack.Count > 0)
+    //            {
+    //                first = stack[stack.Count - 1];
+    //                stack.RemoveAt(stack.Count - 1);
+    //            }
+    //            else
+    //            {
+    //                first = null;
+    //            }
+    //        }
 
 
-            for (int i = 0; i < len; i++)
-            {
-                if (markers[i] != null)
-                {
-                    newTargets.Add(Targets[i]);
-                }
-            }
+    //        for (int i = 0; i < len; i++)
+    //        {
+    //            if (markers[i] != null)
+    //            {
+    //                newTargets.Add(Targets[i]);
+    //            }
+    //        }
 
-            Targets = newTargets;
-            UpadateTargetCount();
-        }
+    //        Targets = newTargets;
+    //        UpadateTargetCount();
+    //    }
 
-        /// <summary>
-        /// Simple distance-based simplification. Consecutive points under 
-        /// threshold distance are removed. 
-        /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="sqTolerance"></param>
-        /// <returns></returns>
-        private void SimplifyRadialDistance(double sqTolerance)
-        {
-            Frame prevFrame = Targets[0];
-            List<Frame> newTargets = new List<Frame> { prevFrame };
-            Frame frame = null;
+    //    /// <summary>
+    //    /// Simple distance-based simplification. Consecutive points under 
+    //    /// threshold distance are removed. 
+    //    /// </summary>
+    //    /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
+    //    /// <param name="sqTolerance"></param>
+    //    /// <returns></returns>
+    //    private void SimplifyRadialDistance(double sqTolerance)
+    //    {
+    //        Frame prevFrame = Targets[0];
+    //        List<Frame> newTargets = new List<Frame> { prevFrame };
+    //        Frame frame = null;
 
-            for (int i = 1; i < Targets.Count; i++)
-            {
-                frame = Targets[i];
+    //        for (int i = 1; i < Targets.Count; i++)
+    //        {
+    //            frame = Targets[i];
 
-                if (Point.SqDistance(frame.Position, prevFrame.Position) > sqTolerance)
-                {
-                    newTargets.Add(frame);
-                    prevFrame = frame;
-                }
-            }
+    //            if (Point.SqDistance(frame.Position, prevFrame.Position) > sqTolerance)
+    //            {
+    //                newTargets.Add(frame);
+    //                prevFrame = frame;
+    //            }
+    //        }
 
-            // Add the last frame of the path (?)
-            if (frame != null && !prevFrame.Position.Equals(frame.Position))
-            {
-                newTargets.Add(frame);
-            }
+    //        // Add the last frame of the path (?)
+    //        if (frame != null && !prevFrame.Position.Equals(frame.Position))
+    //        {
+    //            newTargets.Add(frame);
+    //        }
 
-            Targets = newTargets;
-            UpadateTargetCount();
-        }
-    }
+    //        Targets = newTargets;
+    //        UpadateTargetCount();
+    //    }
+    //}
 
 
 

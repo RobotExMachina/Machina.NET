@@ -43,10 +43,10 @@ namespace BRobot
         /// </summary>
         private Communication comm;
 
-        /// <summary>
-        /// The queue that manages what instructions get sent to the robot
-        /// </summary>
-        private Queue queue;
+        ///// <summary>
+        ///// The queue that manages what instructions get sent to the robot
+        ///// </summary>
+        //private Queue queue;
 
         /// <summary>
         /// A buffer that stores issued actions pending to be released to controllers, exports, etc.
@@ -56,7 +56,7 @@ namespace BRobot
         /// <summary>
         /// An 'interface' to create robot programs based on platform-specific languages and descriptions.
         /// </summary>
-        private ProgramGenerator programGenerator = new ProgramGeneratorABB();  // @TODO: this must be more programmatic and shimmed
+        private Compiler programGenerator = new CompilerABB();  // @TODO: this must be more programmatic and shimmed
 
         /// <summary>
         /// Represents the current values for speed, zone and MotionType.
@@ -120,7 +120,7 @@ namespace BRobot
         public void Reset()
         {
             // @TODO: to deprecate
-            queue = new Queue();
+            //queue = new Queue();
             streamQueue = new StreamQueue();
 
             actionBuffer = new ActionBuffer();
@@ -1264,69 +1264,69 @@ namespace BRobot
 
 
 
-        //██╗    ██╗██╗██████╗ 
-        //██║    ██║██║██╔══██╗
-        //██║ █╗ ██║██║██████╔╝
-        //██║███╗██║██║██╔═══╝ 
-        //╚███╔███╔╝██║██║     
-        // ╚══╝╚══╝ ╚═╝╚═╝     
+        ////██╗    ██╗██╗██████╗ 
+        ////██║    ██║██║██╔══██╗
+        ////██║ █╗ ██║██║██████╔╝
+        ////██║███╗██║██║██╔═══╝ 
+        ////╚███╔███╔╝██║██║     
+        //// ╚══╝╚══╝ ╚═╝╚═╝     
 
-        /// <summary>
-        /// Adds a path to the queue manager and tick it for execution.
-        /// </summary>
-        /// <param name="path"></param>
-        public void AddPathToQueue(Path path)
-        {
-            queue.Add(path);
-            TriggerQueue();
-        }
+        ///// <summary>
+        ///// Adds a path to the queue manager and tick it for execution.
+        ///// </summary>
+        ///// <param name="path"></param>
+        //public void AddPathToQueue(Path path)
+        //{
+        //    queue.Add(path);
+        //    TriggerQueue();
+        //}
 
-        /// <summary>
-        /// Checks the state of the execution of the robot, and if stopped and if elements 
-        /// remaining on the queue, starts executing them.
-        /// </summary>
-        public void TriggerQueue()
-        {
-            if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
-            {
-                Path path = queue.GetNext();
-                // RunPath(path);
+        ///// <summary>
+        ///// Checks the state of the execution of the robot, and if stopped and if elements 
+        ///// remaining on the queue, starts executing them.
+        ///// </summary>
+        //public void TriggerQueue()
+        //{
+        //    if (!comm.IsRunning() && queue.ArePathsPending() && (pathExecuter == null || !pathExecuter.IsAlive))
+        //    {
+        //        Path path = queue.GetNext();
+        //        // RunPath(path);
 
-                // https://msdn.microsoft.com/en-us/library/aa645740(v=vs.71).aspx
-                // Thread oThread = new Thread(new ThreadStart(oAlpha.Beta));
-                // http://stackoverflow.com/a/3360582
-                // Thread thread = new Thread(() => download(filename));
+        //        // https://msdn.microsoft.com/en-us/library/aa645740(v=vs.71).aspx
+        //        // Thread oThread = new Thread(new ThreadStart(oAlpha.Beta));
+        //        // http://stackoverflow.com/a/3360582
+        //        // Thread thread = new Thread(() => download(filename));
 
-                // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
-                //Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
-                //runPathThread.Start();
+        //        // This needs to be much better handled, and the trigger queue should not trigger if a thread is running... 
+        //        //Thread runPathThread = new Thread(() => RunPath(path));  // not working for some reason...
+        //        //runPathThread.Start();
 
-                pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
-                pathExecuter.Start();
-            }
-        }
+        //        pathExecuter = new Thread(() => RunPath(path));  // http://stackoverflow.com/a/3360582
+        //        pathExecuter.Start();
+        //    }
+        //}
 
-        /// <summary>
-        /// Generates a module from a path, loads it to the controller and runs it.
-        /// It assumes the robot is stopped (does this even matter anyway...?)
-        /// </summary>
-        /// <param name="path"></param>
-        public void RunPath(Path path)
-        {
-            Console.WriteLine("RUNNING NEW PATH: " + path.Count);
-            List<string> module = ProgramGenerator.UNSAFEModuleFromPath(path, currentSettings.Speed, currentSettings.Zone);
+        ///// <summary>
+        ///// Generates a module from a path, loads it to the controller and runs it.
+        ///// It assumes the robot is stopped (does this even matter anyway...?)
+        ///// </summary>
+        ///// <param name="path"></param>
+        //public void RunPath(Path path)
+        //{
+        //    Console.WriteLine("RUNNING NEW PATH: " + path.Count);
+        //    List<string> module = Compiler.UNSAFEModuleFromPath(path, currentSettings.Speed, currentSettings.Zone);
 
-            comm.LoadProgramToController(module);
-            comm.StartProgramExecution();
-        }
+        //    comm.LoadProgramToController(module);
+        //    comm.StartProgramExecution();
+        //}
 
-        /// <summary>
-        /// Remove all pending elements from the queue.
-        /// </summary>
-        public void ClearQueue()
-        {
-            queue.EmptyQueue();
-        }
+        ///// <summary>
+        ///// Remove all pending elements from the queue.
+        ///// </summary>
+        //public void ClearQueue()
+        //{
+        //    queue.EmptyQueue();
+        //}
 
         /// <summary>
         /// Adds a Frame to the streaming queue

@@ -68,7 +68,7 @@ namespace BRobot
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1112;
+        public static readonly int Build = 1115;
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -278,23 +278,23 @@ namespace BRobot
             return c.GetCurrentJoints();
         }
 
-        /// <summary>
-        /// Loads the path to the queue manager and triggers execution of the program if applicable.
-        /// </summary>
-        /// <param name="path"></param>
-        public void LoadPath(Path path)
-        {
-            c.AddPathToQueue(path);
-        }
+        ///// <summary>
+        ///// Loads the path to the queue manager and triggers execution of the program if applicable.
+        ///// </summary>
+        ///// <param name="path"></param>
+        //public void LoadPath(Path path)
+        //{
+        //    c.AddPathToQueue(path);
+        //}
 
-        /// <summary>
-        /// Stops the robot after execution of current program. This will also clear the queue.
-        /// </summary>
-        public void StopAfterProgram()
-        {
-            c.ClearQueue();
-            c.StopProgramOnDevice(false);
-        }
+        ///// <summary>
+        ///// Stops the robot after execution of current program. This will also clear the queue.
+        ///// </summary>
+        //public void StopAfterProgram()
+        //{
+        //    c.ClearQueue();
+        //    c.StopProgramOnDevice(false);
+        //}
 
         /// <summary>
         /// 
