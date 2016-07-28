@@ -62,7 +62,7 @@ arm.Move(100, 0, 0);            // relative movement in (default) global coordin
 - EXECUTE MODE
 ```csharp
 // Initializtion
-BRobot arm = new BRobot("ABB", "IRB120");   // initialize brobots with make and model
+Robot arm = new Robot("ABB", "IRB120");   // initialize brobots with make and model
 
 // Set control mode
 arm.ControlMode("execute");     // offline/execute/stream

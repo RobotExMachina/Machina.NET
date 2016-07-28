@@ -22,7 +22,11 @@
 - [x] ProgramGenerator class is now Compiler
 - [x] Deactivated Queue class
 - [x] Deactivated Path class and all related methods 
-- [ ] 
+- [ ] Rebirth of Execute mode
+    - [x] motionCursor
+    - [x] .Execute() instruction
+    - [x] Move ActionBuffer and Compiler now to the RobotCursor class
+    - [ ] Add some queue manager for actions released from the virtualCursor and awaiting in the writerCursor. In other words, find a way to .Execute() several buffered actions, and have the queue manager wait for the robot to stop running the program before sending a new batch of instructions. --> __Do actionBuffers belong to the virtualCursors??__  
 
 ## BUILD 1114
 - [x] Quick Dynamo ZeroTouchNodes test

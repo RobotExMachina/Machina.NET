@@ -14,20 +14,20 @@ namespace BRobot
         /// <summary>
         /// Actions pending to be released.
         /// </summary>
-        private List<Action> bufferedActions;
+        private List<Action> pending;
 
         /// <summary>
         /// Keep track of past released actions.
         /// </summary>
-        private List<Action> pastActions;
+        private List<Action> released;
 
         /// <summary>
         /// Main constructor.
         /// </summary>
         public ActionBuffer()
         {
-            pastActions = new List<Action>();
-            bufferedActions = new List<Action>();
+            released = new List<Action>();
+            pending = new List<Action>();
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace BRobot
         /// <returns></returns>
         public bool Add(Action act)
         {
-            bufferedActions.Add(act); 
+            pending.Add(act); 
             return true;
         }
 
@@ -47,34 +47,56 @@ namespace BRobot
         /// <returns></returns>
         public Action GetNext()
         {
-            if (bufferedActions.Count == 0) return null;
+            if (pending.Count == 0) return null;
 
-            pastActions.Add(bufferedActions[0]);
-            bufferedActions.RemoveAt(0);
+            released.Add(pending[0]);
+            pending.RemoveAt(0);
 
-            return pastActions.Last();
+            return released.Last();
         }
 
         /// <summary>
-        /// Release all pending Actions in the order they were issued. 
+        /// Stores especified action in the released buffer.
+        /// </summary>
+        /// <param name="action"></param>
+        public void Save(Action action)
+        {
+            released.Add(action);
+        }
+
+        /// <summary>
+        /// Release all pending Actions in the order they were issued.
+        /// </summary>
+        /// <param name="flush">If true, pending actions will be flushed from the buffer and flagged as released</param>
+        /// <returns></returns>
+        public List<Action> GetAllPending(bool flush)
+        {
+            List<Action> pending = new List<Action>();
+            foreach (Action a in this.pending) pending.Add(a);  // shallow copy
+            if (flush)
+            {
+                released.AddRange(this.pending);
+                this.pending.Clear();
+            }
+            return pending;
+        }
+
+        /// <summary>
+        /// Release all pending Actions in the order they were issued.
         /// </summary>
         /// <returns></returns>
         public List<Action> GetAllPending()
         {
-            List<Action> pending = new List<Action>();
-            foreach (Action a in bufferedActions) pending.Add(a);  // shallow copy
-            pastActions.AddRange(bufferedActions);
-            bufferedActions.Clear();
-            return pending;
+            return GetAllPending(true);
         }
-
+        
         /// <summary>
         /// Is there any Action pending in the buffer?
         /// </summary>
         /// <returns></returns>
         public bool AreActionsPending()
         {
-            return bufferedActions.Count > 0;
+            return pending.Count > 0;
         }
 
         /// <summary>
@@ -83,7 +105,7 @@ namespace BRobot
         /// <returns></returns>
         public int ActionsPending()
         {
-            return bufferedActions.Count;
+            return pending.Count;
         }
 
         /// <summary>
@@ -92,7 +114,7 @@ namespace BRobot
         /// <returns></returns>
         public bool IsVirgin()
         {
-            return pastActions.Count == 0 && bufferedActions.Count == 0;
+            return released.Count == 0 && pending.Count == 0;
         }
 
         /// <summary>
@@ -100,8 +122,8 @@ namespace BRobot
         /// </summary>
         public void Flush()
         {
-            pastActions.Clear();
-            bufferedActions.Clear();
+            released.Clear();
+            pending.Clear();
         }
 
         /// <summary>
@@ -109,12 +131,12 @@ namespace BRobot
         /// </summary>
         public void LogBufferedActions()
         {
-            foreach (Action a in bufferedActions) Console.WriteLine(a);
+            foreach (Action a in pending) Console.WriteLine(a);
         }
 
         public override string ToString()
         {
-            return string.Format("ACTION BUFFER: {0} issued, {1} remaining", pastActions.Count, bufferedActions.Count);
+            return string.Format("ACTION BUFFER: {0} issued, {1} remaining", released.Count, pending.Count);
         }
     }
 }

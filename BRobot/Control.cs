@@ -43,15 +43,16 @@ namespace BRobot
         ///// </summary>
         //private Queue queue;
 
-        /// <summary>
-        /// A buffer that stores issued actions pending to be released to controllers, exports, etc.
-        /// </summary>
-        private ActionBuffer actionBuffer;
+        // MOVED TO THE CURSORS
+        ///// <summary>
+        ///// A buffer that stores issued actions pending to be released to controllers, exports, etc.
+        ///// </summary>
+        //private ActionBuffer actionBuffer;
 
-        /// <summary>
-        /// An 'interface' to create robot programs based on platform-specific languages and descriptions.
-        /// </summary>
-        private Compiler programGenerator = new CompilerABB();  // @TODO: this must be more programmatic and shimmed
+        ///// <summary>
+        ///// An 'interface' to create robot programs based on platform-specific languages and descriptions.
+        ///// </summary>
+        //private Compiler programGenerator = new CompilerABB();  // @TODO: this must be more programmatic and shimmed
 
         /// <summary>
         /// Represents the current values for speed, zone and MotionType.
@@ -128,7 +129,7 @@ namespace BRobot
             //queue = new Queue();
             streamQueue = new StreamQueue();
 
-            actionBuffer = new ActionBuffer();
+            //actionBuffer = new ActionBuffer();
 
             areCursorsInitialized = false;
             virtualCursor = null;
@@ -440,9 +441,11 @@ namespace BRobot
                 Console.WriteLine("Export() only works in Offline mode");
                 return null;
             }
-            
-            List<Action> actions = actionBuffer.GetAllPending();
-            return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
+
+            //List<Action> actions = actionBuffer.GetAllPending();
+            //return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
+
+            return writeCursor.ProgramFromBuffer();
         }
 
         /// <summary>
@@ -466,9 +469,9 @@ namespace BRobot
         /// <returns></returns>
         public void Execute()
         {
-            List<Action> actions = actionBuffer.GetAllPending();
-            actionsExecuter = new Thread(() => ExecuteActionsInController(actions));  // http://stackoverflow.com/a/3360582
-            actionsExecuter.Start();
+            //actionsExecuter = new Thread(() => ExecuteActionsInController());  // http://stackoverflow.com/a/3360582
+            //actionsExecuter.Start();
+            ExecuteActionsInController();
         }
 
 
@@ -608,16 +611,19 @@ namespace BRobot
                 }
                 else
                 {
-                    Console.WriteLine("Still only working in Offline mode");
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
                 }
             }
-            
+
+            //ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
+            //bool success = virtualCursor.ApplyAction(act);
+            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
+            //if (success) actionBuffer.Add(act);
+            //return success;
+
             ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
-            bool success = virtualCursor.ApplyAction(act);
-            // Only add this action to the queue if it was successfuly applied to the virtualCursor
-            if (success) actionBuffer.Add(act);
-            return success;
+            return virtualCursor.Issue(act);
         }
 
         /// <summary>
@@ -695,16 +701,17 @@ namespace BRobot
                 }
                 else
                 {
-                    Console.WriteLine("Still only working in Offline mode");
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
                 }
             }
 
             ActionRotation act = new ActionRotation(world, rot, relative, speed, zone, mType);
-            bool success = virtualCursor.ApplyAction(act);
-            // Only add this action to the queue if it was successfuly applied to the virtualCursor
-            if (success) actionBuffer.Add(act);
-            return success;
+            //bool success = virtualCursor.ApplyAction(act);
+            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
+            //if (success) actionBuffer.Add(act);
+            //return success;
+            return virtualCursor.Issue(act);
         }
 
         /// <summary>
@@ -787,19 +794,20 @@ namespace BRobot
                 }
                 else
                 {
-                    Console.WriteLine("Still only working in Offline mode");
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
                 }
             }
 
             ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
-            // Only add this action to the queue if it was successfuly applied to the virtualCursor
-            if (virtualCursor.ApplyAction(act))
-            {
-                actionBuffer.Add(act);
-                return true;
-            }
-            return false;
+            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
+            //if (virtualCursor.ApplyAction(act))
+            //{
+            //    actionBuffer.Add(act);
+            //    return true;
+            //}
+            //return false;
+            return virtualCursor.Issue(act);
         }
 
         /// <summary>
@@ -916,19 +924,20 @@ namespace BRobot
                 }
                 else
                 {
-                    Console.WriteLine("Still only working in Offline mode");
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
                 }
             }
 
             ActionRotationAndTranslation act = new ActionRotationAndTranslation(worldRot, rot, relRot, worldTrans, trans, relTrans, speed, zone, mType);
-            // Only add this action to the queue if it was successfuly applied to the virtualCursor
-            if (virtualCursor.ApplyAction(act))
-            {
-                actionBuffer.Add(act);
-                return true;
-            }
-            return false;
+            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
+            //if (virtualCursor.ApplyAction(act))
+            //{
+            //    actionBuffer.Add(act);
+            //    return true;
+            //}
+            //return false;
+            return virtualCursor.Issue(act);
         }
 
         /// <summary>
@@ -1043,19 +1052,20 @@ namespace BRobot
                 }
                 else
                 {
-                    Console.WriteLine("Still only working in Offline mode");
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
                 }
             }
 
             ActionJoints act = new ActionJoints(joints, relJnts, speed, zone);
-            // Only add this action to the queue if it was successfuly applied to the virtualCursor
-            if (virtualCursor.ApplyAction(act))
-            {
-                actionBuffer.Add(act);
-                return true;
-            }
-            return false;
+            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
+            //if (virtualCursor.ApplyAction(act))
+            //{
+            //    actionBuffer.Add(act);
+            //    return true;
+            //}
+            //return false;
+            return virtualCursor.Issue(act);
         }
         /// <summary>
         /// Issue a request to set the values of joint angles in configuration space. 
@@ -1090,18 +1100,19 @@ namespace BRobot
                 }
                 else
                 {
-                    Console.WriteLine("Still only working in Offline mode");
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
                 }
             }
 
             ActionMessage act = new ActionMessage(message);
-            if (virtualCursor.ApplyAction(act))
-            {
-                actionBuffer.Add(act);
-                return true;
-            }
-            return false;
+            //if (virtualCursor.ApplyAction(act))
+            //{
+            //    actionBuffer.Add(act);
+            //    return true;
+            //}
+            //return false;
+            return virtualCursor.Issue(act);
         }
 
 
@@ -1125,18 +1136,19 @@ namespace BRobot
                 }
                 else
                 {
-                    Console.WriteLine("Still only working in Offline mode");
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
                 }
             }
 
             ActionWait act = new ActionWait(millis);
-            if (virtualCursor.ApplyAction(act))
-            {
-                actionBuffer.Add(act);
-                return true;
-            }
-            return false;
+            //if (virtualCursor.ApplyAction(act))
+            //{
+            //    actionBuffer.Add(act);
+            //    return true;
+            //}
+            //return false;
+            return virtualCursor.Issue(act);
         }
 
 
@@ -1218,13 +1230,15 @@ namespace BRobot
         {
             bool success = true;
 
-            virtualCursor = new RobotCursorABB("virtualCursor");
+            virtualCursor = new RobotCursorABB("virtualCursor", true);
             success = success && virtualCursor.Initialize(position, rotation);
 
-            writeCursor = new RobotCursorABB("writeCursor");
+            writeCursor = new RobotCursorABB("writeCursor", false);
+            virtualCursor.SetChild(writeCursor);
             success = success && writeCursor.Initialize(position, rotation);
 
-            motionCursor = new RobotCursorABB("motionCursor");
+            motionCursor = new RobotCursorABB("motionCursor", false);
+            writeCursor.SetChild(motionCursor);
             success = success && motionCursor.Initialize(position, rotation);
 
             areCursorsInitialized = success;
@@ -1254,9 +1268,9 @@ namespace BRobot
         }
 
 
-        private void ExecuteActionsInController(List<Action> actions)
+        private void ExecuteActionsInController()
         {
-            List<string> program = programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
+            List<string> program = writeCursor.ProgramFromBuffer();
             comm.LoadProgramToController(program);
             comm.StartProgramExecution();
         }
@@ -1394,8 +1408,11 @@ namespace BRobot
 
         public void DebugBuffer()
         {
-            Console.WriteLine("BUFFERED ACTIONS:");
-            actionBuffer.LogBufferedActions();
+            Console.WriteLine("VIRTUAL BUFFER:");
+            virtualCursor.buffer.LogBufferedActions();
+
+            Console.WriteLine("WRITE BUFFER:");
+            virtualCursor.buffer.LogBufferedActions();
         }
 
         public void DebugRobotCursors()

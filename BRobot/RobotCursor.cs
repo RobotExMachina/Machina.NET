@@ -30,10 +30,20 @@ namespace BRobot
         public int zone;
         public MotionType motionType;
         protected bool initialized = false;
+        private bool applyImmediately = false;
 
-        public RobotCursor(string name)
+        public ActionBuffer buffer;
+
+        public RobotCursor child;
+
+        public Compiler compiler;
+
+        public RobotCursor(string name, bool applyImmediately)
         {
             this.name = name;
+            this.applyImmediately = applyImmediately;
+
+            buffer = new ActionBuffer();
         }
 
         // Abstract methods
@@ -61,6 +71,40 @@ namespace BRobot
 
             initialized = true;
             return initialized;
+        }
+
+        public void SetChild(RobotCursor childCursor)
+        {
+            child = childCursor;
+        }
+        
+        /// <summary>
+        /// Add an action to this cursor's buffer, to be released whenever assigned priority.
+        /// </summary>
+        /// <param name="action"></param>
+        public bool Issue(Action action)
+        {
+            buffer.Add(action);
+            if (applyImmediately)
+            {
+                return ApplyNextAction();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Applies next action pending in the buffer.
+        /// </summary>
+        /// <returns></returns>
+        public bool ApplyNextAction()
+        {
+            Action next = buffer.GetNext();
+            bool success = ApplyAction(next);
+            if (success)
+            {
+                child.Issue(next);
+            }
+            return success;
         }
 
         /// <summary>
@@ -99,8 +143,19 @@ namespace BRobot
                     return ApplyAction((ActionWait)action);
 
             }
+
+            Console.WriteLine("Could not apply action " + action);
             return false;
-        } 
+        }
+
+
+        public List<string> ProgramFromBuffer()
+        {
+            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this);
+        }
+
+
+
 
     }
 
@@ -117,7 +172,10 @@ namespace BRobot
     internal class RobotCursorABB : RobotCursor
     {
         
-        public RobotCursorABB(string name) : base( name) { }
+        public RobotCursorABB(string name, bool applyImmediately) : base(name, applyImmediately)
+        {
+            compiler = new CompilerABB();
+        }
 
         public override bool ApplyAction(ActionTranslation action)
         {

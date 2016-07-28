@@ -23,9 +23,9 @@ namespace BRobot
         /// </summary>
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
-        /// <param name="actions"></param>
+        /// 
         /// <returns></returns>
-        public abstract List<string> UNSAFEProgramFromActions(string programName, RobotCursor writePointer, List<Action> actions);
+        public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer);
 
         ///// <summary>
         ///// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
@@ -111,15 +111,16 @@ namespace BRobot
         /// </summary>
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
-        /// <param name="actions"></param>
+        /// 
         /// <returns></returns>
-        public override List<string> UNSAFEProgramFromActions(string programName, RobotCursor writePointer, List<Action> actions)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer)
         {
             // Cast the robotPointer to the correct subclass
             RobotCursorABB writer = (RobotCursorABB)writePointer;  // @TODO: ask @PAN
 
+            List<Action> actions = writePointer.buffer.GetAllPending(false);  // copy pending actions without flushing them from the buffer
+            
             // CODE LINES GENERATION
-
             // VELOCITY & ZONE DECLARATIONS
             // Figure out how many different ones are there first
             Dictionary<int, string> velNames = new Dictionary<int, string>();
@@ -172,7 +173,8 @@ namespace BRobot
             foreach (Action a in actions)
             {
                 // Move writerCursor to this action state
-                writer.ApplyAction(a);
+                //writer.ApplyAction(a);
+                writer.ApplyNextAction();  // for the buffer to correctly manage them 
 
                 // Generate lines of code
                 if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
@@ -189,10 +191,6 @@ namespace BRobot
                 // Move on
                 it++;
             }
-            
-
-
-            
 
             // PROGRAM ASSEMBLY
             // Initialize a module list
