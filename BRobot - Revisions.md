@@ -18,6 +18,9 @@
 - [ ] Get stream mode working again
 - [ ] Get Execute mode working again
 
+## BUILD 1114
+- [x] Quick Dynamo ZeroTouchNodes test
+
 ## BUILD 1113
 - [x] Rename the project ;) 
 
