@@ -122,17 +122,17 @@ namespace BRobot
         public abstract Rotation GetCurrentOrientation();
 
         /// <summary>
+        /// Returns a Joints object representing the rotations of the 6 axes of this robot.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Joints GetCurrentJoints();
+
+        /// <summary>
         /// Returns a Frame object representing the current robot's TCP position and orientation. 
         /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
         /// </summary>
         /// <returns></returns>
         public abstract Frame GetCurrentFrame();
-
-        /// <summary>
-        /// Returns a Joints object representing the rotations of the 6 axes of this robot.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Joints GetCurrentJoints();
 
         /// <summary>
         /// Ticks the queue manager and potentially triggers streaming of targets to the controller.
@@ -582,7 +582,9 @@ namespace BRobot
                 return null;
             }
 
-            return new Point(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World));
+            RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
+
+            return new Point(rt.Trans.X, rt.Trans.Y, rt.Trans.Z);
         }
 
         /// <summary>
@@ -597,7 +599,10 @@ namespace BRobot
                 return null;
             }
 
-            return new Rotation(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World));
+            RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
+
+            // ABB's convention is Q1..Q4 as W..Z
+            return new Rotation(rt.Rot.Q1, rt.Rot.Q2, rt.Rot.Q3, rt.Rot.Q4);
         }
 
         /// <summary>
@@ -613,7 +618,9 @@ namespace BRobot
                 return null;
             }
 
-            return new Frame(controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World));
+            RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
+
+            return new Frame(rt.Trans.X, rt.Trans.Y, rt.Trans.Z, rt.Rot.Q1, rt.Rot.Q2, rt.Rot.Q3, rt.Rot.Q4);
         }
 
         /// <summary>
@@ -628,7 +635,9 @@ namespace BRobot
                 return null;
             }
 
-            return new Joints(controller.MotionSystem.ActiveMechanicalUnit.GetPosition());
+            JointTarget jt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition();
+
+            return new Joints(jt.RobAx.Rax_1, jt.RobAx.Rax_2, jt.RobAx.Rax_3, jt.RobAx.Rax_4, jt.RobAx.Rax_5, jt.RobAx.Rax_6);
         }
 
         /// <summary>

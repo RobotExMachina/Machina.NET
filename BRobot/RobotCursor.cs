@@ -92,16 +92,18 @@ namespace BRobot
             { typeof (ActionWait),                      (i, rc) => rc.ApplyAction((ActionWait) i) }
         };
 
-
         /// <summary>
         /// Minimum information necessary to initialize a robot object.
         /// </summary>
         /// <param name="pos"></param>
         /// <param name="rot"></param>
-        public bool Initialize(Point pos, Rotation rot)
+        /// <param name="jnts"></param>
+        /// <returns></returns>
+        public bool Initialize(Point pos, Rotation rot, Joints jnts)
         {
             position = new Point(pos);
             rotation = new Rotation(rot);
+            joints = jnts;
             speed = -1;
             zone = -1;
             motionType = MotionType.Undefined;
@@ -110,6 +112,20 @@ namespace BRobot
             return initialized;
         }
 
+        /// <summary>
+        /// Minimum information necessary to initialize a robot object.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="rot"></param>
+        public bool Initialize(Point pos, Rotation rot)
+        {
+            return Initialize(pos, rot, null);
+        }
+
+        /// <summary>
+        /// Set specified RobotCursor as child to this one.
+        /// </summary>
+        /// <param name="childCursor"></param>
         public void SetChild(RobotCursor childCursor)
         {
             child = childCursor;
@@ -174,7 +190,7 @@ namespace BRobot
         /// Applies the directives of an Action to this cursor. 
         /// </summary>
         /// <remarks>
-        /// While this Dictionary dispatch pattern is a bit convoluted, it is faster, 
+        /// While this Dictionary dispatch pattern is a bit convoluted, it is faster than dynamic casting, 
         /// more stable and allows for compiler-time checks and non-error fallback.
         /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
         /// </remarks>
@@ -209,10 +225,6 @@ namespace BRobot
         {
             return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, true);
         }
-
-        
-
-
 
     }
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using ABB.Robotics.Controllers.RapidDomain;
-
 
 //██████╗  █████╗ ████████╗ █████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗
 //██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝
@@ -71,20 +69,6 @@ namespace BRobot
             this.X = p.X;
             this.Y = p.Y;
             this.Z = p.Z;
-        }
-
-        public Point(Pos pos)
-        {
-            this.X = pos.X;
-            this.Y = pos.Y;
-            this.Z = pos.Z;
-        }
-
-        public Point(RobTarget rt)
-        {
-            this.X = rt.Trans.X;
-            this.Y = rt.Trans.Y;
-            this.Z = rt.Trans.Z;
         }
 
         public Point()
@@ -830,24 +814,6 @@ namespace BRobot
             this.Z = r.Z;
         }
 
-        public Rotation(Orient or)
-        {
-            // ABB's convention is [Q1,Q2,Q3,Q4] as [W,X,Y,Z]
-            this.W = or.Q1;
-            this.X = or.Q2;
-            this.Y = or.Q3;
-            this.Z = or.Q4;
-        }
-
-        public Rotation(RobTarget rt)
-        {
-            // ABB's convention is [Q1,Q2,Q3,Q4] as [W,X,Y,Z]
-            this.W = rt.Rot.Q1;
-            this.X = rt.Rot.Q2;
-            this.Y = rt.Rot.Q3;
-            this.Z = rt.Rot.Q4;
-        }
-
         /// <summary>
         /// Creates a unit Quaternion representing a rotation of n degrees around a 
         /// vector, with right-hand positive convention.
@@ -905,14 +871,7 @@ namespace BRobot
             this.Z = r.Z;
         }
 
-        //// @DEPRECATED
-        //public void Set(List<double> q)
-        //{
-        //    this.W = q[3];
-        //    this.X = q[0];
-        //    this.Y = q[1];
-        //    this.Z = q[2];
-        //}
+
 
         /// <summary>
         /// Returns the length (norm) of this Quaternion.
@@ -1407,29 +1366,6 @@ namespace BRobot
             this.J5 = j.J5;
             this.J6 = j.J6;
         }
-        /// <summary>
-        /// Create a Joints configuration from an ABB JointTarget object.
-        /// </summary>
-        /// <param name="rj"></param>
-        public Joints(RobJoint rj)
-        {
-            this.J1 = rj.Rax_1;
-            this.J2 = rj.Rax_2;
-            this.J3 = rj.Rax_3;
-            this.J4 = rj.Rax_4;
-            this.J5 = rj.Rax_5;
-            this.J6 = rj.Rax_6;
-        }
-
-        public Joints(JointTarget jt)
-        {
-            this.J1 = jt.RobAx.Rax_1;
-            this.J2 = jt.RobAx.Rax_2;
-            this.J3 = jt.RobAx.Rax_3;
-            this.J4 = jt.RobAx.Rax_4;
-            this.J5 = jt.RobAx.Rax_5;
-            this.J6 = jt.RobAx.Rax_6;
-        }
 
         public void Add(Joints j)
         {
@@ -1471,7 +1407,13 @@ namespace BRobot
 
         public override string ToString()
         {
-            return string.Format("[{0},{1},{2},{3},{4},{5}]", J1, J2, J3, J4, J5, J6);
+            return string.Format("[{0},{1},{2},{3},{4},{5}]",
+                Math.Round(J1, STRING_ROUND_DECIMALS),
+                Math.Round(J2, STRING_ROUND_DECIMALS),
+                Math.Round(J3, STRING_ROUND_DECIMALS),
+                Math.Round(J4, STRING_ROUND_DECIMALS),
+                Math.Round(J5, STRING_ROUND_DECIMALS),
+                Math.Round(J6, STRING_ROUND_DECIMALS));
         }
 
     }
@@ -1749,15 +1691,6 @@ namespace BRobot
             this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z);  // shallow copy
             this.Speed = speed;
             this.Zone = zone;
-        }
-
-        public Frame(RobTarget robTarget)
-        {
-            this.Position = new Point(robTarget.Trans);
-            this.Orientation = new Rotation(robTarget.Rot);
-            // temporarily use 'invalid' values to denote this is not getting these values from the robot... 
-            this.Speed = -1;
-            this.Zone = -1;
         }
         
         public string GetPositionDeclaration()

@@ -229,7 +229,8 @@ namespace BRobot
                 // If successful, initialize robot cursors to mirror the state of the device
                 Point currPos = comm.GetCurrentPosition();
                 Rotation currRot = comm.GetCurrentOrientation();
-                InitializeRobotCursors(currPos, currRot);
+                Joints currJnts = comm.GetCurrentJoints();
+                InitializeRobotCursors(currPos, currRot, currJnts);
             }
 
             //// @TODO rework this into Virtual Robots
@@ -1233,25 +1234,37 @@ namespace BRobot
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
+        /// <param name="joints"></param>
         /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position, Rotation rotation)
+        internal bool InitializeRobotCursors(Point position, Rotation rotation, Joints joints)
         {
             bool success = true;
 
             virtualCursor = new RobotCursorABB("virtualCursor", true);
-            success = success && virtualCursor.Initialize(position, rotation);
+            success = success && virtualCursor.Initialize(position, rotation, joints);
 
             writeCursor = new RobotCursorABB("writeCursor", false);
             virtualCursor.SetChild(writeCursor);
-            success = success && writeCursor.Initialize(position, rotation);
+            success = success && writeCursor.Initialize(position, rotation, joints);
 
             motionCursor = new RobotCursorABB("motionCursor", false);
             writeCursor.SetChild(motionCursor);
-            success = success && motionCursor.Initialize(position, rotation);
+            success = success && motionCursor.Initialize(position, rotation, joints);
 
             areCursorsInitialized = success;
 
             return success;
+        }
+
+        /// <summary>
+        /// Initializes all instances of robotCursors with base information
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        internal bool InitializeRobotCursors(Point position, Rotation rotation)
+        {
+            return InitializeRobotCursors(position, rotation, null);
         }
 
         /// <summary>
