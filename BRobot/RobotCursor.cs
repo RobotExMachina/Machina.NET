@@ -68,6 +68,15 @@ namespace BRobot
             buffer = new ActionBuffer();
         }
 
+        // Abstract methods
+        public abstract bool ApplyAction(ActionTranslation action);
+        public abstract bool ApplyAction(ActionRotation action);
+        public abstract bool ApplyAction(ActionTranslationAndRotation action);
+        public abstract bool ApplyAction(ActionRotationAndTranslation action);
+        public abstract bool ApplyAction(ActionJoints action);
+        public abstract bool ApplyAction(ActionMessage action);
+        public abstract bool ApplyAction(ActionWait action);
+
         /// <summary>
         /// A dict that maps Action types to the cursor's applicable method.
         /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
@@ -82,16 +91,6 @@ namespace BRobot
             { typeof (ActionMessage),                   (i, rc) => rc.ApplyAction((ActionMessage) i) },
             { typeof (ActionWait),                      (i, rc) => rc.ApplyAction((ActionWait) i) }
         };
-
-
-        // Abstract methods
-        public abstract bool ApplyAction(ActionTranslation action);
-        public abstract bool ApplyAction(ActionRotation action);
-        public abstract bool ApplyAction(ActionTranslationAndRotation action);
-        public abstract bool ApplyAction(ActionRotationAndTranslation action);
-        public abstract bool ApplyAction(ActionJoints action);
-        public abstract bool ApplyAction(ActionMessage action);
-        public abstract bool ApplyAction(ActionWait action);
 
 
         /// <summary>
@@ -170,60 +169,7 @@ namespace BRobot
         {
             return buffer.AreActionsPending();
         }
-
-        ///// <summary>
-        ///// Applies the directives of an Action to this Cursor.
-        ///// </summary>
-        ///// <param name="action"></param>
-        ///// <returns></returns>
-        //public bool Apply(Action action)
-        //{
-        //    // @TOPAN: is there a better way to choose the subclass?
-        //    //return ApplyAction((action.GetType())action);
-
-        //    // This will need a lot of maintenance, add new cases for each actiontype. 
-        //    // Better way to do it?
-        //    switch (action.type)
-        //    {
-        //        case ActionType.Translation:
-        //            return ApplyAction((ActionTranslation)action);
-
-        //        case ActionType.Rotation:
-        //            return ApplyAction((ActionRotation)action);
-
-        //        case ActionType.TranslationAndRotation:
-        //            return ApplyAction((ActionTranslationAndRotation)action);
-
-        //        case ActionType.RotationAndTranslation:
-        //            return ApplyAction((ActionRotationAndTranslation)action);
-
-        //        case ActionType.Joints:
-        //            return ApplyAction((ActionJoints)action);
-
-        //        case ActionType.Message:
-        //            return ApplyAction((ActionMessage)action);
-
-        //        case ActionType.Wait:
-        //            return ApplyAction((ActionWait)action);
-
-        //    }
-
-        //    Console.WriteLine("Could not apply action " + action);
-        //    return false;
-        //}
-
-        ///// <summary>
-        ///// Applies the directives of an Action to this Cursor. 
-        ///// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
-        ///// </summary>
-        ///// <param name="action"></param>
-        ///// <returns></returns>
-        //public bool Apply(Action action)
-        //{
-        //    //dynamic a = action;
-        //    //return ApplyAction(a);
-        //}
-
+        
         /// <summary>
         /// Applies the directives of an Action to this cursor. 
         /// </summary>
