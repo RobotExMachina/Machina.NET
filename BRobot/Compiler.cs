@@ -26,64 +26,8 @@ namespace BRobot
         /// 
         /// <returns></returns>
         public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block);
+        
 
-        ///// <summary>
-        ///// Given a Path, and constant velocity and zone for all targets, returns a string representation of a RAPID module. Velocity and zone must comply with predefined types.
-        ///// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        ///// robot configuration and assumes the robot controller will figure out the correct one.
-        ///// </summary>
-        ///// <param name="path"></param>
-        ///// <param name="velocity"></param>
-        ///// <param name="zone"></param>
-        ///// <returns></returns>
-        //public static List<string> UNSAFEModuleFromPath(Path path, int velocity, int zone)
-        //{
-        //    string vel = "v" + velocity;
-        //    string zon = "z" + zone;
-
-        //    List<string> module = new List<string>();
-
-        //    module.Add("MODULE " + path.Name);
-        //    module.Add("");
-
-        //    for (int i = 0; i < path.Count; i++)
-        //    {
-        //        Frame t = path.GetTarget(i);
-        //        module.Add("  CONST robtarget Target_" + i
-        //            + ":=" + UNSAFEExplicitRobTargetDeclaration(path.GetTarget(i)) + ";");
-        //    }
-
-        //    module.Add("");
-        //    module.Add("  PROC main()");
-        //    module.Add(@"    ConfJ \Off;");
-        //    module.Add(@"    ConfL \Off;");
-
-        //    for (int i = 0; i < path.Count; i++)
-        //    {
-        //        module.Add("    MoveL Target_" + i
-        //            + "," + vel
-        //            + "," + zon
-        //            + @",Tool0\WObj:=WObj0;");
-        //    }
-
-        //    module.Add("  ENDPROC");
-        //    module.Add("ENDMODULE");
-
-        //    return module;
-        //}
-
-        ///// <summary>
-        ///// Returns a quick and dirty RobTarget declaration out of a Frame object.
-        ///// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        ///// robot configuration and assumes the robot controller will figure out the correct one.
-        ///// </summary>
-        ///// <param name="target"></param>
-        ///// <returns></returns>
-        //public static string UNSAFEExplicitRobTargetDeclaration(Frame target)
-        //{
-        //    //return "[" + target + ",[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]";
-        //    return target.GetUNSAFERobTargetDeclaration();
-        //}
     }
 
 
@@ -116,11 +60,13 @@ namespace BRobot
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         {
             // Cast the robotPointer to the correct subclass
-            RobotCursorABB writer = (RobotCursorABB)writePointer;  // @TODO: ask @PAN
+            RobotCursorABB writer = (RobotCursorABB)writePointer;
 
+            // Which pending Actions are used for this program?
+            // Copy them without flushing the buffer.
             List<Action> actions = block ? 
                 writePointer.buffer.GetBlockPending(false) : 
-                writePointer.buffer.GetAllPending(false);  // copy pending actions without flushing them from the buffer
+                writePointer.buffer.GetAllPending(false);
 
             // CODE LINES GENERATION
             // VELOCITY & ZONE DECLARATIONS
@@ -164,8 +110,6 @@ namespace BRobot
 
 
             // TARGETS AND INSTRUCTIONS
-            //Dictionary<int, string> variableLines = new Dictionary<int, string>();
-            //Dictionary<int, string> instructionLines = new Dictionary<int, string>();
             List<string> variableLines = new List<string>();
             List<string> instructionLines = new List<string>();
 
@@ -175,11 +119,7 @@ namespace BRobot
             foreach (Action a in actions)
             {
                 // Move writerCursor to this action state
-                //writer.ApplyAction(a);
-                //writer.ApplyNextAction();  // for the buffer to correctly manage them 
-                //if (block) writer.ApplyNextActionInQueue();
-                //else writer.ApplyNextAction();
-                writer.ApplyNextAction();
+                writer.ApplyNextAction();  // for the buffer to correctly manage them 
 
                 // Generate lines of code
                 if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...

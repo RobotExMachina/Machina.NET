@@ -621,8 +621,6 @@ namespace BRobot
             return RotateTo(new Rotation(x0, x1, x2, y0, y1, y2));
         }
 
-                
-
         /// <summary>
         /// Issue a compound relative local Translation + Rotation request. 
         /// Note that, if using local coordinates, order of actions will matter.
@@ -755,6 +753,7 @@ namespace BRobot
 
         //// @TODO: feels like Path is too much of a spatial geometry description. 
         //// Should it become something more action-related? Like Instructions, Program, Commands?
+        //// Could implement Procedure, as an ordered collection of abstract Actions...
         //public bool Follow(Path path)
         //{
         //    throw new NotImplementedException();

@@ -65,18 +65,21 @@ namespace BRobot
         private SettingsBuffer settingsBuffer;
 
         /// <summary>
-        /// Keeps track of the state of a virtual robot immediately following all the actions issued to Control.
+        /// A virtual representation of the state of the device after application of issued actions.
         /// </summary>
         private RobotCursor virtualCursor;
 
         /// <summary>
+        /// A virtual representation of the state of the device after releasing pending actions to the controller.
         /// Keeps track of the state of a virtual robot immediately following all the actions released from the 
         /// actionsbuffer to target device defined by controlMode, like an offline program, a full intruction execution 
         /// or a streamed target.
         /// </summary>
         private RobotCursor writeCursor;
 
-
+        /// <summary>
+        /// A virtual representation of the current motion state of the device.
+        /// </summary>
         private RobotCursor motionCursor;
 
         /// <summary>
@@ -1196,7 +1199,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Disconnects and resets the Communcation object.
+        /// Disconnects and resets the Communication object.
         /// </summary>
         /// <returns></returns>
         private bool DropCommunication()
@@ -1272,17 +1275,16 @@ namespace BRobot
             return false;
         }
 
-
-
-
-
+        /// <summary>
+        /// Triggers a thread to send instructions to the connected device if applicable. 
+        /// </summary>
         public void TickWriteCursor()
         {
             if (controlMode == ControlMode.Execute)
             {
                 if (!comm.IsRunning() && areCursorsInitialized && writeCursor.AreActionsPending() && (actionsExecuter == null || !actionsExecuter.IsAlive))
                 {
-                    actionsExecuter = new Thread(() => ExecuteActionsInController());  // http://stackoverflow.com/a/3360582
+                    actionsExecuter = new Thread(() => RunActionsBlockInController());  // http://stackoverflow.com/a/3360582
                     actionsExecuter.Start();
                 }
             }
@@ -1292,7 +1294,11 @@ namespace BRobot
             }
         }
 
-        private void ExecuteActionsInController()
+        /// <summary>
+        /// Cretes a program with the first block of Actions in the cursor, uploads it to the controller
+        /// and runs it. 
+        /// </summary>
+        private void RunActionsBlockInController()
         {
             List<string> program = writeCursor.ProgramFromBlock();
             comm.LoadProgramToController(program);

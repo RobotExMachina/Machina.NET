@@ -30,15 +30,31 @@ namespace BRobot
         public int zone;
         public MotionType motionType;
         protected bool initialized = false;
-        private bool applyImmediately = false;
+        private bool applyImmediately = false;  // when an action is issued to this cursor, apply it immediately?
 
+        /// <summary>
+        /// Manages pending and released Actions, plus blocks. 
+        /// </summary>
         public ActionBuffer buffer;
 
+        /// <summary>
+        /// Specified RobotCursor instance will be issued all Actions 
+        /// released from this one. 
+        /// </summary>
         public RobotCursor child;
 
+        /// <summary>
+        /// Robot program compilers now belong to the RobotCursor. 
+        /// It makes it easier to attach the right device-specific type, 
+        /// and to use the cursor's information to generate the program. 
+        /// </summary>
         public Compiler compiler;
 
+        /// <summary>
+        /// A lock for buffer manipulation operations. 
+        /// </summary>
         public object bufferLock = new object();
+
 
         public RobotCursor(string name, bool applyImmediately)
         {
@@ -47,6 +63,7 @@ namespace BRobot
 
             buffer = new ActionBuffer();
         }
+
 
         // Abstract methods
         public abstract bool ApplyAction(ActionTranslation action);
@@ -99,7 +116,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Applies next action pending in the buffer.
+        /// Applies next single action pending in the buffer.
         /// </summary>
         /// <returns></returns>
         public bool ApplyNextAction()
@@ -117,20 +134,23 @@ namespace BRobot
             }
         }
 
-        ///// <summary>
-        ///// Applies next action pending in the buffer.
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool ApplyNextActionInQueue()
-        //{
-        //    Action next = buffer.GetNextInQueue();
-        //    bool success = ApplyAction(next);
-        //    if (success)
-        //    {
-        //        child.Issue(next);
-        //    }
-        //    return success;
-        //}
+        /// <summary>
+        /// Requests all un-blocked pending Actions in the buffer to be flagged
+        /// as a block. 
+        /// </summary>
+        public void QueueActions()
+        {
+            buffer.SetBlock();
+        }
+
+        /// <summary>
+        /// Are there Actions pending in the buffer?
+        /// </summary>
+        /// <returns></returns>
+        public bool AreActionsPending()
+        {
+            return buffer.AreActionsPending();
+        }
 
         /// <summary>
         /// Applies the directives of an Action to this Cursor.
@@ -173,26 +193,25 @@ namespace BRobot
             return false;
         }
 
-
+        /// <summary>
+        /// Return a device-specific program with all the Actions pending in the buffer.
+        /// </summary>
+        /// <returns></returns>
         public List<string> ProgramFromBuffer()
         {
             return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, false);
         }
 
+        /// <summary>
+        /// Return a device-specific program with the next block of Actions pending in the buffer.
+        /// </summary>
+        /// <returns></returns>
         public List<string> ProgramFromBlock()
         {
             return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, true);
         }
 
-        public void QueueActions()
-        {
-            buffer.SetBlock();
-        }
-
-        public bool AreActionsPending()
-        {
-            return buffer.AreActionsPending();
-        }
+        
 
 
 

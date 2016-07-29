@@ -27,6 +27,8 @@
     - [x] .Execute() instruction
     - [x] Move ActionBuffer and Compiler now to the RobotCursor class
     - [x] Add some queue manager for actions released from the virtualCursor and awaiting in the writerCursor. In other words, find a way to .Execute() several buffered actions, and have the queue manager wait for the robot to stop running the program before sending a new batch of instructions. --> __Do actionBuffers belong to the virtualCursors??__ --> Added this in a rather weird way, not sure if I should rethink this...   
+    - [ ] Add comments to all of the above, it is kinda confusing right now...
+- [ ] Add joint position on Execute cursor initilaization.
 
 ## BUILD 1114
 - [x] Quick Dynamo ZeroTouchNodes test

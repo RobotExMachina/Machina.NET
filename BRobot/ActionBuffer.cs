@@ -21,9 +21,15 @@ namespace BRobot
         /// </summary>
         private List<Action> released;
 
+        /// <summary>
+        /// Stores the amount of Actions per 'block'. 
+        /// A 'block' is a set of Actions flagged to be released as a group,
+        /// like in Execute mode. 
+        /// </summary>
         private List<int> blockCounts;
-
         
+
+
 
         /// <summary>
         /// Main constructor.
@@ -105,7 +111,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Wraps all pending actions outside a release block into one.
+        /// Wraps all pending actions outside release blocks into one.
         /// </summary>
         public void SetBlock()
         {
@@ -114,7 +120,13 @@ namespace BRobot
             blockCounts.Add(pending.Count - sum);
         }
 
-
+        /// <summary>
+        /// Returns the next block of Actions to be released. If no block
+        /// is present, it will return all pending Actions. 
+        /// </summary>
+        /// <param name="flush">If true, this block will be moved 
+        /// from pending to released.</param>
+        /// <returns></returns>
         public List<Action> GetBlockPending(bool flush)
         {
             List<Action> acts;
@@ -176,7 +188,6 @@ namespace BRobot
         /// </summary>
         public void LogBufferedActions()
         {
-            
             Console.WriteLine("--> RELEASED:" );
             foreach (Action a in released) Console.WriteLine("    " + a);
 
