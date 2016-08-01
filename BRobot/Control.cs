@@ -1378,7 +1378,7 @@ namespace BRobot
         public void DebugBuffer()
         {
             Console.WriteLine("VIRTUAL BUFFER:");
-            virtualCursor.buffer.LogBufferedActions();
+             virtualCursor.buffer.LogBufferedActions();
 
             Console.WriteLine("WRITE BUFFER:");
             writeCursor.buffer.LogBufferedActions();
