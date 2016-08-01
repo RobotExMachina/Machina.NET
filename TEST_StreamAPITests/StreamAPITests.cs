@@ -21,8 +21,8 @@ namespace TEST_StreamAPITests
             arm.Connect();
             arm.Start();
 
-            arm.DebugRobotCursors();
-            arm.DebugBuffer();
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffer();
 
             // Do some stuff
             arm.Speed(100);
@@ -40,8 +40,8 @@ namespace TEST_StreamAPITests
             }
             arm.MoveTo(300, 100, 500);
 
-            arm.DebugRobotCursors();
-            arm.DebugBuffer();
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffer();
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
