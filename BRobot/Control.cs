@@ -23,13 +23,18 @@ namespace BRobot
         public static readonly int DEFAULT_ZONE = 5;                                    // default zone for new actions
         public static readonly MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         public static readonly ReferenceCS DEFAULT_REF_CS = ReferenceCS.World;          // default reference coordinate system for relative transform actions
+        public static readonly ControlMode DEFAULT_CONTROLMODE = ControlMode.Offline;
+        public static readonly RunMode DEFAULT_RUNMODE = RunMode.Once;                  
         
+
+
+
 
         /// <summary>
         /// Operation modes by default
         /// </summary>
-        private ControlMode controlMode = ControlMode.Offline;
-        private RunMode runMode = RunMode.Once;
+        private ControlMode controlMode = DEFAULT_CONTROLMODE;
+        private RunMode runMode = DEFAULT_RUNMODE;
 
 
         internal Robot parent;
@@ -208,6 +213,8 @@ namespace BRobot
             }
             else
             {
+                SetRunMode(runMode);
+
                 // If successful, initialize robot cursors to mirror the state of the device
                 Point currPos = comm.GetCurrentPosition();
                 Rotation currRot = comm.GetCurrentOrientation();
@@ -606,8 +613,8 @@ namespace BRobot
             //return virtualCursor.Issue(act);
 
             bool success = virtualCursor.Issue(act);
-            //comm.TickStreamQueue(true);
-            TickWriteCursor();
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            //TickWriteCursor();
             return success;
         }
 
@@ -1244,10 +1251,10 @@ namespace BRobot
                     actionsExecuter.Start();
                 }
             }
-            else if (controlMode == ControlMode.Stream)
-            {
-                comm.TickStreamQueue(true);
-            }
+            //else if (controlMode == ControlMode.Stream)
+            //{
+            //    comm.TickStreamQueue(true);
+            //}
             else
             {
                 Console.WriteLine("Nothing to tick here");

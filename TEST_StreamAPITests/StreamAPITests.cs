@@ -24,7 +24,7 @@ namespace TEST_StreamAPITests
             arm.Start();
 
             // Do some stuff
-            arm.Speed(50);
+            arm.Speed(100);
             arm.Zone(5);
             arm.MoveTo(300, -200, 300);
 
