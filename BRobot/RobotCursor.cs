@@ -231,6 +231,14 @@ namespace BRobot
             return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, true);
         }
 
+        public void LogBufferedActions()
+        {
+            lock(bufferLock)
+            {
+                buffer.LogBufferedActions();
+            }
+        }
+
     }
 
 

@@ -30,7 +30,9 @@ namespace BRobot
         /// </summary>
         private ControlMode controlMode = ControlMode.Offline;
         private RunMode runMode = RunMode.Once;
-                
+
+
+        internal Robot parent;
 
         /// <summary>
         /// Instances of the main robot Controller and Task
@@ -99,8 +101,9 @@ namespace BRobot
         /// <summary>
         /// Main constructor.
         /// </summary>
-        public Control()
+        public Control(Robot parentBot)
         {
+            parent = parentBot;
             Reset();  // @TODO necessary?
         }
 
@@ -603,7 +606,8 @@ namespace BRobot
             //return virtualCursor.Issue(act);
 
             bool success = virtualCursor.Issue(act);
-            comm.TickStreamQueue(true);
+            //comm.TickStreamQueue(true);
+            TickWriteCursor();
             return success;
         }
 
@@ -1388,10 +1392,10 @@ namespace BRobot
         public void DebugBuffer()
         {
             Console.WriteLine("VIRTUAL BUFFER:");
-            virtualCursor.buffer.LogBufferedActions();
+            virtualCursor.LogBufferedActions();
 
             Console.WriteLine("WRITE BUFFER:");
-            writeCursor.buffer.LogBufferedActions();
+            writeCursor.LogBufferedActions();
         }
 
         public void DebugRobotCursors()

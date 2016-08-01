@@ -366,6 +366,7 @@ namespace BRobot
         public override bool DisconnectFromDevice()
         {           
             Reset();
+            UnhookStreamingVariables();
             return true;
         }
 
@@ -697,10 +698,9 @@ namespace BRobot
             }
             else
             {
-                Console.WriteLine("Not setting targets, streamQueue.AreFramesPending() {0} RD_pset[{2}].StringValue.Equals(\"FALSE\") {1}",
-                     writeCursor.AreActionsPending(),
-                    RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"),
-                    virtualStepCounter % virtualRDCount);
+                Console.WriteLine("Not setting targets: {0} {1}",
+                     writeCursor.ActionsPending(),
+                    RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"));
             }
         }
 
@@ -1200,7 +1200,10 @@ namespace BRobot
             if (RD_pnum == null)
                 return false;
 
-            RD_pnum.ValueChanged += OnRD_pnum_ValueChanged;  // add an eventhandler to 'pnum' to track when it changes
+            // http://developercenter.robotstudio.com/BlobProxy/devcenter/RobotCommunicationAppManual/doc30.html
+            //RD_pnum.ValueChanged += OnRD_pnum_ValueChanged;  // add an eventhandler to 'pnum' to track when it changes
+            //RD_pnum.ValueChanged += new EventHandler<DataValueChangedEventArgs>(OnRD_pnum_ValueChanged);
+            RD_pnum.Subscribe(OnRD_pnum_ValueChanged, EventPriority.High);
 
             Console.WriteLine(RD_aborted.StringValue);
             Console.WriteLine(RD_pnum.StringValue);
@@ -1226,6 +1229,54 @@ namespace BRobot
 
             return true;
         }
+
+        private void UnhookStreamingVariables()
+        {
+            // http://developercenter.robotstudio.com/BlobProxy/devcenter/RobotCommunicationAppManual/doc30.html
+            Console.WriteLine("Unhooking straming variables");
+            if (RD_aborted != null)
+            {
+                RD_aborted.Dispose();
+                RD_aborted = null;
+            }
+
+            if (RD_pnum != null)
+            {
+                RD_pnum.Unsubscribe(OnRD_pnum_ValueChanged);
+                RD_pnum.Dispose();
+                RD_pnum = null;
+            }
+
+            for (int i = 0; i < virtualRDCount; i++)
+            {
+                if (RD_vel[i] != null)
+                {
+                    RD_vel[i].Dispose();
+                    RD_vel[i] = null;
+                }
+
+                if (RD_zone[i] != null)
+                {
+                    RD_zone[i].Dispose();
+                    RD_zone[i] = null;
+                }
+
+                if (RD_p[i] != null)
+                {
+                    RD_p[i].Dispose();
+                    RD_p[i] = null;
+                }
+
+                if (RD_pset[i] != null)
+                {
+                    RD_pset[i].Dispose();
+                    RD_pset[i] = null;
+                }
+            }
+
+        }
+
+
 
         /// <summary>
         /// Retrieves a Rapid variable in current module and returns it
@@ -1412,10 +1463,18 @@ namespace BRobot
             // Do not add target if pnum is being reset to initial value (like on program load)
             if (!rd.StringValue.Equals("-1"))
             {
-                Console.WriteLine("Ticking from pnum event handler");
-                //mHeld = true;
-                TickStreamQueue(true);
-                //mHeld = false;
+                
+                // If no actions pending, raise BufferEmpty event
+                if (writeCursor.AreActionsPending())
+                {
+                    Console.WriteLine("Ticking from pnum event handler");
+                    TickStreamQueue(true);
+                }
+                else
+                {
+                    Console.WriteLine("Raising OnBufferEmpty event");
+                    masterControl.parent.OnBufferEmpty(EventArgs.Empty);
+                }                
             }
 
             if (rd != null)

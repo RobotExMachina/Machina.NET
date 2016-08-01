@@ -50,6 +50,8 @@ namespace BRobot
         Local = 1
     };
 
+    public delegate void BufferEmptyHandler(object sender, EventArgs e);
+
 
 
     //  ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
@@ -76,8 +78,19 @@ namespace BRobot
         /// </summary>
         private Control c;  // the main control object
 
- 
-        
+
+        public event BufferEmptyHandler BufferEmpty;
+
+        internal virtual void OnBufferEmpty(EventArgs e)
+        {
+            Console.WriteLine("Event raised, about to call handlers");
+            if (BufferEmpty != null)
+                BufferEmpty(this, e);
+        }
+
+
+
+
         //██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗     █████╗ ██████╗ ██╗
         //██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝    ██╔══██╗██╔══██╗██║
         //██████╔╝██║   ██║██████╔╝██║     ██║██║         ███████║██████╔╝██║
@@ -89,7 +102,7 @@ namespace BRobot
         /// </summary>                                                       
         public Robot()
         {
-            c = new Control();
+            c = new Control(this);
         }
 
         /// <summary>
@@ -809,7 +822,6 @@ namespace BRobot
         {
             c.DebugSettingsBuffer();
         }
-
-
+        
     }
 }

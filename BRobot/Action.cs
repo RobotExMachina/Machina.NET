@@ -74,7 +74,6 @@ namespace BRobot
 
         // Wait properties
         public long waitMillis;
-        
     }
 
 

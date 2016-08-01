@@ -15,7 +15,7 @@ namespace TEST_ExecuteAPITests
             Robot arm = new Robot();   
 
             // Set control mode
-            arm.ControlMode("execute");
+            arm.ControlMode("execute");     
 
             // Connect to a controller
             arm.Connect();
@@ -24,7 +24,7 @@ namespace TEST_ExecuteAPITests
             arm.DebugBuffer();
 
             // Do some stuff
-            arm.Speed(100);
+            arm.Speed(200);
             arm.Zone(5);
             arm.MoveTo(300, 0, 500);
             arm.Move(100, 0);
@@ -40,31 +40,31 @@ namespace TEST_ExecuteAPITests
             arm.Execute();  // flushes all the instructions and sends all pending actions to the controller to be run
 
 
-            // Do some stuff
-            arm.Speed(200);
-            arm.Zone(10);
-            arm.TransformTo(new Point(200, 200, 200), Rotation.FlippedAroundY);
-            arm.Move(100, 0);
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            //// Do some stuff
+            //arm.Speed(200);
+            //arm.Zone(10);
+            //arm.TransformTo(new Point(200, 200, 200), Rotation.FlippedAroundY);
+            //arm.Move(100, 0);
+            //arm.JointsTo(0, 0, 0, 0, 90, 0);
 
-            arm.DebugRobotCursors();
-            arm.DebugBuffer();
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffer();
 
-            arm.Execute();  // flushes all the instructions and sends all pending actions to the controller to be run
+            //arm.Execute();  // flushes all the instructions and sends all pending actions to the controller to be run
 
 
-            // Do some stuff
-            arm.Speed(150);
-            arm.Zone(7);
-            arm.TransformTo(new Point(300, 300, 300), Rotation.FlippedAroundY);
-            arm.Move(0, -100);
-            arm.Rotate(0, 1, 0, 45);
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            //// Do some stuff
+            //arm.Speed(150);
+            //arm.Zone(7);
+            //arm.TransformTo(new Point(300, 300, 300), Rotation.FlippedAroundY);
+            //arm.Move(0, -100);
+            //arm.Rotate(0, 1, 0, 45);
+            //arm.JointsTo(0, 0, 0, 0, 90, 0);
 
-            arm.DebugRobotCursors();
-            arm.DebugBuffer();
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffer();
 
-            arm.Execute();  // flushes all the instructions and sends all pending actions to the controller to be run
+            //arm.Execute();  // flushes all the instructions and sends all pending actions to the controller to be run
 
 
 
