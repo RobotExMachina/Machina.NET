@@ -259,15 +259,15 @@ namespace BRobot
             return c.GetCurrentOrientation();
         }
 
-        /// <summary>
-        /// Returns a Frame object representing the Robot's current TCP position and orientation.
-        /// NOTE: the Frame's velocity and zone are still not representative of the current state.
-        /// </summary>
-        /// <returns></returns>
-        public Frame GetCurrentFrame()
-        {
-            return c.GetCurrentFrame();
-        }
+        ///// <summary>
+        ///// Returns a Frame object representing the Robot's current TCP position and orientation.
+        ///// NOTE: the Frame's velocity and zone are still not representative of the current state.
+        ///// </summary>
+        ///// <returns></returns>
+        //public Frame GetCurrentFrame()
+        //{
+        //    return c.GetCurrentFrame();
+        //}
 
         /// <summary>
         /// Returns a Joint object representing the current angular rotations of the robot's 6 axes.

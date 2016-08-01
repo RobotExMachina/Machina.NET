@@ -385,18 +385,18 @@ namespace BRobot
             return comm.GetCurrentOrientation();
         }
 
-        /// <summary>
-        /// Returns a Frame object representing the current robot's TCP position and orientation. 
-        /// NOTE: the Frame object's speed and zone still do not represent the acutal state of the robot.
-        /// </summary>
-        /// <returns></returns>
-        public Frame GetCurrentFrame()
-        {
-            // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
-            // or the virtual one's (like in offline mode).
+        ///// <summary>
+        ///// Returns a Frame object representing the current robot's TCP position and orientation. 
+        ///// NOTE: the Frame object's speed and zone still do not represent the acutal state of the robot.
+        ///// </summary>
+        ///// <returns></returns>
+        //public Frame GetCurrentFrame()
+        //{
+        //    // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
+        //    // or the virtual one's (like in offline mode).
 
-            return comm.GetCurrentFrame();
-        }
+        //    return comm.GetCurrentFrame();
+        //}
 
         /// <summary>
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
