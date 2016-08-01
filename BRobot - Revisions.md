@@ -16,6 +16,15 @@
 
 ## PENDING 
 - [ ] Get stream mode working again
+- [ ] Rework Actions
+    - [ ] Make a static API that can generate them as objects
+    - [ ] Add the possibility of not inputing speed+zone+mType, and stick to the previous cursor state
+    - [ ] Merge R+T & T+R into one. 
+    - [ ] Do Speed(), Zone() and Motion() become Actions as well? How would this work with push+popSettings?
+    - [ ] If they were Actions, relative and absolute modes could be implemented: .Speed(10) is an increase, .SpeedTo(10) is a setting.
+
+## BUILD 1116
+
 
 ## BUILD 1115
 - [x] ProgramGenerator class is now Compiler

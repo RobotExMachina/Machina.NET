@@ -38,22 +38,6 @@ namespace BRobot
         /// </summary>
         private Communication comm;
 
-        ///// <summary>
-        ///// The queue that manages what instructions get sent to the robot
-        ///// </summary>
-        //private Queue queue;
-
-        // MOVED TO THE CURSORS
-        ///// <summary>
-        ///// A buffer that stores issued actions pending to be released to controllers, exports, etc.
-        ///// </summary>
-        //private ActionBuffer actionBuffer;
-
-        ///// <summary>
-        ///// An 'interface' to create robot programs based on platform-specific languages and descriptions.
-        ///// </summary>
-        //private Compiler programGenerator = new CompilerABB();  // @TODO: this must be more programmatic and shimmed
-
         /// <summary>
         /// Represents the current values for speed, zone and MotionType.
         /// </summary>
@@ -129,10 +113,7 @@ namespace BRobot
         public void Reset()
         {
             // @TODO: to deprecate
-            //queue = new Queue();
             streamQueue = new StreamQueue();
-
-            //actionBuffer = new ActionBuffer();
 
             areCursorsInitialized = false;
             virtualCursor = null;
@@ -232,11 +213,6 @@ namespace BRobot
                 Joints currJnts = comm.GetCurrentJoints();
                 InitializeRobotCursors(currPos, currRot, currJnts);
             }
-
-            //// @TODO rework this into Virtual Robots
-            //Frame curr = comm.GetCurrentFrame();
-            //TCPPosition = curr.Position;
-            //TCPRotation = curr.Orientation;
 
             return true;
         }
@@ -625,12 +601,6 @@ namespace BRobot
                 }
             }
 
-            //ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
-            //bool success = virtualCursor.ApplyAction(act);
-            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
-            //if (success) actionBuffer.Add(act);
-            //return success;
-
             ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
             return virtualCursor.Issue(act);
         }
@@ -716,10 +686,6 @@ namespace BRobot
             }
 
             ActionRotation act = new ActionRotation(world, rot, relative, speed, zone, mType);
-            //bool success = virtualCursor.ApplyAction(act);
-            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
-            //if (success) actionBuffer.Add(act);
-            //return success;
             return virtualCursor.Issue(act);
         }
 
@@ -809,13 +775,6 @@ namespace BRobot
             }
 
             ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
-            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
-            //if (virtualCursor.ApplyAction(act))
-            //{
-            //    actionBuffer.Add(act);
-            //    return true;
-            //}
-            //return false;
             return virtualCursor.Issue(act);
         }
 
@@ -939,13 +898,6 @@ namespace BRobot
             }
 
             ActionRotationAndTranslation act = new ActionRotationAndTranslation(worldRot, rot, relRot, worldTrans, trans, relTrans, speed, zone, mType);
-            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
-            //if (virtualCursor.ApplyAction(act))
-            //{
-            //    actionBuffer.Add(act);
-            //    return true;
-            //}
-            //return false;
             return virtualCursor.Issue(act);
         }
 
@@ -1067,13 +1019,6 @@ namespace BRobot
             }
 
             ActionJoints act = new ActionJoints(joints, relJnts, speed, zone);
-            //// Only add this action to the queue if it was successfuly applied to the virtualCursor
-            //if (virtualCursor.ApplyAction(act))
-            //{
-            //    actionBuffer.Add(act);
-            //    return true;
-            //}
-            //return false;
             return virtualCursor.Issue(act);
         }
         /// <summary>
@@ -1115,12 +1060,6 @@ namespace BRobot
             }
 
             ActionMessage act = new ActionMessage(message);
-            //if (virtualCursor.ApplyAction(act))
-            //{
-            //    actionBuffer.Add(act);
-            //    return true;
-            //}
-            //return false;
             return virtualCursor.Issue(act);
         }
 
@@ -1151,12 +1090,6 @@ namespace BRobot
             }
 
             ActionWait act = new ActionWait(millis);
-            //if (virtualCursor.ApplyAction(act))
-            //{
-            //    actionBuffer.Add(act);
-            //    return true;
-            //}
-            //return false;
             return virtualCursor.Issue(act);
         }
 
@@ -1236,7 +1169,7 @@ namespace BRobot
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position, Rotation rotation, Joints joints)
+        internal bool InitializeRobotCursors(Point position, Rotation rotation, Joints joints = null)
         {
             bool success = true;
 
@@ -1256,16 +1189,16 @@ namespace BRobot
             return success;
         }
 
-        /// <summary>
-        /// Initializes all instances of robotCursors with base information
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position, Rotation rotation)
-        {
-            return InitializeRobotCursors(position, rotation, null);
-        }
+        ///// <summary>
+        ///// Initializes all instances of robotCursors with base information
+        ///// </summary>
+        ///// <param name="position"></param>
+        ///// <param name="rotation"></param>
+        ///// <returns></returns>
+        //internal bool InitializeRobotCursors(Point position, Rotation rotation)
+        //{
+        //    return InitializeRobotCursors(position, rotation, null);
+        //}
 
         /// <summary>
         /// Saves a string List to a file.

@@ -127,12 +127,12 @@ namespace BRobot
         /// <returns></returns>
         public abstract Joints GetCurrentJoints();
 
-        /// <summary>
-        /// Returns a Frame object representing the current robot's TCP position and orientation. 
-        /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Frame GetCurrentFrame();
+        ///// <summary>
+        ///// Returns a Frame object representing the current robot's TCP position and orientation. 
+        ///// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
+        ///// </summary>
+        ///// <returns></returns>
+        //public abstract Frame GetCurrentFrame();
 
         /// <summary>
         /// Ticks the queue manager and potentially triggers streaming of targets to the controller.
@@ -605,23 +605,23 @@ namespace BRobot
             return new Rotation(rt.Rot.Q1, rt.Rot.Q2, rt.Rot.Q3, rt.Rot.Q4);
         }
 
-        /// <summary>
-        /// Returns a Frame object representing the current robot's TCP position and orientation. 
-        /// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
-        /// </summary>
-        /// <returns></returns>
-        public override Frame GetCurrentFrame()
-        {
-            if (!isConnected)
-            {
-                Console.WriteLine("Cannot GetCurrentFrame, not connected to controller");
-                return null;
-            }
+        ///// <summary>
+        ///// Returns a Frame object representing the current robot's TCP position and orientation. 
+        ///// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
+        ///// </summary>
+        ///// <returns></returns>
+        //public override Frame GetCurrentFrame()
+        //{
+        //    if (!isConnected)
+        //    {
+        //        Console.WriteLine("Cannot GetCurrentFrame, not connected to controller");
+        //        return null;
+        //    }
 
-            RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
+        //    RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
 
-            return new Frame(rt.Trans.X, rt.Trans.Y, rt.Trans.Z, rt.Rot.Q1, rt.Rot.Q2, rt.Rot.Q3, rt.Rot.Q4);
-        }
+        //    return new Frame(rt.Trans.X, rt.Trans.Y, rt.Trans.Z, rt.Rot.Q1, rt.Rot.Q2, rt.Rot.Q3, rt.Rot.Q4);
+        //}
 
         /// <summary>
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
@@ -653,7 +653,7 @@ namespace BRobot
                 Console.WriteLine("About to set targets");
                 SetNextVirtualTarget(hasPriority);
                 virtualStepCounter++;
-                TickStreamQueue(hasPriority);
+                TickStreamQueue(hasPriority);  // call this in case there are more in the queue...
             }
             else
             {

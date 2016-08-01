@@ -496,16 +496,16 @@ namespace BRobot
             return c.IssueTranslationRequest(direction, true);
         }
 
-        /// <summary>
-        /// Issue a relative movement action request on current coordinate system.
-        /// </summary>
-        /// <param name="incX"></param>
-        /// <param name="incY"></param>
-        /// <returns></returns>
-        public bool Move(double incX, double incY)
-        {
-            return Move(new Point(incX, incY, 0));
-        }
+        ///// <summary>
+        ///// Issue a relative movement action request on current coordinate system.
+        ///// </summary>
+        ///// <param name="incX"></param>
+        ///// <param name="incY"></param>
+        ///// <returns></returns>
+        //public bool Move(double incX, double incY)
+        //{
+        //    return Move(new Point(incX, incY, 0));
+        //}
 
         /// <summary>
         /// Issue a relative movement action request on current coordinate system.
@@ -514,7 +514,7 @@ namespace BRobot
         /// <param name="incY"></param>
         /// <param name="incZ"></param>
         /// <returns></returns>
-        public bool Move(double incX, double incY, double incZ)
+        public bool Move(double incX, double incY, double incZ = 0)
         {
             return Move(new Point(incX, incY, incZ));
         }
