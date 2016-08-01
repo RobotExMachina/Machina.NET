@@ -81,7 +81,7 @@ namespace BRobot
                 if (!velNames.ContainsKey(a.speed))
                 {
                     velNames.Add(a.speed, "vel" + a.speed);
-                    velDecs.Add(a.speed, GenerateSpeedDeclaration(a.speed));
+                    velDecs.Add(a.speed, writer.GetSpeedDeclaration(a.speed));
                 }
 
                 if (!zoneNames.ContainsKey(a.zone))
@@ -89,7 +89,7 @@ namespace BRobot
                     bool predef = PredefinedZones.Contains(a.zone);
                     zonePredef.Add(a.zone, predef);
                     zoneNames.Add(a.zone, (predef ? "z" : "zone") + a.zone);  // use predef syntax or clean new one
-                    zoneDecs.Add(a.zone, predef ? "" : GenerateZoneDeclaration(a.zone));
+                    zoneDecs.Add(a.zone, predef ? "" : writer.GetZoneDeclaration(a.zone));
                 }
             }
 
@@ -190,30 +190,30 @@ namespace BRobot
             return module;
         }
 
-        /// <summary>
-        /// Returns a speeddata value. 
-        /// </summary>
-        /// <param name="velocity"></param>
-        /// <returns></returns>
-        public string GenerateSpeedDeclaration(int velocity)
-        {
-            // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
-            // Using the same value as lin motion here.
-            return string.Format("[{0},{1},{2},{3}]", velocity, velocity, 5000, 1000);  
-        }
+        ///// <summary>
+        ///// Returns a speeddata value. 
+        ///// </summary>
+        ///// <param name="speed"></param>
+        ///// <returns></returns>
+        //public string GenerateSpeedDeclaration(int speed)
+        //{
+        //    // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
+        //    // Using the same value as lin motion here.
+        //    return string.Format("[{0},{1},{2},{3}]", speed, speed, 5000, 1000);  
+        //}
 
-        /// <summary>
-        /// Returns a zonedata value.
-        /// </summary>
-        /// <param name="zone"></param>
-        /// <returns></returns>
-        public string GenerateZoneDeclaration(int zone)
-        {
-            // Following conventions for default RAPID zones.
-            double high = 1.5 * zone;
-            double low = 0.15 * zone;
-            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
-        }
+        ///// <summary>
+        ///// Returns a zonedata value.
+        ///// </summary>
+        ///// <param name="zone"></param>
+        ///// <returns></returns>
+        //public string GenerateZoneDeclaration(int zone)
+        //{
+        //    // Following conventions for default RAPID zones.
+        //    double high = 1.5 * zone;
+        //    double low = 0.15 * zone;
+        //    return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
+        //}
 
 
         static private bool GenerateVariableDeclaration(Action action, RobotCursorABB cursor, int id, out string declaration)

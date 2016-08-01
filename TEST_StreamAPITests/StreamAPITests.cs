@@ -19,6 +19,7 @@ namespace TEST_StreamAPITests
 
             // Connect to a controller
             arm.Connect();
+            arm.Start();
 
             arm.DebugRobotCursors();
             arm.DebugBuffer();
@@ -34,10 +35,13 @@ namespace TEST_StreamAPITests
                 arm.Move(50, 0);
                 arm.Move(0, 50);
                 arm.Move(-50, 0);
-                arm.Move(0, -50);
-                arm.Move(0, 0, 50);
+                //arm.Move(0, -50);
+                arm.Move(0, -50, 50);
             }
             arm.MoveTo(300, 100, 500);
+
+            arm.DebugRobotCursors();
+            arm.DebugBuffer();
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");

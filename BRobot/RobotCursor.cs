@@ -104,8 +104,8 @@ namespace BRobot
             position = new Point(pos);
             rotation = new Rotation(rot);
             joints = jnts;
-            speed = -1;
-            zone = -1;
+            //speed = -1;
+            //zone = -1;
             motionType = MotionType.Undefined;
 
             initialized = true;
@@ -184,6 +184,11 @@ namespace BRobot
         public bool AreActionsPending()
         {
             return buffer.AreActionsPending();
+        }
+
+        public int ActionsPending()
+        {
+            return buffer.ActionsPending();
         }
         
         /// <summary>
@@ -593,10 +598,40 @@ namespace BRobot
             return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
         }
 
+        /// <summary>
+        /// Returns an ABB jointtarget representation of the current stat of the cursor.
+        /// </summary>
+        /// <returns></returns>
         public string GetJointTargetDeclaration()
         {
             return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", joints);
         }
+
+        public string GetSpeedDeclaration(int speed)
+        {
+            // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
+            // Using the same value as lin motion here.
+            return string.Format("[{0},{1},{2},{3}]", speed, speed, 5000, 1000);
+        }
+
+        public string GetSpeedDeclaration()
+        {
+            return GetSpeedDeclaration(speed);
+        }
+        
+        public string GetZoneDeclaration(int zone)
+        {
+            // Following conventions for default RAPID zones.
+            double high = 1.5 * zone;
+            double low = 0.15 * zone;
+            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
+        }
+
+        public string GetZoneDeclaration()
+        {
+            return GetZoneDeclaration(zone);
+        }
+
         
 
 

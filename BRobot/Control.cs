@@ -78,13 +78,13 @@ namespace BRobot
         /// </summary>
         private bool areCursorsInitialized = false;
 
-        // @TODO: this will need to get reallocated when fixing stream mode...
-        public StreamQueue streamQueue;
+        //// @TODO: this will need to get reallocated when fixing stream mode...
+        //public StreamQueue streamQueue;
 
 
-        
 
-        
+
+
 
 
 
@@ -96,7 +96,7 @@ namespace BRobot
         //██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║     
         //██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗
         //╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝
-                                            
+
         /// <summary>
         /// Main constructor.
         /// </summary>
@@ -112,13 +112,18 @@ namespace BRobot
         /// </summary>
         public void Reset()
         {
-            // @TODO: to deprecate
-            streamQueue = new StreamQueue();
-
+            //// @TODO: to deprecate
+            //streamQueue = new StreamQueue();
+                        
+            //virtualCursor = null;
+            //writeCursor = null;
+            //motionCursor = null;
+            virtualCursor = new RobotCursorABB("virtualCursor", true);
+            writeCursor = new RobotCursorABB("writeCursor", false);
+            virtualCursor.SetChild(writeCursor);
+            motionCursor = new RobotCursorABB("motionCursor", false);
+            writeCursor.SetChild(motionCursor);
             areCursorsInitialized = false;
-            virtualCursor = null;
-            writeCursor = null;
-            motionCursor = null;
 
             currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REF_CS);
             settingsBuffer = new SettingsBuffer();
@@ -602,7 +607,10 @@ namespace BRobot
             }
 
             ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
-            return virtualCursor.Issue(act);
+            //return virtualCursor.Issue(act);
+            bool success = virtualCursor.Issue(act);
+            comm.TickStreamQueue(true);
+            return success;
         }
 
         /// <summary>
@@ -1127,7 +1135,11 @@ namespace BRobot
             comm = new CommunicationABB(this);
 
             // Pass the streamQueue object as a shared reference
-            comm.LinkStreamQueue(streamQueue);
+            //comm.LinkStreamQueue(streamQueue);
+            if (controlMode == ControlMode.Stream)
+            {
+                comm.LinkWriteCursor(ref writeCursor);
+            }
 
             return true;
         }
@@ -1173,15 +1185,15 @@ namespace BRobot
         {
             bool success = true;
 
-            virtualCursor = new RobotCursorABB("virtualCursor", true);
+            //virtualCursor = new RobotCursorABB("virtualCursor", true);
             success = success && virtualCursor.Initialize(position, rotation, joints);
 
-            writeCursor = new RobotCursorABB("writeCursor", false);
-            virtualCursor.SetChild(writeCursor);
+            //writeCursor = new RobotCursorABB("writeCursor", false);
+            //virtualCursor.SetChild(writeCursor);
             success = success && writeCursor.Initialize(position, rotation, joints);
 
-            motionCursor = new RobotCursorABB("motionCursor", false);
-            writeCursor.SetChild(motionCursor);
+            //motionCursor = new RobotCursorABB("motionCursor", false);
+            //writeCursor.SetChild(motionCursor);
             success = success && motionCursor.Initialize(position, rotation, joints);
 
             areCursorsInitialized = success;
@@ -1339,14 +1351,14 @@ namespace BRobot
         //    queue.EmptyQueue();
         //}
 
-        /// <summary>
-        /// Adds a Frame to the streaming queue
-        /// </summary>
-        /// <param name="frame"></param>
-        public void AddFrameToStreamQueue(Frame frame)
-        {
-            streamQueue.Add(frame);
-        }
+        ///// <summary>
+        ///// Adds a Frame to the streaming queue
+        ///// </summary>
+        ///// <param name="frame"></param>
+        //public void AddFrameToStreamQueue(Frame frame)
+        //{
+        //    streamQueue.Add(frame);
+        //}
 
         // This should be moved somewhere else
         public static bool IsBelowTable(double z)
@@ -1378,7 +1390,7 @@ namespace BRobot
         public void DebugBuffer()
         {
             Console.WriteLine("VIRTUAL BUFFER:");
-             virtualCursor.buffer.LogBufferedActions();
+            virtualCursor.buffer.LogBufferedActions();
 
             Console.WriteLine("WRITE BUFFER:");
             writeCursor.buffer.LogBufferedActions();

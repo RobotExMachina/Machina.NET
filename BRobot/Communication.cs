@@ -31,11 +31,16 @@ namespace BRobot
         /// </summary>
         protected Control masterControl = null;
 
-        /// <summary>
-        /// A reference to the shared streamQueue object
-        /// </summary>
-        protected StreamQueue streamQueue = null;
-        
+        //// ADDED A WRITE ROBOT CURSOR IN THE ABB OBJECT
+        ///// <summary>
+        ///// A reference to the shared streamQueue object
+        ///// </summary>
+        //protected StreamQueue streamQueue = null;
+        //public abstract RobotCursor writeCursor = null;
+
+        public abstract RobotCursor WriteCursor { get; set; }
+
+
         /// <summary>
         /// Is the connection to the controller fully operative?
         /// </summary>
@@ -153,9 +158,13 @@ namespace BRobot
             Reset();
         }
 
-        public void LinkStreamQueue(StreamQueue q)
+        //public void LinkStreamQueue(StreamQueue q)
+        //{
+        //    streamQueue = q;
+        //}
+        public void LinkWriteCursor(ref RobotCursor wc)
         {
-            streamQueue = q;
+            WriteCursor = wc;
         }
 
         public bool IsConnected()
@@ -218,6 +227,9 @@ namespace BRobot
         private static string localBufferFilename = "buffer";
         private static string localBufferFileExtension = "mod";
         private static string remoteBufferDirectory = "BRobot";
+        
+        protected RobotCursorABB writeCursor;
+
 
 
         //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
@@ -231,6 +243,19 @@ namespace BRobot
         /// Main constructor
         /// </summary>
         public CommunicationABB(Control ctrl) : base(ctrl) { }
+
+        public override RobotCursor WriteCursor
+        {
+            get
+            {
+                return writeCursor;
+            }
+
+            set
+            {
+                writeCursor = (RobotCursorABB)value;
+            }
+        }
 
         /// <summary>
         /// Reverts the Comm object to a blank state before any connection attempt. 
@@ -647,8 +672,23 @@ namespace BRobot
         /// </summary>
         public override void TickStreamQueue(bool hasPriority)
         {
-            Console.WriteLine("TICKING StreamQueue: {0} targets pending", streamQueue.FramesPending());
-            if (streamQueue.AreFramesPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
+            //Console.WriteLine("TICKING StreamQueue: {0} targets pending", streamQueue.FramesPending());
+            //if (streamQueue.AreFramesPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
+            //{
+            //    Console.WriteLine("About to set targets");
+            //    SetNextVirtualTarget(hasPriority);
+            //    virtualStepCounter++;
+            //    TickStreamQueue(hasPriority);  // call this in case there are more in the queue...
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Not setting targets, streamQueue.AreFramesPending() {0} RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals(\"FALSE\") {1}",
+            //         streamQueue.AreFramesPending(),
+            //        RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"));
+            //}
+
+            Console.WriteLine("TICKING StreamQueue: {0} actions pending", writeCursor.ActionsPending());
+            if (writeCursor.AreActionsPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
             {
                 Console.WriteLine("About to set targets");
                 SetNextVirtualTarget(hasPriority);
@@ -657,9 +697,10 @@ namespace BRobot
             }
             else
             {
-                Console.WriteLine("Not setting targets, streamQueue.AreFramesPending() {0} RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals(\"FALSE\") {1}",
-                     streamQueue.AreFramesPending(),
-                    RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"));
+                Console.WriteLine("Not setting targets, streamQueue.AreFramesPending() {0} RD_pset[{2}].StringValue.Equals(\"FALSE\") {1}",
+                     writeCursor.AreActionsPending(),
+                    RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"),
+                    virtualStepCounter % virtualRDCount);
             }
         }
 
@@ -1239,16 +1280,29 @@ namespace BRobot
 
             lock (rapidDataLock)
             {
-                Frame target = streamQueue.GetNext();
-                if (target != null)
+                //Frame target = streamQueue.GetNext();
+                //if (target != null)
+                //{
+                //    int fid = virtualStepCounter % virtualRDCount;
+
+                //    SetRapidDataVariable(RD_p[fid], target.GetUNSAFERobTargetDeclaration());
+                //    SetRapidDataVariable(RD_vel[fid], target.GetSpeedDeclaration());
+                //    SetRapidDataVariable(RD_zone[fid], target.GetZoneDeclaration());
+                //    SetRapidDataVariable(RD_pset[fid], "TRUE");
+                //}
+
+                bool applied = writeCursor.ApplyNextAction();
+                if (applied)
                 {
                     int fid = virtualStepCounter % virtualRDCount;
 
-                    SetRapidDataVariable(RD_p[fid], target.GetUNSAFERobTargetDeclaration());
-                    SetRapidDataVariable(RD_vel[fid], target.GetSpeedDeclaration());
-                    SetRapidDataVariable(RD_zone[fid], target.GetZoneDeclaration());
+                    SetRapidDataVariable(RD_p[fid], writeCursor.GetUNSAFERobTargetDeclaration());
+                    SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedDeclaration());
+                    SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneDeclaration());
                     SetRapidDataVariable(RD_pset[fid], "TRUE");
                 }
+
+
             }
         }
 
