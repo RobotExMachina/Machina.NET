@@ -30,8 +30,7 @@ namespace BRobot
         /// </summary>
         private ControlMode controlMode = ControlMode.Offline;
         private RunMode runMode = RunMode.Once;
-        
-        
+                
 
         /// <summary>
         /// Instances of the main robot Controller and Task
@@ -112,12 +111,6 @@ namespace BRobot
         /// </summary>
         public void Reset()
         {
-            //// @TODO: to deprecate
-            //streamQueue = new StreamQueue();
-                        
-            //virtualCursor = null;
-            //writeCursor = null;
-            //motionCursor = null;
             virtualCursor = new RobotCursorABB("virtualCursor", true);
             writeCursor = new RobotCursorABB("writeCursor", false);
             virtualCursor.SetChild(writeCursor);
@@ -608,6 +601,7 @@ namespace BRobot
 
             ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
             //return virtualCursor.Issue(act);
+
             bool success = virtualCursor.Issue(act);
             comm.TickStreamQueue(true);
             return success;
@@ -1246,9 +1240,13 @@ namespace BRobot
                     actionsExecuter.Start();
                 }
             }
+            else if (controlMode == ControlMode.Stream)
+            {
+                comm.TickStreamQueue(true);
+            }
             else
             {
-                Console.WriteLine("Still not implemented");
+                Console.WriteLine("Nothing to tick here");
             }
         }
 

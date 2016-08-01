@@ -1280,17 +1280,6 @@ namespace BRobot
 
             lock (rapidDataLock)
             {
-                //Frame target = streamQueue.GetNext();
-                //if (target != null)
-                //{
-                //    int fid = virtualStepCounter % virtualRDCount;
-
-                //    SetRapidDataVariable(RD_p[fid], target.GetUNSAFERobTargetDeclaration());
-                //    SetRapidDataVariable(RD_vel[fid], target.GetSpeedDeclaration());
-                //    SetRapidDataVariable(RD_zone[fid], target.GetZoneDeclaration());
-                //    SetRapidDataVariable(RD_pset[fid], "TRUE");
-                //}
-
                 bool applied = writeCursor.ApplyNextAction();
                 if (applied)
                 {
