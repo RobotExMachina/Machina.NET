@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace BRobot
 {
-    public  abstract class Geometry
+    public abstract class Geometry
     {
         /// <summary>
         /// Precision for floating-point comparisons.

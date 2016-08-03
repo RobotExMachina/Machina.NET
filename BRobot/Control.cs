@@ -786,7 +786,7 @@ namespace BRobot
                     return false;
                 }
             }
-
+            
             ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
             return virtualCursor.Issue(act);
         }
