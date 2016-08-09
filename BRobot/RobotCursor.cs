@@ -168,6 +168,14 @@ namespace BRobot
             }
         }
 
+        public Action GetLastAction()
+        {
+            lock(bufferLock)
+            {
+                return buffer.GetLast();
+            }
+        }
+
         /// <summary>
         /// Requests all un-blocked pending Actions in the buffer to be flagged
         /// as a block. 
@@ -601,7 +609,7 @@ namespace BRobot
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <returns></returns>
-        public string GetUNSAFERobTargetDeclaration()
+        public string GetUNSAFERobTargetValue()
         {
             return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
         }
@@ -610,7 +618,7 @@ namespace BRobot
         /// Returns an ABB jointtarget representation of the current stat of the cursor.
         /// </summary>
         /// <returns></returns>
-        public string GetJointTargetDeclaration()
+        public string GetJointTargetValue()
         {
             return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", joints);
         }
@@ -622,7 +630,7 @@ namespace BRobot
             return string.Format("[{0},{1},{2},{3}]", speed, speed, 5000, 1000);
         }
 
-        public string GetSpeedDeclaration()
+        public string GetSpeedValue()
         {
             return GetSpeedDeclaration(speed);
         }
@@ -635,12 +643,11 @@ namespace BRobot
             return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
         }
 
-        public string GetZoneDeclaration()
+        public string GetZoneValue()
         {
             return GetZoneDeclaration(zone);
         }
 
-        
 
 
 

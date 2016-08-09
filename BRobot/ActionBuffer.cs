@@ -75,6 +75,16 @@ namespace BRobot
             return released.Last();
         }
 
+        /// <summary>
+        /// Returns the last Action that was released by the buffer
+        /// </summary>
+        /// <returns></returns>
+        public Action GetLast()
+        {
+            if (released.Count == 0) return null;
+            return released[released.Count - 1];
+        }
+
         ///// <summary>
         ///// Stores especified action in the released buffer.
         ///// </summary>

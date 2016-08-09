@@ -1152,11 +1152,16 @@ namespace BRobot
             RD_aborted,
             RD_pnum;
         private RapidData[]
+            RD_pset = new RapidData[virtualRDCount],
+            RD_act = new RapidData[virtualRDCount],
             RD_vel = new RapidData[virtualRDCount],
             RD_zone = new RapidData[virtualRDCount],
-            RD_p = new RapidData[virtualRDCount],
-            RD_pset = new RapidData[virtualRDCount];
-        
+            RD_rt = new RapidData[virtualRDCount],
+            RD_jt = new RapidData[virtualRDCount],
+            RD_wt = new RapidData[virtualRDCount],
+            RD_msg = new RapidData[virtualRDCount];
+
+
         /// <summary>
         /// Performs necessary operations to set up 'stream' control mode in the controller
         /// </summary>
@@ -1183,7 +1188,7 @@ namespace BRobot
         /// </summary>
         private bool LoadStreamingModule()
         {
-            return LoadProgramToController(StaticData.StreamModule.ToList());
+            return LoadProgramToController(StreamModuleV2.ToList());
         }
 
         /// <summary>
@@ -1211,20 +1216,27 @@ namespace BRobot
             // Load and set the first four targets
             for (int i = 0; i < virtualRDCount; i++)
             {
+                RD_pset[i] = LoadRapidDataVariable("pset" + i);
+                RD_act[i] = LoadRapidDataVariable("act" + i);
                 RD_vel[i] = LoadRapidDataVariable("vel" + i);
                 RD_zone[i] = LoadRapidDataVariable("zone" + i);
-                RD_p[i] = LoadRapidDataVariable("p" + i);
-                RD_pset[i] = LoadRapidDataVariable("pset" + i);
-                //AddVirtualTarget();
+                RD_rt[i] = LoadRapidDataVariable("rt" + i);
+                RD_jt[i] = LoadRapidDataVariable("jt" + i);
+                RD_wt[i] = LoadRapidDataVariable("wt" + i);
+                RD_msg[i] = LoadRapidDataVariable("msg" + i);
 
-                if (RD_vel[i] == null || RD_zone[i] == null || RD_p[i] == null || RD_pset[i] == null)
+                if (RD_pset[i] == null || RD_vel[i] == null || RD_zone[i] == null || 
+                    RD_rt[i] == null || RD_jt[i] == null || RD_wt[i] == null || RD_msg[i] == null)
                     return false;
 
-                Console.WriteLine("{0}, {1}, {2}, {3}",
+                Console.WriteLine("{0}, {1}, {2}, {3}, {4}, {5}, {6}",
+                    RD_pset[i].StringValue,
                     RD_vel[i].StringValue,
                     RD_zone[i].StringValue,
-                    RD_p[i].StringValue,
-                    RD_pset[i].StringValue);
+                    RD_rt[i].StringValue,
+                    RD_jt[i].StringValue,
+                    RD_wt[i].StringValue,
+                    RD_msg[i].StringValue);
             }
 
             return true;
@@ -1261,10 +1273,10 @@ namespace BRobot
                     RD_zone[i] = null;
                 }
 
-                if (RD_p[i] != null)
+                if (RD_rt[i] != null)
                 {
-                    RD_p[i].Dispose();
-                    RD_p[i] = null;
+                    RD_rt[i].Dispose();
+                    RD_rt[i] = null;
                 }
 
                 if (RD_pset[i] != null)
@@ -1319,6 +1331,11 @@ namespace BRobot
             }
         }
 
+        private void SetRapidDataVariable(RapidData rd, double declaration)
+        {
+            SetRapidDataVariable(rd, declaration.ToString());
+        }
+
 
         /// <summary>
         /// Figures out the appropriate virtual target in the streaming module and 
@@ -1336,15 +1353,185 @@ namespace BRobot
                 {
                     int fid = virtualStepCounter % virtualRDCount;
 
-                    SetRapidDataVariable(RD_p[fid], writeCursor.GetUNSAFERobTargetDeclaration());
-                    SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedDeclaration());
-                    SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneDeclaration());
+                    Action a = writeCursor.GetLastAction();
+
+                    if (a == null)
+                        throw new Exception("Last action wasn't correctly stored...?");
+
+                    switch(a.type)
+                    {
+                        case ActionType.Translation:
+                        case ActionType.Rotation:
+                        case ActionType.TranslationAndRotation:
+                        case ActionType.RotationAndTranslation:
+                            SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
+                            SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
+                            SetRapidDataVariable(RD_rt[fid], writeCursor.GetUNSAFERobTargetValue());
+                            SetRapidDataVariable(RD_act[fid], a.motionType == MotionType.Linear ? 1 : 2);     
+                            break;
+
+                        case ActionType.Joints:
+                            SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
+                            SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
+                            SetRapidDataVariable(RD_jt[fid], writeCursor.GetJointTargetValue());
+                            SetRapidDataVariable(RD_act[fid], 3);
+                            break;
+
+                        case ActionType.Wait:
+                            SetRapidDataVariable(RD_wt[fid], 0.001 * a.waitMillis);
+                            SetRapidDataVariable(RD_act[fid], 4);
+                            break;
+
+                        case ActionType.Message:
+                            SetRapidDataVariable(RD_msg[fid], a.message);
+                            SetRapidDataVariable(RD_act[fid], 5);
+                            break;
+                    }
+                    
                     SetRapidDataVariable(RD_pset[fid], "TRUE");
                 }
             }
         }
 
-
+        /// <summary>
+        /// The enhanced module used for ABB Online Stream mode
+        /// </summary>
+        public static string[] StreamModuleV2 =
+        {
+            "MODULE StreamModule",
+            "",
+            "  ! \"Global\" flags",
+            "  PERS bool aborted := FALSE;",
+            "  PERS num pnum := -1;",
+            "",
+            "  ! Step flags",
+            "  PERS bool pset0 := FALSE;",
+            "  PERS bool pset1 := FALSE;",
+            "  PERS bool pset2 := FALSE;",
+            "  PERS bool pset3 := FALSE;",
+            "",
+            "  ! Action flags",
+            "  PERS num act0 := 1;",
+            "  PERS num act1 := 1;",
+            "  PERS num act2 := 1;",
+            "  PERS num act3 := 1;",
+            "",
+            "  ! Speed declarations",
+            "  PERS speeddata vel0 := [20,20,1000,1000];",
+            "  PERS speeddata vel1 := [20,20,1000,1000];",
+            "  PERS speeddata vel2 := [20,20,1000,1000];",
+            "  PERS speeddata vel3 := [20,20,1000,1000];",
+            "",
+            "  ! Zone declarations",
+            "  PERS zonedata zone0 := [FALSE,5,8,8,0.8,8,0.8];",
+            "  PERS zonedata zone1 := [FALSE,5,8,8,0.8,8,0.8];",
+            "  PERS zonedata zone2 := [FALSE,5,8,8,0.8,8,0.8];",
+            "  PERS zonedata zone3 := [FALSE,5,8,8,0.8,8,0.8];",
+            "",
+            "  ! RobTarget declarations",
+            "  PERS robtarget rt0 := [[1000, 0, 500],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];",
+            "  PERS robtarget rt1 := [[1000, 0, 500],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];",
+            "  PERS robtarget rt2 := [[1000, 0, 500],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];",
+            "  PERS robtarget rt3 := [[1000, 0, 500],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];",
+            "",
+            "  ! JonumTarget declarations",
+            "  PERS jointtarget jt0 := [[0,0,0,0,90,0],[9E9,9E9,9E9,9E9,9E9,9E9]];",
+            "  PERS jointtarget jt1 := [[0,0,0,0,90,0],[9E9,9E9,9E9,9E9,9E9,9E9]];",
+            "  PERS jointtarget jt2 := [[0,0,0,0,90,0],[9E9,9E9,9E9,9E9,9E9,9E9]];",
+            "  PERS jointtarget jt3 := [[0,0,0,0,90,0],[9E9,9E9,9E9,9E9,9E9,9E9]];",
+            "",
+            "  ! Waittimes",
+            "  PERS num wt0 := 0;",
+            "  PERS num wt1 := 0;",
+            "  PERS num wt2 := 0;",
+            "  PERS num wt3 := 0;",
+            "",
+            "  ! Messages",
+            "  PERS string msg0 := \"foo\";",
+            "  PERS string msg1 := \"bar\";",
+            "  PERS string msg2 := \"baz\";",
+            "  PERS string msg3 := \"qux\";",
+            "",
+            "",
+            "  PROC main()",
+            "    AccSet 10, 10;",
+            "    ConfL\\Off;",
+            "    ConfJ\\Off;",
+            "",
+            "    Path0;",
+            "  ENDPROC",
+            "",
+            "  PROC Path0()",
+            "    WHILE NOT aborted DO",
+            "      WaitUntil pset0 = TRUE;",
+            "      pset0 := FALSE;",
+            "      pnum := 0;",
+            "      TEST act0",
+            "        CASE 1:",
+            "          MoveL rt0,vel0,zone0,Tool0\\WObj:=WObj0;",
+            "        CASE 2:",
+            "          MoveJ rt0,vel0,zone0,Tool0\\WObj:=WObj0;",
+            "        CASE 3:",
+            "          MoveAbsJ jt0,vel0,zone0,Tool0\\WObj:=WObj0;",
+            "        CASE 4:",
+            "          WaitTime wt0;",
+            "        CASE 5:",
+            "          TPWrite msg0;",
+            "      ENDTEST",
+            "",
+            "      WaitUntil pset1 = TRUE;",
+            "      pset1 := FALSE;",
+            "      pnum := 1;",
+            "      TEST act1",
+            "        CASE 1:",
+            "          MoveL rt1,vel1,zone1,Tool0\\WObj:=WObj0;",
+            "        CASE 2:",
+            "          MoveJ rt1,vel1,zone1,Tool0\\WObj:=WObj0;",
+            "        CASE 3:",
+            "          MoveAbsJ jt1,vel1,zone0,Tool0\\WObj:=WObj0;",
+            "        CASE 4:",
+            "          WaitTime wt1;",
+            "        CASE 5:",
+            "          TPWrite msg1;",
+            "      ENDTEST",
+            "",
+            "      WaitUntil pset2 = TRUE;",
+            "      pset2 := FALSE;",
+            "      pnum := 2;",
+            "      TEST act2",
+            "        CASE 1:",
+            "          MoveL rt2,vel2,zone2,Tool0\\WObj:=WObj0;",
+            "        CASE 2:",
+            "          MoveJ rt2,vel2,zone2,Tool0\\WObj:=WObj0;",
+            "        CASE 3:",
+            "          MoveAbsJ jt2,vel2,zone2,Tool0\\WObj:=WObj0;",
+            "        CASE 4:",
+            "          WaitTime wt2;",
+            "        CASE 5:",
+            "          TPWrite msg2;",
+            "      ENDTEST",
+            "",
+            "      WaitUntil pset3 = TRUE;",
+            "      pset3 := FALSE;",
+            "      pnum := 3;",
+            "      TEST act3",
+            "        CASE 1:",
+            "          MoveL rt3,vel3,zone3,Tool0\\WObj:=WObj0;",
+            "        CASE 2:",
+            "          MoveJ rt3,vel3,zone3,Tool0\\WObj:=WObj0;",
+            "        CASE 3:",
+            "          MoveAbsJ jt3,vel3,zone3,Tool0\\WObj:=WObj0;",
+            "        CASE 4:",
+            "          WaitTime wt3;",
+            "        CASE 5:",
+            "          TPWrite msg3;",
+            "      ENDTEST",
+            "",
+            "    ENDWHILE",
+            "  ENDPROC",
+            "",
+            "ENDMODULE"
+        };
 
 
 

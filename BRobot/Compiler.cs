@@ -225,11 +225,11 @@ namespace BRobot
                 case ActionType.Rotation:
                 case ActionType.TranslationAndRotation:
                 case ActionType.RotationAndTranslation:
-                    dec = string.Format("  CONST robtarget target{0}:={1};", id, cursor.GetUNSAFERobTargetDeclaration());
+                    dec = string.Format("  CONST robtarget target{0}:={1};", id, cursor.GetUNSAFERobTargetValue());
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("  CONST jointtarget target{0}:={1};", id, cursor.GetJointTargetDeclaration());
+                    dec = string.Format("  CONST jointtarget target{0}:={1};", id, cursor.GetJointTargetValue());
                     break;
             }
 
