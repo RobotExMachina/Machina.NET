@@ -79,7 +79,6 @@
     <Compile Include="RobotCursor.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Solver.cs" />
-    <Compile Include="StaticData.cs" />
     <Compile Include="StreamQueue.cs" />
     <Compile Include="Tool.cs" />
     <Compile Include="Util.cs" />
