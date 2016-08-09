@@ -11,8 +11,9 @@ namespace TEST_StreamAPITests
     class StreamAPITests
     {
         static Robot arm = new Robot();
-        static bool dir = true;
+        static Point dir = new Point(20, 0, 0);
         static int it = 0;
+        static int maxTargets = 36;
 
         static void Main(string[] args)
         {
@@ -23,27 +24,20 @@ namespace TEST_StreamAPITests
             arm.Connect();
             arm.Start();
 
+            // Subscribe to BufferEmpty events
+            arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
+
             // Do some stuff
             arm.Speed(100);
             arm.Zone(5);
-            arm.MoveTo(300, -200, 300);
+            arm.MoveTo(302, 0, 558);
+            arm.MoveTo(300, -150, 300);
+            arm.Speed(25);
 
-            arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
+            // From here on, the BufferEmptyHandler should take command ;)
 
-
-
-            //arm.MoveTo(200, 200, 200);
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    arm.Move(50, 0);
-            //    arm.Move(0, 50);
-            //    arm.Move(-50, 0);
-            //    //arm.Move(0, -50);
-            //    arm.Move(0, -50, 50);  
-            //}
-
-            //arm.DebugRobotCursors();
-            //arm.DebugBuffer();
+            arm.DebugRobotCursors();
+            arm.DebugBuffer();
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
@@ -57,28 +51,21 @@ namespace TEST_StreamAPITests
 
         }
 
+        
+
         static public void GenerateMovements(object sender, EventArgs args)
         {
-            if (it < 10)
+            if (it < maxTargets)
             {
-                Console.WriteLine("       ---> SENDING NEW MOVE INSTR: " + dir);
-                if (dir)
-                {
-                    arm.Move(75, 25);
-                }
-                else
-                {
-                    arm.Move(-75, 25);
-                }
-                dir = !dir;
-                it++;
+                arm.Move(dir);
+                dir.Rotate(Point.ZAxis, 10); 
             }
-            else
+            else if (it == maxTargets)
             {
-                Console.WriteLine("Done sending instructions");
-                //arm.moveto(300, 0, 500);
+                arm.Speed(100);
+                arm.MoveTo(302, 0, 558);
             }
-
+            it++;
         }
     }
 }

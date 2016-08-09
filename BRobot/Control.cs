@@ -552,7 +552,7 @@ namespace BRobot
         /// </summary>
         public void PushCurrentSettings()
         {
-            Console.WriteLine("Pushing {0}", currentSettings);
+            //Console.WriteLine("Pushing {0}", currentSettings);
             settingsBuffer.Push(currentSettings);
             currentSettings = currentSettings.Clone();  // sets currentS to a new object
         }
@@ -564,7 +564,7 @@ namespace BRobot
         public void PopCurrentSettings()
         {
             currentSettings = settingsBuffer.Pop();
-            Console.WriteLine("Reverted to {0}", currentSettings);
+            //Console.WriteLine("Reverted to {0}", currentSettings);
         }
 
 
@@ -614,7 +614,6 @@ namespace BRobot
 
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
-            //TickWriteCursor();
             return success;
         }
 
@@ -699,7 +698,11 @@ namespace BRobot
             }
 
             ActionRotation act = new ActionRotation(world, rot, relative, speed, zone, mType);
-            return virtualCursor.Issue(act);
+            //return virtualCursor.Issue(act);
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+
         }
 
         /// <summary>
@@ -788,7 +791,11 @@ namespace BRobot
             }
             
             ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
-            return virtualCursor.Issue(act);
+            //return virtualCursor.Issue(act);
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+
         }
 
         /// <summary>
@@ -911,7 +918,11 @@ namespace BRobot
             }
 
             ActionRotationAndTranslation act = new ActionRotationAndTranslation(worldRot, rot, relRot, worldTrans, trans, relTrans, speed, zone, mType);
-            return virtualCursor.Issue(act);
+            //return virtualCursor.Issue(act);
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+
         }
 
         /// <summary>
@@ -1032,7 +1043,11 @@ namespace BRobot
             }
 
             ActionJoints act = new ActionJoints(joints, relJnts, speed, zone);
-            return virtualCursor.Issue(act);
+            //return virtualCursor.Issue(act);
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+
         }
         /// <summary>
         /// Issue a request to set the values of joint angles in configuration space. 
@@ -1073,7 +1088,11 @@ namespace BRobot
             }
 
             ActionMessage act = new ActionMessage(message);
-            return virtualCursor.Issue(act);
+            //return virtualCursor.Issue(act);
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+
         }
 
 
@@ -1103,7 +1122,11 @@ namespace BRobot
             }
 
             ActionWait act = new ActionWait(millis);
-            return virtualCursor.Issue(act);
+            //return virtualCursor.Issue(act);
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+
         }
 
 

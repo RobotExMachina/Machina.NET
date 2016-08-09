@@ -1341,8 +1341,6 @@ namespace BRobot
                     SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneDeclaration());
                     SetRapidDataVariable(RD_pset[fid], "TRUE");
                 }
-
-
             }
         }
 
