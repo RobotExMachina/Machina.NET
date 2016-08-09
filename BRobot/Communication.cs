@@ -1383,7 +1383,12 @@ namespace BRobot
                             break;
 
                         case ActionType.Message:
-                            SetRapidDataVariable(RD_msg[fid], a.message);
+                            // TPWrite can only handle 40 chars
+                            string str = a.message;
+                            if (a.message.Length > 40)
+                                str = a.message.Substring(0, 40);
+
+                            SetRapidDataVariable(RD_msg[fid], string.Format("\"{0}\"", str));  // when setting the value for a string rapidvar, the double quotes are needed as part of the value
                             SetRapidDataVariable(RD_act[fid], 5);
                             break;
                     }
