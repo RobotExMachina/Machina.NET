@@ -15,7 +15,7 @@ namespace TEST_ExecuteAPITests
             Robot arm = new Robot();   
 
             // Set control mode
-            arm.ControlMode("execute");     
+            arm.Mode("execute");     
 
             // Connect to a controller
             arm.Connect();

@@ -18,7 +18,7 @@ namespace TEST_StreamAPITests
         static void Main(string[] args)
         {
             // Set control mode
-            arm.ControlMode("stream");
+            arm.Mode("stream");
 
             // Connect to a controller
             arm.Connect();

@@ -23,7 +23,7 @@ namespace EXAMPLE_KeyboardControl
             Robot arm = new Robot();
 
             // Set connection properties
-            arm.ControlMode("stream");
+            arm.Mode("stream");
             arm.Connect();
 
             arm.DebugDump();

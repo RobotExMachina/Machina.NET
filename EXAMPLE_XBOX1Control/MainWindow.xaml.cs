@@ -42,7 +42,7 @@ namespace EXAMPLE_XBOX1Control
 
         Robot arm;
 
-        bool firstPersonMode = false;  // fp mode does relative movement to x axis, absolute mode jsut from the outside...
+        bool firstPersonMode = true;  // fp mode does relative movement to x axis, absolute mode jsut from the outside...
 
         Vec dir = new Vec();
          
@@ -66,7 +66,7 @@ namespace EXAMPLE_XBOX1Control
 
             // Robot stuff
             arm = new Robot();
-            arm.ControlMode("stream");
+            arm.Mode("stream");
             arm.Connect();
 
             // Suscribe to events
@@ -83,7 +83,7 @@ namespace EXAMPLE_XBOX1Control
             arm.TransformTo(new Vec(300, 0, 500), Rot.FlippedAroundY);
             //arm.Rotate(Vec.ZAxis, -180);
 
-            //if (firstPersonMode) arm.Coordinates("local");
+            if (firstPersonMode) arm.Coordinates("local");
             
 
         }

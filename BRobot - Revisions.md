@@ -15,7 +15,6 @@
 ```
 
 ## PENDING 
-- [ ] Get stream mode working again
 - [ ] Rework Actions
     - [ ] Make a static API that can generate them as objects
     - [ ] Add the possibility of not inputing speed+zone+mType, and stick to the previous cursor state
@@ -24,7 +23,9 @@
     - [ ] If they were Actions, relative and absolute modes could be implemented: .Speed(10) is an increase, .SpeedTo(10) is a setting.
 
 ## BUILD 1116
-
+- [x] Get stream mode working again, with all available actions
+- [x] Improved subscription and disposal methods, looks like it might now be reliable if the client always properly disconnects...
+- [x] Robot.ControlMode() is now .Mode()
 
 ## BUILD 1115
 - [x] ProgramGenerator class is now Compiler

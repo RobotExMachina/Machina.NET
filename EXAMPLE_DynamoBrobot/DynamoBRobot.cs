@@ -24,7 +24,7 @@ namespace EXAMPLE_DynamoBRobot
 
         public static List<string> GenerateCode(Robot bot, int speed, int zone, List<Plane> planes)
         {
-            bot.ControlMode("offline");
+            bot.Mode("offline");
 
             bot.Speed(speed);
             bot.Zone(zone);

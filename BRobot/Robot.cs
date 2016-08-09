@@ -120,7 +120,7 @@ namespace BRobot
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public bool ControlMode(string mode)
+        public bool Mode(string mode)
         {
             mode = mode.ToLower();
             bool success = true;

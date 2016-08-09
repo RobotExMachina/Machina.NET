@@ -13,7 +13,7 @@ namespace EXAMPLE_OfflineCodeGeneration
         static void Main(string[] args)
         {
             Robot arm = new Robot();
-            arm.ControlMode("offline");
+            arm.Mode("offline");
 
             // From wherever the robot was, go back to homish position
             arm.Motion("joint");

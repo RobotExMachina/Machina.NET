@@ -21,7 +21,7 @@ namespace EXAMPLE_LoadModule
 
             Robot arm = new Robot();
 
-            arm.ControlMode("execute");
+            arm.Mode("execute");
             arm.Connect();
 
             arm.DebugDump();

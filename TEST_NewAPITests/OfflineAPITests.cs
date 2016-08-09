@@ -13,7 +13,7 @@ namespace TEST_OfflineAPITests
         static void Main(string[] args)
         {
             Robot arm = new Robot();
-            arm.ControlMode("offline");
+            arm.Mode("offline");
 
             //// Trace a planar square in space
             //TracePlanarRectangle(arm);

@@ -29,7 +29,7 @@ namespace EXAMPLE_ConnectionCheck
 
             Robot arm = new Robot();
 
-            arm.ControlMode("execute");
+            arm.Mode("execute");
             arm.Connect();
 
             arm.DebugDump();
