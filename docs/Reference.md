@@ -41,7 +41,9 @@
 - [BufferEmpty](#bufferempty)
 
 
---
+---
+
+
 ## Constructors
 
 ### Robot
@@ -55,10 +57,9 @@ Robot bot = new Robot();
 ```
 
 
---
 ## Properties
 
-## Version
+### Version
 
 _static string_
 
@@ -69,7 +70,7 @@ Console.WriteLine(Robot.Version);  // "0.1.0"
 ```
 
 
---
+
 ## Methods
 
 ### Mode
@@ -488,7 +489,7 @@ bot.Move(0, 0, 100);
 ```
 
 
---
+
 ## Events
 
 ### BufferEmpty
