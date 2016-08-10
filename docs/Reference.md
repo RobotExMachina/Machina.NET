@@ -7,25 +7,24 @@
 - [Version](#version)
 
 ### Methods
-
-- [Mode](#mode)
-
+- [Mode](#mode)  
+&nbsp;
 - [Connect](#connect)
-- [Disconnect](#disconnect)
-
+- [Disconnect](#disconnect)  
+&nbsp;
 - [Start](#start)
-- [Stop](#stop)
-
+- [Stop](#stop)  
+&nbsp;
 - [Export](#export)
-- [Execute](#execute)
-
+- [Execute](#execute)  
+&nbsp;
 - [Motion](#motion)
 - [Coordinates](#coordinates)
 - [Speed](#speed)
 - [Zone](#zone)
 - [PushSettings](#pushsettings)
-- [PopSettings](#popsettings)
-
+- [PopSettings](#popsettings)  
+&nbsp;
 - [Move](#move)
 - [MoveTo](#moveto)
 - [Rotate](#rotate)
@@ -37,11 +36,12 @@
 - [Wait](#wait)
 - [Message](#message)
 
+
 ### Events
 - [BufferEmpty](#bufferempty)
 
 
----
+--
 ## Constructors
 
 ### Robot
@@ -55,7 +55,7 @@ Robot bot = new Robot();
 ```
 
 
----
+--
 ## Properties
 
 ## Version
@@ -69,7 +69,7 @@ Console.WriteLine(Robot.Version);  // "0.1.0"
 ```
 
 
----
+--
 ## Methods
 
 ### Mode
@@ -88,7 +88,7 @@ bot.Mode("stream");
 ```
 
 
----
+--
 ### Connect
 
 _bool Connect()_
@@ -124,7 +124,7 @@ bot.Disconnect();
 _NOTE: it is **extremely important to disconnect from devices** upon client closure to ensure proper disposal of all COM objects. Failure to do so may prevent the client from further successful connections and the need to restart the controller._
 
 
----
+--
 ### Start
 
 _bool Start()_
@@ -168,7 +168,7 @@ bot.Start();  // resume execution
 _NOTE: works only in 'execute' and 'stream' modes._
 
 
----
+--
 ### Export
 _List<string> Export()_
 _bool Export(string filepath)_
@@ -216,7 +216,7 @@ bot.Execute();
 _NOTE: works only in 'execute' mode._
 
 
----
+--
 ### Motion 
 
 _MotionType Motion()_
@@ -335,7 +335,7 @@ bot.Move(100, 0);    // will move at the speed and zone settings before .PushSet
 
 _NOTE: State settings include [motion type](#motion), [reference coordinate system](#coordinates), [speed](#speed) and [zone](#zone)._
 
----
+--
 ### Move
 
 _bool Move(Point direction)_
@@ -488,7 +488,7 @@ bot.Move(0, 0, 100);
 ```
 
 
----
+--
 ## Events
 
 ### BufferEmpty
