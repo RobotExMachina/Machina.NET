@@ -110,7 +110,7 @@ namespace BRobot
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public bool ControlMode(ControlMode mode)
+        public bool Mode(ControlMode mode)
         {
             return c.SetControlMode(mode);
         }
@@ -126,15 +126,15 @@ namespace BRobot
             bool success = true;
             if (mode.Equals("offline"))
             {
-                return ControlMode(BRobot.ControlMode.Offline);
+                return Mode(BRobot.ControlMode.Offline);
             }
             else if (mode.Equals("execute"))
             {
-                return ControlMode(BRobot.ControlMode.Execute);
+                return Mode(BRobot.ControlMode.Execute);
             }
             else if (mode.Equals("stream"))
             {
-                return ControlMode(BRobot.ControlMode.Stream);
+                return Mode(BRobot.ControlMode.Stream);
             }
             else
             {

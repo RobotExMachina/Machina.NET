@@ -107,7 +107,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BRobot\BRobot.csproj">
+    <ProjectReference Include="..\..\BRobot\BRobot.csproj">
       <Project>{12d4098e-2f9e-4e15-892b-fded71da4b47}</Project>
       <Name>BRobot</Name>
     </ProjectReference>

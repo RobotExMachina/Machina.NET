@@ -418,7 +418,7 @@ public class TuioDemo : Form , TuioListener
     {
         // ROBOT
         arm = new Robot();
-        arm.ControlMode(cMode);
+        arm.Mode(cMode);
 
         arm.Connect();
         arm.DebugDump();
