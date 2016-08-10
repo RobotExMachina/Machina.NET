@@ -73,6 +73,11 @@ namespace BRobot
         public static readonly int Build = 1116;
 
         /// <summary>
+        /// Version number.
+        /// </summary>
+        public static readonly string Version = "0.1.0";
+
+        /// <summary>
         /// The main Control object, acts as an interface to all classes that
         /// manage robot control.
         /// </summary>
