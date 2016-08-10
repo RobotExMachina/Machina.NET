@@ -1338,6 +1338,17 @@ namespace BRobot
             }
         }
 
+
+        public Joints()
+        {
+            this.J1 = 0;
+            this.J2 = 0;
+            this.J3 = 0;
+            this.J4 = 0;
+            this.J5 = 0;
+            this.J6 = 0;
+        }
+
         /// <summary>
         /// Create a Joints configuration from values.
         /// </summary>

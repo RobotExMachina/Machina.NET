@@ -184,8 +184,8 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Performs all necessary operations to connect to a robot device, real or virtual.
-        /// This is necessary for 'online' modes.
+        /// Scans the network for robotic devices, real or virtual, and performs all necessary 
+        /// operations to connect to it. This is necessary for 'online' modes such as 'execute' and 'stream.'
         /// </summary>
         /// <param name="mode">If multiple devices are connected, choose this id from the list.</param>
         /// <returns></returns>

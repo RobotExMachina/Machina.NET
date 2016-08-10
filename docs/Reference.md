@@ -1,4 +1,4 @@
-## QUICK API REFERENCE - v0.1.0
+# QUICK API REFERENCE - v0.1.0
 
 ### Constructors
 - [Robot](#robot)
@@ -36,10 +36,14 @@
 - [Wait](#wait)
 - [Message](#message)
 
-
 ### Events
 - [BufferEmpty](#bufferempty)
 
+### BRobot Data Types
+- [Point](#point)
+- [Rotation](#rotation)
+- [Joints](#joints)
+- [CoordinateSystem](#coordinatesystem)
 
 ---
 
@@ -512,4 +516,55 @@ _NOTE: works only in 'stream' mode._
 
 
 
+## BRobot Data Types
 
+### Point
+
+_Point()_
+
+_Point(double x, double y, double z)_
+
+_Point(Point p)_
+
+Represents a location or a vector in three dimensional space. This class features several helper methods and operator overloads to perform vector algebra. 
+
+
+### Rotation
+
+_Rotation()_
+
+_Rotation(double w, double x, double y, double z)_
+
+_Rotation(Rotation r)_
+
+_Rotation(CoordinateSystem cs)_
+
+_Rotation(Point vec, double angDegs)_
+
+_Rotation(Point vecX, Point vecY)_
+
+_Rotation(double x0, double x1, double x2, double y0, double y1, double y2)_
+
+Represents an rotation in three-dimensional space defined by its quaternion representation. This class features several helper methods and operator overloads to perform quaternion algebra. 
+
+
+### Joints
+
+_Joints()_
+
+_Joints(Joints j)_
+
+_Joints(double j1, double j2, double j3, double j4, double j5, double j6)_
+
+A six-dimensional vector useful as a representation of the rotational values at the joints of a robotic manipulator.
+
+
+### CoordinateSystem
+
+_CoordinateSystem()_
+
+_CoordinateSystem(Point vecX, Point vecY)_
+
+_CoordinateSystem(double x0, double x1, double x2, double y0, double y1, double y2)_
+
+Represents a Coordinate System composed of a triplet of orthogonal XYZ unit vectors following right-hand rule orientations. Useful for spatial and rotational orientation.
