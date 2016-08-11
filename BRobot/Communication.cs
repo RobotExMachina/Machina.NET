@@ -1261,6 +1261,12 @@ namespace BRobot
 
             for (int i = 0; i < virtualRDCount; i++)
             {
+                if (RD_pset[i] != null)
+                {
+                    RD_pset[i].Dispose();
+                    RD_pset[i] = null;
+                }
+
                 if (RD_vel[i] != null)
                 {
                     RD_vel[i].Dispose();
@@ -1279,11 +1285,24 @@ namespace BRobot
                     RD_rt[i] = null;
                 }
 
-                if (RD_pset[i] != null)
+                if (RD_jt[i] != null)
                 {
-                    RD_pset[i].Dispose();
-                    RD_pset[i] = null;
+                    RD_jt[i].Dispose();
+                    RD_jt[i] = null;
                 }
+
+                if (RD_wt[i] != null)
+                {
+                    RD_wt[i].Dispose();
+                    RD_wt[i] = null;
+                }
+
+                if (RD_msg[i] != null)
+                {
+                    RD_msg[i].Dispose();
+                    RD_msg[i] = null;
+                }
+
             }
 
         }
