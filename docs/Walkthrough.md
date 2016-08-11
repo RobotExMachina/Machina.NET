@@ -176,13 +176,28 @@ namespace ConsoleApplication1
 ```
 
 
-## The Action Model
+## The Action-State Model
 
+Before we move on, it is probably helpful at this point to discuss the way BRobot is built and works. If you don't care much about abstract jibber jabber, just skip to the last paragraph of this section ;)
 
+BRobot is built following what I would like to describe as an _**action-state model**_. In a few words, the way a user interfaces with physical devices through BRobot is by _issuing actions_ that change the _state_ of different _internal representations_, and which get _released_ and executed whenever they get _priority_. Let's illustrate this with a simple example. 
 
+Imagine you open your email client and you have 50 unread emails. You will most likely start replying one at a time, starting from the oldest (unless you realize there are certain urgent ones). As you respond, your mental state changes, and you may actually give different responses to newer emails based on your reaction to previous ones. Furthermore, as you go through your long queue of messages, new ones keep arriving to your inbox in response to your own responses, or completely unrelated. You probably decide to keep responding in order, and deal with them when you reach the top of your list. In a way, this is similar to what is happening inside BRobot. 
+
+In Brobot, an _**action**_ is any kind of instruction we wish the device to follow, such as moving somewhere, rotating, waiting or displaying a message. We _**issue**_ actions by submitting a request to the device to follow this action, a request which may or may not be accepted for several reasons. If the action is accepted, it gets stored in an internal _**action queue**_. We do expect such action to be executed as soon as all the previously pending actions have been completed, unless we have otherwise specified. BRobot takes care of maganing this queue, and _**releasing**_ its actions to the different connected devices, real or virtual, whenever _**priority**_ dictates. 
+
+The effect of actions on the device is strongly determined by its current _**state**_ at that moment, especially for _**relative**_ actions. For example, if we issue a `Move(100, 0, 0)` action, the device will move 100 mm in the X direction from wherever it was before, while if we tell it to `MoveTo(300, 100, 200)` it doesn't matter where it were before, it will just move to that absolute position. However, both movements will be affected by the current state of speed value, zone, type of motion, etc.  
+
+Due to the inherent asynchronous nature of communicating with physically actuated devices, BRobot manages a series of internal _**state**_ representations, to properly keep track of such states. For example, there is a _**virtual cursor**_ which represents the state of a virtual device immediately after valid actions are issued, a _**write cursor**_ which keeps track of the actions that have been released to a connected device, and a _**motion cursor**_ which tries to keep up with the actual state of the connected device at any given time. BRobot uses these representations to make sure it handles the action queue as accurately as possible, and gives you proper notice of when things are happening so that you can react to them. 
+
+BRobot's action-state model is strongly inspired by the work of [Seymour Papert](https://en.wikipedia.org/wiki/Seymour_Papert) et al. with the [LOGO language](https://en.wikipedia.org/wiki/Logo_(programming_language)) and its application in [turtle graphics and robotics for children](https://en.wikipedia.org/wiki/Turtle_(robot)), with further inspiration drawn from the syntactic sleekness of the [Processing language](https://processing.org/) and the motivation behind [SAM patterns](http://sam.js.org/).
+
+So in a nutshell, the takeaway of the model BRobot offers you is that you can request the device to execute actions at any time, such as moving, rotating or stopping, with the effect of those actions depending on the state of the device whenever those actions happen, such as its location, speed, motion type, etc. Furthermore, those actions won't happen immediately, but will be stored in a queue and released to the device when they get priority, one at a time. The way these actions are released to the device depends on your choice of operating [Modes](#modes) available, which are explained in the next section.
 
 
 ## Modes
+
+BRobot offers three main modes of control: [offline](#offline), [execute](#execute) and [stream](#stream).
 
 
 
