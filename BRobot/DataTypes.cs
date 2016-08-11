@@ -237,8 +237,20 @@ namespace BRobot
             Rotation r = new Rotation(vec, angDegs);
             return this.Rotate(r);
         }
-        
-        
+
+        /// <summary>
+        /// Rotates this Point specified degrees around specified vector. 
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="angDegs"></param>
+        /// <returns></returns>
+        public bool Rotate(double vecX, double vecY, double vecZ, double angDegs)
+        {
+            Rotation r = new Rotation(new Point(vecX, vecY, vecZ), angDegs);
+            return this.Rotate(r);
+        }
+
+
 
 
 

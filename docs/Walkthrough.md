@@ -341,6 +341,103 @@ Offline mode is useful for testing purposes, to get acquaintanced with your devi
 
 ## Examples
 
+Many interesing and cool things can be done when controlling robotic devices in real time. A full list of the actions available in BRobot can be found in the [quick reference API card](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Reference.md). Let's take a look at some examples of cool things that can be done with BRobot.
+
+As we have seen, it is very easy to __trace a rectangle__ in space. We move to the first corner, and then trace the rectangle relative to it:
+
+```csharp
+// Draw a rectangle
+bot.MoveTo(300, 200, 400);
+bot.Move(50, 0, 0);
+bot.Move(0, 75, 0);
+bot.Move(-50, 0, 0);
+bot.Move(0, -75, 0);
+```
+
+Of course, this can be done a bit more __programmatically__: 
+
+```csharp
+void traceXYRectangle(Robot robot, double x, double y, double z, double w, double h) {
+    robot.MoveTo(x, y, z);
+    robot.Move(w, 0, 0);
+    robot.Move(0, h, 0);
+    robot.Move(-w, 0, 0);
+    robot.Move(0, -h, 0);
+}
+```
+
+And then invoked anywhere in your app:
+
+```csharp
+traceXYRectangle(bot, 300, 200, 400, 50, 75);
+```
+
+Such a function could be improved to accept speed and zone parameters, and use __`PushSettings`__ and __`PopSettings`__ to __temporarily switch to those settings and back__:
+
+```csharp
+void traceXYRectangle(Robot robot, Point origin, double w, double h, int speed, int zone) {
+    robot.PushSettings();  // save current state settings
+    robot.Speed(speed);
+    robot.Zone(zone);
+    robot.MoveTo(origin);
+    robot.Move(w, 0, 0);
+    robot.Move(0, h, 0);
+    robot.Move(-w, 0, 0);
+    robot.Move(0, -h, 0);
+    robot.PopSettings();   // revert to previously saved settings
+}
+```
+
+It is also pretty easy to describe a __circle__ with the help of a rotating vector (point):
+
+```csharp
+Point dir = new Point(10, 0, 0);
+
+for (var i = 0; i < 36; i++) {
+    bot.Move(dir);
+    dir.Rotate(0, 0, 1, 10);  // rotate the vector 10 degs around unit Z vector
+}
+```
+
+Rotations in 3D space are also straightforward in BRobot. In the following example, the robot starts from an inverted Z axis position (natural to ABB robots 'pointing down'), and describes a XZ rectangle with its end effector perpendicular to this plane:
+
+```csharp
+// Start point
+bot.MoveTo(300, 0, 500);
+
+// Set orientation to an invered Z axis by setting the 
+// main X & Y axes to -X & Y 
+bot.RotateTo(new Point(-1, 0, 0), new Point(0, 1, 0));
+
+// Rotate 90 degs around X to be perpendicular to XZ plane
+bot.Rotate(1, 0, 0, 90);
+
+// Draw rectangle
+bot.Speed(100);
+bot.Move(0, 200, 0);
+bot.Move(50, 0, 0);
+bot.Move(0, 0, 50);
+bot.Move(-50, 0, 0);
+bot.Move(0, 0, -50);
+bot.Move(0, -200, 0);
+
+// Undo rotation
+bot.Rotate(1, 0, 0, -90);
+```
+
+
+
+
+
+
+
+
+
+
+
+
+And remember, this is just v0.1.0... a lot of awesomeness still to come!
+
 
 
 
