@@ -197,8 +197,146 @@ So in a nutshell, the takeaway of the model BRobot offers you is that you can re
 
 ## Modes
 
-BRobot offers three main modes of control: [offline](#offline), [execute](#execute) and [stream](#stream).
+BRobot offers three main modes of control: [stream](#stream), [execute](#execute) and [offline](#offline). 
 
+
+### Stream
+
+__Stream__ mode is almost pure real-time interaction with a connected device. In stream mode, any action you issue will be immediately sent to the queue, and released to the device for execution as soon as the device is ready to receive it. 
+
+A basic stream example would look like this:
+
+```csharp
+// Initialize
+Robot bot = new Robot();
+
+// Set stream mode, connect and start
+bot.Mode("stream");
+bot.Connect();
+bot.Start();
+
+// Do stuff
+bot.MoveTo(500, 500, 500);  // this action is released to the device immediately
+bot.Move(0, -100, 0);       // this action will be executed immediately after the previous one is done
+bot.Move(0, 0, -100);       // this one is also executed right after the previous one is over
+
+// ... allow some time in your app for the above to execute ...
+
+// When done, remember to always disconnect
+bot.Disconnect();  // will stop the device and disconnect
+```
+
+Stream mode is useful for highly responsive applications such as motion tracking, interactive installation, communication with other devices... you name it. 
+
+Note that due to the nature of network communications and live motion control, and depending on the range of your demands, the device may not be able to properly keep up or conversely demand more information than it can be supplied. This can result in undesired laggy responsiveness and/or abrupt motion. Sometimes this situations can be improved by tweaking motion parameters such as speed, zone, or distance between targets. However, and depending on the nature of your application, you may want to consider using [execute](#mode).
+
+
+### Execute
+
+__Execute__ mode is a nice compromise between responsiveness and performance. In execute mode, issued actions get buffered but are not released until the application explicitly requests so, at which moment BRobot compiles a program with such instructions in the device's native language, uploads it to the controller and runs it. This process is usually costly and takes some time to process, but once the program is up and running, you are ensured its execution at the machine's full capacity and smoothness. 
+
+In this mode, use the `Execute` method to release all pending actions as a program to the controller. Note that consecutive calls to the `Execute` method will queue blocks of pending actions, which will be released as full programs whenever the previous one is done:
+
+```csharp
+// Setup
+Robot bot = new Robot();
+bot.Mode("execute");
+bot.Connect();
+
+// Draw a flat XY square
+bot.Speed(100);
+bot.Zone(2);
+bot.MoveTo(300, 300, 100);
+bot.Move(50, 0);
+bot.Move(0, 50);
+bot.Move(-50, 0);
+bot.Move(0, -50);
+
+// Release all actions issued so far as a program to the controller
+bot.Execute();  // note this will clear all the above actions from the 'pending' buffer
+
+// Issue new actions, a XZ square
+bot.Move(50, 0, 0);
+bot.Move(0, 0, 50);
+bot.Move(-50, 0, 0);
+bot.Move(0, 0, -50);
+
+// This call will queue the above four actions as a block
+// and release it as a program whenever the previous one ends
+bot.Execute();
+
+// ... allow some time in your app for the above to execute ....
+
+bot.Disconnect();  // remember to disconnect before leaving
+```
+
+Execute mode is useful for application where responsiveness is not a top priority, but smooth and reliable motion are desired, such as drawing applications, path planning, etc. It is also very convenient for target-intensive applications where the device must follow a great number of waypoints. 
+
+
+### Offline
+
+You may not always have a device available with you, or may simply just want to generate programs in the native language the device runs. __Offline__ mode is designed to give you access to non-real-time robotics under the same API, and be able to export programs that can be manually loaded to devices. 
+
+Offline mode works very similar to [execute](#execute) mode, releasing all pending actions into a full program. However, instead of uploading the program to the controller, you use `Export` to write it directly to a file on your system. Similar to the example before:
+
+```csharp
+// Setup
+Robot bot = new Robot();
+bot.Mode("offline");
+
+// Draw a flat XY square
+bot.Speed(100);
+bot.Zone(2);
+bot.MoveTo(300, 300, 100);
+bot.Move(50, 0);
+bot.Move(0, 50);
+bot.Move(-50, 0);
+bot.Move(0, -50);
+
+// Release all actions issued so far as a program to a file
+bot.Export(@"c:\XY_square.mod");  // note this will clear all the above actions from the 'pending' buffer
+
+// Issue new actions, a XZ square
+bot.Move(50, 0, 0);
+bot.Move(0, 0, 50);
+bot.Move(-50, 0, 0);
+bot.Move(0, 0, -50);
+
+// Release the newly issued actions as a program
+bot.Export(@"C:\XZ_square.mod");
+```
+
+For an ABB robot, the program in the `XY_square.mod` file will look like this:
+
+```text
+MODULE BRobotProgram
+
+  CONST speeddata vel100:=[100,100,5000,1000];
+
+  CONST zonedata zone2:=[FALSE,2,3,3,0.3,3,0.3];
+
+  CONST robtarget target0:=[[300,300,100],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];
+  CONST robtarget target1:=[[350,300,100],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];
+  CONST robtarget target2:=[[350,350,100],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];
+  CONST robtarget target3:=[[300,350,100],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];
+  CONST robtarget target4:=[[300,300,100],[0,0,1,0],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]];
+
+  PROC main()
+    ConfJ \Off;
+    ConfL \Off;
+
+    MoveL target0,vel100,zone2,Tool0\WObj:=WObj0;
+    MoveL target1,vel100,zone2,Tool0\WObj:=WObj0;
+    MoveL target2,vel100,zone2,Tool0\WObj:=WObj0;
+    MoveL target3,vel100,zone2,Tool0\WObj:=WObj0;
+    MoveL target4,vel100,zone2,Tool0\WObj:=WObj0;
+
+  ENDPROC
+
+ENDMODULE
+```
+
+Offline mode is useful for testing purposes, to get acquaintanced with your device's native language, and to generate full programs in case you don't have access to real-time communication with your machine.
 
 
 ## Examples
