@@ -202,7 +202,7 @@ BRobot offers three main modes of control: [stream](#stream), [execute](#execute
 
 ### Stream
 
-__Stream__ mode is almost pure real-time interaction with a connected device. In stream mode, any action you issue will be immediately sent to the queue, and released to the device for execution as soon as the device is ready to receive it. 
+__Stream__ mode is as close as you can get to pure real-time interaction with a connected device. In stream mode, any action you issue will be immediately sent to the queue, and released to the device for execution as soon as the device is ready to receive it. 
 
 A basic stream example would look like this:
 
@@ -223,19 +223,19 @@ bot.Move(0, 0, -100);       // this one is also executed right after the previou
 // ... allow some time in your app for the above to execute ...
 
 // When done, remember to always disconnect
-bot.Disconnect();  // will stop the device and disconnect
+bot.Disconnect();           // will stop the device and disconnect
 ```
 
 Stream mode is useful for highly responsive applications such as motion tracking, interactive installation, communication with other devices... you name it. 
 
-Note that due to the nature of network communications and live motion control, and depending on the range of your demands, the device may not be able to properly keep up or conversely demand more information than it can be supplied. This can result in undesired laggy responsiveness and/or abrupt motion. Sometimes this situations can be improved by tweaking motion parameters such as speed, zone, or distance between targets. However, and depending on the nature of your application, you may want to consider using [execute](#mode).
+Note that due to the nature of network communications and live motion control, and depending on the range of your demands, the device may not be able to properly keep up with the app's demands, or conversely execute your actions faster that new ones can be supplied. This can result in undesired laggy responsiveness and/or abrupt motion. Sometimes the situation can be improved by tweaking motion parameters such as speed, zone, distance between targets, or subscribing to certain events. However, and depending on the nature of your application, you may want to consider using [execute mode](#mode).
 
 
 ### Execute
 
-__Execute__ mode is a nice compromise between responsiveness and performance. In execute mode, issued actions get buffered but are not released until the application explicitly requests so, at which moment BRobot compiles a program with such instructions in the device's native language, uploads it to the controller and runs it. This process is usually costly and takes some time to process, but once the program is up and running, you are ensured its execution at the machine's full capacity and smoothness. 
+__Execute__ mode is a nice compromise between responsiveness and performance. In execute mode, actions get buffered as soon as the are issued, but are not released until the application explicitly requests so. In that moment BRobot compiles a program with such instructions in the device's native language, uploads it to the controller and runs it. This process is usually costly and takes some time to process, but once the program is up and running, you are ensured its execution at the machine's full capacity and smoothness. 
 
-In this mode, use the `Execute` method to release all pending actions as a program to the controller. Note that consecutive calls to the `Execute` method will queue blocks of pending actions, which will be released as full programs whenever the previous one is done:
+In this mode, use the `Execute` method to release all pending actions as a program to the controller. Note that consecutive calls to the `Execute` method will queue blocks of pending actions, which will be released as full programs whenever the previous one ends:
 
 ```csharp
 // Setup
@@ -243,7 +243,7 @@ Robot bot = new Robot();
 bot.Mode("execute");
 bot.Connect();
 
-// Draw a flat XY square
+// Draw a horizontal XY square
 bot.Speed(100);
 bot.Zone(2);
 bot.MoveTo(300, 300, 100);
@@ -255,14 +255,14 @@ bot.Move(0, -50);
 // Release all actions issued so far as a program to the controller
 bot.Execute();  // note this will clear all the above actions from the 'pending' buffer
 
-// Issue new actions, a XZ square
+// Issue new actions: a vertical XZ square
 bot.Move(50, 0, 0);
 bot.Move(0, 0, 50);
 bot.Move(-50, 0, 0);
 bot.Move(0, 0, -50);
 
 // This call will queue the above four actions as a block
-// and release it as a program whenever the previous one ends
+// and release them as a program whenever the previous one ends
 bot.Execute();
 
 // ... allow some time in your app for the above to execute ....
@@ -277,7 +277,7 @@ Execute mode is useful for application where responsiveness is not a top priorit
 
 You may not always have a device available with you, or may simply just want to generate programs in the native language the device runs. __Offline__ mode is designed to give you access to non-real-time robotics under the same API, and be able to export programs that can be manually loaded to devices. 
 
-Offline mode works very similar to [execute](#execute) mode, releasing all pending actions into a full program. However, instead of uploading the program to the controller, you use `Export` to write it directly to a file on your system. Similar to the example before:
+Offline mode works very similar to [execute mode](#execute), releasing all pending actions into a full program whenever requested. However, instead of uploading the program to the controller, use `Export` to write it directly to a file on your system. Similar to the example before:
 
 ```csharp
 // Setup
@@ -294,7 +294,7 @@ bot.Move(-50, 0);
 bot.Move(0, -50);
 
 // Release all actions issued so far as a program to a file
-bot.Export(@"c:\XY_square.mod");  // note this will clear all the above actions from the 'pending' buffer
+bot.Export(@"C:\XY_square.mod");  // note this will clear all the above actions from the 'pending' buffer
 
 // Issue new actions, a XZ square
 bot.Move(50, 0, 0);
@@ -336,7 +336,7 @@ MODULE BRobotProgram
 ENDMODULE
 ```
 
-Offline mode is useful for testing purposes, to get acquaintanced with your device's native language, and to generate full programs in case you don't have access to real-time communication with your machine.
+Offline mode is useful for testing purposes, to get acquaintanced with your device's native language, and to generate full programs in case you don't have access to real-time communication with your machine. For safety reasons, it is also the default control mode.
 
 
 ## Examples
