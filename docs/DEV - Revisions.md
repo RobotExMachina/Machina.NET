@@ -22,7 +22,7 @@
     - [ ] Do Speed(), Zone() and Motion() become Actions as well? How would this work with push+popSettings?
     - [ ] If they were Actions, relative and absolute modes could be implemented: .Speed(10) is an increase, .SpeedTo(10) is a setting.
 - [ ] Add a CS constructor from a Rotation object
-
+- [ ] R+T vs T+R order in Transform isn't working
 
 ## BUILD 1116
 - [x] Get stream mode working again, with all available actions

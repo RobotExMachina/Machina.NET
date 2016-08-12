@@ -24,9 +24,10 @@ namespace TEST_StreamAPITests
             arm.Connect();
             arm.Start();
 
+            // arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
+
             // TESTING MULTIPLE STREAM ACTIONS
             TestDifferentActions();
-            
 
             arm.DebugRobotCursors();
             arm.DebugBuffer();

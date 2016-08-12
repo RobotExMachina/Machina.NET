@@ -343,6 +343,8 @@ Offline mode is useful for testing purposes, to get acquaintanced with your devi
 
 Many interesing and cool things can be done when controlling robotic devices in real time. A full list of the actions available in BRobot can be found in the [quick reference API card](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Reference.md). Let's take a look at some examples of cool things that can be done with BRobot.
 
+### Motion
+
 As we have seen, it is very easy to __trace a rectangle__ in space. We move to the first corner issuing an absolute `MoveTo` action, and we then trace the rectangle using relative `Move` actions:
 
 ```csharp
@@ -509,20 +511,107 @@ You may have noticed that `Move` and `Rotate` are different actions, and are per
 bot.Transform(new Point(100, 0, 0), new Rotation(0, 0, 1, 15));
 ```
 
-As you may have guessed already, __the order in which relative transformations are chained matters__. The result of moving forward and then rotating is different than rotating first and moving afterwards. 
+As you may have guessed already, __the order in which relative transformations are chained matters__. The result of moving forward and then rotating is different than rotating first and moving afterwards. Therefore, the order in which you input the motion parameters will determine the order in which they will be executed:
+
+```csharp
+// Transform to an absolute position + orientation (order doesn't matter in absolute transformations)
+bot.TransformTo(new Point(300, 0, 500), new Rotation(0, 1, 0, 180));    // [300, 0, 500]
+
+// First rotate and then move
+bot.Transform(new Rotation(0, 0, 1, 45), new Point(0, 100, 0));         // [229.289, 70.71, 500]
+
+// To go back, execute the inverse operation in reversed order!
+bot.Transform(new Point(0, -100, 0), new Rotation(0, 0, 1, -45));       // [300, 0, 500]
+```
+
+All absolute actions, i.e. all those with the `To` suffix, work on _**global coordinates**_ defined by the device's reference frame. For example, for robotic arms, it is usually the base center. By default, _relative actions also use the global reference system_. This means that a `Move(100, 0)` instruction will move the device 100 mm in the positive global X direction, no matter where the device is or its orientation. However, it is possible to choose to work in the device's _**local coordinate system**_, and define movement and rotation based on its current position and orientation. This is set with the `Coordinates` method, accepting `"global"` or `"local"` parameters. 
+
+![](https://github.com/garciadelcastillo/BRobot/blob/master/docs/global_local_coordinates.png)
+
+Assuming a robotic arm with global/local coordinates like the above diagram:
+
+```csharp
+// Absolute movement, always in global coordinates
+bot.MoveTo(300, 0, 500);    // [300, 0, 500]
+
+// Relative movement, in global coordinates (default)
+bot.Coordinates("global");
+bot.Move(100, 75, 50);      // [400, 75, 550]
+
+// Relative movement, in local coordinates
+bot.Coordinates("local");
+bot.Move(100, 75, 50);      // [300, 150, 500]
+```
+
+In a previous example, we saw how to describe a circular trajectory:
+
+```csharp
+Point dir = new Point(10, 0, 0);
+
+for (var i = 0; i < 36; i++) {
+    bot.Move(dir);
+    dir.Rotate(0, 0, 1, 10);  // rotate the vector 10 degs around unit Z vector
+}
+```
+
+In this example, the device moves circularly, although the orientation of the device remains constant along the trajectory. An alternative way of performing this motion, making sure the orientation of the device is tangent to the circle, would be using relative coordinates:
+
+```csharp
+Point dir = new Point(10, 0, 0);
+Rotation z10 = new Rotation(0, 0, 1, 10);
+
+bot.Coordinates("local");
+for (var i = 0; i < 36; i++) {
+    // bot.Move(dir);
+    // bot.Rotate(z10);
+
+    bot.Transform(dir, z10);
+}
+```
+
+Furthermore, for robotic arms there is the possibility of creating movement by directly specifying the rotation value of each one of the six arm joints. Just as with joint motion, this may result in unexpected trajectories, so use with extreme caution:
+
+```csharp
+// Go to 'home' position
+bot.JointsTo(0, 0, 0, 0, 90, 0);    // joints: [0, 0, 0, 0, 90, 0]
+
+// Rotate axis 1 30 degrees
+bot.Joints(30, 0, 0, 0, 0, 0);      // joints: [30, 0, 0, 0, 90, 0]
+
+// Rotate axis 6 (the end effector) -90 degrees
+bot.Joints(0, 0, 0, 0, 0, -90);     // joints: [30, 0, 0, 0, 90, -90]
+
+// Back home
+bot.JointsTo(0, 0, 0, 0, 90, 0);    // joints: [0, 0, 0, 0, 90, 0]
+```
 
 
+### Events
 
+When working in [stream mode](#stream), issued actions are immediately sent to BRobot's buffer, and released to the device as soon as the library determines it will be able to handle them. The asynchronous nature of this process makes it hard to coordinate when your app should issue new actions according to device's motion, as app and cycle times are often quite different. It is easy to issue too many or too few actions, potentially breaking the responsiveness of your app. 
 
+BRobot incoporates a series of events the app can subscribe to, to properly handle coordination between when the app issues new actions and when the device actually needs them. For example, your app can subscribe to `BufferEmpty` events, which will trigger whenever BRobot has released all pending actions in the buffer to the device's controller. 
 
+```csharp
+// Subscribe to BufferEmpty events
+bot.BufferEmpty += new BufferEmptyHandler(IssueNewAction);
 
+// ... 
 
+bool positive = true;
+static public void IssueNewAction(object sender, EventArgs args)
+{
+    // Describe a zig-zag line
+    if (positive) 
+        bot.Move(50, 50);
+    else 
+        bot.Move(-50, 50);
 
+    positive = !positive;
+}
+```
 
-
-
-
-
+Events are currently under heavy development. Expect multiple changes and additions in the near future.
 
 And remember, this is just v0.1.0... a lot of awesomeness still to come!
 
