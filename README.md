@@ -1,10 +1,12 @@
 # BRobot
 
+![](https://github.com/garciadelcastillo/BRobot/blob/master/docs/brobot_banner_888x500.png)
+
 BRobot is a .NET library for action-based real-time control of mechanical actuators. 
 
 BRobot simplifies all the hassle of connecting to a mechanical controller, writing programs in platform-specific languages and managing the asynchronous communication between a machine and a connected application, by providing a [human-relatable API](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Reference.md) of Actions, unified for all the different devices. 
 
-As of v0.1.0, BRobot only works for ABB robotic arms, but other devices are under active development. 
+As of v0.1.0, BRobot only works for ABB robotic arms. Other devices are currently under active development. 
 
 
 ## Disclaimer
@@ -29,7 +31,7 @@ Assuming your computer is [connected to a real or virtual robotic arm](https://g
 // Load assembly
 using BRobot;
 
-// Instantiate a new Robot
+// Instantiate a new Robot object
 Robot bot = new Robot();
 
 // Do real-time streaming
@@ -52,7 +54,7 @@ bot.Move(0, 50, 0);
 bot.Move(0, 0, -50);
 bot.Move(0, -50, 0);
 
-// ... let the robot do its thing before shutting down
+// ... let the robot complete these actions before shutting down
 
 // kthxbye
 bot.Disconnect();
