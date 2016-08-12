@@ -343,12 +343,12 @@ Offline mode is useful for testing purposes, to get acquaintanced with your devi
 
 Many interesing and cool things can be done when controlling robotic devices in real time. A full list of the actions available in BRobot can be found in the [quick reference API card](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Reference.md). Let's take a look at some examples of cool things that can be done with BRobot.
 
-As we have seen, it is very easy to __trace a rectangle__ in space. We move to the first corner, and then trace the rectangle relative to it:
+As we have seen, it is very easy to __trace a rectangle__ in space. We move to the first corner issuing an absolute `MoveTo` action, and we then trace the rectangle using relative `Move` actions:
 
 ```csharp
 // Draw a rectangle
-bot.MoveTo(300, 200, 400);
-bot.Move(50, 0, 0);
+bot.MoveTo(300, 200, 400);  // absolute movement
+bot.Move(50, 0, 0);         // relative movements
 bot.Move(0, 75, 0);
 bot.Move(-50, 0, 0);
 bot.Move(0, -75, 0);
@@ -372,18 +372,91 @@ And then invoked anywhere in your app:
 traceXYRectangle(bot, 300, 200, 400, 50, 75);
 ```
 
-Such a function could be improved to accept speed and zone parameters, and use __`PushSettings`__ and __`PopSettings`__ to __temporarily switch to those settings and back__:
+The characteristics of this movement are defined by the motion settings present in the device, such as speed, zone, type of motion and reference coordinate system. Whenever one of this properties is set, it will be applied to all actions issued hereafter:
+
+```csharp
+// Draw a rectangle with different speed/precision settings
+
+// Approach the start point fast
+bot.Speed(200);
+bot.Zone(5);
+bot.MoveTo(300, 200, 400);
+
+// Slow down and trace with finer precision
+bot.Speed(25);
+bot.Zone(1);
+bot.Move(50, 0, 0);
+bot.Move(0, 75, 0);
+bot.Move(-50, 0, 0);
+bot.Move(0, -75, 0);
+
+// Go back to start
+bot.Speed(200);
+bot.Zone(5);
+bot.MoveTo(300, 200, 400);
+```
+
+By default, BRobot performs linear motion between targets. However, robotic arms have the possibility of performing _joint motion_, in which the trajectory between points resembles a curve as a result of the robot interpolating linearly between origin and target joint rotations. What this means is that joint motion is easier and gentler to the mechanics of a robotic arm, but trajectories are often less intuitive, potentially resulting in unexpected interferences and collisions. Use extreme caution when using this kind of movement. Joint motion is particularly adequate for travel between points which are not in contact with surfaces and when orientation during travel is not required to stay constant:
+
+```csharp
+// The same rectangle, but a bit easier for the robot
+
+// Approach the start point
+bot.Motion("joint");
+bot.Speed(200);
+bot.Zone(5);
+bot.MoveTo(300, 200, 400);
+
+// Fine trace the rectangle
+bot.Motion("linear");
+bot.Speed(25);
+bot.Zone(1);
+bot.Move(50, 0, 0);
+bot.Move(0, 75, 0);
+bot.Move(-50, 0, 0);
+bot.Move(0, -75, 0);
+
+// Back home
+bot.Motion("joint");
+bot.Speed(200);
+bot.Zone(5);
+bot.MoveTo(300, 200, 400);
+```
+
+Constantly changing between motion settings can be confusing and lead to errors, specially in complex programs. __`PushSettings`__ and __`PopSettings`__ can be used to __save the device's settings__, make temporary changes, and the __revert settings back to the saved state__.
+
+```csharp
+// Whatever the motion settings are, save them
+bot.PushSettings();
+
+// Make some changes and move
+bot.Speed(100);
+bot.Zone(2);
+bot.Move(100, 0, 0);
+
+// Revert back to the state in last push
+bot.PopSettings();
+```
+
+With this logic, a more adequate way of implementing the `traceXYRectangle` function could be the following:
 
 ```csharp
 void traceXYRectangle(Robot robot, Point origin, double w, double h, int speed, int zone) {
-    robot.PushSettings();  // save current state settings
+    robot.PushSettings();  // save the program's current state settings
+
+    robot.Motion("joint");
     robot.Speed(speed);
     robot.Zone(zone);
     robot.MoveTo(origin);
+
+    robot.Motion("linear");
+    robot.Speed(speed / 4;);
+    robot.Zone(zone / 4);
     robot.Move(w, 0, 0);
     robot.Move(0, h, 0);
     robot.Move(-w, 0, 0);
     robot.Move(0, -h, 0);
+
     robot.PopSettings();   // revert to previously saved settings
 }
 ```
@@ -399,17 +472,17 @@ for (var i = 0; i < 36; i++) {
 }
 ```
 
-Rotations in 3D space are also straightforward in BRobot. In the following example, the robot starts from an inverted Z axis position (natural to ABB robots 'pointing down'), and describes a XZ rectangle with its end effector perpendicular to this plane:
+Rotations in 3D space are also straightforward in BRobot. In the following example, the robot starts from an inverted Z axis position (natural to ABB robots 'pointing down'), and describes a XZ rectangle with its end effector perpendicular to that plane:
 
 ```csharp
 // Start point
 bot.MoveTo(300, 0, 500);
 
 // Set orientation to an invered Z axis by setting the 
-// main X & Y axes to -X & Y 
+// direction of the main X & Y axes 
 bot.RotateTo(new Point(-1, 0, 0), new Point(0, 1, 0));
 
-// Rotate 90 degs around X to be perpendicular to XZ plane
+// Rotate 90 degs around global X to be perpendicular to XZ plane
 bot.Rotate(1, 0, 0, 90);
 
 // Draw rectangle
@@ -424,6 +497,21 @@ bot.Move(0, -200, 0);
 // Undo rotation
 bot.Rotate(1, 0, 0, -90);
 ```
+
+You may have noticed that `Move` and `Rotate` are different actions, and are performed one at a time, resulting in trajectories that feel kind of 'stepped'. Translation and rotation can be performed at the same time with a `Transform` or `TransformTo` action that encapsulates both motions:
+
+```csharp
+// Instead of performing two separate actions...
+// bot.Move(100, 0, 0);
+// bot.Rotate(0, 0, 1, 15);
+
+// ... they can be wrapped into a single transformation:
+bot.Transform(new Point(100, 0, 0), new Rotation(0, 0, 1, 15));
+```
+
+As you may have guessed already, __the order in which relative transformations are chained matters__. The result of moving forward and then rotating is different than rotating first and moving afterwards. 
+
+
 
 
 

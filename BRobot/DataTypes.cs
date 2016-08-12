@@ -689,23 +689,23 @@ namespace BRobot
         /// <summary>
         /// The orientation of a global XYZ coordinate system (aka an identity rotation).
         /// </summary>
-        public static readonly Rotation GlobalXY = new Rotation(1, 0, 0, 0);
+        public static readonly Rotation GlobalXY = new Rotation(1, 0, 0, 0, true);
 
         /// <summary>
         /// A global XYZ coordinate system rotated 180 degs around its X axis.
         /// </summary>
-        public static readonly Rotation FlippedAroundX = new Rotation(0, 1, 0, 0);
+        public static readonly Rotation FlippedAroundX = new Rotation(0, 1, 0, 0, true);
 
         /// <summary>
         /// A global XYZ coordinate system rotated 180 degs around its Y axis. 
         /// Recommended as the easiest orientation for the standard robot end effector to reach in positive XY octants.
         /// </summary>
-        public static readonly Rotation FlippedAroundY = new Rotation(0, 0, 1, 0);
+        public static readonly Rotation FlippedAroundY = new Rotation(0, 0, 1, 0, true);
 
         /// <summary>
         /// A global XYZ coordinate system rotated 180 degs around its Z axis.
         /// </summary>
-        public static readonly Rotation FlippedAroundZ = new Rotation(0, 0, 0, 1);
+        public static readonly Rotation FlippedAroundZ = new Rotation(0, 0, 0, 1, true);
 
         public double W, X, Y, Z;
 
@@ -733,46 +733,95 @@ namespace BRobot
             return Rotation.Multiply(r1, r2);
         }
 
+
         /// <summary>
         /// Create a Rotation object from its Quaternion parameters: 
-        /// w + x * i + y * j + z * k
+        /// w + x * i + y * j + z * k. 
+        /// NOTE: it is very unlikely that any public user will input 
+        /// direct quaternion values when specifying rotations, and this
+        /// signature could be better used for vector + angle value.
+        /// Changed this to internal, and adding a public vectorXYZ + ang signature.
+        /// A public static Rotation.FromQuaterion() is added for 
+        /// advanced users.
         /// </summary>
         /// <param name="w"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public Rotation(double w, double x, double y, double z)
+        internal Rotation(double w, double x, double y, double z, bool quaternionRepresentation)
         {
-            this.W = w;
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
+            if (quaternionRepresentation)
+            {
+                this.W = w;
+                this.X = x;
+                this.Y = y;
+                this.Z = z;
+            }
+            else
+            {
+                // TODO: this is awful, must be a better way of choosing between two constructors...
+                Rotation r = new Rotation(w, x, y, z);  // use wxyz as vector + ang representation
+                this.W = r.W;
+                this.X = r.X;
+                this.Y = r.Y;
+                this.Z = r.Z;
+            } 
+            
         }
 
-        ///// @DEPRECATED
-        ///// <summary>
-        ///// Create a Rotation object from a coordinate system defined by
-        ///// the coordinates of its main X vector and the coordiantes of 
-        ///// a guiding Y vector.
-        ///// </summary>
-        ///// <param name="x1"></param>
-        ///// <param name="x2"></param>
-        ///// <param name="x3"></param>
-        ///// <param name="y1"></param>
-        ///// <param name="y2"></param>
-        ///// <param name="y3"></param>
-        ///// <param name="z1"></param>
-        ///// <param name="z2"></param>
-        ///// <param name="z3"></param>
-        //public Rotation(double x1, double x2, double x3, double y1, double y2, double y3, double z1, double z2, double z3)
-        //{
-        //    List<double> q = PlaneToQuaternion(x1, x2, x3, y1, y2, y3, z1, z2, z3);
-        //    this.W = q[3];
-        //    this.X = q[0];
-        //    this.Y = q[1];
-        //    this.Z = q[2];
-        //}
+        /// <summary>
+        /// Creates a unit Quaternion representing a rotation of n degrees around a
+        /// vector, with right-hand positive convention.
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        /// <param name="vecZ"></param>
+        /// <param name="angDegs"></param>
+        public Rotation(double vecX, double vecY, double vecZ, double angDegs)
+        {
+            double halfAngRad = Math.PI * angDegs / 360.0;   // ang / 2
+            double s = Math.Sin(halfAngRad);
+            Point u = new Point(vecX, vecY, vecZ);
+            u.Normalize();  // rotation quaternion must be unit
 
+            this.W = Math.Cos(halfAngRad);
+            this.X = s * u.X;
+            this.Y = s * u.Y;
+            this.Z = s * u.Z;
+        }
+
+        /// <summary>
+        /// Creates a unit Quaternion representing a rotation of n degrees around a 
+        /// vector, with right-hand positive convention.
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="angDegs"></param>
+        public Rotation(Point vec, double angDegs)
+        {
+            double halfAngRad = Math.PI * angDegs / 360.0;   // ang / 2
+            double s = Math.Sin(halfAngRad);
+            Point u = new Point(vec);
+            u.Normalize();  // rotation quaternion must be unit
+
+            this.W = Math.Cos(halfAngRad);
+            this.X = s * u.X;
+            this.Y = s * u.Y;
+            this.Z = s * u.Z;
+        }
+
+        /// <summary>
+        /// A static constructor for Rotation objects from their Quaternion representation.
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public static Rotation FromQuaternion(double w, double x, double y, double z)
+        {
+            return new Rotation(w, x, y, z, true);
+        }
+         
         /// <summary>
         /// Create a Rotation object from a CoordinateSystem defined by
         /// the coordinates of its main X vector and the coordiantes of 
@@ -825,26 +874,7 @@ namespace BRobot
             this.Y = r.Y;
             this.Z = r.Z;
         }
-
-        /// <summary>
-        /// Creates a unit Quaternion representing a rotation of n degrees around a 
-        /// vector, with right-hand positive convention.
-        /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="angDegs"></param>
-        public Rotation(Point vec, double angDegs)
-        {
-            double halfAngRad = Math.PI * angDegs / 360.0;   // ang / 2
-            double s = Math.Sin(halfAngRad);
-            Point u = new Point(vec);
-            u.Normalize();  // rotation quaternion must be unit
-
-            this.W = Math.Cos(halfAngRad);
-            this.X = s * u.X;
-            this.Y = s * u.Y;
-            this.Z = s * u.Z;
-        }
-
+        
         /// <summary>
         /// Creates an identity Quaternion (no rotation).
         /// </summary>
@@ -959,7 +989,7 @@ namespace BRobot
                 r1.W + r2.W,
                 r1.X + r2.X,
                 r1.Y + r2.Y,
-                r1.Z + r2.Z);
+                r1.Z + r2.Z, true);
         }
         
         /// <summary>
@@ -986,7 +1016,7 @@ namespace BRobot
                 r1.W - r2.W,
                 r1.X - r2.X,
                 r1.Y - r2.Y,
-                r1.Z - r2.Z);
+                r1.Z - r2.Z, true);
         }
 
         /// <summary>
@@ -1044,7 +1074,7 @@ namespace BRobot
             double y = r1.Y * r2.W + r1.W * r2.Y + r1.Z * r2.X - r1.X * r2.Z;
             double z = r1.Z * r2.W + r1.W * r2.Z + r1.X * r2.Y - r1.Y * r2.X;
 
-            return new Rotation(w, x, y, z);
+            return new Rotation(w, x, y, z, true);
         }
 
         /// <summary>
@@ -1093,7 +1123,7 @@ namespace BRobot
         /// <returns></returns>
         public static Rotation Conjugate(Rotation r)
         {
-            return new Rotation(r.W, -r.X, -r.Y, -r.Z);
+            return new Rotation(r.W, -r.X, -r.Y, -r.Z, true);
         }
 
         /// <summary>
@@ -1558,7 +1588,7 @@ namespace BRobot
             double z = 0.5 * Math.Sqrt(1 - XAxis.X - YAxis.Y + ZAxis.Z)
                 * (XAxis.Y - YAxis.X >= 0 ? 1 : -1);
 
-            return new Rotation(w, x, y, z);
+            return new Rotation(w, x, y, z, true);
         }
 
         /// <summary>
@@ -1671,7 +1701,7 @@ namespace BRobot
         public Frame(double x, double y, double z, double qw, double qx, double qy, double qz)
         {
             this.Position = new Point(x, y, z);
-            this.Orientation = new Rotation(qw, qx, qy, qz);
+            this.Orientation = new Rotation(qw, qx, qy, qz, true);
             this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
@@ -1679,7 +1709,7 @@ namespace BRobot
         public Frame(double x, double y, double z, double qw, double qx, double qy, double qz, double speed, double zone)
         {
             this.Position = new Point(x, y, z);
-            this.Orientation = new Rotation(qw, qx, qy, qz);
+            this.Orientation = new Rotation(qw, qx, qy, qz, true);
             this.Speed = speed;
             this.Zone = zone;
         }
@@ -1703,7 +1733,7 @@ namespace BRobot
         public Frame(Point position, Rotation orientation)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
-            this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z);  // shallow copy
+            this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z, true);  // shallow copy
             this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
@@ -1711,7 +1741,7 @@ namespace BRobot
         public Frame(Point position, Rotation orientation, double speed, double zone)
         {
             this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
-            this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z);  // shallow copy
+            this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z, true);  // shallow copy
             this.Speed = speed;
             this.Zone = zone;
         }
