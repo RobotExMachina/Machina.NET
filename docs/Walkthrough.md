@@ -101,7 +101,7 @@ Finally, let's move the robot back to a 'home' position by directly setting the 
 
 ```csharp
 bot.Speed(50);
-bot.Joints(0, 0, 0, 0, 90, 0);
+bot.JointsTo(0, 0, 0, 0, 90, 0);
 ```
 
 As soon as these actions get priority, the robot will start moving back to its initial rest position. 
@@ -216,7 +216,8 @@ bot.Connect();
 bot.Start();
 
 // Do stuff
-bot.MoveTo(500, 500, 500);  // this action is released to the device immediately
+bot.Speed(200);
+bot.MoveTo(300, 100, 500);  // this action is released to the device immediately
 bot.Move(0, -100, 0);       // this action will be executed immediately after the previous one is done
 bot.Move(0, 0, -100);       // this one is also executed right after the previous one is over
 
@@ -392,10 +393,10 @@ bot.Move(0, 75, 0);
 bot.Move(-50, 0, 0);
 bot.Move(0, -75, 0);
 
-// Go back to start
+// Go back home
 bot.Speed(200);
 bot.Zone(5);
-bot.MoveTo(300, 200, 400);
+bot.MoveTo(300, 0, 500);
 ```
 
 By default, BRobot performs linear motion between targets. However, robotic arms have the possibility of performing _joint motion_, in which the trajectory between points resembles a curve as a result of the robot interpolating linearly between origin and target joint rotations. What this means is that joint motion is easier and gentler to the mechanics of a robotic arm, but trajectories are often less intuitive, potentially resulting in unexpected interferences and collisions. Use extreme caution when using this kind of movement. Joint motion is particularly adequate for travel between points which are not in contact with surfaces and when orientation during travel is not required to stay constant:
@@ -422,7 +423,7 @@ bot.Move(0, -75, 0);
 bot.Motion("joint");
 bot.Speed(200);
 bot.Zone(5);
-bot.MoveTo(300, 200, 400);
+bot.MoveTo(300, 0, 500);
 ```
 
 Constantly changing between motion settings can be confusing and lead to errors, specially in complex programs. __`PushSettings`__ and __`PopSettings`__ can be used to __save the device's settings__, make temporary changes, and the __revert settings back to the saved state__.

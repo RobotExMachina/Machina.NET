@@ -23,6 +23,17 @@
     - [ ] If they were Actions, relative and absolute modes could be implemented: .Speed(10) is an increase, .SpeedTo(10) is a setting.
 - [ ] Add a CS constructor from a Rotation object
 - [ ] R+T vs T+R order in Transform isn't working
+- [ ] This example doesn't work:
+    ```csharp
+        Point dir = new Point(0, 5, 0);
+
+        for (var i = 0; i < 36; i++) {
+            bot.Move(dir);
+            dir.Rotate(0, 0, 1, -10);  // rotate the vector 10 degs around unit Z vector
+            Console.WriteLine("DIR" + dir);
+        } 
+    ```
+
 
 ## BUILD 1116
 - [x] Get stream mode working again, with all available actions
