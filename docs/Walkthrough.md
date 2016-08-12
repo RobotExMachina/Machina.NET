@@ -14,7 +14,7 @@ When using robots in a real-time interactive environment, plase make sure:
 - you are following the facility's and facility staff's __security protocols__,
 - and the robot has the __appropriate guarding__ in place, including, but not reduced to, e-stops, physical barriers, light courtains, etc. 
 
-__BRobot is in a very early stage of development.__ You are using this software at your own risk, no warranties are provided herewith, and unexpected results/bugs may arise during its use. Always test and simulate your applications thoroughly before running them in a real device. The author/s shall not be liable for any injuries, damages or losses consequence of using this software in any way.
+__BRobot is in a very early stage of development.__ You are using this software at your own risk, no warranties are provided herewith, and unexpected results/bugs may arise during its use. Always test and simulate your applications thoroughly before running them in a real device. The author/s shall not be liable for any injuries, damages or losses consequence of using this software in any way whatsoever.
 
 
 ## Introduction
