@@ -1,14 +1,14 @@
 # Acknowledgments
 
-BRobot was born in Boston the Summer of 2016 during a research residency at [Autodesk, Inc](https://www.autodesk.com/). 
+[BRobot](https://github.com/garciadelcastillo/BRobot) was born in Boston the Summer of 2016 during a research residency at [Autodesk, Inc](https://www.autodesk.com/). 
 
-The development of BRobot was sponsored by Autodesk, Inc., under the guidance of Matt Jezyk, Racel Williams and all the Generative Design Team. Special gratitude goes to Panagiotis Michalatos, Michael Kirschner and Andrew Payne for their technical mentorship, and to the BUILD Space staff for their patience and dedication, including, but not reduced to, Rick Rundell, Adam Allard, Tim Brinkerhoff, Joe Aronis, Bevin Lin, Nathan King and the rest of the team. A big shout-out to Tom, Lilli, Aaron, Sriram, Zack, Peter, Neal, Michael, Anthony and Thord; love you guys!
+The development of BRobot was sponsored by Autodesk, Inc., under the guidance of Matt Jezyk, Racel Williams and all the [Generative Design Team](http://www.autodesk.com/solutions/generative-design). Special gratitude goes to Panagiotis Michalatos, Michael Kirschner and Andrew Payne for their technical mentorship, and to the [BUILD Space](https://twitter.com/buildspc) staff for their patience and dedication, including, but not reduced to, Rick Rundell, Adam Allard, Tim Brinkerhoff, Joe Aronis, Bevin Lin, Nathan King and the rest of the team. A big shout-out to Tom, Lilli, Aaron, Sriram, Zack, Peter, Neal, Michael, Anthony and Thord; love you guys!
 
 Life support from the 'dream team' Nono Martinez Alonso, Keith Alfaro, Omid Oliyan and Varvara Toulkeridou was critical for the sanity (or insanity) of this project. Just one more thing to add here: :ok_hand: 
 
 The [DynamoTORO](https://github.com/coten/TORO) project by Nick Cote was a fantastic reference for early implementation of Dynamo-based robotics. You should check it out, it's pretty awesome. 
 
-For a brief period of time, BRobot implemented a Plane to Quaternion conversion developed at the Harvard Graduate School of Design's Design Robotics Group, with contributions from Sola Grantham, Anthony Kane, Nathan King, Jonathan Grinham, and others. This was deprecated in favour of a simplified version, whose functionality is still under evaluation. Maybe it will come back, maybe it doesn't... 
+For a brief period of time, BRobot implemented a Plane to Quaternion conversion developed at the Harvard Graduate School of Design's [Design Robotics Group](http://research.gsd.harvard.edu/maps/), with contributions from Sola Grantham, Anthony Kane, Nathan King, Jonathan Grinham, and others. This was deprecated in favour of a simplified version, whose functionality is still under evaluation. Maybe it will come back, maybe it doesn't... 
 
 Polyline simplification algorithms were borrowed from https://github.com/imshz/simplify-net.
 
@@ -18,5 +18,4 @@ Some of the syntactic and state-based flavor of BRobot was inspired by the outst
 
 I am sure I have forgotten many people who should be acknowledged here, and I haven't. If you feel that is the case, poke me and tell me you deserve it. You will probably be right ;)
 
-BRobot was created and is maintained by Jose Luis Garcia del Castillo.
-
+BRobot was created and is maintained by [Jose Luis Garcia del Castillo](http://www.garciadelcastillo.es).
