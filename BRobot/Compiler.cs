@@ -270,8 +270,6 @@ namespace BRobot
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
-                //case ActionType.TranslationAndRotation:
-                //case ActionType.RotationAndTranslation:
                 case ActionType.Transformation:
                     dec = string.Format("  CONST robtarget target{0}:={1};", id, cursor.GetUNSAFERobTargetValue());
                     break;
@@ -295,8 +293,6 @@ namespace BRobot
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
-                //case ActionType.TranslationAndRotation:
-                //case ActionType.RotationAndTranslation:
                 case ActionType.Transformation:
                     dec = string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",

@@ -498,70 +498,35 @@ namespace BRobot
         public int GetCurrentSpeedSetting()
         {
             // @TODO: will need to decide if this returns the current virtual, write or motion speed
-            //return currentSettings.Speed;
             return virtualCursor.speed;
         }
-            
 
-        // ABSTRACTED TO A FULL ACTION!
-        ///// <summary>
-        ///// Sets the speed parameter for future issued actions.
-        ///// </summary>
-        ///// <param name="speed">In mm/s</param>
-        //public void IssueSpeedRequest(int speed, bool relative)
-        //{
-        //    currentSettings.Speed = speed;
-        //}
+        /// <summary>
+        /// Gets current zone setting.
+        /// </summary>
+        /// <returns></returns>
+        public int GetCurrentZoneSetting()
+        {
+            return virtualCursor.zone;
+        }
 
-        ///// <summary>
-        ///// Gets current zone setting.
-        ///// </summary>
-        ///// <returns></returns>
-        //public int GetCurrentZoneSetting()
-        //{
-        //    return currentSettings.Zone;
-        //}
+        /// <summary>
+        /// Gets current Motion setting.
+        /// </summary>
+        /// <returns></returns>
+        public MotionType GetCurrentMotionTypeSetting()
+        {
+            return virtualCursor.motionType;
+        }
 
-        ///// <summary>
-        ///// Sets the approximation corner radius for future issued actions.
-        ///// </summary>
-        ///// <param name="zone">In mm.</param>
-        //public void SetCurrentZoneSetting(int zone)
-        //{
-        //    currentSettings.Zone = zone;
-        //}
-
-        //public MotionType GetCurrentMotionTypeSetting()
-        //{
-        //    return currentSettings.MotionType;
-        //}
-
-        ///// <summary>
-        ///// Sets the motion type (linear, joint...) for future issued actions.
-        ///// </summary>
-        ///// <param name="type"></param>
-        //public void SetCurrentMotionTypeSetting(MotionType type)
-        //{
-        //    currentSettings.MotionType = type;
-        //}
-
-        ///// <summary>
-        ///// Gets the reference coordinate system used for relative transform actions.
-        ///// </summary>
-        ///// <returns></returns>
-        //public ReferenceCS GetCurrentReferenceCS()
-        //{
-        //    return currentSettings.RefCS;
-        //}
-
-        ///// <summary>
-        ///// Sets the default reference coordinate system to use for relative transform actions.
-        ///// </summary>
-        ///// <param name="refcs"></param>
-        //public void SetCurrentReferenceCS(ReferenceCS refcs)
-        //{
-        //    currentSettings.RefCS = refcs;
-        //}
+        /// <summary>
+        /// Gets the reference coordinate system used for relative transform actions.
+        /// </summary>
+        /// <returns></returns>
+        public ReferenceCS GetCurrentReferenceCS()
+        {
+            return virtualCursor.referenceCS;
+        }
         
         ///// <summary>
         ///// Buffers current state settings (speed, zone, motion type...), and opens up for 
@@ -598,9 +563,6 @@ namespace BRobot
         //██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
         //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
 
-
-
-
         /// <summary>
         /// Sets the speed parameter for future issued actions.
         /// </summary>
@@ -619,6 +581,63 @@ namespace BRobot
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
             return success;
         }
+
+
+        public bool IssueZoneRequest(int zone, bool relative)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionZone act = new ActionZone(zone, relative);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+        public bool IssueMotionRequest(MotionType motionType)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionMotion act = new ActionMotion(motionType);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+        public bool IssueCoordinatesRequest(ReferenceCS referenceCS)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionCoordinates act = new ActionCoordinates(referenceCS);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+
+
+
+
+
+
+
+
+
+
 
 
         /// <summary>
@@ -1264,16 +1283,6 @@ namespace BRobot
             return success;
         }
 
-        ///// <summary>
-        ///// Initializes all instances of robotCursors with base information
-        ///// </summary>
-        ///// <param name="position"></param>
-        ///// <param name="rotation"></param>
-        ///// <returns></returns>
-        //internal bool InitializeRobotCursors(Point position, Rotation rotation)
-        //{
-        //    return InitializeRobotCursors(position, rotation, null);
-        //}
 
         /// <summary>
         /// Saves a string List to a file.

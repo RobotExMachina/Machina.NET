@@ -1382,13 +1382,10 @@ namespace BRobot
                     {
                         case ActionType.Translation:
                         case ActionType.Rotation:
-                        //case ActionType.TranslationAndRotation:
-                        //case ActionType.RotationAndTranslation:
                         case ActionType.Transformation:
                             SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
                             SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
-                            SetRapidDataVariable(RD_rt[fid], writeCursor.GetUNSAFERobTargetValue());
-                            //SetRapidDataVariable(RD_act[fid], a.motionType == MotionType.Linear ? 1 : 2);     
+                            SetRapidDataVariable(RD_rt[fid], writeCursor.GetUNSAFERobTargetValue());    
                             SetRapidDataVariable(RD_act[fid], writeCursor.motionType == MotionType.Linear ? 1 : 2);
                             break;
 
@@ -1415,14 +1412,10 @@ namespace BRobot
                             SetRapidDataVariable(RD_msg[fid], string.Format("\"{0}\"", str));  // when setting the value for a string rapidvar, the double quotes are needed as part of the value
                             SetRapidDataVariable(RD_act[fid], 5);
                             break;
-
-                        case ActionType.Speed:
-                            // A speed change doesn't create a new target: do nothing, and prevent triggering a new target
-                            moveOn = false;
-                            break;
-
+                            
+                        // speed, zone, motion, refcs...
                         default:
-                            // Do nothing fallback
+                            // A speed change doesn't create a new target: do nothing, and prevent triggering a new target
                             moveOn = false;
                             break;
                     }

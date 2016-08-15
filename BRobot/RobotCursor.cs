@@ -70,6 +70,10 @@ namespace BRobot
         }
 
         // Abstract methods
+        public abstract bool ApplyAction(ActionSpeed action);
+        public abstract bool ApplyAction(ActionZone action);
+        public abstract bool ApplyAction(ActionMotion action);
+        public abstract bool ApplyAction(ActionCoordinates action);
         public abstract bool ApplyAction(ActionTranslation action);
         public abstract bool ApplyAction(ActionRotation action);
         public abstract bool ApplyAction(ActionTransformation action);
@@ -77,7 +81,7 @@ namespace BRobot
         public abstract bool ApplyAction(ActionMessage action);
         public abstract bool ApplyAction(ActionWait action);
 
-        public abstract bool ApplyAction(ActionSpeed action);
+        
 
         /// <summary>
         /// A dict that maps Action types to the cursor's applicable method.
@@ -85,14 +89,17 @@ namespace BRobot
         /// </summary>
         Dictionary<Type, Func<BRobot.Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
         {
+            { typeof (ActionSpeed),                     (i, rc) => rc.ApplyAction((ActionSpeed) i) },
+            { typeof (ActionZone),                      (i, rc) => rc.ApplyAction((ActionZone) i) },
+            { typeof (ActionMotion),                    (i, rc) => rc.ApplyAction((ActionMotion) i) },
+            { typeof (ActionCoordinates),               (i, rc) => rc.ApplyAction((ActionCoordinates) i) },
             { typeof (ActionTranslation),               (i, rc) => rc.ApplyAction((ActionTranslation) i) },
             { typeof (ActionRotation),                  (i, rc) => rc.ApplyAction((ActionRotation) i) },
             { typeof (ActionTransformation),            (i, rc) => rc.ApplyAction((ActionTransformation) i) },
             { typeof (ActionJoints),                    (i, rc) => rc.ApplyAction((ActionJoints) i) },
             { typeof (ActionMessage),                   (i, rc) => rc.ApplyAction((ActionMessage) i) },
-            { typeof (ActionWait),                      (i, rc) => rc.ApplyAction((ActionWait) i) },
-
-            { typeof (ActionSpeed),                     (i, rc) => rc.ApplyAction((ActionSpeed) i) }
+            { typeof (ActionWait),                      (i, rc) => rc.ApplyAction((ActionWait) i) }
+            
         };
 
         /// <summary>
@@ -266,12 +273,99 @@ namespace BRobot
     //                          
     internal class RobotCursorABB : RobotCursor
     {
-        
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="applyImmediately"></param>
         public RobotCursorABB(string name, bool applyImmediately) : base(name, applyImmediately)
         {
             compiler = new CompilerABB();
         }
 
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// Apply Speed Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public override bool ApplyAction(ActionSpeed action)
+        {
+            if (action.relative)
+                this.speed += action.speed;
+            else
+                this.speed = action.speed;
+
+            if (this.speed < 0) speed = 0;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply Zone Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public override bool ApplyAction(ActionZone action)
+        {
+            if (action.relative)
+                this.zone += action.zone;
+            else
+                this.zone = action.zone;
+
+            if (this.zone < 0) zone = 0;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply Motion Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public override bool ApplyAction(ActionMotion action)
+        {
+            this.motionType = action.motionType;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply ReferenceCS Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public override bool ApplyAction(ActionCoordinates action)
+        {
+            this.referenceCS = action.referenceCS;
+
+            return true;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// Apply Translation Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public override bool ApplyAction(ActionTranslation action)
         {
             Point newPosition = new Point();
@@ -285,7 +379,6 @@ namespace BRobot
                     return false;
                 }
 
-                //if (action.worldTranslation)
                 if (referenceCS == ReferenceCS.World)
                 {
                     newPosition = position + action.translation;
@@ -328,20 +421,15 @@ namespace BRobot
             position = newPosition;
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
-            //// If valid inputs, update, otherwise stick with previous values
-            //if (action.speed != -1) speed = action.speed;
-            //if (action.zone != -1) zone = action.zone;
-            //if (action.motionType != MotionType.Undefined) motionType = action.motionType;
-
             return true;
         }
 
-        //public override bool RevertAction(ActionTranslation action)
-        //{
 
-        //}
-
-
+        /// <summary>
+        /// Apply Rotation Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public override bool ApplyAction(ActionRotation action)
         {
             // @TODO: implement some kind of security check here...
@@ -354,7 +442,6 @@ namespace BRobot
                     return false;
                 }
 
-                //if (action.worldRotation)
                 if (referenceCS == ReferenceCS.World)
                 {
                     rotation.PreMultiply(action.rotation);
@@ -378,15 +465,15 @@ namespace BRobot
 
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
-            //// If valid inputs, update, otherwise stick with previous values
-            //if (action.speed != -1) speed = action.speed;
-            //if (action.zone != -1) zone = action.zone;
-            //if (action.motionType != MotionType.Undefined) motionType = action.motionType;
-
             return true;
         }
 
 
+        /// <summary>
+        /// Apply Transformation Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public override bool ApplyAction(ActionTransformation action)
         {
             Point newPos;
@@ -405,7 +492,6 @@ namespace BRobot
                 // This is Translate + Rotate
                 if (action.translationFirst)
                 {
-                    //if (action.worldTranslation)
                     if (referenceCS == ReferenceCS.World)
                     {
                         newPos = position + action.translation;
@@ -422,7 +508,6 @@ namespace BRobot
                 // or Rotate + Translate
                 else
                 {
-                    //if (action.worldTranslation)
                     if (referenceCS == ReferenceCS.World)
                     {
                         newPos = position + action.translation;
@@ -464,132 +549,19 @@ namespace BRobot
                     }
                 }
             }
-
-            //// @TODO: implement some kind of security check here...
-            //if (action.relative)
-            //{
-            //    // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
-            //    if (position == null || rotation == null)
-            //    {
-            //        Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
-            //        return false;
-            //    }
-
-            //    //if (action.worldRotation)
-            //    if (referenceCS == ReferenceCS.World)
-            //    {
-            //        rotation.PreMultiply(action.rotation);
-            //    }
-            //    else
-            //    {
-            //        rotation.Multiply(action.rotation);
-            //    }
-            //}
-            //else
-            //{
-            //    //rotation.Set(action.rotation);
-            //    rotation = new Rotation(action.rotation);
-            //}
-
+            
             position = newPos;
             rotation = newRot;
             joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
-            //// If valid inputs, update, otherwise stick with previous values
-            //if (action.speed != -1) speed = action.speed;
-            //if (action.zone != -1) zone = action.zone;
-            //if (action.motionType != MotionType.Undefined) motionType = action.motionType;
-
             return true;
         }
 
-
-        //public override bool ApplyAction(ActionRotationAndTranslation action)
-        //{
-        //    // @TODO: implement some kind of security check here...
-        //    Rotation newRot;
-        //    if (action.relativeRotation)
-        //    {
-        //        // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
-        //        if (position == null || rotation == null)
-        //        {
-        //            Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
-        //            return false;
-        //        }
-
-        //        if (action.worldRotation)
-        //        {
-        //            //rotation.PreMultiply(action.rotation);
-        //            newRot = Rotation.Multiply(action.rotation, rotation);
-        //        }
-        //        else
-        //        {
-        //            //rotation.Multiply(action.rotation);
-        //            newRot = Rotation.Multiply(rotation, action.rotation);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //newRot.Set(action.rotation);
-        //        newRot = new Rotation(action.rotation);
-        //    }
-
-        //    Point newPos;
-        //    if (action.relativeTranslation)
-        //    {
-        //        // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
-        //        if (position == null || rotation == null)
-        //        {
-        //            Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
-        //            return false;
-        //        }
-
-        //        if (action.worldTranslation)
-        //        {
-        //            newPos = position + action.translation;
-        //        }
-        //        else
-        //        {
-        //            Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(newRot));
-        //            newPos = position + worldVector;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //newPos.Set(action.translation);
-        //        newPos = new Point(action.translation);
-        //    }
-
-        //    // @TODO: this must be more programmatically implemented 
-        //    if (Control.SAFETY_CHECK_TABLE_COLLISION)
-        //    {
-        //        if (Control.IsBelowTable(newPos.Z))
-        //        {
-        //            if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
-        //            {
-        //                Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPos.Z);
-        //                return false;
-        //            }
-        //            else
-        //            {
-        //                Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPos.Z);
-        //            }
-        //        }
-        //    }
-
-        //    rotation = newRot;
-        //    position = newPos;
-        //    joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
-
-        //    // If valid inputs, update, otherwise stick with previous values
-        //    if (action.speed != -1) speed = action.speed;
-        //    if (action.zone != -1) zone = action.zone;
-        //    if (action.motionType != MotionType.Undefined) motionType = action.motionType;
-
-        //    return true;
-        //}
-
-
+        /// <summary>
+        /// Apply Joints Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public override bool ApplyAction(ActionJoints action)
         {
             
@@ -616,15 +588,15 @@ namespace BRobot
             position = null;
             rotation = null;
 
-            //// If valid inputs, update, otherwise stick with previous values
-            //if (action.speed != -1) speed = action.speed;
-            //if (action.zone != -1) zone = action.zone;
-            //if (action.motionType != MotionType.Undefined) motionType = action.motionType;
-
             return true;
         }
 
         
+        /// <summary>
+        /// Apply Message Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public override bool ApplyAction(ActionMessage action)
         {
             // There is basically nothing to do here! Leave the state of the robot as-is.
@@ -632,23 +604,18 @@ namespace BRobot
             return true;
         }
 
-
+        /// <summary>
+        /// Apply Wait Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public override bool ApplyAction(ActionWait action)
         {
             // There is basically nothing to do here! Leave the state of the robot as-is.
             return true;
         }
 
-
-        public override bool ApplyAction(ActionSpeed action)
-        {
-            if (action.relative)
-                this.speed += action.speed;
-            else
-                this.speed = action.speed;
-
-            return true;
-        }
+        
 
 
 

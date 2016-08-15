@@ -395,114 +395,119 @@ namespace BRobot
             c.IssueSpeedRequest(speed, false);
         }
 
+        /// <summary>
+        /// Gets the current zone setting.
+        /// </summary>
+        /// <returns></returns>
+        public int Zone()
+        {
+            return c.GetCurrentZoneSetting();
+        }
 
+        /// <summary>
+        /// Increase the default zone value new actions will be given.
+        /// </summary>
+        /// <param name="zone"></param>
+        public void Zone(int zone)
+        {
+            c.IssueZoneRequest(zone, true);
+        }
 
+        /// <summary>
+        /// Sets the default zone value new actions will be given.
+        /// </summary>
+        /// <param name="zone"></param>
+        public void ZoneTo(int zone)
+        {
+            c.IssueZoneRequest(zone, false);
+        }
 
+        /// <summary>
+        /// Gets the current MotionType setting.
+        /// </summary>
+        /// <returns></returns>
+        public MotionType Motion()
+        {
+            return c.GetCurrentMotionTypeSetting();
+        }
 
+        /// <summary>
+        /// Sets the motion type (linear, joint...) for future issued actions.
+        /// </summary>
+        /// <param name="type"></param>
+        public void Motion(MotionType type)
+        {
+            c.IssueMotionRequest(type);
+        }
 
-        ///// <summary>
-        ///// Gets the current zone setting.
-        ///// </summary>
-        ///// <returns></returns>
-        //public int Zone()
-        //{
-        //    return c.GetCurrentZoneSetting();
-        //}
+        /// <summary>
+        /// Sets the motion type (linear, joint...) for future issued actions.
+        /// </summary>
+        /// <param name="type">"linear", "joint" or "joints"</param>
+        public void Motion(string type)
+        {
+            MotionType t = MotionType.Undefined;
+            type = type.ToLower();
+            if (type.Equals("linear"))
+            {
+                t = MotionType.Linear;
+            }
+            else if (type.Equals("joint"))
+            {
+                t = MotionType.Joint;
+            }
 
-        ///// <summary>
-        ///// Sets the default zone value new actions will be given.
-        ///// </summary>
-        ///// <param name="zone"></param>
-        //public void Zone(int zone)
-        //{
-        //    c.SetCurrentZoneSetting(zone);
-        //}
+            if (t == MotionType.Undefined)
+            {
+                Console.WriteLine("Invalid motion type");
+                return;
+            }
 
-        ///// <summary>
-        ///// Gets the current MotionType setting.
-        ///// </summary>
-        ///// <returns></returns>
-        //public MotionType Motion()
-        //{
-        //    return c.GetCurrentMotionTypeSetting();
-        //}
+            Motion(t);
+        }
 
-        ///// <summary>
-        ///// Sets the motion type (linear, joint...) for future issued actions.
-        ///// </summary>
-        ///// <param name="type"></param>
-        //public void Motion(MotionType type)
-        //{
-        //    c.SetCurrentMotionTypeSetting(type);
-        //}
+        /// <summary>
+        /// Gets current ReferenceCS setting.
+        /// </summary>
+        /// <returns></returns>
+        public ReferenceCS Coordinates()
+        {
+            return c.GetCurrentReferenceCS();
+        }
 
-        ///// <summary>
-        ///// Sets the motion type (linear, joint...) for future issued actions.
-        ///// </summary>
-        ///// <param name="type">"linear", "joint" or "joints"</param>
-        //public void Motion(string type)
-        //{
-        //    MotionType t = MotionType.Undefined;
-        //    type = type.ToLower();
-        //    if (type.Equals("linear")) {
-        //        t = MotionType.Linear;
-        //    }
-        //    else if (type.Equals("joint"))
-        //    {
-        //        t = MotionType.Joint;
-        //    }
+        /// <summary>
+        /// Sets the reference system used for relative transformations.
+        /// </summary>
+        /// <param name="refcs"></param>
+        public void Coordinates(ReferenceCS refcs)
+        {
+            c.IssueCoordinatesRequest(refcs);
+        }
 
-        //    if (t == MotionType.Undefined)
-        //    {
-        //        Console.WriteLine("Invalid motion type");
-        //        return;
-        //    }
+        /// <summary>
+        /// Sets the reference system used for relative transformations ('local', 'global'...)
+        /// </summary>
+        /// <param name="type"></param>
+        public void Coordinates(string type)
+        {
+            ReferenceCS refcs;
+            type = type.ToLower();
+            if (type.Equals("global") || type.Equals("world"))
+            {
+                refcs = ReferenceCS.World;
+            }
+            else if (type.Equals("local"))
+            {
+                refcs = ReferenceCS.Local;
+            }
+            else
+            {
+                Console.WriteLine("Invalid reference coordinate system");
+                return;
+            }
 
-        //    Motion(t);
-        //}
-
-        ///// <summary>
-        ///// Gets current ReferenceCS setting.
-        ///// </summary>
-        ///// <returns></returns>
-        //public ReferenceCS Coordinates()
-        //{
-        //    return c.GetCurrentReferenceCS();
-        //}
-
-        ///// <summary>
-        ///// Sets the reference system used for relative transformations.
-        ///// </summary>
-        ///// <param name="refcs"></param>
-        //public void Coordinates(ReferenceCS refcs)
-        //{
-        //    c.SetCurrentReferenceCS(refcs);
-        //}
-
-        ///// <summary>
-        ///// Sets the reference system used for relative transformations ('local', 'global'...)
-        ///// </summary>
-        ///// <param name="type"></param>
-        //public void Coordinates(string type)
-        //{
-        //    ReferenceCS refcs;
-        //    type = type.ToLower();
-        //    if (type.Equals("global") || type.Equals("world"))
-        //    {
-        //        refcs = ReferenceCS.World;
-        //    }
-        //    else if (type.Equals("local"))
-        //    {
-        //        refcs = ReferenceCS.Local;
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Invalid reference coordinate system");
-        //        return;
-        //    }
-
-        //    Coordinates(refcs);
-        //}
+            Coordinates(refcs);
+        }
 
         ///// <summary>
         ///// Buffers current state settings (speed, zone, motion type...), and opens up for 
@@ -531,7 +536,7 @@ namespace BRobot
         //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
         //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
         //                                                         
-        
+
         /// <summary>
         /// Issue a relative movement action request on current coordinate system.
         /// </summary>
