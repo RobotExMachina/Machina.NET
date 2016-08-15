@@ -44,15 +44,15 @@ namespace BRobot
         /// </summary>
         private Communication comm;
 
-        /// <summary>
-        /// Represents the current values for speed, zone and MotionType.
-        /// </summary>
-        private Settings currentSettings;
+        ///// <summary>
+        ///// Represents the current values for speed, zone and MotionType.
+        ///// </summary>
+        //private Settings currentSettings;
 
-        /// <summary>
-        /// A buffer that stores Push and PopSettings() states.
-        /// </summary>
-        private SettingsBuffer settingsBuffer;
+        ///// <summary>
+        ///// A buffer that stores Push and PopSettings() states.
+        ///// </summary>
+        //private SettingsBuffer settingsBuffer;
 
         /// <summary>
         /// A virtual representation of the state of the device after application of issued actions.
@@ -126,8 +126,10 @@ namespace BRobot
             writeCursor.SetChild(motionCursor);
             areCursorsInitialized = false;
 
-            currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REFCS);
-            settingsBuffer = new SettingsBuffer();
+            SetControlMode(DEFAULT_CONTROLMODE);
+
+            //currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REFCS);
+            //settingsBuffer = new SettingsBuffer();
         }
 
         /// <summary>
@@ -139,14 +141,26 @@ namespace BRobot
         {
             controlMode = mode;
 
-            // @TODO: Make changes in ControlMode at runtime possible, i.e. resetting controllers and communication, flushing queues, etc.
+            //// @TODO: Make changes in ControlMode at runtime possible, i.e. resetting controllers and communication, flushing queues, etc.
+            //if (mode == ControlMode.Offline)
+            //{
+            //    DropCommunication();
+            //}
+            //else
+            //{
+            //    InitializeCommunication();  // online modes
+            //}
+
             if (mode == ControlMode.Offline)
             {
                 DropCommunication();
+
+                // In offline modes, initialize the robot to a bogus standard transform
+                InitializeRobotCursors(new Point(), Rotation.FlippedAroundY);
             }
             else
             {
-                InitializeCommunication();  // online modes
+                InitializeCommunication();
             }
             
             return true;
@@ -487,14 +501,14 @@ namespace BRobot
             return currentSettings.Speed;
         }
             
-        /// <summary>
-        /// Sets the speed parameter for future issued actions.
-        /// </summary>
-        /// <param name="speed">In mm/s</param>
-        public void SetCurrentSpeedSetting(int speed)
-        {
-            currentSettings.Speed = speed;
-        }
+        ///// <summary>
+        ///// Sets the speed parameter for future issued actions.
+        ///// </summary>
+        ///// <param name="speed">In mm/s</param>
+        //public void IssueSpeedRequest(int speed, bool relative)
+        //{
+        //    currentSettings.Speed = speed;
+        //}
 
         /// <summary>
         /// Gets current zone setting.
@@ -580,6 +594,42 @@ namespace BRobot
         //██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
         //██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
         //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+
+
+
+
+        /// <summary>
+        /// Sets the speed parameter for future issued actions.
+        /// </summary>
+        /// <param name="speed">In mm/s</param>
+        public void IssueSpeedRequest(int speed, bool relative)
+        {
+            if (!areCursorsInitialized)
+            {
+                if (controlMode == ControlMode.Offline)
+                {
+                    if (!InitializeRobotCursors(trans, Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                    {
+                        Console.WriteLine("Could not initialize cursors...");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                    return false;
+                }
+            }
+
+            ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
+            //return virtualCursor.Issue(act);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+
         /// <summary>
         /// Issue a Translation action request with fully customized parameters.
         /// </summary>
@@ -1209,20 +1259,15 @@ namespace BRobot
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position, Rotation rotation, Joints joints = null)
+        internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
+            int speed = Control.DEFAULT_SPEED, int zone = Control.DEFAULT_ZONE,
+            MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
+
         {
             bool success = true;
-
-            //virtualCursor = new RobotCursorABB("virtualCursor", true);
-            success = success && virtualCursor.Initialize(position, rotation, joints);
-
-            //writeCursor = new RobotCursorABB("writeCursor", false);
-            //virtualCursor.SetChild(writeCursor);
-            success = success && writeCursor.Initialize(position, rotation, joints);
-
-            //motionCursor = new RobotCursorABB("motionCursor", false);
-            //writeCursor.SetChild(motionCursor);
-            success = success && motionCursor.Initialize(position, rotation, joints);
+            success = success && virtualCursor.Initialize(position, rotation, joints, speed, zone, mType, refCS);
+            success = success && writeCursor.Initialize(position, rotation, joints, speed, zone, mType, refCS);
+            success = success && motionCursor.Initialize(position, rotation, joints, speed, zone, mType, refCS);
 
             areCursorsInitialized = success;
 

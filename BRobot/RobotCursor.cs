@@ -103,8 +103,7 @@ namespace BRobot
         /// <param name="joints"></param>
         /// <returns></returns>
         public bool Initialize(Point position, Rotation rotation, Joints joints, 
-            int speed = Control.DEFAULT_SPEED, int zone = Control.DEFAULT_ZONE, 
-            MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
+            int speed, int zone, MotionType mType, ReferenceCS refCS)
         {
             this.position = new Point(position);
             this.rotation = new Rotation(rotation);

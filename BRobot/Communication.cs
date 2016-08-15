@@ -1377,16 +1377,19 @@ namespace BRobot
                     if (a == null)
                         throw new Exception("Last action wasn't correctly stored...?");
 
+                    bool moveOn = true;
                     switch(a.type)
                     {
                         case ActionType.Translation:
                         case ActionType.Rotation:
-                        case ActionType.TranslationAndRotation:
-                        case ActionType.RotationAndTranslation:
+                        //case ActionType.TranslationAndRotation:
+                        //case ActionType.RotationAndTranslation:
+                        case ActionType.Transformation:
                             SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
                             SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
                             SetRapidDataVariable(RD_rt[fid], writeCursor.GetUNSAFERobTargetValue());
-                            SetRapidDataVariable(RD_act[fid], a.motionType == MotionType.Linear ? 1 : 2);     
+                            //SetRapidDataVariable(RD_act[fid], a.motionType == MotionType.Linear ? 1 : 2);     
+                            SetRapidDataVariable(RD_act[fid], writeCursor.motionType == MotionType.Linear ? 1 : 2);
                             break;
 
                         case ActionType.Joints:
@@ -1397,22 +1400,35 @@ namespace BRobot
                             break;
 
                         case ActionType.Wait:
-                            SetRapidDataVariable(RD_wt[fid], 0.001 * a.waitMillis);
+                            ActionWait aw = (ActionWait)a;
+                            SetRapidDataVariable(RD_wt[fid], 0.001 * aw.millis);
                             SetRapidDataVariable(RD_act[fid], 4);
                             break;
 
                         case ActionType.Message:
+                            ActionMessage am = (ActionMessage)a;
                             // TPWrite can only handle 40 chars
-                            string str = a.message;
-                            if (a.message.Length > 40)
-                                str = a.message.Substring(0, 40);
+                            string str = am.message;
+                            if (am.message.Length > 40)
+                                str = am.message.Substring(0, 40);
 
                             SetRapidDataVariable(RD_msg[fid], string.Format("\"{0}\"", str));  // when setting the value for a string rapidvar, the double quotes are needed as part of the value
                             SetRapidDataVariable(RD_act[fid], 5);
                             break;
+
+                        case ActionType.Speed:
+                            // A speed change doesn't create a new target: do nothing, and prevent triggering a new target
+                            moveOn = false;
+                            break;
+
+                        default:
+                            // Do nothing fallback
+                            moveOn = false;
+                            break;
                     }
                     
-                    SetRapidDataVariable(RD_pset[fid], "TRUE");
+                    if (moveOn)
+                        SetRapidDataVariable(RD_pset[fid], "TRUE");
                 }
             }
         }
