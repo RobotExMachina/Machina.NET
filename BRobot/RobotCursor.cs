@@ -385,7 +385,8 @@ namespace BRobot
                 }
                 else
                 {
-                    Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
+                    //Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
+                    Point worldVector = Point.Rotation(action.translation, this.rotation);
                     newPosition = position + worldVector;
                 }
             }
@@ -499,7 +500,8 @@ namespace BRobot
                     }
                     else
                     {
-                        Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
+                        //Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
+                        Point worldVector = Point.Rotation(action.translation, this.rotation);
                         newPos = position + worldVector;
                         newRot = Rotation.Multiply(rotation, action.rotation);  // postmultiplication
                     }
@@ -518,7 +520,8 @@ namespace BRobot
                     {
                         // @TOCHECK: is this correct?
                         newRot = Rotation.Multiply(rotation, action.rotation);  // postmultiplication
-                        Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(newRot));
+                        //Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(newRot));
+                        Point worldVector = Point.Rotation(action.translation, newRot);
                         newPos = position + worldVector;
                     }
 
