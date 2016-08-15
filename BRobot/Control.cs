@@ -14,17 +14,17 @@ namespace BRobot
     class Control
     {
         // Some 'environment variables' to define check states and behavior
-        public static readonly bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
-        public static readonly bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
-        public static readonly bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
-        public static readonly double SAFETY_TABLE_Z_LIMIT = 100;                       // table security checks will trigger below this z height (mm)
+        public const bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
+        public const bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
+        public const bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
+        public const double SAFETY_TABLE_Z_LIMIT = 100;                       // table security checks will trigger below this z height (mm)
 
-        public static readonly int DEFAULT_SPEED = 20;                                  // default speed for new actions
-        public static readonly int DEFAULT_ZONE = 5;                                    // default zone for new actions
-        public static readonly MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
-        public static readonly ReferenceCS DEFAULT_REF_CS = ReferenceCS.World;          // default reference coordinate system for relative transform actions
-        public static readonly ControlMode DEFAULT_CONTROLMODE = ControlMode.Offline;
-        public static readonly RunMode DEFAULT_RUNMODE = RunMode.Once;                  
+        public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
+        public const int DEFAULT_ZONE = 5;                                    // default zone for new actions
+        public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
+        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;          // default reference coordinate system for relative transform actions
+        public const ControlMode DEFAULT_CONTROLMODE = ControlMode.Offline;
+        public const RunMode DEFAULT_RUNMODE = RunMode.Once;                  
         
 
 
@@ -126,7 +126,7 @@ namespace BRobot
             writeCursor.SetChild(motionCursor);
             areCursorsInitialized = false;
 
-            currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REF_CS);
+            currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REFCS);
             settingsBuffer = new SettingsBuffer();
         }
 

@@ -210,12 +210,12 @@ namespace TEST_OfflineAPITests
             Rotation rzn45 = new Rotation(new Point(0, 0, 1), -45);
             Rotation rzn90 = new Rotation(new Point(0, 0, 1), -90);
 
-            Point xAxis = rx45.RotationVector();
-            Point yAxis = ry45.RotationVector();
-            Point zAxis = rz45.RotationVector();
+            Point xAxis = rx45.GetRotationVector();
+            Point yAxis = ry45.GetRotationVector();
+            Point zAxis = rz45.GetRotationVector();
 
-            double val45 = rx45.RotationAngle();
-            double val90 = rx90.RotationAngle();
+            double val45 = rx45.GetRotationAngle();
+            double val90 = rx90.GetRotationAngle();
 
             arm.Speed(100);
             arm.MoveTo(300, 0, 500);

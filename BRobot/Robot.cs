@@ -50,6 +50,16 @@ namespace BRobot
         Local = 1
     };
 
+    /// <summary>
+    /// Defines which type of motion to use for translation actions.;
+    /// </summary>
+    public enum MotionType : int
+    {
+        Undefined = 0,
+        Linear = 1,
+        Joint = 2
+    }
+
     public delegate void BufferEmptyHandler(object sender, EventArgs e);
 
 
