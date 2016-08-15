@@ -16,6 +16,6 @@ BRobot's action-state model is strongly inspired by the work of [Seymour Papert]
 
 Some of the syntactic and state-based flavor of BRobot was inspired by the outstanding [Processing project](http://processing.org), co-created by Casey Reas and Ben Fry.
 
-I am sure I have forgotten many people who should be acknowledged here, and I haven't. If you feel that is the case, poke me and tell me you deserve it. You will probably be right ;)
+I am sure I have forgotten many people who should be acknowledged here. If you feel that is the case, poke me and tell me you deserve it. You will probably be right ;)
 
 BRobot was created and is maintained by [Jose Luis Garcia del Castillo](http://www.garciadelcastillo.es).
