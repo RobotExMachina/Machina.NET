@@ -14,26 +14,27 @@ namespace TEST_Workbench
         {
             //int inc = 50;
             Robot arm = new Robot();
-            //arm.Mode("stream");
-            //arm.Connect();
-            //arm.Start();
-
-            arm.Mode("offline");
-
+            //arm.Mode("offline");
+            arm.Mode("stream");
+            arm.Connect();
+            arm.Start();
+            
             TestRelativeMovementAxes(arm);
-            //TestRelativeRotations(arm);
+            TestRelativeRotations(arm);
 
-            arm.Export(@"C:\test.mod");
+            //arm.Export(@"C:\test.mod");
 
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
 
-            //arm.Disconnect();
+            arm.Disconnect();
         }
 
         static void TestRelativeMovementAxes(Robot arm)
         {
-            arm.SpeedTo(100);
+            arm.SpeedTo(200);
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.TransformTo(new Point(302, 0, 558), Rotation.FlippedAroundY);
             arm.MoveTo(300, 300, 200);
 
             arm.ZoneTo(2);
@@ -67,6 +68,9 @@ namespace TEST_Workbench
         static void TestRelativeRotations(Robot arm)
         {
             arm.SpeedTo(200);
+
+            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.TransformTo(new Point(302, 0, 558), Rotation.FlippedAroundY);
             arm.MoveTo(100, -400, 300);
 
             //// Works!

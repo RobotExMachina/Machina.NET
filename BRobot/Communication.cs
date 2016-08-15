@@ -673,27 +673,13 @@ namespace BRobot
         /// </summary>
         public override void TickStreamQueue(bool hasPriority)
         {
-            //Console.WriteLine("TICKING StreamQueue: {0} targets pending", streamQueue.FramesPending());
-            //if (streamQueue.AreFramesPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
-            //{
-            //    Console.WriteLine("About to set targets");
-            //    SetNextVirtualTarget(hasPriority);
-            //    virtualStepCounter++;
-            //    TickStreamQueue(hasPriority);  // call this in case there are more in the queue...
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Not setting targets, streamQueue.AreFramesPending() {0} RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals(\"FALSE\") {1}",
-            //         streamQueue.AreFramesPending(),
-            //        RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"));
-            //}
-
+           
             Console.WriteLine("TICKING StreamQueue: {0} actions pending", writeCursor.ActionsPending());
             if (writeCursor.AreActionsPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
             {
                 Console.WriteLine("About to set targets");
                 SetNextVirtualTarget(hasPriority);
-                //virtualStepCounter++;
+                //virtualStepCounter++;  // moved to SetNextVirtualTarget
                 TickStreamQueue(hasPriority);  // call this in case there are more in the queue...
             }
             else

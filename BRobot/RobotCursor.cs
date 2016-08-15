@@ -594,7 +594,6 @@ namespace BRobot
             return true;
         }
 
-        
         /// <summary>
         /// Apply Message Action.
         /// </summary>
