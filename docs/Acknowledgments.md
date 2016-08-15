@@ -2,7 +2,7 @@
 
 [BRobot](https://github.com/garciadelcastillo/BRobot) was born in Boston the Summer of 2016 during a research residency at [Autodesk, Inc](https://www.autodesk.com/). 
 
-The development of BRobot was sponsored by Autodesk, Inc., under the guidance of Matt Jezyk, Racel Williams and all the [Generative Design Team](http://www.autodesk.com/solutions/generative-design). Special gratitude goes to Panagiotis Michalatos, Michael Kirschner and Andrew Payne for their technical mentorship, and to the [BUILD Space](https://twitter.com/buildspc) staff for their patience and dedication, including, but not reduced to, Rick Rundell, Adam Allard, Tim Brinkerhoff, Joe Aronis, Bevin Lin, Nathan King and the rest of the team. A big shout-out to Tom, Lilli, Aaron, Sriram, Zack, Peter, Neal, Michael, Anthony and Thord; love you guys!
+The development of BRobot was sponsored by [Autodesk, Inc](https://www.autodesk.com/), under the guidance of Matt Jezyk, Racel Williams and all the [Generative Design Team](http://www.autodesk.com/solutions/generative-design). Special gratitude goes to Panagiotis Michalatos, Michael Kirschner and Andrew Payne for their technical mentorship, and to the [BUILD Space](https://twitter.com/buildspc) staff for their patience and dedication, including, but not reduced to, Rick Rundell, Adam Allard, Tim Brinkerhoff, Joe Aronis, Bevin Lin, Nathan King and the rest of the team. A big shout-out to Tom, Lilli, Aaron, Sriram, Zack, Peter, Neal, Michael, Anthony and Thord; love you guys!
 
 Life support from the 'dream team' Nono Martinez Alonso, Keith Alfaro, Omid Oliyan and Varvara Toulkeridou was critical for the sanity (or insanity) of this project. Just one more thing to add here: :ok_hand: 
 
