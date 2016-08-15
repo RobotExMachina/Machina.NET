@@ -90,7 +90,7 @@ BRobot is an open-source project, with a lot of room for improvement and collabo
 
 ## Acknowledgments
 
-The development of BRobot was sponsored by [Autodesk, Inc](https://www.autodesk.com/), as part of a summer research residency project in Boston, 2016. 
+The development of BRobot was sponsored by [Autodesk, Inc](https://www.autodesk.com/), as part of a summer research residency project in Boston, 2016. Please take a look at the [detailed list of acknowledgments](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Acknowledgments.md)
 
 BRobot was created and is maintained by [Jose Luis Garcia del Castillo](http://www.garciadelcastillo.es).
 

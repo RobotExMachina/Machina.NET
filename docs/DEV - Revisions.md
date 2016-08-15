@@ -23,7 +23,7 @@
     - [ ] If they were Actions, relative and absolute modes could be implemented: .Speed(10) is an increase, .SpeedTo(10) is a setting.
 - [ ] Add a CS constructor from a Rotation object
 - [ ] R+T vs T+R order in Transform isn't working
-- [ ] This example doesn't work:
+- [ ] This example doesn't work!
     ```csharp
         Point dir = new Point(0, 5, 0);
 
@@ -33,6 +33,8 @@
             Console.WriteLine("DIR" + dir);
         } 
     ```
+
+
 
 
 ## BUILD 1116
