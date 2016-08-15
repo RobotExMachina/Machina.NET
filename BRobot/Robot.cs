@@ -538,6 +538,17 @@ namespace BRobot
         //                                                         
 
         /// <summary>
+        /// Applies an action to this robot. 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool Do(Action action)
+        {
+            return c.IssueApplyActionRequest(action);
+        }
+
+
+        /// <summary>
         /// Issue a relative movement action request on current coordinate system.
         /// </summary>
         /// <param name="direction"></param>

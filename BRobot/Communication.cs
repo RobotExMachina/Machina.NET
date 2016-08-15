@@ -673,7 +673,6 @@ namespace BRobot
         /// </summary>
         public override void TickStreamQueue(bool hasPriority)
         {
-           
             Console.WriteLine("TICKING StreamQueue: {0} actions pending", writeCursor.ActionsPending());
             if (writeCursor.AreActionsPending() && RD_pset[virtualStepCounter % virtualRDCount].StringValue.Equals("FALSE"))
             {

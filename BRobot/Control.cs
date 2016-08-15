@@ -564,6 +564,24 @@ namespace BRobot
         //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
 
         /// <summary>
+        /// Issue an Action of whatever kind...
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool IssueApplyActionRequest(Action action)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            bool success = virtualCursor.Issue(action);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+        /// <summary>
         /// Sets the speed parameter for future issued actions.
         /// </summary>
         /// <param name="speed">In mm/s</param>

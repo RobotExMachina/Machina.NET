@@ -10,7 +10,7 @@ namespace BRobot
     /// Defines an Action Type, like Translation, Rotation, Wait... 
     /// Useful to flag base Actions into children classes.
     /// </summary>
-    internal enum ActionType : int
+    public enum ActionType : int
     {
         Undefined = 0,
         Translation = 1,
@@ -44,9 +44,20 @@ namespace BRobot
     /// They are independent from the device's properties, and their translation into
     /// actual robotic instructions depends on the robot's properties and state. 
     /// </summary>
-    internal abstract class Action
+    public class Action
     {
         public ActionType type = ActionType.Undefined;
+
+        public static ActionTranslation Move(Point pos)
+        {
+            return new ActionTranslation(pos, true); 
+        }
+
+        public static ActionTranslation MoveTo(Point pos)
+        {
+            return new ActionTranslation(pos, false);
+        }
+
     }
 
 
@@ -160,7 +171,7 @@ namespace BRobot
     /// <summary>
     /// An action representing a Translation transform in along a guiding vector.
     /// </summary>
-    internal class ActionTranslation : Action
+    public class ActionTranslation : Action
     {
 
         public Point translation;

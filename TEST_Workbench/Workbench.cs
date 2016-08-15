@@ -18,9 +18,10 @@ namespace TEST_Workbench
             arm.Mode("stream");
             arm.Connect();
             arm.Start();
-            
-            TestRelativeMovementAxes(arm);
-            TestRelativeRotations(arm);
+
+            //TestRelativeMovementAxes(arm);
+            //TestRelativeRotations(arm);
+            TestStaticActions(arm);
 
             //arm.Export(@"C:\test.mod");
 
@@ -28,6 +29,16 @@ namespace TEST_Workbench
             Console.ReadKey();
 
             arm.Disconnect();
+        }
+
+        static void TestStaticActions(Robot arm)
+        {
+            BRobot.Action start = BRobot.Action.MoveTo(new Point(302, 0, 558));
+            BRobot.Action x100 = BRobot.Action.Move(new Point(100, 0, 0));
+
+            arm.Do(start);
+            arm.Do(x100);
+            arm.Do(start);
         }
 
         static void TestRelativeMovementAxes(Robot arm)
