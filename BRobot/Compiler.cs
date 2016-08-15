@@ -68,38 +68,68 @@ namespace BRobot
                 writePointer.buffer.GetBlockPending(false) : 
                 writePointer.buffer.GetAllPending(false);
 
+
             // CODE LINES GENERATION
             // VELOCITY & ZONE DECLARATIONS
-            // Figure out how many different ones are there first
+            // Amount of different VZ types
             Dictionary<int, string> velNames = new Dictionary<int, string>();
             Dictionary<int, string> velDecs = new Dictionary<int, string>();
             Dictionary<int, string> zoneNames = new Dictionary<int, string>();
             Dictionary<int, string> zoneDecs = new Dictionary<int, string>();
             Dictionary<int, bool> zonePredef = new Dictionary<int, bool>();
+            // Declarations
+            List<string> velocityLines = new List<string>();
+            List<string> zoneLines = new List<string>();
+
+            // TARGETS AND INSTRUCTIONS
+            List<string> variableLines = new List<string>();
+            List<string> instructionLines = new List<string>();
+
+            // DATA GENERATION
+            // Use the write robot pointer to generate the data
+            int it = 0;
+            string line = null;
             foreach (Action a in actions)
             {
-                if (!velNames.ContainsKey(a.speed))
+                // Move writerCursor to this action state
+                writer.ApplyNextAction();  // for the buffer to correctly manage them 
+
+                // Check velocity + zone and generate data accordingly
+                if (!velNames.ContainsKey(writer.speed))
                 {
-                    velNames.Add(a.speed, "vel" + a.speed);
-                    velDecs.Add(a.speed, writer.GetSpeedDeclaration(a.speed));
+                    velNames.Add(writer.speed, "vel" + writer.speed);
+                    velDecs.Add(writer.speed, writer.GetSpeedDeclaration(writer.speed));
                 }
 
-                if (!zoneNames.ContainsKey(a.zone))
+                if (!zoneNames.ContainsKey(writer.zone))
                 {
-                    bool predef = PredefinedZones.Contains(a.zone);
-                    zonePredef.Add(a.zone, predef);
-                    zoneNames.Add(a.zone, (predef ? "z" : "zone") + a.zone);  // use predef syntax or clean new one
-                    zoneDecs.Add(a.zone, predef ? "" : writer.GetZoneDeclaration(a.zone));
+                    bool predef = PredefinedZones.Contains(writer.zone);
+                    zonePredef.Add(writer.zone, predef);
+                    zoneNames.Add(writer.zone, (predef ? "z" : "zone") + writer.zone);  // use predef syntax or clean new one
+                    zoneDecs.Add(writer.zone, predef ? "" : writer.GetZoneDeclaration(writer.zone));
                 }
+
+                // Generate lines of code
+                if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                {
+                    variableLines.Add(line);
+                }
+
+                if (GenerateInstructionDeclaration(a, writer, it, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
+                {
+                    instructionLines.Add(line);
+                }
+
+                // Move on
+                it++;
             }
 
-            List<string> velocityLines = new List<string>();
+
+            // Generate V+Z 
             foreach (int v in velNames.Keys)
             {
                 velocityLines.Add(string.Format("  CONST speeddata {0}:={1};", velNames[v], velDecs[v]));
             }
-
-            List<string> zoneLines = new List<string>();
             foreach (int z in zoneNames.Keys)
             {
                 if (!zonePredef[z])  // no need to add declarations for predefined zones
@@ -109,33 +139,70 @@ namespace BRobot
             }
 
 
-            // TARGETS AND INSTRUCTIONS
-            List<string> variableLines = new List<string>();
-            List<string> instructionLines = new List<string>();
 
-            // Use the write robot pointer to generate the data
-            int it = 0;
-            string line = null;
-            foreach (Action a in actions)
-            {
-                // Move writerCursor to this action state
-                writer.ApplyNextAction();  // for the buffer to correctly manage them 
 
-                // Generate lines of code
-                if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
-                {
-                    //variableLines.Add(it, line);
-                    variableLines.Add(line);
-                };
-                if (GenerateInstructionDeclaration(a, writer, it, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
-                {
-                    //variableLines.Add(it, line);
-                    instructionLines.Add(line);
-                };
 
-                // Move on
-                it++;
-            }
+
+            //foreach (Action a in actions)
+            //{
+            //    if (!velNames.ContainsKey(a.speed))
+            //    {
+            //        velNames.Add(a.speed, "vel" + a.speed);
+            //        velDecs.Add(a.speed, writer.GetSpeedDeclaration(a.speed));
+            //    }
+
+            //    if (!zoneNames.ContainsKey(a.zone))
+            //    {
+            //        bool predef = PredefinedZones.Contains(a.zone);
+            //        zonePredef.Add(a.zone, predef);
+            //        zoneNames.Add(a.zone, (predef ? "z" : "zone") + a.zone);  // use predef syntax or clean new one
+            //        zoneDecs.Add(a.zone, predef ? "" : writer.GetZoneDeclaration(a.zone));
+            //    }
+            //}
+
+            //List<string> velocityLines = new List<string>();
+            //foreach (int v in velNames.Keys)
+            //{
+            //    velocityLines.Add(string.Format("  CONST speeddata {0}:={1};", velNames[v], velDecs[v]));
+            //}
+
+            //List<string> zoneLines = new List<string>();
+            //foreach (int z in zoneNames.Keys)
+            //{
+            //    if (!zonePredef[z])  // no need to add declarations for predefined zones
+            //    {
+            //        zoneLines.Add(string.Format("  CONST zonedata {0}:={1};", zoneNames[z], zoneDecs[z]));
+            //    }
+            //}
+
+
+            //// TARGETS AND INSTRUCTIONS
+            //List<string> variableLines = new List<string>();
+            //List<string> instructionLines = new List<string>();
+
+            //// Use the write robot pointer to generate the data
+            //int it = 0;
+            //string line = null;
+            //foreach (Action a in actions)
+            //{
+            //    // Move writerCursor to this action state
+            //    writer.ApplyNextAction();  // for the buffer to correctly manage them 
+
+            //    // Generate lines of code
+            //    if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+            //    {
+            //        //variableLines.Add(it, line);
+            //        variableLines.Add(line);
+            //    };
+            //    if (GenerateInstructionDeclaration(a, writer, it, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
+            //    {
+            //        //variableLines.Add(it, line);
+            //        instructionLines.Add(line);
+            //    };
+
+            //    // Move on
+            //    it++;
+            //}
 
             // PROGRAM ASSEMBLY
             // Initialize a module list
@@ -167,7 +234,6 @@ namespace BRobot
                 module.Add("");
             }
             
-            
             // MAIN PROCEDURE
             module.Add("  PROC main()");
             module.Add(@"    ConfJ \Off;");
@@ -190,30 +256,11 @@ namespace BRobot
             return module;
         }
 
-        ///// <summary>
-        ///// Returns a speeddata value. 
-        ///// </summary>
-        ///// <param name="speed"></param>
-        ///// <returns></returns>
-        //public string GenerateSpeedDeclaration(int speed)
-        //{
-        //    // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
-        //    // Using the same value as lin motion here.
-        //    return string.Format("[{0},{1},{2},{3}]", speed, speed, 5000, 1000);  
-        //}
 
-        ///// <summary>
-        ///// Returns a zonedata value.
-        ///// </summary>
-        ///// <param name="zone"></param>
-        ///// <returns></returns>
-        //public string GenerateZoneDeclaration(int zone)
-        //{
-        //    // Following conventions for default RAPID zones.
-        //    double high = 1.5 * zone;
-        //    double low = 0.15 * zone;
-        //    return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
-        //}
+
+
+
+
 
 
         static private bool GenerateVariableDeclaration(Action action, RobotCursorABB cursor, int id, out string declaration)
@@ -223,8 +270,9 @@ namespace BRobot
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
-                case ActionType.TranslationAndRotation:
-                case ActionType.RotationAndTranslation:
+                //case ActionType.TranslationAndRotation:
+                //case ActionType.RotationAndTranslation:
+                case ActionType.Transformation:
                     dec = string.Format("  CONST robtarget target{0}:={1};", id, cursor.GetUNSAFERobTargetValue());
                     break;
 
@@ -247,28 +295,31 @@ namespace BRobot
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
-                case ActionType.TranslationAndRotation:
-                case ActionType.RotationAndTranslation:
+                //case ActionType.TranslationAndRotation:
+                //case ActionType.RotationAndTranslation:
+                case ActionType.Transformation:
                     dec = string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
-                        action.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
+                        cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         id,
-                        velNames[action.speed],
-                        zoneNames[action.zone]);
+                        velNames[cursor.speed],
+                        zoneNames[cursor.zone]);
                     break;
 
                 case ActionType.Joints:
                     dec = string.Format("    MoveAbsJ target{0},{1},{2},Tool0\\WObj:=WObj0;",
                         id,
-                        velNames[action.speed],
-                        zoneNames[action.zone]);
+                        velNames[cursor.speed],
+                        zoneNames[cursor.zone]);
                     break;
 
                 case ActionType.Message:
-                    dec = string.Format("    TPWrite \"{0}\";", action.message);
+                    ActionMessage am = (ActionMessage)action;
+                    dec = string.Format("    TPWrite \"{0}\";", am.message);
                     break;
 
                 case ActionType.Wait:
-                    dec = string.Format("    WaitTime {0};", 0.001 * action.waitMillis);
+                    ActionWait aw = (ActionWait)action;
+                    dec = string.Format("    WaitTime {0};", 0.001 * aw.millis);
                     break;
             }
 

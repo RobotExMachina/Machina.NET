@@ -156,7 +156,7 @@ namespace BRobot
                 DropCommunication();
 
                 // In offline modes, initialize the robot to a bogus standard transform
-                InitializeRobotCursors(new Point(), Rotation.FlippedAroundY);
+                InitializeRobotCursors(new Point(), Rotation.FlippedAroundY);  // @TODO: defaults should depend on robot make/model
             }
             else
             {
@@ -498,9 +498,12 @@ namespace BRobot
         public int GetCurrentSpeedSetting()
         {
             // @TODO: will need to decide if this returns the current virtual, write or motion speed
-            return currentSettings.Speed;
+            //return currentSettings.Speed;
+            return virtualCursor.speed;
         }
             
+
+        // ABSTRACTED TO A FULL ACTION!
         ///// <summary>
         ///// Sets the speed parameter for future issued actions.
         ///// </summary>
@@ -510,76 +513,76 @@ namespace BRobot
         //    currentSettings.Speed = speed;
         //}
 
-        /// <summary>
-        /// Gets current zone setting.
-        /// </summary>
-        /// <returns></returns>
-        public int GetCurrentZoneSetting()
-        {
-            return currentSettings.Zone;
-        }
+        ///// <summary>
+        ///// Gets current zone setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //public int GetCurrentZoneSetting()
+        //{
+        //    return currentSettings.Zone;
+        //}
 
-        /// <summary>
-        /// Sets the approximation corner radius for future issued actions.
-        /// </summary>
-        /// <param name="zone">In mm.</param>
-        public void SetCurrentZoneSetting(int zone)
-        {
-            currentSettings.Zone = zone;
-        }
+        ///// <summary>
+        ///// Sets the approximation corner radius for future issued actions.
+        ///// </summary>
+        ///// <param name="zone">In mm.</param>
+        //public void SetCurrentZoneSetting(int zone)
+        //{
+        //    currentSettings.Zone = zone;
+        //}
 
-        public MotionType GetCurrentMotionTypeSetting()
-        {
-            return currentSettings.MotionType;
-        }
+        //public MotionType GetCurrentMotionTypeSetting()
+        //{
+        //    return currentSettings.MotionType;
+        //}
 
-        /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued actions.
-        /// </summary>
-        /// <param name="type"></param>
-        public void SetCurrentMotionTypeSetting(MotionType type)
-        {
-            currentSettings.MotionType = type;
-        }
+        ///// <summary>
+        ///// Sets the motion type (linear, joint...) for future issued actions.
+        ///// </summary>
+        ///// <param name="type"></param>
+        //public void SetCurrentMotionTypeSetting(MotionType type)
+        //{
+        //    currentSettings.MotionType = type;
+        //}
 
-        /// <summary>
-        /// Gets the reference coordinate system used for relative transform actions.
-        /// </summary>
-        /// <returns></returns>
-        public ReferenceCS GetCurrentReferenceCS()
-        {
-            return currentSettings.RefCS;
-        }
+        ///// <summary>
+        ///// Gets the reference coordinate system used for relative transform actions.
+        ///// </summary>
+        ///// <returns></returns>
+        //public ReferenceCS GetCurrentReferenceCS()
+        //{
+        //    return currentSettings.RefCS;
+        //}
 
-        /// <summary>
-        /// Sets the default reference coordinate system to use for relative transform actions.
-        /// </summary>
-        /// <param name="refcs"></param>
-        public void SetCurrentReferenceCS(ReferenceCS refcs)
-        {
-            currentSettings.RefCS = refcs;
-        }
+        ///// <summary>
+        ///// Sets the default reference coordinate system to use for relative transform actions.
+        ///// </summary>
+        ///// <param name="refcs"></param>
+        //public void SetCurrentReferenceCS(ReferenceCS refcs)
+        //{
+        //    currentSettings.RefCS = refcs;
+        //}
         
-        /// <summary>
-        /// Buffers current state settings (speed, zone, motion type...), and opens up for 
-        /// temporary settings changes to be reverted by PopSettings().
-        /// </summary>
-        public void PushCurrentSettings()
-        {
-            //Console.WriteLine("Pushing {0}", currentSettings);
-            settingsBuffer.Push(currentSettings);
-            currentSettings = currentSettings.Clone();  // sets currentS to a new object
-        }
+        ///// <summary>
+        ///// Buffers current state settings (speed, zone, motion type...), and opens up for 
+        ///// temporary settings changes to be reverted by PopSettings().
+        ///// </summary>
+        //public void PushCurrentSettings()
+        //{
+        //    //Console.WriteLine("Pushing {0}", currentSettings);
+        //    settingsBuffer.Push(currentSettings);
+        //    currentSettings = currentSettings.Clone();  // sets currentS to a new object
+        //}
 
-        /// <summary>
-        /// Reverts the state settings (speed, zone, motion type...) to the previously buffered
-        /// state by PushSettings().
-        /// </summary>
-        public void PopCurrentSettings()
-        {
-            currentSettings = settingsBuffer.Pop();
-            //Console.WriteLine("Reverted to {0}", currentSettings);
-        }
+        ///// <summary>
+        ///// Reverts the state settings (speed, zone, motion type...) to the previously buffered
+        ///// state by PushSettings().
+        ///// </summary>
+        //public void PopCurrentSettings()
+        //{
+        //    currentSettings = settingsBuffer.Pop();
+        //    //Console.WriteLine("Reverted to {0}", currentSettings);
+        //}
 
 
 
@@ -602,70 +605,21 @@ namespace BRobot
         /// Sets the speed parameter for future issued actions.
         /// </summary>
         /// <param name="speed">In mm/s</param>
-        public void IssueSpeedRequest(int speed, bool relative)
+        public bool IssueSpeedRequest(int speed, bool relative)
         {
             if (!areCursorsInitialized)
             {
-                if (controlMode == ControlMode.Offline)
-                {
-                    if (!InitializeRobotCursors(trans, Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                    return false;
-                }
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
             }
-
-            ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
-            //return virtualCursor.Issue(act);
+            
+            ActionSpeed act = new ActionSpeed(speed, relative);
 
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
-
-        /// <summary>
-        /// Issue a Translation action request with fully customized parameters.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="trans"></param>
-        /// <param name="relative"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <param name="mType"></param>
-        /// <returns></returns>
-        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int speed, int zone, MotionType mType)
-        {
-            if (!areCursorsInitialized)
-            {
-                if (controlMode == ControlMode.Offline)
-                {  
-                    if ( !InitializeRobotCursors(trans, Frame.DefaultOrientation) )  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                    return false;
-                }
-            }
-
-            ActionTranslation act = new ActionTranslation(world, trans, relative, speed, zone, mType);
-            //return virtualCursor.Issue(act);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
         /// <summary>
         /// Issue a Translation action request that falls back on the state of current settings.
@@ -673,47 +627,83 @@ namespace BRobot
         /// <param name="world"></param>
         /// <param name="trans"></param>
         /// <param name="relative"></param>
+        /// <param name="speed"></param>
+        /// <param name="zone"></param>
+        /// <param name="mType"></param>
         /// <returns></returns>
         public bool IssueTranslationRequest(Point trans, bool relative)
         {
-            return IssueTranslationRequest(currentSettings.RefCS == ReferenceCS.World, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+            if (!areCursorsInitialized)
+            {
+                //if (controlMode == ControlMode.Offline)
+                //{  
+                //    if ( !InitializeRobotCursors(trans, Frame.DefaultOrientation) )  // @TODO: defaults should depend on robot make/model
+                //    {
+                //        Console.WriteLine("Could not initialize cursors...");
+                //        return false;
+                //    }
+                //}
+                //else
+                //{
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                    return false;
+                //}
+            }
+
+            ActionTranslation act = new ActionTranslation(trans, relative);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
         }
-        /// <summary>
-        /// Issue a Translation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="trans"></param>
-        /// <param name="relative"></param>
-        /// <returns></returns>
-        public bool IssueTranslationRequest(bool world, Point trans, bool relative)
-        {
-            return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Translation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="trans"></param>
-        /// <param name="relative"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <returns></returns>
-        public bool IssueTranslationRequest(bool world, Point trans, bool relative, int speed, int zone)
-        {
-            return IssueTranslationRequest(world, trans, relative, speed, zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Translation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="trans"></param>
-        /// <param name="relative"></param>
-        /// <param name="mType"></param>
-        /// <returns></returns>
-        public bool IssueTranslationRequest(bool world, Point trans, bool relative, MotionType mType)
-        {
-            return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, mType);
-        }
+
+        ///// <summary>
+        ///// Issue a Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relative"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationRequest(Point trans, bool relative)
+        //{
+        //    return IssueTranslationRequest(currentSettings.RefCS == ReferenceCS.World, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relative"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationRequest(bool world, Point trans, bool relative)
+        //{
+        //    return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relative"></param>
+        ///// <param name="speed"></param>
+        ///// <param name="zone"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationRequest(bool world, Point trans, bool relative, int speed, int zone)
+        //{
+        //    return IssueTranslationRequest(world, trans, relative, speed, zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relative"></param>
+        ///// <param name="mType"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationRequest(bool world, Point trans, bool relative, MotionType mType)
+        //{
+        //    return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, mType);
+        //}
 
 
 
@@ -728,80 +718,80 @@ namespace BRobot
         /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
-        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int speed, int zone, MotionType mType)
+        public bool IssueRotationRequest(Rotation rot, bool relative)
         {
             if (!areCursorsInitialized)
             {
-                if (controlMode == ControlMode.Offline)
-                {
-                    if (!InitializeRobotCursors(new Point(), rot))  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
+                //if (controlMode == ControlMode.Offline)
+                //{
+                //    if (!InitializeRobotCursors(new Point(), rot))  // @TODO: defaults should depend on robot make/model
+                //    {
+                //        Console.WriteLine("Could not initialize cursors...");
+                //        return false;
+                //    }
+                //}
+                //else
+                //{
                     Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
-                }
+                //}
             }
 
-            ActionRotation act = new ActionRotation(world, rot, relative, speed, zone, mType);
-            //return virtualCursor.Issue(act);
+            ActionRotation act = new ActionRotation(rot, relative);
+
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
 
-        /// <summary>
-        /// Issue a Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="rot"></param>
-        /// <param name="relative"></param>
-        /// <returns></returns>
-        public bool IssueRotationRequest(Rotation rot, bool relative)
-        {
-            return IssueRotationRequest(currentSettings.RefCS == ReferenceCS.World, rot, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="rot"></param>
-        /// <param name="relative"></param>
-        /// <returns></returns>
-        public bool IssueRotationRequest(bool world, Rotation rot, bool relative)
-        {
-            return IssueRotationRequest(world, rot, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="rot"></param>
-        /// <param name="relative"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <returns></returns>
-        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int speed, int zone)
-        {
-            return IssueRotationRequest(world, rot, relative, speed, zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="rot"></param>
-        /// <param name="relative"></param>
-        /// <param name="mType"></param>
-        /// <returns></returns>
-        public bool IssueRotationRequest(bool world, Rotation rot, bool relative, MotionType mType)
-        {
-            return IssueRotationRequest(world, rot, relative, currentSettings.Speed, currentSettings.Zone, mType);
-        }
+        ///// <summary>
+        ///// Issue a Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relative"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationRequest(Rotation rot, bool relative)
+        //{
+        //    return IssueRotationRequest(currentSettings.RefCS == ReferenceCS.World, rot, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relative"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationRequest(bool world, Rotation rot, bool relative)
+        //{
+        //    return IssueRotationRequest(world, rot, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relative"></param>
+        ///// <param name="speed"></param>
+        ///// <param name="zone"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationRequest(bool world, Rotation rot, bool relative, int speed, int zone)
+        //{
+        //    return IssueRotationRequest(world, rot, relative, speed, zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="world"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relative"></param>
+        ///// <param name="mType"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationRequest(bool world, Rotation rot, bool relative, MotionType mType)
+        //{
+        //    return IssueRotationRequest(world, rot, relative, currentSettings.Speed, currentSettings.Zone, mType);
+        //}
 
 
 
@@ -818,244 +808,244 @@ namespace BRobot
         /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
-        public bool IssueTranslationAndRotationRequest(
-            bool worldTrans, Point trans, bool relTrans, 
-            bool worldRot, Rotation rot, bool relRot, 
-            int speed, int zone, MotionType mType)
+        public bool IssueTransformationRequest(Point trans, Rotation rot, bool rel, bool translationFirst)
         {
             if (!areCursorsInitialized)
             {
-                if (controlMode == ControlMode.Offline)
-                {
-                    if (!InitializeRobotCursors(trans, rot))  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
+                //if (controlMode == ControlMode.Offline)
+                //{
+                //    if (!InitializeRobotCursors(trans, rot))  // @TODO: defaults should depend on robot make/model
+                //    {
+                //        Console.WriteLine("Could not initialize cursors...");
+                //        return false;
+                //    }
+                //}
+                //else
+                //{
                     Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
-                }
+                //}
             }
-            
-            ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
+
+            //ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
             //return virtualCursor.Issue(act);
+
+            ActionTransformation act = new ActionTransformation(trans, rot, rel, translationFirst);
+
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
 
-        /// <summary>
-        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <returns></returns>
-        public bool IssueTranslationAndRotationRequest(
-            Point trans, bool relTrans,
-            Rotation rot, bool relRot)
-        {
-            return IssueTranslationAndRotationRequest(
-                currentSettings.RefCS == ReferenceCS.World, trans, relTrans,
-                currentSettings.RefCS == ReferenceCS.World, rot, relRot,
-                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <returns></returns>
-        public bool IssueTranslationAndRotationRequest(
-            bool worldTrans, Point trans, bool relTrans,
-            bool worldRot, Rotation rot, bool relRot)
-        {
-            return IssueTranslationAndRotationRequest(
-                worldTrans, trans, relTrans, 
-                worldRot, rot, relRot, 
-                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <returns></returns>
-        public bool IssueTranslationAndRotationRequest(
-            bool worldTrans, Point trans, bool relTrans,
-            bool worldRot, Rotation rot, bool relRot, 
-            int speed, int zone)
-        {
-            return IssueTranslationAndRotationRequest(
-                worldTrans, trans, relTrans,
-                worldRot, rot, relRot,
-                speed, zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Translation + Rotation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="mType"></param>
-        /// <returns></returns>
-        public bool IssueTranslationAndRotationRequest(
-            bool worldTrans, Point trans, bool relTrans,
-            bool worldRot, Rotation rot, bool relRot, 
-            MotionType mType)
-        {
-            return IssueTranslationAndRotationRequest(
-                worldTrans, trans, relTrans,
-                worldRot, rot, relRot,
-                currentSettings.Speed, currentSettings.Zone, mType);
-        }
+        ///// <summary>
+        ///// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationAndRotationRequest(
+        //    Point trans, bool relTrans,
+        //    Rotation rot, bool relRot)
+        //{
+        //    return IssueTranslationAndRotationRequest(
+        //        currentSettings.RefCS == ReferenceCS.World, trans, relTrans,
+        //        currentSettings.RefCS == ReferenceCS.World, rot, relRot,
+        //        currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationAndRotationRequest(
+        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldRot, Rotation rot, bool relRot)
+        //{
+        //    return IssueTranslationAndRotationRequest(
+        //        worldTrans, trans, relTrans, 
+        //        worldRot, rot, relRot, 
+        //        currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <param name="speed"></param>
+        ///// <param name="zone"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationAndRotationRequest(
+        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldRot, Rotation rot, bool relRot, 
+        //    int speed, int zone)
+        //{
+        //    return IssueTranslationAndRotationRequest(
+        //        worldTrans, trans, relTrans,
+        //        worldRot, rot, relRot,
+        //        speed, zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Translation + Rotation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <param name="mType"></param>
+        ///// <returns></returns>
+        //public bool IssueTranslationAndRotationRequest(
+        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldRot, Rotation rot, bool relRot, 
+        //    MotionType mType)
+        //{
+        //    return IssueTranslationAndRotationRequest(
+        //        worldTrans, trans, relTrans,
+        //        worldRot, rot, relRot,
+        //        currentSettings.Speed, currentSettings.Zone, mType);
+        //}
 
 
 
-        /// <summary>
-        /// Issue a Rotation + Translation action request with fully customized parameters.
-        /// </summary>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <param name="mType"></param>
-        /// <returns></returns>
-        public bool IssueRotationAndTranslationRequest(
-            bool worldRot, Rotation rot, bool relRot,
-            bool worldTrans, Point trans, bool relTrans,
-            int speed, int zone, MotionType mType)
-        {
-            if (!areCursorsInitialized)
-            {
-                if (controlMode == ControlMode.Offline)
-                {
-                    if (!InitializeRobotCursors(trans, rot))  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                    return false;
-                }
-            }
+        ///// <summary>
+        ///// Issue a Rotation + Translation action request with fully customized parameters.
+        ///// </summary>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <param name="speed"></param>
+        ///// <param name="zone"></param>
+        ///// <param name="mType"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationAndTranslationRequest(
+        //    bool worldRot, Rotation rot, bool relRot,
+        //    bool worldTrans, Point trans, bool relTrans,
+        //    int speed, int zone, MotionType mType)
+        //{
+        //    if (!areCursorsInitialized)
+        //    {
+        //        if (controlMode == ControlMode.Offline)
+        //        {
+        //            if (!InitializeRobotCursors(trans, rot))  // @TODO: defaults should depend on robot make/model
+        //            {
+        //                Console.WriteLine("Could not initialize cursors...");
+        //                return false;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+        //            return false;
+        //        }
+        //    }
 
-            ActionRotationAndTranslation act = new ActionRotationAndTranslation(worldRot, rot, relRot, worldTrans, trans, relTrans, speed, zone, mType);
-            //return virtualCursor.Issue(act);
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
-            return success;
+        //    ActionRotationAndTranslation act = new ActionRotationAndTranslation(worldRot, rot, relRot, worldTrans, trans, relTrans, speed, zone, mType);
+        //    //return virtualCursor.Issue(act);
+        //    bool success = virtualCursor.Issue(act);
+        //    if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+        //    return success;
 
-        }
+        //}
 
-        /// <summary>
-        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <returns></returns>
-        public bool IssueRotationAndTranslationRequest(
-            Rotation rot, bool relRot,
-            Point trans, bool relTrans)
-        {
-            return IssueRotationAndTranslationRequest(
-                currentSettings.RefCS == ReferenceCS.World, rot, relRot,
-                currentSettings.RefCS == ReferenceCS.World, trans, relTrans,
-                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <returns></returns>
-        public bool IssueRotationAndTranslationRequest(
-            bool worldRot, Rotation rot, bool relRot,
-            bool worldTrans, Point trans, bool relTrans)
-        {
-            return IssueRotationAndTranslationRequest(
-                worldRot, rot, relRot,
-                worldTrans, trans, relTrans,
-                currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <returns></returns>
-        public bool IssueRotationAndTranslationRequest(
-            bool worldRot, Rotation rot, bool relRot,
-            bool worldTrans, Point trans, bool relTrans,
-            int speed, int zone)
-        {
-            return IssueRotationAndTranslationRequest(
-                worldRot, rot, relRot,
-                worldTrans, trans, relTrans,
-                speed, zone, currentSettings.MotionType);
-        }
-        /// <summary>
-        /// Issue a Rotation + Translation action request that falls back on the state of current settings.
-        /// </summary>
-        /// <param name="worldRot"></param>
-        /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="worldTrans"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="mType"></param>
-        /// <returns></returns>
-        public bool IssueRotationAndTranslationRequest(
-            bool worldRot, Rotation rot, bool relRot,
-            bool worldTrans, Point trans, bool relTrans,
-            MotionType mType)
-        {
-            return IssueRotationAndTranslationRequest(
-                worldRot, rot, relRot,
-                worldTrans, trans, relTrans,
-                currentSettings.Speed, currentSettings.Zone, mType);
-        }
+        ///// <summary>
+        ///// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationAndTranslationRequest(
+        //    Rotation rot, bool relRot,
+        //    Point trans, bool relTrans)
+        //{
+        //    return IssueRotationAndTranslationRequest(
+        //        currentSettings.RefCS == ReferenceCS.World, rot, relRot,
+        //        currentSettings.RefCS == ReferenceCS.World, trans, relTrans,
+        //        currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationAndTranslationRequest(
+        //    bool worldRot, Rotation rot, bool relRot,
+        //    bool worldTrans, Point trans, bool relTrans)
+        //{
+        //    return IssueRotationAndTranslationRequest(
+        //        worldRot, rot, relRot,
+        //        worldTrans, trans, relTrans,
+        //        currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <param name="speed"></param>
+        ///// <param name="zone"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationAndTranslationRequest(
+        //    bool worldRot, Rotation rot, bool relRot,
+        //    bool worldTrans, Point trans, bool relTrans,
+        //    int speed, int zone)
+        //{
+        //    return IssueRotationAndTranslationRequest(
+        //        worldRot, rot, relRot,
+        //        worldTrans, trans, relTrans,
+        //        speed, zone, currentSettings.MotionType);
+        //}
+        ///// <summary>
+        ///// Issue a Rotation + Translation action request that falls back on the state of current settings.
+        ///// </summary>
+        ///// <param name="worldRot"></param>
+        ///// <param name="rot"></param>
+        ///// <param name="relRot"></param>
+        ///// <param name="worldTrans"></param>
+        ///// <param name="trans"></param>
+        ///// <param name="relTrans"></param>
+        ///// <param name="mType"></param>
+        ///// <returns></returns>
+        //public bool IssueRotationAndTranslationRequest(
+        //    bool worldRot, Rotation rot, bool relRot,
+        //    bool worldTrans, Point trans, bool relTrans,
+        //    MotionType mType)
+        //{
+        //    return IssueRotationAndTranslationRequest(
+        //        worldRot, rot, relRot,
+        //        worldTrans, trans, relTrans,
+        //        currentSettings.Speed, currentSettings.Zone, mType);
+        //}
 
 
 
@@ -1066,49 +1056,49 @@ namespace BRobot
         /// <param name="relJnts"></param>
         /// <param name="speed"></param>
         /// <param name="zone"></param>
-        /// <returns></returns>
-        public bool IssueJointsRequest(Joints joints, bool relJnts, int speed, int zone)
-        {
-            if (!areCursorsInitialized)
-            {
-                if (controlMode == ControlMode.Offline)
-                {
-                    if (relJnts)
-                    {
-                        Console.WriteLine("Sorry, first Joints action upon offline robot initialization must be in absolute values");
-                        return false;
-                    }
-
-                    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                    return false;
-                }
-            }
-
-            ActionJoints act = new ActionJoints(joints, relJnts, speed, zone);
-            //return virtualCursor.Issue(act);
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
-            return success;
-
-        }
-        /// <summary>
-        /// Issue a request to set the values of joint angles in configuration space. 
-        /// </summary>
-        /// <param name="joints"></param>
-        /// <param name="relJnts"></param>
         /// <returns></returns>
         public bool IssueJointsRequest(Joints joints, bool relJnts)
         {
-            return IssueJointsRequest(joints, relJnts, currentSettings.Speed, currentSettings.Zone);
+            if (!areCursorsInitialized)
+            {
+                //if (controlMode == ControlMode.Offline)
+                //{
+                //    if (relJnts)
+                //    {
+                //        Console.WriteLine("Sorry, first Joints action upon offline robot initialization must be in absolute values");
+                //        return false;
+                //    }
+
+                //    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                //    {
+                //        Console.WriteLine("Could not initialize cursors...");
+                //        return false;
+                //    }
+                //}
+                //else
+                //{
+                    Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                    return false;
+                //}
+            }
+
+            ActionJoints act = new ActionJoints(joints, relJnts);
+            
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+
         }
+        ///// <summary>
+        ///// Issue a request to set the values of joint angles in configuration space. 
+        ///// </summary>
+        ///// <param name="joints"></param>
+        ///// <param name="relJnts"></param>
+        ///// <returns></returns>
+        //public bool IssueJointsRequest(Joints joints, bool relJnts)
+        //{
+        //    return IssueJointsRequest(joints, relJnts, currentSettings.Speed, currentSettings.Zone);
+        //}
 
 
 
@@ -1122,23 +1112,23 @@ namespace BRobot
         {
             if (!areCursorsInitialized)
             {
-                if (controlMode == ControlMode.Offline)
-                {
-                    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
+                //if (controlMode == ControlMode.Offline)
+                //{
+                //    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                //    {
+                //        Console.WriteLine("Could not initialize cursors...");
+                //        return false;
+                //    }
+                //}
+                //else
+                //{
                     Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
-                }
+                //}
             }
 
             ActionMessage act = new ActionMessage(message);
-            //return virtualCursor.Issue(act);
+
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
             return success;
@@ -1156,23 +1146,23 @@ namespace BRobot
         {
             if (!areCursorsInitialized)
             {
-                if (controlMode == ControlMode.Offline)
-                {
-                    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
-                    {
-                        Console.WriteLine("Could not initialize cursors...");
-                        return false;
-                    }
-                }
-                else
-                {
+                //if (controlMode == ControlMode.Offline)
+                //{
+                //    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                //    {
+                //        Console.WriteLine("Could not initialize cursors...");
+                //        return false;
+                //    }
+                //}
+                //else
+                //{
                     Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                     return false;
-                }
+                //}
             }
 
             ActionWait act = new ActionWait(millis);
-            //return virtualCursor.Issue(act);
+            
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
             return success;
@@ -1491,11 +1481,11 @@ namespace BRobot
                 Console.WriteLine(writeCursor);
         }
 
-        public void DebugSettingsBuffer()
-        {
-            settingsBuffer.LogBuffer();
-            Console.WriteLine("Current settings: " + currentSettings);
-        }
+        //public void DebugSettingsBuffer()
+        //{
+        //    settingsBuffer.LogBuffer();
+        //    Console.WriteLine("Current settings: " + currentSettings);
+        //}
 
         /// <summary>
         /// Printlines a "DEBUG" ASCII banner... ;)

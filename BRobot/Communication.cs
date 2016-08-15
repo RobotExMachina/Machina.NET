@@ -693,7 +693,7 @@ namespace BRobot
             {
                 Console.WriteLine("About to set targets");
                 SetNextVirtualTarget(hasPriority);
-                virtualStepCounter++;
+                //virtualStepCounter++;
                 TickStreamQueue(hasPriority);  // call this in case there are more in the queue...
             }
             else
@@ -1428,7 +1428,11 @@ namespace BRobot
                     }
                     
                     if (moveOn)
+                    {
                         SetRapidDataVariable(RD_pset[fid], "TRUE");
+                        virtualStepCounter++;
+                    }
+                        
                 }
             }
         }

@@ -400,109 +400,109 @@ namespace BRobot
 
 
 
-        /// <summary>
-        /// Gets the current zone setting.
-        /// </summary>
-        /// <returns></returns>
-        public int Zone()
-        {
-            return c.GetCurrentZoneSetting();
-        }
+        ///// <summary>
+        ///// Gets the current zone setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //public int Zone()
+        //{
+        //    return c.GetCurrentZoneSetting();
+        //}
 
-        /// <summary>
-        /// Sets the default zone value new actions will be given.
-        /// </summary>
-        /// <param name="zone"></param>
-        public void Zone(int zone)
-        {
-            c.SetCurrentZoneSetting(zone);
-        }
+        ///// <summary>
+        ///// Sets the default zone value new actions will be given.
+        ///// </summary>
+        ///// <param name="zone"></param>
+        //public void Zone(int zone)
+        //{
+        //    c.SetCurrentZoneSetting(zone);
+        //}
 
-        /// <summary>
-        /// Gets the current MotionType setting.
-        /// </summary>
-        /// <returns></returns>
-        public MotionType Motion()
-        {
-            return c.GetCurrentMotionTypeSetting();
-        }
+        ///// <summary>
+        ///// Gets the current MotionType setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //public MotionType Motion()
+        //{
+        //    return c.GetCurrentMotionTypeSetting();
+        //}
 
-        /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued actions.
-        /// </summary>
-        /// <param name="type"></param>
-        public void Motion(MotionType type)
-        {
-            c.SetCurrentMotionTypeSetting(type);
-        }
+        ///// <summary>
+        ///// Sets the motion type (linear, joint...) for future issued actions.
+        ///// </summary>
+        ///// <param name="type"></param>
+        //public void Motion(MotionType type)
+        //{
+        //    c.SetCurrentMotionTypeSetting(type);
+        //}
 
-        /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued actions.
-        /// </summary>
-        /// <param name="type">"linear", "joint" or "joints"</param>
-        public void Motion(string type)
-        {
-            MotionType t = MotionType.Undefined;
-            type = type.ToLower();
-            if (type.Equals("linear")) {
-                t = MotionType.Linear;
-            }
-            else if (type.Equals("joint"))
-            {
-                t = MotionType.Joint;
-            }
+        ///// <summary>
+        ///// Sets the motion type (linear, joint...) for future issued actions.
+        ///// </summary>
+        ///// <param name="type">"linear", "joint" or "joints"</param>
+        //public void Motion(string type)
+        //{
+        //    MotionType t = MotionType.Undefined;
+        //    type = type.ToLower();
+        //    if (type.Equals("linear")) {
+        //        t = MotionType.Linear;
+        //    }
+        //    else if (type.Equals("joint"))
+        //    {
+        //        t = MotionType.Joint;
+        //    }
 
-            if (t == MotionType.Undefined)
-            {
-                Console.WriteLine("Invalid motion type");
-                return;
-            }
+        //    if (t == MotionType.Undefined)
+        //    {
+        //        Console.WriteLine("Invalid motion type");
+        //        return;
+        //    }
 
-            Motion(t);
-        }
+        //    Motion(t);
+        //}
 
-        /// <summary>
-        /// Gets current ReferenceCS setting.
-        /// </summary>
-        /// <returns></returns>
-        public ReferenceCS Coordinates()
-        {
-            return c.GetCurrentReferenceCS();
-        }
+        ///// <summary>
+        ///// Gets current ReferenceCS setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //public ReferenceCS Coordinates()
+        //{
+        //    return c.GetCurrentReferenceCS();
+        //}
 
-        /// <summary>
-        /// Sets the reference system used for relative transformations.
-        /// </summary>
-        /// <param name="refcs"></param>
-        public void Coordinates(ReferenceCS refcs)
-        {
-            c.SetCurrentReferenceCS(refcs);
-        }
+        ///// <summary>
+        ///// Sets the reference system used for relative transformations.
+        ///// </summary>
+        ///// <param name="refcs"></param>
+        //public void Coordinates(ReferenceCS refcs)
+        //{
+        //    c.SetCurrentReferenceCS(refcs);
+        //}
 
-        /// <summary>
-        /// Sets the reference system used for relative transformations ('local', 'global'...)
-        /// </summary>
-        /// <param name="type"></param>
-        public void Coordinates(string type)
-        {
-            ReferenceCS refcs;
-            type = type.ToLower();
-            if (type.Equals("global") || type.Equals("world"))
-            {
-                refcs = ReferenceCS.World;
-            }
-            else if (type.Equals("local"))
-            {
-                refcs = ReferenceCS.Local;
-            }
-            else
-            {
-                Console.WriteLine("Invalid reference coordinate system");
-                return;
-            }
+        ///// <summary>
+        ///// Sets the reference system used for relative transformations ('local', 'global'...)
+        ///// </summary>
+        ///// <param name="type"></param>
+        //public void Coordinates(string type)
+        //{
+        //    ReferenceCS refcs;
+        //    type = type.ToLower();
+        //    if (type.Equals("global") || type.Equals("world"))
+        //    {
+        //        refcs = ReferenceCS.World;
+        //    }
+        //    else if (type.Equals("local"))
+        //    {
+        //        refcs = ReferenceCS.Local;
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Invalid reference coordinate system");
+        //        return;
+        //    }
 
-            Coordinates(refcs);
-        }
+        //    Coordinates(refcs);
+        //}
 
         ///// <summary>
         ///// Buffers current state settings (speed, zone, motion type...), and opens up for 
@@ -572,7 +572,7 @@ namespace BRobot
         /// <returns></returns>
         public bool MoveTo(Point position)
         {
-            return c.IssueTranslationRequest(true, position, false);
+            return c.IssueTranslationRequest(position, false);
         }
 
         /// <summary>
@@ -628,7 +628,7 @@ namespace BRobot
         /// <returns></returns>
         public bool RotateTo(Rotation rotation)
         {
-            return c.IssueRotationRequest(true, rotation, false);
+            return c.IssueRotationRequest(rotation, false);
         }
 
         /// <summary>
@@ -677,7 +677,9 @@ namespace BRobot
         public bool Transform(Point position, Rotation rotation)
         {
             // Note the T+R action order
-            return c.IssueTranslationAndRotationRequest(position, true, rotation, true);
+            //return c.IssueTranslationAndRotationRequest(position, true, rotation, true);
+
+            return c.IssueTransformationRequest(position, rotation, true, true);
         }
 
         /// <summary>
@@ -690,7 +692,9 @@ namespace BRobot
         public bool Transform(Rotation rotation, Point position)
         {
             // Note the R+T action order
-            return c.IssueRotationAndTranslationRequest(rotation, true, position, true);
+            //return c.IssueRotationAndTranslationRequest(rotation, true, position, true);
+
+            return c.IssueTransformationRequest(position, rotation, true, false);
         }
         
         /// <summary>
@@ -702,7 +706,9 @@ namespace BRobot
         public bool TransformTo(Point position, Rotation rotation)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
-            return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+            //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+
+            return c.IssueTransformationRequest(position, rotation, false, true);
         }
 
         /// <summary>
@@ -714,7 +720,9 @@ namespace BRobot
         public bool TransformTo(Rotation rotation, Point position)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
-            return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+            //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+
+            return c.IssueTransformationRequest(position, rotation, false, false);
         }
 
 
@@ -853,7 +861,7 @@ namespace BRobot
         /// </summary>
         public void DebugSettingsBuffer()
         {
-            c.DebugSettingsBuffer();
+            //c.DebugSettingsBuffer();
         }
         
     }

@@ -105,9 +105,9 @@ namespace BRobot
         public bool Initialize(Point position, Rotation rotation, Joints joints, 
             int speed, int zone, MotionType mType, ReferenceCS refCS)
         {
-            this.position = new Point(position);
-            this.rotation = new Rotation(rotation);
-            this.joints = new Joints(joints);
+            if (position != null) this.position = new Point(position);
+            if (rotation != null) this.rotation = new Rotation(rotation);
+            if (joints != null) this.joints = new Joints(joints);
             this.speed = speed;
             this.zone = zone;
             this.motionType = mType;
