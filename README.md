@@ -45,8 +45,8 @@ bot.Start();
 bot.Message("Hello world!");
 
 // Move it to positive XYZ octant, face front and trace the square
-bot.Speed(100);
-bot.Zone(2);
+bot.SpeedTo(100);
+bot.ZoneTo(2);
 bot.MoveTo(300, 300, 300);
 bot.Rotate(0, 1, 0, -90);
 bot.Move(0, 0, 50);
