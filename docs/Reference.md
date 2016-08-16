@@ -21,7 +21,9 @@
 - [Motion](#motion)
 - [Coordinates](#coordinates)
 - [Speed](#speed)
+- [SpeedTo](#speedto)
 - [Zone](#zone)
+- [ZoneTo](#zoneto)
 - [PushSettings](#pushsettings)
 - [PopSettings](#popsettings)  
 &nbsp;
@@ -270,15 +272,30 @@ bot.Rotate(1, 0, 0, 45);  // rotates 45 degs around local X axis
 
 _int Speed()_
 
-_void Speed(int speed)_
+_void Speed(int speedInc)_
 
-Gets or sets the speed in mm/s at which future transformation actions will run. Default value is 20.
+Gets or increases the speed in mm/s at which future transformation actions will run. Default value is 20. 
 
 ```csharp
-bot.Speed(100);
+bot.SpeedTo(100);
 bot.Move(100, 0);  // will move at 100 mm/s
 
-bot.Speed(25);
+bot.Speed(-75);
+bot.Move(100, 0);  // will move at 25 mm/s
+```
+
+
+### SpeedTo
+
+_void Speed(int speed)_
+
+Sets the speed in mm/s at which future transformation actions will run. Default value is 20.
+
+```csharp
+bot.SpeedTo(100);
+bot.Move(100, 0);  // will move at 100 mm/s
+
+bot.Speed(-75);
 bot.Move(100, 0);  // will move at 25 mm/s
 ```
 
@@ -287,15 +304,37 @@ bot.Move(100, 0);  // will move at 25 mm/s
 
 _int Zone()_
 
-_void Zone(int zone)_
+_void Zone(int zoneInc)_
 
-Gets or sets the zone radius in mm at which the device will start transitioning to its next target transformation. You can think of this as a 'proximity precision' parameter to blend movement along consecutive waypoints. Default value is 5 mm.
+Gets or increases the zone radius in mm at which the device will start transitioning to its next target transformation. You can think of this as a 'proximity precision' parameter to blend movement along consecutive waypoints. Default value is 5 mm.
 
 ```csharp
 // Set a 10 mm proximity radius to targets
-bot.Zone(10);
+bot.ZoneTo(10);
+bot.MoveTo(200, 200, 10);
 
-// The corners of this square movement will look 'rounded' with a 10 mm radius
+// The corners of this square movement will look 'rounded' with a 4 mm radius
+bot.Zone(-6);
+bot.Move(50, 0);  
+bot.Move(0, 50);
+bot.Move(-50, 0);
+bot.Move(0, -50);
+```
+
+
+### ZoneTo
+
+_void ZoneTo(int zone)_
+
+Sets the zone radius in mm at which the device will start transitioning to its next target transformation. You can think of this as a 'proximity precision' parameter to blend movement along consecutive waypoints. Default value is 5 mm.
+
+```csharp
+// Set a 10 mm proximity radius to targets
+bot.ZoneTo(10);
+bot.MoveTo(200, 200, 10);
+
+// The corners of this square movement will look 'rounded' with a 4 mm radius
+bot.Zone(-6);
 bot.Move(50, 0);  
 bot.Move(0, 50);
 bot.Move(-50, 0);

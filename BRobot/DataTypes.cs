@@ -1200,7 +1200,7 @@ namespace BRobot
         /// even if the quaternion was created from a negative one (flipped vector).
         /// </summary>
         /// <returns></returns>
-        public Point RotationVector()
+        public Point GetRotationVector()
         {
             double theta2 = 2 * Math.Acos(W);
 
@@ -1219,7 +1219,7 @@ namespace BRobot
         /// Note it will always yield the positive rotation.
         /// </summary>
         /// <returns></returns>
-        public double RotationAngle()
+        public double GetRotationAngle()
         {
             double theta2 = 2 * Math.Acos(W);
             return theta2 < EPSILON ? 0 : Math.Round( 180 * theta2 / Math.PI, EPSILON_DECIMALS);

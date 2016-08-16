@@ -50,6 +50,16 @@ namespace BRobot
         Local = 1
     };
 
+    /// <summary>
+    /// Defines which type of motion to use for translation actions.;
+    /// </summary>
+    public enum MotionType : int
+    {
+        Undefined = 0,
+        Linear = 1,
+        Joint = 2
+    }
+
     public delegate void BufferEmptyHandler(object sender, EventArgs e);
 
 
@@ -70,7 +80,7 @@ namespace BRobot
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1116;
+        public static readonly int Build = 1117;
 
         /// <summary>
         /// Version number.
@@ -365,29 +375,51 @@ namespace BRobot
         public int Speed()
         {
             return c.GetCurrentSpeedSetting();
-        }   
+        }
                                                             
+        /// <summary>
+        /// Increase the default velocity new actions will be run at.
+        /// </summary>
+        /// <param name="speedInc"></param>
+        public void Speed(int speedInc)
+        {
+            c.IssueSpeedRequest(speedInc, true);
+        }
+
         /// <summary>
         /// Sets the default velocity new actions will be run at.
         /// </summary>
         /// <param name="speed"></param>
-        public void Speed(int speed)
+        public void SpeedTo(int speed)
         {
-            c.SetCurrentSpeedSetting(speed);
+            c.IssueSpeedRequest(speed, false);
         }
 
+        /// <summary>
+        /// Gets the current zone setting.
+        /// </summary>
+        /// <returns></returns>
         public int Zone()
         {
             return c.GetCurrentZoneSetting();
         }
 
         /// <summary>
+        /// Increase the default zone value new actions will be given.
+        /// </summary>
+        /// <param name="zoneInc"></param>
+        public void Zone(int zoneInc)
+        {
+            c.IssueZoneRequest(zoneInc, true);
+        }
+
+        /// <summary>
         /// Sets the default zone value new actions will be given.
         /// </summary>
         /// <param name="zone"></param>
-        public void Zone(int zone)
+        public void ZoneTo(int zone)
         {
-            c.SetCurrentZoneSetting(zone);
+            c.IssueZoneRequest(zone, false);
         }
 
         /// <summary>
@@ -405,7 +437,7 @@ namespace BRobot
         /// <param name="type"></param>
         public void Motion(MotionType type)
         {
-            c.SetCurrentMotionTypeSetting(type);
+            c.IssueMotionRequest(type);
         }
 
         /// <summary>
@@ -416,7 +448,8 @@ namespace BRobot
         {
             MotionType t = MotionType.Undefined;
             type = type.ToLower();
-            if (type.Equals("linear")) {
+            if (type.Equals("linear"))
+            {
                 t = MotionType.Linear;
             }
             else if (type.Equals("joint"))
@@ -448,7 +481,7 @@ namespace BRobot
         /// <param name="refcs"></param>
         public void Coordinates(ReferenceCS refcs)
         {
-            c.SetCurrentReferenceCS(refcs);
+            c.IssueCoordinatesRequest(refcs);
         }
 
         /// <summary>
@@ -482,7 +515,7 @@ namespace BRobot
         /// </summary>
         public void PushSettings()
         {
-            c.PushCurrentSettings();
+            c.IssuePushPopRequest(true);
         }
 
         /// <summary>
@@ -491,7 +524,7 @@ namespace BRobot
         /// </summary>
         public void PopSettings()
         {
-            c.PopCurrentSettings();
+            c.IssuePushPopRequest(false);
         }
 
 
@@ -503,7 +536,18 @@ namespace BRobot
         //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
         //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
         //                                                         
-        
+
+        /// <summary>
+        /// Applies an action to this robot. 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool Do(Action action)
+        {
+            return c.IssueApplyActionRequest(action);
+        }
+
+
         /// <summary>
         /// Issue a relative movement action request on current coordinate system.
         /// </summary>
@@ -544,7 +588,7 @@ namespace BRobot
         /// <returns></returns>
         public bool MoveTo(Point position)
         {
-            return c.IssueTranslationRequest(true, position, false);
+            return c.IssueTranslationRequest(position, false);
         }
 
         /// <summary>
@@ -600,7 +644,7 @@ namespace BRobot
         /// <returns></returns>
         public bool RotateTo(Rotation rotation)
         {
-            return c.IssueRotationRequest(true, rotation, false);
+            return c.IssueRotationRequest(rotation, false);
         }
 
         /// <summary>
@@ -649,7 +693,9 @@ namespace BRobot
         public bool Transform(Point position, Rotation rotation)
         {
             // Note the T+R action order
-            return c.IssueTranslationAndRotationRequest(position, true, rotation, true);
+            //return c.IssueTranslationAndRotationRequest(position, true, rotation, true);
+
+            return c.IssueTransformationRequest(position, rotation, true, true);
         }
 
         /// <summary>
@@ -662,7 +708,9 @@ namespace BRobot
         public bool Transform(Rotation rotation, Point position)
         {
             // Note the R+T action order
-            return c.IssueRotationAndTranslationRequest(rotation, true, position, true);
+            //return c.IssueRotationAndTranslationRequest(rotation, true, position, true);
+
+            return c.IssueTransformationRequest(position, rotation, true, false);
         }
         
         /// <summary>
@@ -674,7 +722,9 @@ namespace BRobot
         public bool TransformTo(Point position, Rotation rotation)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
-            return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+            //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+
+            return c.IssueTransformationRequest(position, rotation, false, true);
         }
 
         /// <summary>
@@ -686,7 +736,9 @@ namespace BRobot
         public bool TransformTo(Rotation rotation, Point position)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
-            return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+            //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
+
+            return c.IssueTransformationRequest(position, rotation, false, false);
         }
 
 
@@ -825,7 +877,7 @@ namespace BRobot
         /// </summary>
         public void DebugSettingsBuffer()
         {
-            c.DebugSettingsBuffer();
+            //c.DebugSettingsBuffer();
         }
         
     }

@@ -86,7 +86,7 @@ bot.MoveTo(300, 100, 200);
 `MoveTo` is an movement action in absolute global coordinates. You should see the virtual robot start moving slowly to this location in global coordinates. By default, the robot moves at 20 mm/s. We can set the speed for new instructions a bit higher:
 
 ```csharp
-bot.Speed(100);
+bot.SpeedTo(100);
 ```
 
 And issue a new instruction so that the robot moves 200 mm in the positive Z direction:
@@ -100,7 +100,7 @@ bot.Move(0, 0, 200);
 Finally, let's move the robot back to a 'home' position by directly setting the rotation angles of the joints. Since this is not a linear movement, we want to be cautious and slow the robot down a little:
 
 ```csharp
-bot.Speed(50);
+bot.SpeedTo(50);
 bot.JointsTo(0, 0, 0, 0, 90, 0);
 ```
 
@@ -154,7 +154,7 @@ namespace ConsoleApplication1
             bot.MoveTo(300, 100, 200);
 
             // Let's set a higher speed for the next movement
-            bot.Speed(100);
+            bot.SpeedTo(100);
 
             // Let's issue a new order to move 200 mm in the Z direction
             bot.Move(0, 0, 200);
@@ -216,7 +216,7 @@ bot.Connect();
 bot.Start();
 
 // Do stuff
-bot.Speed(200);
+bot.SpeedTo(200);
 bot.MoveTo(300, 100, 500);  // this action is released to the device immediately
 bot.Move(0, -100, 0);       // this action will be executed immediately after the previous one is done
 bot.Move(0, 0, -100);       // this one is also executed right after the previous one is over
@@ -245,8 +245,8 @@ bot.Mode("execute");
 bot.Connect();
 
 // Draw a horizontal XY square
-bot.Speed(100);
-bot.Zone(2);
+bot.SpeedTo(100);
+bot.ZoneTo(2);
 bot.MoveTo(300, 300, 100);
 bot.Move(50, 0);
 bot.Move(0, 50);
@@ -286,8 +286,8 @@ Robot bot = new Robot();
 bot.Mode("offline");
 
 // Draw a flat XY square
-bot.Speed(100);
-bot.Zone(2);
+bot.SpeedTo(100);
+bot.ZoneTo(2);
 bot.MoveTo(300, 300, 100);
 bot.Move(50, 0);
 bot.Move(0, 50);
@@ -381,21 +381,21 @@ The characteristics of this movement are defined by the motion settings present 
 // Draw a rectangle with different speed/precision settings
 
 // Approach the start point fast
-bot.Speed(200);
-bot.Zone(5);
+bot.SpeedTo(200);
+bot.ZoneTo(5);
 bot.MoveTo(300, 200, 400);
 
 // Slow down and trace with finer precision
-bot.Speed(25);
-bot.Zone(1);
+bot.SpeedTo(25);
+bot.ZoneTo(1);
 bot.Move(50, 0, 0);
 bot.Move(0, 75, 0);
 bot.Move(-50, 0, 0);
 bot.Move(0, -75, 0);
 
 // Go back home
-bot.Speed(200);
-bot.Zone(5);
+bot.SpeedTo(200);
+bot.ZoneTo(5);
 bot.MoveTo(300, 0, 500);
 ```
 
@@ -406,14 +406,14 @@ By default, BRobot performs linear motion between targets. However, robotic arms
 
 // Approach the start point
 bot.Motion("joint");
-bot.Speed(200);
-bot.Zone(5);
+bot.SpeedTo(200);
+bot.ZoneTo(5);
 bot.MoveTo(300, 200, 400);
 
 // Fine trace the rectangle
 bot.Motion("linear");
-bot.Speed(25);
-bot.Zone(1);
+bot.SpeedTo(25);
+bot.ZoneTo(1);
 bot.Move(50, 0, 0);
 bot.Move(0, 75, 0);
 bot.Move(-50, 0, 0);
@@ -421,8 +421,8 @@ bot.Move(0, -75, 0);
 
 // Back home
 bot.Motion("joint");
-bot.Speed(200);
-bot.Zone(5);
+bot.SpeedTo(200);
+bot.ZoneTo(5);
 bot.MoveTo(300, 0, 500);
 ```
 
@@ -433,8 +433,8 @@ Constantly changing between motion settings can be confusing and lead to errors,
 bot.PushSettings();
 
 // Make some changes and move
-bot.Speed(100);
-bot.Zone(2);
+bot.SpeedTo(100);
+bot.ZoneTo(2);
 bot.Move(100, 0, 0);
 
 // Revert back to the state in last push
@@ -448,13 +448,13 @@ void traceXYRectangle(Robot robot, Point origin, double w, double h, int speed, 
     robot.PushSettings();  // save the program's current state settings
 
     robot.Motion("joint");
-    robot.Speed(speed);
-    robot.Zone(zone);
+    robot.SpeedTo(speed);
+    robot.ZoneTo(zone);
     robot.MoveTo(origin);
 
     robot.Motion("linear");
-    robot.Speed(speed / 4;);
-    robot.Zone(zone / 4);
+    robot.SpeedTo(speed / 4;);
+    robot.ZoneTo(zone / 4);
     robot.Move(w, 0, 0);
     robot.Move(0, h, 0);
     robot.Move(-w, 0, 0);
@@ -489,7 +489,7 @@ bot.RotateTo(new Point(-1, 0, 0), new Point(0, 1, 0));
 bot.Rotate(1, 0, 0, 90);
 
 // Draw rectangle
-bot.Speed(100);
+bot.SpeedTo(100);
 bot.Move(0, 200, 0);
 bot.Move(50, 0, 0);
 bot.Move(0, 0, 50);
