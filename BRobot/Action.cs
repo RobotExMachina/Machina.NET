@@ -48,6 +48,40 @@ namespace BRobot
     {
         public ActionType type = ActionType.Undefined;
 
+        public static ActionSpeed Speed(int speedInc)
+        {
+            return new ActionSpeed(speedInc, true);
+        }
+
+        public static ActionSpeed SpeedTo(int speed)
+        {
+            return new ActionSpeed(speed, false);
+        }
+
+
+        public static ActionZone Zone(int zoneInc)
+        {
+            return new ActionZone(zoneInc, true);
+        }
+
+        public static ActionZone ZoneTo(int zone)
+        {
+            return new ActionZone(zone, false);
+        }
+
+
+        public static ActionMotion Motion(MotionType motionType)
+        {
+            return new ActionMotion(motionType);
+        }
+
+
+        public static ActionCoordinates Coordinates(ReferenceCS referenceCS)
+        {
+            return new ActionCoordinates(referenceCS);
+        }
+
+
         public static ActionTranslation Move(Point pos)
         {
             return new ActionTranslation(pos, true); 
@@ -57,6 +91,53 @@ namespace BRobot
         {
             return new ActionTranslation(pos, false);
         }
+
+
+        public static ActionRotation Rotate(Rotation rot)
+        {
+            return new ActionRotation(rot, true);
+        }
+
+        public static ActionRotation RotateTo(Rotation rot)
+        {
+            return new ActionRotation(rot, false);
+        }
+
+
+        public static ActionTransformation Transform(Point pos, Rotation rot, bool translationFirst)
+        {
+            return new ActionTransformation(pos, rot, true, translationFirst);
+        }
+
+        public static ActionTransformation TransformTo(Point pos, Rotation rot)
+        {
+            return new ActionTransformation(pos, rot, false, true);
+        }
+
+
+        public static ActionJoints Joints(Joints jointsInc)
+        {
+            return new ActionJoints(jointsInc, true);
+        }
+
+        public static ActionJoints JointsTo(Joints joints)
+        {
+            return new ActionJoints(joints, false);
+        }
+
+        
+        public static ActionWait Wait(long millis)
+        {
+            return new ActionWait(millis);
+        }
+
+
+        public static ActionMessage Message(string msg)
+        {
+            return new ActionMessage(msg);
+        }
+
+
 
     }
 
@@ -72,7 +153,7 @@ namespace BRobot
     /// <summary>
     /// An Action to change the current speed setting.
     /// </summary>
-    internal class ActionSpeed : Action
+    public class ActionSpeed : Action
     {
         public int speed;
         public bool relative;
@@ -96,7 +177,7 @@ namespace BRobot
     /// <summary>
     /// An Action to change current zone setting.
     /// </summary>
-    internal class ActionZone : Action
+    public class ActionZone : Action
     {
         public int zone;
         public bool relative;
@@ -120,7 +201,7 @@ namespace BRobot
     /// <summary>
     /// An Action to change current MotionType.
     /// </summary>
-    internal class ActionMotion : Action
+    public class ActionMotion : Action
     {
         public MotionType motionType;
         
@@ -140,7 +221,7 @@ namespace BRobot
     /// <summary>
     /// An Action to change current Reference Coordinate System.
     /// </summary>
-    internal class ActionCoordinates : Action
+    public class ActionCoordinates : Action
     {
         public ReferenceCS referenceCS;
 
@@ -213,7 +294,7 @@ namespace BRobot
     /// <summary>
     /// An Action representing a Rotation transformation in Quaternion represnetation.
     /// </summary>
-    internal class ActionRotation : Action
+    public class ActionRotation : Action
     {
         public Rotation rotation;
         public bool relative;
@@ -247,7 +328,7 @@ namespace BRobot
     /// <summary>
     /// An Action representing a combined Translation and Rotation Transformation.
     /// </summary>
-    internal class ActionTransformation : Action
+    public class ActionTransformation : Action
     {
         public Point translation;
         public Rotation rotation;
@@ -297,7 +378,7 @@ namespace BRobot
     /// <summary>
     /// An Action representing the raw angular values of the device's joint rotations.
     /// </summary>
-    internal class ActionJoints : Action
+    public class ActionJoints : Action
     {
         public Joints joints;
         public bool relative;
@@ -328,7 +409,7 @@ namespace BRobot
     /// <summary>
     /// An Action representing a string message sent to the device to be displayed.
     /// </summary>
-    internal class ActionMessage : Action
+    public class ActionMessage : Action
     {
         public string message;
 
@@ -356,7 +437,7 @@ namespace BRobot
     /// <summary>
     /// An Action represening the device staying idle for a period of time.
     /// </summary>
-    internal class ActionWait : Action
+    public class ActionWait : Action
     {
         public long millis;
 

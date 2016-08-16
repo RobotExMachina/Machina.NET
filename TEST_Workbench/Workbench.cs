@@ -34,10 +34,18 @@ namespace TEST_Workbench
         static void TestStaticActions(Robot arm)
         {
             BRobot.Action start = BRobot.Action.MoveTo(new Point(302, 0, 558));
-            BRobot.Action x100 = BRobot.Action.Move(new Point(100, 0, 0));
+            BRobot.Action x10 = BRobot.Action.Move(new Point(25, 0, 0));
+            BRobot.Action y10 = BRobot.Action.Move(new Point(0, 25, 0));
+            BRobot.Action z10 = BRobot.Action.Move(new Point(0, 0, 25));
+
 
             arm.Do(start);
-            arm.Do(x100);
+            for (int i = 0; i < 5; i++)
+            {
+                arm.Do(x10);
+                arm.Do(y10);
+                arm.Do(z10);
+            }
             arm.Do(start);
         }
 

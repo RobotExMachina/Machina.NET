@@ -380,10 +380,10 @@ namespace BRobot
         /// <summary>
         /// Increase the default velocity new actions will be run at.
         /// </summary>
-        /// <param name="speed"></param>
-        public void Speed(int speed)
+        /// <param name="speedInc"></param>
+        public void Speed(int speedInc)
         {
-            c.IssueSpeedRequest(speed, true);
+            c.IssueSpeedRequest(speedInc, true);
         }
 
         /// <summary>
@@ -407,10 +407,10 @@ namespace BRobot
         /// <summary>
         /// Increase the default zone value new actions will be given.
         /// </summary>
-        /// <param name="zone"></param>
-        public void Zone(int zone)
+        /// <param name="zoneInc"></param>
+        public void Zone(int zoneInc)
         {
-            c.IssueZoneRequest(zone, true);
+            c.IssueZoneRequest(zoneInc, true);
         }
 
         /// <summary>
