@@ -33,10 +33,7 @@ namespace BRobot
         protected bool initialized = false;
         private bool applyImmediately = false;  // when an action is issued to this cursor, apply it immediately?
 
-        /// <summary>
-        /// Manages pending and released Actions, plus blocks. 
-        /// </summary>
-        public ActionBuffer buffer;
+        
 
         /// <summary>
         /// Specified RobotCursor instance will be issued all Actions 
@@ -52,9 +49,19 @@ namespace BRobot
         public Compiler compiler;
 
         /// <summary>
+        /// A buffer that stores Push and PopSettings() states.
+        /// </summary>
+        protected SettingsBuffer settingsBuffer;
+
+        /// <summary>
+        /// Manages pending and released Actions, plus blocks. 
+        /// </summary>
+        public ActionBuffer actionBuffer;
+
+        /// <summary>
         /// A lock for buffer manipulation operations. 
         /// </summary>
-        public object bufferLock = new object();
+        public object actionBufferLock = new object();
 
         /// <summary>
         /// Main constructor.
@@ -66,7 +73,8 @@ namespace BRobot
             this.name = name;
             this.applyImmediately = applyImmediately;
 
-            buffer = new ActionBuffer();
+            actionBuffer = new ActionBuffer();
+            settingsBuffer = new SettingsBuffer();
         }
 
         // Abstract methods
@@ -74,6 +82,7 @@ namespace BRobot
         public abstract bool ApplyAction(ActionZone action);
         public abstract bool ApplyAction(ActionMotion action);
         public abstract bool ApplyAction(ActionCoordinates action);
+        public abstract bool ApplyAction(ActionPushPop action);
         public abstract bool ApplyAction(ActionTranslation action);
         public abstract bool ApplyAction(ActionRotation action);
         public abstract bool ApplyAction(ActionTransformation action);
@@ -93,6 +102,7 @@ namespace BRobot
             { typeof (ActionZone),                      (i, rc) => rc.ApplyAction((ActionZone) i) },
             { typeof (ActionMotion),                    (i, rc) => rc.ApplyAction((ActionMotion) i) },
             { typeof (ActionCoordinates),               (i, rc) => rc.ApplyAction((ActionCoordinates) i) },
+            { typeof (ActionPushPop),                   (i, rc) => rc.ApplyAction((ActionPushPop) i) },
             { typeof (ActionTranslation),               (i, rc) => rc.ApplyAction((ActionTranslation) i) },
             { typeof (ActionRotation),                  (i, rc) => rc.ApplyAction((ActionRotation) i) },
             { typeof (ActionTransformation),            (i, rc) => rc.ApplyAction((ActionTransformation) i) },
@@ -124,16 +134,6 @@ namespace BRobot
             return initialized;
         }
         
-        ///// <summary>
-        ///// Minimum information necessary to initialize a robot object.
-        ///// </summary>
-        ///// <param name="pos"></param>
-        ///// <param name="rot"></param>
-        //public bool Initialize(Point pos, Rotation rot)
-        //{
-        //    return Initialize(pos, rot, null);
-        //}
-
         /// <summary>
         /// Set specified RobotCursor as child to this one.
         /// </summary>
@@ -149,9 +149,9 @@ namespace BRobot
         /// <param name="action"></param>
         public bool Issue(Action action)
         {
-            lock(bufferLock)
+            lock(actionBufferLock)
             {
-                buffer.Add(action);
+                actionBuffer.Add(action);
                 if (applyImmediately)
                 {
                     return ApplyNextAction();
@@ -167,9 +167,9 @@ namespace BRobot
         /// <returns></returns>
         public bool ApplyNextAction()
         {
-            lock(bufferLock)
+            lock(actionBufferLock)
             {
-                Action next = buffer.GetNext();
+                Action next = actionBuffer.GetNext();
                 if (next == null) return false;
                 bool success = Apply(next);
                 if (success)
@@ -182,9 +182,9 @@ namespace BRobot
 
         public Action GetLastAction()
         {
-            lock(bufferLock)
+            lock(actionBufferLock)
             {
-                return buffer.GetLast();
+                return actionBuffer.GetLast();
             }
         }
 
@@ -194,7 +194,7 @@ namespace BRobot
         /// </summary>
         public void QueueActions()
         {
-            buffer.SetBlock();
+            actionBuffer.SetBlock();
         }
 
         /// <summary>
@@ -203,12 +203,12 @@ namespace BRobot
         /// <returns></returns>
         public bool AreActionsPending()
         {
-            return buffer.AreActionsPending();
+            return actionBuffer.AreActionsPending();
         }
 
         public int ActionsPending()
         {
-            return buffer.ActionsPending();
+            return actionBuffer.ActionsPending();
         }
         
         /// <summary>
@@ -253,9 +253,9 @@ namespace BRobot
 
         public void LogBufferedActions()
         {
-            lock(bufferLock)
+            lock(actionBufferLock)
             {
-                buffer.LogBufferedActions();
+                actionBuffer.LogBufferedActions();
             }
         }
 
@@ -350,6 +350,32 @@ namespace BRobot
             return true;
         }
 
+        /// <summary>
+        /// Apply a Push or Pop Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public override bool ApplyAction(ActionPushPop action)
+        {
+            if (action.push)
+            {
+                Settings s = new Settings(this.speed, this.zone, this.motionType, this.referenceCS);
+                return this.settingsBuffer.Push(s);
+            }
+            else
+            {
+                Settings s = settingsBuffer.Pop();
+                if (s != null)
+                {
+                    this.speed = s.Speed;
+                    this.zone = s.Zone;
+                    this.motionType = s.MotionType;
+                    this.referenceCS = s.RefCS;
+                    return true;
+                }
+            }
+            return false;
+        }
 
 
 

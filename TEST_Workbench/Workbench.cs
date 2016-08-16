@@ -21,7 +21,8 @@ namespace TEST_Workbench
 
             //TestRelativeMovementAxes(arm);
             //TestRelativeRotations(arm);
-            TestStaticActions(arm);
+            //TestStaticActions(arm);
+            TestNewPushPop(arm);
 
             //arm.Export(@"C:\test.mod");
 
@@ -29,6 +30,26 @@ namespace TEST_Workbench
             Console.ReadKey();
 
             arm.Disconnect();
+        }
+
+        static void TestNewPushPop(Robot arm)
+        {
+            arm.SpeedTo(100);
+            arm.MoveTo(302, 0, 558);
+
+            arm.PushSettings();
+            arm.Speed(-50);
+            arm.Zone(-2);
+            arm.Motion("joint");
+            arm.Coordinates("local");
+            arm.Move(0, 0, 50);
+
+            arm.SpeedTo(200);
+            arm.Move(0, 0, -100);
+
+            arm.PopSettings();
+
+            arm.MoveTo(302, 0, 558);
         }
 
         static void TestStaticActions(Robot arm)

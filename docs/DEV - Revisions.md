@@ -34,13 +34,15 @@
         } 
     ```
 
+## BUILD 1118
+- [ ] Implement Actions in a Dynamo suite of nodes
+
 ## BUILD 1117
 - [x] Fixed local orientation problem
 - [x] Reworked Settings to become Actions: Speed, Zone, Motion and Coordinates.
 - [x] Modify walkthoruhg and API with SpeedTo + ZoneTo 
 - [x] Add static Action constructors mirroring the main API
-- [ ] Bring back Push and PopSettings with some simple workaround
-- [ ] Implement Actions in a Dynamo suite of nodes
+- [x] Bring back Push and PopSettings with some simple workaround
 
 ## BUILD 1116
 - [x] Get stream mode working again, with all available actions

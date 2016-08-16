@@ -22,7 +22,8 @@ namespace BRobot
         Speed = 7,
         Zone = 8,
         Motion = 9,
-        Coordinates = 10
+        Coordinates = 10,
+        PushPop = 11
     }
 
     
@@ -165,6 +166,13 @@ namespace BRobot
             this.speed = speed;
             this.relative = relative;
         }
+
+        public override string ToString()
+        {
+            return relative ?
+                string.Format("Increase speed by {0} mm/s", speed) :
+                string.Format("Set speed to {0} mm/s", speed);
+        }
     }
 
     //  ███████╗ ██████╗ ███╗   ██╗███████╗
@@ -189,6 +197,13 @@ namespace BRobot
             this.zone = zone;
             this.relative = relative;
         }
+
+        public override string ToString()
+        {
+            return relative ?
+                string.Format("Increase zone by {0} mm", zone) :
+                string.Format("Set zone to {0} mm", zone);
+        }
     }
 
     //  ███╗   ███╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗
@@ -207,7 +222,14 @@ namespace BRobot
         
         public ActionMotion(MotionType motionType)
         {
+            type = ActionType.Motion;
+
             this.motionType = motionType;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Set motion type to '{0}'", motionType);
         }
     }
 
@@ -227,10 +249,45 @@ namespace BRobot
 
         public ActionCoordinates(ReferenceCS referenceCS)
         {
+            type = ActionType.Coordinates;
+
             this.referenceCS = referenceCS;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Set reference coordinate system to '{0}'", referenceCS);
         }
     }
 
+    //  ██████╗ ██╗   ██╗███████╗██╗  ██╗      ██████╗  ██████╗ ██████╗ 
+    //  ██╔══██╗██║   ██║██╔════╝██║  ██║      ██╔══██╗██╔═══██╗██╔══██╗
+    //  ██████╔╝██║   ██║███████╗███████║█████╗██████╔╝██║   ██║██████╔╝
+    //  ██╔═══╝ ██║   ██║╚════██║██╔══██║╚════╝██╔═══╝ ██║   ██║██╔═══╝ 
+    //  ██║     ╚██████╔╝███████║██║  ██║      ██║     ╚██████╔╝██║     
+    //  ╚═╝      ╚═════╝ ╚══════╝╚═╝  ╚═╝      ╚═╝      ╚═════╝ ╚═╝     
+    //                                                                  
+    /// <summary>
+    /// An Action to Push or Pop current device settings (such as speed, zone, etc.)
+    /// </summary>
+    public class ActionPushPop: Action
+    {
+        public bool push;  // is this push or pop?
+
+        public ActionPushPop(bool push)
+        {
+            type = ActionType.Translation;
+
+            this.push = push;
+        }
+
+        public override string ToString()
+        {
+            return push ?
+                "Push settings to buffer" :
+                "Pop settings";
+        }
+    }
 
 
 

@@ -65,8 +65,8 @@ namespace BRobot
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ? 
-                writePointer.buffer.GetBlockPending(false) : 
-                writePointer.buffer.GetAllPending(false);
+                writePointer.actionBuffer.GetBlockPending(false) : 
+                writePointer.actionBuffer.GetAllPending(false);
 
 
             // CODE LINES GENERATION

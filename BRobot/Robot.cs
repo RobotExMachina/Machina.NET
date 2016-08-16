@@ -509,23 +509,23 @@ namespace BRobot
             Coordinates(refcs);
         }
 
-        ///// <summary>
-        ///// Buffers current state settings (speed, zone, motion type...), and opens up for 
-        ///// temporary settings changes to be reverted by PopSettings().
-        ///// </summary>
-        //public void PushSettings()
-        //{
-        //    c.PushCurrentSettings();
-        //}
+        /// <summary>
+        /// Buffers current state settings (speed, zone, motion type...), and opens up for 
+        /// temporary settings changes to be reverted by PopSettings().
+        /// </summary>
+        public void PushSettings()
+        {
+            c.IssuePushPopRequest(true);
+        }
 
-        ///// <summary>
-        ///// Reverts the state settings (speed, zone, motion type...) to the previously buffered
-        ///// state by PushSettings().
-        ///// </summary>
-        //public void PopSettings()
-        //{
-        //    c.PopCurrentSettings();
-        //}
+        /// <summary>
+        /// Reverts the state settings (speed, zone, motion type...) to the previously buffered
+        /// state by PushSettings().
+        /// </summary>
+        public void PopSettings()
+        {
+            c.IssuePushPopRequest(false);
+        }
 
 
 

@@ -646,7 +646,20 @@ namespace BRobot
             return success;
         }
 
+        public bool IssuePushPopRequest(bool push)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
 
+            ActionPushPop act = new ActionPushPop(push);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
 
 
 
