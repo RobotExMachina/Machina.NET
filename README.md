@@ -74,6 +74,8 @@ Documentation on BRobot's API can be found in the [Reference](https://github.com
 
 BRobot comes with a bunch of sample projects that may help you understand its possibilities. Take a look at them, and please don't blame me if they broke during development... :sweat_smile:
 
+- [BRobot for Dynamo](#https://github.com/garciadelcastillo/BRobot-for-Dynamo)
+
 
 ## Current Limitations
 
