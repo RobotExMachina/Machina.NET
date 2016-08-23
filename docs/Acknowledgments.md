@@ -8,7 +8,7 @@ Life support from the 'dream team' Nono Martinez Alonso, Keith Alfaro, Omid Oliy
 
 The [DynamoTORO](https://github.com/coten/TORO) project by Nick Cote was a fantastic reference for early implementation of Dynamo-based robotics. You should check it out, it's pretty awesome. 
 
-For a brief period of time, BRobot implemented a Plane to Quaternion conversion developed at the Harvard Graduate School of Design's [Design Robotics Group](http://research.gsd.harvard.edu/maps/), with contributions from Sola Grantham, Anthony Kane, Nathan King, Jonathan Grinham, and others. This was deprecated in favour of a simplified version, whose functionality is still under evaluation. Maybe it will come back, maybe it doesn't... 
+For a brief period of time, BRobot implemented a Plane to Quaternion conversion developed at the Harvard Graduate School of Design's [Design Robotics Group](http://research.gsd.harvard.edu/maps/), with contributions from Sola Grantham, Anthony Kane, Nathan King, Jonathan Grinham, and others. This was deprecated in favour of a simplified version, whose functionality is still under evaluation. Maybe it will come back, maybe it won't... 
 
 BRobot's action-state model is strongly inspired by the work of [Seymour Papert](https://en.wikipedia.org/wiki/Seymour_Papert) et al. with the [LOGO language](https://en.wikipedia.org/wiki/Logo_(programming_language)) and its application in [turtle graphics and robotics for children](https://en.wikipedia.org/wiki/Turtle_(robot)). The title 'action-state model' is loosely inspired by the motivations behind [SAM patterns](http://sam.js.org/).
 
