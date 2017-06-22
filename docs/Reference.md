@@ -7,16 +7,16 @@
 - [Version](#version)
 
 ### Methods
-- [Mode](#mode)  
+- [Mode](#mode)
 &nbsp;
 - [Connect](#connect)
-- [Disconnect](#disconnect)  
+- [Disconnect](#disconnect)
 &nbsp;
 - [Start](#start)
-- [Stop](#stop)  
+- [Stop](#stop)
 &nbsp;
 - [Export](#export)
-- [Execute](#execute)  
+- [Execute](#execute)
 &nbsp;
 - [Motion](#motion)
 - [Coordinates](#coordinates)
@@ -25,7 +25,7 @@
 - [Zone](#zone)
 - [ZoneTo](#zoneto)
 - [PushSettings](#pushsettings)
-- [PopSettings](#popsettings)  
+- [PopSettings](#popsettings)
 &nbsp;
 - [Move](#move)
 - [MoveTo](#moveto)
@@ -85,13 +85,13 @@ _bool Mode(ControlMode mode)_
 
 _bool Mode(string mode)_
 
-Sets the control mode the robot will operate under: __"offline"__ (default), __"execute"__ or __"stream."__
+Sets the control mode the robot will operate under: __"offline"__ (default), __"execute"__ or __"stream."__ Check the [Walkthrough section](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Walkthrough.md) for more information about what this means.
 
 ```csharp
 Robot arm = new Robot();
 
 // Sets the robot instance to work in 'stream' mode
-bot.Mode("stream");  
+bot.Mode("stream");
 ```
 
 
@@ -107,7 +107,7 @@ Robot bot = new Robot();
 bot.Mode("stream");
 
 // Connects to a real or virtual controller
-bot.Connect();  
+bot.Connect();
 ```
 
 
@@ -115,7 +115,7 @@ bot.Connect();
 
 _bool Disconnect()_
 
-Performs all necessary operations to safely disconnect from connected devices. Necessary for 'online' modes such as 'execute' and 'stream.' 
+Performs all necessary operations to safely disconnect from connected devices. Necessary for 'online' modes such as 'execute' and 'stream.'
 
 ```csharp
 Robot bot = new Robot();
@@ -125,7 +125,7 @@ bot.Connect();
 // ... do awesome stuff
 
 // Disconnect from the controller before closing the client
-bot.Disconnect();  
+bot.Disconnect();
 ```
 
 _NOTE: it is **extremely important to disconnect from devices** upon client closure to ensure proper disposal of all COM objects. Failure to do so may prevent the client from further successful connections and the need to restart the controller._
@@ -177,7 +177,8 @@ _NOTE: works only in 'execute' and 'stream' modes._
 
 --
 ### Export
-_List<string> Export()_
+_List &lt;string> Export()_
+
 _bool Export(string filepath)_
 
 Converts all pending actions into device-specific code, and returns it as a string representation or saves it to a text file. All actions issued to the Robot instance so far will be flushed from the buffer.
@@ -208,7 +209,7 @@ _NOTE: works only in 'offline' mode._
 
 _void Execute()_
 
-Converts all pending actions into device-specific code, uploads it to the connected controller and starts execution of this program. All actions issued to the Robot instance so far will be flushed from the buffer. 
+Converts all pending actions into device-specific code, uploads it to the connected controller and starts execution of this program. All actions issued to the Robot instance so far will be flushed from the buffer.
 
 ```csharp
 Robot bot = new Robot();
@@ -224,7 +225,7 @@ _NOTE: works only in 'execute' mode._
 
 
 --
-### Motion 
+### Motion
 
 _MotionType Motion()_
 
@@ -232,7 +233,7 @@ _void Motion(MotionType type)_
 
 _void Motion(string type)_
 
-Gets or sets the current type of motion to be applied to future translation actions. This can be __"linear"__ (default) for straight line movements in euclidean space, or __"joint"__ for linear transitions between joint angles (linear movement in robot configuration space).
+Gets or sets the current type of motion to be applied to future translation actions. This can be __"linear"__ (default) for straight line movements in Euclidean space, or __"joint"__ for linear transitions between joint angles (linear movement in robot configuration space).
 
 ```csharp
 // Change to "joint" movement
@@ -255,10 +256,10 @@ _void Coordinates(ReferenceCS refcs)_
 
 _void Coordinates(string type)_
 
-Gets or sets the coordinate system that will be used for future relative actions. This can be __"global"__ or __"world"__ (default) to refer to the system's global reference coordinates, or __"local"__ to refer to the device's local reference frame. For example, for a robotic arm, the "global" coordinate system will be the robot's base, and the "local" one will be the coordinates of the end effector, after all translation and rotation transformations. 
+Gets or sets the coordinate system that will be used for future relative actions. This can be __"global"__ or __"world"__ (default) to refer to the system's global reference coordinates, or __"local"__ to refer to the device's local reference frame. For example, for a robotic arm, the "global" coordinate system will be the robot's base, and the "local" one will be the coordinates of the end effector, after all translation and rotation transformations.
 
 ```csharp
-bot.Move(100, 0);      // moves 100 mm in global (default) X direction
+bot.Move(100, 0);         // moves 100 mm in global (default) X direction
 bot.Rotate(1, 0, 0, 45);  // rotates 45 degs around global X axis
 
 // Sets relative actions to use the device's local reference frame
@@ -274,7 +275,7 @@ _int Speed()_
 
 _void Speed(int speedInc)_
 
-Gets or increases the speed in mm/s at which future transformation actions will run. Default value is 20. 
+Gets the current speed value, or increases the speed value in mm/s at which future transformation actions will run. Default value is 20.
 
 ```csharp
 bot.SpeedTo(100);
@@ -287,9 +288,9 @@ bot.Move(100, 0);  // will move at 25 mm/s
 
 ### SpeedTo
 
-_void Speed(int speed)_
+_void SpeedTo(int speed)_
 
-Sets the speed in mm/s at which future transformation actions will run. Default value is 20.
+Sets the absolute speed value in mm/s at which future transformation actions will run. Default value is 20.
 
 ```csharp
 bot.SpeedTo(100);
@@ -306,7 +307,7 @@ _int Zone()_
 
 _void Zone(int zoneInc)_
 
-Gets or increases the zone radius in mm at which the device will start transitioning to its next target transformation. You can think of this as a 'proximity precision' parameter to blend movement along consecutive waypoints. Default value is 5 mm.
+Gets the current zone value, or increases the zone radius in mm at which the device will start transitioning to its next target transformation. You can think of this as a 'proximity precision' parameter to blend movement along consecutive waypoints. Default value is 5 mm.
 
 ```csharp
 // Set a 10 mm proximity radius to targets
@@ -315,7 +316,7 @@ bot.MoveTo(200, 200, 10);
 
 // The corners of this square movement will look 'rounded' with a 4 mm radius
 bot.Zone(-6);
-bot.Move(50, 0);  
+bot.Move(50, 0);
 bot.Move(0, 50);
 bot.Move(-50, 0);
 bot.Move(0, -50);
@@ -326,7 +327,7 @@ bot.Move(0, -50);
 
 _void ZoneTo(int zone)_
 
-Sets the zone radius in mm at which the device will start transitioning to its next target transformation. You can think of this as a 'proximity precision' parameter to blend movement along consecutive waypoints. Default value is 5 mm.
+Sets the absolute zone radius in mm at which the device will start transitioning to its next target transformation. You can think of this as a 'proximity precision' parameter to blend movement along consecutive waypoints. Default value is 5 mm.
 
 ```csharp
 // Set a 10 mm proximity radius to targets
@@ -335,7 +336,7 @@ bot.MoveTo(200, 200, 10);
 
 // The corners of this square movement will look 'rounded' with a 4 mm radius
 bot.Zone(-6);
-bot.Move(50, 0);  
+bot.Move(50, 0);
 bot.Move(0, 50);
 bot.Move(-50, 0);
 bot.Move(0, -50);
@@ -346,7 +347,7 @@ bot.Move(0, -50);
 
 _void PushSettings()_
 
-Stores current state settings to a buffer, so that temporary changes can be made, and settings can be reverted to the stored state later with [PopSettings()](#popsettings). 
+Stores current state settings to a buffer, so that temporary changes can be made, and settings can be reverted to the stored state later with [PopSettings()](#popsettings).
 
 ```csharp
 bot.PushSettings();  // store current settings
@@ -355,7 +356,7 @@ bot.Zone(10);
 bot.Move(100, 0);    // will move at 200 mm/s with 10 mm zone
 bot.PopSettings();   // revert to previously stored settings
 
-bot.Move(100, 0);    // will move at the speed and zone settings before .PushSettings()
+bot.Move(100, 0);    // will move at the speed and zone values before .PushSettings()
 ```
 
 _NOTE: State settings include [motion type](#motion), [reference coordinate system](#coordinates), [speed](#speed) and [zone](#zone)._
@@ -365,7 +366,7 @@ _NOTE: State settings include [motion type](#motion), [reference coordinate syst
 
 _void PopSettings()_
 
-Reverts current settings to the state store by the last call to [PushSettings()](#pushsettings).  
+Reverts current settings to the state stored by the last call to [PushSettings()](#pushsettings).
 
 ```csharp
 bot.PushSettings();  // store current settings
@@ -388,7 +389,7 @@ _bool Move(double incX, double incY)_
 
 _bool Move(double incX, double incY, double incZ)_
 
-Moves the device along a speficied vector relative to its current position. 
+Moves the device along a specified vector relative to its current position.
 
 ```csharp
 bot.MoveTo(300, 0, 500);  // device moves to global coordinates [300, 0, 500]
@@ -404,7 +405,7 @@ _bool MoveTo(Point position)_
 
 _bool MoveTo(double x, double y, double z)_
 
-Moves the device to an absolute position in global coordinates. 
+Moves the device to an absolute position in global coordinates.
 
 ```csharp
 bot.MoveTo(300, 0, 500);  // device moves to global coordinates [300, 0, 500]
@@ -423,7 +424,7 @@ _bool Rotate(double rotVecX, double rotVecY, double rotVecZ, double angDegs)_
 Rotates the device a specified angle in degrees along the specified vector.
 
 ```csharp
-bot.Rotate(0, 0, 1, 45);  // rotates the device 45 degrees around Z axis  
+bot.Rotate(0, 0, 1, 45);  // rotates the device 45 degrees around Z axis
 ```
 
 _NOTE: the orientation of this relative rotation is defined by the current [reference coordinate system](#coordinates)._
@@ -439,7 +440,7 @@ _bool RotateTo(Point vecX, Point vecY)_
 
 _bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)_
 
-Rotate the devices to an absolute orientation defined by the two main X and Y axes.
+Rotates the devices to an absolute orientation, usually defined by the two main X and Y axes.
 
 ```csharp
 bot.RotateTo(-1, 0, 0, 0, 1, 0);  // rotates to a coordinate system with flipped Z axis
@@ -452,7 +453,7 @@ _bool Transform(Point position, Rotation rotation)_
 
 _bool Transform(Rotation rotation, Point position)_
 
-Performs a compound relative rotation + translation transformation in a single action. Note that when performing relative transformations, the R+T versus T+R order matters. The overloads are designed to take this order into account. 
+Performs a compound relative rotation + translation transformation in a single action. Note that when performing relative transformations, the R+T versus T+R order matters. The overloads are designed to take this order into account.
 
 ```csharp
 // Move the device 100 mm in X and then rotate 90 degs around Z axis
@@ -472,7 +473,7 @@ Performs a compound absolute rotation + translation transformation, or in other 
 
 ```csharp
 // The device moves to [300, 0, 500] and is rotated 180 degs in the Y axis from the global reference CS
-bot.TransformTo(new Point(300, 0, 500), new Rotation(0, 1, 0, 180)); 
+bot.TransformTo(new Point(300, 0, 500), new Rotation(0, 1, 0, 180));
 ```
 
 _NOTE: R+T order isn't relevant for absolute transformations, the overloads are here just for [orthogonality](https://en.wikipedia.org/wiki/Orthogonal_instruction_set)._
@@ -484,7 +485,7 @@ _bool Joints(Joints incJoints)_
 
 _bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)_
 
-Increase the rotation angle in degrees of the joints in mechanical devices, specially robotic arms. 
+Increase the rotation angle in degrees of the joints in mechanical devices, specially robotic arms.
 
 ```csharp
 bot.Joints(-15, 0, 0, 0, 0, 0);  // rotate joint 1 (base) -15 degs
@@ -498,7 +499,7 @@ _bool JointsTo(Joints joints)_
 
 _bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)_
 
-Sets the rotation angle in degrees of the joints in mechanical devices, specially robotic arms. 
+Sets the rotation angle in degrees of the joints in mechanical devices, specially robotic arms.
 
 ```csharp
 bot.JointsTo(0, 0, 0, 0, 0, 0);   // sets the robot to move to home position
@@ -510,12 +511,12 @@ bot.JointsTo(0, 0, 0, 0, 90, 0);  // set joint 5 to rotate 90 degs
 
 _bool Wait(long timeMillis)_
 
-Pause program execution for specified milliseconds. 
+Pause program execution for specified milliseconds.
 
 ```csharp
-bot.Move(100, 0);
+bot.MoveTo(300, 200, 400);
 bot.Wait(1500);    // wait 1.5 s before executing next action
-bot.Move(0, 100);
+bot.Move(0, 0, 100);
 ```
 
 
@@ -526,7 +527,7 @@ _bool Message(string message)_
 Displays a text message on the device. This will depend on the device's configuration. For example, for ABB robots it will display it on the FlexPendant's log window.
 
 ```csharp
-bot.Move(100, 0);
+bot.MoveTo(300, 200, 400);
 bot.Message("Moving up!");
 bot.Move(0, 0, 100);
 ```
@@ -542,7 +543,7 @@ _event BufferEmptyHandler BufferEmpty_
 This event rises whenever the client has released all pending actions to the controller, and there are no more instructions to be issued. Think of this as an event that signals a 'demand' to issue new orders to the connected device. This is useful when developing time-sensitive apps whose actions depend on the state of the environment, like motion controllers, interactive installations and so on...
 
 ```csharp
-// Subscribe to BufferEmptyEvents 
+// Subscribe to BufferEmptyEvents
 bot.BufferEmpty += new BufferEmptyHandler(IssueNewMovement);
 
 void IssueNewMovement(object sender, EventArgs args) {
@@ -565,7 +566,7 @@ _Point(double x, double y, double z)_
 
 _Point(Point p)_
 
-Represents a location or a vector in three dimensional space. This class features several helper methods and operator overloads to perform vector algebra. 
+Represents a location or a vector in three dimensional space. This class features several helper methods and operator overloads to perform vector algebra.
 
 
 ### Rotation
@@ -584,7 +585,7 @@ _Rotation(Point vecX, Point vecY)_
 
 _Rotation(double x0, double x1, double x2, double y0, double y1, double y2)_
 
-Represents an rotation in three-dimensional space defined by its quaternion representation. This class features several helper methods and operator overloads to perform quaternion algebra. 
+Represents an rotation in three-dimensional space defined by its quaternion representation. This class features several helper methods and operator overloads to perform quaternion algebra.
 
 
 ### Joints

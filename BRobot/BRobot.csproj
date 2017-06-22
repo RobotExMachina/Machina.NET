@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BRobot</RootNamespace>
     <AssemblyName>BRobot</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -55,7 +55,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ABB.Robotics.Controllers.PC">
-      <HintPath>C:\Program Files (x86)\ABB Industrial IT\Robotics IT\SDK\PCSDK 6.03\ABB.Robotics.Controllers.PC.dll</HintPath>
+      <HintPath>..\assemblies\ABB.Robotics.Controllers.PC.dll</HintPath>
+    </Reference>
+    <Reference Include="RobotStudio.Services.RobApi.Desktop">
+      <HintPath>..\assemblies\RobotStudio.Services.RobApi.Desktop.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

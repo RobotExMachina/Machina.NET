@@ -14,6 +14,15 @@
    ╚═╝    ╚═════╝ ╚═════╝  ╚═════╝ 
 ```
 
+# PHASE 2
+
+
+
+
+---
+
+# PHASE 1
+
 ## HIGH-LEVEL
 - [x] Merged ConnectionMode & OnlineMode into ControlMode
 - [x] Restructured library

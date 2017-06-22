@@ -401,7 +401,7 @@ namespace BRobot
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute position values first before applying relative ones..." + this);
+                    Console.WriteLine("Sorry, must provide absolute position values first before applying relative ones... " + this);
                     return false;
                 }
 
@@ -421,7 +421,7 @@ namespace BRobot
                 // Fail if issued abs movement without prior rotation info. (This limitation is due to current lack of FK/IK solvers)
                 if (rotation == null)
                 {
-                    Console.WriteLine("Sorry, currently missing TCP orientation to work with..." + this);
+                    Console.WriteLine("Sorry, currently missing TCP orientation to work with... " + this);
                     return false;
                 }
 
@@ -465,7 +465,7 @@ namespace BRobot
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute rotation values first before applying relative ones..." + this);
+                    Console.WriteLine("Sorry, must provide absolute rotation values first before applying relative ones... " + this);
                     return false;
                 }
 
@@ -483,7 +483,7 @@ namespace BRobot
                 // Fail if issued abs rotation without prior position info. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null)
                 {
-                    Console.WriteLine("Sorry, currently missing TCP position to work with..." + this);
+                    Console.WriteLine("Sorry, currently missing TCP position to work with... " + this);
                     return false;
                 }
 

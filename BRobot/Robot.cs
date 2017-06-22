@@ -72,20 +72,15 @@ namespace BRobot
     //  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
     //                                             
     /// <summary>
-    /// The core Class in BRobot. Represents a state & action-based virtual robot, 
+    /// The core Class in BRobot. Represents a state and action-based virtual robot, 
     /// and exposes the public API for robot manipulation and control.
     /// </summary>
     public class Robot
     {
         /// <summary>
-        /// Build number.
+        /// Version + build number.
         /// </summary>
-        public static readonly int Build = 1117;
-
-        /// <summary>
-        /// Version number.
-        /// </summary>
-        public static readonly string Version = "0.1.0";
+        public static readonly string Version = "0.2.0 - 1200";
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that

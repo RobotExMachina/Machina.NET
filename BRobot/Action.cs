@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace BRobot
 {
 
+    /// <summary>
     /// Defines an Action Type, like Translation, Rotation, Wait... 
     /// Useful to flag base Actions into children classes.
     /// </summary>

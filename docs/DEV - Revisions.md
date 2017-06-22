@@ -14,6 +14,19 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+# PHASE 2
+
+## BUILD 1200
+- [ ] Project is now targetting .NET framework 4.6.1 (because of the new ABB.Robotics library...)
+
+
+
+
+
+---
+
+# PHASE 1
+
 ## PENDING 
 - [ ] Rework Actions
     - [ ] Make a static API that can generate them as objects
@@ -35,7 +48,7 @@
     ```
 
 ## BUILD 1118
-- [ ] Implement Actions in a Dynamo suite of nodes
+- [x] Implement Actions in a Dynamo suite of nodes
 
 ## BUILD 1117
 - [x] Fixed local orientation problem
