@@ -16,12 +16,32 @@
 
 # PHASE 2
 
+
+
+
 ## BUILD 1200
-- [ ] Project is now targetting .NET framework 4.6.1 (because of the new ABB.Robotics library...)
+- [x] Project is now targetting .NET framework 4.6.1 (because of the new ABB.Robotics library...)
+- [x] BRobot for Dynamo is now a package
+- [x] Renamed Rotation.GetRotationVector() to .GetRotationAxis(), this will only return the unit vector corresponding to the rotation axis.
+- [x] Added Rotation.GetRotationVector() to return the axis-angle representation of the Quaternion https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
+- [x] Add Joint.Scale()
+- [x] Fix PushPop actions generating targets on compilation
+- [x] Updated old TEST_OfflineAPITests to new abs+rel conventions, specially speeds and zones.
+- [ ] Rotation problem: the following R construction returns a CS system with the Y inverted!:
+    ```csharp
+        > Rotation r = new Rotation(-1, 0, 0, 0, 0, -1);
+        > r
+        [[0,0,0.70710678,0.70710678]]
+        > r.GetCoordinateSystem()
+        [[[-1,0,0],[0,0,1],[0,1,0]]]  // --> Notice the inverted Y axis!
 
-
-
-
+        // It doesn't happen with this one for example:
+        > Rotation r1 = new Rotation(-1, 0, 0, 0, 1, 0);
+        > r1
+        [[0,0,1,0]]
+        > r1.GetCoordinateSystem()
+        [[[-1,0,0],[0,1,0],[0,0,-1]]]
+    ```
 
 ---
 

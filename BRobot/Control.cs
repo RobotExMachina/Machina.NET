@@ -22,7 +22,7 @@ namespace BRobot
         public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
         public const int DEFAULT_ZONE = 5;                                    // default zone for new actions
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
-        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;          // default reference coordinate system for relative transform actions
+        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
         public const ControlMode DEFAULT_CONTROLMODE = ControlMode.Offline;
         public const RunMode DEFAULT_RUNMODE = RunMode.Once;                  
         
@@ -119,10 +119,10 @@ namespace BRobot
         /// </summary>
         public void Reset()
         {
-            virtualCursor = new RobotCursorABB("virtualCursor", true);
-            writeCursor = new RobotCursorABB("writeCursor", false);
+            virtualCursor = new RobotCursorUR("virtualCursor", true);
+            writeCursor = new RobotCursorUR("writeCursor", false);
             virtualCursor.SetChild(writeCursor);
-            motionCursor = new RobotCursorABB("motionCursor", false);
+            motionCursor = new RobotCursorUR("motionCursor", false);
             writeCursor.SetChild(motionCursor);
             areCursorsInitialized = false;
 

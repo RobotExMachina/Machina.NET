@@ -78,9 +78,14 @@ namespace BRobot
     public class Robot
     {
         /// <summary>
-        /// Version + build number.
+        /// Build number.
         /// </summary>
-        public static readonly string Version = "0.2.0 - 1200";
+        public static readonly int Build = 1200;
+
+        /// <summary>
+        /// Version number.
+        /// </summary>
+        public static readonly string Version = "0.2.0";
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that

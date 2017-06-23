@@ -28,8 +28,8 @@ namespace TEST_OfflineAPITests
             //// Use Push & PopSettings ;)
             //PushAndPopSettingsTest(arm);
 
-            //// Rotation tests
-            //RotationTests(arm);
+            // Rotation tests
+            RotationTests(arm);
 
             //// Advanced rotation tests
             //RotationTestsAdvanced(arm);
@@ -47,7 +47,7 @@ namespace TEST_OfflineAPITests
             //TestCircleTransformLocal(arm, 10);
             //TestCircleTransformGlobal(arm, 10);
             //TestZTableLimitations(arm);
-            
+
             //// Snake
             //TestSnake(arm);
 
@@ -58,13 +58,13 @@ namespace TEST_OfflineAPITests
             //// Absolute vs relative movement buffers
             //TestChangesInMovementModes(arm);
 
-            // Wait and Message
-            TestWaitAndMessage(arm);
+            //// Wait and Message
+            //TestWaitAndMessage(arm);
 
             arm.DebugBuffer();  // read all pending buffered actions
             arm.DebugRobotCursors();
 
-            arm.Export(@"C:\offlineTests.mod");
+            arm.Export(@"C:\offlineTests.script");
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
 
@@ -79,19 +79,19 @@ namespace TEST_OfflineAPITests
 
         static public void TracePlanarRectangle(Robot arm)
         {
-            arm.Speed(200); 
-            arm.Zone(20);
+            arm.SpeedTo(100); 
+            arm.ZoneTo(20);
             arm.MoveTo(300, 300, 300);
 
-            arm.Speed(50);
-            arm.Zone(2);  // non predef zone
+            arm.SpeedTo(50);
+            arm.ZoneTo(2);  // non predef zone
             arm.Move(50, 0, 0);
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
             arm.Move(0, -50, 50);
 
-            arm.Speed(500);
-            arm.Zone(10);
+            arm.SpeedTo(100);
+            arm.ZoneTo(10);
             arm.MoveTo(300, 0, 500);
         }
 
@@ -100,8 +100,8 @@ namespace TEST_OfflineAPITests
         {
             if (jointMovement) arm.Motion("joint");
 
-            arm.Speed(100);
-            arm.Zone(1);
+            arm.SpeedTo(100);
+            arm.ZoneTo(1);
             arm.MoveTo(300, 0, 600);
             arm.MoveTo(200, -200, 400);
             arm.Move(0, 378, 0);
@@ -114,7 +114,7 @@ namespace TEST_OfflineAPITests
         {
             double h = height;
             zStep = Math.Abs(zStep);
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, h);
             while (h > 0)
             {
@@ -130,8 +130,11 @@ namespace TEST_OfflineAPITests
         {
             arm.MoveTo(300, -200, 300);
 
+            arm.SpeedTo(100);
+            arm.ZoneTo(1);
+
             arm.PushSettings();
-            arm.Speed(52);
+            arm.Speed(50);
             arm.Move(0, 200, 0);
             arm.DebugSettingsBuffer();
             arm.PopSettings();
@@ -144,7 +147,7 @@ namespace TEST_OfflineAPITests
 
             arm.PushSettings();
             arm.Motion("joint");
-            arm.Speed(150);
+            arm.Speed(100);
             arm.Move(0, 0, 200);
             arm.DebugSettingsBuffer();
             arm.PopSettings();
@@ -162,24 +165,46 @@ namespace TEST_OfflineAPITests
 
         public static void RotationTests(Robot arm)
         {
-            arm.Speed(100);
+            //// ABB VERSION
+            //arm.SpeedTo(100);
+            //arm.MoveTo(300, 0, 500);
+
+            //// Move to a more dexterous area
+            //arm.MoveTo(300, -100, 400);
+
+            //// Velocity is expresses in both mm/s and °/s
+            //arm.SpeedTo(45);
+
+            //arm.RotateTo(0, 1, 0, 1, 0, 0);     // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
+            //arm.RotateTo(0, 0, 1, 1, 0, 0);     // 'rotate 90° around global X'
+            //arm.RotateTo(0, 0, 1, 0, -1, 0);    // 'rotate -90° around global Z'
+
+            ////arm.RotateTo(0, 0, 1, 0);  // revert back to base flipped Z
+            //arm.RotateTo(1, 0, 0, 0, -1, 0);
+
+            //arm.SpeedTo(100);
+            //arm.MoveTo(300, 0, 500);
+
+            // UR VERSION
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
+            arm.RotateTo(-1, 0, 0, 0, 1, 0);  // Set TCP to default orientation
 
             // Move to a more dexterous area
             arm.MoveTo(300, -100, 400);
 
             // Velocity is expresses in both mm/s and °/s
-            arm.Speed(45);
+            arm.SpeedTo(45);
 
-            arm.RotateTo(0, 1, 0, 1, 0, 0);     // set coordinate system from XYZ unit vectors (rotate -90° around global Z)
-            arm.RotateTo(0, 0, 1, 1, 0, 0);     // 'rotate 90° around global X'
-            arm.RotateTo(0, 0, 1, 0, -1, 0);    // 'rotate -90° around global Z'
+            arm.RotateTo(-1, 0, 0, 0, 0, -1);  // rotate 90 degs around local X
+            //arm.RotateTo(0, 0, -1, 1, 0, 0);   // rotate 90 degs around local z
+            //arm.RotateTo(0, 1, 0, 1, 0, 0);    // rotate 90 degs around local Y
 
-            //arm.RotateTo(0, 0, 1, 0);  // revert back to base flipped Z
-            arm.RotateTo(1, 0, 0, 0, -1, 0);
+            //arm.Wait(1000);
+            //arm.RotateTo(-1, 0, 0, 0, 1, 0);  // revert back to standard
 
-            arm.Speed(100);
-            arm.MoveTo(300, 0, 500);
+            //arm.SpeedTo(100);
+            //arm.MoveTo(300, 0, 500);
         }
 
         public static void RotationTestsAdvanced(Robot arm)
@@ -210,9 +235,9 @@ namespace TEST_OfflineAPITests
             Rotation rzn45 = new Rotation(new Point(0, 0, 1), -45);
             Rotation rzn90 = new Rotation(new Point(0, 0, 1), -90);
 
-            Point xAxis = rx45.GetRotationVector();
-            Point yAxis = ry45.GetRotationVector();
-            Point zAxis = rz45.GetRotationVector();
+            Point xAxis = rx45.GetRotationAxis();
+            Point yAxis = ry45.GetRotationAxis();
+            Point zAxis = rz45.GetRotationAxis();
 
             double val45 = rx45.GetRotationAngle();
             double val90 = rx90.GetRotationAngle();

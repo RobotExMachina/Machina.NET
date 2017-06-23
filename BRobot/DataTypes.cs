@@ -31,6 +31,12 @@ namespace BRobot
         /// Amount of decimals for rounding on ToString() operations.
         /// </summary>
         protected static readonly int STRING_ROUND_DECIMALS = 8;
+
+        // Angle conversion
+        protected static readonly double TO_DEGS = 180.0 / Math.PI;
+        protected static readonly double TO_RADS = Math.PI / 180.0;
+
+
     }
 
     //██████╗  ██████╗ ██╗███╗   ██╗████████╗
@@ -779,7 +785,7 @@ namespace BRobot
         /// <param name="angDegs"></param>
         public Rotation(double vecX, double vecY, double vecZ, double angDegs)
         {
-            double halfAngRad = Math.PI * angDegs / 360.0;   // ang / 2
+            double halfAngRad = 0.5 * TO_RADS * angDegs;   // ang / 2
             double s = Math.Sin(halfAngRad);
             Point u = new Point(vecX, vecY, vecZ);
             u.Normalize();  // rotation quaternion must be unit
@@ -796,18 +802,8 @@ namespace BRobot
         /// </summary>
         /// <param name="vec"></param>
         /// <param name="angDegs"></param>
-        public Rotation(Point vec, double angDegs)
-        {
-            double halfAngRad = Math.PI * angDegs / 360.0;   // ang / 2
-            double s = Math.Sin(halfAngRad);
-            Point u = new Point(vec);
-            u.Normalize();  // rotation quaternion must be unit
-
-            this.W = Math.Cos(halfAngRad);
-            this.X = s * u.X;
-            this.Y = s * u.Y;
-            this.Z = s * u.Z;
-        }
+        public Rotation(Point vec, double angDegs) : this(vec.X, vec.Y, vec.Z, angDegs) { }
+        
 
         /// <summary>
         /// A static constructor for Rotation objects from their Quaternion representation.
@@ -1195,12 +1191,36 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Returns the rotation vector in axis-angle representation, 
+        /// i.e. the unit vector defining the rotation axis multiplied by the 
+        /// angle rotation scalar in degrees.
+        /// https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
+        /// </summary>
+        /// <returns></returns>
+        public Point GetRotationVector(bool radians)
+        {
+            Point axisAng = GetRotationAxis() * GetRotationAngle();
+            if (radians)
+            {
+                axisAng.Scale(TO_RADS);
+            }
+
+            return axisAng;
+        }
+
+        public Point GetRotationVector()
+        {
+            return GetRotationVector(false);
+        }
+
+
+        /// <summary>
         /// Returns the rotation axis represented by this Quaternion. 
-        /// Note it will always return the vector corresponding to a positive rotation, 
+        /// Note it will always return the unit vector corresponding to a positive rotation, 
         /// even if the quaternion was created from a negative one (flipped vector).
         /// </summary>
         /// <returns></returns>
-        public Point GetRotationVector()
+        public Point GetRotationAxis()
         {
             double theta2 = 2 * Math.Acos(W);
 
@@ -1222,7 +1242,7 @@ namespace BRobot
         public double GetRotationAngle()
         {
             double theta2 = 2 * Math.Acos(W);
-            return theta2 < EPSILON ? 0 : Math.Round( 180 * theta2 / Math.PI, EPSILON_DECIMALS);
+            return theta2 < EPSILON ? 0 : Math.Round(theta2 * TO_DEGS, EPSILON_DECIMALS);
         }
 
 
@@ -1440,6 +1460,16 @@ namespace BRobot
             this.J6 = j.J6;
         }
 
+        public void Scale(double s)
+        {
+            this.J1 += s;
+            this.J2 += s;
+            this.J3 += s;
+            this.J4 += s;
+            this.J5 += s;
+            this.J6 += s;
+        }
+
         /// <summary>
         /// Returns the norm (euclidean length) of this joints as a vector.
         /// </summary>
@@ -1457,6 +1487,7 @@ namespace BRobot
         {
             return J1 * J1 + J2 * J2 + J3 * J3 + J4 * J4 + J5 * J5 + J6 * J6;
         }
+
 
         public override string ToString()
         {

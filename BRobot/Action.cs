@@ -133,10 +133,20 @@ namespace BRobot
             return new ActionWait(millis);
         }
 
-
         public static ActionMessage Message(string msg)
         {
             return new ActionMessage(msg);
+        }
+
+        // Why were these not here...?
+        public static ActionPushPop PushSettings()
+        {
+            return new ActionPushPop(true);
+        }
+
+        public static ActionPushPop PopSettings()
+        {
+            return new ActionPushPop(false);
         }
 
 
@@ -277,7 +287,7 @@ namespace BRobot
 
         public ActionPushPop(bool push)
         {
-            type = ActionType.Translation;
+            type = ActionType.PushPop;
 
             this.push = push;
         }
@@ -369,7 +379,7 @@ namespace BRobot
         public override string ToString()
         {
             return relative ?
-                string.Format("Rotate {0}° around {1}", rotation.GetRotationAngle(), rotation.GetRotationVector()) :
+                string.Format("Rotate {0}° around {1}", rotation.GetRotationAngle(), rotation.GetRotationAxis()) :
                 string.Format("Rotate to {0}", rotation.GetCoordinateSystem());
         }
 
@@ -410,9 +420,9 @@ namespace BRobot
             if (relative)
             {
                 if (translationFirst)
-                    str = string.Format("Move {0} mm and rotate {1}° around {2}", translation, rotation.GetRotationAngle(), rotation.GetRotationVector());
+                    str = string.Format("Move {0} mm and rotate {1}° around {2}", translation, rotation.GetRotationAngle(), rotation.GetRotationAxis());
                 else 
-                    str = string.Format("Rotate {0}° around {1} and move {2} mm", rotation.GetRotationAngle(), rotation.GetRotationVector(), translation);
+                    str = string.Format("Rotate {0}° around {1} and move {2} mm", rotation.GetRotationAngle(), rotation.GetRotationAxis(), translation);
             }
             else
             {
