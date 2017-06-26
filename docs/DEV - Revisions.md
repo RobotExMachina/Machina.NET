@@ -70,7 +70,6 @@
 - [ ] Coordinates(): this should:
     - [ ] Accept a CS object to use as a new reference frame
     - [ ] Use workobjects when compiled
-- [ ] RobotCursor for ABBs and URs is pretty much identical, except for the utility functions, which pretty much relate to compilation anyway. Move this to Compiler and keep one unitary Cursor.
 - [ ] Add `.Motion("circle")` for `movec` commands?
 - [ ] Add `.Acceleration()` and `.AccelerationTo()` for UR robots?
 - [ ] Rethink API names to be more 'generic' and less 'ABBish'
@@ -79,6 +78,9 @@
     arm.Rotate(1, 0, 0, 225);  // interesting (and obvious): because internally this only adds a new target, the result is the robot getting there in the shortest way possible (performing a -135deg rotation) rather than the actual 225 rotation over X as would intuitively come from reading he API...
     ```
 - [ ] On export, add an additional file with human-readable instructions
+
+## BUILD 1202
+- [ ] RobotCursor for ABBs and URs is pretty much identical, except for the utility functions, which pretty much relate to compilation anyway. Move this to Compiler and keep one unitary Cursor.
 
 
 ## BUILD 1201

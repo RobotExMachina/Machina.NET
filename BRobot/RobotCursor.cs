@@ -1111,37 +1111,37 @@ namespace BRobot
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <returns></returns>
-        public string GetPoseTargetValue()
-        {
-            //return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
-            Point axisAng = rotation.GetRotationVector(true);
-            return string.Format("p[{0}, {1}, {2}, {3}, {4}, {5}]",
-                0.001 * position.X,
-                0.001 * position.Y,
-                0.001 * position.Z,
-                axisAng.X,
-                axisAng.Y,
-                axisAng.Z);
-        }
+        //public string GetPoseTargetValue()
+        //{
+        //    //return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
+        //    Point axisAng = rotation.GetRotationVector(true);
+        //    return string.Format("p[{0}, {1}, {2}, {3}, {4}, {5}]",
+        //        0.001 * position.X,
+        //        0.001 * position.Y,
+        //        0.001 * position.Z,
+        //        axisAng.X,
+        //        axisAng.Y,
+        //        axisAng.Z);
+        //}
 
-        /// <summary>
-        /// Returns an ABB jointtarget representation of the current stat of the cursor.
-        /// </summary>
-        /// <returns></returns>
-        public string GetJointTargetValue()
-        {
-            Joints jrad = new Joints(joints);  // use a shallow copy
-            Console.WriteLine(jrad);
-            jrad.Scale(Math.PI / 180);
-            Console.WriteLine(jrad);
-            return string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]", 
-                jrad.J1,
-                jrad.J2,
-                jrad.J3,
-                jrad.J4,
-                jrad.J5,
-                jrad.J6);
-        }
+        ///// <summary>
+        ///// Returns a UR joint representation of the current state of the cursor.
+        ///// </summary>
+        ///// <returns></returns>
+        //public string GetJointTargetValue()
+        //{
+        //    Joints jrad = new Joints(joints);  // use a shallow copy
+        //    Console.WriteLine(jrad);
+        //    jrad.Scale(Math.PI / 180);
+        //    Console.WriteLine(jrad);
+        //    return string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]", 
+        //        jrad.J1,
+        //        jrad.J2,
+        //        jrad.J3,
+        //        jrad.J4,
+        //        jrad.J5,
+        //        jrad.J6);
+        //}
         
 
         public override string ToString()

@@ -273,9 +273,7 @@ namespace BRobot
     internal class CompilerUR : Compiler
     {
         /// <summary>
-        /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
-        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        /// robot configuration and assumes the robot controller will figure out the correct one.
+        /// Creates a textual program representation of a set of Actions using native UR Script.
         /// </summary>
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
@@ -293,18 +291,7 @@ namespace BRobot
                 writePointer.actionBuffer.GetAllPending(false);
 
 
-            //// CODE LINES GENERATION
-            //// VELOCITY & ZONE DECLARATIONS
-            //// Amount of different VZ types
-            //Dictionary<int, string> velNames = new Dictionary<int, string>();
-            //Dictionary<int, string> velDecs = new Dictionary<int, string>();
-            //Dictionary<int, string> zoneNames = new Dictionary<int, string>();
-            //Dictionary<int, string> zoneDecs = new Dictionary<int, string>();
-            //Dictionary<int, bool> zonePredef = new Dictionary<int, bool>();
-            //// Declarations
-            //List<string> velocityLines = new List<string>();
-            //List<string> zoneLines = new List<string>();
-
+            // CODE LINES GENERATION
             // TARGETS AND INSTRUCTIONS
             List<string> variableLines = new List<string>();
             List<string> instructionLines = new List<string>();
@@ -317,21 +304,6 @@ namespace BRobot
             {
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them 
-
-                //// Check velocity + zone and generate data accordingly
-                //if (!velNames.ContainsKey(writer.speed))
-                //{
-                //    velNames.Add(writer.speed, "vel" + writer.speed);
-                //    velDecs.Add(writer.speed, writer.GetSpeedDeclaration(writer.speed));
-                //}
-
-                //if (!zoneNames.ContainsKey(writer.zone))
-                //{
-                //    bool predef = PredefinedZones.Contains(writer.zone);
-                //    zonePredef.Add(writer.zone, predef);
-                //    zoneNames.Add(writer.zone, (predef ? "z" : "zone") + writer.zone);  // use predef syntax or clean new one
-                //    zoneDecs.Add(writer.zone, predef ? "" : writer.GetZoneDeclaration(writer.zone));
-                //}
 
                 // Generate lines of code
                 if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
@@ -349,22 +321,6 @@ namespace BRobot
             }
 
 
-            //// Generate V+Z 
-            //foreach (int v in velNames.Keys)
-            //{
-            //    velocityLines.Add(string.Format("  CONST speeddata {0}:={1};", velNames[v], velDecs[v]));
-            //}
-            //foreach (int z in zoneNames.Keys)
-            //{
-            //    if (!zonePredef[z])  // no need to add declarations for predefined zones
-            //    {
-            //        zoneLines.Add(string.Format("  CONST zonedata {0}:={1};", zoneNames[z], zoneDecs[z]));
-            //    }
-            //}
-
-
-
-
             // PROGRAM ASSEMBLY
             // Initialize a module list
             List<string> module = new List<string>();
@@ -373,21 +329,6 @@ namespace BRobot
             module.Add("def " + programName + "():");
             module.Add("");
 
-            //// VARIABLE DECLARATIONS
-            //// Velocities
-            //if (velocityLines.Count != 0)
-            //{
-            //    module.AddRange(velocityLines);
-            //    module.Add("");
-            //}
-
-            //// Zones
-            //if (zoneLines.Count != 0)
-            //{
-            //    module.AddRange(zoneLines);
-            //    module.Add("");
-            //}
-
             // Targets
             if (variableLines.Count != 0)
             {
@@ -395,12 +336,7 @@ namespace BRobot
                 module.Add("");
             }
 
-            //// MAIN PROCEDURE
-            //module.Add("  PROC main()");
-            //module.Add(@"    ConfJ \Off;");
-            //module.Add(@"    ConfL \Off;");
-            //module.Add("");
-
+            // MAIN PROCEDURE
             // Instructions
             if (instructionLines.Count != 0)
             {
@@ -420,10 +356,9 @@ namespace BRobot
 
 
 
-
-
-
-
+        //  ╦ ╦╔╦╗╦╦  ╔═╗
+        //  ║ ║ ║ ║║  ╚═╗
+        //  ╚═╝ ╩ ╩╩═╝╚═╝
         static private bool GenerateVariableDeclaration(Action action, RobotCursorUR cursor, int id, out string declaration)
         {
             string dec = null;
@@ -432,11 +367,11 @@ namespace BRobot
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  target{0}={1}", id, cursor.GetPoseTargetValue());
+                    dec = string.Format("  target{0}={1}", id, GetPoseTargetValue(cursor));
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("  target{0}={1}", id, cursor.GetJointTargetValue());
+                    dec = string.Format("  target{0}={1}", id, GetJointTargetValue(cursor));
                     break;
             }
 
@@ -486,6 +421,41 @@ namespace BRobot
 
             declaration = dec;
             return dec != null;
+        }
+
+        /// <summary>
+        /// Returns an UR pose representation of the current state of the cursor.
+        /// </summary>
+        /// <returns></returns>
+        static private string GetPoseTargetValue(RobotCursor cursor)
+        {
+            Point axisAng = cursor.rotation.GetRotationVector(true);
+            return string.Format("p[{0}, {1}, {2}, {3}, {4}, {5}]",
+                0.001 * cursor.position.X,
+                0.001 * cursor.position.Y,
+                0.001 * cursor.position.Z,
+                axisAng.X,
+                axisAng.Y,
+                axisAng.Z);
+        }
+
+        /// <summary>
+        /// Returns a UR joint representation of the current state of the cursor.
+        /// </summary>
+        /// <returns></returns>
+        static private string GetJointTargetValue(RobotCursor cursor)
+        {
+            Joints jrad = new Joints(cursor.joints);  // use a shallow copy
+            Console.WriteLine(jrad);
+            jrad.Scale(Math.PI / 180);  // convert to radians
+            Console.WriteLine(jrad);
+            return string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]",
+                jrad.J1,
+                jrad.J2,
+                jrad.J3,
+                jrad.J4,
+                jrad.J5,
+                jrad.J6);
         }
 
     }
