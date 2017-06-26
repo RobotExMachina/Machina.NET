@@ -41,7 +41,7 @@ namespace BRobot
     internal class CompilerABB : Compiler
     {
         /// <summary>
-        /// A Set of ABB's predefined zone values. 
+        /// A Set of RAPID's predefined zone values. 
         /// </summary>
         private static HashSet<int> PredefinedZones = new HashSet<int>()
         {
@@ -49,7 +49,7 @@ namespace BRobot
         };
 
         /// <summary>
-        /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
+        /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
@@ -98,7 +98,7 @@ namespace BRobot
                 if (!velNames.ContainsKey(writer.speed))
                 {
                     velNames.Add(writer.speed, "vel" + writer.speed);
-                    velDecs.Add(writer.speed, writer.GetSpeedDeclaration(writer.speed));
+                    velDecs.Add(writer.speed, GetSpeedValue(writer));
                 }
 
                 if (!zoneNames.ContainsKey(writer.zone))
@@ -106,7 +106,7 @@ namespace BRobot
                     bool predef = PredefinedZones.Contains(writer.zone);
                     zonePredef.Add(writer.zone, predef);
                     zoneNames.Add(writer.zone, (predef ? "z" : "zone") + writer.zone);  // use predef syntax or clean new one
-                    zoneDecs.Add(writer.zone, predef ? "" : writer.GetZoneDeclaration(writer.zone));
+                    zoneDecs.Add(writer.zone, predef ? "" : GetZoneValue(writer));
                 }
 
                 // Generate lines of code
@@ -196,10 +196,9 @@ namespace BRobot
 
 
 
-
-
-
-
+        //  ╦ ╦╔╦╗╦╦  ╔═╗
+        //  ║ ║ ║ ║║  ╚═╗
+        //  ╚═╝ ╩ ╩╩═╝╚═╝
         static private bool GenerateVariableDeclaration(Action action, RobotCursorABB cursor, int id, out string declaration)
         {
             string dec = null;
@@ -208,11 +207,11 @@ namespace BRobot
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  CONST robtarget target{0}:={1};", id, cursor.GetUNSAFERobTargetValue());
+                    dec = string.Format("  CONST robtarget target{0}:={1};", id, GetUNSAFERobTargetValue(cursor));
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("  CONST jointtarget target{0}:={1};", id, cursor.GetJointTargetValue());
+                    dec = string.Format("  CONST jointtarget target{0}:={1};", id, GetJointTargetValue(cursor));
                     break;
             }
 
@@ -259,6 +258,61 @@ namespace BRobot
             declaration = dec;
             return dec != null;
         }
+
+        /// <summary>
+        /// Returns an RAPID robtarget representation of the current state of the cursor.
+        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        /// robot configuration and assumes the robot controller will figure out the correct one.
+        /// </summary>
+        /// <returns></returns>
+        static private string GetUNSAFERobTargetValue(RobotCursor cursor)
+        {
+            return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", cursor.position, cursor.rotation);
+        }
+
+        /// <summary>
+        /// Returns an RAPID jointtarget representation of the current state of the cursor.
+        /// </summary>
+        /// <returns></returns>
+        static private string GetJointTargetValue(RobotCursor cursor)
+        {
+            return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", cursor.joints);
+        }
+
+        /// <summary>
+        /// Returns a RAPID representation of cursor speed.
+        /// </summary>
+        /// <param name="speed"></param>
+        /// <returns></returns>
+        static private string GetSpeedValue(RobotCursor cursor)
+        {
+            // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
+            // Using the same value as lin motion here.
+            return string.Format("[{0},{1},{2},{3}]", cursor.speed, cursor.speed, 5000, 1000);
+        }
+
+        //public string GetSpeedValue()
+        //{
+        //    return GetSpeedDeclaration(speed);
+        //}
+
+        /// <summary>
+        /// Returns a RAPID representaiton of cursor zone.
+        /// </summary>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        static private string GetZoneValue(RobotCursor cursor)
+        {
+            // Following conventions for default RAPID zones.
+            double high = 1.5 * cursor.zone;
+            double low = 0.15 * cursor.zone;
+            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", cursor.zone, high, high, low, high, low);
+        }
+
+        //public string GetZoneValue()
+        //{
+        //    return GetZoneDeclaration(zone);
+        //}
 
     }
 

@@ -651,50 +651,50 @@ namespace BRobot
 
 
 
-        /// <summary>
-        /// Returns an ABB robtarget representation of the current state of the cursor.
-        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        /// robot configuration and assumes the robot controller will figure out the correct one.
-        /// </summary>
-        /// <returns></returns>
-        public string GetUNSAFERobTargetValue()
-        {
-            return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
-        }
+        ///// <summary>
+        ///// Returns an ABB robtarget representation of the current state of the cursor.
+        ///// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        ///// robot configuration and assumes the robot controller will figure out the correct one.
+        ///// </summary>
+        ///// <returns></returns>
+        //public string GetUNSAFERobTargetValue()
+        //{
+        //    return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
+        //}
 
-        /// <summary>
-        /// Returns an ABB jointtarget representation of the current stat of the cursor.
-        /// </summary>
-        /// <returns></returns>
-        public string GetJointTargetValue()
-        {
-            return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", joints);
-        }
+        ///// <summary>
+        ///// Returns an ABB jointtarget representation of the current stat of the cursor.
+        ///// </summary>
+        ///// <returns></returns>
+        //public string GetJointTargetValue()
+        //{
+        //    return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", joints);
+        //}
 
-        public string GetSpeedDeclaration(int speed)
-        {
-            // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
-            // Using the same value as lin motion here.
-            return string.Format("[{0},{1},{2},{3}]", speed, speed, 5000, 1000);
-        }
+        //public string GetSpeedDeclaration(int speed)
+        //{
+        //    // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
+        //    // Using the same value as lin motion here.
+        //    return string.Format("[{0},{1},{2},{3}]", speed, speed, 5000, 1000);
+        //}
 
-        public string GetSpeedValue()
-        {
-            return GetSpeedDeclaration(speed);
-        }
+        //public string GetSpeedValue()
+        //{
+        //    return GetSpeedDeclaration(speed);
+        //}
         
-        public string GetZoneDeclaration(int zone)
-        {
-            // Following conventions for default RAPID zones.
-            double high = 1.5 * zone;
-            double low = 0.15 * zone;
-            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
-        }
+        //public string GetZoneDeclaration(int zone)
+        //{
+        //    // Following conventions for default RAPID zones.
+        //    double high = 1.5 * zone;
+        //    double low = 0.15 * zone;
+        //    return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", zone, high, high, low, high, low);
+        //}
 
-        public string GetZoneValue()
-        {
-            return GetZoneDeclaration(zone);
-        }
+        //public string GetZoneValue()
+        //{
+        //    return GetZoneDeclaration(zone);
+        //}
 
 
 
@@ -1092,61 +1092,10 @@ namespace BRobot
             // There is basically nothing to do here! Leave the state of the robot as-is.
             return true;
         }
-
-
-
-
-
-
-
-
-
-
-        //  ╦ ╦╔╦╗╦╦  ╔═╗
-        //  ║ ║ ║ ║║  ╚═╗
-        //  ╚═╝ ╩ ╩╩═╝╚═╝
-        /// <summary>
-        /// Returns an UR robtarget representation of the current state of the cursor.
-        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        /// robot configuration and assumes the robot controller will figure out the correct one.
-        /// </summary>
-        /// <returns></returns>
-        //public string GetPoseTargetValue()
-        //{
-        //    //return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", position, rotation);
-        //    Point axisAng = rotation.GetRotationVector(true);
-        //    return string.Format("p[{0}, {1}, {2}, {3}, {4}, {5}]",
-        //        0.001 * position.X,
-        //        0.001 * position.Y,
-        //        0.001 * position.Z,
-        //        axisAng.X,
-        //        axisAng.Y,
-        //        axisAng.Z);
-        //}
-
-        ///// <summary>
-        ///// Returns a UR joint representation of the current state of the cursor.
-        ///// </summary>
-        ///// <returns></returns>
-        //public string GetJointTargetValue()
-        //{
-        //    Joints jrad = new Joints(joints);  // use a shallow copy
-        //    Console.WriteLine(jrad);
-        //    jrad.Scale(Math.PI / 180);
-        //    Console.WriteLine(jrad);
-        //    return string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]", 
-        //        jrad.J1,
-        //        jrad.J2,
-        //        jrad.J3,
-        //        jrad.J4,
-        //        jrad.J5,
-        //        jrad.J6);
-        //}
         
 
         public override string ToString()
         {
-            //return string.Format("{5}: {0} p{1} r{2} j{6} v{3} z{4}", motionType, position, rotation, speed, zone, name, joints);
             return string.Format("{0}: {1} p{2} r{3} j{4} v{5} z{6}", name, motionType, position, rotation, joints, speed, zone);
         }
 
