@@ -33,7 +33,11 @@ namespace BRobot
         protected bool initialized = false;
         private bool applyImmediately = false;  // when an action is issued to this cursor, apply it immediately?
 
-        
+
+        /// <summary>
+        /// Who manages this Cursor?
+        /// </summary>
+        public Control parentControl;
 
         /// <summary>
         /// Specified RobotCursor instance will be issued all Actions 
@@ -75,13 +79,29 @@ namespace BRobot
         /// </summary>
         /// <param name="name"></param>
         /// <param name="applyImmediately"></param>
-        public RobotCursor(string name, bool applyImmediately)
+        public RobotCursor(Control parentControl, string name,  bool applyImmediately)
         {
+            this.parentControl = parentControl;
             this.name = name;
             this.applyImmediately = applyImmediately;
 
-            // @TODO: figure out how to use a brand-speficic compiler
-            compiler = new CompilerABB();
+            // 
+            if (this.parentControl.robotBrand == RobotType.Undefined)
+            {
+                compiler = new CompilerHuman();
+            }
+            else if (this.parentControl.robotBrand == RobotType.ABB)
+            {
+                compiler = new CompilerABB();
+            }
+            else if (this.parentControl.robotBrand == RobotType.UR)
+            {
+                compiler = new CompilerUR();
+            }
+            else if (this.parentControl.robotBrand == RobotType.KUKA)
+            {
+                compiler = new CompilerKUKA();
+            }
 
             actionBuffer = new ActionBuffer();
             settingsBuffer = new SettingsBuffer();

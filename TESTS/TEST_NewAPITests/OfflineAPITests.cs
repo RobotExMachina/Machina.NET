@@ -12,24 +12,27 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Robot arm = new Robot();
+            Robot arm = new Robot("UR");
             arm.Mode("offline");
 
-            // Trace a planar square in space
-            TracePlanarRectangle(arm);
+            // An generic test program
+            GeneralTest(arm, 50);
 
-            // Trace a straight line in Linear and Joint movement modes
-            TraceYLine(arm, false);
-            TraceYLine(arm, true);
+            //// Trace a planar square in space
+            //TracePlanarRectangle(arm);
 
-            // Test security table check
-            ApproachBaseXYPlane(arm, 300, 25);
+            //// Trace a straight line in Linear and Joint movement modes
+            //TraceYLine(arm, false);
+            //TraceYLine(arm, true);
 
-            // Use Push & PopSettings ;)
-            PushAndPopSettingsTest(arm);
+            //// Test security table check
+            //ApproachBaseXYPlane(arm, 300, 25);
 
-            // Rotation tests
-            RotationTests(arm);
+            //// Use Push & PopSettings ;)
+            //PushAndPopSettingsTest(arm);
+
+            //// Rotation tests
+            //RotationTests(arm);
 
             //// Advanced rotation tests
             //RotationTestsAdvanced(arm);
@@ -64,7 +67,9 @@ namespace TEST_OfflineAPITests
             arm.DebugBuffer();  // read all pending buffered actions
             arm.DebugRobotCursors();
 
-            arm.Export(@"C:\offlineTests.script");
+            arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" : 
+                arm.IsBrand("UR") ? @"C:\offlineTests.script" : @"C:\offlineTests.brobot");
+
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
 
@@ -74,6 +79,76 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+
+        // A generic program featuring most of the API calls, good for general base testing
+        static public void GeneralTest(Robot arm, double size)
+        {
+            // Move to 'home' position
+            arm.Motion("joint");
+            arm.SpeedTo(100);
+            arm.ZoneTo(5);  // predef zone
+            if (arm.IsBrand("ABB"))
+            {
+                arm.JointsTo(0, 0, 0, 0, 90, 0);  // 'homie' for ABB
+            }
+            else if (arm.IsBrand("UR"))
+            {
+                arm.JointsTo(0, -90, -90, -90, 90, 90);
+            }
+            else
+            {
+                arm.JointsTo(0, 0, 0, 0, 0, 0);
+            }
+            
+            // Transform to starting point (needs a transform after a joint movement)
+            arm.PushSettings();
+            arm.Speed(100);  // relative increase
+            arm.Zone(5);    // rel increase
+            arm.Motion("joint");
+            arm.TransformTo(new Point(200, 300, 400), new Rotation(-1, 0, 0, 0, 1, 0));
+
+            // Align TCP vertically
+            //arm.Motion("linear");  // if this is joint mov, UR doesn't do it! XD
+            arm.Rotate(0, 1, 0, -90);
+            arm.PopSettings();
+
+            // Draw rectangle
+            arm.Message("Drawing rectangle");
+            arm.Wait(2000);
+            arm.PushSettings();
+            arm.SpeedTo(25);
+            arm.ZoneTo(1);
+            arm.Move(0, size, 0);
+            arm.Move(0, 0, size);
+            arm.Move(0, -size, 0);
+            arm.Move(0, 0, -size);
+
+            // Draw half an arc up
+            arm.Message("Drawing arc");
+            arm.Coordinates("local");
+            for (var i = 0; i < 18; i++)
+            {
+                arm.Move(0, 0.2 * size, 0);
+                arm.Rotate(0, 0, 1, 10);
+            }
+            arm.PopSettings();
+            arm.Wait(2000);
+
+            arm.Message("Back home");
+            if (arm.IsBrand("ABB"))
+            {
+                arm.JointsTo(0, 0, 0, 0, 90, 0);  // 'homie' for ABB
+            }
+            else if (arm.IsBrand("UR"))
+            {
+                arm.JointsTo(0, -90, -90, -90, 90, 90);
+            }
+            else
+            {
+                arm.JointsTo(0, 0, 0, 0, 0, 0);
+            }
         }
 
 

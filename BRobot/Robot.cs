@@ -11,7 +11,8 @@ namespace BRobot
     /// <summary>
     /// Represents the type of control that will be performed over the real/virtual robot.
     /// </summary>
-    public enum ControlMode : int {
+    public enum ControlMode : int
+    {
         /// <summary>
         /// Not connected to any controller. Useful for robot code generation and export.
         /// </summary>
@@ -30,16 +31,17 @@ namespace BRobot
         /// interaction, useful on situations where low latency is required.
         /// </summary>
         Stream = 2
-    };
+    }
 
     /// <summary>
     /// Defines the different modes a program can be ran.
     /// </summary>
-    public enum RunMode : int {
+    public enum RunMode : int
+    {
         None = 0,
         Once = 1,
         Loop = 2
-    };
+    }
 
     /// <summary>
     /// Defines which reference coordinate system to use for transform actions.
@@ -48,7 +50,7 @@ namespace BRobot
     {
         World = 0,
         Local = 1
-    };
+    }
 
     /// <summary>
     /// Defines which type of motion to use for translation actions.;
@@ -58,6 +60,14 @@ namespace BRobot
         Undefined = 0,
         Linear = 1,
         Joint = 2
+    }
+
+    public enum RobotType : int
+    {
+        Undefined = 0,
+        ABB = 1,
+        UR = 2,
+        KUKA = 3
     }
 
     public delegate void BufferEmptyHandler(object sender, EventArgs e);
@@ -86,13 +96,15 @@ namespace BRobot
         /// Version number.
         /// </summary>
         public static readonly string Version = "0.2.0";
+       
+
+
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
         /// manage robot control.
         /// </summary>
         private Control c;  // the main control object
-
 
         public event BufferEmptyHandler BufferEmpty;
 
@@ -112,13 +124,66 @@ namespace BRobot
         //██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║         ██╔══██║██╔═══╝ ██║
         //██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗    ██║  ██║██║     ██║
         //╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
-        /// <summary>
-        /// Base constructor.
-        /// </summary>                                                       
-        public Robot()
+        ///// <summary>
+        ///// Base constructor.
+        ///// </summary>                                                       
+        //public Robot()
+        //{
+        //    c = new Control(this);
+        //}
+
+        public Robot(string brand)
         {
-            c = new Control(this);
+            string b = brand.ToUpper();
+            
+            if (b.Equals("ABB"))
+            {
+                c = new Control(this, RobotType.ABB);
+            }
+            else if (b.Equals("UR"))
+            {
+                c = new Control(this, RobotType.UR);
+            }
+            else if (b.Equals("KUKA"))
+            {
+                c = new Control(this, RobotType.KUKA);
+            } 
+            else
+            {
+                Console.WriteLine(brand + " is not a valis Robot type. Please specify one of the following: ");
+                for (var i = 1; i < 4; i++)
+                {
+                    Console.WriteLine(((RobotType)i).ToString());
+                }
+                c = new Control(this, RobotType.Undefined);
+            }
         }
+
+
+        public bool IsBrand(string brandName)
+        {
+            brandName = brandName.ToUpper();
+
+            switch (c.robotBrand)
+            {
+                case RobotType.Undefined:
+                    return brandName.Equals("HUMAN");
+
+                case RobotType.ABB:
+                    return brandName.Equals("ABB");
+
+                case RobotType.UR:
+                    return brandName.Equals("UR");
+
+                case RobotType.KUKA:
+                    return brandName.Equals("KUKA");
+            }
+
+            return false;
+        }
+
+
+
 
         /// <summary>
         /// Sets the control mode the robot will operate under.

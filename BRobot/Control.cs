@@ -44,16 +44,11 @@ namespace BRobot
         /// </summary>
         private Communication comm;
 
-        ///// <summary>
-        ///// Represents the current values for speed, zone and MotionType.
-        ///// </summary>
-        //private Settings currentSettings;
-
-        ///// <summary>
-        ///// A buffer that stores Push and PopSettings() states.
-        ///// </summary>
-        //private SettingsBuffer settingsBuffer;
-
+        /// <summary>
+        /// What brand of robot is this?
+        /// </summary>
+        internal RobotType robotBrand;
+        
         /// <summary>
         /// A virtual representation of the state of the device after application of issued actions.
         /// </summary>
@@ -106,9 +101,11 @@ namespace BRobot
         /// <summary>
         /// Main constructor.
         /// </summary>
-        public Control(Robot parentBot)
+        public Control(Robot parentBot, RobotType brand)
         {
             parent = parentBot;
+            robotBrand = brand;
+
             Reset();  // @TODO necessary?
         }
 
@@ -119,10 +116,10 @@ namespace BRobot
         /// </summary>
         public void Reset()
         {
-            virtualCursor = new RobotCursor("virtualCursor", true);
-            writeCursor = new RobotCursor("writeCursor", false);
+            virtualCursor = new RobotCursor(this, "virtualCursor", true);
+            writeCursor = new RobotCursor(this, "writeCursor", false);
             virtualCursor.SetChild(writeCursor);
-            motionCursor = new RobotCursor("motionCursor", false);
+            motionCursor = new RobotCursor(this, "motionCursor", false);
             writeCursor.SetChild(motionCursor);
             areCursorsInitialized = false;
 

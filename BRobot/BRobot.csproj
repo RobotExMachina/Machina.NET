@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ActionBuffer.cs" />
+    <Compile Include="SettingsBuffer.cs" />
     <Compile Include="Communication.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="DataTypes.cs" />

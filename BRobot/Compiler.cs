@@ -9,7 +9,6 @@ namespace BRobot
     //  ██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║██║     ██╔══╝  ██╔══██╗
     //  ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║███████╗███████╗██║  ██║
     //   ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
-    //                                                                 
     /// <summary>
     /// A class that features methods to translate high-level robot actions into
     /// platform-specific programs. 
@@ -29,14 +28,26 @@ namespace BRobot
 
     }
 
+    /// <summary>
+    /// Will add a quick compiler for human-readable instructions.
+    /// </summary>
+    internal class CompilerHuman : Compiler
+    {
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+
 
     //   █████╗ ██████╗ ██████╗ 
     //  ██╔══██╗██╔══██╗██╔══██╗
     //  ███████║██████╔╝██████╔╝
     //  ██╔══██║██╔══██╗██╔══██╗
     //  ██║  ██║██████╔╝██████╔╝
-    //  ╚═╝  ╚═╝╚═════╝ ╚═════╝ 
-    //                          
+    //  ╚═╝  ╚═╝╚═════╝ ╚═════╝                         
     internal class CompilerABB : Compiler
     {
         /// <summary>
@@ -495,6 +506,25 @@ namespace BRobot
                 jrad.J4,
                 jrad.J5,
                 jrad.J6);
+        }
+
+    }
+
+
+
+
+    //  ██╗  ██╗██╗   ██╗██╗  ██╗ █████╗ 
+    //  ██║ ██╔╝██║   ██║██║ ██╔╝██╔══██╗
+    //  █████╔╝ ██║   ██║█████╔╝ ███████║
+    //  ██╔═██╗ ██║   ██║██╔═██╗ ██╔══██║
+    //  ██║  ██╗╚██████╔╝██║  ██╗██║  ██║
+    //  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+    internal class CompilerKUKA : Compiler
+    {
+        
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
+        {
+            throw new NotImplementedException();
         }
 
     }
