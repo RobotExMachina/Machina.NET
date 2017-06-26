@@ -119,10 +119,10 @@ namespace BRobot
         /// </summary>
         public void Reset()
         {
-            virtualCursor = new RobotCursorUR("virtualCursor", true);
-            writeCursor = new RobotCursorUR("writeCursor", false);
+            virtualCursor = new RobotCursor("virtualCursor", true);
+            writeCursor = new RobotCursor("writeCursor", false);
             virtualCursor.SetChild(writeCursor);
-            motionCursor = new RobotCursorUR("motionCursor", false);
+            motionCursor = new RobotCursor("motionCursor", false);
             writeCursor.SetChild(motionCursor);
             areCursorsInitialized = false;
 

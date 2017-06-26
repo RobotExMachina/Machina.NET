@@ -228,7 +228,8 @@ namespace BRobot
         private static string localBufferFileExtension = "mod";
         private static string remoteBufferDirectory = "BRobot";
         
-        protected RobotCursorABB writeCursor;
+        //protected RobotCursorABB writeCursor;
+        protected RobotCursor writeCursor;
 
 
 
@@ -253,7 +254,8 @@ namespace BRobot
 
             set
             {
-                writeCursor = (RobotCursorABB)value;
+                //writeCursor = (RobotCursorABB)value;
+                writeCursor = value;
             }
         }
 
@@ -1368,16 +1370,24 @@ namespace BRobot
                         case ActionType.Translation:
                         case ActionType.Rotation:
                         case ActionType.Transformation:
-                            SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
-                            SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
-                            SetRapidDataVariable(RD_rt[fid], writeCursor.GetUNSAFERobTargetValue());    
+                            //SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
+                            //SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
+                            //SetRapidDataVariable(RD_rt[fid], writeCursor.GetUNSAFERobTargetValue());    
+                            //SetRapidDataVariable(RD_act[fid], writeCursor.motionType == MotionType.Linear ? 1 : 2);
+                            SetRapidDataVariable(RD_vel[fid], CompilerABB.GetSpeedValue(writeCursor));
+                            SetRapidDataVariable(RD_zone[fid], CompilerABB.GetZoneValue(writeCursor));
+                            SetRapidDataVariable(RD_rt[fid], CompilerABB.GetUNSAFERobTargetValue(writeCursor));
                             SetRapidDataVariable(RD_act[fid], writeCursor.motionType == MotionType.Linear ? 1 : 2);
                             break;
 
                         case ActionType.Joints:
-                            SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
-                            SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
-                            SetRapidDataVariable(RD_jt[fid], writeCursor.GetJointTargetValue());
+                            //SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
+                            //SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
+                            //SetRapidDataVariable(RD_jt[fid], writeCursor.GetJointTargetValue());
+                            //SetRapidDataVariable(RD_act[fid], 3);
+                            SetRapidDataVariable(RD_vel[fid], CompilerABB.GetSpeedValue(writeCursor));
+                            SetRapidDataVariable(RD_zone[fid], CompilerABB.GetZoneValue(writeCursor));
+                            SetRapidDataVariable(RD_jt[fid], CompilerABB.GetJointTargetValue(writeCursor));
                             SetRapidDataVariable(RD_act[fid], 3);
                             break;
 

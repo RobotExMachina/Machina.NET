@@ -23,7 +23,6 @@ namespace BRobot
         /// </summary>
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
-        /// 
         /// <returns></returns>
         public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block);
 
@@ -273,7 +272,7 @@ namespace BRobot
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <returns></returns>
-        static private string GetUNSAFERobTargetValue(RobotCursor cursor)
+        static public string GetUNSAFERobTargetValue(RobotCursor cursor)
         {
             return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", cursor.position, cursor.rotation);
         }
@@ -282,7 +281,7 @@ namespace BRobot
         /// Returns an RAPID jointtarget representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        static private string GetJointTargetValue(RobotCursor cursor)
+        static public string GetJointTargetValue(RobotCursor cursor)
         {
             return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", cursor.joints);
         }
@@ -292,35 +291,25 @@ namespace BRobot
         /// </summary>
         /// <param name="speed"></param>
         /// <returns></returns>
-        static private string GetSpeedValue(RobotCursor cursor)
+        static public string GetSpeedValue(RobotCursor cursor)
         {
             // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
             // Using the same value as lin motion here.
             return string.Format("[{0},{1},{2},{3}]", cursor.speed, cursor.speed, 5000, 1000);
         }
 
-        //public string GetSpeedValue()
-        //{
-        //    return GetSpeedDeclaration(speed);
-        //}
-
         /// <summary>
         /// Returns a RAPID representaiton of cursor zone.
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        static private string GetZoneValue(RobotCursor cursor)
+        static public string GetZoneValue(RobotCursor cursor)
         {
             // Following conventions for default RAPID zones.
             double high = 1.5 * cursor.zone;
             double low = 0.15 * cursor.zone;
             return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", cursor.zone, high, high, low, high, low);
         }
-
-        //public string GetZoneValue()
-        //{
-        //    return GetZoneDeclaration(zone);
-        //}
 
     }
 
@@ -429,7 +418,7 @@ namespace BRobot
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        static private bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        static public bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -449,7 +438,7 @@ namespace BRobot
             return dec != null;
         }
 
-        static private bool GenerateInstructionDeclaration(
+        static public bool GenerateInstructionDeclaration(
             Action action, RobotCursor cursor, int id,
             out string declaration)
         {
@@ -497,7 +486,7 @@ namespace BRobot
         /// Returns an UR pose representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        static private string GetPoseTargetValue(RobotCursor cursor)
+        static public string GetPoseTargetValue(RobotCursor cursor)
         {
             Point axisAng = cursor.rotation.GetRotationVector(true);
             return string.Format("p[{0}, {1}, {2}, {3}, {4}, {5}]",
@@ -513,7 +502,7 @@ namespace BRobot
         /// Returns a UR joint representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        static private string GetJointTargetValue(RobotCursor cursor)
+        static public string GetJointTargetValue(RobotCursor cursor)
         {
             Joints jrad = new Joints(cursor.joints);  // use a shallow copy
             Console.WriteLine(jrad);
