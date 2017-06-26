@@ -29,7 +29,7 @@ namespace TEST_OfflineAPITests
             //PushAndPopSettingsTest(arm);
 
             // Rotation tests
-            RotationTests(arm);
+            //RotationTests(arm);
 
             //// Advanced rotation tests
             //RotationTestsAdvanced(arm);
@@ -59,7 +59,7 @@ namespace TEST_OfflineAPITests
             //TestChangesInMovementModes(arm);
 
             //// Wait and Message
-            //TestWaitAndMessage(arm);
+            TestWaitAndMessage(arm);
 
             arm.DebugBuffer();  // read all pending buffered actions
             arm.DebugRobotCursors();
@@ -134,20 +134,20 @@ namespace TEST_OfflineAPITests
             arm.ZoneTo(1);
 
             arm.PushSettings();
-            arm.Speed(50);
+            arm.SpeedTo(50);
             arm.Move(0, 200, 0);
             arm.DebugSettingsBuffer();
             arm.PopSettings();
 
             arm.PushSettings();
-            arm.Zone(4);
+            arm.ZoneTo(4);
             arm.Move(0, 200, 0);
             arm.DebugSettingsBuffer();
             arm.PopSettings();
 
             arm.PushSettings();
             arm.Motion("joint");
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.Move(0, 0, 200);
             arm.DebugSettingsBuffer();
             arm.PopSettings();
@@ -185,6 +185,16 @@ namespace TEST_OfflineAPITests
             //arm.SpeedTo(100);
             //arm.MoveTo(300, 0, 500);
 
+            //arm.Wait(1000);
+            //arm.RotateTo(-1, 0, 0, 0, 1, 0);  // revert back to standard
+
+            //arm.SpeedTo(100);
+            //arm.MoveTo(300, 0, 500);
+
+
+
+
+
             // UR VERSION
             arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
@@ -194,17 +204,25 @@ namespace TEST_OfflineAPITests
             arm.MoveTo(300, -100, 400);
 
             // Velocity is expresses in both mm/s and °/s
-            arm.SpeedTo(45);
+            arm.SpeedTo(100);
 
-            arm.RotateTo(-1, 0, 0, 0, 0, -1);  // rotate 90 degs around local X
+            //arm.RotateTo(-1, 0, 0, 0, 0, -1);  // rotate 90 degs around local X --> CONVERSION ERROR!
             //arm.RotateTo(0, 0, -1, 1, 0, 0);   // rotate 90 degs around local z
             //arm.RotateTo(0, 1, 0, 1, 0, 0);    // rotate 90 degs around local Y
 
-            //arm.Wait(1000);
-            //arm.RotateTo(-1, 0, 0, 0, 1, 0);  // revert back to standard
+            //CoordinateSystem cs = new CoordinateSystem(-1, 0, 0, 0, 0, -1);
+            //arm.RotateTo(cs);
+            arm.Coordinates("local");
+            arm.Rotate(1, 0, 0, 45);
+            arm.Rotate(1, 0, 0, -90);
+            //arm.Rotate(1, 0, 0, 225);  // interesting (and obvious): because internally this only adds a new target, the result is the robot getting there in the shortest way possible (performing a -135deg rotation) rather than the actual 225 rotation over X as would intuitively come from reading he API...
+            arm.Rotate(1, 0, 0, 135);
 
-            //arm.SpeedTo(100);
-            //arm.MoveTo(300, 0, 500);
+            arm.Rotate(0, 1, 0, -90);
+            arm.Rotate(1, 0, 0, -90);
+            arm.Rotate(0, 0, 1, 90);
+
+
         }
 
         public static void RotationTestsAdvanced(Robot arm)
@@ -242,14 +260,14 @@ namespace TEST_OfflineAPITests
             double val45 = rx45.GetRotationAngle();
             double val90 = rx90.GetRotationAngle();
 
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
 
             // Move to a more dexterous area
             arm.MoveTo(300, -100, 400);
 
             // Velocity is expresses in both mm/s and °/s
-            arm.Speed(45);
+            arm.SpeedTo(45);
 
             
             arm.RotateTo(ry135);
@@ -257,7 +275,7 @@ namespace TEST_OfflineAPITests
             arm.RotateTo(ry90);
             arm.RotateTo(ry180);
 
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
         }
 
@@ -282,7 +300,7 @@ namespace TEST_OfflineAPITests
             Rotation zn90 = new Rotation(new Point(0, 0, 1), -90);
 
             // Reset
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
@@ -290,7 +308,7 @@ namespace TEST_OfflineAPITests
             arm.MoveTo(300, 100, 400);
 
             // Make the TCP face the user
-            arm.Speed(30);
+            arm.SpeedTo(30);
             arm.RotateTo(0, 0, -1, 0, 1, 0);
 
             // Now lets try relative rotation over world Z
@@ -304,7 +322,7 @@ namespace TEST_OfflineAPITests
             }
 
             // Back home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
             arm.MoveTo(300, 0, 500);
         }
@@ -312,11 +330,11 @@ namespace TEST_OfflineAPITests
         public static void TestLocalWorldMovements(Robot arm)
         {
             // Reset
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
-            arm.Speed(25);
+            arm.SpeedTo(25);
 
             // Rotate TCP
             arm.PushSettings();
@@ -344,7 +362,7 @@ namespace TEST_OfflineAPITests
             arm.PopSettings();
 
             // Back home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
         }
@@ -352,7 +370,7 @@ namespace TEST_OfflineAPITests
         public static void TestCircle(Robot arm)
         {
             // Reset
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
             arm.RotateTo(-1, 0, 0, 0, 1, 0);
 
@@ -360,16 +378,35 @@ namespace TEST_OfflineAPITests
 
             arm.PushSettings();
             arm.Coordinates("local");
-            for (var i = 0; i < 36; i++)
+            //for (var i = 0; i < 36; i++)
+            //{
+            //    arm.Move(5 * Point.YAxis);
+            //    arm.Rotate(Point.ZAxis, 10);
+            //    arm.Rotate(Point.YAxis, -2);  // add some off plane movement ;)
+            //}
+            // Half circle
+            for (var i = 0; i < 18; i++)
             {
                 arm.Move(5 * Point.YAxis);
                 arm.Rotate(Point.ZAxis, 10);
-                arm.Rotate(Point.YAxis, -2);  // add some off plane movement ;)
             }
+            // 'Unscrew' TCP to avoid wrist out of rotation limits.
+            // Must do sequentially, otherwise if issue a local rotation of -360, the target stays the same...
+            for (var i = 0; i < 4; i++)
+            {
+                arm.Rotate(0, 0, 1, -90);
+            }
+            // Keep going with the circle.
+            for (var i = 0; i < 18; i++)
+            {
+                arm.Move(5 * Point.YAxis);
+                arm.Rotate(Point.ZAxis, 10);
+            }
+
             arm.PopSettings();
 
             // Back home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
 
             // 'Disentangle' axis 6
@@ -384,11 +421,11 @@ namespace TEST_OfflineAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
             arm.Move(150, 0, -100);
-            arm.Speed(25);
+            arm.SpeedTo(25);
 
             Rotation z30 = new Rotation(Point.ZAxis, 30);
 
@@ -409,7 +446,7 @@ namespace TEST_OfflineAPITests
             arm.Transform(Rotation.Conjugate(z30), -50 * Point.XAxis);
 
             // Back home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
         }
 
@@ -419,7 +456,7 @@ namespace TEST_OfflineAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
             double x = 450;
@@ -459,7 +496,7 @@ namespace TEST_OfflineAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
             double x = 450;
@@ -490,7 +527,7 @@ namespace TEST_OfflineAPITests
             arm.PopSettings();
 
             // Back home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
         }
 
@@ -499,7 +536,7 @@ namespace TEST_OfflineAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
             double x = 450;
@@ -534,7 +571,7 @@ namespace TEST_OfflineAPITests
             }
 
             // Back home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
         }
@@ -546,7 +583,7 @@ namespace TEST_OfflineAPITests
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
             Rotation noRot = new Rotation();
 
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
             // Bring close to limit (100 by default)
@@ -569,12 +606,12 @@ namespace TEST_OfflineAPITests
             // Reset
             Point home = new Point(300, 0, 500);
             Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
             
             arm.MoveTo(300, -300, 250);
 
-            arm.Speed(200);
+            arm.SpeedTo(200);
             arm.Coordinates("local");
             for (int i = 0; i < 100; i++)
             {
@@ -583,7 +620,7 @@ namespace TEST_OfflineAPITests
             }
 
             // Back home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
         }
 
@@ -593,7 +630,7 @@ namespace TEST_OfflineAPITests
             Console.WriteLine("WARNING: DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF");
 
             // Reset
-            arm.Speed(500);
+            arm.SpeedTo(500);
             arm.JointsTo(0, 0, 0, 0, 90, 0);
 
             // Go from lower to higher configuration space (ABB IRB120)
@@ -619,7 +656,7 @@ namespace TEST_OfflineAPITests
             Console.WriteLine("WARNING: DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF");
          
             // Reset
-            arm.Speed(300);
+            arm.SpeedTo(300);
             arm.JointsTo(0, 0, 0, 0, 90, 0);
 
             // DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF
@@ -642,8 +679,9 @@ namespace TEST_OfflineAPITests
         public static void TestChangesInMovementModes(Robot arm)
         {
             // Go home
-            arm.Speed(100);
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.SpeedTo(100);
+            //arm.JointsTo(0, 0, 0, 0, 90, 0);  // ABB
+            arm.JointsTo(0, -90, -90, -90, 90, 90);  // UR
 
             // Issue an absolute RT movement (should work)
             arm.TransformTo(new Point(200, 200, 200), Rotation.FlippedAroundY);
@@ -680,13 +718,14 @@ namespace TEST_OfflineAPITests
             arm.RotateTo(Rotation.FlippedAroundY);  // missing point information
 
             // Back home (should work)
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            //arm.JointsTo(0, 0, 0, 0, 90, 0);    // ABB
+            arm.JointsTo(0, -90, -90, -90, 90, 90);  // UR
         }
 
         static public void TestWaitAndMessage(Robot arm)
         {
             // Go home
-            arm.Speed(100);
+            arm.SpeedTo(100);
             arm.Message("Going home");
             arm.MoveTo(300, 0, 500);
 
@@ -700,7 +739,8 @@ namespace TEST_OfflineAPITests
             arm.Wait(5000);
 
             arm.Message("Going home");
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            //arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.JointsTo(0, -90, -90, -90, 90, 90);
         }
 
 

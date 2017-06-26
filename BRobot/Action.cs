@@ -420,13 +420,13 @@ namespace BRobot
             if (relative)
             {
                 if (translationFirst)
-                    str = string.Format("Move {0} mm and rotate {1}° around {2}", translation, rotation.GetRotationAngle(), rotation.GetRotationAxis());
+                    str = string.Format("Transform: move {0} mm and rotate {1}° around {2}", translation, rotation.GetRotationAngle(), rotation.GetRotationAxis());
                 else 
-                    str = string.Format("Rotate {0}° around {1} and move {2} mm", rotation.GetRotationAngle(), rotation.GetRotationAxis(), translation);
+                    str = string.Format("Transform: rotate {0}° around {1} and move {2} mm", rotation.GetRotationAngle(), rotation.GetRotationAxis(), translation);
             }
             else
             {
-                str = string.Format("Move to {0} mm and rotate to {1}", translation, rotation.GetCoordinateSystem());
+                str = string.Format("Transform: move to {0} mm and rotate to {1}", translation, rotation.GetCoordinateSystem());
             }
             return str;
         }
@@ -490,7 +490,7 @@ namespace BRobot
 
         public override string ToString()
         {
-            return string.Format("Send message \"{0}\"", message);
+            return string.Format("Display message \"{0}\"", message);
         }
     }
 

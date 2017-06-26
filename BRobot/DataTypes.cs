@@ -1462,12 +1462,12 @@ namespace BRobot
 
         public void Scale(double s)
         {
-            this.J1 += s;
-            this.J2 += s;
-            this.J3 += s;
-            this.J4 += s;
-            this.J5 += s;
-            this.J6 += s;
+            this.J1 *= s;
+            this.J2 *= s;
+            this.J3 *= s;
+            this.J4 *= s;
+            this.J5 *= s;
+            this.J6 *= s;
         }
 
         /// <summary>

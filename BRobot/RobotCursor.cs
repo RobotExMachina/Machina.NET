@@ -1131,7 +1131,9 @@ namespace BRobot
         public string GetJointTargetValue()
         {
             Joints jrad = new Joints(joints);  // use a shallow copy
-            jrad.Scale(Math.PI / 180.0);
+            Console.WriteLine(jrad);
+            jrad.Scale(Math.PI / 180);
+            Console.WriteLine(jrad);
             return string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]", 
                 jrad.J1,
                 jrad.J2,

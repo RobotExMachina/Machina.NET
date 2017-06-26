@@ -16,17 +16,7 @@
 
 # PHASE 2
 
-
-
-
-## BUILD 1200
-- [x] Project is now targetting .NET framework 4.6.1 (because of the new ABB.Robotics library...)
-- [x] BRobot for Dynamo is now a package
-- [x] Renamed Rotation.GetRotationVector() to .GetRotationAxis(), this will only return the unit vector corresponding to the rotation axis.
-- [x] Added Rotation.GetRotationVector() to return the axis-angle representation of the Quaternion https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
-- [x] Add Joint.Scale()
-- [x] Fix PushPop actions generating targets on compilation
-- [x] Updated old TEST_OfflineAPITests to new abs+rel conventions, specially speeds and zones.
+## TODO
 - [ ] Rotation problem: the following R construction returns a CS system with the Y inverted!:
     ```csharp
         > Rotation r = new Rotation(-1, 0, 0, 0, 0, -1);
@@ -41,7 +31,75 @@
         [[0,0,1,0]]
         > r1.GetCoordinateSystem()
         [[[-1,0,0],[0,1,0],[0,0,-1]]]
+    
+        // Another way to see this is the following:
+        > CoordinateSystem cs = new CoordinateSystem(-1, 0, 0, 0, 0, -1);
+        > cs
+        [[[-1,0,0],[0,0,-1],[0,-1,0]]]
+        > 
+        > cs.GetQuaternion().GetCoordinateSystem()
+        [[[-1,0,0],[0,0,1],[0,1,0]]]  // It is inverted!
+
+        // However, this works well:
+        > Rotation r = new Rotation(-1, 0, 0, 0, 1, -1);
+        > r
+        [[0,0,0.92387953,0.38268343]]
+        > r.GetCoordinateSystem()
+        [[[-1,0,0],[0,0.70710678,0.70710678],[0,0.70710678,-0.70710678]]]
+
+        > Rotation r2 = new Rotation(-1, 0, 0, 0, 1, 0);
+        > r2.GetCoordinateSystem()
+        [[[-1,0,0],[0,1,0],[0,0,-1]]]
+        > r2.RotateLocal(new Rotation(1, 0, 0, 45));
+        > r2
+        [[0,0,0.92387953,-0.38268343]]
+        > r2.GetCoordinateSystem()
+        [[[-1,0,0],[0,0.70710678,-0.70710678],[0,-0.70710678,-0.70710678]]]
+        > r2.RotateLocal(new Rotation(1, 0, 0, 45));
+        > r2.GetCoordinateSystem()
+        [[[-1,0,0],[0,0,-1],[0,-1,0]]]
+        > 
+        // Maybe the problem is in the initial Vectors to Quaternion conversion?
+        
     ```
+    --> check https://github.com/westphae/quaternion/blob/master/quaternion.go ?
+    --> Write some unit tests and test the library to figure this out
+    --> Is this a problem inherent to Quaternion to Axis-Angle convertion, and the fact that the latter always returns positive rotations? 
+
+- [ ] The dependency tree makes BRobot not work right now if the user doesn't have RobotStudio in the system. And the library is pretty much only used for comm, not used at all for offlien code generation. A way to figure this out, and have the library work in offline mode without the libraries should be implemented. 
+- [ ] Coordinates(): this should:
+    - [ ] Accept a CS object to use as a new reference frame
+    - [ ] Use workobjects when compiled
+- [ ] RobotCursor for ABBs and URs is pretty much identical, except for the utility functions, which pretty much relate to compilation anyway. Move this to Compiler and keep one unitary Cursor.
+- [ ] Add `.Motion("circle")` for `movec` commands?
+- [ ] Add `.Acceleration()` and `.AccelerationTo()` for UR robots?
+- [ ] Rethink API names to be more 'generic' and less 'ABBish'
+- [ ] This happens, should it be fixed...?
+    ```csharp
+    arm.Rotate(1, 0, 0, 225);  // interesting (and obvious): because internally this only adds a new target, the result is the robot getting there in the shortest way possible (performing a -135deg rotation) rather than the actual 225 rotation over X as would intuitively come from reading he API...
+    ```
+- [ ] On export, add an additional file with human-readable instructions
+
+
+## BUILD 1201
+- [x] Testing and debugging of UR offline code generation
+
+## BUILD 1200
+- [x] Project is now targetting .NET framework 4.6.1 (because of the new ABB.Robotics library...)
+- [x] BRobot for Dynamo is now a package
+- [x] Renamed Rotation.GetRotationVector() to .GetRotationAxis(), this will only return the unit vector corresponding to the rotation axis.
+- [x] Added Rotation.GetRotationVector() to return the axis-angle representation of the Quaternion https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
+- [x] Add Joint.Scale()
+- [x] Fix PushPop actions generating targets on compilation
+- [x] Updated old TEST_OfflineAPITests to new abs+rel conventions, specially speeds and zones.
+
+
+
+
+
+
+
+
 
 ---
 
@@ -49,12 +107,12 @@
 
 ## PENDING 
 - [ ] Rework Actions
-    - [ ] Make a static API that can generate them as objects
+    - [x] Make a static API that can generate them as objects
     - [ ] Add the possibility of not inputing speed+zone+mType, and stick to the previous cursor state
     - [ ] Merge R+T & T+R into one. 
-    - [ ] Do Speed(), Zone() and Motion() become Actions as well? How would this work with push+popSettings?
-    - [ ] If they were Actions, relative and absolute modes could be implemented: .Speed(10) is an increase, .SpeedTo(10) is a setting.
-- [ ] Add a CS constructor from a Rotation object
+    - [x] Do Speed(), Zone() and Motion() become Actions as well? How would this work with push+popSettings?
+    - [x] If they were Actions, relative and absolute modes could be implemented: .Speed(10) is an increase, .SpeedTo(10) is a setting.
+- [x] Add a CS constructor from a Rotation object
 - [ ] R+T vs T+R order in Transform isn't working
 - [ ] This example doesn't work!
     ```csharp
