@@ -57,16 +57,24 @@ namespace BRobot
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
+        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
         {
-            // Cast the robotPointer to the correct subclass
-            RobotCursorABB writer = (RobotCursorABB)writePointer;
+            // REMOVED BRAND-SPECIFIC CURSORS
+            //// Cast the robotPointer to the correct subclass
+            //RobotCursorABB writer = (RobotCursorABB)writePointer;
+
+            //// Which pending Actions are used for this program?
+            //// Copy them without flushing the buffer.
+            //List<Action> actions = block ?
+            //    writePointer.actionBuffer.GetBlockPending(false) :
+            //    writePointer.actionBuffer.GetAllPending(false);
 
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
-                writePointer.actionBuffer.GetBlockPending(false) :
-                writePointer.actionBuffer.GetAllPending(false);
+                writer.actionBuffer.GetBlockPending(false) :
+                writer.actionBuffer.GetAllPending(false);
 
 
             // CODE LINES GENERATION
@@ -199,7 +207,7 @@ namespace BRobot
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        static private bool GenerateVariableDeclaration(Action action, RobotCursorABB cursor, int id, out string declaration)
+        static private bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -220,7 +228,7 @@ namespace BRobot
         }
 
         static private bool GenerateInstructionDeclaration(
-            Action action, RobotCursorABB cursor, int id,
+            Action action, RobotCursor cursor, int id,
             Dictionary<int, string> velNames, Dictionary<int, string> zoneNames,
             out string declaration)
         {
@@ -333,16 +341,24 @@ namespace BRobot
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
+        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
         {
-            // Cast the RobotCursor to the correct subclass
-            RobotCursorUR writer = (RobotCursorUR)writePointer;
+            //// Cast the RobotCursor to the correct subclass
+            //RobotCursorUR writer = (RobotCursorUR)writePointer;
 
+            //// Which pending Actions are used for this program?
+            //// Copy them without flushing the buffer.
+            //List<Action> actions = block ?
+            //    writePointer.actionBuffer.GetBlockPending(false) :
+            //    writePointer.actionBuffer.GetAllPending(false);
+
+            // REMOVE BRAND-SPECIFIC CURSORS
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
-                writePointer.actionBuffer.GetBlockPending(false) :
-                writePointer.actionBuffer.GetAllPending(false);
+                writer.actionBuffer.GetBlockPending(false) :
+                writer.actionBuffer.GetAllPending(false);
 
 
             // CODE LINES GENERATION
@@ -413,7 +429,7 @@ namespace BRobot
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        static private bool GenerateVariableDeclaration(Action action, RobotCursorUR cursor, int id, out string declaration)
+        static private bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -434,7 +450,7 @@ namespace BRobot
         }
 
         static private bool GenerateInstructionDeclaration(
-            Action action, RobotCursorUR cursor, int id,
+            Action action, RobotCursor cursor, int id,
             out string declaration)
         {
             string dec = null;
