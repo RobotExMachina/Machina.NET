@@ -59,16 +59,6 @@ namespace BRobot
         //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
         {
-            // REMOVED BRAND-SPECIFIC CURSORS
-            //// Cast the robotPointer to the correct subclass
-            //RobotCursorABB writer = (RobotCursorABB)writePointer;
-
-            //// Which pending Actions are used for this program?
-            //// Copy them without flushing the buffer.
-            //List<Action> actions = block ?
-            //    writePointer.actionBuffer.GetBlockPending(false) :
-            //    writePointer.actionBuffer.GetAllPending(false);
-
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
@@ -333,16 +323,6 @@ namespace BRobot
         //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
         {
-            //// Cast the RobotCursor to the correct subclass
-            //RobotCursorUR writer = (RobotCursorUR)writePointer;
-
-            //// Which pending Actions are used for this program?
-            //// Copy them without flushing the buffer.
-            //List<Action> actions = block ?
-            //    writePointer.actionBuffer.GetBlockPending(false) :
-            //    writePointer.actionBuffer.GetAllPending(false);
-
-            // REMOVE BRAND-SPECIFIC CURSORS
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
