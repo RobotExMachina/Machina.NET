@@ -1322,7 +1322,15 @@ namespace BRobot
         {
             try
             {
-                System.IO.File.WriteAllLines(filepath, lines, System.Text.Encoding.ASCII);
+                if (robotBrand == RobotType.Undefined)
+                {
+                    System.IO.File.WriteAllLines(filepath, lines, System.Text.Encoding.UTF8);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
+                }
+                else
+                {
+                    System.IO.File.WriteAllLines(filepath, lines, System.Text.Encoding.ASCII);
+                }
+
                 return true;
             }
             catch (Exception ex)
