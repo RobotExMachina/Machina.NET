@@ -37,6 +37,7 @@
 - [JointsTo](#jointsto)
 - [Wait](#wait)
 - [Message](#message)
+- [Comment](#comment)
 
 ### Events
 - [BufferEmpty](#bufferempty)
@@ -530,6 +531,24 @@ Displays a text message on the device. This will depend on the device's configur
 bot.MoveTo(300, 200, 400);
 bot.Message("Moving up!");
 bot.Move(0, 0, 100);
+```
+
+### Comment
+
+_bool Comment(string comment)_
+
+Adds a commented line into the robot instructions set. This is useful in `offline` mode when compiling programs in device-specific language, to add comments, annotations and reminders. 
+
+```csharp
+bot.Comment("Here we move the robot to home position");
+bot.JointsTo(0, 0, 0, 0, 90, 0);
+```
+
+If this code was compiled in RAPID language for ABB robots, it would look like this:
+
+```rapid
+  ! Here we move the robot to home position
+  MoveAbsJ [[0,0,0,0,90,0],[0,9E9,9E9,9E9,9E9,9E9]],vel100,z5,Tool0\WObj:=WObj0;
 ```
 
 
