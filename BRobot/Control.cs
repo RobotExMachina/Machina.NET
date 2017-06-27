@@ -1217,6 +1217,26 @@ namespace BRobot
         }
 
 
+        /// <summary>
+        /// Issue a request to add an internal comment in the compiled code. 
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
+        public bool IssueCommentRequest(string comment)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionComment act = new ActionComment(comment);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
 
 
 

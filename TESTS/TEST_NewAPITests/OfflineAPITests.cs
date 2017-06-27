@@ -12,7 +12,7 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Robot arm = new Robot("ABB");
+            Robot arm = new Robot("fdsfddsf");
             arm.Mode("offline");
 
             // An generic test program
@@ -85,6 +85,9 @@ namespace TEST_OfflineAPITests
         // A generic program featuring most of the API calls, good for general base testing
         static public void GeneralTest(Robot arm, double size)
         {
+            // Add inline comment in code
+            arm.Comment("GENERAL BROBOT CODE COMPILATION TEST! :)");
+
             // Move to 'home' position
             arm.Motion("joint");
             arm.SpeedTo(100);

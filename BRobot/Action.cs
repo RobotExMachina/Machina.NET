@@ -24,7 +24,8 @@ namespace BRobot
         Zone = 8,
         Motion = 9,
         Coordinates = 10,
-        PushPop = 11
+        PushPop = 11, 
+        Comment = 12
     }
 
     
@@ -147,6 +148,11 @@ namespace BRobot
         public static ActionPushPop PopSettings()
         {
             return new ActionPushPop(false);
+        }
+
+        public static ActionComment Comment(string comment)
+        {
+            return new ActionComment(comment);
         }
 
 
@@ -459,7 +465,7 @@ namespace BRobot
             this.relative = relative;
         }
 
-        public override string ToString()
+        public override string ToString() 
         {
             return relative ?
                 string.Format("Increase joint rotations by {0}°", joints) :
@@ -522,4 +528,20 @@ namespace BRobot
         }
     }
     
+    public class ActionComment : Action
+    {
+        public string comment;
+
+        public ActionComment(string comment)
+        {
+            type = ActionType.Comment;
+
+            this.comment = comment;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Comment: \"{0}\"", comment);
+        }
+    }
 }

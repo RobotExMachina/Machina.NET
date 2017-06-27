@@ -24,8 +24,7 @@ namespace BRobot
         /// <param name="writePointer"></param>
         /// <returns></returns>
         public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block);
-
-
+        
     }
 
 
@@ -305,6 +304,11 @@ namespace BRobot
                     ActionWait aw = (ActionWait)action;
                     dec = string.Format("    WaitTime {0};", 0.001 * aw.millis);
                     break;
+
+                case ActionType.Comment:
+                    ActionComment ac = (ActionComment)action;
+                    dec = string.Format("    ! {0}", ac.comment);
+                    break;
             }
 
             declaration = dec;
@@ -501,7 +505,6 @@ namespace BRobot
 
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    //dec = string.Format("    TPWrite \"{0}\";", am.message);
                     dec = string.Format("  popup(\"{0}\",title=\"{0}\", warning=False, error=False)",
                         am.message);
                     break;
@@ -510,6 +513,11 @@ namespace BRobot
                     ActionWait aw = (ActionWait)action;
                     dec = string.Format("  sleep({0})",
                         0.001 * aw.millis);
+                    break;
+
+                case ActionType.Comment:
+                    ActionComment ac = (ActionComment)action;
+                    dec = string.Format("  # {0}", ac.comment);
                     break;
             }
 

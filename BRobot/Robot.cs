@@ -118,20 +118,22 @@ namespace BRobot
 
 
 
-        //██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗     █████╗ ██████╗ ██╗
-        //██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝    ██╔══██╗██╔══██╗██║
-        //██████╔╝██║   ██║██████╔╝██║     ██║██║         ███████║██████╔╝██║
-        //██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║         ██╔══██║██╔═══╝ ██║
-        //██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗    ██║  ██║██║     ██║
-        //╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
+        //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗     █████╗ ██████╗ ██╗
+        //  ██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝    ██╔══██╗██╔══██╗██║
+        //  ██████╔╝██║   ██║██████╔╝██║     ██║██║         ███████║██████╔╝██║
+        //  ██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║         ██╔══██║██╔═══╝ ██║
+        //  ██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗    ██║  ██║██║     ██║
+        //  ╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
         ///// <summary>
         ///// Base constructor.
         ///// </summary>                                                       
-        //public Robot()
-        //{
-        //    c = new Control(this);
-        //}
+        [System.Obsolete("Deprecated constructor, defaults to a generic device. Please use Robot(\"BrandName\") instead")]
+        public Robot() : this("HUMAN") { }
 
+        /// <summary>
+        /// Base constructor.
+        /// </summary>
+        /// <param name="brand"></param>
         public Robot(string brand)
         {
             string b = brand.ToUpper();
@@ -148,6 +150,10 @@ namespace BRobot
             {
                 c = new Control(this, RobotType.KUKA);
             } 
+            else if (b.Equals("HUMAN"))
+            {
+                c = new Control(this, RobotType.Undefined);
+            }
             else
             {
                 Console.WriteLine(brand + " is not a valis Robot type. Please specify one of the following: ");
@@ -431,8 +437,6 @@ namespace BRobot
         //  ╚════██║██╔══╝     ██║      ██║   ██║██║╚██╗██║██║   ██║╚════██║
         //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
         //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
-        //           
-        
         /// <summary>
         /// Gets the current speed setting.
         /// </summary>
@@ -881,6 +885,16 @@ namespace BRobot
             return c.IssueMessageRequest(message);
         }
 
+        /// <summary>
+        /// Display an internal comment in the compilation code. 
+        /// Useful for internal annotations, reminders, etc. 
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
+        public bool Comment(string comment)
+        {
+            return c.IssueCommentRequest(comment);
+        }
 
 
 

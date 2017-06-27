@@ -160,7 +160,9 @@ namespace BRobot
             { typeof (ActionTransformation),            (act, robCur) => robCur.ApplyAction((ActionTransformation) act) },
             { typeof (ActionJoints),                    (act, robCur) => robCur.ApplyAction((ActionJoints) act) },
             { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
-            { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) }
+            { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
+            { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
+
 
         };
 
@@ -633,6 +635,17 @@ namespace BRobot
         /// <param name="action"></param>
         /// <returns></returns>
         public bool ApplyAction(ActionWait action)
+        {
+            // There is basically nothing to do here! Leave the state of the robot as-is.
+            return true;
+        }
+
+        /// <summary>
+        /// Apply Comment Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionComment action)
         {
             // There is basically nothing to do here! Leave the state of the robot as-is.
             return true;
