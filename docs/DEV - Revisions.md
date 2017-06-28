@@ -77,9 +77,7 @@
     ```csharp
     arm.Rotate(1, 0, 0, 225);  // interesting (and obvious): because internally this only adds a new target, the result is the robot getting there in the shortest way possible (performing a -135deg rotation) rather than the actual 225 rotation over X as would intuitively come from reading he API...
     ```
-- [ ] On export, add an additional file with human-readable instructions
 - [ ] UR simulator is doing weird things with linear vs. joint movements...
-- [ ] Add `.Comment()` to the Reference.
 
 
 
@@ -87,7 +85,8 @@
 - [x] RobotCursor for ABBs and URs is pretty much identical, except for the utility functions, which pretty much relate to compilation anyway. Move this to Compiler and keep one unitary Cursor.
 - [x] Add string to Robot constructor to determine robot make.
 - [x] Add `.Comment()` to generate inline custom comments
-
+- [x] Add `.Comment()` to the Reference.
+- [x] On export, add an additional file with human-readable instructions --> Added `.Robot("HUMAN")`! Unrecognized brand names default to this compiler.
 
 ## BUILD 1201
 - [x] Testing and debugging of UR offline code generation
