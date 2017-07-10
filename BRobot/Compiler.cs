@@ -269,11 +269,11 @@ namespace BRobot
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  CONST robtarget target{0}:={1};", id, GetUNSAFERobTargetValue(cursor));
+                    dec = string.Format("  CONST robtarget target{0} := {1};", id, GetUNSAFERobTargetValue(cursor));
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("  CONST jointtarget target{0}:={1};", id, GetJointTargetValue(cursor));
+                    dec = string.Format("  CONST jointtarget target{0} := {1};", id, GetJointTargetValue(cursor));
                     break;
             }
 
@@ -292,7 +292,7 @@ namespace BRobot
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("    {0} target{1},{2},{3},Tool0\\WObj:=WObj0;",
+                    dec = string.Format("    {0} target{1}, {2}, {3}, Tool0\\WObj:=WObj0;",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         id,
                         velNames[cursor.speed],
@@ -300,7 +300,7 @@ namespace BRobot
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("    MoveAbsJ target{0},{1},{2},Tool0\\WObj:=WObj0;",
+                    dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, Tool0\\WObj:=WObj0;",
                         id,
                         velNames[cursor.speed],
                         zoneNames[cursor.zone]);
@@ -337,7 +337,7 @@ namespace BRobot
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("    {0} {1},{2},{3},Tool0\\WObj:=WObj0;  ! [{4}]",
+                    dec = string.Format("    {0} {1}, {2}, {3}, Tool0\\WObj:=WObj0;  ! [{4}]",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         GetUNSAFERobTargetValue(cursor),
                         velNames[cursor.speed],
@@ -346,7 +346,7 @@ namespace BRobot
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("    MoveAbsJ {0},{1},{2},Tool0\\WObj:=WObj0;  ! [{3}]",
+                    dec = string.Format("    MoveAbsJ {0}, {1}, {2}, Tool0\\WObj:=WObj0;  ! [{3}]",
                         GetJointTargetValue(cursor),
                         velNames[cursor.speed],
                         zoneNames[cursor.zone],
@@ -385,7 +385,7 @@ namespace BRobot
         /// <returns></returns>
         static public string GetUNSAFERobTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0},{1},[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]", cursor.position, cursor.rotation);
+            return string.Format("[{0}, {1}, [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]]", cursor.position, cursor.rotation);
         }
 
         /// <summary>
@@ -394,7 +394,7 @@ namespace BRobot
         /// <returns></returns>
         static public string GetJointTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0},[0,9E9,9E9,9E9,9E9,9E9]]", cursor.joints);
+            return string.Format("[{0}, [0,9E9,9E9,9E9,9E9,9E9]]", cursor.joints);
         }
 
         /// <summary>
@@ -571,8 +571,8 @@ namespace BRobot
                     dec = string.Format("  {0}(target{1}, a=1, v={2}, r={3})",
                         "movej",
                         id,
-                        0.001 * cursor.speed,
-                        0.001 * cursor.zone);
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Message:
@@ -610,8 +610,8 @@ namespace BRobot
                     dec = string.Format("  {0}({1}, a=1, v={2}, r={3})  # [{4}]",
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         GetPoseTargetValue(cursor),
-                        0.001 * cursor.speed,
-                        0.001 * cursor.zone,
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
                         action.id);
                     break;
 
@@ -620,8 +620,8 @@ namespace BRobot
                     dec = string.Format("  {0}({1}, a=1, v={2}, r={3})  # [{4}]",
                         "movej",
                         GetJointTargetValue(cursor),
-                        0.001 * cursor.speed,
-                        0.001 * cursor.zone,
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
                         action.id);
                     break;
 
@@ -660,13 +660,13 @@ namespace BRobot
         static public string GetPoseTargetValue(RobotCursor cursor)
         {
             Point axisAng = cursor.rotation.GetRotationVector(true);
-            return string.Format("p[{0}, {1}, {2}, {3}, {4}, {5}]",
-                0.001 * cursor.position.X,
-                0.001 * cursor.position.Y,
-                0.001 * cursor.position.Z,
-                axisAng.X,
-                axisAng.Y,
-                axisAng.Z);
+            return string.Format("p[{0},{1},{2},{3},{4},{5}]",
+                Math.Round(0.001 * cursor.position.X, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(0.001 * cursor.position.Y, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(0.001 * cursor.position.Z, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(axisAng.X, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Y, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Z, Geometry.STRING_ROUND_DECIMALS_RADS));
         }
 
         /// <summary>
@@ -679,13 +679,13 @@ namespace BRobot
             Console.WriteLine(jrad);
             jrad.Scale(Math.PI / 180);  // convert to radians
             Console.WriteLine(jrad);
-            return string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]",
-                jrad.J1,
-                jrad.J2,
-                jrad.J3,
-                jrad.J4,
-                jrad.J5,
-                jrad.J6);
+            return string.Format("[{0},{1},{2},{3},{4},{5}]",
+                Math.Round(jrad.J1, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.J2, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.J3, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.J4, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.J5, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.J6, Geometry.STRING_ROUND_DECIMALS_RADS));
         }
 
     }

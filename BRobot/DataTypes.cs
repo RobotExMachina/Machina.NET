@@ -31,8 +31,8 @@ namespace BRobot
         /// Amount of decimals for rounding on ToString() operations.
         /// </summary>
         internal static readonly int STRING_ROUND_DECIMALS_MM = 3;
-        protected static readonly int STRING_ROUND_DECIMALS_DEGS = 3;
-        protected static readonly int STRING_ROUND_DECIMALS_RADS = 5;
+        internal static readonly int STRING_ROUND_DECIMALS_DEGS = 3;
+        internal static readonly int STRING_ROUND_DECIMALS_RADS = 6;
 
         // Angle conversion
         protected static readonly double TO_DEGS = 180.0 / Math.PI;
@@ -1644,7 +1644,7 @@ namespace BRobot
 
         public override string ToString()
         {
-            return string.Format("[{0},{1},{2}]", XAxis, YAxis, ZAxis);
+            return string.Format("[{0}, {1}, {2}]", XAxis, YAxis, ZAxis);
         }
 
     }
