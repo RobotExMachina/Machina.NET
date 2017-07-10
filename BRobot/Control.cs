@@ -17,7 +17,7 @@ namespace BRobot
         public const bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
         public const bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
         public const bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
-        public const double SAFETY_TABLE_Z_LIMIT = 100;                       // table security checks will trigger below this z height (mm)
+        public const double SAFETY_TABLE_Z_LIMIT = -1000;                     // table security checks will trigger below this z height (mm)
 
         public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
         public const int DEFAULT_ZONE = 5;                                    // default zone for new actions
@@ -429,11 +429,12 @@ namespace BRobot
         }
 
         /// <summary>
-        /// For Offline modes, it flushes all pending actions and returns a devide-specific program 
+        ///  For Offline modes, it flushes all pending actions and returns a devide-specific program 
         /// as a stringList representation.
         /// </summary>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public List<string> Export()
+        public List<string> Export(bool inlineTargets)
         {
             if (controlMode != ControlMode.Offline)
             {
@@ -444,19 +445,20 @@ namespace BRobot
             //List<Action> actions = actionBuffer.GetAllPending();
             //return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
 
-            return writeCursor.ProgramFromBuffer();
+            return writeCursor.ProgramFromBuffer(inlineTargets);
         }
 
         /// <summary>
         /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program as a text file.
         /// </summary>
         /// <param name="filepath"></param>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public bool Export(string filepath)
+        public bool Export(string filepath, bool inlineTargets)
         {
             // @TODO: add some filepath sanity here
 
-            List<string> programCode = Export();
+            List<string> programCode = Export(inlineTargets);
             if (programCode == null) return false;
             return SaveStringListToFile(programCode, filepath);
         }
@@ -1370,7 +1372,7 @@ namespace BRobot
             {
                 if (!comm.IsRunning() && areCursorsInitialized && writeCursor.AreActionsPending() && (actionsExecuter == null || !actionsExecuter.IsAlive))
                 {
-                    actionsExecuter = new Thread(() => RunActionsBlockInController());  // http://stackoverflow.com/a/3360582
+                    actionsExecuter = new Thread(() => RunActionsBlockInController(true));  // http://stackoverflow.com/a/3360582
                     actionsExecuter.Start();
                 }
             }
@@ -1388,9 +1390,9 @@ namespace BRobot
         /// Cretes a program with the first block of Actions in the cursor, uploads it to the controller
         /// and runs it. 
         /// </summary>
-        private void RunActionsBlockInController()
+        private void RunActionsBlockInController(bool inlineTargets)
         {
-            List<string> program = writeCursor.ProgramFromBlock();
+            List<string> program = writeCursor.ProgramFromBlock(inlineTargets);
             comm.LoadProgramToController(program);
             comm.StartProgramExecution();
         }

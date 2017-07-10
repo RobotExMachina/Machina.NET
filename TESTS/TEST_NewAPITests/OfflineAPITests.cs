@@ -12,7 +12,7 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Robot arm = new Robot("fdsfddsf");
+            Robot arm = new Robot("UR");
             arm.Mode("offline");
 
             // An generic test program

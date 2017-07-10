@@ -253,3 +253,5 @@ paket-files/
 
 # private files
 private/
+.dropbox
+desktop.ini

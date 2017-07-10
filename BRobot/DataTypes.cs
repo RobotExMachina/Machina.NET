@@ -30,7 +30,9 @@ namespace BRobot
         /// <summary>
         /// Amount of decimals for rounding on ToString() operations.
         /// </summary>
-        protected static readonly int STRING_ROUND_DECIMALS = 8;
+        internal static readonly int STRING_ROUND_DECIMALS_MM = 3;
+        protected static readonly int STRING_ROUND_DECIMALS_DEGS = 3;
+        protected static readonly int STRING_ROUND_DECIMALS_RADS = 5;
 
         // Angle conversion
         protected static readonly double TO_DEGS = 180.0 / Math.PI;
@@ -673,9 +675,9 @@ namespace BRobot
         public override string ToString()
         {
             return string.Format("[{0},{1},{2}]",
-                Math.Round(X, STRING_ROUND_DECIMALS),
-                Math.Round(Y, STRING_ROUND_DECIMALS),
-                Math.Round(Z, STRING_ROUND_DECIMALS));
+                Math.Round(X, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
         }
 
     }
@@ -1341,10 +1343,10 @@ namespace BRobot
         public override string ToString()
         {
             return string.Format("[{0},{1},{2},{3}]",
-                Math.Round(W, STRING_ROUND_DECIMALS),
-                Math.Round(X, STRING_ROUND_DECIMALS),
-                Math.Round(Y, STRING_ROUND_DECIMALS),
-                Math.Round(Z, STRING_ROUND_DECIMALS));
+                Math.Round(W, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(X, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(Y, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(Z, STRING_ROUND_DECIMALS_RADS));
         }
 
     }
@@ -1492,12 +1494,12 @@ namespace BRobot
         public override string ToString()
         {
             return string.Format("[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(J1, STRING_ROUND_DECIMALS),
-                Math.Round(J2, STRING_ROUND_DECIMALS),
-                Math.Round(J3, STRING_ROUND_DECIMALS),
-                Math.Round(J4, STRING_ROUND_DECIMALS),
-                Math.Round(J5, STRING_ROUND_DECIMALS),
-                Math.Round(J6, STRING_ROUND_DECIMALS));
+                Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J4, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J5, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J6, STRING_ROUND_DECIMALS_DEGS));
         }
 
     }

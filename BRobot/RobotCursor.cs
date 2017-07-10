@@ -259,19 +259,21 @@ namespace BRobot
         /// <summary>
         /// Return a device-specific program with all the Actions pending in the buffer.
         /// </summary>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public List<string> ProgramFromBuffer()
+        public List<string> ProgramFromBuffer(bool inlineTargets)
         {
-            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, false);
+            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, false, inlineTargets);
         }
 
         /// <summary>
         /// Return a device-specific program with the next block of Actions pending in the buffer.
         /// </summary>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public List<string> ProgramFromBlock()
+        public List<string> ProgramFromBlock(bool inlineTargets)
         {
-            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, true);
+            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, true, inlineTargets);
         }
 
         public void LogBufferedActions()

@@ -90,7 +90,7 @@ namespace BRobot
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1202;
+        public static readonly int Build = 1203;
 
         /// <summary>
         /// Version number.
@@ -127,7 +127,7 @@ namespace BRobot
         ///// <summary>
         ///// Base constructor.
         ///// </summary>                                                       
-        [System.Obsolete("Deprecated constructor, defaults to a generic device. Please use Robot(\"BrandName\") instead")]
+        [System.Obsolete("Deprecated constructor, defaults to a human-readable interpretation of the actions. Please use Robot(\"BrandName\") instead. Example: `Robot arm = new Robot(\"ABB\");`")]
         public Robot() : this("HUMAN") { }
 
         /// <summary>
@@ -402,7 +402,18 @@ namespace BRobot
         /// <returns></returns>
         public List<string> Export()
         {
-            return c.Export();
+            return c.Export(true);
+        }
+
+        /// <summary>
+        /// Create a program with all the buffered actions and return it as a string List.
+        /// Note all buffered actions will be removed from the queue.
+        /// </summary>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <returns></returns>
+        public List<string> Export(bool inlineTargets)
+        {
+            return c.Export(inlineTargets);
         }
 
         /// <summary>
@@ -413,8 +424,21 @@ namespace BRobot
         /// <returns></returns>
         public bool Export(string filepath)
         {
-            return c.Export(filepath);
+            return c.Export(filepath, true);
         }
+
+        /// <summary>
+        /// Create a program with all the buffered actions and save it to a file. 
+        /// Note all buffered actions will be removed from the queue.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <returns></returns>
+        public bool Export(string filepath, bool inlineTargets)
+        {
+            return c.Export(filepath, inlineTargets);
+        }
+
 
         /// <summary>
         /// In 'execute' mode, flushes all pending actions, creates a program, 

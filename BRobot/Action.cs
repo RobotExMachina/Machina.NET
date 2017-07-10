@@ -49,7 +49,11 @@ namespace BRobot
     /// </summary>
     public class Action
     {
-        public ActionType type = ActionType.Undefined;
+
+        //  ╔═╗╔╦╗╔═╗╔╦╗╦╔═╗  ╔═╗╔╦╗╦ ╦╔═╗╔═╗
+        //  ╚═╗ ║ ╠═╣ ║ ║║    ╚═╗ ║ ║ ║╠╣ ╠╣ 
+        //  ╚═╝ ╩ ╩ ╩ ╩ ╩╚═╝  ╚═╝ ╩ ╚═╝╚  ╚  
+        internal static int currentId = 1;  // a rolling id counter
 
         public static ActionSpeed Speed(int speedInc)
         {
@@ -61,7 +65,6 @@ namespace BRobot
             return new ActionSpeed(speed, false);
         }
 
-
         public static ActionZone Zone(int zoneInc)
         {
             return new ActionZone(zoneInc, true);
@@ -72,18 +75,15 @@ namespace BRobot
             return new ActionZone(zone, false);
         }
 
-
         public static ActionMotion Motion(MotionType motionType)
         {
             return new ActionMotion(motionType);
         }
 
-
         public static ActionCoordinates Coordinates(ReferenceCS referenceCS)
         {
             return new ActionCoordinates(referenceCS);
         }
-
 
         public static ActionTranslation Move(Point pos)
         {
@@ -95,7 +95,6 @@ namespace BRobot
             return new ActionTranslation(pos, false);
         }
 
-
         public static ActionRotation Rotate(Rotation rot)
         {
             return new ActionRotation(rot, true);
@@ -105,7 +104,6 @@ namespace BRobot
         {
             return new ActionRotation(rot, false);
         }
-
 
         public static ActionTransformation Transform(Point pos, Rotation rot, bool translationFirst)
         {
@@ -117,7 +115,6 @@ namespace BRobot
             return new ActionTransformation(pos, rot, false, true);
         }
 
-
         public static ActionJoints Joints(Joints jointsInc)
         {
             return new ActionJoints(jointsInc, true);
@@ -127,7 +124,6 @@ namespace BRobot
         {
             return new ActionJoints(joints, false);
         }
-
         
         public static ActionWait Wait(long millis)
         {
@@ -157,7 +153,22 @@ namespace BRobot
 
 
 
+
+        //  ╦╔╗╔╔═╗╔╦╗╔═╗╔╗╔╔═╗╔═╗  ╔═╗╔╦╗╦ ╦╔═╗╔═╗
+        //  ║║║║╚═╗ ║ ╠═╣║║║║  ║╣   ╚═╗ ║ ║ ║╠╣ ╠╣ 
+        //  ╩╝╚╝╚═╝ ╩ ╩ ╩╝╚╝╚═╝╚═╝  ╚═╝ ╩ ╚═╝╚  ╚  
+        public ActionType type = ActionType.Undefined;
+        public int id;
+
+        /// <summary>
+        /// A base constructor to take care of common setup for all actionss
+        /// </summary>
+        public Action()
+        {
+            this.id = currentId++;
+        }
     }
+
 
 
 
@@ -176,7 +187,7 @@ namespace BRobot
         public int speed;
         public bool relative;
 
-        public ActionSpeed(int speed, bool relative)
+        public ActionSpeed(int speed, bool relative) : base()
         {
             type = ActionType.Speed;
 
@@ -207,7 +218,7 @@ namespace BRobot
         public int zone;
         public bool relative;
 
-        public ActionZone(int zone, bool relative)
+        public ActionZone(int zone, bool relative) : base()
         {
             type = ActionType.Zone;
 
@@ -237,7 +248,7 @@ namespace BRobot
     {
         public MotionType motionType;
         
-        public ActionMotion(MotionType motionType)
+        public ActionMotion(MotionType motionType) : base()
         {
             type = ActionType.Motion;
 
@@ -264,7 +275,7 @@ namespace BRobot
     {
         public ReferenceCS referenceCS;
 
-        public ActionCoordinates(ReferenceCS referenceCS)
+        public ActionCoordinates(ReferenceCS referenceCS) : base()
         {
             type = ActionType.Coordinates;
 
@@ -291,7 +302,7 @@ namespace BRobot
     {
         public bool push;  // is this push or pop?
 
-        public ActionPushPop(bool push)
+        public ActionPushPop(bool push) : base()
         {
             type = ActionType.PushPop;
 
@@ -341,7 +352,7 @@ namespace BRobot
         /// <param name="speed"></param>
         /// <param name="zone"></param>
         /// <param name="mType"></param>
-        public ActionTranslation(Point trans, bool relTrans)
+        public ActionTranslation(Point trans, bool relTrans) : base()
         {
             type = ActionType.Translation;
 
@@ -373,7 +384,7 @@ namespace BRobot
         public Rotation rotation;
         public bool relative;
             
-        public ActionRotation(Rotation rot, bool relRot)
+        public ActionRotation(Rotation rot, bool relRot) : base()
         {
             type = ActionType.Rotation;
 
@@ -409,7 +420,7 @@ namespace BRobot
         public bool relative;
         public bool translationFirst;  // for relative transforms, translate or rotate first?
 
-        public ActionTransformation(Point translation, Rotation rotation, bool relative, bool translationFirst)
+        public ActionTransformation(Point translation, Rotation rotation, bool relative, bool translationFirst) : base()
         {
             type = ActionType.Transformation;
 
@@ -457,7 +468,7 @@ namespace BRobot
         public Joints joints;
         public bool relative;
 
-        public ActionJoints(Joints joints, bool relative)
+        public ActionJoints(Joints joints, bool relative) : base()
         {
             type = ActionType.Joints;
 
@@ -487,7 +498,7 @@ namespace BRobot
     {
         public string message;
 
-        public ActionMessage(string message)
+        public ActionMessage(string message) : base()
         {
             type = ActionType.Message;
 
@@ -515,7 +526,7 @@ namespace BRobot
     {
         public long millis;
 
-        public ActionWait(long millis)
+        public ActionWait(long millis) : base()
         {
             type = ActionType.Wait;
 
@@ -527,12 +538,24 @@ namespace BRobot
             return string.Format("Wait {0} ms", millis);
         }
     }
-    
+
+
+
+    //   ██████╗ ██████╗ ███╗   ███╗███╗   ███╗███████╗███╗   ██╗████████╗
+    //  ██╔════╝██╔═══██╗████╗ ████║████╗ ████║██╔════╝████╗  ██║╚══██╔══╝
+    //  ██║     ██║   ██║██╔████╔██║██╔████╔██║█████╗  ██╔██╗ ██║   ██║   
+    //  ██║     ██║   ██║██║╚██╔╝██║██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   
+    //  ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   
+    //   ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
+    //
+    /// <summary>
+    /// Adds a line comment to the compiled code
+    /// </summary>
     public class ActionComment : Action
     {
         public string comment;
 
-        public ActionComment(string comment)
+        public ActionComment(string comment) : base()
         {
             type = ActionType.Comment;
 

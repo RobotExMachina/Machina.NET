@@ -23,7 +23,7 @@ namespace BRobot
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
         /// <returns></returns>
-        public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block);
+        public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets);
         
     }
 
@@ -40,7 +40,7 @@ namespace BRobot
     /// </summary>
     internal class CompilerHuman : Compiler
     {
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
         {
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -111,7 +111,7 @@ namespace BRobot
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
         //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
         {
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -160,15 +160,26 @@ namespace BRobot
                     zoneDecs.Add(writer.zone, predef ? "" : GetZoneValue(writer));
                 }
 
-                // Generate lines of code
-                if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                if (inlineTargets)
                 {
-                    variableLines.Add(line);
+                    // Generate lines of code
+                    if (GenerateInstructionDeclaration(a, writer, velNames, zoneNames, out line))
+                    {
+                        instructionLines.Add(line);
+                    }
                 }
-
-                if (GenerateInstructionDeclaration(a, writer, it, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
+                else
                 {
-                    instructionLines.Add(line);
+                    // Generate lines of code
+                    if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        variableLines.Add(line);
+                    }
+
+                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        instructionLines.Add(line);
+                    }
                 }
 
                 // Move on
@@ -270,7 +281,7 @@ namespace BRobot
             return dec != null;
         }
 
-        static private bool GenerateInstructionDeclaration(
+        static private bool GenerateInstructionDeclarationFromVariable(
             Action action, RobotCursor cursor, int id,
             Dictionary<int, string> velNames, Dictionary<int, string> zoneNames,
             out string declaration)
@@ -303,6 +314,57 @@ namespace BRobot
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
                     dec = string.Format("    WaitTime {0};", 0.001 * aw.millis);
+                    break;
+
+                case ActionType.Comment:
+                    ActionComment ac = (ActionComment)action;
+                    dec = string.Format("    ! {0}", ac.comment);
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
+        }
+
+        static private bool GenerateInstructionDeclaration(
+            Action action, RobotCursor cursor,
+            Dictionary<int, string> velNames, Dictionary<int, string> zoneNames,
+            out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.Transformation:
+                    dec = string.Format("    {0} {1},{2},{3},Tool0\\WObj:=WObj0;  ! [{4}]",
+                        cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
+                        GetUNSAFERobTargetValue(cursor),
+                        velNames[cursor.speed],
+                        zoneNames[cursor.zone],
+                        action.id);
+                    break;
+
+                case ActionType.Joints:
+                    dec = string.Format("    MoveAbsJ {0},{1},{2},Tool0\\WObj:=WObj0;  ! [{3}]",
+                        GetJointTargetValue(cursor),
+                        velNames[cursor.speed],
+                        zoneNames[cursor.zone],
+                        action.id);
+                    break;
+
+                case ActionType.Message:
+                    ActionMessage am = (ActionMessage)action;
+                    dec = string.Format("    TPWrite \"{0}\";  ! [{1}]", 
+                        am.message,
+                        action.id);
+                    break;
+
+                case ActionType.Wait:
+                    ActionWait aw = (ActionWait)action;
+                    dec = string.Format("    WaitTime {0};  ! [{1}]", 
+                        0.001 * aw.millis,
+                        action.id);
                     break;
 
                 case ActionType.Comment:
@@ -380,7 +442,7 @@ namespace BRobot
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
         //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
         {
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -403,15 +465,25 @@ namespace BRobot
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them 
 
-                // Generate lines of code
-                if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                if (inlineTargets)
                 {
-                    variableLines.Add(line);
-                }
+                    if (GenerateInstructionDeclaration(a, writer, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        instructionLines.Add(line);
+                    }
+                } 
+                else
+                {
+                    // Generate lines of code
+                    if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        variableLines.Add(line);
+                    }
 
-                if (GenerateInstructionDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
-                {
-                    instructionLines.Add(line);
+                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        instructionLines.Add(line);
+                    }
                 }
 
                 // Move on
@@ -477,7 +549,7 @@ namespace BRobot
             return dec != null;
         }
 
-        static public bool GenerateInstructionDeclaration(
+        static public bool GenerateInstructionDeclarationFromVariable(
             Action action, RobotCursor cursor, int id,
             out string declaration)
         {
@@ -490,8 +562,8 @@ namespace BRobot
                     dec = string.Format("  {0}(target{1}, a=1, v={2}, r={3})",
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         id,
-                        0.001 * cursor.speed,
-                        0.001 * cursor.zone);
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Joints:
@@ -505,7 +577,7 @@ namespace BRobot
 
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  popup(\"{0}\",title=\"{0}\", warning=False, error=False)",
+                    dec = string.Format("  popup(\"{0}\", title=\"{0}\", warning=False, error=False)",
                         am.message);
                     break;
 
@@ -524,6 +596,62 @@ namespace BRobot
             declaration = dec;
             return dec != null;
         }
+
+        static public bool GenerateInstructionDeclaration(
+            Action action, RobotCursor cursor,
+            out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.Transformation:
+                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})  # [{4}]",
+                        cursor.motionType == MotionType.Joint ? "movej" : "movel",
+                        GetPoseTargetValue(cursor),
+                        0.001 * cursor.speed,
+                        0.001 * cursor.zone,
+                        action.id);
+                    break;
+
+                case ActionType.Joints:
+                    // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
+                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})  # [{4}]",
+                        "movej",
+                        GetJointTargetValue(cursor),
+                        0.001 * cursor.speed,
+                        0.001 * cursor.zone,
+                        action.id);
+                    break;
+
+                case ActionType.Message:
+                    ActionMessage am = (ActionMessage)action;
+                    dec = string.Format("  popup(\"{0}\", title=\"{0}\", warning=False, error=False)  # [{1}]",
+                        am.message,
+                        am.id);
+                    break;
+
+                case ActionType.Wait:
+                    ActionWait aw = (ActionWait)action;
+                    dec = string.Format("  sleep({0})  # [{1}]",
+                        0.001 * aw.millis,
+                        aw.id);
+                    break;
+
+                case ActionType.Comment:
+                    ActionComment ac = (ActionComment)action;
+                    dec = string.Format("  # {0}", 
+                        ac.comment);
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
+        }
+
+
+
 
         /// <summary>
         /// Returns an UR pose representation of the current state of the cursor.
@@ -574,7 +702,7 @@ namespace BRobot
     internal class CompilerKUKA : Compiler
     {
         
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
         {
             throw new NotImplementedException();
         }
