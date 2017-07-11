@@ -14,82 +14,17 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
-# PHASE 2
 
-## TODO
-- [ ] Rotation problem: the following R construction returns a CS system with the Y inverted!:
-    ```csharp
-        > Rotation r = new Rotation(-1, 0, 0, 0, 0, -1);
-        > r
-        [[0,0,0.70710678,0.70710678]]
-        > r.GetCoordinateSystem()
-        [[[-1,0,0],[0,0,1],[0,1,0]]]  // --> Notice the inverted Y axis!
-
-        // It doesn't happen with this one for example:
-        > Rotation r1 = new Rotation(-1, 0, 0, 0, 1, 0);
-        > r1
-        [[0,0,1,0]]
-        > r1.GetCoordinateSystem()
-        [[[-1,0,0],[0,1,0],[0,0,-1]]]
-    
-        // Another way to see this is the following:
-        > CoordinateSystem cs = new CoordinateSystem(-1, 0, 0, 0, 0, -1);
-        > cs
-        [[[-1,0,0],[0,0,-1],[0,-1,0]]]
-        > 
-        > cs.GetQuaternion().GetCoordinateSystem()
-        [[[-1,0,0],[0,0,1],[0,1,0]]]  // It is inverted!
-
-        // However, this works well:
-        > Rotation r = new Rotation(-1, 0, 0, 0, 1, -1);
-        > r
-        [[0,0,0.92387953,0.38268343]]
-        > r.GetCoordinateSystem()
-        [[[-1,0,0],[0,0.70710678,0.70710678],[0,0.70710678,-0.70710678]]]
-
-        > Rotation r2 = new Rotation(-1, 0, 0, 0, 1, 0);
-        > r2.GetCoordinateSystem()
-        [[[-1,0,0],[0,1,0],[0,0,-1]]]
-        > r2.RotateLocal(new Rotation(1, 0, 0, 45));
-        > r2
-        [[0,0,0.92387953,-0.38268343]]
-        > r2.GetCoordinateSystem()
-        [[[-1,0,0],[0,0.70710678,-0.70710678],[0,-0.70710678,-0.70710678]]]
-        > r2.RotateLocal(new Rotation(1, 0, 0, 45));
-        > r2.GetCoordinateSystem()
-        [[[-1,0,0],[0,0,-1],[0,-1,0]]]
-        > 
-        // Maybe the problem is in the initial Vectors to Quaternion conversion?
-        
-    ```
-    --> check https://github.com/westphae/quaternion/blob/master/quaternion.go ?
-    --> Write some unit tests and test the library to figure this out
-    --> Is this a problem inherent to Quaternion to Axis-Angle convertion, and the fact that the latter always returns positive rotations? 
-
-- [ ] The dependency tree makes BRobot not work right now if the user doesn't have RobotStudio in the system. And the library is pretty much only used for comm, not used at all for offlien code generation. A way to figure this out, and have the library work in offline mode without the libraries should be implemented. 
-- [ ] Coordinates(): this should:
-    - [ ] Accept a CS object to use as a new reference frame
-    - [ ] Use workobjects when compiled
-- [ ] Add `.Motion("circle")` for `movec` commands?
-- [ ] Add `.Acceleration()` and `.AccelerationTo()` for UR robots?
-- [ ] Rethink API names to be more 'generic' and less 'ABBish'
-- [ ] This happens, should it be fixed...?
-    ```csharp
-    arm.Rotate(1, 0, 0, 225);  // interesting (and obvious): because internally this only adds a new target, the result is the robot getting there in the shortest way possible (performing a -135deg rotation) rather than the actual 225 rotation over X as would intuitively come from reading he API...
-    ```
-- [ ] UR simulator is doing weird things with linear vs. joint movements... --> RoboDK doesn't do it, but follows a different path on `movej`...
-- [ ] Reduce numerical precison on exports, we don't need 15 decimals:
-    ```
-    movej(p[0.2, 0.319848077530122, 0.401736481776669, 0.137046446582579, 1.56644805234647, 0.137046446582579], a=1, v=0.025, r=0.001)
-    ```
-- [ ] To improve integration with RoboDK, instead of splitting target declarations and values, use the values right away in the commands (or at least, have some overload to do it one way or the other...). Also, Jeremy thinks it will make life easier for certain simulation aspects.
-
-
-
+## BUILD 1204
+- [ ] 
 
 ## BUILD 1203
 - [x] Add inline generation of poses, instead of splitting them into variables.
-- [ ] Add 'id' count to Actions
+- [x] Add 'id' count to Actions
+- [x] Reduce numerical precison on string exports, we don't need 15 decimals:
+    ```
+    movej(p[0.2, 0.319848077530122, 0.401736481776669, 0.137046446582579, 1.56644805234647, 0.137046446582579], a=1, v=0.025, r=0.001)
+    ```
 
 ## BUILD 1202
 - [x] RobotCursor for ABBs and URs is pretty much identical, except for the utility functions, which pretty much relate to compilation anyway. Move this to Compiler and keep one unitary Cursor.
