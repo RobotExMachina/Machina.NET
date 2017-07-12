@@ -87,6 +87,8 @@
     arm.Rotate(1, 0, 0, 225);  // interesting (and obvious): because internally this only adds a new target, the result is the robot getting there in the shortest way possible (performing a -135deg rotation) rather than the actual 225 rotation over X as would intuitively come from reading he API...
     ```
 - [ ] UR simulator is doing weird things with linear vs. joint movements... --> RoboDK doesn't do it, but follows a different path on `movej`...
+- [ ] Named CSs could be "world", "base", "flange", and "tool"/"tcp"
+- [ ] Add `bot.Units("meters");` to set which units are used from a point on.
 
 
 

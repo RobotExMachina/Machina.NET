@@ -1268,6 +1268,34 @@ namespace BRobot
             this.Multiply(r);
         }
 
+        /// <summary>
+        /// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Conversion
+        /// </summary>
+        /// <returns></returns>
+        public Point ToEulerZYX()
+        {
+            Point eu = new Point();
+
+            double y2, t0, t1, t2, t3, t4;
+
+            y2 = Y * Y;
+
+            t0 = 2 * (W * X + Y * Z);
+            t1 = 1 - 2 * (X * X + y2);
+            eu.X = Math.Atan2(t0, t1) * TO_DEGS;
+
+            t2 = 2 * (W * Y - Z * X);
+            t2 = t2 > 1 ? 1 : t2;
+            t2 = t2 < -1 ? -1 : t2;
+            eu.Y = Math.Asin(t2) * TO_DEGS;
+
+            t3 = 2 * (W * Z + X * Y);
+            t4 = 1 - 2 * (y2 + Z * Z);
+            eu.Z = Math.Atan2(t3, t4) * TO_DEGS;
+
+            return eu;
+        }
+
         
 
 

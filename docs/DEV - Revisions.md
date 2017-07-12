@@ -15,8 +15,11 @@
 ```
 
 
+## BUILD 1205
+- [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!
+
 ## BUILD 1204
-- [ ] 
+- [ ] Add KUKA KRL
 
 ## BUILD 1203
 - [x] Add inline generation of poses, instead of splitting them into variables.
