@@ -1269,6 +1269,7 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Returns the Euler angle representation of this Quaternion in Tait-Bryant convention (ZY'X'' order, aka intrinsic ZYX). Please note each axis rotation is stored in its own XYZ parameter. So for example, to convert this to the ABC representation used by KUKA, ABC maps to the vector's ZYX.
         /// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Conversion
         /// </summary>
         /// <returns></returns>

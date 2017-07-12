@@ -701,10 +701,338 @@ namespace BRobot
     //  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
     internal class CompilerKUKA : Compiler
     {
-        
+        /// <summary>
+        /// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
+        /// </summary>
+        /// <param name="programName"></param>
+        /// <param name="writePointer"></param>
+        /// <param name="block">Use actions in waiting queue or buffer?</param>
+        /// <returns></returns>
+        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
         {
-            throw new NotImplementedException();
+            // Which pending Actions are used for this program?
+            // Copy them without flushing the buffer.
+            List<Action> actions = block ?
+                writer.actionBuffer.GetBlockPending(false) :
+                writer.actionBuffer.GetAllPending(false);
+
+
+            // CODE LINES GENERATION
+            // TARGETS AND INSTRUCTIONS
+            List<string> declarationLines = new List<string>();
+            List<string> initializationLines = new List<string>();
+            List<string> instructionLines = new List<string>();
+
+            //KUKA INITIALIZATION BOILERPLATE
+            declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
+            declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");  // import BAS sys function
+
+            initializationLines.Add("  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM()");  // legacy support for user-programming safety
+            initializationLines.Add("  INTERRUPT ON 3");
+            initializationLines.Add("  BAS (#INITMOV, 0)");  // use base function to initialize sys vars to defaults
+            initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
+            initializationLines.Add("  $LOAD.M = 1");
+            initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
+
+            // DATA GENERATION
+            // Use the write RobotCursor to generate the data
+            int it = 0;
+            string line = null;
+            foreach (Action a in actions)
+            {
+                // Move writerCursor to this action state
+                writer.ApplyNextAction();  // for the buffer to correctly manage them
+
+                if (inlineTargets)
+                {
+                    if (GenerateInstructionDeclaration(a, writer, out line))
+                    {
+                        instructionLines.Add(line);
+                    }
+                }
+                else
+                {
+                    if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        declarationLines.Add(line);
+                    }
+
+                    if (GenerateVariableInitialization(a, writer, it, out line)) 
+                    {
+                        initializationLines.Add(line);
+                    }
+
+                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        instructionLines.Add(line);
+                    }
+                }
+
+                // Move on
+                it++;
+            }
+
+
+            // PROGRAM ASSEMBLY
+            // Initialize a module list
+            List<string> module = new List<string>();
+
+            // MODULE HEADER
+            module.Add("DEF " + programName + "():");
+            module.Add("");
+
+            // Declarations
+            if (declarationLines.Count != 0)
+            {
+                module.AddRange(declarationLines);
+                module.Add("");
+            }
+
+            // Initializations
+            if (initializationLines.Count != 0)
+            {
+                module.AddRange(initializationLines);
+                module.Add("");
+            }
+            
+            // MAIN PROCEDURE
+            // Instructions
+            if (instructionLines.Count != 0)
+            {
+                module.AddRange(instructionLines);
+                module.Add("");
+            }
+
+            module.Add("END");
+            module.Add("");
+
+            //// MODULE KICKOFF
+            //module.Add(programName + "()");  // no need for this in KRL if file name is same as module name --> what if user exports them with different names?
+
+            return module;
+        }
+
+
+
+
+        //  ╦ ╦╔╦╗╦╦  ╔═╗
+        //  ║ ║ ║ ║║  ╚═╗
+        //  ╚═╝ ╩ ╩╩═╝╚═╝
+        static public bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.Transformation:
+                    dec = string.Format("  POS target{0}",
+                        id);
+                    break;
+
+                case ActionType.Joints:
+                    dec = string.Format("  AXIS target{0}", 
+                        id);
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
+        }
+
+        static public bool GenerateVariableInitialization(Action action, RobotCursor cursor, int id, out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.Transformation:
+                    dec = string.Format("  target{0} = {1}",
+                        id,
+                        GetPositionTargetValue(cursor));
+                    break;
+
+                case ActionType.Joints:
+                    dec = string.Format("  target{0} = {1}",
+                        id,
+                        GetAxisTargetValue(cursor));
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
+        }
+
+        static public bool GenerateInstructionDeclarationFromVariable(
+            Action action, RobotCursor cursor, int id,
+            out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
+                case ActionType.Speed:
+                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}  ; [{1}]",
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                        action.id);
+                    break;
+
+                case ActionType.Zone:
+                    dec = string.Format("  $APO.CDIS = {0}  ; [{1}]",
+                        cursor.zone,
+                        action.id);
+                    break;
+
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.Transformation:
+                    dec = string.Format("  {0} target{1} {2}  ; [{3}]",
+                        cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
+                        id,
+                        cursor.zone >= 1 ? "C_DIS" : "",
+                        action.id);
+                    break;
+
+                case ActionType.Joints:
+                    dec = string.Format("  {0} target{1} {2}  ; [{3}]",
+                        "PTP",
+                        id,
+                        cursor.zone >= 1 ? "C_DIS" : "",  // @TODO: figure out how to turn this into C_PTP
+                        action.id);
+                    break;
+
+                // @TODO: apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it.
+                // Will figure this out later.
+                case ActionType.Message:
+                    ActionMessage am = (ActionMessage)action;
+                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in BRobot)",
+                        am.message,
+                        am.id);
+                    break;
+
+                case ActionType.Wait:
+                    ActionWait aw = (ActionWait)action;
+                    dec = string.Format("  WAIT SEC {0}  ; [{1}]",
+                        0.001 * aw.millis,
+                        aw.id);
+                    break;
+
+                case ActionType.Comment:
+                    ActionComment ac = (ActionComment)action;
+                    dec = string.Format("  ; {0} [{1}]",
+                        ac.comment,
+                        ac.id);
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
+        }
+
+
+        static public bool GenerateInstructionDeclaration(
+            Action action, RobotCursor cursor,
+            out string declaration)
+        {
+            string dec = null;
+            switch (action.type)
+            {
+                // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
+                case ActionType.Speed:
+                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}  ; [{1}]",
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                        action.id);
+                    break;
+
+                case ActionType.Zone:
+                    dec = string.Format("  $APO.CDIS = {0}  ; [{1}]",
+                        cursor.zone,
+                        action.id);
+                    break;
+
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.Transformation:
+                    dec = string.Format("  {0} {1} {2}  ; [{3}]",
+                        cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
+                        GetPositionTargetValue(cursor),
+                        cursor.zone >= 1 ? "C_DIS" : "",
+                        action.id);
+                    break;
+
+                case ActionType.Joints:
+                    dec = string.Format("  {0} {1} {2}  ; [{3}]",
+                        "PTP",
+                        GetAxisTargetValue(cursor),
+                        cursor.zone >= 1 ? "C_DIS" : "",  // @TODO: figure out how to turn this into C_PTP
+                        action.id);
+                    break;
+
+                // @TODO: apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it.
+                // Will figure this out later.
+                case ActionType.Message:
+                    ActionMessage am = (ActionMessage)action;
+                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in BRobot)",
+                        am.message,
+                        am.id);
+                    break;
+
+                case ActionType.Wait:
+                    ActionWait aw = (ActionWait)action;
+                    dec = string.Format("  WAIT SEC {0}  ; [{1}]",
+                        0.001 * aw.millis,
+                        aw.id);
+                    break;
+
+                case ActionType.Comment:
+                    ActionComment ac = (ActionComment)action;
+                    dec = string.Format("  ; {0} [{1}]",
+                        ac.comment,
+                        ac.id);
+                    break;
+            }
+
+            declaration = dec;
+            return dec != null;
+        }
+
+
+
+
+        /// <summary>
+        /// Returns a KRL FRAME representation of the current state of the cursor.
+        /// Note POS also accept T and S parameters for unambiguous arm configuration def. @TODO: implement?
+        /// </summary>
+        /// <returns></returns>
+        static public string GetPositionTargetValue(RobotCursor cursor)
+        {
+            Point euler = cursor.rotation.ToEulerZYX();  // @TODO: does this actually work...?
+
+            return string.Format("{{POS: X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
+                Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                // note reversed ZYX order
+                Math.Round(euler.Z, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.Y, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.X, Geometry.STRING_ROUND_DECIMALS_DEGS));
+        }
+
+        /// <summary>
+        /// Returns a KRL AXIS joint representation of the current state of the cursor.
+        /// </summary>
+        /// <returns></returns>
+        static public string GetAxisTargetValue(RobotCursor cursor)
+        {
+            return string.Format("{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
+                Math.Round(cursor.joints.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.joints.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.joints.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.joints.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.joints.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.joints.J6, Geometry.STRING_ROUND_DECIMALS_DEGS));
         }
 
     }

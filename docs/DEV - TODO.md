@@ -89,8 +89,9 @@
 - [ ] UR simulator is doing weird things with linear vs. joint movements... --> RoboDK doesn't do it, but follows a different path on `movej`...
 - [ ] Named CSs could be "world", "base", "flange", and "tool"/"tcp"
 - [ ] Add `bot.Units("meters");` to set which units are used from a point on.
-
-
+- [ ] Compilers are starting to look pretty similar. Abstract them into the superclass, and only override instruction-specific string generation?
+- [ ] In KRL, user may export the file with a different name from the module... how do we fix this?
+- [ ] Apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it. Figure this out.
 
 
 

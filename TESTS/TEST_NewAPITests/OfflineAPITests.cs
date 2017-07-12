@@ -12,7 +12,7 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Robot arm = new Robot("UR");
+            Robot arm = new Robot("KUKA");
             arm.Mode("offline");
 
             // An generic test program
@@ -68,7 +68,8 @@ namespace TEST_OfflineAPITests
             arm.DebugRobotCursors();
 
             arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" : 
-                arm.IsBrand("UR") ? @"C:\offlineTests.script" : @"C:\offlineTests.brobot");
+                arm.IsBrand("UR") ? @"C:\offlineTests.script" : 
+                arm.IsBrand("KUKA") ? @"C:\offlineTests.SRC" : @"C:\offlineTests.brobot", false);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
@@ -100,6 +101,10 @@ namespace TEST_OfflineAPITests
             {
                 arm.JointsTo(0, -90, -90, -90, 90, 90);
             }
+            else if (arm.IsBrand("KUKA"))
+            {
+                arm.JointsTo(0, -90, 90, 0, 90, 0);
+            }
             else
             {
                 arm.JointsTo(0, 0, 0, 0, 0, 0);
@@ -118,6 +123,7 @@ namespace TEST_OfflineAPITests
             arm.PopSettings();
 
             // Draw rectangle
+            arm.Motion("linear");
             arm.Message("Drawing rectangle");
             arm.Wait(2000);
             arm.PushSettings();
@@ -147,6 +153,10 @@ namespace TEST_OfflineAPITests
             else if (arm.IsBrand("UR"))
             {
                 arm.JointsTo(0, -90, -90, -90, 90, 90);
+            }
+            else if (arm.IsBrand("KUKA"))
+            {
+                arm.JointsTo(0, -90, 90, 0, 90, 0);
             }
             else
             {
