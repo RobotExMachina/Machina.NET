@@ -16,6 +16,7 @@
 
 
 ## BUILD 1205
+- [ ] Update readme with KUKA implementation and development levels.
 - [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!
 
 ## BUILD 1204
