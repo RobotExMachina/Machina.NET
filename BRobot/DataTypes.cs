@@ -37,8 +37,7 @@ namespace BRobot
         // Angle conversion
         protected static readonly double TO_DEGS = 180.0 / Math.PI;
         protected static readonly double TO_RADS = Math.PI / 180.0;
-
-
+        
     }
 
     //██████╗  ██████╗ ██╗███╗   ██╗████████╗
@@ -2248,6 +2247,342 @@ namespace BRobot
         {
         }
     }
+
+
+
+
+
+    //  ███╗   ██╗███████╗██╗    ██╗    ██████╗  ██████╗ ████████╗███████╗
+    //  ████╗  ██║██╔════╝██║    ██║    ██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝
+    //  ██╔██╗ ██║█████╗  ██║ █╗ ██║    ██████╔╝██║   ██║   ██║   ███████╗
+    //  ██║╚██╗██║██╔══╝  ██║███╗██║    ██╔══██╗██║   ██║   ██║   ╚════██║
+    //  ██║ ╚████║███████╗╚███╔███╔╝    ██║  ██║╚██████╔╝   ██║   ███████║
+    //  ╚═╝  ╚═══╝╚══════╝ ╚══╝╚══╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚══════╝
+    //                                                                    
+    
+    //  ╔═╗ ┬ ┬┌─┐┌┬┐┌─┐┬─┐┌┐┌┬┌─┐┌┐┌
+    //  ║═╬╗│ │├─┤ │ ├┤ ├┬┘│││││ ││││
+    //  ╚═╝╚└─┘┴ ┴ ┴ └─┘┴└─┘└┘┴└─┘┘└┘
+    public class Quaternion : Geometry
+    {
+        protected static bool QUATERNION_NORMALIZATION = false;  // on creation, are quaternions normalized by default?
+
+        public double W, X, Y, Z;
+
+        public static bool operator == (Quaternion q1, Quaternion q2)
+        {
+            return Math.Abs(q1.W - q2.W) < EPSILON
+                && Math.Abs(q1.X - q2.X) < EPSILON
+                && Math.Abs(q1.Y - q2.Y) < EPSILON
+                && Math.Abs(q1.Z - q2.Z) < EPSILON;
+        }
+
+        public static bool operator != (Quaternion q1, Quaternion q2) {
+            return Math.Abs(q1.W - q2.W) > EPSILON
+                || Math.Abs(q1.X - q2.X) > EPSILON
+                || Math.Abs(q1.Y - q2.Y) > EPSILON
+                || Math.Abs(q1.Z - q2.Z) > EPSILON;
+        }
+
+        public Quaternion(double w, double x, double y, double z) 
+            : this(w, x, y, z, QUATERNION_NORMALIZATION) { } 
+        
+        public Quaternion(double w, double x, double y, double z, bool normalize)
+        {
+            // No normalization check is performed by default
+            this.W = w;
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+
+            if (normalize)
+            {
+                this.Normalize();
+            }
+        }
+
+        /// <summary>
+        /// Sets the values of this Quaternion's components.
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        public void Set(double w, double x, double y, double z)
+        {
+            this.W = w;
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
+
+        /// <summary>
+        /// Returns the length (norm) of this Quaternion.
+        /// </summary>
+        /// <returns></returns>
+        public double Length()
+        {
+            return Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
+        }
+
+        /// <summary>
+        /// Returns the square length of this Quaternion.
+        /// </summary>
+        /// <returns></returns>
+        public double SqLength()
+        {
+            return W * W + X * X + Y * Y + Z * Z;
+        }
+
+        /// <summary>
+        /// Turns this Quaternion into a <a href="https://en.wikipedia.org/wiki/Versor">Versor</a> (unit length quaternion).
+        /// </summary>
+        public bool Normalize()
+        {
+            double len = this.Length();
+
+            if (Math.Abs(len) < EPSILON) return false;  // check for zero quaternion
+
+            this.W /= len;
+            this.X /= len;
+            this.Y /= len;
+            this.Z /= len;
+            return true;
+        }
+
+        /// <summary>
+        /// Is this a unit length quaternion?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsUnit()
+        {
+            //double zero = Math.Abs(this.SqLength() - 1);
+            //return zero < EPSILON;
+            return Math.Abs(this.SqLength() - 1) < EPSILON;
+        }
+
+        /// <summary>
+        /// Is this a zero length quaternion?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsZero()
+        {
+            double sqlen = this.SqLength();
+            return Math.Abs(sqlen) < EPSILON;
+        }
+
+        public bool IsIdentity()
+        {
+            return Math.Abs(this.W - 1) < EPSILON
+                && Math.Abs(this.X) < EPSILON
+                && Math.Abs(this.Y) < EPSILON
+                && Math.Abs(this.Z) < EPSILON;
+        }
+
+        ///// <summary>
+        ///// Returns the rotation axis represented by this Quaternion. 
+        ///// Note it will always return the unit vector corresponding to a positive rotation, 
+        ///// even if the quaternion was created from a negative one (flipped vector).
+        ///// </summary>
+        ///// <returns></returns>
+        //public Point GetRotationAxis()
+        //{
+        //    double theta2 = 2 * Math.Acos(W);
+
+        //    // If angle == 0, no rotation is performed and this Quat is identity
+        //    if (theta2 < EPSILON)
+        //    {
+        //        return new Point();
+        //    }
+
+        //    double s = Math.Sin(0.5 * theta2);
+        //    return new Point(this.X / s, this.Y / s, this.Z / s);
+        //}
+
+        ///// <summary>
+        ///// Returns the rotation angle represented by this Quaternion in degrees.
+        ///// Note it will always yield the positive rotation.
+        ///// </summary>
+        ///// <returns></returns>
+        //public double GetRotationAngle()
+        //{
+        //    double theta2 = 2 * Math.Acos(W);
+        //    return theta2 < EPSILON ? 0 : Math.Round(theta2 * TO_DEGS, EPSILON_DECIMALS);
+        //}
+
+        public AxisAngle ToAxisAngle()
+        {
+            double theta2 = 2 * Math.Acos(this.W);
+
+            // If angle == 0, no rotation is performed and this Quat is identity
+            if (theta2 < EPSILON)
+            {
+                return new AxisAngle(0, 0, 0, 0);
+            }
+
+            double s = Math.Sin(0.5 * theta2);
+            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Quaternion[{0}, {1}, {2}, {3}]",
+                Math.Round(W, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(X, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(Y, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(Z, STRING_ROUND_DECIMALS_RADS));
+        }
+
+
+    }
+
+
+    //  ╔═╗─┐ ┬┬┌─┐╔═╗┌┐┌┌─┐┬  ┌─┐
+    //  ╠═╣┌┴┬┘│└─┐╠═╣││││ ┬│  ├┤ 
+    //  ╩ ╩┴ └─┴└─┘╩ ╩┘└┘└─┘┴─┘└─┘
+    public class AxisAngle : Geometry
+    {
+        protected static bool AXISANGLE_NORMALIZATION = false;
+        protected static bool AXISANGLE_MODULATION = false;
+
+        public double X, Y, Z, Angle;
+
+        public static bool operator ==(AxisAngle aa1, AxisAngle aa2)
+        {
+            return Math.Abs(aa1.X - aa2.X) < EPSILON
+                && Math.Abs(aa1.Y - aa2.Y) < EPSILON
+                && Math.Abs(aa1.Z - aa2.Z) < EPSILON
+                && Math.Abs(aa1.Angle - aa2.Angle) < EPSILON;
+        }
+
+        public static bool operator !=(AxisAngle aa1, AxisAngle aa2)
+        {
+            return Math.Abs(aa1.X - aa2.X) > EPSILON
+                || Math.Abs(aa1.Y - aa2.Y) > EPSILON
+                || Math.Abs(aa1.Z - aa2.Z) > EPSILON
+                || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
+        }
+
+        public AxisAngle(double x, double y, double z, double angle)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+            this.Angle = angle;
+        }
+
+        public AxisAngle(Point vector, double angle)
+        {
+            this.X = vector.X;
+            this.Y = vector.Y;
+            this.Z = vector.Z;
+            this.Angle = angle;
+        }
+
+        public void Normalize()
+        {
+            double len = Math.Sqrt(X * X + Y * Y + Z * Z);
+            this.X /= len;
+            this.Y /= len;
+            this.Z /= len;
+            this.Angle %= 360;
+        }
+
+        /// <summary>
+        /// Returns a unit Quaternion representing this AxisAngle rotation.
+        /// </summary>
+        /// <returns></returns>
+        public Quaternion ToQuaternion()
+        {
+            double a2 = 0.5 * TO_RADS * this.Angle;
+            double s = Math.Sin(a2);
+            Point u = new Point(this.X, this.Y, this.Z);
+            //u.Normalize();  // rotation quaternion must be unit...-1
+
+            double w, x, y, z;
+            w = Math.Cos(a2);
+            x = s * u.X;
+            y = s * u.Y;
+            z = s * u.Z;
+
+            return new Quaternion(w, x, y, z);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("AxisAngle[{0}, {1}, {2}, {3}]",
+                Math.Round(X, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Z, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
+        }
+    }
+    
+
+    //  ╦═╗┌─┐┌┬┐┌─┐┌┬┐┬┌─┐┌┐┌╦  ╦┌─┐┌─┐┌┬┐┌─┐┬─┐
+    //  ╠╦╝│ │ │ ├─┤ │ ││ ││││╚╗╔╝├┤ │   │ │ │├┬┘
+    //  ╩╚═└─┘ ┴ ┴ ┴ ┴ ┴└─┘┘└┘ ╚╝ └─┘└─┘ ┴ └─┘┴└─
+    public class RotationVector : Geometry
+    {
+        double X, Y, Z;
+
+        public RotationVector(double x, double y, double z, double angleDegs)
+        {
+            Point v = new Point(x, y, z);
+            v.Normalize();
+            v.Scale(angleDegs);
+            this.X = v.X;
+            this.Y = v.Y;
+            this.Z = v.Z;
+        }
+    }
+
+
+
+    //  ╔╦╗┌─┐┌┬┐┬─┐┬─┐ ┬╔╦╗┬ ┬┬─┐┌─┐┌─┐╔╦╗┬ ┬┬─┐┌─┐┌─┐
+    //  ║║║├─┤ │ ├┬┘│┌┴┬┘ ║ ├─┤├┬┘├┤ ├┤  ║ ├─┤├┬┘├┤ ├┤ 
+    //  ╩ ╩┴ ┴ ┴ ┴└─┴┴ └─ ╩ ┴ ┴┴└─└─┘└─┘ ╩ ┴ ┴┴└─└─┘└─┘
+    public class Matrix33 : Geometry
+    {
+               // cols
+        double R11, R12, R13,  // rows
+               R21, R22, R23,
+               R31, R32, R33;
+
+        public Matrix33(double r11, double r12, double r13,
+                        double r21, double r22, double r23, 
+                        double r31, double r32, double r33)
+        {
+            this.R11 = r11;
+            this.R12 = r12;
+            this.R13 = r13;
+            this.R21 = r21;
+            this.R22 = r22;
+            this.R23 = r23;
+            this.R31 = r31;
+            this.R32 = r32;
+            this.R33 = r33;
+        }
+    }
+
+
+
+    //  ╔═╗┬ ┬┬  ┌─┐┬─┐╔═╗╦ ╦═╗ ╦
+    //  ║╣ │ ││  ├┤ ├┬┘╔═╝╚╦╝╔╩╦╝
+    //  ╚═╝└─┘┴─┘└─┘┴└─╚═╝ ╩ ╩ ╚═
+    public class EulerZYX : Geometry
+    {
+        double X, Y, Z;
+
+        public EulerZYX(double z, double y, double x)
+        {
+            this.Z = z;
+            this.Y = y;
+            this.X = x;
+        }
+    }
+
+
 
 
 }

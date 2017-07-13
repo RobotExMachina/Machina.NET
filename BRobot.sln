@@ -37,6 +37,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Referenced Assemblies", "Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_Workbench", "TESTS\TEST_Workbench\TEST_Workbench.csproj", "{7DCE128B-98CE-4C3B-8346-829D40A62BFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTypesTests", "DataTypesTests\DataTypesTests.csproj", "{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,14 @@ Global
 		{7DCE128B-98CE-4C3B-8346-829D40A62BFC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7DCE128B-98CE-4C3B-8346-829D40A62BFC}.Release|x64.ActiveCfg = Release|Any CPU
 		{7DCE128B-98CE-4C3B-8346-829D40A62BFC}.Release|x64.Build.0 = Release|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Debug|x64.Build.0 = Debug|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Release|x64.ActiveCfg = Release|Any CPU
+		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

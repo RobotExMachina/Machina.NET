@@ -93,6 +93,13 @@
 - [ ] In KRL, user may export the file with a different name from the module... how do we fix this?
 - [ ] Apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it. Figure this out.
 
+- [ ] ROTATION REWORK:
+    - [x] Create individual classes for AxisAngle (main), Quaternion, RotationVector (UR), Matrix33, and EulerZYX
+    - [x] Create constructors for each one. 
+    - [ ] Create conversions between them:
+        * [ ] AxisAngle -> Quaternion
+        * [ ] Quaternion -> AxisAngle
+    - [ ]   
 
 
 ---
