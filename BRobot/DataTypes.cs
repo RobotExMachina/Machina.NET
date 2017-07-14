@@ -2581,6 +2581,7 @@ namespace BRobot
         /// Note it will always return the unit vector corresponding to a positive rotation, 
         /// even if the quaternion was created from a negative one (flipped vector).
         /// </summary>
+        /// <seealso cref="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm"/>
         /// <returns></returns>
         public AxisAngle ToAxisAngle()
         {

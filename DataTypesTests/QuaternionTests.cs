@@ -275,8 +275,83 @@ namespace DataTypesTests
 
 
 
+        /// <summary>
+        /// Tests Q -> AA -> Q
+        /// </summary>
+        [TestMethod]
+        public void Quaternion_ToAxisAngle_ToQuaternion()
+        {
+            Quaternion q1, q2;
+            AxisAngle aa;
 
-        
+            double w, x, y, z;
+
+            // Test random quaternions
+            for (var i = 0; i < 50; i++)
+            {
+                w = Random(-100, 100);
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+
+                Trace.WriteLine("");
+                Trace.WriteLine(w + " " + x + " " + y + " " + z);
+
+                q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                Trace.WriteLine(q1);
+
+                aa = q1.ToAxisAngle();
+                Trace.WriteLine(aa);
+
+                q2 = aa.ToQuaternion();
+                Trace.WriteLine(q2);
+
+                Assert.IsTrue(q1 == q2, "Booo!");
+            }
+
+            // Test all permutations of unitary components quaternions (including zero)
+            for (w = -1; w <= 1; w += 0.5)
+            {
+                for (x = -1; x <= 1; x += 0.5)
+                {
+                    for (y = -1; y <= 1; y += 0.5)
+                    {
+                        for (z = -1; z <= 1; z += 0.5)
+                        {
+                            Trace.WriteLine("");
+                            Trace.WriteLine(w + " " + x + " " + y + " " + z);
+
+                            q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                            Trace.WriteLine(q1);
+
+                            aa = q1.ToAxisAngle();
+                            Trace.WriteLine(aa);
+
+                            q2 = aa.ToQuaternion();
+                            Trace.WriteLine(q2);
+                            
+                            if (q1.IsIdentity())
+                            {
+                                // Make this pass:
+                                /* Make this pass:
+                                   -1 0 0 0
+                                   Quaternion[-1, 0, 0, 0]
+                                   AxisAngle[0, 0, 0, 360]
+                                   Quaternion[1, 0, 0, 0]
+                                 */
+                                Assert.IsTrue(q2.IsIdentity());  
+                            }
+                            else
+                            {
+                                Assert.IsTrue(q1 == q2, "Booo!");
+                            }
+                            
+                        }
+                    }
+                }
+            }
+
+        }
 
 
 

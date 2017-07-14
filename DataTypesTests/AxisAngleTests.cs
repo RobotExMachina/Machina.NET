@@ -131,13 +131,10 @@ namespace DataTypesTests
 
         /// <summary>
         /// AxisAngle to Quaternion conversion tests.
-        /// TEST 1:
-        ///     - Input axis is normalized
-        ///     - Angle is [0, 360]
-        ///     - Random XYZ
+        /// Using System.Numerics.Quaternion for comparison.
         /// </summary>
         [TestMethod]
-        public void AxisAngle_ToQuaternion_Test1()
+        public void AxisAngle_ToQuaternionConversion()
         {
             AxisAngle aa;
             Quaternion q;
@@ -155,12 +152,10 @@ namespace DataTypesTests
                 x = Random(-100, 100);
                 y = Random(-100, 100);
                 z = Random(-100, 100);
-                angle = Random(0, 360);
-                Geometry.Normalize(x, y, z, out x, out y, out z);
+                angle = Random(-720, 720);
 
                 Trace.WriteLine("");
-                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
-                Trace.WriteLine(Geometry.Length(x, y, z));
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
 
                 aa = new AxisAngle(x, y, z, angle);
                 q = aa.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
@@ -169,6 +164,7 @@ namespace DataTypesTests
 
                 // TEST 1: compare to System.Numeric.Quaternion
                 normV = new Vector3((float)x, (float)y, (float)z);
+                normV = Vector3.Normalize(normV);
                 sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
                 Trace.WriteLine(sq + " length: " + sq.Length());
 
@@ -185,11 +181,10 @@ namespace DataTypesTests
                 {
                     for (z = -1; z <= 1; z++)
                     {
-                        for (angle = -720; angle <= 720; angle += 45)
+                        for (angle = -720; angle <= 720; angle += 22.5)
                         {
                             Trace.WriteLine("");
-                            Trace.WriteLine(x + " " + y + " " + z + " " + angle);
-                            Trace.WriteLine(Geometry.Length(x, y, z));
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
 
                             // Normalize
                             v = new Point(x, y, z);
@@ -225,6 +220,9 @@ namespace DataTypesTests
                 }
             }
         }
+
+
+        // @TODO: Add AA -> Q -> AA
 
 
 
