@@ -135,7 +135,7 @@ namespace DataTypesTests
 
                             len = Math.Sqrt(q.W * q.W + q.X * q.X + q.Y * q.Y + q.Z * q.Z);
                             Assert.AreEqual(norm ? 1 : 0, len, 0.0000001, "Failed Normalize() for " + q);
-                            
+
 
                             // Is Length working?
                             Trace.WriteLine(q + " " + len);
@@ -148,70 +148,16 @@ namespace DataTypesTests
         }
 
         [TestMethod]
-        public void AxisAngle_To_Quaternion()
+        public void AxisAngle_ToQuaternion()
         {
-            AxisAngle aa1;
+            AxisAngle aa;
             Quaternion q;
-            //SysQuat sq;
-            AxisAngle aa2;
-            Point normV;
-            AxisAngle normAA;
 
-            double x, y, z, angle;
-            //double len;
-            //bool norm;
-
-            // Test random quaternions
-            for (var i = 0; i < 50; i++)
-            {
-                x = Random(-100, 100);
-                y = Random(-100, 100);
-                z = Random(-100, 100);
-                angle = Random(-3 * 360, 3 * 360);
-
-                aa1 = new AxisAngle(x, y, z, angle);
-                q = aa1.ToQuaternion();
-                //sq = SysQuat.CreateFromAxisAngle(new Vector3((float)x, (float)y, (float)z), (float) (angle * Math.PI / 180.0));  // This is giving me really strange results
-                aa2 = q.ToAxisAngle();
-
-                Trace.WriteLine("");
-                Trace.WriteLine(aa1);
-                Trace.WriteLine(q);
-                //Trace.WriteLine(sq);
-                Trace.WriteLine(aa2);
-
-
-                normAA = new AxisAngle(x, y, z, angle);
-                normAA.Normalize();
-                Trace.WriteLine(normAA);
-
-                Assert.IsTrue(normAA == aa2);
-
-                //Point test = new Point(sq.X, sq.Y, sq.Z);
-                //test.Normalize();
-                //Trace.WriteLine(test);
-
-                //Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
-                //Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
-                //Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
-                //Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
-
-            }
-        }
-
-        [TestMethod]
-        public void AxisAngle_To_Quaternion_WithSysComparison()
-        {
-            AxisAngle aa1;
-            Quaternion q;
+            Vector3 normV;
             SysQuat sq;
-            AxisAngle aa2;
-            Point normV;
-            AxisAngle normAA;
 
             double x, y, z, angle;
-            //double len;
-            //bool norm;
+            bool zero;
 
             // Test random quaternions
             for (var i = 0; i < 50; i++)
@@ -221,36 +167,173 @@ namespace DataTypesTests
                 z = Random(-100, 100);
                 angle = Random(-3 * 360, 3 * 360);
 
-                aa1 = new AxisAngle(x, y, z, angle);
-                //aa1.Normalize();
-                q = aa1.ToQuaternion();
-                sq = SysQuat.CreateFromAxisAngle(new Vector3((float)aa1.X, (float)aa1.Y, (float)aa1.Z), (float)(aa1.Angle * Math.PI / 180.0));  // This is giving me really strange results
-                //aa2 = q.ToAxisAngle();
-
+                // Conversion
+                aa = new AxisAngle(x, y, z, angle);
+                q = aa.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
                 Trace.WriteLine("");
-                Trace.WriteLine(aa1);
+                Trace.WriteLine(aa);
                 Trace.WriteLine(q);
-                Trace.WriteLine(sq);
-                //Trace.WriteLine(aa2);
 
+                // TEST 1: compare to System.Numeric.Quaternion
+                //sq = SysQuat.CreateFromAxisAngle(new Vector3((float)x, (float)y, (float)z), (float)(angle * Math.PI / 180.0));  // this Quaternion is not a versor (not unit)
+                normV = new Vector3((float)x, (float)y, (float)z);
+                normV = Vector3.Normalize(normV);
+                sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
+                Trace.WriteLine(sq + " length: " + sq.Length());
 
-                //normAA = new AxisAngle(x, y, z, angle);
-                //normAA.Normalize();
-                //Trace.WriteLine(normAA);
-
-                //Assert.IsTrue(normAA == aa2);
-
-                //Point test = new Point(sq.X, sq.Y, sq.Z);
-                //test.Normalize();
-                //Trace.WriteLine(test);
-
-                //Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
-                //Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
-                //Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
-                //Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
+                Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
+                Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
+                Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
+                Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
 
             }
+
+            // Test all permutations of unitary components quaternions (including zero)
+            for (angle = -720; angle <= 720; angle += 45)
+            {
+                for (x = -1; x <= 1; x++)
+                {
+                    for (y = -1; y <= 1; y++)
+                    {
+                        for (z = -1; z <= 1; z++)
+                        {
+                            // Conversion
+                            aa = new AxisAngle(x, y, z, angle);
+                            q = aa.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
+                            Trace.WriteLine("");
+                            Trace.WriteLine(aa);
+                            Trace.WriteLine(q);
+
+                            // TEST 0: is the rotation axis valid
+                            zero = aa.IsZero();
+                            Assert.AreEqual(x == 0 && y == 0 && z == 0, zero);
+
+                            if (!zero)
+                            {
+                                // TEST 1: compare to System.Numeric.Quaternion
+                                //sq = SysQuat.CreateFromAxisAngle(new Vector3((float)x, (float)y, (float)z), (float)(angle * Math.PI / 180.0));  // this Quaternion is not a versor (not unit)
+                                normV = new Vector3((float)x, (float)y, (float)z);
+                                normV = Vector3.Normalize(normV);
+                                sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
+                                Trace.WriteLine(sq + " length: " + sq.Length());
+
+                                Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
+                                Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
+                                Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
+                                Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+
+
+        //[TestMethod]
+        //public void AxisAngle_To_Quaternion()
+        //{
+        //    AxisAngle aa1;
+        //    Quaternion q;
+        //    //SysQuat sq;
+        //    AxisAngle aa2;
+        //    Point normV;
+        //    AxisAngle normAA;
+
+        //    double x, y, z, angle;
+        //    //double len;
+        //    //bool norm;
+
+        //    // Test random quaternions
+        //    for (var i = 0; i < 50; i++)
+        //    {
+        //        x = Random(-100, 100);
+        //        y = Random(-100, 100);
+        //        z = Random(-100, 100);
+        //        angle = Random(-3 * 360, 3 * 360);
+
+        //        aa1 = new AxisAngle(x, y, z, angle);
+        //        q = aa1.ToQuaternion();
+        //        //sq = SysQuat.CreateFromAxisAngle(new Vector3((float)x, (float)y, (float)z), (float) (angle * Math.PI / 180.0));  // This is giving me really strange results
+        //        aa2 = q.ToAxisAngle();
+
+        //        Trace.WriteLine("");
+        //        Trace.WriteLine(aa1);
+        //        Trace.WriteLine(q);
+        //        //Trace.WriteLine(sq);
+        //        Trace.WriteLine(aa2);
+
+
+        //        normAA = new AxisAngle(x, y, z, angle);
+        //        normAA.Normalize();
+        //        Trace.WriteLine(normAA);
+
+        //        //Assert.IsTrue(normAA == aa2);
+
+        //        //Point test = new Point(sq.X, sq.Y, sq.Z);
+        //        //test.Normalize();
+        //        //Trace.WriteLine(test);
+
+        //        //Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
+        //        //Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
+        //        //Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
+        //        //Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
+
+        //    }
+        //}
+
+        //[TestMethod]
+        //public void AxisAngle_To_Quaternion_WithSysComparison()
+        //{
+        //    AxisAngle aa1;
+        //    Quaternion q;
+        //    SysQuat sq;
+        //    AxisAngle aa2;
+        //    Point normV;
+        //    AxisAngle normAA;
+
+        //    double x, y, z, angle;
+        //    //double len;
+        //    //bool norm;
+
+        //    // Test random quaternions
+        //    for (var i = 0; i < 50; i++)
+        //    {
+        //        x = Random(-100, 100);
+        //        y = Random(-100, 100);
+        //        z = Random(-100, 100);
+        //        angle = Random(-3 * 360, 3 * 360);
+
+        //        aa1 = new AxisAngle(x, y, z, angle);
+        //        //aa1.Normalize();
+        //        q = aa1.ToQuaternion();
+        //        sq = SysQuat.CreateFromAxisAngle(new Vector3((float)aa1.X, (float)aa1.Y, (float)aa1.Z), (float)(aa1.Angle * Math.PI / 180.0));  // This is giving me really strange results
+        //        //aa2 = q.ToAxisAngle();
+
+        //        Trace.WriteLine("");
+        //        Trace.WriteLine(aa1);
+        //        Trace.WriteLine(q);
+        //        Trace.WriteLine(sq);
+        //        //Trace.WriteLine(aa2);
+
+
+        //        //normAA = new AxisAngle(x, y, z, angle);
+        //        //normAA.Normalize();
+        //        //Trace.WriteLine(normAA);
+
+        //        //Assert.IsTrue(normAA == aa2);
+
+        //        //Point test = new Point(sq.X, sq.Y, sq.Z);
+        //        //test.Normalize();
+        //        //Trace.WriteLine(test);
+
+        //        //Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
+        //        //Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
+        //        //Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
+        //        //Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
+
+        //    }
+        //}
 
 
 

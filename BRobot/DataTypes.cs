@@ -2379,37 +2379,13 @@ namespace BRobot
                 && Math.Abs(this.Z) < EPSILON;
         }
 
-        ///// <summary>
-        ///// Returns the rotation axis represented by this Quaternion. 
-        ///// Note it will always return the unit vector corresponding to a positive rotation, 
-        ///// even if the quaternion was created from a negative one (flipped vector).
-        ///// </summary>
-        ///// <returns></returns>
-        //public Point GetRotationAxis()
-        //{
-        //    double theta2 = 2 * Math.Acos(W);
 
-        //    // If angle == 0, no rotation is performed and this Quat is identity
-        //    if (theta2 < EPSILON)
-        //    {
-        //        return new Point();
-        //    }
-
-        //    double s = Math.Sin(0.5 * theta2);
-        //    return new Point(this.X / s, this.Y / s, this.Z / s);
-        //}
-
-        ///// <summary>
-        ///// Returns the rotation angle represented by this Quaternion in degrees.
-        ///// Note it will always yield the positive rotation.
-        ///// </summary>
-        ///// <returns></returns>
-        //public double GetRotationAngle()
-        //{
-        //    double theta2 = 2 * Math.Acos(W);
-        //    return theta2 < EPSILON ? 0 : Math.Round(theta2 * TO_DEGS, EPSILON_DECIMALS);
-        //}
-
+        /// <summary>
+        /// Returns the AxisAngle rotation represented by this Quaternion. 
+        /// Note it will always return the unit vector corresponding to a positive rotation, 
+        /// even if the quaternion was created from a negative one (flipped vector).
+        /// </summary>
+        /// <returns></returns>
         public AxisAngle ToAxisAngle()
         {
             double theta2 = 2 * Math.Acos(this.W);
@@ -2479,6 +2455,9 @@ namespace BRobot
             this.Angle = angle;
         }
 
+        /// <summary>
+        /// Make the Axis vector unit, and confine angle rotation to [-360, 360] (should do [-180, 180]?)
+        /// </summary>
         public void Normalize()
         {
             double len = Math.Sqrt(X * X + Y * Y + Z * Z);
@@ -2486,6 +2465,13 @@ namespace BRobot
             this.Y /= len;
             this.Z /= len;
             this.Angle %= 360;
+        }
+
+        public bool IsZero()
+        {
+            return Math.Abs(this.X) < EPSILON
+                && Math.Abs(this.Y) < EPSILON
+                && Math.Abs(this.Z) < EPSILON;
         }
 
         /// <summary>
@@ -2497,7 +2483,13 @@ namespace BRobot
             double a2 = 0.5 * TO_RADS * this.Angle;
             double s = Math.Sin(a2);
             Point u = new Point(this.X, this.Y, this.Z);
-            //u.Normalize();  // rotation quaternion must be unit...-1
+            bool norm = u.Normalize();  // rotation quaternion must be unit... --> NOTE: ROTATION quaternions myst be unit, quaternions in general don't need to...
+
+            // If the axis vector is null, return an identity quaternion
+            if (!norm)
+            {
+                return new Quaternion(1, 0, 0, 0);  
+            }
 
             double w, x, y, z;
             w = Math.Cos(a2);
