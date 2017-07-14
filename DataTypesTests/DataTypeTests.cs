@@ -24,7 +24,7 @@ namespace DataTypesTests
             Quaternion q;
 
             double w, x, y, z;
-            double len;
+            double len, len2;
             bool norm;
 
             // Test random quaternions
@@ -34,26 +34,29 @@ namespace DataTypesTests
                 x = Random(-100, 100);
                 y = Random(-100, 100);
                 z = Random(-100, 100);
+                len = Math.Sqrt(w * w + x * x + y * y + z * z);
 
                 Trace.WriteLine("");
+                Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                Trace.WriteLine(len);
+
                 q = new Quaternion(w, x, y, z);
                 Trace.WriteLine(q);
 
-                // Is Length working?
-                len = Math.Sqrt(q.W * q.W + q.X * q.X + q.Y * q.Y + q.Z * q.Z);
-                Trace.WriteLine(q + " " + len);
-                Assert.AreEqual(len, q.Length(), 0.0000001);
-
-                // In Normalize working?
-                norm = q.Normalize();
-                Trace.WriteLine(q + " " + len);
-                len = Math.Sqrt(q.W * q.W + q.X * q.X + q.Y * q.Y + q.Z * q.Z);
-                Assert.AreEqual(len, norm ? 1 : 0, 0.0000001);
+                // Did the quaternion get normalized? It should probably be different than the randomly gen on
+                len2 = Math.Sqrt(q.W * q.W + q.X * q.X + q.Y * q.Y + q.Z * q.Z);
+                Trace.WriteLine(q + " " + len2);
+                Assert.AreNotEqual(len, len2, 0.00000001);
 
                 // Is Length working?
                 len = q.Length();
-                Trace.WriteLine(q + " " + len);
-                Assert.AreEqual(len, norm ? 1 : 0, 0.0000001);
+                Trace.WriteLine(q + " " + len2);
+                Assert.AreEqual(len2, len, 0.0000001);
+
+                // In Normalize working?
+                norm = q.Normalize();
+                len2 = q.Length();
+                Assert.AreEqual(1, len2, 0.0000001);
             }
 
             // Test all permutations of unitary components quaternions (including zero)
@@ -66,27 +69,30 @@ namespace DataTypesTests
                         for (z = -1; z <= 1; z++)
                         {
                             Trace.WriteLine("");
+                            Trace.WriteLine(w + " " + x + " " + y + " " + z);
+
                             q = new Quaternion(w, x, y, z);
                             Trace.WriteLine(q);
 
-                            // Is Zero Quaternion properly handled?
-                            if (w == 0 && x == 0 && y == 0 && z == 0)
-                            {
-                                Assert.IsTrue(q.IsZero());
-                            }
-                            else
-                            {
-                                Assert.IsFalse(q.IsZero());
-                            }
+                            //// THIS IS OBSOLETE, SINCE A ZERO QUATERNION SHOULD ALWAYS TURN INTO AN IDENTITY ONE
+                            //// Is Zero Quaternion properly handled?
+                            //if (w == 0 && x == 0 && y == 0 && z == 0)
+                            //{
+                            //    Assert.IsTrue(q.IsZero());
+                            //}
+                            //else
+                            //{
+                            //    Assert.IsFalse(q.IsZero());
+                            //}
 
-                            // Is Identity Quaternion properly handled?
-                            if (w == 1 && x == 0 && y == 0 && z == 0)
+                            // Is Zero/Identity Quaternion properly handled?
+                            if ((w == 0 || w == 1 || w == -1) && x == 0 && y == 0 && z == 0)
                             {
-                                Assert.IsTrue(q.IsIdentity());
+                                Assert.IsTrue(q.IsIdentity(), "Failed IsIdentity()");
                             }
                             else
                             {
-                                Assert.IsFalse(q.IsIdentity());
+                                Assert.IsFalse(q.IsIdentity(), "Failed IsIdentity()");
                             }
 
                             // Is Length working?
@@ -107,17 +113,9 @@ namespace DataTypesTests
                             // In Normalize working?
                             norm = q.Normalize();
                             Trace.WriteLine(q + " " + len);
-                            if (w == 0 && x == 0 && y == 0 && z == 0)
-                            {
-                                Assert.IsFalse(norm, "Zero Quaternion improperly asserted: " + q);
-                            }
-                            else
-                            {
-                                Assert.IsTrue(norm, "Non-zero Quaternion properly asserted: " + q);
-                            }
 
                             len = Math.Sqrt(q.W * q.W + q.X * q.X + q.Y * q.Y + q.Z * q.Z);
-                            Assert.AreEqual(norm ? 1 : 0, len, 0.0000001, "Failed Normalize() for " + q);
+                            Assert.AreEqual(1, len, 0.0000001, "Failed Normalize() for " + q);
 
 
                             // Is Length working?
@@ -215,22 +213,21 @@ namespace DataTypesTests
         }
 
 
-        // ADD TEST TO SEE IF AXISVECTORS WITH ANGLES MULTIPLES OF 360 YIELD THE SAME Q
-        // ADD TEST AA -> Q -> AA
-
-        /// <summary>
-        /// Test conversions from AxisAngle to Quaternions
-        /// </summary>
-        [TestMethod]
-        public void Quaternion_ToAxisAngle()
-        {
-            Quaternion q;
-            AxisAngle aa;
-
-            double w, x, y, z;
 
 
-        }
+        ///// <summary>
+        ///// Test conversions from AxisAngle to Quaternions
+        ///// </summary>
+        //[TestMethod]
+        //public void Quaternion_ToAxisAngle()
+        //{
+        //    Quaternion q;
+        //    AxisAngle aa;
+
+        //    double w, x, y, z;
+
+
+        //}
 
         // Any Quaternion is correctly normalized
         [TestMethod]
@@ -296,6 +293,25 @@ namespace DataTypesTests
             }
         }
 
+        /// <summary>
+        /// The result of normalizing a zero-quaternion should be the positive identity quaternion.
+        /// </summary>
+        [TestMethod]
+        public void Quaternion_VectorNormalizeZeroQuaternion()
+        {
+            Quaternion q;
+
+            q = new Quaternion(0, 0, 0, 0);
+
+            Trace.WriteLine("");
+            Trace.WriteLine("0 0 0 0");
+            Trace.WriteLine(q);
+
+            Assert.AreEqual(1, q.W, 0.00001);
+            Assert.AreEqual(0, q.X, 0.00001);
+            Assert.AreEqual(0, q.Y, 0.00001);
+            Assert.AreEqual(0, q.Z, 0.00001);
+        }
 
         /// <summary>
         /// Identity quaternions should remain the same on creation.
@@ -306,6 +322,9 @@ namespace DataTypesTests
             Quaternion q;
 
             q = new Quaternion(1, 0, 0, 0);
+            Trace.WriteLine("");
+            Trace.WriteLine(q);
+
             Assert.AreEqual(1, q.W, 0.00001);
             Assert.AreEqual(0, q.X, 0.00001);
             Assert.AreEqual(0, q.Y, 0.00001);
@@ -313,6 +332,8 @@ namespace DataTypesTests
             Assert.IsTrue(q.NormalizeVector());
 
             q = new Quaternion(-1, 0, 0, 0);
+            Trace.WriteLine("");
+            Trace.WriteLine(q);
             Assert.AreEqual(-1, q.W, 0.00001);
             Assert.AreEqual(0, q.X, 0.00001);
             Assert.AreEqual(0, q.Y, 0.00001);
@@ -320,7 +341,32 @@ namespace DataTypesTests
             Assert.IsTrue(q.NormalizeVector());
         }
 
+        /// <summary>
+        /// Quaternions with no rotation vector should normalize to identity vector.
+        /// </summary>
+        [TestMethod]
+        public void Quaternion_VectorNormalizeZeroAxisQuaternions()
+        {
+            Quaternion q;
+            double w;
 
+            for (var i = 0; i < 10; i++)
+            {
+                w = Random(-2, 2);
+                Trace.WriteLine("");
+                Trace.WriteLine(w + " 0 0 0");
+                q = new Quaternion(w, 0, 0, 0);
+                Trace.WriteLine(q);
+                Assert.AreEqual(w >= 0 ? 1 : -1, q.W, 0.00001);
+                Assert.AreEqual(0, q.X, 0.00001);
+                Assert.AreEqual(0, q.Y, 0.00001);
+                Assert.AreEqual(0, q.Z, 0.00001);
+                Assert.IsTrue(q.NormalizeVector());
+            }
+        }
+
+        // ADD TEST TO SEE IF AXISVECTORS WITH ANGLES MULTIPLES OF 360 YIELD THE SAME Q
+        // ADD TEST AA -> Q -> AA
 
 
 

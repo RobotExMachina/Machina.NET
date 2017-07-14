@@ -37,7 +37,28 @@ namespace BRobot
         // Angle conversion
         protected static readonly double TO_DEGS = 180.0 / Math.PI;
         protected static readonly double TO_RADS = Math.PI / 180.0;
-        
+
+
+
+        //  ╦ ╦╔╦╗╦╦  ╦╔╦╗╦ ╦  ╔═╗╦ ╦╔╗╔╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
+        //  ║ ║ ║ ║║  ║ ║ ╚╦╝  ╠╣ ║ ║║║║║   ║ ║║ ║║║║╚═╗
+        //  ╚═╝ ╩ ╩╩═╝╩ ╩  ╩   ╚  ╚═╝╝╚╝╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
+        public static double Length(double x, double y)
+        {
+            return Math.Sqrt(x * x + y * y);
+        }
+
+        public static double Length(double x, double y, double z)
+        {
+            return Math.Sqrt(x * x + y * y + z * z);
+        }
+
+        public static double Length(double w, double x, double y, double z)
+        {
+            return Math.Sqrt(w * w + x * x + y * y + z * z);
+        }
+
+
     }
 
     //██████╗  ██████╗ ██╗███╗   ██╗████████╗
@@ -2375,16 +2396,24 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Turns into an identity Quaternion (1, 0, 0, 0).
+        /// Turns into an identity Quaternion.
         /// </summary>
-        public void Identity()
+        public void Identity(bool positive)
         {
-            this.W = 1;
+            this.W = positive ? 1 : -1;
             this.X = 0;
             this.Y = 0;
             this.Z = 0;
         }
 
+        /// <summary>
+        /// Turns into a positive identity Quaternion (1, 0, 0, 0).
+        /// </summary>
+        public void Identity()
+        {
+            this.Identity(true);
+        }
+        
         /// <summary>
         /// Returns the length (norm) of this Quaternion.
         /// </summary>
@@ -2431,7 +2460,7 @@ namespace BRobot
         /// coming from a rotation specified by non-unit vectors, to maintain angular spin.
         /// If the scalar is outside the [-1, 0] range, the entire quaternion will be normalized.
         /// </summary>
-        /// <remarks>Homebrew algorithm</remarks>
+        /// <remarks>Homebrew algorithm, TO REVIEW</remarks>
         /// <returns></returns>
         public bool NormalizeVector()
         {
@@ -2440,10 +2469,10 @@ namespace BRobot
                 return this.Normalize();
             }
 
-
-            // Can't deal with a zero-length quaternion
-            if (this.Length() < EPSILON)
+            // Can't deal with a zero-length quaternions or axis vectors
+            if (this.Length() < EPSILON || Geometry.Length(this.X, this.Y, this.Z) < EPSILON)
             {
+                this.Identity(this.W >= 0);
                 return false;
             }
 
@@ -2517,6 +2546,7 @@ namespace BRobot
         /// Is this a zero length quaternion?
         /// </summary>
         /// <returns></returns>
+        [System.Obsolete("IsZero is deprecated, should always return false since the class will not allow zero-length quaternions to exist and always fallbak into an identity quaternion")]
         public bool IsZero()
         {
             double sqlen = this.SqLength();
