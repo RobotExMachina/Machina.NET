@@ -2271,10 +2271,25 @@ namespace BRobot
     //                                                                                             
     public class Quaternion : Geometry
     {
-        protected static bool QUATERNION_NORMALIZATION = false;  // on creation, are quaternions normalized by default?
+        /// <summary>
+        /// On creation, will Quaternions be automatically normalized?
+        /// For Quaternions to be used as valid representations of spatial rotations, 
+        /// they need to be versors (unit quaternions). 
+        /// While this may restrict more general complex algebra, it will be useful
+        /// in the context of this library to keep Quaternions tight this way ;)
+        /// </summary>
 
+        /// <summary>
+        /// Quaternion properties.
+        /// </summary>
         public double W, X, Y, Z;
 
+        /// <summary>
+        /// Equality operator.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
         public static bool operator == (Quaternion q1, Quaternion q2)
         {
             return Math.Abs(q1.W - q2.W) < EPSILON
@@ -2283,6 +2298,12 @@ namespace BRobot
                 && Math.Abs(q1.Z - q2.Z) < EPSILON;
         }
 
+        /// <summary>
+        /// Inequality operator.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
         public static bool operator != (Quaternion q1, Quaternion q2) {
             return Math.Abs(q1.W - q2.W) > EPSILON
                 || Math.Abs(q1.X - q2.X) > EPSILON
@@ -2290,12 +2311,32 @@ namespace BRobot
                 || Math.Abs(q1.Z - q2.Z) > EPSILON;
         }
 
+        /// <summary>
+        /// Create a Quaternion from its components. 
+        /// For quaternions to be used as valid representations of spatial rotations, 
+        /// they need to be versors (unit quaternions). This constructor will automatically
+        /// Vector-Normalize the resulting Quaternion.
+        /// While this may restrict more general complex algebra, it will be useful
+        /// in the context of robotics to keep quaternions tight this way ;)
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public Quaternion(double w, double x, double y, double z) 
-            : this(w, x, y, z, QUATERNION_NORMALIZATION) { } 
+            : this(w, x, y, z, true) { } 
         
+        /// <summary>
+        /// A private constructor with the option to bypass automatic quaternion normalization.
+        /// This saves computation when using conversion algorithms that already yield normalized results.
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="normalize"></param>
         public Quaternion(double w, double x, double y, double z, bool normalize)
         {
-            // No normalization check is performed by default
             this.W = w;
             this.X = x;
             this.Y = y;
@@ -2303,12 +2344,13 @@ namespace BRobot
 
             if (normalize)
             {
-                this.Normalize();
+                this.NormalizeVector();
             }
         }
 
         /// <summary>
-        /// Sets the values of this Quaternion's components.
+        /// Sets the values of this Quaternion's components. 
+        /// The result is Vector-Normalized.
         /// </summary>
         /// <param name="w"></param>
         /// <param name="x"></param>
@@ -2316,10 +2358,31 @@ namespace BRobot
         /// <param name="z"></param>
         public void Set(double w, double x, double y, double z)
         {
+            this.Set(w, x, y, z, true);
+        }
+
+        private void Set(double w, double x, double y, double z, bool normalize)
+        {
             this.W = w;
             this.X = x;
             this.Y = y;
             this.Z = z;
+
+            if (normalize)
+            {
+                this.NormalizeVector();
+            }
+        }
+
+        /// <summary>
+        /// Turns into an identity Quaternion (1, 0, 0, 0).
+        /// </summary>
+        public void Identity()
+        {
+            this.W = 1;
+            this.X = 0;
+            this.Y = 0;
+            this.Z = 0;
         }
 
         /// <summary>
@@ -2342,19 +2405,102 @@ namespace BRobot
 
         /// <summary>
         /// Turns this Quaternion into a <a href="https://en.wikipedia.org/wiki/Versor">Versor</a> (unit length quaternion).
+        /// If quaternion couldn't be normalized (zero-length), turns it into identity and return false.
         /// </summary>
         public bool Normalize()
         {
             double len = this.Length();
 
-            if (Math.Abs(len) < EPSILON) return false;  // check for zero quaternion
+            if (Math.Abs(len) < EPSILON)
+            {
+                this.Identity();
+                return false;  // check for zero quaternion
+            }
 
             this.W /= len;
             this.X /= len;
             this.Y /= len;
             this.Z /= len;
+
             return true;
         }
+
+        /// <summary>
+        /// Normalizes the complex portion of this Quaternion (the rotation vector)
+        /// maintaining the scalar portion (the rotation angle) the same. This is useful when
+        /// coming from a rotation specified by non-unit vectors, to maintain angular spin.
+        /// If the scalar is outside the [-1, 0] range, the entire quaternion will be normalized.
+        /// </summary>
+        /// <remarks>Homebrew algorithm</remarks>
+        /// <returns></returns>
+        public bool NormalizeVector()
+        {
+            if (this.W <= -1 || this.W >= 1)
+            {
+                return this.Normalize();
+            }
+
+
+            // Can't deal with a zero-length quaternion
+            if (this.Length() < EPSILON)
+            {
+                return false;
+            }
+
+            // Avoid divisions by zero
+            if (Math.Abs(this.X) > EPSILON)
+            {
+                double yx, zx;
+
+                yx = this.Y / this.X;
+                zx = this.Z / this.X;
+
+                this.X = Math.Sqrt((1 - this.W * this.W) / (1 + yx * yx + zx * zx));
+                this.Y = yx * this.X;
+                this.Z = zx * this.X;
+
+                return true;
+            }
+            else if (Math.Abs(this.Y) > EPSILON)
+            {
+                double xy, zy;
+
+                xy = this.X / this.Y;
+                zy = this.Y / this.Y;
+
+                this.Y = Math.Sqrt((1 - this.W * this.W) / (xy * xy + 1 + zy * zy));
+                this.X = xy * this.Y;
+                this.Z = zy * this.Y;
+                
+                return true;
+            }
+            else if (Math.Abs(this.Z) > EPSILON)
+            {
+                double xz, yz;
+
+                xz = this.X / this.Z;
+                yz = this.Y / this.Z;
+
+                this.Z = Math.Sqrt((1 - this.W * this.W) / (xz * xz + yz * yz + 1));
+                this.X = xz * this.Z;
+                this.Y = yz * this.Z;
+                
+                return true;
+            }
+            
+            return false;
+        }
+
+        public static Point NormalizeMaintainXTest(double x, double y, double z)
+        {
+            double f = y / z;
+            
+            double newZ = Math.Sqrt((1 - x * x) / (f * f + 1));
+            double newY = f * newZ;
+
+            return new Point(x, newY, newZ);
+        }
+
 
         /// <summary>
         /// Is this a unit length quaternion?
