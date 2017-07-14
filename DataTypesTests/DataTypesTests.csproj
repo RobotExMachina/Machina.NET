@@ -52,7 +52,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="DataTypeTests.cs" />
+    <Compile Include="AxisAngleTests.cs" />
+    <Compile Include="QuaternionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

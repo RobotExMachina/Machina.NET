@@ -2358,7 +2358,7 @@ namespace BRobot
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="normalize"></param>
-        protected Quaternion(double w, double x, double y, double z, bool normalize)
+        internal Quaternion(double w, double x, double y, double z, bool normalize)
         {
             this.W = w;
             this.X = x;
@@ -2487,15 +2487,21 @@ namespace BRobot
                 return false;
             }
 
+            // The result of squaring is always positive, and leads to vector reversal. 
+            // Account for it. 
+            bool pos;
+
             // Avoid divisions by zero
             if (Math.Abs(this.X) > EPSILON)
             {
                 double yx, zx;
 
+                pos = this.X >= 0;
+
                 yx = this.Y / this.X;
                 zx = this.Z / this.X;
 
-                this.X = Math.Sqrt((1 - this.W * this.W) / (1 + yx * yx + zx * zx));
+                this.X = Math.Sqrt((1 - this.W * this.W) / (1 + yx * yx + zx * zx)) * (pos ? 1 : -1);
                 this.Y = yx * this.X;
                 this.Z = zx * this.X;
 
@@ -2505,10 +2511,12 @@ namespace BRobot
             {
                 double xy, zy;
 
+                pos = this.Y >= 0;
+
                 xy = this.X / this.Y;
                 zy = this.Y / this.Y;
 
-                this.Y = Math.Sqrt((1 - this.W * this.W) / (xy * xy + 1 + zy * zy));
+                this.Y = Math.Sqrt((1 - this.W * this.W) / (xy * xy + 1 + zy * zy)) * (pos ? 1 : -1);
                 this.X = xy * this.Y;
                 this.Z = zy * this.Y;
                 
@@ -2518,10 +2526,12 @@ namespace BRobot
             {
                 double xz, yz;
 
+                pos = this.Z >= 0;
+
                 xz = this.X / this.Z;
                 yz = this.Y / this.Z;
 
-                this.Z = Math.Sqrt((1 - this.W * this.W) / (xz * xz + yz * yz + 1));
+                this.Z = Math.Sqrt((1 - this.W * this.W) / (xz * xz + yz * yz + 1)) * (pos ? 1 : -1);
                 this.X = xz * this.Z;
                 this.Y = yz * this.Z;
                 
@@ -2599,13 +2609,20 @@ namespace BRobot
     }
 
 
-    //  ╔═╗─┐ ┬┬┌─┐╔═╗┌┐┌┌─┐┬  ┌─┐
-    //  ╠═╣┌┴┬┘│└─┐╠═╣││││ ┬│  ├┤ 
-    //  ╩ ╩┴ └─┴└─┘╩ ╩┘└┘└─┘┴─┘└─┘
+
+
+    //   █████╗ ██╗  ██╗██╗███████╗ █████╗ ███╗   ██╗ ██████╗ ██╗     ███████╗
+    //  ██╔══██╗╚██╗██╔╝██║██╔════╝██╔══██╗████╗  ██║██╔════╝ ██║     ██╔════╝
+    //  ███████║ ╚███╔╝ ██║███████╗███████║██╔██╗ ██║██║  ███╗██║     █████╗  
+    //  ██╔══██║ ██╔██╗ ██║╚════██║██╔══██║██║╚██╗██║██║   ██║██║     ██╔══╝  
+    //  ██║  ██║██╔╝ ██╗██║███████║██║  ██║██║ ╚████║╚██████╔╝███████╗███████╗
+    //  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚══════╝
+    //                                                                        
+
     public class AxisAngle : Geometry
     {
-        protected static bool AXISANGLE_NORMALIZATION = false;
-        protected static bool AXISANGLE_MODULATION = false;
+        //protected static bool AXISANGLE_NORMALIZATION = false;
+        //protected static bool AXISANGLE_MODULATION = false;
 
         /// <summary>
         /// AxisAngle properties.
@@ -2639,45 +2656,6 @@ namespace BRobot
                 || Math.Abs(aa1.Z - aa2.Z) > EPSILON
                 || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
         }
-
-
-        ///// <summary>
-        ///// Create a Quaternion from its components. 
-        ///// For quaternions to be used as valid representations of spatial rotations, 
-        ///// they need to be versors (unit quaternions). This constructor will automatically
-        ///// Vector-Normalize the resulting Quaternion.
-        ///// While this may restrict more general complex algebra, it will be useful
-        ///// in the context of robotics to keep quaternions tight this way ;)
-        ///// </summary>
-        ///// <param name="w"></param>
-        ///// <param name="x"></param>
-        ///// <param name="y"></param>
-        ///// <param name="z"></param>
-        //public Quaternion(double w, double x, double y, double z) 
-        //    : this(w, x, y, z, true) { }
-
-        ///// <summary>
-        ///// A private constructor with the option to bypass automatic quaternion normalization.
-        ///// This saves computation when using conversion algorithms that already yield normalized results.
-        ///// </summary>
-        ///// <param name="w"></param>
-        ///// <param name="x"></param>
-        ///// <param name="y"></param>
-        ///// <param name="z"></param>
-        ///// <param name="normalize"></param>
-        //public Quaternion(double w, double x, double y, double z, bool normalize)
-        //{
-        //    this.W = w;
-        //    this.X = x;
-        //    this.Y = y;
-        //    this.Z = z;
-
-        //    if (normalize)
-        //    {
-        //        this.NormalizeVector();
-        //    }
-        //}
-
 
         /// <summary>
         /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
@@ -2772,24 +2750,33 @@ namespace BRobot
         /// <returns></returns>
         public Quaternion ToQuaternion()
         {
-            double a2 = 0.5 * TO_RADS * this.Angle;
-            double s = Math.Sin(a2);
-            Point u = new Point(this.X, this.Y, this.Z);
-            bool norm = u.Normalize();  // rotation quaternion must be unit... --> NOTE: ROTATION quaternions myst be unit, quaternions in general don't need to...
-
-            // If the axis vector is null, return an identity quaternion
-            if (!norm)
+            // If this AxisAngle performs no rotation, return an identity Quaternion
+            if (this.IsZero())
             {
-                return new Quaternion(1, 0, 0, 0);  
+                return new Quaternion(1, 0, 0, 0);
             }
 
-            double w, x, y, z;
-            w = Math.Cos(a2);
-            x = s * u.X;
-            y = s * u.Y;
-            z = s * u.Z;
+            double a2 = 0.5 * TO_RADS * this.Angle;
+            double s = Math.Sin(a2);
 
-            return new Quaternion(w, x, y, z);
+            // NO NEED FOR THIS ANYMORE, AXIS VECTOR IS ENSURED TO BE UNIT
+            //Point u = new Point(this.X, this.Y, this.Z);  
+            //bool norm = u.Normalize();
+
+            //double w, x, y, z;
+            //w = Math.Cos(a2);
+            //x = s * u.X;
+            //y = s * u.Y;
+            //z = s * u.Z;
+
+            //return new Quaternion(w, x, y, z);
+
+            return new Quaternion(
+                Math.Cos(a2),
+                s * this.X,
+                s * this.Y,
+                s * this.Z,
+                false);
         }
 
         public override string ToString()
