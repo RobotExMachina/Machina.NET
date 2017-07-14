@@ -289,7 +289,7 @@ namespace DataTypesTests
             // Test random quaternions
             for (var i = 0; i < 50; i++)
             {
-                w = Random(-100, 100);
+                w = Random(-1, 1);  // force vector-normalization
                 x = Random(-100, 100);
                 y = Random(-100, 100);
                 z = Random(-100, 100);
@@ -310,7 +310,7 @@ namespace DataTypesTests
             }
 
             // Test all permutations of unitary components quaternions (including zero)
-            for (w = -1; w <= 1; w += 0.5)
+            for (w = -2; w <= 2; w += 0.5)  // test vector + non-vector normalization
             {
                 for (x = -1; x <= 1; x += 0.5)
                 {
