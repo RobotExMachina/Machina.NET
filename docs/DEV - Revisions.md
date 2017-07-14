@@ -24,7 +24,7 @@
     - [x] Add Quaternion Vector-Normalization: if between {-1, 1}, keep scalar component constant and normalize the rotation axis.
     - [x] Add fallback to regular normalization if Vector-Norm is not possible.
     - [x] Add fallback to convert the Quaternion to identity if trying to normalize a zero-length Q   
-    - [ ] The above fallback takes into account the sign of the rotation to return positive or negative identity quaternions (not sure why, it just feels like it makes sense...)
+    - [x] The above fallback takes into account the sign of the rotation to return positive or negative identity quaternions (not sure why, it just feels like it makes sense...)
 
 
 ## BUILD 1204
