@@ -11,30 +11,13 @@ namespace DataTypesTests
     [TestClass]
     public class DataTypeTests
     {
-        //[TestMethod]
-        //public void Quaternion_Creation()
-        //{
-        //    BRobot.Quaternion q1;
-        //    System.Numerics.Quaternion q2;
-        //    double w, x, y, z;
-        //    for (var i = 0; i < 100; i++)
-        //    {
-        //        w = Random(-10, 10);
-        //        x = Random(-10, 10);
-        //        y = Random(-10, 10);
-        //        z = Random(-10, 10);
-        //        q1 = new BRobot.Quaternion(w, x, y, z);
-        //        q2 = new System.Numerics.Quaternion((float) x, (float) y, (float) z, (float) w);
-
-        //        Assert.AreEqual(q1.W, q2.W, 0.000001);  // can't go very precise due to float imprecision in sys quat
-        //        Assert.AreEqual(q1.X, q2.X, 0.000001);
-        //        Assert.AreEqual(q1.Y, q2.Y, 0.000001);
-        //        Assert.AreEqual(q1.Z, q2.Z, 0.000001);
-        //    }
-        //}
 
         public static double TAU = 2 * Math.PI;
 
+        /// <summary>
+        /// A general test that goes over Quaternions and checks basic Normalization,
+        /// Length, and versor and null checks.
+        /// </summary>
         [TestMethod]
         public void Quaternion_Normalization_Lengths_Units_Zeros()
         {
@@ -227,6 +210,12 @@ namespace DataTypesTests
                 }
             }
         }
+
+
+        // ADD TEST TO SEE IF AXISVECTORS WITH ANGLES MULTIPLES OF 360 YIELD THE SAME Q
+        // ADD TEST AA -> Q -> AA
+
+
 
 
 
