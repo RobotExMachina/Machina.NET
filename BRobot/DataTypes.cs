@@ -2759,18 +2759,7 @@ namespace BRobot
             double a2 = 0.5 * TO_RADS * this.Angle;
             double s = Math.Sin(a2);
 
-            // NO NEED FOR THIS ANYMORE, AXIS VECTOR IS ENSURED TO BE UNIT
-            //Point u = new Point(this.X, this.Y, this.Z);  
-            //bool norm = u.Normalize();
-
-            //double w, x, y, z;
-            //w = Math.Cos(a2);
-            //x = s * u.X;
-            //y = s * u.Y;
-            //z = s * u.Z;
-
-            //return new Quaternion(w, x, y, z);
-
+            // Remember that axis vector is already normalized ;)
             return new Quaternion(
                 Math.Cos(a2),
                 s * this.X,

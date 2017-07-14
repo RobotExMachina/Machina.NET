@@ -142,6 +142,7 @@ namespace DataTypesTests
             AxisAngle aa;
             Quaternion q;
 
+            Point v;
             Vector3 normV;
             SysQuat sq;
 
@@ -168,7 +169,6 @@ namespace DataTypesTests
 
                 // TEST 1: compare to System.Numeric.Quaternion
                 normV = new Vector3((float)x, (float)y, (float)z);
-                //normV = Vector3.Normalize(normV);
                 sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
                 Trace.WriteLine(sq + " length: " + sq.Length());
 
@@ -176,56 +176,54 @@ namespace DataTypesTests
                 Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
                 Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
                 Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
-
-                //if (Math.Abs(q.X - sq.X) > 0.001)
-                //{
-                //    Trace.WriteLine("INVERTED SIGNS");
-                //}
-
-                //Assert.AreEqual(Math.Abs(q.X - sq.X) > 0.001, aa.X < 0);
-
-
-
             }
 
-            //// Test all permutations of unitary components quaternions (including zero)
-            //for (angle = -720; angle <= 720; angle += 45)
-            //{
-            //    for (x = -1; x <= 1; x++)
-            //    {
-            //        for (y = -1; y <= 1; y++)
-            //        {
-            //            for (z = -1; z <= 1; z++)
-            //            {
-            //                // Conversion
-            //                aa = new AxisAngle(x, y, z, angle);
-            //                q = aa.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
-            //                Trace.WriteLine("");
-            //                Trace.WriteLine(aa);
-            //                Trace.WriteLine(q);
+            // Test all permutations of unitary components quaternions (including zero)
+            for (x = -1; x <= 1; x++)
+            {
+                for (y = -1; y <= 1; y++)
+                {
+                    for (z = -1; z <= 1; z++)
+                    {
+                        for (angle = -720; angle <= 720; angle += 45)
+                        {
+                            Trace.WriteLine("");
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+                            Trace.WriteLine(Geometry.Length(x, y, z));
 
-            //                // TEST 0: is the rotation axis valid
-            //                zero = aa.IsZero();
-            //                Assert.AreEqual(x == 0 && y == 0 && z == 0, zero);
+                            // Normalize
+                            v = new Point(x, y, z);
+                            v.Normalize();
 
-            //                if (!zero)
-            //                {
-            //                    // TEST 1: compare to System.Numeric.Quaternion
-            //                    //sq = SysQuat.CreateFromAxisAngle(new Vector3((float)x, (float)y, (float)z), (float)(angle * Math.PI / 180.0));  // this Quaternion is not a versor (not unit)
-            //                    normV = new Vector3((float)x, (float)y, (float)z);
-            //                    normV = Vector3.Normalize(normV);
-            //                    sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
-            //                    Trace.WriteLine(sq + " length: " + sq.Length());
+                            aa = new AxisAngle(v, angle);
+                            q = aa.ToQuaternion();
+                            Trace.WriteLine(aa);
+                            Trace.WriteLine(q);
 
-            //                    Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
-            //                    Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
-            //                    Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
-            //                    Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+                            zero = aa.IsZero();
+
+                            if (zero)
+                            {
+                                Assert.IsTrue(new Quaternion(1, 0, 0, 0) == q, "Failed zero quaternion");
+                            }
+                            else
+                            {
+                                // TEST 1: compare to System.Numeric.Quaternion
+                                //sq = SysQuat.CreateFromAxisAngle(new Vector3((float)x, (float)y, (float)z), (float)(angle * Math.PI / 180.0));  // this Quaternion is not a versor (not unit)
+                                normV = new Vector3((float)x, (float)y, (float)z);
+                                normV = Vector3.Normalize(normV);
+                                sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
+                                Trace.WriteLine(sq + " length: " + sq.Length());
+
+                                Assert.AreEqual(q.W, sq.W, 0.000001, "Failed W");  // can't go very precise due to float imprecision in sys quat
+                                Assert.AreEqual(q.X, sq.X, 0.000001, "Failed X");
+                                Assert.AreEqual(q.Y, sq.Y, 0.000001, "Failed Y");
+                                Assert.AreEqual(q.Z, sq.Z, 0.000001, "Failed Z");
+                            }
+                        }
+                    }
+                }
+            }
         }
 
 
