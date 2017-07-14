@@ -284,7 +284,116 @@ namespace DataTypesTests
         //  ██║  ██║██╔╝ ██╗██║███████║██║  ██║██║ ╚████║╚██████╔╝███████╗███████╗
         //  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚══════╝
         //            
-                                                                    
+            
+        /// <summary>
+        /// Are new AxisAngle objects normalized?
+        /// </summary>
+        [TestMethod]
+        public void AxisAngle_NormalizedOnCreation()
+        {
+            AxisAngle aa;
+
+            double x, y, z, angle;
+            double len, len2;
+
+            // Test random axes
+            for (var i = 0; i < 50; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-720, 720);
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+
+                aa = new AxisAngle(x, y, z, angle);
+                Trace.WriteLine(aa);
+
+                // Raw check
+                len = Math.Sqrt(x * x + y * y + z * z);
+                len2 = Math.Sqrt(aa.X * aa.X + aa.Y * aa.Y + aa.Z * aa.Z);
+                Trace.WriteLine(len);
+                Trace.WriteLine(len2);
+                Assert.AreNotEqual(len, len2, 0.000001);
+                Assert.AreEqual(1, len2, 0.000001);
+
+                // .AxisLength() check
+                len = aa.AxisLength();
+                Trace.WriteLine(len);
+                Assert.AreEqual(1, len, 0.0000001);
+            }
+
+            // Test all permutations of unitary components (including zero)
+            for (x = -1; x <= 1; x++)
+            {
+                for (y = -1; y <= 1; y++)
+                {
+                    for (z = -1; z <= 1; z++)
+                    {
+                        for (angle = -720; angle <= 720; angle += 45)
+                        {
+                            Trace.WriteLine("");
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+
+                            aa = new AxisAngle(x, y, z, angle);
+                            Trace.WriteLine(aa);
+
+                            // Raw check
+                            len = Math.Sqrt(x * x + y * y + z * z);
+                            len2 = Math.Sqrt(aa.X * aa.X + aa.Y * aa.Y + aa.Z * aa.Z);
+                            Trace.WriteLine(len);
+                            Trace.WriteLine(len2);
+                            Assert.AreEqual(len == 0 ? 0 : 1, len2, 0.000001);
+
+                            // .AxisLength() check
+                            len2 = aa.AxisLength();
+                            Trace.WriteLine(len);
+                            Assert.AreEqual(len == 0 ? 0 : 1, len2, 0.0000001);
+                        }
+                    }
+                }
+            }
+        }    
+
+
+        /// <summary>
+        /// .IsZero() returns true if this AxisAngle represents no rotation: 
+        /// zero rotation axis or zero angle.
+        /// </summary>
+        [TestMethod]
+        public void AxisAngle_IsZero()
+        {
+            AxisAngle aa;
+
+            double x, y, z, angle;
+            bool zero;
+
+            // Test all permutations of unitary components (including zero)
+            for (x = -1; x <= 1; x++)
+            {
+                for (y = -1; y <= 1; y++)
+                {
+                    for (z = -1; z <= 1; z++)
+                    {
+                        for (angle = -720; angle <= 720; angle += 90)
+                        {
+                            Trace.WriteLine("");
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+
+                            aa = new AxisAngle(x, y, z, angle);
+                            Trace.WriteLine(aa);
+
+                            zero = angle == 0 || (aa.X == 0 && aa.Y == 0 && aa.Z == 0);
+                            Assert.AreEqual(zero, aa.IsZero());
+                        }
+                    }
+                }
+            }
+        }
+            
+        
+                                                           
         /// <summary>
         /// Test conversions from AxisAngle to Quaternions
         /// </summary>

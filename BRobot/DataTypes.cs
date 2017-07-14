@@ -58,6 +58,15 @@ namespace BRobot
             return Math.Sqrt(w * w + x * x + y * y + z * z);
         }
 
+        public static void Normalize(double x, double y, double z,
+            out double newX, out double newY, out double newZ)
+        {
+            double len = Length(x, y, z);
+            newX = x / len;
+            newY = y / len;
+            newZ = z / len;
+        }
+
 
     }
 
@@ -2292,13 +2301,6 @@ namespace BRobot
     //                                                                                             
     public class Quaternion : Geometry
     {
-        /// <summary>
-        /// On creation, will Quaternions be automatically normalized?
-        /// For Quaternions to be used as valid representations of spatial rotations, 
-        /// they need to be versors (unit quaternions). 
-        /// While this may restrict more general complex algebra, it will be useful
-        /// in the context of this library to keep Quaternions tight this way ;)
-        /// </summary>
 
         /// <summary>
         /// Quaternion properties.
@@ -2356,7 +2358,7 @@ namespace BRobot
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="normalize"></param>
-        public Quaternion(double w, double x, double y, double z, bool normalize)
+        protected Quaternion(double w, double x, double y, double z, bool normalize)
         {
             this.W = w;
             this.X = x;
@@ -2382,7 +2384,16 @@ namespace BRobot
             this.Set(w, x, y, z, true);
         }
 
-        private void Set(double w, double x, double y, double z, bool normalize)
+        /// <summary>
+        /// Sets the values of this Quaternion's components with the option to bypass normalization.
+        /// For internal use, when wxyz come from a normalized source.
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="normalize"></param>
+        protected void Set(double w, double x, double y, double z, bool normalize)
         {
             this.W = w;
             this.X = x;
@@ -2396,9 +2407,17 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Turns into a positive identity Quaternion (1, 0, 0, 0).
+        /// </summary>
+        public void Identity()
+        {
+            this.Identity(true);
+        }
+
+        /// <summary>
         /// Turns into an identity Quaternion.
         /// </summary>
-        public void Identity(bool positive)
+        protected void Identity(bool positive)
         {
             this.W = positive ? 1 : -1;
             this.X = 0;
@@ -2406,14 +2425,6 @@ namespace BRobot
             this.Z = 0;
         }
 
-        /// <summary>
-        /// Turns into a positive identity Quaternion (1, 0, 0, 0).
-        /// </summary>
-        public void Identity()
-        {
-            this.Identity(true);
-        }
-        
         /// <summary>
         /// Returns the length (norm) of this Quaternion.
         /// </summary>
@@ -2520,17 +2531,6 @@ namespace BRobot
             return false;
         }
 
-        public static Point NormalizeMaintainXTest(double x, double y, double z)
-        {
-            double f = y / z;
-            
-            double newZ = Math.Sqrt((1 - x * x) / (f * f + 1));
-            double newY = f * newZ;
-
-            return new Point(x, newY, newZ);
-        }
-
-
         /// <summary>
         /// Is this a unit length quaternion?
         /// </summary>
@@ -2565,7 +2565,6 @@ namespace BRobot
                 && Math.Abs(this.Y) < EPSILON
                 && Math.Abs(this.Z) < EPSILON;
         }
-
 
         /// <summary>
         /// Returns the AxisAngle rotation represented by this Quaternion. 
@@ -2608,8 +2607,17 @@ namespace BRobot
         protected static bool AXISANGLE_NORMALIZATION = false;
         protected static bool AXISANGLE_MODULATION = false;
 
+        /// <summary>
+        /// AxisAngle properties.
+        /// </summary>
         public double X, Y, Z, Angle;
 
+        /// <summary>
+        /// Equality operator.
+        /// </summary>
+        /// <param name="aa1"></param>
+        /// <param name="aa2"></param>
+        /// <returns></returns>
         public static bool operator ==(AxisAngle aa1, AxisAngle aa2)
         {
             return Math.Abs(aa1.X - aa2.X) < EPSILON
@@ -2618,6 +2626,12 @@ namespace BRobot
                 && Math.Abs(aa1.Angle - aa2.Angle) < EPSILON;
         }
 
+        /// <summary>
+        /// Inequality operator.
+        /// </summary>
+        /// <param name="aa1"></param>
+        /// <param name="aa2"></param>
+        /// <returns></returns>
         public static bool operator !=(AxisAngle aa1, AxisAngle aa2)
         {
             return Math.Abs(aa1.X - aa2.X) > EPSILON
@@ -2626,39 +2640,130 @@ namespace BRobot
                 || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
         }
 
-        public AxisAngle(double x, double y, double z, double angle)
+
+        ///// <summary>
+        ///// Create a Quaternion from its components. 
+        ///// For quaternions to be used as valid representations of spatial rotations, 
+        ///// they need to be versors (unit quaternions). This constructor will automatically
+        ///// Vector-Normalize the resulting Quaternion.
+        ///// While this may restrict more general complex algebra, it will be useful
+        ///// in the context of robotics to keep quaternions tight this way ;)
+        ///// </summary>
+        ///// <param name="w"></param>
+        ///// <param name="x"></param>
+        ///// <param name="y"></param>
+        ///// <param name="z"></param>
+        //public Quaternion(double w, double x, double y, double z) 
+        //    : this(w, x, y, z, true) { }
+
+        ///// <summary>
+        ///// A private constructor with the option to bypass automatic quaternion normalization.
+        ///// This saves computation when using conversion algorithms that already yield normalized results.
+        ///// </summary>
+        ///// <param name="w"></param>
+        ///// <param name="x"></param>
+        ///// <param name="y"></param>
+        ///// <param name="z"></param>
+        ///// <param name="normalize"></param>
+        //public Quaternion(double w, double x, double y, double z, bool normalize)
+        //{
+        //    this.W = w;
+        //    this.X = x;
+        //    this.Y = y;
+        //    this.Z = z;
+
+        //    if (normalize)
+        //    {
+        //        this.NormalizeVector();
+        //    }
+        //}
+
+
+        /// <summary>
+        /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
+        /// and the rotation agle in degrees. 
+        /// The axis vector will be automatically normalized.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="angleDegs"></param>
+        public AxisAngle(double x, double y, double z, double angleDegs) 
+            : this(x, y, z, angleDegs, true) { }
+
+        /// <summary>
+        /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
+        /// and the rotation agle in degrees. 
+        /// The axis vector will be automatically normalized.
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="angleDegs"></param>
+        public AxisAngle(Point axis, double angleDegs)
+            : this(axis.X, axis.Y, axis.Z, angleDegs, true) { }
+
+        /// <summary>
+        /// Private constructor, can bypass normalization if input axis is ensured to be normalized. 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="angleDegs"></param>
+        /// <param name="normalize"></param>
+        protected AxisAngle(double x, double y, double z, double angleDegs, bool normalize)
         {
             this.X = x;
             this.Y = y;
             this.Z = z;
-            this.Angle = angle;
-        }
+            this.Angle = angleDegs;
 
-        public AxisAngle(Point vector, double angle)
-        {
-            this.X = vector.X;
-            this.Y = vector.Y;
-            this.Z = vector.Z;
-            this.Angle = angle;
+            if (normalize)
+            {
+                this.Normalize();
+            }
         }
 
         /// <summary>
-        /// Make the Axis vector unit, and confine angle rotation to [-360, 360] (should do [-180, 180]?)
+        /// Make the Axis a vector unit.
         /// </summary>
-        public void Normalize()
+        public bool Normalize()
         {
-            double len = Math.Sqrt(X * X + Y * Y + Z * Z);
+            double len = Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+
+            if (len < EPSILON)
+            {
+                this.X = 0;
+                this.Y = 0;
+                this.Z = 0;
+
+                return false;
+            } 
+
             this.X /= len;
             this.Y /= len;
             this.Z /= len;
-            this.Angle %= 360;
+
+            return true;
         }
 
+        /// <summary>
+        /// Returns true if this AxisAngle represents no rotation: zero rotation axis or zero angle.
+        /// </summary>
+        /// <returns></returns>
         public bool IsZero()
         {
-            return Math.Abs(this.X) < EPSILON
-                && Math.Abs(this.Y) < EPSILON
-                && Math.Abs(this.Z) < EPSILON;
+            return Math.Abs(this.Angle) < EPSILON
+                || (Math.Abs(this.X) < EPSILON
+                    && Math.Abs(this.Y) < EPSILON
+                    && Math.Abs(this.Z) < EPSILON);
+        }
+
+        /// <summary>
+        /// Returns the length of the rotation axis.
+        /// </summary>
+        /// <returns></returns>
+        public double AxisLength()
+        {
+            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
         }
 
         /// <summary>

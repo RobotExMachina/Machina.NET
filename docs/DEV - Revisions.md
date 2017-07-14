@@ -18,14 +18,17 @@
 ## BUILD 1205
 - [ ] Update readme with KUKA implementation and development levels.
 - [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!
+- [ ] QUATERINONS:
     - [x] Quaternion Implementation
-    - [x] AxisAngle implementation
     - [x] Quaternions are always normalized on construction for proper rotation representation
     - [x] Add Quaternion Vector-Normalization: if between {-1, 1}, keep scalar component constant and normalize the rotation axis.
     - [x] Add fallback to regular normalization if Vector-Norm is not possible.
     - [x] Add fallback to convert the Quaternion to identity if trying to normalize a zero-length Q   
     - [x] The above fallback takes into account the sign of the rotation to return positive or negative identity quaternions (not sure why, it just feels like it makes sense...)
-
+- [ ] AXISANGLES:
+    - [x] AxisAngle implementation
+    - [ ] Auto-normalization on creation
+    - [ ] .IsZero on zero axis or zero angle
 
 ## BUILD 1204
 - [x] Add KUKA KRL. Still a lot of testing to do!
