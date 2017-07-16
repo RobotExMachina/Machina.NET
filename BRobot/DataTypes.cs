@@ -1185,6 +1185,7 @@ namespace BRobot
         /// Returns a CoordinateSystem representation of current Quaternion
         /// (a 3x3 rotation matrix).
         /// </summary>
+        /// <seealso cref="https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions#Conversion_formulae_between_formalisms"/>
         /// <returns></returns>
         public CoordinateSystem GetCoordinateSystem()
         {
@@ -1193,20 +1194,21 @@ namespace BRobot
                    y2 = this.Y + this.Y,
                    z2 = this.Z + this.Z;
 
-            double xx = this.X * x2,
-                   yx = this.Y * x2,
-                   yy = this.Y * y2,
-                   zx = this.Z * x2,
-                   zy = this.Z * y2,
-                   zz = this.Z * z2,
-                   wx = this.W * x2,
-                   wy = this.W * y2,
-                   wz = this.W * z2;
+            double xx2 = this.X * x2,
+                   yx2 = this.Y * x2,
+                   yy2 = this.Y * y2,
+                   zx2 = this.Z * x2,
+                   zy2 = this.Z * y2,
+                   zz2 = this.Z * z2,
+                   wx2 = this.W * x2,
+                   wy2 = this.W * y2,
+                   wz2 = this.W * z2;
 
+            // @TODO: review the order of these elements, they might be transposed for webgl conventions
             return CoordinateSystem.FromComponents(
-                1 - yy - zz,     yx + wz,     zx - wy,
-                    yx - wz, 1 - xx - zz,     zy + wx,
-                    zx + wy,     zy - wx, 1 - xx - yy);
+                1 - yy2 - zz2,     yx2 + wz2,     zx2 - wy2,
+                    yx2 - wz2, 1 - xx2 - zz2,     zy2 + wx2,
+                    zx2 + wy2,     zy2 - wx2, 1 - xx2 - yy2);
         }
 
         /// <summary>
