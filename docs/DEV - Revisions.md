@@ -14,24 +14,30 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+## BUILD 1206
+- [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!
+    - [ ] ROTATIONVECTOR
+        - [ ] Simple conversion from AxisAngle
+
 
 ## BUILD 1205
 - [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!
-- [ ] QUATERNIONS:
-    - [x] Quaternion Implementation
-    - [x] Quaternions are always normalized on construction for proper rotation representation
-    - [x] Add Quaternion Vector-Normalization: if between {-1, 1}, keep scalar component constant and normalize the rotation axis.
-    - [x] Add fallback to regular normalization if Vector-Norm is not possible.
-    - [x] Add fallback to convert the Quaternion to identity if trying to normalize a zero-length Q   
-    - [x] The above fallback takes into account the sign of the rotation to return positive or negative identity quaternions (not sure why, it just feels like it makes sense...)
-    - [x] Fixed a bug that made quaternions flip the axis for negative leading member on Vector-normalization...
-    - [x] Quaternion -> AaxisAngle -> Quaternion successful conversion
-- [ ] AXISANGLES:
-    - [x] AxisAngle implementation
-    - [x] Auto-normalization on creation
-    - [x] .IsZero on zero axis or zero angle
-    - [x] Working simple AxisAngle to Quaternion conversion.
-    - [ ] Add AA -> Q -> AA tests (account for Q returning always positive rotation)
+    - [x] QUATERNIONS:
+        - [x] Quaternion Implementation
+        - [x] Quaternions are always normalized on construction for proper rotation representation
+        - [x] Add Quaternion Vector-Normalization: if between {-1, 1}, keep scalar component constant and normalize the rotation axis.
+        - [x] Add fallback to regular normalization if Vector-Norm is not possible.
+        - [x] Add fallback to convert the Quaternion to identity if trying to normalize a zero-length Q   
+        - [x] The above fallback takes into account the sign of the rotation to return positive or negative identity quaternions (not sure why, it just feels like it makes sense...)
+        - [x] Fixed a bug that made quaternions flip the axis for negative leading member on Vector-normalization...
+        - [x] Quaternion -> AaxisAngle -> Quaternion successful conversion
+    - [x] AXISANGLES:
+        - [x] AxisAngle implementation
+        - [x] Auto-normalization on creation
+        - [x] .IsZero on zero axis or zero angle
+        - [x] Working simple AxisAngle to Quaternion conversion.
+        - [x] Add AA -> Q -> AA tests (account for Q returning always positive rotation)
+        - [x] AxisAngle.Flip() + .Modulate()
 
 - [ ] Update readme with KUKA implementation and development levels.
 
