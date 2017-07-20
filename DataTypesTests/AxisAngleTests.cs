@@ -330,6 +330,10 @@ namespace DataTypesTests
             }
         }
 
+        /// <summary>
+        /// Test AA > Q > AA conversion for ANY angle.
+        /// A .Modulate() operation is performed if angle is outside [0, 360] for comparison.
+        /// </summary>
         [TestMethod]
         public void AxisAngle_ToQuaternion_ToAxisAngle_Modulation()
         {
