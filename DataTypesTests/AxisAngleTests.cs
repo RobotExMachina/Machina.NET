@@ -295,7 +295,7 @@ namespace DataTypesTests
 
         /// <summary>
         /// Perform AA > Q > AA conversion from a AA1 with negative angle.
-        /// Performs a .Flip() operation for comparison.
+        /// Uses a .Flip() operation for comparison.
         /// </summary>
         [TestMethod]
         public void AxisAngle_ToQuaternion_ToAxisAngle_Negative()
@@ -311,7 +311,7 @@ namespace DataTypesTests
                 x = Random(-100, 100);
                 y = Random(-100, 100);
                 z = Random(-100, 100);
-                angle = Random(-360, 0);  // choose only positive angles, because quaternion coversion will always return a positive rotation in [0, 360]
+                angle = Random(-360, 0);  // choose only negative angles
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
@@ -329,6 +329,52 @@ namespace DataTypesTests
                 Assert.IsTrue(aa1 == aa2, "Boooo! :(");
             }
         }
+
+        [TestMethod]
+        public void AxisAngle_ToQuaternion_ToAxisAngle_Modulation()
+        {
+            AxisAngle aa1, aa2;
+            Quaternion q;
+
+            double x, y, z, angle;
+
+            // Test random quaternions
+            for (var i = 0; i < 50; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-1000, 1000);  // test any possible angle
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+
+                aa1 = new AxisAngle(x, y, z, angle);
+                q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
+                aa2 = q.ToAxisAngle();
+                Trace.WriteLine(aa1);
+                Trace.WriteLine(q);
+                Trace.WriteLine(aa2);
+
+                // If angle wasn't within 'module', modulate it
+                if (angle < 0 || angle > 360)
+                {
+                    aa1.Modulate();
+                    q = aa1.ToQuaternion();
+                    aa2 = q.ToAxisAngle();
+                    Trace.WriteLine("After modulation:");
+                    Trace.WriteLine(aa1);
+                    Trace.WriteLine(q);
+                    Trace.WriteLine(aa2);
+                }
+
+                // Now this should work
+                Assert.IsTrue(aa1 == aa2);
+            }
+        }
+
+
+
 
 
 
