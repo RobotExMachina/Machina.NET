@@ -227,7 +227,7 @@ namespace DataTypesTests
         /// Test simple case where AA! rotation is [0, 360]
         /// </summary>
         [TestMethod]
-        public void AxisAngle_ToQuaternion_AxisAngle_Simple()
+        public void AxisAngle_ToQuaternion_ToAxisAngle_Simple()
         {
             AxisAngle aa1, aa2;
             Quaternion q;
@@ -291,8 +291,45 @@ namespace DataTypesTests
                     }
                 }
             }
-
         }
+
+        /// <summary>
+        /// Perform AA > Q > AA conversion from a AA1 with negative angle.
+        /// Performs a .Flip() operation for comparison.
+        /// </summary>
+        [TestMethod]
+        public void AxisAngle_ToQuaternion_ToAxisAngle_Negative()
+        {
+            AxisAngle aa1, aa2;
+            Quaternion q;
+
+            double x, y, z, angle;
+
+            // Test random quaternions
+            for (var i = 0; i < 50; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-360, 0);  // choose only positive angles, because quaternion coversion will always return a positive rotation in [0, 360]
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+
+                aa1 = new AxisAngle(x, y, z, angle);
+                q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
+                aa2 = q.ToAxisAngle();
+                Trace.WriteLine(aa1);
+                Trace.WriteLine(q);
+                Trace.WriteLine(aa2);
+
+                aa2.Flip();  // from quaternion conversion, aa2 will be inverted. Flip for comparison
+                Trace.WriteLine(aa2 + " (flipped)");
+
+                Assert.IsTrue(aa1 == aa2, "Boooo! :(");
+            }
+        }
+
 
 
 

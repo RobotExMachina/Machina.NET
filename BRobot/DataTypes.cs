@@ -2748,6 +2748,30 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Transforms this AxisAngle into a rotation around the same axis, but with a rotation angle
+        /// between 0 and 360. Note the axis vector will be flipped if the original angle was negative. 
+        /// </summary>
+        public void Modulate()
+        {
+            this.Angle %= 360;
+            if (this.Angle < 0)
+            {
+                this.Flip();
+            }
+        }
+
+        /// <summary>
+        /// Flip this AxisAngle to represent the same rotation with inverted vector and opposite angle.
+        /// </summary>
+        public void Flip()
+        {
+            this.X *= -1;
+            this.Y *= -1;
+            this.Z *= -1;
+            this.Angle *= -1;
+        }
+
+        /// <summary>
         /// Returns a unit Quaternion representing this AxisAngle rotation.
         /// </summary>
         /// <returns></returns>
