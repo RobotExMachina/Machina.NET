@@ -83,7 +83,7 @@ namespace BRobot
         /// <param name="z"></param>
         /// <param name="angleDegs"></param>
         /// <param name="normalize"></param>
-        protected AxisAngle(double x, double y, double z, double angleDegs, bool normalize)
+        internal AxisAngle(double x, double y, double z, double angleDegs, bool normalize)
         {
             this.X = x;
             this.Y = y;
