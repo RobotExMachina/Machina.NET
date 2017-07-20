@@ -90,12 +90,12 @@ namespace BRobot
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1205;
+        public static readonly int Build = 1206;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.2.2";
+        public static readonly string Version = "0.2.3";
        
 
 
