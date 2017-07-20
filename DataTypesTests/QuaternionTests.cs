@@ -306,7 +306,7 @@ namespace DataTypesTests
                 q2 = aa.ToQuaternion();
                 Trace.WriteLine(q2);
 
-                Assert.IsTrue(q1 == q2, "Booo!");
+                Assert.IsTrue(q1 == q2, "Booo! :(");
             }
 
             // Test all permutations of unitary components quaternions (including zero)
@@ -377,7 +377,7 @@ namespace DataTypesTests
         {
             return Random(0, max);
         }
-
+        
         public double Lerp(double start, double end, double norm)
         {
             return start + (end - start) * norm;

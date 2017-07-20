@@ -222,7 +222,77 @@ namespace DataTypesTests
         }
 
 
-        // @TODO: Add AA -> Q -> AA
+        /// <summary>
+        /// Does AA to Q to AA work correctly?
+        /// Test simple case where AA! rotation is [0, 360]
+        /// </summary>
+        [TestMethod]
+        public void AxisAngle_ToQuaternion_AxisAngle_Simple()
+        {
+            AxisAngle aa1, aa2;
+            Quaternion q;
+
+            double x, y, z, angle;
+
+            // Test random quaternions
+            for (var i = 0; i < 50; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(360);  // choose only positive angles, because quaternion coversion will always return a positive rotation in [0, 360]
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+
+                aa1 = new AxisAngle(x, y, z, angle);
+                q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
+                aa2 = q.ToAxisAngle();
+                Trace.WriteLine(aa1);
+                Trace.WriteLine(q);
+                Trace.WriteLine(aa2);
+
+                Assert.IsTrue(aa1 == aa2, "Boooo! :(");
+            }
+
+
+            // Test all permutations of unitary components quaternions (including zero)
+            for (x = -1; x <= 1; x++)
+            {
+                for (y = -1; y <= 1; y++)
+                {
+                    for (z = -1; z <= 1; z++)
+                    {
+                        for (angle = 0; angle <= 360; angle += 45)
+                        {
+                            Trace.WriteLine("");
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+
+                            aa1 = new AxisAngle(x, y, z, angle);
+                            q = aa1.ToQuaternion();
+                            aa2 = q.ToAxisAngle();
+                            Trace.WriteLine(aa1);
+                            Trace.WriteLine(q);
+                            Trace.WriteLine(aa2);
+
+                            // Deal with zero angles
+                            if (aa1.IsZero())
+                            {
+                                Assert.IsTrue(aa1.IsZero());
+                                Assert.IsTrue(q.IsIdentity());
+                                Assert.IsTrue(aa2.IsZero());
+                            }
+                            else
+                            {
+                                Assert.IsTrue(aa1 == aa2, "Booooo! :(");
+                            }
+                            
+                        }
+                    }
+                }
+            }
+
+        }
 
 
 
