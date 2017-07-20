@@ -27,23 +27,23 @@ namespace BRobot
         /// <summary>
         /// Quaternion addition
         /// </summary>
-        /// <param name="r1"></param>
-        /// <param name="r2"></param>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
         /// <returns></returns>
-        public static Rotation operator +(Rotation r1, Rotation r2)
+        public static Quaternion operator +(Quaternion q1, Quaternion q2)
         {
-            return Quaternion.Addition(r1, r2);
+            return Quaternion.Addition(q1, q2);
         }
 
         /// <summary>
         /// Quaternion subtraction
         /// </summary>
-        /// <param name="r1"></param>
-        /// <param name="r2"></param>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
         /// <returns></returns>
-        public static Rotation operator -(Rotation r1, Rotation r2)
+        public static Quaternion operator -(Quaternion q1, Quaternion q2)
         {
-            return Quaternion.Subtraction(r1, r2);
+            return Quaternion.Subtraction(q1, q2);
         }
 
         /// <summary>
@@ -65,12 +65,12 @@ namespace BRobot
         /// of the first quaternion by the second.
         /// Remember quaternion multiplication is non-commutative.
         /// </summary>
-        /// <param name="r1"></param>
-        /// <param name="r2"></param>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
         /// <returns></returns>
-        public static Rotation operator *(Rotation r1, Rotation r2)
+        public static Quaternion operator *(Quaternion q1, Quaternion q2)
         {
-            return Quaternion.Multiply(r1, r2);
+            return Quaternion.Multiply(q1, q2);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Create a Quaternion from its components. 
+        /// Create a Quaternion from its components: w + x * i + y * j + z * k
         /// For quaternions to be used as valid representations of spatial rotations, 
         /// they need to be versors (unit quaternions). This constructor will automatically
         /// Vector-Normalize the resulting Quaternion.
@@ -101,6 +101,14 @@ namespace BRobot
         /// <param name="z"></param>
         public Quaternion(double w, double x, double y, double z)
             : this(w, x, y, z, true) { }
+
+        /// <summary>
+        /// Create a Quaternion as a shallow copy of another. 
+        /// This Quaternion will be vector-normalized. 
+        /// </summary>
+        /// <param name="q"></param>
+        public Quaternion(Quaternion q) 
+            : this(q.W, q.X, q.Y, q.Z, true) { }
 
         /// <summary>
         /// A private constructor with the option to bypass automatic quaternion normalization.
@@ -135,6 +143,18 @@ namespace BRobot
         public void Set(double w, double x, double y, double z)
         {
             this.Set(w, x, y, z, true);
+        }
+
+        /// <summary>
+        /// Shallow-copies the values of specified Quaternion.
+        /// </summary>
+        /// <param name="r"></param>
+        public void Set(Rotation r)
+        {
+            this.W = r.W;
+            this.X = r.X;
+            this.Y = r.Y;
+            this.Z = r.Z;
         }
 
         /// <summary>
@@ -295,6 +315,69 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Turns this Rotation into its conjugate.
+        /// </summary>
+        /// <seealso cref="http://mathworld.wolfram.com/QuaternionConjugate.html"/>
+        public void Conjugate()
+        {
+            // W stays the same
+            this.X = -this.X;
+            this.Y = -this.Y;
+            this.Z = -this.Z;
+        }
+
+        /// <summary>
+        /// Returns the conjugate of given quaternion.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public static Quaternion Conjugate(Quaternion q)
+        {
+            return new Quaternion(q.W, -q.X, -q.Y, -q.Z);
+        }
+
+        /// <summary>
+        /// Inverts this quaternion.
+        /// </summary>
+        public void Invert()
+        {
+            //if (this.IsUnit())
+            //{
+                // The inverse of unit vectors is its conjugate.
+                // This Quaternion will always be unit.
+                this.X = -this.X;
+                this.Y = -this.Y;
+                this.Z = -this.Z;
+            //}
+            //else if (this.IsZero())
+            //{
+            //    // The inverse of a zero quat is itself
+            //}
+            //else
+            //{
+            //    // The inverse of a quaternion is its conjugate divided by the squared norm.
+            //    double sqlen = this.SqLength();
+
+            //    this.W /= sqlen;
+            //    this.X /= -sqlen;
+            //    this.Y /= -sqlen;
+            //    this.Z /= -sqlen;
+            //}
+        }
+
+        /// <summary>
+        /// Returns the inverse of given quaternion.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public static Quaternion Inverse(Quaternion q)
+        {
+            Quaternion qinv = new Quaternion(q);
+            qinv.Invert();
+            return qinv;
+        }
+
+        /// <summary>
         /// Is this a unit length quaternion?
         /// </summary>
         /// <returns></returns>
@@ -328,6 +411,169 @@ namespace BRobot
                 && Math.Abs(this.Y) < EPSILON
                 && Math.Abs(this.Z) < EPSILON;
         }
+
+        /// <summary>
+        /// Add a Quaternion to this one. 
+        /// </summary>
+        /// <param name="q"></param>
+        public void Add(Quaternion q)
+        {
+            this.W += q.W;
+            this.X += q.X;
+            this.Y += q.Y;
+            this.Z += q.Z;
+        }
+
+        /// <summary>
+        /// Returns the addition of two quaternions.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static Quaternion Addition(Quaternion q1, Quaternion q2)
+        {
+            return new Quaternion(
+                q1.W + q2.W,
+                q1.X + q2.X,
+                q1.Y + q2.Y,
+                q1.Z + q2.Z, true);
+        }
+
+        /// <summary>
+        /// Subtract a quaternion from this one. 
+        /// </summary>
+        /// <param name="q"></param>
+        public void Subtract(Quaternion q)
+        {
+            this.W -= q.W;
+            this.X -= q.X;
+            this.Y -= q.Y;
+            this.Z -= q.Z;
+        }
+
+        /// <summary>
+        /// Returns the subtraction of two quaternions.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static Quaternion Subtraction(Quaternion q1, Quaternion q2)
+        {
+            return new Quaternion(
+                q1.W - q2.W,
+                q1.X - q2.X,
+                q1.Y - q2.Y,
+                q1.Z - q2.Z, true);
+        }
+
+        /// <summary>
+        /// Multiply this Quaternion by the specified one, a.k.a. this = this * q. 
+        /// Conceptually, this means that a Rotation 'q' in Local coordinates is applied 
+        /// to this Rotation.
+        /// See https://en.wikipedia.org/wiki/Quaternion#Hamilton_product
+        /// </summary>
+        /// <param name="q"></param>
+        public void Multiply(Quaternion q)
+        {
+            double w = this.W,
+                   x = this.X,
+                   y = this.Y,
+                   z = this.Z;
+
+            this.W = w * q.W - x * q.X - y * q.Y - z * q.Z;
+            this.X = x * q.W + w * q.X + y * q.Z - z * q.Y;
+            this.Y = y * q.W + w * q.Y + z * q.X - x * q.Z;
+            this.Z = z * q.W + w * q.Z + x * q.Y - y * q.X;
+        }
+
+        /// <summary>
+        /// Premultiplies this Quaternion by the specified one, a.k.a. this = q * this. 
+        /// Conceptually, this means that a Rotation 'q' in Global coordinates is applied 
+        /// to this Rotation.
+        /// See https://en.wikipedia.org/wiki/Quaternion#Hamilton_product
+        /// </summary>
+        /// <param name="q"></param>
+        public void PreMultiply(Quaternion q)
+        {
+            double w = this.W,
+                   x = this.X,
+                   y = this.Y,
+                   z = this.Z;
+
+            this.W = q.W * w - q.X * x - q.Y * y - q.Z * z;
+            this.X = q.X * w + q.W * x + q.Y * z - q.Z * y;
+            this.Y = q.Y * w + q.W * y + q.Z * x - q.X * z;
+            this.Z = q.Z * w + q.W * z + q.X * y - q.Y * x;
+        }
+
+        /// <summary>
+        /// Returns the <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> 
+        /// of the first quaternion by the second.
+        /// Remember quaternion multiplication is non-commutative.
+        /// The result is vector-normalized.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static Quaternion Multiply(Quaternion q1, Quaternion q2)
+        {
+            double w = q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z;
+            double x = q1.X * q2.W + q1.W * q2.X + q1.Y * q2.Z - q1.Z * q2.Y;
+            double y = q1.Y * q2.W + q1.W * q2.Y + q1.Z * q2.X - q1.X * q2.Z;
+            double z = q1.Z * q2.W + q1.W * q2.Z + q1.X * q2.Y - q1.Y * q2.X;
+
+            return new Quaternion(w, x, y, z);
+        }
+
+        /// <summary>
+        /// Divide this Quaternion by another one. 
+        /// In reality, this quaternion is post-multiplied by the inverse of the provided one.
+        /// </summary>
+        /// <param name="q"></param>
+        public void Divide(Quaternion q)
+        {
+            Quaternion arg = new Quaternion(q);
+            arg.Invert();
+            this.Multiply(arg);
+        }
+
+        /// <summary>
+        /// Returns the division of r1 by r2.
+        /// Under the hood, r1 is post-multiplied by the inverse of r2.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
+        public static Rotation Division(Rotation r1, Rotation r2)
+        {
+            Rotation a = new Rotation(r1),
+                     b = new Rotation(r2);
+            b.Invert();
+            a.Multiply(b);
+            return a;
+        }
+
+        /// <summary>
+        /// Rotate this Quaternion by specified Rotation around GLOBAL reference system.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        public void RotateGlobal(Quaternion rotation)
+        {
+            this.PreMultiply(rotation);
+        }
+
+        /// <summary>
+        /// Rotate this Quaternion by specified Rotation around LOCAL reference system.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        public void RotateLocal(Quaternion rotation)
+        {
+            this.Multiply(rotation);
+        }
+
+
 
         /// <summary>
         /// Returns the AxisAngle rotation represented by this Quaternion. 

@@ -3,7 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 
 using BRobot;
-using BRobot.DataTypes;
 using SysQuat = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
 
