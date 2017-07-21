@@ -7,7 +7,7 @@ using SysQuat = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
 
 namespace DataTypesTests
-{   
+{
     [TestClass]
     public class RotationVectorTests : DataTypesTests
     {
@@ -39,7 +39,7 @@ namespace DataTypesTests
                 len2 = Math.Sqrt(rv.X * rv.X + rv.Y * rv.Y + rv.Z * rv.Z);
                 Trace.WriteLine(len);
                 Trace.WriteLine(len2);
-                Assert.AreNotEqual(len, len2, 0.000001); 
+                Assert.AreNotEqual(len, len2, 0.000001);
                 Assert.AreEqual(angle, len2, 0.000001);
                 Assert.AreEqual(angle, rv.GetAngle(), 0.000001);
 
@@ -142,7 +142,7 @@ namespace DataTypesTests
                 {
                     for (z = -1; z <= 1; z++)
                     {
-                        for (angle =720; angle <= 0; angle += 45)
+                        for (angle = 720; angle <= 0; angle += 45)
                         {
                             Trace.WriteLine("");
                             Trace.WriteLine(x + " " + y + " " + z + " " + angle);
@@ -250,6 +250,75 @@ namespace DataTypesTests
             }
         }
 
+        [TestMethod]
+        public void RotationVector_ToQuaternion_ToRotationVector()
+        {
+            RotationVector rv1, rv2;
+            Quaternion q;
 
+            double x, y, z, angle;
+            double len;
+
+            // Test random axes
+            for (var i = 0; i < 50; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-720, 720);
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+
+                rv1 = new RotationVector(x, y, z, angle);
+                q = rv1.ToQuaternion();
+                rv2 = q.ToRotationVector();
+                Trace.WriteLine(rv1);
+                Trace.WriteLine(q);
+                Trace.WriteLine(rv2);
+
+                Assert.IsTrue(rv1 == rv2);
+                Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
+            }
+
+            // Test all permutations of unitary components (including zero)
+            for (x = -1; x <= 1; x++)
+            {
+                for (y = -1; y <= 1; y++)
+                {
+                    for (z = -1; z <= 1; z++)
+                    {
+                        for (angle = -720; angle <= 0; angle += 45)
+                        {
+
+                            Trace.WriteLine("");
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+
+                            rv1 = new RotationVector(x, y, z, angle);
+                            q = rv1.ToQuaternion();
+                            rv2 = q.ToRotationVector();
+                            Trace.WriteLine(rv1);
+                            Trace.WriteLine(q);
+                            Trace.WriteLine(rv2);
+
+                            len = rv1.Length();
+
+                            if (angle == 0 || len == 0)
+                            {
+                                Assert.IsTrue(q.IsIdentity());
+                                Assert.IsTrue(rv2.IsZero());
+                            }
+                            else
+                            {
+                                Assert.IsTrue(rv1 == rv2);
+                                Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        }
     }
 }

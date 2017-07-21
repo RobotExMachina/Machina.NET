@@ -609,8 +609,30 @@ namespace BRobot
             }
 
             double s = Math.Sin(0.5 * theta2);
-            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS);
+            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, false);
         }
+
+        /// <summary>
+        /// Returns the Rotationvector rotation represented by this Quaternion. 
+        /// Note it will always return the unit vector corresponding to a positive rotation, 
+        /// even if the quaternion was created from a negative one (flipped vector).
+        /// </summary>
+        /// <returns></returns>
+        public RotationVector ToRotationVector()
+        {
+            double theta2 = 2 * Math.Acos(this.W);
+
+            // If angle == 0, no rotation is performed and this Quat is identity
+            if (theta2 < EPSILON)
+            {
+                return new RotationVector(0, 0, 0, 0);
+            }
+
+            double s = Math.Sin(0.5 * theta2);
+            return new RotationVector(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, true);
+        }
+
+
 
         public override string ToString()
         {
