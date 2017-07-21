@@ -25,6 +25,11 @@ namespace DataTypesTests
             return Random(0, max);
         }
 
+        public int RandomInt(int min, int max)
+        {
+            return rnd.Next(min, max + 1);
+        }
+
         public double Lerp(double start, double end, double norm)
         {
             return start + (end - start) * norm;

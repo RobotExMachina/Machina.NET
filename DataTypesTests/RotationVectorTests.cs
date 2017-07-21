@@ -255,7 +255,7 @@ namespace DataTypesTests
         {
             RotationVector rv1, rv2;
             Quaternion q;
-            AxisAngle aa1, aa2;
+            AxisAngle aa1;
 
             double x, y, z, angle;
             double len;
@@ -278,18 +278,21 @@ namespace DataTypesTests
                 Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
                 Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");
 
-                rv1 = new RotationVector(x, y, z, angle);
-                aa1 = rv1.ToAxisAngle();
-                q = aa1.ToQuaternion();
-                rv2 = q.ToRotationVector();
-                Trace.WriteLine("Itemized:");
-                Trace.WriteLine(rv1 + " (" + rv1.ToAxisAngle() + ")");
-                Trace.WriteLine(aa1);
-                Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
-                Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");
+                //rv1 = new RotationVector(x, y, z, angle);
+                //aa1 = rv1.ToAxisAngle();
+                //q = aa1.ToQuaternion();
+                //rv2 = q.ToRotationVector();
+                //Trace.WriteLine("Itemized:");
+                //Trace.WriteLine(rv1 + " (" + rv1.ToAxisAngle() + ")");
+                //Trace.WriteLine(aa1);
+                //Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
+                //Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");
 
-                //Assert.IsTrue(rv1 == rv2);
-                //Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
+                ////Assert.IsTrue(rv1 == rv2);
+                ////Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
+
+                // This is not very clean, but I guess does the job...? 
+                Assert.IsTrue(rv1.ToAxisAngle().IsEquivalent(rv2.ToAxisAngle()));
             }
 
             // Test all permutations of unitary components (including zero)
@@ -308,9 +311,9 @@ namespace DataTypesTests
                             rv1 = new RotationVector(x, y, z, angle);
                             q = rv1.ToQuaternion();
                             rv2 = q.ToRotationVector();
-                            Trace.WriteLine(rv1);
-                            Trace.WriteLine(q);
-                            Trace.WriteLine(rv2);
+                            Trace.WriteLine(rv1 + " (" + rv1.ToAxisAngle() + ")");
+                            Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
+                            Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");
 
                             len = rv1.Length();
 
@@ -321,8 +324,7 @@ namespace DataTypesTests
                             }
                             else
                             {
-                                Assert.IsTrue(rv1 == rv2);
-                                Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
+                                Assert.IsTrue(rv1.ToAxisAngle().IsEquivalent(rv2.ToAxisAngle()), "RV assert failed");
                             }
 
                         }

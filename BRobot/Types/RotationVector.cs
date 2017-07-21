@@ -161,6 +161,19 @@ namespace BRobot
             return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
         }
 
+        /// <summary>
+        /// Is this rotation equivalent to a given one? 
+        /// Equivalence is defined as rotations around vectors sharing the same axis (including opposite directions)
+        /// and an angle with the same modulated equivalence. This in turn means the same spatial orientation after transformation.
+        /// See <see cref="AxisAngle.IsEquivalent(AxisAngle)"/>
+        /// </summary>
+        /// <param name="rv"></param>
+        /// <returns></returns>
+        public bool IsEquivalent(RotationVector rv)
+        {
+            return this.ToAxisAngle().IsEquivalent(rv.ToAxisAngle());
+        }
+
         
 
         /// <summary>
@@ -170,7 +183,7 @@ namespace BRobot
         public AxisAngle ToAxisAngle()
         {
             double angle = this.GetAngle();
-            if (angle < EPSILON) return new AxisAngle(0,0,0,0);
+            if (angle < EPSILON) return new AxisAngle(0, 0, 0, 0, false);
 
             double x = this.X / angle,
                 y = this.Y / angle,

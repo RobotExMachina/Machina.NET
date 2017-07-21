@@ -159,6 +159,18 @@ namespace DataTypesTests
             b = new AxisAngle(0, 0, 10, 45);
             Trace.WriteLine(b);
             Assert.IsTrue(a.IsEquivalent(b));
+
+            // Zero vectors
+            a = new AxisAngle(0, 0, 0, 0);
+            Trace.WriteLine(a);
+            for (var i = 0; i < 50; i++) {
+                b = new AxisAngle(Random(-10, 10), Random(-10, 10), Random(-10, 10), RandomInt(-3, 3) * 360);
+                Trace.WriteLine(b);
+
+                Assert.IsTrue(a.IsEquivalent(b));
+                Assert.IsTrue(b.IsEquivalent(a));
+            }
+            
         }
 
 

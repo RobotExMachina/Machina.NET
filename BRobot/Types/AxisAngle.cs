@@ -190,13 +190,27 @@ namespace BRobot
         /// [0, 0, 1, -45] (negative rotation, same angle)
         /// [0, 0, -1, 45] (flipped axis, same angle)
         /// [0, 0, 10, 315] (same axis and angle, longer vector. note non-unit vectors are not allowed in this AA representation)
+        /// 
+        /// Also, these are equivalent:
+        /// [0, 0, 0, 0]
+        /// [0, 0, 1, 720] 
         /// </summary>
         /// <param name="axisAngle"></param>
         /// <returns></returns>
         public bool IsEquivalent(AxisAngle axisAngle)
         {
+            // Sanity checks
+            if (this.IsZero())
+            {
+                return Math.Abs(axisAngle.Angle % 360) < EPSILON;
+            } 
+            else if (axisAngle.IsZero())
+            {
+                return Math.Abs(this.Angle % 360) < EPSILON;
+            }
+
             Point v1 = new Point(this.X, this.Y, this.Z),
-                v2 = new Point(axisAngle.X, axisAngle.Y, axisAngle.Z);
+            v2 = new Point(axisAngle.X, axisAngle.Y, axisAngle.Z);
             int directions = Point.CompareDirections(v1, v2);
             
             // If axes are not parallel, they are not equivalent
@@ -204,6 +218,7 @@ namespace BRobot
             {
                 return false;
             }
+            
 
             // Bring all angles to [0, 360]
             double a1 = this.Angle;
