@@ -19,7 +19,9 @@
     - [ ] ROTATIONVECTOR
         - [x] Simple conversion from AxisAngle
         - [ ] 
+    - [x] Add AxisAngle.IsEquivalent()
 
+- [x] Add Point.CompareDirections() for parallelism, orthogonality and oppositeness.
 - [ ] Update readme with KUKA implementation and development levels.
 
 
@@ -46,6 +48,7 @@
 ## BUILD 1204
 - [x] Add KUKA KRL. Still a lot of testing to do!
 
+
 ## BUILD 1203
 - [x] Add inline generation of poses, instead of splitting them into variables.
 - [x] Add 'id' count to Actions
@@ -54,6 +57,7 @@
     movej(p[0.2, 0.319848077530122, 0.401736481776669, 0.137046446582579, 1.56644805234647, 0.137046446582579], a=1, v=0.025, r=0.001)
     ```
 
+
 ## BUILD 1202
 - [x] RobotCursor for ABBs and URs is pretty much identical, except for the utility functions, which pretty much relate to compilation anyway. Move this to Compiler and keep one unitary Cursor.
 - [x] Add string to Robot constructor to determine robot make.
@@ -61,8 +65,10 @@
 - [x] Add `.Comment()` to the Reference.
 - [x] On export, add an additional file with human-readable instructions --> Added `.Robot("HUMAN")`! Unrecognized brand names default to this compiler.
     
+
 ## BUILD 1201
 - [x] Testing and debugging of UR offline code generation
+
 
 ## BUILD 1200
 - [x] Project is now targetting .NET framework 4.6.1 (because of the new ABB.Robotics library...)
