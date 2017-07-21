@@ -69,6 +69,12 @@ namespace BRobot
                 || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
         }
 
+
+        public static implicit operator Point(AxisAngle aa)
+        {
+            return new BRobot.Point(aa.X, aa.Y, aa.Z);
+        }
+
         /// <summary>
         /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
         /// and the rotation angle in degrees. 
@@ -195,30 +201,30 @@ namespace BRobot
         /// [0, 0, 0, 0]
         /// [0, 0, 1, 720] 
         /// </summary>
-        /// <param name="axisAngle"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public bool IsEquivalent(AxisAngle axisAngle)
+        public bool IsEquivalent(AxisAngle other)
         {
             // Sanity checks
             if (this.IsZero())
             {
-                return Math.Abs(axisAngle.Angle % 360) < EPSILON;
+                return Math.Abs(other.Angle % 360) < EPSILON;
             } 
-            else if (axisAngle.IsZero())
+            else if (other.IsZero())
             {
                 return Math.Abs(this.Angle % 360) < EPSILON;
             }
 
-            Point v1 = new Point(this.X, this.Y, this.Z),
-            v2 = new Point(axisAngle.X, axisAngle.Y, axisAngle.Z);
-            int directions = Point.CompareDirections(v1, v2);
+            //Point v1 = new Point(this.X, this.Y, this.Z),
+            //v2 = new Point(axisAngle.X, axisAngle.Y, axisAngle.Z);
+            //int directions = Point.CompareDirections(v1, v2);
+            int directions = Point.CompareDirections(this, other);
             
             // If axes are not parallel, they are not equivalent
             if (directions == 0 || directions == 2)
             {
                 return false;
             }
-            
 
             // Bring all angles to [0, 360]
             double a1 = this.Angle;
@@ -227,13 +233,15 @@ namespace BRobot
                 a1 += 360;
             }
             a1 %= 360;
+            if (Math.Abs(a1 - 360) < EPSILON) a1 = 0;
 
-            double a2 = axisAngle.Angle;
+            double a2 = other.Angle;
             while (a2 < 0)
             {
                 a2 += 360;
             }
             a2 %= 360;
+            if (Math.Abs(a2 - 360) < EPSILON) a2 = 0;
 
             // If the vectors have the same direction, angles should be module of each other.
             if (directions == 1)

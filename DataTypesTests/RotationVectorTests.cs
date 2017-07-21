@@ -292,7 +292,8 @@ namespace DataTypesTests
                 ////Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
 
                 // This is not very clean, but I guess does the job...? 
-                Assert.IsTrue(rv1.ToAxisAngle().IsEquivalent(rv2.ToAxisAngle()));
+                //Assert.IsTrue(rv1.ToAxisAngle().IsEquivalent(rv2.ToAxisAngle()));
+                Assert.IsTrue(rv1.IsEquivalent(rv2));
             }
 
             // Test all permutations of unitary components (including zero)
@@ -324,7 +325,12 @@ namespace DataTypesTests
                             }
                             else
                             {
-                                Assert.IsTrue(rv1.ToAxisAngle().IsEquivalent(rv2.ToAxisAngle()), "RV assert failed");
+                                //Assert.IsTrue(rv1.ToAxisAngle().IsEquivalent(rv2.ToAxisAngle()), "RV assert failed");
+                                if (x == -1 && y == -1 && z == -1 && angle == -360)
+                                {
+                                    Assert.IsTrue(rv1.IsEquivalent(rv2));
+                                }
+                                Assert.IsTrue(rv1.IsEquivalent(rv2));
                             }
 
                         }

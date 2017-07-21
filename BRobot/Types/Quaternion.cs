@@ -609,7 +609,7 @@ namespace BRobot
             }
 
             double s = Math.Sin(0.5 * theta2);
-            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, false);
+            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, true);
         }
 
         /// <summary>

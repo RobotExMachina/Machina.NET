@@ -20,12 +20,12 @@ namespace BRobot
         /// <summary>
         /// Precision for floating-point comparisons.
         /// </summary>
-        protected static readonly double EPSILON = 0.000001;
+        internal static readonly double EPSILON = 0.000001;
 
         /// <summary>
         /// Amount of digits for floating-point comparisons precision.
         /// </summary>
-        protected static readonly int EPSILON_DECIMALS = 10;
+        internal static readonly int EPSILON_DECIMALS = 10;
 
         /// <summary>
         /// Amount of decimals for rounding on ToString() operations.
@@ -35,8 +35,10 @@ namespace BRobot
         internal static readonly int STRING_ROUND_DECIMALS_RADS = 6;
 
         // Angle conversion
-        protected static readonly double TO_DEGS = 180.0 / Math.PI;
-        protected static readonly double TO_RADS = Math.PI / 180.0;
+        internal static readonly double TO_DEGS = 180.0 / Math.PI;
+        internal static readonly double TO_RADS = Math.PI / 180.0;
+
+        internal static readonly double TAU = 2 * Math.PI;
 
 
 

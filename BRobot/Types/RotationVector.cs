@@ -76,14 +76,7 @@ namespace BRobot
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="angle"></param>
-        public RotationVector(double x, double y, double z, double angle)
-        {
-            Point v = new Point(x, y, z);
-            v.Normalize();
-            this.X = v.X * angle;
-            this.Y = v.Y * angle;
-            this.Z = v.Z * angle;
-        }
+        public RotationVector(double x, double y, double z, double angle) : this(x, y, z, angle, true) { }
 
         /// <summary>
         /// Protected constructor to bypass normalization of input vector.
@@ -92,22 +85,33 @@ namespace BRobot
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="angle"></param>
-        /// <param name="isVectorNormalized"></param>
-        internal RotationVector(double x, double y, double z, double angle, bool isVectorNormalized)
+        /// <param name="normalize"></param>
+        internal RotationVector(double x, double y, double z, double angle, bool normalize)
         {
-            if (isVectorNormalized)
+            if (normalize)
+            {
+                double len = Point.Length(x, y, z);
+
+                if (len < EPSILON)
+                {
+                    this.X = 0;
+                    this.Y = 0;
+                    this.Z = 0;
+                }
+                else
+                {
+                    double m = angle / len;
+                    this.X = x * m;
+                    this.Y = y * m;
+                    this.Z = z * m;
+                }
+
+            }
+            else
             {
                 this.X = x * angle;
                 this.Y = y * angle;
                 this.Z = z * angle;
-            }
-            else
-            {
-                Point v = new Point(x, y, z);
-                v.Normalize();
-                this.X = v.X * angle;
-                this.Y = v.Y * angle;
-                this.Z = v.Z * angle;
             }
         }
 
@@ -173,9 +177,7 @@ namespace BRobot
         {
             return this.ToAxisAngle().IsEquivalent(rv.ToAxisAngle());
         }
-
         
-
         /// <summary>
         /// Returns an Axis-Angle representation of this rotation.
         /// </summary>
