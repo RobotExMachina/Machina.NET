@@ -16,10 +16,14 @@
 
 ## BUILD 1206
 - [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!
-    - [ ] ROTATIONVECTOR
+    - [x] ROTATIONVECTOR
         - [x] Simple conversion from AxisAngle
-        - [ ] 
-    - [x] Add AxisAngle.IsEquivalent()
+        - [x] ... a lot of unlogged goodness
+        - [x] RV > AA > RV
+        - [x] RV > Q > RV
+    - [x] AXISANGLE 
+        - [x] Add AxisAngle.IsEquivalent()
+        - [x] Implicit conversion to Point
 
 - [x] Add Point.CompareDirections() for parallelism, orthogonality and oppositeness.
 - [ ] Update readme with KUKA implementation and development levels.
