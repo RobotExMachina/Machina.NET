@@ -20,9 +20,25 @@ namespace BRobot
     public class Quaternion : Geometry
     {
         /// <summary>
-        /// Quaternion properties.
+        /// W property of the Quaternion (scalar)
         /// </summary>
-        public double W, X, Y, Z;
+        public double W { get; internal set; }
+
+        /// <summary>
+        /// X property of the Quaternion (i part)
+        /// </summary>
+        public double X { get; internal set; }
+
+        /// <summary>
+        /// Y property of the Quaternion (j part)
+        /// </summary>
+        public double Y { get; internal set; }
+
+        /// <summary>
+        /// Z property of the Quaternion (k part)
+        /// </summary>
+        public double Z { get; internal set; }
+
 
         /// <summary>
         /// Quaternion addition

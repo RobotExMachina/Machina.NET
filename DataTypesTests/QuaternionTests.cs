@@ -9,7 +9,7 @@ using Vector3 = System.Numerics.Vector3;
 namespace DataTypesTests
 {
     [TestClass]
-    public class QuaternionTests
+    public class QuaternionTests : DataTypesTests
     {
 
         public static double TAU = 2 * Math.PI;
@@ -352,47 +352,6 @@ namespace DataTypesTests
             }
 
         }
-
-
-
-
-        // ADD TEST TO SEE IF AXISVECTORS WITH ANGLES MULTIPLES OF 360 YIELD THE SAME Q
-        // ADD TEST AA -> Q -> AA
-
-
-
-        internal static Random rnd = new System.Random();
-
-        public double Random(double min, double max)
-        {
-            return Lerp(min, max, rnd.NextDouble());
-        }
-
-        public double Random()
-        {
-            return Random(0, 1);
-        }
-
-        public double Random(double max)
-        {
-            return Random(0, max);
-        }
         
-        public double Lerp(double start, double end, double norm)
-        {
-            return start + (end - start) * norm;
-        }
-
-        public double Normalize(double value, double start, double end)
-        {
-            return (value - start) / (end - start);
-        }
-
-        public double Map(double value, double sourceStart, double sourceEnd, double targetStart, double targetEnd)
-        {
-            //double n = Normalize(value, sourceStart, sourceEnd);
-            //return targetStart + n * (targetEnd - targetStart);
-            return targetStart + (targetEnd - targetStart) * (value - sourceStart) / (sourceEnd - sourceStart);
-        }
     }
 }

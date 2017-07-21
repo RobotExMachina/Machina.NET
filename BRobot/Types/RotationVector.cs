@@ -20,14 +20,53 @@ namespace BRobot
     //   ╚████╔╝ ███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║              
     //    ╚═══╝  ╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝              
     //                                                                   
-    
+
     /// <summary>
     /// A class to represent a spatial rotation as a Rotation Vector: an unit rotation
     /// axis multiplied by the rotation angle.
     /// </summary>
     public class RotationVector : Geometry
     {
-        double X, Y, Z;
+        /// <summary>
+        /// X coordinate of the Rotation Vector
+        /// </summary>
+        public double X { get; internal set; }
+
+        /// <summary>
+        /// Y coordinate of the Rotation Vector
+        /// </summary>
+        public double Y { get; internal set; }
+
+        /// <summary>
+        /// Z coordinate of the Rotation Vector
+        /// </summary>
+        public double Z { get; internal set; }
+
+        /// <summary>
+        /// Equality operator.
+        /// </summary>
+        /// <param name="rv1"></param>
+        /// <param name="rv2"></param>
+        /// <returns></returns>
+        public static bool operator ==(RotationVector rv1, RotationVector rv2)
+        {
+            return Math.Abs(rv1.X - rv2.X) < EPSILON
+                && Math.Abs(rv1.Y - rv2.Y) < EPSILON
+                && Math.Abs(rv1.Z - rv2.Z) < EPSILON;
+        }
+
+        /// <summary>
+        /// Inequality operator.
+        /// </summary>
+        /// <param name="rv1"></param>
+        /// <param name="rv2"></param>
+        /// <returns></returns>
+        public static bool operator !=(RotationVector rv1, RotationVector rv2)
+        {
+            return Math.Abs(rv1.X - rv2.X) > EPSILON
+                || Math.Abs(rv1.Y - rv2.Y) > EPSILON
+                || Math.Abs(rv1.Z - rv2.Z) > EPSILON;
+        }
 
         /// <summary>
         /// Creates a rotation represented by a RotationVector: an unit rotation
@@ -72,7 +111,34 @@ namespace BRobot
             }
         }
 
-       
+        /// <summary>
+        /// Returns the length of this vector.
+        /// </summary>
+        /// <returns></returns>
+        public double Length()
+        {
+            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+        }
+
+        /// <summary>
+        /// Returns the squared length of this vector.
+        /// </summary>
+        /// <returns></returns>
+        public double SqLength()
+        {
+            return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public bool IsZero()
+        {
+            double sqlen = this.SqLength();
+            return sqlen < EPSILON;
+        }
+        
 
         /// <summary>
         /// Returns the unit vector representing the axis of this rotation.
@@ -87,6 +153,7 @@ namespace BRobot
 
         /// <summary>
         /// Returns the rotation angle of this rotation (the length of the vector).
+        /// Note the rotation angle will always be positive.
         /// </summary>
         /// <returns></returns>
         public double GetAngle()
@@ -94,14 +161,7 @@ namespace BRobot
             return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
         }
 
-        /// <summary>
-        /// Returns the length of this vector.
-        /// </summary>
-        /// <returns></returns>
-        public double Length()
-        {
-            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
-        }
+        
 
         /// <summary>
         /// Returns an Axis-Angle representation of this rotation.
@@ -128,6 +188,13 @@ namespace BRobot
             return this.ToAxisAngle().ToQuaternion();
         }
 
+        public override string ToString()
+        {
+            return string.Format("RotationVector[{0}, {1}, {2}]",
+                Math.Round(X, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
+        }
 
     }
 }

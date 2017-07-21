@@ -84,6 +84,20 @@ namespace BRobot
        
         public double X, Y, Z;
         
+
+        public static bool operator ==(Point p1, Point p2) {
+            return Math.Abs(p1.X - p2.X) < EPSILON
+                && Math.Abs(p1.Y - p2.Y) < EPSILON
+                && Math.Abs(p1.Z - p2.Z) < EPSILON;
+        }
+
+        public static bool operator !=(Point p1, Point p2)
+        {
+            return Math.Abs(p1.X - p2.X) > EPSILON
+                || Math.Abs(p1.Y - p2.Y) > EPSILON
+                || Math.Abs(p1.Z - p2.Z) > EPSILON;
+        }
+
         /// <summary>
         /// Create a Point from its XYZ coordinates.
         /// </summary>

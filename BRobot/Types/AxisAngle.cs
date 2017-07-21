@@ -21,9 +21,25 @@ namespace BRobot
     public class AxisAngle : Geometry
     {
         /// <summary>
-        /// AxisAngle properties.
+        /// X coordinate of the rotation vector.
         /// </summary>
-        public double X, Y, Z, Angle;
+        public double X { get; internal set; }
+
+        /// <summary>
+        /// Y coordinate of the rotation vector.
+        /// </summary>
+        public double Y { get; internal set; }
+
+        /// <summary>
+        /// Z coordinate of the rotation vector.
+        /// </summary>
+        public double Z { get; internal set; }
+
+        /// <summary>
+        /// Rotation angle.
+        /// </summary>
+        public double Angle { get; internal set; }
+
 
         /// <summary>
         /// Equality operator.
@@ -186,6 +202,15 @@ namespace BRobot
                 s * this.Y,
                 s * this.Z,
                 false);
+        }
+
+        /// <summary>
+        /// Returns a RotationVector representing this AxisAngle rotation.
+        /// </summary>
+        /// <returns></returns>
+        public RotationVector ToRotationVector()
+        {
+            return new RotationVector(this.X, this.Y, this.Z, this.Angle, true);
         }
 
         public override string ToString()
