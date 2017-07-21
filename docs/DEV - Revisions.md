@@ -17,9 +17,11 @@
 ## BUILD 1206
 - [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!
     - [ ] ROTATIONVECTOR
-        - [ ] Simple conversion from AxisAngle
+        - [x] Simple conversion from AxisAngle
+        - [ ] 
 
 - [ ] Update readme with KUKA implementation and development levels.
+
 
 ## BUILD 1205
 - [ ] Rework all rotation definitions, add different definition modes, write testing suit, make this good once and for all!

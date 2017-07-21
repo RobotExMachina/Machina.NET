@@ -20,7 +20,7 @@ namespace BRobot
         /// <summary>
         /// Precision for floating-point comparisons.
         /// </summary>
-        protected static readonly double EPSILON = 0.0000000001;
+        protected static readonly double EPSILON = 0.000001;
 
         /// <summary>
         /// Amount of digits for floating-point comparisons precision.
@@ -388,8 +388,15 @@ namespace BRobot
 
             if (lens < EPSILON)
                 return 0.5 * Math.PI;
+            
+            double div = DotProduct(p1, p2) / lens;
+            
+            // Cap floating-point decimal precision on orthogonal angles to avoid NaN problems
+            // https://stackoverflow.com/questions/8961952/c-sharp-math-acos-how-prevent-nan
+            if (div > 1) div = 1;
+            if (div < -1) div = -1;
 
-            return Math.Acos(DotProduct(p1, p2) / lens);
+            return Math.Acos(div);
         }
 
         /// <summary>
@@ -451,7 +458,8 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Are specified vectors parallel?
+        /// Are specified vectors parallel? This includes vectors with opposite directions, 
+        /// even with different magnitudes.
         /// </summary>
         /// <param name="vec1"></param>
         /// <param name="vec2"></param>
@@ -472,6 +480,45 @@ namespace BRobot
         {
             double alpha = AngleBetween(vec1, vec2);
             return alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON;
+        }
+
+        /// <summary>
+        /// Are these vectors parallel but in opposite directions? They can have different magnitudes.
+        /// </summary>
+        /// <param name="vec1"></param>
+        /// <param name="vec2"></param>
+        /// <returns></returns>
+        public static bool AreOpposite(Point vec1, Point vec2)
+        {
+            double alpha = AngleBetween(vec1, vec2);
+            return alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON;
+        }
+
+        /// <summary>
+        /// Compares the directions of two vectors, regardless of their magnitude.
+        /// </summary>
+        /// <param name="vec1"></param>
+        /// <param name="vec2"></param>
+        /// <returns>1 if parallel (same direction), 2 if orthogonal (perpendicular
+        /// directions), 3 if opposite (parallel in opposite directions), 
+        /// 0 otherwise</returns>
+        public static int CompareDirections(Point vec1, Point vec2)
+        {
+            double alpha = AngleBetween(vec1, vec2);
+
+            if (alpha < EPSILON)
+            {
+                return 1;
+            }
+            else if (alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON)
+            {
+                return 2;
+            }
+            else if (Math.Abs(alpha - Math.PI) < EPSILON)
+            {
+                return 3;
+            }
+            return 0;
         }
 
         /// <summary>

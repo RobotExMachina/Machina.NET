@@ -255,6 +255,7 @@ namespace DataTypesTests
         {
             RotationVector rv1, rv2;
             Quaternion q;
+            AxisAngle aa1, aa2;
 
             double x, y, z, angle;
             double len;
@@ -265,7 +266,7 @@ namespace DataTypesTests
                 x = Random(-100, 100);
                 y = Random(-100, 100);
                 z = Random(-100, 100);
-                angle = Random(-720, 720);
+                angle = Random(-1440, 1440);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z + " " + angle);
@@ -273,12 +274,22 @@ namespace DataTypesTests
                 rv1 = new RotationVector(x, y, z, angle);
                 q = rv1.ToQuaternion();
                 rv2 = q.ToRotationVector();
-                Trace.WriteLine(rv1);
-                Trace.WriteLine(q);
-                Trace.WriteLine(rv2);
+                Trace.WriteLine(rv1 + " (" + rv1.ToAxisAngle() + ")");
+                Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
+                Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");
 
-                Assert.IsTrue(rv1 == rv2);
-                Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
+                rv1 = new RotationVector(x, y, z, angle);
+                aa1 = rv1.ToAxisAngle();
+                q = aa1.ToQuaternion();
+                rv2 = q.ToRotationVector();
+                Trace.WriteLine("Itemized:");
+                Trace.WriteLine(rv1 + " (" + rv1.ToAxisAngle() + ")");
+                Trace.WriteLine(aa1);
+                Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
+                Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");
+
+                //Assert.IsTrue(rv1 == rv2);
+                //Assert.AreEqual(angle > 0 ? angle : -angle, rv2.GetAngle(), 0.00001);
             }
 
             // Test all permutations of unitary components (including zero)

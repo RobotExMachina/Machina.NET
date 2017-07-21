@@ -36,7 +36,7 @@ namespace BRobot
         public double Z { get; internal set; }
 
         /// <summary>
-        /// Rotation angle.
+        /// Rotation angle in degrees.
         /// </summary>
         public double Angle { get; internal set; }
 
@@ -71,7 +71,7 @@ namespace BRobot
 
         /// <summary>
         /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
-        /// and the rotation agle in degrees. 
+        /// and the rotation angle in degrees. 
         /// The axis vector will be automatically normalized.
         /// </summary>
         /// <param name="x"></param>
@@ -83,7 +83,7 @@ namespace BRobot
 
         /// <summary>
         /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
-        /// and the rotation agle in degrees. 
+        /// and the rotation angle in degrees. 
         /// The axis vector will be automatically normalized.
         /// </summary>
         /// <param name="axis"></param>
@@ -179,6 +179,63 @@ namespace BRobot
             this.Z *= -1;
             this.Angle *= -1;
         }
+
+        /// <summary>
+        /// Is this rotation equivalent to a given one? 
+        /// Equivalence is defined as rotations around vectors sharing the same axis (including opposite directions)
+        /// and an angle with the same modulated equivalence. This in turn means the same spatial orientation after transformation.
+        /// For example, the following rotations are equivalent:
+        /// [0, 0, 1, 315]
+        /// [0, 0, 1, 675] (one additional turn, same angle)
+        /// [0, 0, 1, -45] (negative rotation, same angle)
+        /// [0, 0, -1, 45] (flipped axis, same angle)
+        /// [0, 0, 10, 315] (same axis and angle, longer vector. note non-unit vectors are not allowed in this AA representation)
+        /// </summary>
+        /// <param name="axisAngle"></param>
+        /// <returns></returns>
+        public bool IsEquivalent(AxisAngle axisAngle)
+        {
+            Point v1 = new Point(this.X, this.Y, this.Z),
+                v2 = new Point(axisAngle.X, axisAngle.Y, axisAngle.Z);
+            int directions = Point.CompareDirections(v1, v2);
+            
+            // If axes are not parallel, they are not equivalent
+            if (directions == 0 || directions == 2)
+            {
+                return false;
+            }
+
+            // Bring all angles to [0, 360]
+            double a1 = this.Angle;
+            while (a1 < 0)
+            {
+                a1 += 360;
+            }
+            a1 %= 360;
+
+            double a2 = axisAngle.Angle;
+            while (a2 < 0)
+            {
+                a2 += 360;
+            }
+            a2 %= 360;
+
+            // If the vectors have the same direction, angles should be module of each other.
+            if (directions == 1)
+            {
+                return Math.Abs(a1 - a2) < EPSILON;
+            }
+
+            // If opposite directions, they should add up to 360 degs.
+            if (directions == 3)
+            {
+                return Math.Abs(a1 + a2 - 360) < EPSILON;
+            }
+
+            return false;  // if here, something went wrong
+        }
+
+
 
         /// <summary>
         /// Returns a unit Quaternion representing this AxisAngle rotation.

@@ -127,6 +127,40 @@ namespace DataTypesTests
             }
         }
 
+        /// <summary>
+        /// Quick manual equivalence tests
+        /// </summary>
+        [TestMethod]
+        public void AxisAngle_Equivalence()
+        {
+            AxisAngle a = new AxisAngle(0, 0, 1, 45);
+            AxisAngle b = new AxisAngle(0, 0, 1, 45 + 360);
+            Trace.WriteLine(a);
+            Trace.WriteLine(b);
+            Assert.IsTrue(a.IsEquivalent(b));
+            Assert.IsTrue(b.IsEquivalent(a));
+
+            b = new AxisAngle(0, 0, 1, 45 - 360);
+            Trace.WriteLine(b);
+            Assert.IsTrue(a.IsEquivalent(b));
+
+            b = new AxisAngle(0, 0, -1, -45);
+            Trace.WriteLine(b);
+            Assert.IsTrue(a.IsEquivalent(b));
+
+            b = new AxisAngle(0, 0, -1, -45 - 360);
+            Trace.WriteLine(b);
+            Assert.IsTrue(a.IsEquivalent(b));
+
+            b = new AxisAngle(0, 0, -1, -45 + 360);
+            Trace.WriteLine(b);
+            Assert.IsTrue(a.IsEquivalent(b));
+
+            b = new AxisAngle(0, 0, 10, 45);
+            Trace.WriteLine(b);
+            Assert.IsTrue(a.IsEquivalent(b));
+        }
+
 
 
         /// <summary>
@@ -354,7 +388,7 @@ namespace DataTypesTests
                 Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
 
                 aa1 = new AxisAngle(x, y, z, angle);
-                q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
+                q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as necessary for spatial rotation representation
                 aa2 = q.ToAxisAngle();
                 Trace.WriteLine(aa1);
                 Trace.WriteLine(q);
