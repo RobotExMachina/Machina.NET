@@ -352,6 +352,69 @@ namespace DataTypesTests
             }
 
         }
-        
+
+        [TestMethod]
+        public void Quaternion_ToRotationMatrix_ToQuaternion()
+        {
+            Quaternion q1, q2;
+            RotationMatrix m;
+
+            double w, x, y, z;
+
+            // Test random quaternions
+            for (var i = 0; i < 100; i++)
+            {
+                w = Random(-1, 1);  // force vector-normalization
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+
+                q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                m = q1.ToRotationMatrix();
+                q2 = m.ToQuaternion();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                Trace.WriteLine(q1);
+                Trace.WriteLine(m);
+                Trace.WriteLine(q2);
+
+                Assert.IsTrue(q1 == q2, "Booo! :(");
+            }
+
+            // Test all permutations of unitary components quaternions (including zero)
+            for (w = -2; w <= 2; w += 0.5)  // test vector + non-vector normalization
+            {
+                for (x = -1; x <= 1; x += 0.5)
+                {
+                    for (y = -1; y <= 1; y += 0.5)
+                    {
+                        for (z = -1; z <= 1; z += 0.5)
+                        {
+                            q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                            m = q1.ToRotationMatrix();
+                            q2 = m.ToQuaternion();
+
+                            Trace.WriteLine("");
+                            Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                            Trace.WriteLine(q1);
+                            Trace.WriteLine(m);
+                            Trace.WriteLine(q2);
+
+                            if (q1.IsIdentity())
+                            {
+                                Assert.IsTrue(q2.IsIdentity());
+                            }
+                            else
+                            {
+                                Assert.IsTrue(q1 == q2, "Booo!");
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

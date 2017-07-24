@@ -72,6 +72,32 @@ namespace BRobot
         /// </summary>
         public double m22 { get { return this.R[8]; } internal set { R[8] = value; } }
 
+        public static bool operator ==(RotationMatrix  m1, RotationMatrix m2)
+        {
+            return Math.Abs(m1.R[0] - m2.R[0]) < EPSILON
+                && Math.Abs(m1.R[1] - m2.R[1]) < EPSILON
+                && Math.Abs(m1.R[2] - m2.R[2]) < EPSILON
+                && Math.Abs(m1.R[3] - m2.R[3]) < EPSILON
+                && Math.Abs(m1.R[4] - m2.R[4]) < EPSILON
+                && Math.Abs(m1.R[5] - m2.R[5]) < EPSILON
+                && Math.Abs(m1.R[6] - m2.R[6]) < EPSILON
+                && Math.Abs(m1.R[7] - m2.R[7]) < EPSILON
+                && Math.Abs(m1.R[8] - m2.R[8]) < EPSILON;
+        }
+
+        public static bool operator !=(RotationMatrix m1, RotationMatrix m2)
+        {
+            return Math.Abs(m1.R[0] - m2.R[0]) > EPSILON
+                || Math.Abs(m1.R[1] - m2.R[1]) > EPSILON
+                || Math.Abs(m1.R[2] - m2.R[2]) > EPSILON
+                || Math.Abs(m1.R[3] - m2.R[3]) > EPSILON
+                || Math.Abs(m1.R[4] - m2.R[4]) > EPSILON
+                || Math.Abs(m1.R[5] - m2.R[5]) > EPSILON
+                || Math.Abs(m1.R[6] - m2.R[6]) > EPSILON
+                || Math.Abs(m1.R[7] - m2.R[7]) > EPSILON
+                || Math.Abs(m1.R[8] - m2.R[8]) > EPSILON;
+        }
+
         /// <summary>
         /// Create a 3x3 identity matrix representing no rotation.
         /// </summary>

@@ -20,13 +20,17 @@
     - [x] Create 3x3 matrix
     - [x] M33 > Q
     - [x] Q > M33
-    - [ ] TESTS
+    - [x] TESTS
+    - [x] M33 > Q > M33
+    - [x] TESTS
+    - [x] M33.Inverse()
+    - [x] M33.Transpose()
+    - [x] Orthogonality checks on creation of a M33
     - [ ] Q > M33 > Q
-    - [ ] M33 > Q > M33
-    - [ ] TESTS
-    - [ ] M33.Inverse()
-    - [ ] M33.Transpose()
-    - [ ] Orthogonality checks on creation of a M33
+    - [ ] M33 > AA
+    - [ ] AA > M33
+    - [ ] M33 > RV
+    - [ ] RV > M33
 
 
 ## BUILD 1206

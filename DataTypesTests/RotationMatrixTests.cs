@@ -137,7 +137,7 @@ namespace DataTypesTests
         }
 
         [TestMethod]
-        public void RotationMatrix_ToQuaternionConversion_CompareToNumericsLibrary()
+        public void RotationMatrix_ToQuaternion_CompareToNumericsLibrary()
         {
             RotationMatrix m;
             Quaternion q;
@@ -181,18 +181,21 @@ namespace DataTypesTests
                 Trace.WriteLine(sq);
                 Trace.WriteLine(m44bis);
 
-                //Assert.IsTrue(Math.Abs(q.W - sq.W) < 0.000001);
-                //Assert.IsTrue(Math.Abs(q.X - sq.X) < 0.000001);
-                //Assert.IsTrue(Math.Abs(q.Y - sq.Y) < 0.000001);
-                //Assert.IsTrue(Math.Abs(q.Z - sq.Z) < 0.000001);
                 Assert.IsTrue(q.IsEquivalent(new Quaternion(sq.W, sq.X, sq.Y, sq.Z)), "Quaternions are not equivalent!");
-
             }
         }
 
 
         // @TODO: design a test with matrices with very low traces...
+        [TestMethod]
+        public void RotationMatrix_ToQuaternion_LowTrace()
+        {
+            RotationMatrix m = new RotationMatrix(new Point(0, 1, 0), new Point(-1, 0, 0));
+            Quaternion q = m.ToQuaternion();
+            RotationMatrix m1 = q.ToRotationMatrix();
 
+            Assert.IsTrue(m == m1);
+        }
 
 
         [TestMethod]
@@ -205,7 +208,7 @@ namespace DataTypesTests
 
             double[] r = new double[9];
 
-            for (var i = 0; i < 50; i++)
+            for (var i = 0; i < 100; i++)
             {
                 vecX = Point.RandomFromDoubles(-100, 100);
                 vecY = Point.RandomFromDoubles(-100, 100);
@@ -221,6 +224,7 @@ namespace DataTypesTests
                 Trace.WriteLine(q);
                 Trace.WriteLine(m2);
 
+                Assert.IsTrue(m1 == m2);
             }
         }
     }
