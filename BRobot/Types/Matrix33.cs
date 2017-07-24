@@ -73,6 +73,17 @@ namespace BRobot
         public double m22 { get { return this.R[8]; } internal set { R[8] = value; } }
 
         /// <summary>
+        /// Create a 3x3 identity matrix representing no rotation.
+        /// </summary>
+        public Matrix33()
+        {
+            R = new double[9];
+            this.R[0] = 1;
+            this.R[4] = 1;
+            this.R[8] = 1;
+        }
+
+        /// <summary>
         /// Create a 3x3 Rotation Matrix from it's constituent components. 
         /// Elements of the rotation matrix, ordered in row to column way, 
         /// i.e. r[2] is r13 (row 1 col 3), r[6] is r31, etc. 
@@ -211,15 +222,12 @@ namespace BRobot
             return false;
         }
 
+        /// <summary>
+        /// Returns the determinant of this Matrix.
+        /// </summary>
+        /// <returns></returns>
         public double Determinant()
         {
-            //return m00 * m11 * m22
-            //    + m01 * m12 * m20
-            //    + m02 * m10 * m21
-            //    - m00 * m12 * m21
-            //    - m01 * m10 * m22
-            //    - m02 * m11 * m20;
-
             return R[0] * R[4] * R[8]
                 + R[1] * R[5] * R[6]
                 + R[2] * R[3] * R[7]
@@ -228,6 +236,46 @@ namespace BRobot
                 - R[2] * R[4] * R[6];
         }
 
+        /// <summary>
+        /// Transposes this Matrix.
+        /// </summary>
+        public void Transpose()
+        {
+            double old01 = R[1],
+                old02 = R[2],
+                old12 = R[5];
+
+            this.R[1] = R[3];
+            this.R[2] = R[6];
+            this.R[5] = R[7];
+
+            this.R[3] = old01;
+            this.R[6] = old02;
+            this.R[7] = old12;
+        }
+
+        /// <summary>
+        /// Multiplies two rotation matrices.
+        /// </summary>
+        /// <param name="m1"></param>
+        /// <param name="m2"></param>
+        /// <returns></returns>
+        public static Matrix33 Multiply(Matrix33 m1, Matrix33 m2)
+        {
+            Matrix33 m = new Matrix33();
+
+            m.R[0] = m1.R[0] * m2.R[0] + m1.R[1] * m2.R[3] + m1.R[2] * m2.R[6];
+            m.R[1] = m1.R[0] * m2.R[1] + m1.R[1] * m2.R[4] + m1.R[2] * m2.R[7];
+            m.R[2] = m1.R[0] * m2.R[2] + m1.R[1] * m2.R[5] + m1.R[2] * m2.R[8];
+            m.R[3] = m1.R[3] * m2.R[0] + m1.R[4] * m2.R[3] + m1.R[5] * m2.R[6];
+            m.R[4] = m1.R[3] * m2.R[1] + m1.R[4] * m2.R[4] + m1.R[5] * m2.R[7];
+            m.R[5] = m1.R[3] * m2.R[2] + m1.R[4] * m2.R[5] + m1.R[5] * m2.R[8];
+            m.R[6] = m1.R[6] * m2.R[0] + m1.R[7] * m2.R[3] + m1.R[8] * m2.R[6];
+            m.R[7] = m1.R[6] * m2.R[1] + m1.R[7] * m2.R[4] + m1.R[8] * m2.R[7];
+            m.R[8] = m1.R[6] * m2.R[2] + m1.R[7] * m2.R[5] + m1.R[8] * m2.R[8];
+
+            return m;
+        }
 
         /// <summary>
         /// Returns a Quaternion representing the same rotation as this Matrix.
@@ -235,7 +283,8 @@ namespace BRobot
         /// <returns></returns>
         public Quaternion ToQuaternion()
         {
-            // This conversion assumes the rotation matrix is special orthogonal 
+            // This conversion assumes the rotation matrix is special orthogonal .
+            // As a result, the returned Quaternion will be a versor.
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
             double trace = m00 + m11 + m22;
             Quaternion q = new Quaternion();
