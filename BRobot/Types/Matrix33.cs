@@ -76,6 +76,7 @@ namespace BRobot
         /// Create a 3x3 Rotation Matrix from it's constituent components. 
         /// Elements of the rotation matrix, ordered in row to column way, 
         /// i.e. r[2] is r13 (row 1 col 3), r[6] is r31, etc. 
+        /// This Matrix will be reorthogonalized if necessary.
         /// </summary>
         /// <param name="r00"></param>
         /// <param name="r01"></param>
@@ -90,17 +91,9 @@ namespace BRobot
                         double r10, double r11, double r12,
                         double r20, double r21, double r22)
         {
-            R = new double[9];
-
-            this.R[0] = r00;
-            this.R[1] = r01;
-            this.R[2] = r02;
-            this.R[3] = r10;
-            this.R[4] = r11;
-            this.R[5] = r12;
-            this.R[6] = r20;
-            this.R[7] = r21;
-            this.R[8] = r22;
+            this.Initialize(r00, r01, r02,
+                            r10, r11, r12,
+                            r20, r21, r22, true);
         }
 
         /// <summary>
@@ -141,10 +134,83 @@ namespace BRobot
             }
         }
 
-        //public bool IsOrthogonal()
-        //{
+        public Matrix33(Point vecX, Point vecY)
+        {
+            // Some sanity
+            int dir = Point.CompareDirections(vecX, vecY);
 
-        //}
+            if (dir == 1 || dir == 3)
+            {
+                throw new Exception("Cannot create a Rotation Matrix with two parallel vectors");
+            }
+
+            Point XAxis, YAxis, ZAxis;
+
+            // Create unit X axis
+            XAxis = new Point(vecX);
+            XAxis.Normalize();
+
+            // Find normal vector to plane
+            ZAxis = Point.CrossProduct(vecX, vecY);
+            ZAxis.Normalize();
+
+            // Y axis is the cross product of both
+            YAxis = Point.CrossProduct(ZAxis, XAxis);
+
+            // Initialize the Matrix
+            this.Initialize(XAxis.X, YAxis.X, ZAxis.X,
+                            XAxis.Y, YAxis.Y, ZAxis.Y,
+                            XAxis.Z, YAxis.Z, ZAxis.Z, false);
+        }
+
+
+        /// <summary>
+        /// An internal initializator to start this matrix from its components. 
+        /// The method allows for optional re-orthogonalization of this Matrix.
+        /// </summary>
+        /// <param name="r00"></param>
+        /// <param name="r01"></param>
+        /// <param name="r02"></param>
+        /// <param name="r10"></param>
+        /// <param name="r11"></param>
+        /// <param name="r12"></param>
+        /// <param name="r20"></param>
+        /// <param name="r21"></param>
+        /// <param name="r22"></param>
+        internal void Initialize(double r00, double r01, double r02,
+                                    double r10, double r11, double r12,
+                                    double r20, double r21, double r22, bool orthonogonalize)
+        {
+            R = new double[9];
+
+            this.R[0] = r00;
+            this.R[1] = r01;
+            this.R[2] = r02;
+            this.R[3] = r10;
+            this.R[4] = r11;
+            this.R[5] = r12;
+            this.R[6] = r20;
+            this.R[7] = r21;
+            this.R[8] = r22;
+
+            if (orthonogonalize)
+            {
+                this.Orthogonalize();
+            }
+        }
+        
+        public bool Orthogonalize()
+        {
+            //@TODOL: implement!
+            return false;
+        }
+
+        public bool IsOrthogonal()
+        {
+            // @TODO: implement!
+            return false;
+        }
+
 
         /// <summary>
         /// Returns a Quaternion representing the same rotation as this Matrix.
@@ -201,7 +267,19 @@ namespace BRobot
             return q;
         }
 
-
+        public override string ToString()
+        {
+            return string.Format("RotationMatrix[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
+                Math.Round(m00, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m01, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m02, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m10, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m11, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m12, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m20, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m21, STRING_ROUND_DECIMALS_MM),
+                Math.Round(m22, STRING_ROUND_DECIMALS_MM));
+        }
 
     }
 }
