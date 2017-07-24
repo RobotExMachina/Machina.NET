@@ -211,6 +211,23 @@ namespace BRobot
             return false;
         }
 
+        public double Determinant()
+        {
+            //return m00 * m11 * m22
+            //    + m01 * m12 * m20
+            //    + m02 * m10 * m21
+            //    - m00 * m12 * m21
+            //    - m01 * m10 * m22
+            //    - m02 * m11 * m20;
+
+            return R[0] * R[4] * R[8]
+                + R[1] * R[5] * R[6]
+                + R[2] * R[3] * R[7]
+                - R[0] * R[5] * R[7]
+                - R[1] * R[3] * R[8]
+                - R[2] * R[4] * R[6];
+        }
+
 
         /// <summary>
         /// Returns a Quaternion representing the same rotation as this Matrix.
