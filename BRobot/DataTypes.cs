@@ -427,8 +427,12 @@ namespace BRobot
             // A · B = ||A|| * ||B|| * cos(ang);
             double lens = p1.Length() * p2.Length();
 
+            // Why was I returning 90 degs...? 
+            //if (lens < EPSILON)
+            //    return 0.5 * Math.PI;
+
             if (lens < EPSILON)
-                return 0.5 * Math.PI;
+                return 0;  // should convert to nullable "double?" ? 
             
             double div = DotProduct(p1, p2) / lens;
             
@@ -540,7 +544,7 @@ namespace BRobot
         /// </summary>
         /// <param name="vec1"></param>
         /// <param name="vec2"></param>
-        /// <returns>1 if parallel (same direction), 2 if orthogonal (perpendicular
+        /// <returns>1 if parallel (same direction), 2 if orthogonal (perpendicularr
         /// directions), 3 if opposite (parallel in opposite directions), 
         /// 0 otherwise</returns>
         public static int CompareDirections(Point vec1, Point vec2)
@@ -569,9 +573,14 @@ namespace BRobot
         /// <param name="min"></param>
         /// <param name="max"></param>
         /// <returns></returns>
-        public static Point RandomDouble(double min, double max)
+        public static Point RandomFromDoubles(double min, double max)
         {
             return new BRobot.Point(Random(min, max), Random(min, max), Random(min, max));
+        }
+
+        public static Point RandomFromInts(int min, int max)
+        {
+            return new BRobot.Point(RandomInt(min, max), RandomInt(min, max), RandomInt(min, max));
         }
 
         /// <summary>

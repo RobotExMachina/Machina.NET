@@ -146,31 +146,10 @@ namespace BRobot
         /// <param name="vecY"></param>
         public RotationMatrix(Point vecX, Point vecY)
         {
-            // Some sanity
-            int dir = Point.CompareDirections(vecX, vecY);
-
-            if (dir == 1 || dir == 3)
-            {
-                throw new Exception("Cannot create a Rotation Matrix with two parallel vectors");
-            }
-
-            Point XAxis, YAxis, ZAxis;
-
-            // Create unit X axis
-            XAxis = new Point(vecX);
-            XAxis.Normalize();
-
-            // Find normal vector to plane
-            ZAxis = Point.CrossProduct(vecX, vecY);
-            ZAxis.Normalize();
-
-            // Y axis is the cross product of both
-            YAxis = Point.CrossProduct(ZAxis, XAxis);
-
-            // Initialize the Matrix
-            this.Initialize(XAxis.X, YAxis.X, ZAxis.X,
-                            XAxis.Y, YAxis.Y, ZAxis.Y,
-                            XAxis.Z, YAxis.Z, ZAxis.Z, false);
+            // Rely on internal orthoginalization to correctly form this matrix
+            this.Initialize(vecX.X, vecY.X, 0,
+                            vecX.Y, vecY.Y, 0,
+                            vecX.Z, vecY.Z, 1, true);
         }
 
 
@@ -254,7 +233,9 @@ namespace BRobot
             int dir = Point.CompareDirections(vecX, vecY);
             if (dir == 1 || dir == 3)
             {
-                throw new Exception("Cannot orthogonalize a Matrix with X & Y parallel vectors");
+                Console.WriteLine("Cannot orthogonalize a Matrix with X & Y parallel vectors");
+                this.Identity();
+                return false;
             }
 
             // Create unit X axis
@@ -351,6 +332,16 @@ namespace BRobot
             R[8] = (a11* a00 - a01* a10) * det;
 
             return true;
+        }
+
+        /// <summary>
+        /// Turn this into an indentity matrix, representing no transformation. 
+        /// </summary>
+        public void Identity()
+        {
+            R[0] = 1; R[1] = 0; R[2] = 0;
+            R[3] = 0; R[4] = 1; R[5] = 0;
+            R[6] = 0; R[7] = 0; R[8] = 1;
         }
 
         /// <summary>
