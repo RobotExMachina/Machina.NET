@@ -141,41 +141,87 @@ namespace DataTypesTests
         {
             RotationMatrix m;
             Quaternion q;
-            SysMatrix44 m44;
+            SysMatrix44 m44, m44bis;
             SysQuat sq;
             Point vecX, vecY;
+            int dir;
+
+            int runs = 500;
+            for (var i = 0; i < runs; i++)
+            {
+                if (i < 0.5 * runs)
+                {
+                    vecX = Point.RandomFromDoubles(-100, 100);
+                    vecY = Point.RandomFromDoubles(-100, 100);
+                }
+                else
+                {
+                    vecX = Point.RandomFromInts(-1, 1);
+                    vecY = Point.RandomFromInts(-1, 1);
+                }
+                
+                dir = Point.CompareDirections(vecX, vecY);
+                m = new RotationMatrix(vecX, vecY);
+                q = m.ToQuaternion();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
+                Trace.WriteLine(m);
+                Trace.WriteLine(q);
+
+                // Use the matrix's orthogonal values to create a M44 matrix with just rotation values:
+                m44 = new SysMatrix44((float)m.m00, (float)m.m01, (float)m.m02, 0,
+                                        (float)m.m10, (float)m.m11, (float)m.m12, 0,
+                                        (float)m.m20, (float)m.m21, (float)m.m22, 0,
+                                        0, 0, 0, 1);
+                m44 = SysMatrix44.Transpose(m44);  // Numerics.Matrix4x4 uses a transposed convention, meaning the translation vector is horizontal in m41-42-43 instead of vertical in m14-24-34
+                sq = SysQuat.CreateFromRotationMatrix(m44);
+                m44bis = SysMatrix44.CreateFromQuaternion(sq);
+                Trace.WriteLine(m44);
+                Trace.WriteLine(sq);
+                Trace.WriteLine(m44bis);
+
+                //Assert.IsTrue(Math.Abs(q.W - sq.W) < 0.000001);
+                //Assert.IsTrue(Math.Abs(q.X - sq.X) < 0.000001);
+                //Assert.IsTrue(Math.Abs(q.Y - sq.Y) < 0.000001);
+                //Assert.IsTrue(Math.Abs(q.Z - sq.Z) < 0.000001);
+                Assert.IsTrue(q.IsEquivalent(new Quaternion(sq.W, sq.X, sq.Y, sq.Z)), "Quaternions are not equivalent!");
+
+            }
+        }
+
+
+        // @TODO: design a test with matrices with very low traces...
+
+
+
+        [TestMethod]
+        public void RotationMatrix_ToQuaternion_ToRotationMatrix()
+        {
+            RotationMatrix m1, m2;
+            Quaternion q;
+            Point vecX, vecY;
+            int dir;
+
+            double[] r = new double[9];
 
             for (var i = 0; i < 50; i++)
             {
                 vecX = Point.RandomFromDoubles(-100, 100);
                 vecY = Point.RandomFromDoubles(-100, 100);
-                m = new RotationMatrix(vecX, vecY);
-                q = m.ToQuaternion();
+                dir = Point.CompareDirections(vecX, vecY);
 
+                m1 = new RotationMatrix(vecX, vecY);
+                q = m1.ToQuaternion();
+                m2 = q.ToRotationMatrix();
 
+                Trace.WriteLine("");
+                Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
+                Trace.WriteLine(m1);
+                Trace.WriteLine(q);
+                Trace.WriteLine(m2);
 
             }
         }
-
-        //public void RotationMatrix_ToQuaternion_ToRotationMatrix()
-        //{
-        //    RotationMatrix m1, m2;
-        //    Quaternion q;
-
-        //    double[] r = new double[9];
-
-        //    for (var i = 0; i < 50; i++)
-        //    {
-        //        for (int j = 0; j < 9; j++)
-        //        {
-        //            r[j] = Random(-100, 100);
-        //        }
-
-        //        m1 = new RotationMatrix(r);
-
-
-        //    }
-
-        //}
     }
 }

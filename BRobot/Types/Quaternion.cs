@@ -90,6 +90,29 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Returns the Quaternion reulting of scaling Q by a scalar.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="factor"></param>
+        /// <returns></returns>
+        public static Quaternion operator *(Quaternion q, double factor)
+        {
+            return Quaternion.Scale(q, factor);
+        }
+        public static Quaternion operator *(double factor, Quaternion q)
+        {
+            return Quaternion.Scale(q, factor);
+        }
+        public static Quaternion operator *(Quaternion q, int factor)
+        {
+            return Quaternion.Scale(q, factor);
+        }
+        public static Quaternion operator *(int factor, Quaternion q)
+        {
+            return Quaternion.Scale(q, factor);
+        }
+
+        /// <summary>
         /// Inequality operator.
         /// </summary>
         /// <param name="q1"></param>
@@ -309,7 +332,7 @@ namespace BRobot
                 pos = this.Y >= 0;
 
                 xy = this.X / this.Y;
-                zy = this.Y / this.Y;
+                zy = this.Z / this.Y;
 
                 this.Y = Math.Sqrt((1 - this.W * this.W) / (xy * xy + 1 + zy * zy)) * (pos ? 1 : -1);
                 this.X = xy * this.Y;
@@ -434,6 +457,28 @@ namespace BRobot
                 && Math.Abs(this.Z) < EPSILON;
         }
 
+        public bool IsEquivalent(Quaternion other)
+        {
+            // Assuming this Quaternion is normalized, but the other may not:
+            Quaternion qn = new Quaternion(other);  // this constructor already normalizes the q
+
+            // A Quaternion multiplied by any real number represents an equivalent rotation.
+            // Numerically, and because both quaternions are unit, they are equivalent if 
+            // the addition or subtraction of the sum of their components is zero.
+            double sumQ = this.Sum();
+            double sumQn = qn.Sum();
+            return (Math.Abs(sumQ + sumQn) < EPSILON || Math.Abs(sumQn - sumQ) < EPSILON);
+        }
+
+        /// <summary>
+        /// Return the simple sum of the scalar and vector components.
+        /// </summary>
+        /// <returns></returns>
+        internal double Sum()
+        {
+            return this.W + this.X + this.Y + this.Z;
+        }
+
         /// <summary>
         /// Add a Quaternion to this one. 
         /// </summary>
@@ -545,6 +590,31 @@ namespace BRobot
             double z = q1.Z * q2.W + q1.W * q2.Z + q1.X * q2.Y - q1.Y * q2.X;
 
             return new Quaternion(w, x, y, z);
+        }
+
+        /// <summary>
+        /// Multiply this Quaternion by a scalar.
+        /// </summary>
+        /// <param name="factor"></param>
+        public void Scale(double factor)
+        {
+            this.W *= factor;
+            this.X *= factor;
+            this.Y *= factor;
+            this.Z *= factor;
+        }
+
+        /// <summary>
+        /// Returns a new Quaternion equal to the original multiplied by a factor.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="factor"></param>
+        /// <returns></returns>
+        public static Quaternion Scale(Quaternion q, double factor)
+        {
+            Quaternion qScaled = new Quaternion(q);
+            q.Scale(factor);
+            return qScaled;
         }
 
         /// <summary>
