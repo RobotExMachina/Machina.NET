@@ -643,7 +643,7 @@ namespace BRobot
         /// Returns a 3x3 Rotation Matrix representing this Quaternion's rotation. 
         /// </summary>
         /// <returns></returns>
-        public Matrix33 ToRotationMatrix()
+        public RotationMatrix ToRotationMatrix()
         {
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
             double xx2 = 2 * this.X * this.X,
@@ -657,7 +657,7 @@ namespace BRobot
                 zw2 = 2 * this.Z * this.W,
                 ww2 = 2 * this.W * this.W;
 
-            return new Matrix33(1 - yy2 - zz2, xy2 - zw2, xz2 + yw2,
+            return new RotationMatrix(1 - yy2 - zz2, xy2 - zw2, xz2 + yw2,
                                 xy2 + zw2, 1 - xx2 - zz2, yz2 - xw2,
                                 xz2 - yw2, yz2 + xw2, 1 - xx2 - yy2);
         }

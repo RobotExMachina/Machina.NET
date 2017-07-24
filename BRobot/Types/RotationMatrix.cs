@@ -18,7 +18,7 @@ namespace BRobot
     /// <summary>
     /// A class representing a 3x3 rotation matrix
     /// </summary>
-    public class Matrix33 : Geometry
+    public class RotationMatrix : Geometry
     {
         /// <summary>
         /// Elements of the rotation matrix, ordered in row to column way, 
@@ -75,7 +75,7 @@ namespace BRobot
         /// <summary>
         /// Create a 3x3 identity matrix representing no rotation.
         /// </summary>
-        public Matrix33()
+        public RotationMatrix()
         {
             R = new double[9];
             this.R[0] = 1;
@@ -98,7 +98,7 @@ namespace BRobot
         /// <param name="r20"></param>
         /// <param name="r21"></param>
         /// <param name="r22"></param>
-        public Matrix33(double r00, double r01, double r02,
+        public RotationMatrix(double r00, double r01, double r02,
                         double r10, double r11, double r12,
                         double r20, double r21, double r22)
         {
@@ -113,7 +113,7 @@ namespace BRobot
         /// i.e. r[2] is r13 (row 1 col 3), r[6] is r31, etc. 
         /// </summary>
         /// <param name="rotationValues"></param>
-        public Matrix33(double[] rotationValues)
+        public RotationMatrix(double[] rotationValues)
         {
             R = new double[9];
 
@@ -134,7 +134,7 @@ namespace BRobot
         /// Create a 3x3 Rotation Matrix as a shallow copy of another.
         /// </summary>
         /// <param name="rotationMatrix"></param>
-        public Matrix33(Matrix33 rotationMatrix)
+        public RotationMatrix(RotationMatrix rotationMatrix)
         {
             R = new double[9];
 
@@ -145,7 +145,7 @@ namespace BRobot
             }
         }
 
-        public Matrix33(Point vecX, Point vecY)
+        public RotationMatrix(Point vecX, Point vecY)
         {
             // Some sanity
             int dir = Point.CompareDirections(vecX, vecY);
@@ -232,9 +232,9 @@ namespace BRobot
             // (the matrix multiplied by its transpose yields the identity matrix)
             // As a consequence, it also holds that the transpose of an orthogonal matrix equals its inverse:
             // Qt = Q^-1
-            Matrix33 t = new Matrix33(this);
+            RotationMatrix t = new RotationMatrix(this);
             t.Transpose();
-            Matrix33 ident = Matrix33.Multiply(this, t);
+            RotationMatrix ident = RotationMatrix.Multiply(this, t);
             return ident.IsIdentity();
         }
 
@@ -360,9 +360,9 @@ namespace BRobot
         /// <param name="m1"></param>
         /// <param name="m2"></param>
         /// <returns></returns>
-        public static Matrix33 Multiply(Matrix33 m1, Matrix33 m2)
+        public static RotationMatrix Multiply(RotationMatrix m1, RotationMatrix m2)
         {
-            Matrix33 m = new Matrix33();
+            RotationMatrix m = new RotationMatrix();
 
             m.R[0] = m1.R[0] * m2.R[0] + m1.R[1] * m2.R[3] + m1.R[2] * m2.R[6];
             m.R[1] = m1.R[0] * m2.R[1] + m1.R[1] * m2.R[4] + m1.R[2] * m2.R[7];
