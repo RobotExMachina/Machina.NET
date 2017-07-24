@@ -216,21 +216,63 @@ namespace BRobot
         /// <returns></returns>
         public bool IsIdentity()
         {
-            return R[0] == 1 && R[1] == 0 && R[2] == 0
-                && R[3] == 0 && R[4] == 1 && R[5] == 0
-                && R[6] == 0 && R[7] == 0 && R[8] == 1;
+            return Math.Abs(R[0] - 1) < EPSILON && Math.Abs(R[1]) < EPSILON && Math.Abs(R[2]) < EPSILON
+                && Math.Abs(R[3]) < EPSILON && Math.Abs(R[4] - 1) < EPSILON && Math.Abs(R[5]) < EPSILON
+                && Math.Abs(R[6]) < EPSILON && Math.Abs(R[7]) < EPSILON && Math.Abs(R[8] - 1) < EPSILON;
         }
 
-        
+        /// <summary>
+        /// Is this 
+        /// </summary>
+        /// <returns></returns>
         public bool IsOrthogonal()
         {
-            // @TODO: implement!
-            return false;
+            // Orthogonal matrices satisfy that:
+            // Q * Qt = Qt * Q = I;  
+            // (the matrix multiplied by its transpose yields the identity matrix)
+            // As a consequence, it also holds that the transpose of an orthogonal matrix equals its inverse:
+            // Qt = Q^-1
+            Matrix33 t = new Matrix33(this);
+            t.Transpose();
+            Matrix33 ident = Matrix33.Multiply(this, t);
+            return ident.IsIdentity();
         }
 
+        /// <summary>
+        /// Force the orthogonalization of this matrix.
+        /// </summary>
+        /// <returns></returns>
         public bool Orthogonalize()
         {
-            //@TODOL: implement!
+            // This algorithm will orthogonalize this matrix by
+            // maintaining the main X direction and XY plane, 
+            // and recomputing the Y and Z axes to comply with this condition.
+            Point vecX = new Point(R[0], R[3], R[6]),
+                vecY = new Point(R[1], R[4], R[7]),
+                vecZ;
+
+            // Some sanity
+            int dir = Point.CompareDirections(vecX, vecY);
+            if (dir == 1 || dir == 3)
+            {
+                throw new Exception("Cannot orthogonalize a Matrix with X & Y parallel vectors");
+            }
+
+            // Create unit X axis
+            vecX.Normalize();
+
+            // Find normal vector to plane
+            vecZ = Point.CrossProduct(vecX, vecY);
+            vecZ.Normalize();
+
+            // Y axis is the cross product of both
+            vecY = Point.CrossProduct(vecZ, vecX);
+
+            // Initialize the Matrix
+            this.Initialize(vecX.X, vecY.X, vecZ.X,
+                            vecX.Y, vecY.Y, vecZ.Y,
+                            vecX.Z, vecY.Z, vecZ.Z, false);
+
             return false;
         }
 
@@ -273,6 +315,14 @@ namespace BRobot
         /// <returns></returns>
         public bool Invert()
         {
+            // If this matrix is orthogonal (which it should be if it represents a rotation),
+            // its transpose is equal to its inverse (saving a lot of calculation?)
+            if (this.IsOrthogonal())
+            {
+                this.Transpose();
+                return true;
+            }
+
             // From glmatrix.js: https://github.com/toji/gl-matrix/blob/master/src/gl-matrix/mat3.js
             double a00 = R[0], a01 = R[1], a02 = R[2];
             double a10 = R[3], a11 = R[4], a12 = R[5];
