@@ -57,6 +57,7 @@
     <Compile Include="PointTests.cs" />
     <Compile Include="QuaternionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RotationMatrixTests.cs" />
     <Compile Include="RotationVectorTests.cs" />
   </ItemGroup>
   <ItemGroup>

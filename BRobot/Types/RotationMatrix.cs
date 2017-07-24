@@ -115,19 +115,14 @@ namespace BRobot
         /// <param name="rotationValues"></param>
         public RotationMatrix(double[] rotationValues)
         {
-            R = new double[9];
-
-            int i;
-            for (i = 0; i < rotationValues.Length || i < 9; i++)
+            if (rotationValues.Length < 9)
             {
-                R[i] = rotationValues[i];
-            } 
-
-            // If rotationValues had less than 9 elements
-            while (i < 9)
-            {
-                R[i++] = 0;
+                throw new Exception("Need an array of at least 9 values to create a RotationMatrix");
             }
+
+            this.Initialize(rotationValues[0], rotationValues[1], rotationValues[2],
+                            rotationValues[3], rotationValues[4], rotationValues[5],
+                            rotationValues[6], rotationValues[7], rotationValues[8], true);  // we don't know where these values came from, orthogonalize them
         }
 
         /// <summary>
@@ -136,15 +131,19 @@ namespace BRobot
         /// <param name="rotationMatrix"></param>
         public RotationMatrix(RotationMatrix rotationMatrix)
         {
-            R = new double[9];
-
-            // Make a shallow copy
-            for (var i = 0; i < 9; i++)
-            {
-                R[i] = rotationMatrix.R[i];
-            }
+            this.Initialize(rotationMatrix.R[0], rotationMatrix.R[1], rotationMatrix.R[2],
+                            rotationMatrix.R[3], rotationMatrix.R[4], rotationMatrix.R[5],
+                            rotationMatrix.R[6], rotationMatrix.R[7], rotationMatrix.R[8], false);  // let's assume the RotationMatrix was already orthogonal... 
         }
 
+        /// <summary>
+        /// Create a RotationMatrix from two Vectors. 
+        /// This constructor will create the best-fit orthogonal 3x3 matrix 
+        /// respecting the direction of the X vector and the plane formed with the Y vector. 
+        /// The Z vector will be normal to this planes, and all vectors will be unitized. 
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
         public RotationMatrix(Point vecX, Point vecY)
         {
             // Some sanity

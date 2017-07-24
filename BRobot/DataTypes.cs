@@ -69,6 +69,45 @@ namespace BRobot
             newZ = z / len;
         }
 
+        internal static Random rnd = new System.Random();
+
+        public static double Random(double min, double max)
+        {
+            return Lerp(min, max, rnd.NextDouble());
+        }
+
+        public static double Random()
+        {
+            return Random(0, 1);
+        }
+
+        public static double Random(double max)
+        {
+            return Random(0, max);
+        }
+
+        public static int RandomInt(int min, int max)
+        {
+            return rnd.Next(min, max + 1);
+        }
+
+        public static double Lerp(double start, double end, double norm)
+        {
+            return start + (end - start) * norm;
+        }
+
+        public static double Normalize(double value, double start, double end)
+        {
+            return (value - start) / (end - start);
+        }
+
+        public static double Map(double value, double sourceStart, double sourceEnd, double targetStart, double targetEnd)
+        {
+            //double n = Normalize(value, sourceStart, sourceEnd);
+            //return targetStart + n * (targetEnd - targetStart);
+            return targetStart + (targetEnd - targetStart) * (value - sourceStart) / (sourceEnd - sourceStart);
+        }
+
 
     }
 
@@ -521,6 +560,18 @@ namespace BRobot
                 return 3;
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Returns a random Point with coordinates between specified double ranges. 
+        /// Useful for testing and debugging.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static Point RandomDouble(double min, double max)
+        {
+            return new BRobot.Point(Random(min, max), Random(min, max), Random(min, max));
         }
 
         /// <summary>
