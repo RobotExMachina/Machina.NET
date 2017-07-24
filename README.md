@@ -10,8 +10,8 @@ As of v0.2.3, BRobot works for the following robotic arms in different degrees o
 
 ```text
 ABB:    [=========  ]  (tested offline, wip online)
-UR:     [=====      ]  (pseudo-tested offline)
 KUKA:   [==         ]  (untested offline, wanna try?)
+UR:     [=====      ]  (pseudo-tested offline)
 ```
 
 

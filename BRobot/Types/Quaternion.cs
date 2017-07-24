@@ -104,6 +104,12 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Create an identity Quaternion representing no rotation.
+        /// </summary>
+        public Quaternion()
+            : this(1, 0, 0, 0, false) { }
+
+        /// <summary>
         /// Create a Quaternion from its components: w + x * i + y * j + z * k
         /// For quaternions to be used as valid representations of spatial rotations, 
         /// they need to be versors (unit quaternions). This constructor will automatically
@@ -630,6 +636,30 @@ namespace BRobot
 
             double s = Math.Sin(0.5 * theta2);
             return new RotationVector(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, true);
+        }
+
+
+        /// <summary>
+        /// Returns a 3x3 Rotation Matrix representing this Quaternion's rotation. 
+        /// </summary>
+        /// <returns></returns>
+        public Matrix33 ToRotationMatrix()
+        {
+            // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
+            double xx2 = 2 * this.X * this.X,
+                xy2 = 2 * this.X * this.Y,
+                xz2 = 2 * this.X * this.Z,
+                xw2 = 2 * this.X * this.W,
+                yy2 = 2 * this.Y * this.Y,
+                yz2 = 2 * this.Y * this.Z,
+                yw2 = 2 * this.Y * this.W,
+                zz2 = 2 * this.Z * this.Z,
+                zw2 = 2 * this.Z * this.W,
+                ww2 = 2 * this.W * this.W;
+
+            return new Matrix33(1 - yy2 - zz2, xy2 - zw2, xz2 + yw2,
+                                xy2 + zw2, 1 - xx2 - zz2, yz2 - xw2,
+                                xz2 - yw2, yz2 + xw2, 1 - xx2 - yy2);
         }
 
 

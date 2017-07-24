@@ -14,6 +14,21 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+
+## BUILD 1207
+- [ ] ROTATIONMATRIX
+    - [x] Create 3x3 matrix
+    - [x] M33 > Q
+    - [x] Q > M33
+    - [ ] TESTS
+    - [ ] Q > M33 > Q
+    - [ ] M33 > Q > M33
+    - [ ] TESTS
+    - [ ] M33.Inverse()
+    - [ ] M33.Transpose()
+    - [ ] Orthogonality checks on creation of a M33
+
+
 ## BUILD 1206
 - [x] ROTATIONVECTOR
     - [x] Simple conversion from AxisAngle

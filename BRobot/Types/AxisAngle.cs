@@ -15,7 +15,7 @@ namespace BRobot
     //                                                                        
 
     /// <summary>
-    /// A class representing a spatial otation as an Axis-Angle:
+    /// A class representing a spatial rotation as an Axis-Angle:
     /// an unit axis vector and the rotation angle.
     /// </summary>
     public class AxisAngle : Geometry
