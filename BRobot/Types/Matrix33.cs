@@ -210,15 +210,27 @@ namespace BRobot
             }
         }
         
-        public bool Orthogonalize()
+        /// <summary>
+        /// Is this an identity matrix?
+        /// </summary>
+        /// <returns></returns>
+        public bool IsIdentity()
         {
-            //@TODOL: implement!
-            return false;
+            return R[0] == 1 && R[1] == 0 && R[2] == 0
+                && R[3] == 0 && R[4] == 1 && R[5] == 0
+                && R[6] == 0 && R[7] == 0 && R[8] == 1;
         }
 
+        
         public bool IsOrthogonal()
         {
             // @TODO: implement!
+            return false;
+        }
+
+        public bool Orthogonalize()
+        {
+            //@TODOL: implement!
             return false;
         }
 
@@ -252,6 +264,44 @@ namespace BRobot
             this.R[3] = old01;
             this.R[6] = old02;
             this.R[7] = old12;
+        }
+
+        /// <summary>
+        /// Inverts this Matrix.
+        /// Returns false if the Matrix could not be inverted (singular matrix). 
+        /// </summary>
+        /// <returns></returns>
+        public bool Invert()
+        {
+            // From glmatrix.js: https://github.com/toji/gl-matrix/blob/master/src/gl-matrix/mat3.js
+            double a00 = R[0], a01 = R[1], a02 = R[2];
+            double a10 = R[3], a11 = R[4], a12 = R[5];
+            double a20 = R[6], a21 = R[7], a22 = R[8];
+
+            double b01 = a22 * a11 - a12 * a21;
+            double b11 = -a22 * a10 + a12 * a20;
+            double b21 = a21 * a10 - a11 * a20;
+
+            // Calculate the determinant
+            double det = a00 * b01 + a01 * b11 + a02 * b21;
+
+            if (det < EPSILON)
+            {
+                return false;
+            }
+            det = 1.0 / det;
+
+            R[0] = b01* det;
+            R[1] = (-a22* a01 + a02* a21) * det;
+            R[2] = (a12* a01 - a02* a11) * det;
+            R[3] = b11* det;
+            R[4] = (a22* a00 - a02* a20) * det;
+            R[5] = (-a12* a00 + a02* a10) * det;
+            R[6] = b21* det;
+            R[7] = (-a21* a00 + a01* a20) * det;
+            R[8] = (a11* a00 - a01* a10) * det;
+
+            return true;
         }
 
         /// <summary>
