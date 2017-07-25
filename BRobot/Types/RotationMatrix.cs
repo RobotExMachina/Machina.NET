@@ -239,7 +239,7 @@ namespace BRobot
             RotationMatrix t = new RotationMatrix(this);
             t.Transpose();
             RotationMatrix ident = RotationMatrix.Multiply(this, t);
-            return ident.IsIdentity();
+            return ident.IsIdentity() && Math.Abs(this.Determinant() - 1) < EPSILON;
         }
 
         /// <summary>
@@ -393,6 +393,8 @@ namespace BRobot
             return m;
         }
 
+
+
         /// <summary>
         /// Returns a Quaternion representing the same rotation as this Matrix.
         /// </summary>
@@ -457,14 +459,19 @@ namespace BRobot
             return q;
         }
 
-        internal double Copysign(double x, double y)
-        {
-            if ( (x > 0 && y > 0) || (x < 0 && y < 0) )
-            {
-                return x;
-            }
-            return -x;
-        }
+        //internal double Copysign(double x, double y)
+        //{
+        //    if ( (x > 0 && y > 0) || (x < 0 && y < 0) )
+        //    {
+        //        return x;
+        //    }
+        //    return -x;
+        //}
+
+        //public AxisAngle ToAxisAngle()
+        //{
+
+        //}
 
         public override string ToString()
         {

@@ -293,6 +293,39 @@ namespace BRobot
             return new RotationVector(this.X, this.Y, this.Z, this.Angle, true);
         }
 
+        public RotationMatrix ToRotationMatrix()
+        {
+            // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
+            // This conversion assumes the rotation vector is normalized.
+            double ang = this.Angle * TO_RADS;
+            double c = Math.Cos(ang);
+            double s = Math.Sin(ang);
+            double t = 1 - c;
+            
+
+            RotationMatrix m = new RotationMatrix();
+            m.m00 = c + t * this.X * this.X;
+            m.m11 = c + t * this.Y * this.Y;
+            m.m22 = c + t * this.Z * this.Z;
+
+            double t1 = t * this.X * this.Y;
+            double t2 = s * this.Z;
+            m.m10 = t1 + t2;
+            m.m01 = t1 - t2;
+
+            t1 = t * this.X * this.Z;
+            t2 = this.Y * s;
+            m.m20 = t1 - t2;
+            m.m02 = t1 + t2;
+
+            t1 = t * this.Y * this.Z;
+            t2 = s * this.X;
+            m.m21 = t1 + t2;
+            m.m12 = t1 - t2;
+
+            return m;
+        }
+
         public override string ToString()
         {
             return string.Format("AxisAngle[{0}, {1}, {2}, {3}]",
