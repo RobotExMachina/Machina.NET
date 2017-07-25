@@ -393,11 +393,17 @@ namespace BRobot
             return m;
         }
 
+        public Quaternion ToQuaternion()
+        {
+            int method;
+            return this.ToQuaternion(out method);
+        }
+
         /// <summary>
         /// Returns a Quaternion representing the same rotation as this Matrix.
         /// </summary>
         /// <returns></returns>
-        public Quaternion ToQuaternion()
+        public Quaternion ToQuaternion(out int method)
         {
             // This conversion assumes the rotation matrix is special orthogonal .
             // As a result, the returned Quaternion will be a versor.
@@ -407,16 +413,17 @@ namespace BRobot
             double s;
 
             // Compute a regular conversion
-            if (trace > EPSILON)
+            if (trace > 0)
             {
                 s = 2 * Math.Sqrt(trace + 1);
                 q.W = 0.25 * s;
                 q.X = (m21 - m12) / s;
                 q.Y = (m02 - m20) / s;
                 q.Z = (m10 - m01) / s;
+                method = 0;
             }
 
-            // If trace is close to zero, avoid division by zero and floating-point degeneracy
+            // If trace is zero or negative, avoid division by zero, square root of negative and floating-point degeneracy
             // by searching which major diagonal element has the greatest value:
             else
             {
@@ -427,6 +434,7 @@ namespace BRobot
                     q.X = 0.25 * s;
                     q.Y = (m01 + m10) / s;
                     q.Z = (m02 + m20) / s;
+                    method = 1;
                 }
                 else if (m11 > m22)
                 {
@@ -435,6 +443,7 @@ namespace BRobot
                     q.X = (m01 + m10) / s;
                     q.Y = 0.25 * s;
                     q.Z = (m12 + m21) / s;
+                    method = 2;
                 }
                 else
                 {
@@ -443,10 +452,29 @@ namespace BRobot
                     q.X = (m02 + m20) / s;
                     q.Y = (m12 + m21) / s;
                     q.Z = 0.25 * s;
+                    method = 3;
                 }
             }
 
+
+            ////http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/christian.htm
+            //Quaternion q = new Quaternion();
+            //q.W = 0.5 * Math.Sqrt(Math.Max(0, 1 + m00 + m11 + m22));
+            //q.X = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 + m00 - m11 - m22)), m21 - m12);
+            //q.Y = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 + m11 - m22)), m02 - m20);
+            //q.Z = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 - m11 + m22)), m10 - m01);
+            //method = 0; 
+
             return q;
+        }
+
+        internal double Copysign(double x, double y)
+        {
+            if ( (x > 0 && y > 0) || (x < 0 && y < 0) )
+            {
+                return x;
+            }
+            return -x;
         }
 
         public override string ToString()

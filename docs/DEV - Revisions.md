@@ -31,7 +31,8 @@
     - [ ] AA > M33
     - [ ] M33 > RV
     - [ ] RV > M33
-
+- [ ] Acknowledge EuclideanSpace 
+**
 
 ## BUILD 1206
 - [x] ROTATIONVECTOR
