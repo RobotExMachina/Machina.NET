@@ -468,10 +468,95 @@ namespace BRobot
         //    return -x;
         //}
 
-        //public AxisAngle ToAxisAngle()
-        //{
+        public AxisAngle ToAxisAngle()
+        {
+            // Taken from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
+            double x, y, z, angle;
+            double sinv = 1 / Math.Sqrt(2);  // 0.7071...
 
-        //}
+            // Check for singularities
+            if (Math.Abs(m01 - m10) < EPSILON
+                && Math.Abs(m02 - m20) < EPSILON
+                && Math.Abs(m12 - m21) < EPSILON)
+            {
+                // If identity matrix (angle = 0), return a non rotation AxisAngle
+                if (this.IsIdentity())
+                {
+                    return new AxisAngle();
+                }
+                // Otherwise, angle is 180
+                angle = 180;
+                double xx = 0.5 * m00 + 0.5;
+                double yy = 0.5 * m11 + 0.5;
+                double zz = 0.5 * m22 + 0.5;
+                double xy = 0.25 * (m01 + m10);
+                double xz = 0.25 * (m02 + m20);
+                double yz = 0.25 * (m12 + m21);
+
+                // If m00 is the largest diagonal
+                if (xx > yy && xx > zz)
+                {
+                    if (xx < EPSILON)
+                    {
+                        x = 0;
+                        y = sinv;
+                        z = sinv;
+                    } 
+                    else
+                    {
+                        x = Math.Sqrt(xx);
+                        y = xy / x;
+                        z = xz / x;
+                    }
+                }
+                // If m11 is the largest diagonal
+                else if (yy > zz)
+                {
+                    if (yy < EPSILON)
+                    {
+                        x = sinv;
+                        y = 0;
+                        z = sinv;
+                    }
+                    else
+                    {
+                        y = Math.Sqrt(yy);
+                        x = xy / y;
+                        z = yz / y;
+                    }
+                }
+                // m22 is the largest diagonal
+                else
+                {
+                    if (zz < EPSILON)
+                    {
+                        x = sinv;
+                        y = sinv;
+                        z = 0;
+                    }
+                    else
+                    {
+                        z = Math.Sqrt(zz);
+                        x = xz / z;
+                        y = yz / z;
+                    }
+                }
+
+                return new AxisAngle(x, y, z, angle);
+            }
+
+            // No singularities then, proceed normally
+            double s = Math.Sqrt((m21 - m12) * (m21 - m12)
+                    + (m02 - m20) * (m02 - m20)
+                    + (m10 - m01) * (m10 - m01));  // for normalization (is this necessary here?)
+            if (Math.Abs(s) < EPSILON) s = 1;  // "prevent divide by zero, should not happen if matrix is orthogonal and should be caught by singularity test above, but I've left it in just in case"
+            angle = TO_DEGS * Math.Acos(0.5 * (m00 + m11 + m22 - 1));
+            x = (m21 - m12) / s;
+            y = (m02 - m20) / s;
+            z = (m10 - m01) / s;
+
+            return new AxisAngle(x, y, z, angle);
+        }
 
         public override string ToString()
         {

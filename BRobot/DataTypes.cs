@@ -23,6 +23,11 @@ namespace BRobot
         internal static readonly double EPSILON = 0.000001;
 
         /// <summary>
+        /// A more permissive precision factor for other purposes.
+        /// </summary>
+        internal static readonly double EPSILON2 = 0.001;
+
+        /// <summary>
         /// Amount of digits for floating-point comparisons precision.
         /// </summary>
         internal static readonly int EPSILON_DECIMALS = 10;

@@ -27,8 +27,9 @@
     - [x] M33.Transpose()
     - [x] Orthogonality checks on creation of a M33
     - [x] Q > M33 > Q
-    - [ ] M33 > AA
-    - [ ] AA > M33
+    - [x] M33 > AA
+    - [x] AA > M33
+    - [ ] TEST THE ABOVE
     - [ ] M33 > RV
     - [ ] RV > M33
 - [ ] Acknowledge EuclideanSpace 

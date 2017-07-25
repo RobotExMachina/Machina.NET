@@ -69,11 +69,19 @@ namespace BRobot
                 || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
         }
 
-
+        /// <summary>
+        /// Implicitn conversion to Vector object.
+        /// </summary>
+        /// <param name="aa"></param>
         public static implicit operator Point(AxisAngle aa)
         {
             return new BRobot.Point(aa.X, aa.Y, aa.Z);
         }
+
+        /// <summary>
+        /// Creates an AxisAngle representing no rotation.
+        /// </summary>
+        public AxisAngle() : this(0, 0, 0, 0, false) { }
 
         /// <summary>
         /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
@@ -290,7 +298,7 @@ namespace BRobot
         /// <returns></returns>
         public RotationVector ToRotationVector()
         {
-            return new RotationVector(this.X, this.Y, this.Z, this.Angle, true);
+            return new RotationVector(this.X, this.Y, this.Z, this.Angle, false);  // this vector should already be normalized
         }
 
         public RotationMatrix ToRotationMatrix()
