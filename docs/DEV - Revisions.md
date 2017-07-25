@@ -26,7 +26,7 @@
     - [x] M33.Inverse()
     - [x] M33.Transpose()
     - [x] Orthogonality checks on creation of a M33
-    - [ ] Q > M33 > Q
+    - [x] Q > M33 > Q
     - [ ] M33 > AA
     - [ ] AA > M33
     - [ ] M33 > RV

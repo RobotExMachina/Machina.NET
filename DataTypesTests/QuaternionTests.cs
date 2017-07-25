@@ -355,6 +355,13 @@ namespace DataTypesTests
 
         }
 
+
+        /// <summary>
+        /// Quaternion to RotationMatrix to Quaternion conversions. 
+        /// Note that the methods involved in these conversions apply arithmetic that might be sign-sensitive
+        /// like squares and square roots. This means that a Quaternion Q1 having a leading component below -0.5
+        /// will result in a conversed Quaternion Q2 of opposite sign (i.e. Q1 = -Q2), yet still an equivalent one.
+        /// </summary>
         [TestMethod]
         public void Quaternion_ToRotationMatrix_ToQuaternion()
         {
@@ -365,12 +372,12 @@ namespace DataTypesTests
             SysMatrix44 sm;
 
             double w, x, y, z;
-            int method;
 
-            List<string> quatsIn = new List<string>();
-            quatsIn.Add("W,X,Y,Z,FLIPPED,METHOD");
-            List<string> quatsOut = new List<string>();
-            quatsOut.Add("W,X,Y,Z,FLIPPED,METHOD");
+            //// Temp dumps used for data viz... :)
+            //List<string> quatsIn = new List<string>();
+            //quatsIn.Add("W,X,Y,Z,FLIPPED,METHOD");
+            //List<string> quatsOut = new List<string>();
+            //quatsOut.Add("W,X,Y,Z,FLIPPED,METHOD");
 
             // Test random quaternions
             for (var i = 0; i < 2000; i++)
@@ -382,7 +389,7 @@ namespace DataTypesTests
 
                 q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
                 m = q1.ToRotationMatrix();
-                q2 = m.ToQuaternion(out method);
+                q2 = m.ToQuaternion();
 
                 // Compare with System quaternions
                 sq1 = new SysQuat((float)q1.X, (float)q1.Y, (float)q1.Z, (float)q1.W);  // use same q1 normalization
@@ -399,69 +406,50 @@ namespace DataTypesTests
                 Trace.WriteLine(sq2);
 
                 // TEMP: create a dump CSV file with these quats
-                    quatsIn.Add(string.Format("{0},{1},{2},{3},{4},{5}", q1.W, q1.X, q1.Y, q1.Z, q1 == q2 ? 0 : 1, method));
-                    quatsOut.Add(string.Format("{0},{1},{2},{3},{4},{5}", q2.W, q2.X, q2.Y, q2.Z, q1 == q2 ? 0 : 1, method));
+                //    quatsIn.Add(string.Format("{0},{1},{2},{3},{4},{5}", q1.W, q1.X, q1.Y, q1.Z, q1 == q2 ? 0 : 1, method));
+                //    quatsOut.Add(string.Format("{0},{1},{2},{3},{4},{5}", q2.W, q2.X, q2.Y, q2.Z, q1 == q2 ? 0 : 1, method));
 
-                System.IO.File.WriteAllLines(@"quaternionsIn.csv", quatsIn, System.Text.Encoding.UTF8);
-                System.IO.File.WriteAllLines(@"quaternionsOut.csv", quatsOut, System.Text.Encoding.UTF8);
+                //System.IO.File.WriteAllLines(@"quaternionsIn.csv", quatsIn, System.Text.Encoding.UTF8);
+                //System.IO.File.WriteAllLines(@"quaternionsOut.csv", quatsOut, System.Text.Encoding.UTF8);
 
-                //if (HasAnyComponentBelowOrEqual(q1, -0.5))
-                //{
-                //    q2.Scale(-1);
-                //}
-
-                //Assert.IsTrue(q1 == q2, "Booo! :(");
+                // NOTE: second quaternion might be the opposite sign, i.e. q1 = -q2. 
+                // Note that all quaternions multiplied by a real number (-1 in this case) represent the same spatial rotation
+                Assert.IsTrue(q1.IsEquivalent(q2), "Booo! :(");
             }
 
-            //Console.WriteLine("flipped:");
-            //foreach(Quaternion q in flipped)
-            //{
-            //    Console.WriteLine(q);
-            //}
-            //Console.WriteLine("nonflipped");
-            //foreach (Quaternion q in nonflipped)
-            //{
-            //    Console.WriteLine(q);
-            //}
 
-            //// Test all permutations of unitary components quaternions (including zero)
-            //for (w = -2; w <= 2; w += 0.5)  // test vector + non-vector normalization
-            //{
-            //    for (x = -1; x <= 1; x += 0.5)
-            //    {
-            //        for (y = -1; y <= 1; y += 0.5)
-            //        {
-            //            for (z = -1; z <= 1; z += 0.5)
-            //            {
-            //                q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
-            //                m = q1.ToRotationMatrix();
-            //                q2 = m.ToQuaternion();
+            // Test all permutations of unitary components quaternions (including zero)
+            for (w = -2; w <= 2; w += 0.5)  // test vector + non-vector normalization
+            {
+                for (x = -1; x <= 1; x += 0.5)
+                {
+                    for (y = -1; y <= 1; y += 0.5)
+                    {
+                        for (z = -1; z <= 1; z += 0.5)
+                        {
+                            q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                            m = q1.ToRotationMatrix();
+                            q2 = m.ToQuaternion();
 
-            //                Trace.WriteLine("");
-            //                Trace.WriteLine(w + " " + x + " " + y + " " + z);
-            //                Trace.WriteLine(q1);
-            //                Trace.WriteLine(m);
-            //                Trace.WriteLine(q2);
+                            // Compare with System quaternions
+                            sq1 = new SysQuat((float)q1.X, (float)q1.Y, (float)q1.Z, (float)q1.W);  // use same q1 normalization
+                            sm = SysMatrix44.CreateFromQuaternion(sq1);
+                            sq2 = SysQuat.CreateFromRotationMatrix(sm);
 
-            //                if (q1.IsIdentity())
-            //                {
-            //                    //Assert.IsTrue(q2.IsIdentity());
-            //                }
-            //                else
-            //                {
-            //                    //Assert.IsTrue(q1 == q2, "Booo!");
-            //                }
+                            Trace.WriteLine("");
+                            Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                            Trace.WriteLine(q1);
+                            Trace.WriteLine(m);
+                            Trace.WriteLine(q2);
+                            Trace.WriteLine(sq1);
+                            Trace.WriteLine(sm);
+                            Trace.WriteLine(sq2);
 
-            //            }
-            //        }
-            //    }
-            //}
-        }
-
-
-        public bool HasAnyComponentBelowOrEqual(Quaternion q, double threshold)
-        {
-            return q.W <= threshold || q.X <= threshold || q.Y <= threshold || q.Z <= threshold;
+                            Assert.IsTrue(q1.IsEquivalent(q2), "Booo! :(");
+                        }
+                    }
+                }
+            }
         }
 
     }

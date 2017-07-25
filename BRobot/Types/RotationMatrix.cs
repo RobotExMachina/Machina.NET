@@ -393,17 +393,11 @@ namespace BRobot
             return m;
         }
 
-        public Quaternion ToQuaternion()
-        {
-            int method;
-            return this.ToQuaternion(out method);
-        }
-
         /// <summary>
         /// Returns a Quaternion representing the same rotation as this Matrix.
         /// </summary>
         /// <returns></returns>
-        public Quaternion ToQuaternion(out int method)
+        public Quaternion ToQuaternion()
         {
             // This conversion assumes the rotation matrix is special orthogonal .
             // As a result, the returned Quaternion will be a versor.
@@ -420,7 +414,6 @@ namespace BRobot
                 q.X = (m21 - m12) / s;
                 q.Y = (m02 - m20) / s;
                 q.Z = (m10 - m01) / s;
-                method = 0;
             }
 
             // If trace is zero or negative, avoid division by zero, square root of negative and floating-point degeneracy
@@ -434,7 +427,6 @@ namespace BRobot
                     q.X = 0.25 * s;
                     q.Y = (m01 + m10) / s;
                     q.Z = (m02 + m20) / s;
-                    method = 1;
                 }
                 else if (m11 > m22)
                 {
@@ -443,7 +435,6 @@ namespace BRobot
                     q.X = (m01 + m10) / s;
                     q.Y = 0.25 * s;
                     q.Z = (m12 + m21) / s;
-                    method = 2;
                 }
                 else
                 {
@@ -452,7 +443,6 @@ namespace BRobot
                     q.X = (m02 + m20) / s;
                     q.Y = (m12 + m21) / s;
                     q.Z = 0.25 * s;
-                    method = 3;
                 }
             }
 
@@ -463,7 +453,6 @@ namespace BRobot
             //q.X = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 + m00 - m11 - m22)), m21 - m12);
             //q.Y = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 + m11 - m22)), m02 - m20);
             //q.Z = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 - m11 + m22)), m10 - m01);
-            //method = 0; 
 
             return q;
         }
