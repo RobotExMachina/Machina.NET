@@ -764,7 +764,7 @@ namespace BRobot
 
             // First, test if close to pitch 90deg singularity:
             double test = this.W * this.Y - this.Z * this.X;
-            if (test > 0.5 - EPSILON)  // singularity at north pole
+            if (test > 0.5 - EPSILON3)  // singularity at north pole
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
@@ -772,7 +772,7 @@ namespace BRobot
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
             } 
-            else if (test < -0.5 + EPSILON)  // singularity at south pole
+            else if (test < -0.5 + EPSILON3)  // singularity at south pole
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;

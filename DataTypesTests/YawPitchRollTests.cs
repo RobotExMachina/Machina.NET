@@ -19,25 +19,30 @@ namespace DataTypesTests
         public void YawPitchRoll_ToQuaternion_ToYawPitchRoll()
         {
             YawPitchRoll eu1, eu2;
-            Quaternion q;
+            Quaternion q1, q2;
 
             double x, y, z;
 
-            for (var i = 0; i < 200; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 x = Random(-180, 180);
                 y = Random(-90, 90);
                 z = Random(-180, 180);
 
                 eu1 = new YawPitchRoll(x, y, z);
-                q = eu1.ToQuaternion();
-                eu2 = q.ToEulerZYX();
+                q1 = eu1.ToQuaternion();
+                eu2 = q1.ToEulerZYX();
+                q2 = eu2.ToQuaternion();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z);
                 Trace.WriteLine(eu1);
-                Trace.WriteLine(q);
+                Trace.WriteLine(q1);
                 Trace.WriteLine(eu2);
+                Trace.WriteLine(q2);
+
+                Assert.IsTrue(eu1 == eu2, "Eulers not equal");
+                Assert.IsTrue(q1 == q2, "Quats not equal");
             }
 
 
