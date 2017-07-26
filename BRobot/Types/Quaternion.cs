@@ -738,7 +738,7 @@ namespace BRobot
         /// (intrinsic ZY'X'' rotations, or Yaw-Pitch-Roll).
         /// </summary>
         /// <returns></returns>
-        public EulerZYX ToEulerZYX()
+        public YawPitchRoll ToEulerZYX()
         {
             /**
              * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/ with:
@@ -795,7 +795,7 @@ namespace BRobot
                                          1 - 2 * (this.Y * this.Y + this.Z * this.Z));
             }
 
-            return new EulerZYX(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
+            return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
         }
 
 

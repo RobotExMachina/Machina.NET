@@ -7,18 +7,19 @@ using System.Threading.Tasks;
 namespace BRobot
 {
 
-    //  ███████╗██╗   ██╗██╗     ███████╗██████╗ ███████╗██╗   ██╗██╗  ██╗
-    //  ██╔════╝██║   ██║██║     ██╔════╝██╔══██╗╚══███╔╝╚██╗ ██╔╝╚██╗██╔╝
-    //  █████╗  ██║   ██║██║     █████╗  ██████╔╝  ███╔╝  ╚████╔╝  ╚███╔╝ 
-    //  ██╔══╝  ██║   ██║██║     ██╔══╝  ██╔══██╗ ███╔╝    ╚██╔╝   ██╔██╗ 
-    //  ███████╗╚██████╔╝███████╗███████╗██║  ██║███████╗   ██║   ██╔╝ ██╗
-    //  ╚══════╝ ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝
-    //                                                                    
+
+    //  ██╗   ██╗ █████╗ ██╗    ██╗██████╗ ██╗████████╗ ██████╗██╗  ██╗██████╗  ██████╗ ██╗     ██╗     
+    //  ╚██╗ ██╔╝██╔══██╗██║    ██║██╔══██╗██║╚══██╔══╝██╔════╝██║  ██║██╔══██╗██╔═══██╗██║     ██║     
+    //   ╚████╔╝ ███████║██║ █╗ ██║██████╔╝██║   ██║   ██║     ███████║██████╔╝██║   ██║██║     ██║     
+    //    ╚██╔╝  ██╔══██║██║███╗██║██╔═══╝ ██║   ██║   ██║     ██╔══██║██╔══██╗██║   ██║██║     ██║     
+    //     ██║   ██║  ██║╚███╔███╔╝██║     ██║   ██║   ╚██████╗██║  ██║██║  ██║╚██████╔╝███████╗███████╗
+    //     ╚═╝   ╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝     ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
+    //                                                                                                  
     /// <summary>
-    /// A class representing a rasdasdotation in Euler Angles over intrinsic
+    /// A class representing a Yaw-Pitch-Roll rotation, e.g. Euler Angles over intrinsic
     /// ZY'X'' axes (Tait-Bryan angles). See <see cref="https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles"/>
     /// </summary>
-    public class EulerZYX : Geometry
+    public class YawPitchRoll : Geometry
     {
         /// <summary>
         /// Rotation around the X axis in degrees.
@@ -71,7 +72,7 @@ namespace BRobot
         /// <param name="eu1"></param>
         /// <param name="eu2"></param>
         /// <returns></returns>
-        public static bool operator ==(EulerZYX eu1, EulerZYX eu2)
+        public static bool operator ==(YawPitchRoll eu1, YawPitchRoll eu2)
         {
             return Math.Abs(eu1.XAngle - eu2.XAngle) < EPSILON
                 && Math.Abs(eu1.YAngle - eu2.YAngle) < EPSILON
@@ -84,7 +85,7 @@ namespace BRobot
         /// <param name="eu1"></param>
         /// <param name="eu2"></param>
         /// <returns></returns>
-        public static bool operator !=(EulerZYX eu1, EulerZYX eu2)
+        public static bool operator !=(YawPitchRoll eu1, YawPitchRoll eu2)
         {
             return Math.Abs(eu1.XAngle - eu2.XAngle) > EPSILON
                 || Math.Abs(eu1.YAngle - eu2.YAngle) > EPSILON
@@ -97,7 +98,7 @@ namespace BRobot
         /// <param name="xAngle"></param>
         /// <param name="yAngle"></param>
         /// <param name="zAngle"></param>
-        public EulerZYX(double xAngle, double yAngle, double zAngle)
+        public YawPitchRoll(double xAngle, double yAngle, double zAngle)
         {
             this.XAngle = xAngle;
             this.YAngle = yAngle;
@@ -110,7 +111,7 @@ namespace BRobot
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool IsEquivalent(EulerZYX other)
+        public bool IsEquivalent(YawPitchRoll other)
         {
             // Simple (and expensive?) test, compare underlying Quaternions...
             return this.ToQuaternion().IsEquivalent(other.ToQuaternion());

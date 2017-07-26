@@ -19,8 +19,8 @@
 - [ ] Euler Angles --> Rename to YawPitchRoll
     - [x] Create class structure
     - [x] EU > Q > EU
-    - [ ] EU > AA > EU
     - [ ] EU > RM > EU
+    - [ ] EU > AA > EU
     - [ ] EU > RV > EU
 
 

@@ -523,7 +523,7 @@ namespace DataTypesTests
         public void Quaternion_ToEulerZYX_ToQuaternion()
         {
             Quaternion q1, q2, q3;
-            EulerZYX eu1, eu2, eu3;
+            YawPitchRoll eu1, eu2, eu3;
 
             double w, x, y, z;
 
