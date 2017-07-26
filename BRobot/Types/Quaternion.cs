@@ -733,6 +733,29 @@ namespace BRobot
                                 xz2 - yw2, yz2 + xw2, 1 - xx2 - yy2);
         }
 
+        /// <summary>
+        /// Returns the Euler Angle representation of this rotation in Tait-Bryan representation
+        /// (intrinsic ZY'X'' rotations, or Yaw-Pitch-Roll).
+        /// </summary>
+        /// <returns></returns>
+        public EulerZYX ToEulerZYX()
+        {
+            // Roll
+            double xAng = Math.Atan2(2 * (this.W * this.X + this.Y * this.Z), 
+                                     1 - 2 * (this.X * this.X + this.Y * this.Y));
+            
+            // Pitch
+            double t = 2 * (this.W * this.Y - this.Z * this.X);
+            t = t > 1 ? 1 : t;
+            t = t < -1 ? -1 : t;
+            double yAng = Math.Asin(t);
+
+            // Yaw
+            double zAng = Math.Atan2(2 * (this.W * this.Z + this.X * this.Y),
+                                     1 - 2 * (this.Y * this.Y + this.Z * this.Z));
+
+            return new EulerZYX(xAng, yAng, zAng);
+        }
 
 
         public override string ToString()

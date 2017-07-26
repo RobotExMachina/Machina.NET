@@ -15,6 +15,15 @@
 ```
 
 
+## BUILD 1208
+- [ ] Euler Angles --> Rename to YawPitchRoll
+    - [ ] Create class structure
+    - [ ] EU > Q > EU
+    - [ ] EU > AA > EU
+    - [ ] EU > RM > EU
+    - [ ] EU > RV > EU
+
+
 ## BUILD 1207
 - [x] ROTATIONMATRIX
     - [x] Create 3x3 matrix

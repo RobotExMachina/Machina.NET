@@ -51,7 +51,22 @@ namespace BRobot
         public double Yaw { get { return this.ZAngle; } }
 
         /// <summary>
-        /// Create an Euler Angles ZY'X'' intrinsic rotation from its constituent components. 
+        /// Alias for rotation around X axis.
+        /// </summary>
+        public double Bank { get { return this.XAngle; } }
+
+        /// <summary>
+        /// Alias for rotation around Y axis.
+        /// </summary>
+        public double Attitude { get { return this.YAngle; } }
+
+        /// <summary>
+        /// Alias for rotation around Z axis.
+        /// </summary>
+        public double Heading { get { return this.ZAngle; } }
+
+        /// <summary>
+        /// Create an Euler Angles ZY'X'' intrinsic rotation from its constituent components in degrees.
         /// </summary>
         /// <param name="xAngle"></param>
         /// <param name="yAngle"></param>
@@ -64,6 +79,54 @@ namespace BRobot
         }
 
 
+        //public RotationMatrix ToRotationMatrix()
+        //{
+
+        //}
+
+        
+        public Quaternion ToQuaternion()
+        {
+            // From Shoemake, Ken. "Animating rotation with quaternion curves." ACM SIGGRAPH computer graphics. Vol. 19. No. 3. ACM, 1985.
+            // (using a different Euler convention than EuclideanSpace)
+            double cX = Math.Cos(0.5 * TO_RADS * this.XAngle),
+                   cY = Math.Cos(0.5 * TO_RADS * this.YAngle),
+                   cZ = Math.Cos(0.5 * TO_RADS * this.ZAngle),
+                   sX = Math.Sin(0.5 * TO_RADS * this.XAngle),
+                   sY = Math.Sin(0.5 * TO_RADS * this.YAngle),
+                   sZ = Math.Sin(0.5 * TO_RADS * this.ZAngle);
+
+            return new Quaternion(cX * cY * cZ + sX * sY * sZ,
+                                  sX * cY * cZ - cX * sY * sZ,
+                                  cX * sY * cZ + sX * cY * sZ,
+                                  cX * cY * sZ - sX * sY * cZ);
+        }
+
+        /// <summary>
+        /// Returns the Rotation Matrix representation os this rotation.
+        /// </summary>
+        /// <returns></returns>
+        public RotationMatrix ToRotationMatrix()
+        {
+            double cX = Math.Cos(TO_RADS * this.XAngle),
+                   cY = Math.Cos(TO_RADS * this.YAngle),
+                   cZ = Math.Cos(TO_RADS * this.ZAngle),
+                   sX = Math.Sin(TO_RADS * this.XAngle),
+                   sY = Math.Sin(TO_RADS * this.YAngle),
+                   sZ = Math.Sin(TO_RADS * this.ZAngle);
+
+            return new RotationMatrix(cY * cZ,  -cX * sZ + sX * sY * cZ,     sX * sZ + cX * sY * cZ,
+                                      cY * sZ,   cX * cZ + sX * sY * sZ,    -sX * cZ + cX * sY * sZ,
+                                          -sY,                 sX * cY,                     cX * cY, false);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("EulerZYX[Z:{0}, Y:{1}, X:{2}]",
+                Math.Round(this.ZAngle, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(this.YAngle, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(this.XAngle, STRING_ROUND_DECIMALS_RADS));
+        }
 
     }
 }

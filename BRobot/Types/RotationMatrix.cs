@@ -134,6 +134,29 @@ namespace BRobot
         }
 
         /// <summary>
+        /// A private constructor to bypass orthogonalization when input parameters are
+        /// guaranteed to be orthogonal.
+        /// </summary>
+        /// <param name="r00"></param>
+        /// <param name="r01"></param>
+        /// <param name="r02"></param>
+        /// <param name="r10"></param>
+        /// <param name="r11"></param>
+        /// <param name="r12"></param>
+        /// <param name="r20"></param>
+        /// <param name="r21"></param>
+        /// <param name="r22"></param>
+        /// <param name="orthogonalize"></param>
+        internal RotationMatrix(double r00, double r01, double r02,
+                        double r10, double r11, double r12,
+                        double r20, double r21, double r22, bool orthogonalize)
+        {
+            this.Initialize(r00, r01, r02,
+                            r10, r11, r12,
+                            r20, r21, r22, orthogonalize);
+        }
+
+        /// <summary>
         /// Create a 3x3 Rotation Matrix from it's constituent components. 
         /// Elements of the rotation matrix, ordered in row to column way, 
         /// i.e. r[2] is r13 (row 1 col 3), r[6] is r31, etc. 
