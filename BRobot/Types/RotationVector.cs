@@ -203,6 +203,15 @@ namespace BRobot
             return this.ToAxisAngle().ToQuaternion();
         }
 
+        /// <summary>
+        /// Returns a Rotation Matrix representation of this vector.
+        /// </summary>
+        /// <returns></returns>
+        public RotationMatrix ToRotationMatrix()
+        {
+            return this.ToAxisAngle().ToRotationMatrix();
+        }
+
         public override string ToString()
         {
             return string.Format("RotationVector[{0}, {1}, {2}]",

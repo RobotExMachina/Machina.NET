@@ -6,13 +6,13 @@ The development of BRobot was sponsored by [Autodesk, Inc](https://www.autodesk.
 
 Life support from the 'dream team' Nono Martinez Alonso, Keith Alfaro, Omid Oliyan and Varvara Toulkeridou was critical for the sanity (or insanity) of this project. Just one more thing to add here: :ok_hand:
 
-The [DynamoTORO](https://github.com/coten/TORO) project by Nick Cote was a fantastic reference for early implementation of Dynamo-based robotics. You should check it out, it's pretty awesome.
-
-For a brief period of time, BRobot implemented a Plane to Quaternion conversion developed at the Harvard Graduate School of Design's [Design Robotics Group](http://research.gsd.harvard.edu/maps/), with contributions from Sola Grantham, Anthony Kane, Nathan King, Jonathan Grinham, and others. This was deprecated in favor of a simplified version, whose functionality is still under evaluation. Maybe it will come back, maybe it won't... 
+A great deal of the mathematics behind this library, especially related to conversion between geometry representations, was based on the incredible knowledgebase in [Euclidean Space](http://www.euclideanspace.com). My immense gratitude to Martin John Baker for maintaining this resource.
 
 BRobot's action-state model is strongly inspired by the work of [Seymour Papert](https://en.wikipedia.org/wiki/Seymour_Papert) et al. with the [LOGO language](https://en.wikipedia.org/wiki/Logo_(programming_language)) and its application in [turtle graphics and robotics for children](https://en.wikipedia.org/wiki/Turtle_(robot)). The title 'action-state model' is loosely inspired by the motivations behind [SAM patterns](http://sam.js.org/).
 
 Some of the syntactic and state-based flavor of BRobot was inspired by the outstanding [Processing project](http://processing.org), co-created by Casey Reas and Ben Fry.
+
+The [DynamoTORO](https://github.com/coten/TORO) project by Nick Cote was a fantastic reference for early implementation of Dynamo-based robotics. You should check it out, it's pretty awesome.
 
 BRobot vector icon made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](http://www.flaticon.com/)
 

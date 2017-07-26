@@ -16,7 +16,7 @@
 
 
 ## BUILD 1207
-- [ ] ROTATIONMATRIX
+- [x] ROTATIONMATRIX
     - [x] Create 3x3 matrix
     - [x] M33 > Q
     - [x] Q > M33
@@ -30,11 +30,11 @@
     - [x] Do two opposed quaternions yield the same RM? 
     - [x] M33 > AA
     - [x] AA > M33
-    - [ ] TEST THE ABOVE
-    - [ ] M33 > RV
-    - [ ] RV > M33
-- [ ] Acknowledge EuclideanSpace 
-**
+    - [x] TEST THE ABOVE
+    - [x] M33 > RV
+    - [x] RV > M33
+- [x] Acknowledge EuclideanSpace 
+
 
 ## BUILD 1206
 - [x] ROTATIONVECTOR

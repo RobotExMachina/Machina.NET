@@ -563,6 +563,16 @@ namespace BRobot
             return new AxisAngle(x, y, z, angle);
         }
 
+        /// <summary>
+        /// Returns a Rotation Vector representation of this Matrix.
+        /// </summary>
+        /// <returns></returns>
+        public RotationVector ToRotationVector()
+        {
+            return this.ToAxisAngle().ToRotationVector();
+        }
+
+
         public override string ToString()
         {
             return string.Format("RotationMatrix[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
