@@ -5,7 +5,7 @@ using System.Diagnostics;
 using BRobot;
 using SysMatrix44 = System.Numerics.Matrix4x4;
 using SysQuat = System.Numerics.Quaternion;
-using Vector3 = System.Numerics.Vector3;
+using SysVec = System.Numerics.Vector3;
 
 namespace DataTypesTests
 {
@@ -137,7 +137,7 @@ namespace DataTypesTests
         }
 
         [TestMethod]
-        public void RotationMatrix_ToQuaternion_CompareToNumericsLibrary()
+        public void RotationMatrix_ToQuaternion_VsSystemNumerics()
         {
             RotationMatrix m;
             Quaternion q;
@@ -227,5 +227,15 @@ namespace DataTypesTests
                 Assert.IsTrue(m1 == m2);
             }
         }
+
+        //[TestMethod]
+        //public void RotationMatrix_ToAxisAngle_VsSystemNumeric()
+        //{
+        //    RotationMatrix m;
+        //    AxisAngle aa;
+
+
+
+        //}
     }
 }

@@ -468,6 +468,11 @@ namespace BRobot
         //    return -x;
         //}
 
+        /// <summary>
+        /// Returns an Axis Angle representation of this Rotation Matrix. 
+        /// Note that the returned Axis Angle will always represent a positive rotation between [0, 180]
+        /// </summary>
+        /// <returns></returns>
         public AxisAngle ToAxisAngle()
         {
             // Taken from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm

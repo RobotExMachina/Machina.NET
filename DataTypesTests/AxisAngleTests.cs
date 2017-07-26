@@ -111,7 +111,7 @@ namespace DataTypesTests
                 {
                     for (z = -1; z <= 1; z++)
                     {
-                        for (angle = -720; angle <= 720; angle += 90)
+                        for (angle = -1440; angle <= 1440; angle += 90)
                         {
                             Trace.WriteLine("");
                             Trace.WriteLine(x + " " + y + " " + z + " " + angle);
@@ -119,7 +119,7 @@ namespace DataTypesTests
                             aa = new AxisAngle(x, y, z, angle);
                             Trace.WriteLine(aa);
 
-                            zero = angle == 0 || (aa.X == 0 && aa.Y == 0 && aa.Z == 0);
+                            zero = angle % 360 == 0 || (aa.X == 0 && aa.Y == 0 && aa.Z == 0);
                             Assert.AreEqual(zero, aa.IsZero());
                         }
                     }
@@ -424,5 +424,55 @@ namespace DataTypesTests
         }
 
 
+        [TestMethod]
+        public void AxisAngle_ToRotationMatrix_ToAxisAngle()
+        {
+            AxisAngle aa, aabis;
+            RotationMatrix m;
+
+            double x, y, z, angle;
+            Point axis;
+
+            // Test random quaternions
+            for (var i = 0; i < 50; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-1440, 1440);  // test any possible angle
+
+                aa = new AxisAngle(x, y, z, angle);
+                m = aa.ToRotationMatrix();
+                aabis = m.ToAxisAngle();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+                Trace.WriteLine(aa);
+                Trace.WriteLine(m);
+                Trace.WriteLine(aabis);
+
+                Assert.IsTrue(aa.IsEquivalent(aabis));
+            }
+
+            // Test singularities
+            for (var i = 0; i < 1000; i++)
+            {
+                axis = Point.RandomFromInts(-1, 1);
+                angle = 90 * RandomInt(-8, 8);
+
+                aa = new AxisAngle(axis, angle);
+                m = aa.ToRotationMatrix();
+                aabis = m.ToAxisAngle();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(axis + " " + angle);
+                Trace.WriteLine(aa);
+                Trace.WriteLine(m);
+                Trace.WriteLine(aabis);
+
+                Assert.IsTrue(aa.IsEquivalent(aabis));
+            }
+
+        }
     }
 }

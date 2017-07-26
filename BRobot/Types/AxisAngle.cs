@@ -150,12 +150,12 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Returns true if this AxisAngle represents no rotation: zero rotation axis or zero angle.
+        /// Returns true if this AxisAngle represents no rotation: zero rotation axis or zero (modulated) angle.
         /// </summary>
         /// <returns></returns>
         public bool IsZero()
         {
-            return Math.Abs(this.Angle) < EPSILON
+            return Math.Abs(this.Angle % 360) < EPSILON
                 || (Math.Abs(this.X) < EPSILON
                     && Math.Abs(this.Y) < EPSILON
                     && Math.Abs(this.Z) < EPSILON);
@@ -301,15 +301,28 @@ namespace BRobot
             return new RotationVector(this.X, this.Y, this.Z, this.Angle, false);  // this vector should already be normalized
         }
 
+        /// <summary>
+        /// Returns a Rotation Matrix representation of this Axis Angle. 
+        /// Please note that rotation matrices represent rotations in orthonormalized coordinates,  
+        /// so that additional Axis Angle information such as overturns (angles outside [0, 180])
+        /// will get lost, and rotation axis might be flipped. 
+        /// If this Axis Angle represents no effective rotation, the identity matrix will be returned. 
+        /// </summary>
+        /// <returns></returns>
         public RotationMatrix ToRotationMatrix()
         {
+            // Some sanity: if this AA represents no rotation, return identity matrix
+            if (this.IsZero())
+            {
+                return new RotationMatrix();
+            }
+
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
             // This conversion assumes the rotation vector is normalized.
             double ang = this.Angle * TO_RADS;
             double c = Math.Cos(ang);
             double s = Math.Sin(ang);
             double t = 1 - c;
-            
 
             RotationMatrix m = new RotationMatrix();
             m.m00 = c + t * this.X * this.X;
