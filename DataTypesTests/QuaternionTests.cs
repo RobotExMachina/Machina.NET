@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 using BRobot;
 using SysQuat = System.Numerics.Quaternion;
-using Vector3 = System.Numerics.Vector3;
+using SysVec = System.Numerics.Vector3;
 using SysMatrix44 = System.Numerics.Matrix4x4;
 using System.Collections.Generic;
 

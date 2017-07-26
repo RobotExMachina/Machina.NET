@@ -4,7 +4,8 @@ using System.Diagnostics;
 
 using BRobot;
 using SysQuat = System.Numerics.Quaternion;
-using Vector3 = System.Numerics.Vector3;
+using SysVec = System.Numerics.Vector3;
+using SysMatrix44 = System.Numerics.Matrix4x4;
 
 namespace DataTypesTests
 {
@@ -186,7 +187,7 @@ namespace DataTypesTests
             Quaternion q;
 
             Point v;
-            Vector3 normV;
+            SysVec normV;
             SysQuat sq;
 
             double x, y, z, angle;
@@ -209,8 +210,8 @@ namespace DataTypesTests
                 Trace.WriteLine(q);
 
                 // TEST 1: compare to System.Numeric.Quaternion
-                normV = new Vector3((float)x, (float)y, (float)z);
-                normV = Vector3.Normalize(normV);
+                normV = new SysVec((float)x, (float)y, (float)z);
+                normV = SysVec.Normalize(normV);
                 sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
                 Trace.WriteLine(sq + " length: " + sq.Length());
 
@@ -251,8 +252,8 @@ namespace DataTypesTests
                             {
                                 // TEST 1: compare to System.Numeric.Quaternion
                                 //sq = SysQuat.CreateFromAxisAngle(new Vector3((float)x, (float)y, (float)z), (float)(angle * Math.PI / 180.0));  // this Quaternion is not a versor (not unit)
-                                normV = new Vector3((float)x, (float)y, (float)z);
-                                normV = Vector3.Normalize(normV);
+                                normV = new SysVec((float)x, (float)y, (float)z);
+                                normV = SysVec.Normalize(normV);
                                 sq = SysQuat.CreateFromAxisAngle(normV, (float)(angle * Math.PI / 180.0));  // now this Quaternion SHOULD be normalized...
                                 Trace.WriteLine(sq + " length: " + sq.Length());
 
@@ -423,7 +424,6 @@ namespace DataTypesTests
             }
         }
 
-
         [TestMethod]
         public void AxisAngle_ToRotationMatrix_ToAxisAngle()
         {
@@ -433,7 +433,7 @@ namespace DataTypesTests
             double x, y, z, angle;
             Point axis;
 
-            // Test random quaternions
+            // Test random permutations
             for (var i = 0; i < 50; i++)
             {
                 x = Random(-100, 100);

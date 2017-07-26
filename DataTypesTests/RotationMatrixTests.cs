@@ -228,14 +228,64 @@ namespace DataTypesTests
             }
         }
 
-        //[TestMethod]
-        //public void RotationMatrix_ToAxisAngle_VsSystemNumeric()
-        //{
-        //    RotationMatrix m;
-        //    AxisAngle aa;
+        [TestMethod]
+        public void RotationMatrix_ToAxisAngle_ToRotationMatrix()
+        {
+
+            RotationMatrix m1, m2;
+            AxisAngle aa1, aa2;
+
+            double x, y, z, angle;
+            Point axis;
+
+            // Test random permutations
+            for (var i = 0; i < 200; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-1440, 1440);  // test any possible angle
+
+                aa1 = new AxisAngle(x, y, z, angle);  // a random AA is easier to create than a random RM
+                m1 = aa1.ToRotationMatrix();
+                aa2 = m1.ToAxisAngle();
+                m2 = aa2.ToRotationMatrix();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+                Trace.WriteLine(aa1);
+                Trace.WriteLine(m1);
+                Trace.WriteLine(aa2);
+                Trace.WriteLine(m2);
+
+                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(aa1.IsEquivalent(aa2));  // just for the sake of it, not the point of this test ;)
+            }
 
 
+            // Test singularities
+            for (var i = 0; i < 1000; i++)
+            {
+                axis = Point.RandomFromInts(-1, 1);
+                angle = 90 * RandomInt(-8, 8);
 
-        //}
+                aa1 = new AxisAngle(axis, angle);  // a random AA is easier to create than a random RM
+                m1 = aa1.ToRotationMatrix();
+                aa2 = m1.ToAxisAngle();
+                m2 = aa2.ToRotationMatrix();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(axis + " " + angle);
+                Trace.WriteLine(aa1);
+                Trace.WriteLine(m1);
+                Trace.WriteLine(aa2);
+                Trace.WriteLine(m2);
+
+                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(aa1.IsEquivalent(aa2));  // just for the sake of it, not the point of this test ;)
+            }
+        }
+
+
     }
 }
