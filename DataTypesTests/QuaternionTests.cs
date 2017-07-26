@@ -536,9 +536,9 @@ namespace DataTypesTests
                 z = Random(-100, 100);
 
                 q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
-                eu1 = q1.ToEulerZYX();
+                eu1 = q1.ToYawPitchRoll();
                 q2 = eu1.ToQuaternion();
-                eu2 = q2.ToEulerZYX();
+                eu2 = q2.ToYawPitchRoll();
                 q3 = eu2.ToQuaternion();
 
                 Trace.WriteLine("");
@@ -565,11 +565,11 @@ namespace DataTypesTests
                         for (z = -1; z <= 1; z += 0.5)
                         {
                             q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
-                            eu1 = q1.ToEulerZYX();
+                            eu1 = q1.ToYawPitchRoll();
                             q2 = eu1.ToQuaternion();
-                            eu2 = q2.ToEulerZYX();
+                            eu2 = q2.ToYawPitchRoll();
                             q3 = eu2.ToQuaternion();
-                            eu3 = q3.ToEulerZYX();
+                            eu3 = q3.ToYawPitchRoll();
 
                             Trace.WriteLine("");
                             Trace.WriteLine(w + " " + x + " " + y + " " + z);
