@@ -740,21 +740,62 @@ namespace BRobot
         /// <returns></returns>
         public EulerZYX ToEulerZYX()
         {
-            // Roll
-            double xAng = Math.Atan2(2 * (this.W * this.X + this.Y * this.Z), 
-                                     1 - 2 * (this.X * this.X + this.Y * this.Y));
-            
-            // Pitch
-            double t = 2 * (this.W * this.Y - this.Z * this.X);
-            t = t > 1 ? 1 : t;
-            t = t < -1 ? -1 : t;
-            double yAng = Math.Asin(t);
+            /**
+             * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/ with:
+             *      - BRobot conventions: ES uses different heading/pitch/bank axes, fixed here
+             *      - More singularity precision: using 0.001 triggers on angles above 86.3 degrees, 
+             *        resulting in imprecise sets of conversions in those areas, like:
+             *              Quaternion[0.027125, 0.691126, -0.058642, 0.71984]
+                            EulerZYX[Z:175.504902, Y:-90, X:0]
+                            Quaternion[0.027731, 0.706563, -0.027731, 0.706563]
+                            EulerZYX[Z:175.504902, Y:-90, X:0]
+                      instead of the following for 0.000001:
+                            [Quaternion[0.027125, 0.691126, -0.058642, 0.71984]]
+                            [EulerZYX[Z:-135.814015, Y:-86.544758, X:-51.142989]]
+                            [Quaternion[-0.027125, -0.691126, 0.058642, -0.71984]]
+             *      - Consistency adjustment on singularities: as a result of the 2 * atan2 operation, singularities
+             *        may yield Z rotations between [-TAU, TAU], instead of the regular [-PI, PI]. This is not a big deal, 
+             *        but for the sake of consistency in the Euler Angle representation, this has been readapted. 
+             **/
 
-            // Yaw
-            double zAng = Math.Atan2(2 * (this.W * this.Z + this.X * this.Y),
-                                     1 - 2 * (this.Y * this.Y + this.Z * this.Z));
+            // Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
+            // with new BRobot conventions, using much more precision on singula
+            double xAng, yAng, zAng;
 
-            return new EulerZYX(xAng, yAng, zAng);
+            // First, test if close to pitch 90deg singularity:
+            double test = this.W * this.Y - this.Z * this.X;
+            if (test > 0.5 - EPSILON)  // singularity at north pole
+            {
+                xAng = 0;
+                yAng = 0.5 * Math.PI;
+                zAng = 2 * Math.Atan2(this.X, -this.W);
+                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= TAU;
+            } 
+            else if (test < -0.5 + EPSILON)  // singularity at south pole
+            {
+                xAng = 0;
+                yAng = -0.5 * Math.PI;
+                zAng = -2 * Math.Atan2(this.X, -this.W);
+                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= TAU;
+            }
+            else
+            {
+                // From https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#quaternion_to_euler_angles_conversion
+                // Roll
+                xAng = Math.Atan2(2 * (this.W * this.X + this.Y * this.Z),
+                                         1 - 2 * (this.X * this.X + this.Y * this.Y));
+
+                // Pitch
+                yAng = Math.Asin(2 * test);
+
+                // Yaw
+                zAng = Math.Atan2(2 * (this.W * this.Z + this.X * this.Y),
+                                         1 - 2 * (this.Y * this.Y + this.Z * this.Z));
+            }
+
+            return new EulerZYX(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
         }
 
 

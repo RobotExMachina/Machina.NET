@@ -519,6 +519,78 @@ namespace DataTypesTests
         }
 
 
+        [TestMethod]
+        public void Quaternion_ToEulerZYX_ToQuaternion()
+        {
+            Quaternion q1, q2, q3;
+            EulerZYX eu1, eu2, eu3;
+
+            double w, x, y, z;
+
+            // Test random quaternions
+            for (var i = 0; i < 200; i++)
+            {
+                w = Random(-1, 1);  // force vector-normalization
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+
+                q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                eu1 = q1.ToEulerZYX();
+                q2 = eu1.ToQuaternion();
+                eu2 = q2.ToEulerZYX();
+                q3 = eu2.ToQuaternion();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                Trace.WriteLine(q1);
+                Trace.WriteLine(eu1);
+                Trace.WriteLine(q2);
+                Trace.WriteLine(eu2);  // just for testing...
+                Trace.WriteLine(q3);  // and this one too...
+
+                Assert.IsTrue(q1.IsEquivalent(q2), "Not equivalent");
+                Assert.IsTrue(q2 == q3, "Not equal");
+                Assert.IsTrue(eu1 == eu2, "Euler angles not equal");
+            }
+
+
+            // Test all permutations of unitary components quaternions (including zero)
+            for (w = -2; w <= 2; w += 0.5)  // test vector + non-vector normalization
+            {
+                for (x = -1; x <= 1; x += 0.5)
+                {
+                    for (y = -1; y <= 1; y += 0.5)
+                    {
+                        for (z = -1; z <= 1; z += 0.5)
+                        {
+                            q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                            eu1 = q1.ToEulerZYX();
+                            q2 = eu1.ToQuaternion();
+                            eu2 = q2.ToEulerZYX();
+                            q3 = eu2.ToQuaternion();
+                            eu3 = q3.ToEulerZYX();
+
+                            Trace.WriteLine("");
+                            Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                            Trace.WriteLine(q1);
+                            Trace.WriteLine(eu1);
+                            Trace.WriteLine(q2);
+                            Trace.WriteLine(eu2);  // just for testing...
+                            Trace.WriteLine(q3);  // and this one too...
+                            Trace.WriteLine(eu3);  // and even more!
+
+                            Assert.IsTrue(q1.IsEquivalent(q2), "Not equivalent");
+                            Assert.IsTrue(q2 == q3, "Not equal");
+                            Assert.IsTrue(eu1 == eu2, "Euler angles 12 not equal");
+                            Assert.IsTrue(eu2 == eu3, "Euler angles 23 not equal");
+                        }
+                    }
+                }
+            }
+        }
+
+
 
 
     }

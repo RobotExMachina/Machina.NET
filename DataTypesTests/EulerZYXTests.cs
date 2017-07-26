@@ -15,37 +15,68 @@ namespace DataTypesTests
     {
         private double TO_RADS = Math.PI / 180.0;
 
+        //[TestMethod]
+        //public void EulerZYX_ToQuaternion_VsSystemNumerics()
+        //{
+        //    EulerZYX eu;
+        //    Quaternion q;
+        //    SysQuat sq;
+
+        //    double x, y, z;
+
+        //    for (var i = 0; i < 200; i++)
+        //    {
+        //        x = Random(-1440, 1440);
+        //        y = Random(-1440, 1440);
+        //        z = Random(-1440, 1440);
+
+        //        eu = new EulerZYX(x, y, z);
+        //        q = eu.ToQuaternion();
+
+        //        // What freaking convention is System Quaternion using for YawPitchRoll??
+        //        // Explained in the Rotation section here: https://www.codeproject.com/Articles/17425/A-Vector-Type-for-C
+        //        //sq = SysQuat.CreateFromYawPitchRoll((float) (z * TO_RADS), (float)(y * TO_RADS), (float)(x * TO_RADS));
+        //        sq = SysQuat.CreateFromYawPitchRoll((float)(y * TO_RADS), (float)(x * TO_RADS), -(float)(z * TO_RADS));
+
+        //        Trace.WriteLine("");
+        //        Trace.WriteLine(x + " " + y + " " + z);
+        //        Trace.WriteLine(eu);
+        //        Trace.WriteLine(q);
+        //        Trace.WriteLine(sq);
+
+
+        //    }
+        //}
+
         [TestMethod]
-        public void EulerZYX_ToQuaternion_VsSystemNumerics()
+        public void EulerZYX_ToQuaternion_ToEulerZYX()
         {
-            EulerZYX eu;
+            EulerZYX eu1, eu2;
             Quaternion q;
-            SysQuat sq;
 
             double x, y, z;
 
             for (var i = 0; i < 200; i++)
             {
-                x = Random(-1440, 1440);
-                y = Random(-1440, 1440);
-                z = Random(-1440, 1440);
+                //x = Random(-1440, 1440);
+                //y = Random(-1440, 1440);
+                //z = Random(-1440, 1440);
+                x = Random(-180, 180);
+                y = Random(-180, 180);
+                z = Random(-180, 180);
 
-                eu = new EulerZYX(x, y, z);
-                q = eu.ToQuaternion();
-
-                // What freaking convention is System Quaternion using for YawPitchRoll??
-                // Explained in the Rotation section here: https://www.codeproject.com/Articles/17425/A-Vector-Type-for-C
-                //sq = SysQuat.CreateFromYawPitchRoll((float) (z * TO_RADS), (float)(y * TO_RADS), (float)(x * TO_RADS));
-                sq = SysQuat.CreateFromYawPitchRoll((float)(y * TO_RADS), (float)(x * TO_RADS), -(float)(z * TO_RADS));
+                eu1 = new EulerZYX(x, y, z);
+                q = eu1.ToQuaternion();
+                eu2 = q.ToEulerZYX();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z);
-                Trace.WriteLine(eu);
+                Trace.WriteLine(eu1);
                 Trace.WriteLine(q);
-                Trace.WriteLine(sq);
-
-
+                Trace.WriteLine(eu2);
             }
+
+
         }
 
     }

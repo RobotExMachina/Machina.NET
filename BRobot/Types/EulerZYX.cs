@@ -66,6 +66,32 @@ namespace BRobot
         public double Heading { get { return this.ZAngle; } }
 
         /// <summary>
+        /// Equality operator.
+        /// </summary>
+        /// <param name="eu1"></param>
+        /// <param name="eu2"></param>
+        /// <returns></returns>
+        public static bool operator ==(EulerZYX eu1, EulerZYX eu2)
+        {
+            return Math.Abs(eu1.XAngle - eu2.XAngle) < EPSILON
+                && Math.Abs(eu1.YAngle - eu2.YAngle) < EPSILON
+                && Math.Abs(eu1.ZAngle - eu2.ZAngle) < EPSILON;
+        }
+
+        /// <summary>
+        /// Inequality operator. 
+        /// </summary>
+        /// <param name="eu1"></param>
+        /// <param name="eu2"></param>
+        /// <returns></returns>
+        public static bool operator !=(EulerZYX eu1, EulerZYX eu2)
+        {
+            return Math.Abs(eu1.XAngle - eu2.XAngle) > EPSILON
+                || Math.Abs(eu1.YAngle - eu2.YAngle) > EPSILON
+                || Math.Abs(eu1.ZAngle - eu2.ZAngle) > EPSILON;
+        }
+
+        /// <summary>
         /// Create an Euler Angles ZY'X'' intrinsic rotation from its constituent components in degrees.
         /// </summary>
         /// <param name="xAngle"></param>
@@ -79,12 +105,21 @@ namespace BRobot
         }
 
 
-        //public RotationMatrix ToRotationMatrix()
-        //{
+        /// <summary>
+        /// Is this rotation equivalent to another? I.e. is the resulting orientation the same?
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool IsEquivalent(EulerZYX other)
+        {
+            // Simple (and expensive?) test, compare underlying Quaternions...
+            return this.ToQuaternion().IsEquivalent(other.ToQuaternion());
+        }
 
-        //}
-
-        
+        /// <summary>
+        /// Returns the Quaternion representation of this rotation.
+        /// </summary>
+        /// <returns></returns>
         public Quaternion ToQuaternion()
         {
             // From Shoemake, Ken. "Animating rotation with quaternion curves." ACM SIGGRAPH computer graphics. Vol. 19. No. 3. ACM, 1985.

@@ -17,8 +17,8 @@
 
 ## BUILD 1208
 - [ ] Euler Angles --> Rename to YawPitchRoll
-    - [ ] Create class structure
-    - [ ] EU > Q > EU
+    - [x] Create class structure
+    - [x] EU > Q > EU
     - [ ] EU > AA > EU
     - [ ] EU > RM > EU
     - [ ] EU > RV > EU

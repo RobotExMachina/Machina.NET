@@ -596,6 +596,8 @@ namespace BRobot
         }
 
 
+
+
         public override string ToString()
         {
             return string.Format("RotationMatrix[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
