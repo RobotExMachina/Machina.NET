@@ -27,6 +27,7 @@
     - [x] M33.Transpose()
     - [x] Orthogonality checks on creation of a M33
     - [x] Q > M33 > Q
+    - [ ] Do two opposed quaternions yield the same RM? 
     - [x] M33 > AA
     - [x] AA > M33
     - [ ] TEST THE ABOVE

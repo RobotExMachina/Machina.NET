@@ -452,5 +452,71 @@ namespace DataTypesTests
             }
         }
 
+
+        /// <summary>
+        /// Do equivalent (but not equal) Quaternions yield the same Rotation Matrix? 
+        /// This is checked by scaking the first quaternion by a random factor.
+        /// </summary>
+        [TestMethod]
+        public void Quaternion_ToRotationMatrix_FromEquivalentQuaternions()
+        {
+            Quaternion q1, q2;
+            RotationMatrix m1, m2;
+
+            double w, x, y, z, factor;
+
+            // Test random quaternions
+            for (var i = 0; i < 100; i++)
+            {
+                w = Random(-1, 1);  // force vector-normalization
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                factor = Random(-10, 10);
+
+                q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
+                m1 = q1.ToRotationMatrix();
+                q2 = Quaternion.Scale(q1, factor);
+                m2 = q2.ToRotationMatrix();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                Trace.WriteLine(q1);
+                Trace.WriteLine(m1);
+                Trace.WriteLine(q2);
+                Trace.WriteLine(m2);
+
+                Assert.IsTrue(m1 == m2);
+            }
+
+            factor = -1;
+            // Test all permutations of unitary components quaternions (including zero)
+            for (w = -2; w <= 2; w += 0.5)  // test vector + non-vector normalization
+            {
+                for (x = -1; x <= 1; x += 0.5)
+                {
+                    for (y = -1; y <= 1; y += 0.5)
+                    {
+                        for (z = -1; z <= 1; z += 0.5)
+                        {
+                            q1 = new Quaternion(w, x, y, z);
+                            m1 = q1.ToRotationMatrix();
+                            q2 = Quaternion.Scale(q1, factor);
+                            m2 = q2.ToRotationMatrix();
+
+                            Trace.WriteLine("");
+                            Trace.WriteLine(w + " " + x + " " + y + " " + z);
+                            Trace.WriteLine(q1);
+                            Trace.WriteLine(m1);
+                            Trace.WriteLine(q2);
+                            Trace.WriteLine(m2);
+
+                            Assert.IsTrue(m1 == m2);
+                        }
+                    }
+                }
+            }
+                        }
+
     }
 }

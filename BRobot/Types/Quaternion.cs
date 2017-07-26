@@ -593,7 +593,8 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Multiply this Quaternion by a scalar.
+        /// Multiply this Quaternion by a scalar. 
+        /// @TODO: this perhaps shouldn't be here, since it would de-unitize this Q and possibly break things after...
         /// </summary>
         /// <param name="factor"></param>
         public void Scale(double factor)
