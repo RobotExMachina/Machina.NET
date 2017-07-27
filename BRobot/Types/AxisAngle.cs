@@ -335,7 +335,7 @@ namespace BRobot
             m.m01 = t1 - t2;
 
             t1 = t * this.X * this.Z;
-            t2 = this.Y * s;
+            t2 = s * this.Y;
             m.m20 = t1 - t2;
             m.m02 = t1 + t2;
 
@@ -345,6 +345,83 @@ namespace BRobot
             m.m12 = t1 - t2;
 
             return m;
+        }
+
+        /// <summary>
+        /// Returns a YawPitchRoll representation of this rotation.
+        /// </summary>
+        /// <returns></returns>
+        public YawPitchRoll ToYawPitchRoll()
+        {
+            // Some sanity: if this AA represents no rotation, return identity matrix
+            if (this.IsZero())
+            {
+                return new YawPitchRoll();
+            }
+
+            // This is basically transforming it to a RM and then YPR: this.ToRotationMatrix().ToYawPitchRoll()
+            // The above may actually be faster, we will see...
+
+            // This conversion assumes the rotation vector is normalized.
+            double ang = this.Angle * TO_RADS;
+            double c = Math.Cos(ang);
+            double s = Math.Sin(ang);
+            double t = 1 - c;
+            double trace = t * this.X * this.Z - this.Y * s;
+
+            double xAng, yAng, zAng;
+
+            // North pole singularity (yAng ~ 90degs)? Note m02 is -sin(y) = -sin(90) = -1
+            if (trace < -1 + EPSILON3)
+            {
+                xAng = 0;
+                yAng = 0.5 * Math.PI;
+                zAng = Math.Atan2(t * this.Y * this.Z - s * this.X, t * this.X * this.Z + s * this.Y);
+                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= TAU;
+            }
+
+            // South pole singularity (yAng ~ -90degs)? Note m02 is -sin(y) = -sin(-90) = 1
+            else if (trace > 1 - EPSILON3)
+            {
+                xAng = 0;
+                yAng = -0.5 * Math.PI;
+                zAng = Math.Atan2(-t * this.Y * this.Z + s * this.X, -t * this.X * this.Z - s * this.Y);
+                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= TAU;
+            }
+
+            // Regular derivation
+            else
+            {
+                //xAng = Math.Atan2(this.m21, this.m22);
+                //yAng = -Math.Asin(this.m20);
+                //zAng = Math.Atan2(this.m10, this.m00);
+                xAng = Math.Atan2(t * this.Y * this.Z + s * this.X, c + t * this.Z * this.Z);
+                yAng = -Math.Asin(t * this.X * this.Z - s * this.Y);
+                zAng = Math.Atan2(t * this.X * this.Y + s * this.Z, c + t * this.X * this.X);
+
+                //m.m00 = c + t * this.X * this.X;
+                //m.m11 = c + t * this.Y * this.Y;
+                //m.m22 = c + t * this.Z * this.Z;
+
+                //double t1 = t * this.X * this.Y;
+                //double t2 = s * this.Z;
+                //m.m10 = t1 + t2;
+                //m.m01 = t1 - t2;
+
+                //t1 = t * this.X * this.Z;
+                //t2 = s * this.Y;
+                //m.m20 = t1 - t2;
+                //m.m02 = t1 + t2;
+
+                //t1 = t * this.Y * this.Z;
+                //t2 = s * this.X;
+                //m.m21 = t1 + t2;
+                //m.m12 = t1 - t2;
+            }
+
+            return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
         }
 
         public override string ToString()

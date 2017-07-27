@@ -474,5 +474,56 @@ namespace DataTypesTests
             }
 
         }
+
+        [TestMethod]
+        public void AxisAngle_ToYawPitchRoll_ComparisonThroughRotationMatrix()
+        {
+            AxisAngle aa;
+            RotationMatrix m;
+            YawPitchRoll eu1, eu2;
+
+            double x, y, z, angle;
+            Point axis;
+
+            // Test random permutations
+            for (var i = 0; i < 200; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-1440, 1440);  // test any possible angle
+
+                aa = new AxisAngle(x, y, z, angle);
+                eu1 = aa.ToYawPitchRoll();
+                m = aa.ToRotationMatrix();
+                eu2 = m.ToYawPitchRoll();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+                Trace.WriteLine(aa + " --> " + eu1);
+                Trace.WriteLine(aa + " --> " + m + " --> " + eu2);
+
+                Assert.IsTrue(eu1 == eu2);
+            }
+
+            //// Test singularities
+            //for (var i = 0; i < 1000; i++)
+            //{
+            //    axis = Point.RandomFromInts(-1, 1);
+            //    angle = 90 * RandomInt(-8, 8);
+
+            //    aa = new AxisAngle(axis, angle);
+            //    m = aa.ToRotationMatrix();
+            //    aabis = m.ToAxisAngle();
+
+            //    Trace.WriteLine("");
+            //    Trace.WriteLine(axis + " " + angle);
+            //    Trace.WriteLine(aa);
+            //    Trace.WriteLine(m);
+            //    Trace.WriteLine(aabis);
+
+            //    Assert.IsTrue(aa.IsEquivalent(aabis));
+            //}
+        }
     }
 }

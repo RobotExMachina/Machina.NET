@@ -93,6 +93,11 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Create a zero rotation.
+        /// </summary>
+        public YawPitchRoll() : this(0, 0, 0) { }
+
+        /// <summary>
         /// Create an Euler Angles ZY'X'' intrinsic rotation from its constituent components in degrees.
         /// </summary>
         /// <param name="xAngle"></param>
@@ -157,7 +162,10 @@ namespace BRobot
                                           -sY,                 sX * cY,                     cX * cY, false);
         }
 
-
+        /// <summary>
+        /// Returns the Axis-Angle representation of this rotation.
+        /// </summary>
+        /// <returns></returns>
         public AxisAngle ToAxisAngle()
         {
             // This is just basically converting it to a quaternion, and then axis-angle: this.ToQuaternion().ToAxisAngle();
