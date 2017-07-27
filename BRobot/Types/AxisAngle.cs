@@ -70,7 +70,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Implicitn conversion to Vector object.
+        /// Implicit conversion to Vector object.
         /// </summary>
         /// <param name="aa"></param>
         public static implicit operator Vector(AxisAngle aa)

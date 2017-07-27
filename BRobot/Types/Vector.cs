@@ -7,19 +7,33 @@ using System.Threading.Tasks;
 namespace BRobot
 {
 
-    //██████╗  ██████╗ ██╗███╗   ██╗████████╗
-    //██╔══██╗██╔═══██╗██║████╗  ██║╚══██╔══╝
-    //██████╔╝██║   ██║██║██╔██╗ ██║   ██║   
-    //██╔═══╝ ██║   ██║██║██║╚██╗██║   ██║   
-    //██║     ╚██████╔╝██║██║ ╚████║   ██║   
-    //╚═╝      ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝                                  
+    //  ██╗   ██╗███████╗ ██████╗████████╗ ██████╗ ██████╗ 
+    //  ██║   ██║██╔════╝██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗
+    //  ██║   ██║█████╗  ██║        ██║   ██║   ██║██████╔╝
+    //  ╚██╗ ██╔╝██╔══╝  ██║        ██║   ██║   ██║██╔══██╗
+    //   ╚████╔╝ ███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║
+    //    ╚═══╝  ╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
+    //                                                     
     /// <summary>
-    /// Represents three coordinates in space.
+    /// Represents a three dimensional vector.
     /// </summary>
     public class Vector : Geometry
     {
 
-        public double X, Y, Z;
+        /// <summary>
+        /// X property of the Vector.
+        /// </summary>
+        public double X { get; internal set; }
+
+        /// <summary>
+        /// Y property of the Vector.
+        /// </summary>
+        public double Y { get; internal set; }
+
+        /// <summary>
+        /// Z property of the Vector.
+        /// </summary>
+        public double Z { get; internal set; }
 
 
         public static bool operator ==(Vector p1, Vector p2)
@@ -34,6 +48,15 @@ namespace BRobot
             return Math.Abs(p1.X - p2.X) > EPSILON
                 || Math.Abs(p1.Y - p2.Y) > EPSILON
                 || Math.Abs(p1.Z - p2.Z) > EPSILON;
+        }
+
+        /// <summary>
+        /// Implicit conversion to Point object.
+        /// </summary>
+        /// <param name="vec"></param>
+        public static implicit operator Point(Vector vec)
+        {
+            return new BRobot.Point(vec.X, vec.Y, vec.Z);
         }
 
         /// <summary>

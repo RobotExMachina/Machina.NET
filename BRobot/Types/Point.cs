@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BRobot
+{
+    //██████╗  ██████╗ ██╗███╗   ██╗████████╗
+    //██╔══██╗██╔═══██╗██║████╗  ██║╚══██╔══╝
+    //██████╔╝██║   ██║██║██╔██╗ ██║   ██║   
+    //██╔═══╝ ██║   ██║██║██║╚██╗██║   ██║   
+    //██║     ╚██████╔╝██║██║ ╚████║   ██║   
+    //╚═╝      ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝   
+    //
+    /// <summary>
+    /// Represents a three dimensional point. 
+    /// This is just a cosmetic alias for Vectors in the Public API... Users may have a better
+    /// time at first understanding position as Points and direction as Vectors...?
+    /// </summary>
+    public class Point : Geometry
+    {
+        /// <summary>
+        /// X property of the Point.
+        /// </summary>
+        public double X { get; internal set; }
+
+        /// <summary>
+        /// Y property of the Point.
+        /// </summary>
+        public double Y { get; internal set; }
+
+        /// <summary>
+        /// Z property of the Point.
+        /// </summary>
+        public double Z { get; internal set; }
+
+        /// <summary>
+        /// Implicit conversion to Vector object.
+        /// </summary>
+        /// <param name="p"></param>
+        public static implicit operator Vector(Point p)
+        {
+            return new BRobot.Vector(p.X, p.Y, p.Z);
+        }
+
+        /// <summary>
+        /// Create a Point from its XYZ coordinates.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        public Point(double x, double y, double z)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
+    }
+}
