@@ -51,7 +51,7 @@ namespace BRobot
         /// Alias
         /// </summary>
         public double m11 { get { return this.R[4]; } internal set { R[4] = value; } }
-        
+
         /// <summary>
         /// Alias
         /// </summary>
@@ -72,7 +72,7 @@ namespace BRobot
         /// </summary>
         public double m22 { get { return this.R[8]; } internal set { R[8] = value; } }
 
-        public static bool operator ==(RotationMatrix  m1, RotationMatrix m2)
+        public static bool operator ==(RotationMatrix m1, RotationMatrix m2)
         {
             return Math.Abs(m1.R[0] - m2.R[0]) < EPSILON
                 && Math.Abs(m1.R[1] - m2.R[1]) < EPSILON
@@ -236,7 +236,7 @@ namespace BRobot
                 this.Orthogonalize();
             }
         }
-        
+
         /// <summary>
         /// Is this an identity matrix?
         /// </summary>
@@ -370,15 +370,15 @@ namespace BRobot
             }
             det = 1.0 / det;
 
-            R[0] = b01* det;
-            R[1] = (-a22* a01 + a02* a21) * det;
-            R[2] = (a12* a01 - a02* a11) * det;
-            R[3] = b11* det;
-            R[4] = (a22* a00 - a02* a20) * det;
-            R[5] = (-a12* a00 + a02* a10) * det;
-            R[6] = b21* det;
-            R[7] = (-a21* a00 + a01* a20) * det;
-            R[8] = (a11* a00 - a01* a10) * det;
+            R[0] = b01 * det;
+            R[1] = (-a22 * a01 + a02 * a21) * det;
+            R[2] = (a12 * a01 - a02 * a11) * det;
+            R[3] = b11 * det;
+            R[4] = (a22 * a00 - a02 * a20) * det;
+            R[5] = (-a12 * a00 + a02 * a10) * det;
+            R[6] = b21 * det;
+            R[7] = (-a21 * a00 + a01 * a20) * det;
+            R[8] = (a11 * a00 - a01 * a10) * det;
 
             return true;
         }
@@ -529,7 +529,7 @@ namespace BRobot
                         x = 0;
                         y = sinv;
                         z = sinv;
-                    } 
+                    }
                     else
                     {
                         x = Math.Sqrt(xx);
@@ -593,6 +593,57 @@ namespace BRobot
         public RotationVector ToRotationVector()
         {
             return this.ToAxisAngle().ToRotationVector();
+        }
+
+
+        public YawPitchRoll ToYawPitchRoll()
+        {
+            /**
+             * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/index.htm with:
+             *      - BRobot conventions: ES uses different heading/pitch/bank axes, fixed here
+             *      - More singularity precision: using 0.001 triggers on angles above 86.3 degrees, 
+             *        resulting in imprecise sets of conversions in those areas, like:
+             *              Quaternion[0.027125, 0.691126, -0.058642, 0.71984]
+                            EulerZYX[Z:175.504902, Y:-90, X:0]
+                            Quaternion[0.027731, 0.706563, -0.027731, 0.706563]
+                            EulerZYX[Z:175.504902, Y:-90, X:0]
+                      instead of the following for 0.000001:
+                            [Quaternion[0.027125, 0.691126, -0.058642, 0.71984]]
+                            [EulerZYX[Z:-135.814015, Y:-86.544758, X:-51.142989]]
+                            [Quaternion[-0.027125, -0.691126, 0.058642, -0.71984]]
+             *      - Consistency adjustment on singularities: as a result of the 2 * atan2 operation, singularities
+             *        may yield Z rotations between [-TAU, TAU], instead of the regular [-PI, PI]. This is not a big deal, 
+             *        but for the sake of consistency in the Euler Angle representation, this has been readapted. 
+             **/
+
+            double xAng, yAng, zAng;
+
+            // North pole singularity (yAng ~ 90degs)?
+            if (this.m20 > 1 - EPSILON)
+            {
+                xAng = 0;
+                yAng = 0.5 * Math.PI;
+                zAng = Math.Atan2(this.m12, this.m02);
+                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= TAU;
+            }
+            // South pole singularity (yAng ~ -90degs)?
+            else if (this.m20 < -1 + EPSILON) 
+            {
+                xAng = 0;
+                yAng = -0.5 * Math.PI;
+                zAng = Math.Atan2(this.m12, this.m02);
+                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= TAU;
+            }
+            else
+            {
+                xAng = Math.Atan2(this.m21, this.m22);
+                yAng = Math.Asin(this.m20);
+                zAng = Math.Atan2(this.m10, this.m00);
+            }
+
+            return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
         }
 
 

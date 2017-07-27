@@ -728,9 +728,9 @@ namespace BRobot
                 zw2 = 2 * this.Z * this.W,
                 ww2 = 2 * this.W * this.W;
 
-            return new RotationMatrix(1 - yy2 - zz2, xy2 - zw2, xz2 + yw2,
-                                xy2 + zw2, 1 - xx2 - zz2, yz2 - xw2,
-                                xz2 - yw2, yz2 + xw2, 1 - xx2 - yy2);
+            return new RotationMatrix(1 - yy2 - zz2,         xy2 - zw2,         xz2 + yw2,
+                                          xy2 + zw2,     1 - xx2 - zz2,         yz2 - xw2,
+                                          xz2 - yw2,         yz2 + xw2,     1 - xx2 - yy2);
         }
 
         /// <summary>
@@ -758,8 +758,6 @@ namespace BRobot
              *        but for the sake of consistency in the Euler Angle representation, this has been readapted. 
              **/
 
-            // Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-            // with new BRobot conventions, using much more precision on singula
             double xAng, yAng, zAng;
 
             // First, test if close to pitch 90deg singularity:
