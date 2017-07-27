@@ -358,7 +358,7 @@ namespace BRobot
                 return new YawPitchRoll();
             }
 
-            // This is basically transforming it to a RM and then YPR: this.ToRotationMatrix().ToYawPitchRoll()
+            // THIS IS BASICALLY TRANSFORMING IT TO A RM AND THEN YPR: this.ToRotationMatrix().ToYawPitchRoll()
             // The above may actually be faster, we will see...
 
             // This conversion assumes the rotation vector is normalized.

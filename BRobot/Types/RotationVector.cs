@@ -204,12 +204,21 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Returns a Rotation Matrix representation of this vector.
+        /// Returns a Rotation Matrix representation of this rotation.
         /// </summary>
         /// <returns></returns>
         public RotationMatrix ToRotationMatrix()
         {
             return this.ToAxisAngle().ToRotationMatrix();
+        }
+
+        /// <summary>
+        /// Return a YawPitchRoll representation of this rotation.
+        /// </summary>
+        /// <returns></returns>
+        public YawPitchRoll ToYawPitchRoll()
+        {
+            return this.ToAxisAngle().ToYawPitchRoll();
         }
 
         public override string ToString()

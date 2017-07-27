@@ -197,6 +197,15 @@ namespace BRobot
             return new AxisAngle(x, y, z, TO_DEGS * angle, false);
         }
 
+        /// <summary>
+        /// Returns a Rotation Vector representation of this rotation.
+        /// </summary>
+        /// <returns></returns>
+        public RotationVector ToRotationVector()
+        {
+            return this.ToAxisAngle().ToRotationVector();
+        }
+
 
         public override string ToString()
         {
