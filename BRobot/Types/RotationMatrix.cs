@@ -618,8 +618,8 @@ namespace BRobot
 
             double xAng, yAng, zAng;
 
-            // North pole singularity (yAng ~ 90degs)?
-            if (this.m20 > 1 - EPSILON)
+            // North pole singularity (yAng ~ 90degs)? Note m02 is -sin(y) = -sin(90) = -1
+            if (this.m20 < -1 + EPSILON)
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
@@ -627,19 +627,22 @@ namespace BRobot
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
             }
-            // South pole singularity (yAng ~ -90degs)?
-            else if (this.m20 < -1 + EPSILON) 
+
+            // South pole singularity (yAng ~ -90degs)? Note m02 is -sin(y) = -sin(-90) = 1
+            else if (this.m20 > 1 - EPSILON) 
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;
-                zAng = Math.Atan2(this.m12, this.m02);
+                zAng = Math.Atan2(-this.m12, -this.m02);
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
             }
+            
+            // Regular derivation
             else
             {
                 xAng = Math.Atan2(this.m21, this.m22);
-                yAng = Math.Asin(this.m20);
+                yAng = -Math.Asin(this.m20);
                 zAng = Math.Atan2(this.m10, this.m00);
             }
 

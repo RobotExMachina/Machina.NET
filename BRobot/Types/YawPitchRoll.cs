@@ -113,7 +113,7 @@ namespace BRobot
         /// <returns></returns>
         public bool IsEquivalent(YawPitchRoll other)
         {
-            // Simple (and expensive?) test, compare underlying Quaternions...
+            // Quick and dirty (and expensive?) test, compare underlying Quaternions...
             return this.ToQuaternion().IsEquivalent(other.ToQuaternion());
         }
 
@@ -144,6 +144,7 @@ namespace BRobot
         /// <returns></returns>
         public RotationMatrix ToRotationMatrix()
         {
+            // From https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles
             double cX = Math.Cos(TO_RADS * this.XAngle),
                    cY = Math.Cos(TO_RADS * this.YAngle),
                    cZ = Math.Cos(TO_RADS * this.ZAngle),

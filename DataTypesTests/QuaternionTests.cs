@@ -520,7 +520,7 @@ namespace DataTypesTests
 
 
         [TestMethod]
-        public void Quaternion_ToEulerZYX_ToQuaternion()
+        public void Quaternion_ToYawPitchRoll_ToQuaternion()
         {
             Quaternion q1, q2, q3;
             YawPitchRoll eu1, eu2, eu3;

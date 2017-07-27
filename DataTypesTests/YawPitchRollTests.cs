@@ -82,7 +82,7 @@ namespace DataTypesTests
             }
 
 
-            }
+        }
 
 
         [TestMethod]
@@ -140,6 +140,73 @@ namespace DataTypesTests
             }
 
 
+        }
+
+        [TestMethod]
+        public void YawPitchRoll_ToRotationMatrix_ToYawPitchRoll()
+        {
+            YawPitchRoll eu1, eu2, eu3;
+            RotationMatrix m1, m2, m3;
+
+            double x, y, z;
+
+            // Amp this up to 100000 cycles to hit singularities
+            for (var i = 0; i < 500; i++)
+            {
+                x = Random(-1440, 1440);
+                y = Random(-1440, 1440);
+                z = Random(-1440, 1440);
+
+                eu1 = new YawPitchRoll(x, y, z);
+                m1 = eu1.ToRotationMatrix();
+                eu2 = m1.ToYawPitchRoll();
+                m2 = eu2.ToRotationMatrix();
+                eu3 = m2.ToYawPitchRoll();
+                m3 = eu3.ToRotationMatrix();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z);
+                Trace.WriteLine(eu1 + " " + eu1.ToQuaternion());
+                Trace.WriteLine(m1);
+                Trace.WriteLine(eu2 + " " + eu2.ToQuaternion());
+                Trace.WriteLine(m2);
+                Trace.WriteLine(eu3);
+                Trace.WriteLine(m3);
+
+                Assert.IsTrue(eu1.IsEquivalent(eu2), "Eulers1 not equiv");
+                Assert.IsTrue(eu2 == eu3, "Eulers2 not equal");
+                Assert.IsTrue(m1 == m2, "Matrices1 not equiv");
+                Assert.IsTrue(m2 == m3, "Matrices2 not equal");
+            }
+
+            // Try orthogonal configurations
+            for (var i = 0; i < 500; i++)
+            {
+                x = 90 * RandomInt(-16, 16);
+                y = 90 * RandomInt(-16, 16);
+                z = 90 * RandomInt(-16, 16);
+
+                eu1 = new YawPitchRoll(x, y, z);
+                m1 = eu1.ToRotationMatrix();
+                eu2 = m1.ToYawPitchRoll();
+                m2 = eu2.ToRotationMatrix();
+                eu3 = m2.ToYawPitchRoll();
+                m3 = eu3.ToRotationMatrix();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z);
+                Trace.WriteLine(eu1 + " " + eu1.ToQuaternion());
+                Trace.WriteLine(m1);
+                Trace.WriteLine(eu2 + " " + eu2.ToQuaternion());
+                Trace.WriteLine(m2);
+                Trace.WriteLine(eu3 + " " + eu3.ToQuaternion());
+                Trace.WriteLine(m3);
+
+                Assert.IsTrue(eu1.IsEquivalent(eu2), "Eulers1 not equiv");
+                Assert.IsTrue(eu2.IsEquivalent(eu3), "Eulers2 not equal");
+                Assert.IsTrue(m1 == m2, "Matrices1 not equiv");
+                Assert.IsTrue(m2 == m3, "Matrices2 not equal");
+            }
         }
 
     }
