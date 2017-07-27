@@ -506,24 +506,86 @@ namespace DataTypesTests
                 Assert.IsTrue(eu1 == eu2);
             }
 
-            //// Test singularities
-            //for (var i = 0; i < 1000; i++)
-            //{
-            //    axis = Point.RandomFromInts(-1, 1);
-            //    angle = 90 * RandomInt(-8, 8);
+            // Test singularities
+            for (var i = 0; i < 200; i++)
+            {
+                axis = Point.RandomFromInts(-1, 1);
+                angle = 90 * RandomInt(-8, 8);
 
-            //    aa = new AxisAngle(axis, angle);
-            //    m = aa.ToRotationMatrix();
-            //    aabis = m.ToAxisAngle();
+                aa = new AxisAngle(axis, angle);
+                eu1 = aa.ToYawPitchRoll();
+                m = aa.ToRotationMatrix();
+                eu2 = m.ToYawPitchRoll();
 
-            //    Trace.WriteLine("");
-            //    Trace.WriteLine(axis + " " + angle);
-            //    Trace.WriteLine(aa);
-            //    Trace.WriteLine(m);
-            //    Trace.WriteLine(aabis);
+                Trace.WriteLine("");
+                Trace.WriteLine(axis + " " + angle);
+                Trace.WriteLine(aa + " --> " + eu1);
+                Trace.WriteLine(aa + " --> " + m + " --> " + eu2);
 
-            //    Assert.IsTrue(aa.IsEquivalent(aabis));
-            //}
+                Assert.IsTrue(eu1 == eu2);
+            }
+        }
+
+        [TestMethod]
+        public void AxisAngle_ToYawPitchRoll_ToAxisAngle()
+        {
+            AxisAngle aa1, aa2, aa3;
+            YawPitchRoll eu1, eu2, eu3;
+
+            double x, y, z, angle;
+            Point axis;
+
+            // Test random permutations
+            for (var i = 0; i < 200; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-1440, 1440);  // test any possible angle
+
+                aa1 = new AxisAngle(x, y, z, angle);
+                eu1 = aa1.ToYawPitchRoll();
+                aa2 = eu1.ToAxisAngle();
+                eu2 = aa2.ToYawPitchRoll();
+                aa3 = eu2.ToAxisAngle();
+                eu3 = aa3.ToYawPitchRoll();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+                Trace.WriteLine("    " + aa1 + " --> " + eu1);
+                Trace.WriteLine("--> " + aa2 + " --> " + eu2);
+                Trace.WriteLine("--> " + aa3 + " --> " + eu3);
+
+                Assert.IsTrue(aa1.IsEquivalent(aa2));
+                Assert.IsTrue(aa2 == aa3);
+                Assert.IsTrue(eu1 == eu2);
+                Assert.IsTrue(eu2 == eu3);
+            }
+
+            // Test singularities
+            for (var i = 0; i < 200; i++)
+            {
+                axis = Point.RandomFromInts(-1, 1);
+                angle = 90 * RandomInt(-8, 8);
+
+                aa1 = new AxisAngle(axis, angle);
+                eu1 = aa1.ToYawPitchRoll();
+                aa2 = eu1.ToAxisAngle();
+                eu2 = aa2.ToYawPitchRoll();
+                aa3 = eu2.ToAxisAngle();
+                eu3 = aa3.ToYawPitchRoll();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(axis + " " + angle);
+                Trace.WriteLine("    " + aa1 + " --> " + eu1);
+                Trace.WriteLine("--> " + aa2 + " --> " + eu2);
+                Trace.WriteLine("--> " + aa3 + " --> " + eu3);
+
+                Assert.IsTrue(aa1.IsEquivalent(aa2));
+                Assert.IsTrue(aa2 == aa3);
+                Assert.IsTrue(eu1 == eu2);
+                Assert.IsTrue(eu2 == eu3);
+            }
         }
     }
 }

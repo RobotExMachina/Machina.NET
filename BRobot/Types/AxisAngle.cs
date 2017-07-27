@@ -394,31 +394,9 @@ namespace BRobot
             // Regular derivation
             else
             {
-                //xAng = Math.Atan2(this.m21, this.m22);
-                //yAng = -Math.Asin(this.m20);
-                //zAng = Math.Atan2(this.m10, this.m00);
                 xAng = Math.Atan2(t * this.Y * this.Z + s * this.X, c + t * this.Z * this.Z);
                 yAng = -Math.Asin(t * this.X * this.Z - s * this.Y);
                 zAng = Math.Atan2(t * this.X * this.Y + s * this.Z, c + t * this.X * this.X);
-
-                //m.m00 = c + t * this.X * this.X;
-                //m.m11 = c + t * this.Y * this.Y;
-                //m.m22 = c + t * this.Z * this.Z;
-
-                //double t1 = t * this.X * this.Y;
-                //double t2 = s * this.Z;
-                //m.m10 = t1 + t2;
-                //m.m01 = t1 - t2;
-
-                //t1 = t * this.X * this.Z;
-                //t2 = s * this.Y;
-                //m.m20 = t1 - t2;
-                //m.m02 = t1 + t2;
-
-                //t1 = t * this.Y * this.Z;
-                //t2 = s * this.X;
-                //m.m21 = t1 + t2;
-                //m.m12 = t1 - t2;
             }
 
             return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);

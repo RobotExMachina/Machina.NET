@@ -287,5 +287,68 @@ namespace DataTypesTests
 
             }
         }
+
+
+
+        [TestMethod]
+        public void YawPitchRoll_ToAxisAngle_ToYawPitchRoll()
+        {
+            YawPitchRoll eu1, eu2, eu3;
+            AxisAngle aa1, aa2, aa3;
+
+            double x, y, z;
+
+            // Amp this up to 100000 cycles to hit singularities
+            for (var i = 0; i < 500; i++)
+            {
+                x = Random(-1440, 1440);
+                y = Random(-1440, 1440);
+                z = Random(-1440, 1440);
+
+                eu1 = new YawPitchRoll(x, y, z);
+                aa1 = eu1.ToAxisAngle();
+                eu2 = aa1.ToYawPitchRoll();
+                aa2 = eu2.ToAxisAngle();
+                eu3 = aa2.ToYawPitchRoll();
+                aa3 = eu3.ToAxisAngle();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z);
+                Trace.WriteLine("    " + eu1 + " --> " + aa1);
+                Trace.WriteLine("    " + eu2 + " --> " + aa2);
+                Trace.WriteLine("    " + eu3 + " --> " + aa3);
+
+                Assert.IsTrue(eu1.IsEquivalent(eu2), "Eulers1 not equiv");
+                Assert.IsTrue(eu2 == eu3, "Eulers2 not equal");
+                Assert.IsTrue(aa1.IsEquivalent(aa2), "AA1 not equal");
+                Assert.IsTrue(aa2 == aa3, "AA2 not equal");
+            }
+
+            // Try orthogonal configurations
+            for (var i = 0; i < 500; i++)
+            {
+                x = 90 * RandomInt(-16, 16);
+                y = 90 * RandomInt(-16, 16);
+                z = 90 * RandomInt(-16, 16);
+
+                eu1 = new YawPitchRoll(x, y, z);
+                aa1 = eu1.ToAxisAngle();
+                eu2 = aa1.ToYawPitchRoll();
+                aa2 = eu2.ToAxisAngle();
+                eu3 = aa2.ToYawPitchRoll();
+                aa3 = eu3.ToAxisAngle();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z);
+                Trace.WriteLine("    " + eu1 + " --> " + aa1);
+                Trace.WriteLine("    " + eu2 + " --> " + aa2);
+                Trace.WriteLine("    " + eu3 + " --> " + aa3);
+
+                Assert.IsTrue(eu1.IsEquivalent(eu2), "Eulers1 not equiv");
+                Assert.IsTrue(eu2.IsEquivalent(eu3), "Eulers2 not equal");
+                Assert.IsTrue(aa1.IsEquivalent(aa2), "AA1 not equal");
+                Assert.IsTrue(aa2.IsEquivalent(aa3), "AA2 not equal");
+            }
+        }
     }
 }
