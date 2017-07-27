@@ -73,7 +73,14 @@
     <Compile Include="Action.cs" />
     <Compile Include="ActionBuffer.cs" />
     <Compile Include="Types\AxisAngle.cs" />
+    <Compile Include="Types\Geometry.cs" />
+    <Compile Include="Types\t_CoordinateSystem.cs" />
+    <Compile Include="Types\Joints.cs" />
     <Compile Include="Types\Point.cs" />
+    <Compile Include="Types\t_Frame.cs" />
+    <Compile Include="Types\t_Path.cs" />
+    <Compile Include="Types\t_Rotation.cs" />
+    <Compile Include="Types\t_SpatialTrigger.cs" />
     <Compile Include="Types\Vector.cs" />
     <Compile Include="Types\YawPitchRoll.cs" />
     <Compile Include="Types\RotationMatrix.cs" />
@@ -82,7 +89,6 @@
     <Compile Include="SettingsBuffer.cs" />
     <Compile Include="Communication.cs" />
     <Compile Include="Control.cs" />
-    <Compile Include="DataTypes.cs" />
     <Compile Include="Library.cs" />
     <Compile Include="Queue.cs" />
     <Compile Include="Compiler.cs" />
