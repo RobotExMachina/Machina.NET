@@ -15,13 +15,18 @@
 ```
 
 
+## BUILD 1209
+- [ ] Point is now Vector: 
+    - [x] All internal instances of Point have been changed to Vector
+    - [ ] There is still a new Point class. This is just for the sake of the public API, for the sake of presenting a _perceied difference_ between a location and a direction. This is just cosmetic, everything is Vectors internally...
+
 ## BUILD 1208
-- [ ] Euler Angles --> Rename to YawPitchRoll
+- [x] Euler Angles --> Rename to YawPitchRoll
     - [x] Create class structure
     - [x] EU > Q > EU
     - [x] EU > RM > EU
     - [x] EU > AA > EU
-    - [ ] EU > RV > EU
+    - [x] EU > RV > EU
 - [x] This was really helpful, nice tool: http://danceswithcode.net/engineeringnotes/rotations_in_3d/demo3D/rotations_in_3d_tool.html
 
 ## BUILD 1207

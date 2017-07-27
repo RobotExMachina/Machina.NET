@@ -153,7 +153,7 @@ namespace BRobot
                 DropCommunication();
 
                 // In offline modes, initialize the robot to a bogus standard transform
-                InitializeRobotCursors(new Point(), Rotation.FlippedAroundY);  // @TODO: defaults should depend on robot make/model
+                InitializeRobotCursors(new Vector(), Rotation.FlippedAroundY);  // @TODO: defaults should depend on robot make/model
             }
             else
             {
@@ -227,7 +227,7 @@ namespace BRobot
                 SetRunMode(runMode);
 
                 // If successful, initialize robot cursors to mirror the state of the device
-                Point currPos = comm.GetCurrentPosition();
+                Vector currPos = comm.GetCurrentPosition();
                 Rotation currRot = comm.GetCurrentOrientation();
                 Joints currJnts = comm.GetCurrentJoints();
                 InitializeRobotCursors(currPos, currRot, currJnts);
@@ -381,10 +381,10 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Returns a Point object representing the current robot's TCP position.
+        /// Returns a Vector object representing the current robot's TCP position.
         /// </summary>
         /// <returns></returns>
-        public Point GetCurrentPosition()
+        public Vector GetCurrentPosition()
         {
             // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
             // or the virtual one's (like in offline mode).
@@ -680,7 +680,7 @@ namespace BRobot
         /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
-        public bool IssueTranslationRequest(Point trans, bool relative)
+        public bool IssueTranslationRequest(Vector trans, bool relative)
         {
             if (!areCursorsInitialized)
             {
@@ -713,7 +713,7 @@ namespace BRobot
         ///// <param name="trans"></param>
         ///// <param name="relative"></param>
         ///// <returns></returns>
-        //public bool IssueTranslationRequest(Point trans, bool relative)
+        //public bool IssueTranslationRequest(Vector trans, bool relative)
         //{
         //    return IssueTranslationRequest(currentSettings.RefCS == ReferenceCS.World, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
         //}
@@ -724,7 +724,7 @@ namespace BRobot
         ///// <param name="trans"></param>
         ///// <param name="relative"></param>
         ///// <returns></returns>
-        //public bool IssueTranslationRequest(bool world, Point trans, bool relative)
+        //public bool IssueTranslationRequest(bool world, Vector trans, bool relative)
         //{
         //    return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, currentSettings.MotionType);
         //}
@@ -737,7 +737,7 @@ namespace BRobot
         ///// <param name="speed"></param>
         ///// <param name="zone"></param>
         ///// <returns></returns>
-        //public bool IssueTranslationRequest(bool world, Point trans, bool relative, int speed, int zone)
+        //public bool IssueTranslationRequest(bool world, Vector trans, bool relative, int speed, int zone)
         //{
         //    return IssueTranslationRequest(world, trans, relative, speed, zone, currentSettings.MotionType);
         //}
@@ -749,7 +749,7 @@ namespace BRobot
         ///// <param name="relative"></param>
         ///// <param name="mType"></param>
         ///// <returns></returns>
-        //public bool IssueTranslationRequest(bool world, Point trans, bool relative, MotionType mType)
+        //public bool IssueTranslationRequest(bool world, Vector trans, bool relative, MotionType mType)
         //{
         //    return IssueTranslationRequest(world, trans, relative, currentSettings.Speed, currentSettings.Zone, mType);
         //}
@@ -773,7 +773,7 @@ namespace BRobot
             {
                 //if (controlMode == ControlMode.Offline)
                 //{
-                //    if (!InitializeRobotCursors(new Point(), rot))  // @TODO: defaults should depend on robot make/model
+                //    if (!InitializeRobotCursors(new Vector(), rot))  // @TODO: defaults should depend on robot make/model
                 //    {
                 //        Console.WriteLine("Could not initialize cursors...");
                 //        return false;
@@ -857,7 +857,7 @@ namespace BRobot
         /// <param name="zone"></param>
         /// <param name="mType"></param>
         /// <returns></returns>
-        public bool IssueTransformationRequest(Point trans, Rotation rot, bool rel, bool translationFirst)
+        public bool IssueTransformationRequest(Vector trans, Rotation rot, bool rel, bool translationFirst)
         {
             if (!areCursorsInitialized)
             {
@@ -898,7 +898,7 @@ namespace BRobot
         ///// <param name="relRot"></param>
         ///// <returns></returns>
         //public bool IssueTranslationAndRotationRequest(
-        //    Point trans, bool relTrans,
+        //    Vector trans, bool relTrans,
         //    Rotation rot, bool relRot)
         //{
         //    return IssueTranslationAndRotationRequest(
@@ -917,7 +917,7 @@ namespace BRobot
         ///// <param name="relRot"></param>
         ///// <returns></returns>
         //public bool IssueTranslationAndRotationRequest(
-        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldTrans, Vector trans, bool relTrans,
         //    bool worldRot, Rotation rot, bool relRot)
         //{
         //    return IssueTranslationAndRotationRequest(
@@ -938,7 +938,7 @@ namespace BRobot
         ///// <param name="zone"></param>
         ///// <returns></returns>
         //public bool IssueTranslationAndRotationRequest(
-        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldTrans, Vector trans, bool relTrans,
         //    bool worldRot, Rotation rot, bool relRot, 
         //    int speed, int zone)
         //{
@@ -959,7 +959,7 @@ namespace BRobot
         ///// <param name="mType"></param>
         ///// <returns></returns>
         //public bool IssueTranslationAndRotationRequest(
-        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldTrans, Vector trans, bool relTrans,
         //    bool worldRot, Rotation rot, bool relRot, 
         //    MotionType mType)
         //{
@@ -986,7 +986,7 @@ namespace BRobot
         ///// <returns></returns>
         //public bool IssueRotationAndTranslationRequest(
         //    bool worldRot, Rotation rot, bool relRot,
-        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldTrans, Vector trans, bool relTrans,
         //    int speed, int zone, MotionType mType)
         //{
         //    if (!areCursorsInitialized)
@@ -1026,7 +1026,7 @@ namespace BRobot
         ///// <returns></returns>
         //public bool IssueRotationAndTranslationRequest(
         //    Rotation rot, bool relRot,
-        //    Point trans, bool relTrans)
+        //    Vector trans, bool relTrans)
         //{
         //    return IssueRotationAndTranslationRequest(
         //        currentSettings.RefCS == ReferenceCS.World, rot, relRot,
@@ -1045,7 +1045,7 @@ namespace BRobot
         ///// <returns></returns>
         //public bool IssueRotationAndTranslationRequest(
         //    bool worldRot, Rotation rot, bool relRot,
-        //    bool worldTrans, Point trans, bool relTrans)
+        //    bool worldTrans, Vector trans, bool relTrans)
         //{
         //    return IssueRotationAndTranslationRequest(
         //        worldRot, rot, relRot,
@@ -1066,7 +1066,7 @@ namespace BRobot
         ///// <returns></returns>
         //public bool IssueRotationAndTranslationRequest(
         //    bool worldRot, Rotation rot, bool relRot,
-        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldTrans, Vector trans, bool relTrans,
         //    int speed, int zone)
         //{
         //    return IssueRotationAndTranslationRequest(
@@ -1087,7 +1087,7 @@ namespace BRobot
         ///// <returns></returns>
         //public bool IssueRotationAndTranslationRequest(
         //    bool worldRot, Rotation rot, bool relRot,
-        //    bool worldTrans, Point trans, bool relTrans,
+        //    bool worldTrans, Vector trans, bool relTrans,
         //    MotionType mType)
         //{
         //    return IssueRotationAndTranslationRequest(
@@ -1118,7 +1118,7 @@ namespace BRobot
                 //        return false;
                 //    }
 
-                //    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                //    if (!InitializeRobotCursors(new Vector(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
                 //    {
                 //        Console.WriteLine("Could not initialize cursors...");
                 //        return false;
@@ -1163,7 +1163,7 @@ namespace BRobot
             {
                 //if (controlMode == ControlMode.Offline)
                 //{
-                //    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                //    if (!InitializeRobotCursors(new Vector(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
                 //    {
                 //        Console.WriteLine("Could not initialize cursors...");
                 //        return false;
@@ -1197,7 +1197,7 @@ namespace BRobot
             {
                 //if (controlMode == ControlMode.Offline)
                 //{
-                //    if (!InitializeRobotCursors(new Point(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
+                //    if (!InitializeRobotCursors(new Vector(), Frame.DefaultOrientation))  // @TODO: defaults should depend on robot make/model
                 //    {
                 //        Console.WriteLine("Could not initialize cursors...");
                 //        return false;

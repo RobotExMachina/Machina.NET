@@ -659,7 +659,7 @@ namespace BRobot
         /// <returns></returns>
         static public string GetPoseTargetValue(RobotCursor cursor)
         {
-            Point axisAng = cursor.rotation.GetRotationVector(true);
+            Vector axisAng = cursor.rotation.GetRotationVector(true);
             return string.Format("p[{0},{1},{2},{3},{4},{5}]",
                 Math.Round(0.001 * cursor.position.X, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(0.001 * cursor.position.Y, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
@@ -1008,7 +1008,7 @@ namespace BRobot
         /// <returns></returns>
         static public string GetPositionTargetValue(RobotCursor cursor)
         {
-            Point euler = cursor.rotation.ToEulerZYX();  // @TODO: does this actually work...?
+            Vector euler = cursor.rotation.ToEulerZYX();  // @TODO: does this actually work...?
 
             return string.Format("{{POS: X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
                 Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),

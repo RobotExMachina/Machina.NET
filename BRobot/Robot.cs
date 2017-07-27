@@ -646,7 +646,7 @@ namespace BRobot
         /// </summary>
         /// <param name="direction"></param>
         /// <returns></returns>
-        public bool Move(Point direction)
+        public bool Move(Vector direction)
         {
             return c.IssueTranslationRequest(direction, true);
         }
@@ -659,7 +659,7 @@ namespace BRobot
         ///// <returns></returns>
         //public bool Move(double incX, double incY)
         //{
-        //    return Move(new Point(incX, incY, 0));
+        //    return Move(new Vector(incX, incY, 0));
         //}
 
         /// <summary>
@@ -671,7 +671,7 @@ namespace BRobot
         /// <returns></returns>
         public bool Move(double incX, double incY, double incZ = 0)
         {
-            return Move(new Point(incX, incY, incZ));
+            return Move(new Vector(incX, incY, incZ));
         }
 
         /// <summary>
@@ -693,7 +693,7 @@ namespace BRobot
         /// <returns></returns>
         public bool MoveTo(double x, double y, double z)
         {
-            return MoveTo(new Point(x, y, z));
+            return MoveTo(new Vector(x, y, z));
         }
         
         /// <summary>
@@ -712,7 +712,7 @@ namespace BRobot
         /// <param name="vector"></param>
         /// <param name="angDegs"></param>
         /// <returns></returns>
-        public bool Rotate(Point vector, double angDegs)
+        public bool Rotate(Vector vector, double angDegs)
         {
             return Rotate(new Rotation(vector, angDegs));
         }
@@ -727,7 +727,7 @@ namespace BRobot
         /// <returns></returns>
         public bool Rotate(double rotVecX, double rotVecY, double rotVecZ, double angDegs)
         {
-            return Rotate(new Rotation(new Point(rotVecX, rotVecY, rotVecZ), angDegs));
+            return Rotate(new Rotation(new Vector(rotVecX, rotVecY, rotVecZ), angDegs));
         }
                 
         /// <summary>
@@ -756,7 +756,7 @@ namespace BRobot
         /// <param name="vecX"></param>
         /// <param name="vecY"></param>
         /// <returns></returns>
-        public bool RotateTo(Point vecX, Point vecY)
+        public bool RotateTo(Vector vecX, Vector vecY)
         {
             return RotateTo(new Rotation(vecX, vecY));
         }
@@ -780,15 +780,15 @@ namespace BRobot
         /// Issue a compound relative local Translation + Rotation request. 
         /// Note that, if using local coordinates, order of actions will matter.
         /// </summary>
-        /// <param name="position"></param>
+        /// <param name="direction"></param>
         /// <param name="rotation"></param>
         /// <returns></returns>
-        public bool Transform(Point position, Rotation rotation)
+        public bool Transform(Vector direction, Rotation rotation)
         {
             // Note the T+R action order
             //return c.IssueTranslationAndRotationRequest(position, true, rotation, true);
 
-            return c.IssueTransformationRequest(position, rotation, true, true);
+            return c.IssueTransformationRequest(direction, rotation, true, true);
         }
 
         /// <summary>
@@ -796,14 +796,14 @@ namespace BRobot
         /// Note that, if using local coordinates, order of actions will matter.
         /// </summary>
         /// <param name="rotation"></param>
-        /// <param name="position"></param>
+        /// <param name="direction"></param>
         /// <returns></returns>
-        public bool Transform(Rotation rotation, Point position)
+        public bool Transform(Rotation rotation, Vector direction)
         {
             // Note the R+T action order
             //return c.IssueRotationAndTranslationRequest(rotation, true, position, true);
 
-            return c.IssueTransformationRequest(position, rotation, true, false);
+            return c.IssueTransformationRequest(direction, rotation, true, false);
         }
         
         /// <summary>

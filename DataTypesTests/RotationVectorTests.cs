@@ -18,7 +18,7 @@ namespace DataTypesTests
 
             double x, y, z, angle;
             double len, len2;
-            Point v1, v2;
+            Vector v1, v2;
 
             // Test random axes
             for (var i = 0; i < 50; i++)
@@ -43,7 +43,7 @@ namespace DataTypesTests
                 Assert.AreEqual(angle, len2, 0.000001);
                 Assert.AreEqual(angle, rv.GetAngle(), 0.000001);
 
-                v1 = new Point(x, y, z);
+                v1 = new Vector(x, y, z);
                 v1.Normalize();
                 v2 = rv.GetVector();
 
@@ -82,7 +82,7 @@ namespace DataTypesTests
                                 Assert.AreEqual(angle, len2, 0.000001);
                                 Assert.AreEqual(angle, rv.GetAngle(), 0.000001);
 
-                                v1 = new Point(x, y, z);
+                                v1 = new Vector(x, y, z);
                                 v1.Normalize();
                                 v2 = rv.GetVector();
 
@@ -102,7 +102,7 @@ namespace DataTypesTests
             double x, y, z, angle;
             double len, len2;
 
-            Point v1, v2;
+            Vector v1, v2;
 
             // Test random axes
             for (var i = 0; i < 50; i++)
@@ -118,7 +118,7 @@ namespace DataTypesTests
                 rv = new RotationVector(x, y, z, angle);
                 Trace.WriteLine(rv);
 
-                v1 = new Point(x, y, z);
+                v1 = new Vector(x, y, z);
                 v1.Normalize();
                 v1.Invert();
                 v2 = rv.GetVector();
@@ -167,7 +167,7 @@ namespace DataTypesTests
                                 Assert.AreEqual(-angle, len2, 0.000001);
                                 Assert.AreEqual(-angle, rv.GetAngle(), 0.000001);
 
-                                v1 = new Point(x, y, z);
+                                v1 = new Vector(x, y, z);
                                 v1.Normalize();
                                 v2 = rv.GetVector();
                                 v2.Invert();

@@ -186,7 +186,7 @@ namespace DataTypesTests
             AxisAngle aa;
             Quaternion q;
 
-            Point v;
+            Vector v;
             SysVec normV;
             SysQuat sq;
 
@@ -234,7 +234,7 @@ namespace DataTypesTests
                             Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
 
                             // Normalize
-                            v = new Point(x, y, z);
+                            v = new Vector(x, y, z);
                             v.Normalize();
 
                             aa = new AxisAngle(v, angle);
@@ -431,7 +431,7 @@ namespace DataTypesTests
             RotationMatrix m;
 
             double x, y, z, angle;
-            Point axis;
+            Vector axis;
 
             // Test random permutations
             for (var i = 0; i < 50; i++)
@@ -457,7 +457,7 @@ namespace DataTypesTests
             // Test singularities
             for (var i = 0; i < 1000; i++)
             {
-                axis = Point.RandomFromInts(-1, 1);
+                axis = Vector.RandomFromInts(-1, 1);
                 angle = 90 * RandomInt(-8, 8);
 
                 aa = new AxisAngle(axis, angle);
@@ -483,7 +483,7 @@ namespace DataTypesTests
             YawPitchRoll eu1, eu2;
 
             double x, y, z, angle;
-            Point axis;
+            Vector axis;
 
             // Test random permutations
             for (var i = 0; i < 200; i++)
@@ -509,7 +509,7 @@ namespace DataTypesTests
             // Test singularities
             for (var i = 0; i < 200; i++)
             {
-                axis = Point.RandomFromInts(-1, 1);
+                axis = Vector.RandomFromInts(-1, 1);
                 angle = 90 * RandomInt(-8, 8);
 
                 aa = new AxisAngle(axis, angle);
@@ -533,7 +533,7 @@ namespace DataTypesTests
             YawPitchRoll eu1, eu2, eu3;
 
             double x, y, z, angle;
-            Point axis;
+            Vector axis;
 
             // Test random permutations
             for (var i = 0; i < 200; i++)
@@ -565,7 +565,7 @@ namespace DataTypesTests
             // Test singularities
             for (var i = 0; i < 200; i++)
             {
-                axis = Point.RandomFromInts(-1, 1);
+                axis = Vector.RandomFromInts(-1, 1);
                 angle = 90 * RandomInt(-8, 8);
 
                 aa1 = new AxisAngle(axis, angle);

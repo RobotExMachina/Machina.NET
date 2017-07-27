@@ -73,9 +73,9 @@ namespace BRobot
         /// Implicitn conversion to Vector object.
         /// </summary>
         /// <param name="aa"></param>
-        public static implicit operator Point(AxisAngle aa)
+        public static implicit operator Vector(AxisAngle aa)
         {
-            return new BRobot.Point(aa.X, aa.Y, aa.Z);
+            return new BRobot.Vector(aa.X, aa.Y, aa.Z);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace BRobot
         /// </summary>
         /// <param name="axis"></param>
         /// <param name="angleDegs"></param>
-        public AxisAngle(Point axis, double angleDegs)
+        public AxisAngle(Vector axis, double angleDegs)
             : this(axis.X, axis.Y, axis.Z, angleDegs, true) { }
 
         /// <summary>
@@ -223,10 +223,10 @@ namespace BRobot
                 return Math.Abs(this.Angle % 360) < EPSILON;
             }
 
-            //Point v1 = new Point(this.X, this.Y, this.Z),
-            //v2 = new Point(axisAngle.X, axisAngle.Y, axisAngle.Z);
-            //int directions = Point.CompareDirections(v1, v2);
-            int directions = Point.CompareDirections(this, other);
+            //Vector v1 = new Vector(this.X, this.Y, this.Z),
+            //v2 = new Vector(axisAngle.X, axisAngle.Y, axisAngle.Z);
+            //int directions = Vector.CompareDirections(v1, v2);
+            int directions = Vector.CompareDirections(this, other);
             
             // If axes are not parallel, they are not equivalent
             if (directions == 0 || directions == 2)

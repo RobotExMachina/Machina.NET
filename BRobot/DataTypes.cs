@@ -121,728 +121,6 @@ namespace BRobot
 
     }
 
-    //██████╗  ██████╗ ██╗███╗   ██╗████████╗
-    //██╔══██╗██╔═══██╗██║████╗  ██║╚══██╔══╝
-    //██████╔╝██║   ██║██║██╔██╗ ██║   ██║   
-    //██╔═══╝ ██║   ██║██║██║╚██╗██║   ██║   
-    //██║     ╚██████╔╝██║██║ ╚████║   ██║   
-    //╚═╝      ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝                                  
-    /// <summary>
-    /// Represents three coordinates in space.
-    /// </summary>
-    public class Point : Geometry
-    {
-       
-        public double X, Y, Z;
-        
-
-        public static bool operator ==(Point p1, Point p2) {
-            return Math.Abs(p1.X - p2.X) < EPSILON
-                && Math.Abs(p1.Y - p2.Y) < EPSILON
-                && Math.Abs(p1.Z - p2.Z) < EPSILON;
-        }
-
-        public static bool operator !=(Point p1, Point p2)
-        {
-            return Math.Abs(p1.X - p2.X) > EPSILON
-                || Math.Abs(p1.Y - p2.Y) > EPSILON
-                || Math.Abs(p1.Z - p2.Z) > EPSILON;
-        }
-
-        /// <summary>
-        /// Create a Point from its XYZ coordinates.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        public Point(double x, double y, double z)
-        {
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
-        }
-
-        /// <summary>
-        /// Creates a shallow copy of the specified Point.
-        /// </summary>
-        /// <param name="p"></param>
-        public Point(Point p)
-        {
-            this.X = p.X;
-            this.Y = p.Y;
-            this.Z = p.Z;
-        }
-
-        public Point()
-        {
-            this.X = 0;
-            this.Y = 0;
-            this.Z = 0;
-        }
-
-        public void Set(double newX, double newY, double newz)
-        {
-            this.X = newX;
-            this.Y = newY;
-            this.Z = newz;
-        }
-
-        /// <summary>
-        /// Shallow-copies the values of specified Point.
-        /// </summary>
-        /// <param name="p"></param>
-        public void Set(Point p)
-        {
-            this.X = p.X;
-            this.Y = p.Y;
-            this.Z = p.Z;
-        }
-
-        /// <summary>
-        /// Add specified values to this Point.
-        /// </summary>
-        /// <param name="incX"></param>
-        /// <param name="incY"></param>
-        /// <param name="incZ"></param>
-        public void Add(double incX, double incY, double incZ)
-        {
-            this.X += incX;
-            this.Y += incY;
-            this.Z += incZ;
-        }
-
-        /// <summary>
-        /// Add the coordinates of specified Point to this one.
-        /// </summary>
-        /// <param name="p"></param>
-        public void Add(Point p)
-        {
-            this.X += p.X;
-            this.Y += p.Y;
-            this.Z += p.Z;
-        }
-
-        /// <summary>
-        /// Returns the length of this Vector.
-        /// </summary>
-        /// <returns></returns>
-        public double Length()
-        {
-            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
-        }
-
-        /// <summary>
-        /// Returns the squared length of this Vector.
-        /// </summary>
-        /// <returns></returns>
-        public double LengthSq()
-        {
-            return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
-        }
-
-        /// <summary>
-        /// Unitizes this Vector. Will return false if Vector is not unitizable
-        /// (zero length Vector).
-        /// </summary>
-        /// <returns></returns>
-        public bool Normalize()
-        {
-            double len = this.Length();
-            if (len < EPSILON) return false;
-            this.X /= len;
-            this.Y /= len;
-            this.Z /= len;
-            return true;
-        }
-
-        /// <summary>
-        /// Is this a unit Vector?
-        /// </summary>
-        /// <returns></returns>
-        public bool IsUnit()
-        {
-            double zero = Math.Abs(this.Length() - 1);
-            return zero < EPSILON;
-        }
-
-        /// <summary>
-        /// Reverses the direction of this Vector.
-        /// </summary>
-        public void Invert()
-        {
-            this.X = -this.X;
-            this.Y = -this.Y;
-            this.Z = -this.Z;
-        }
-
-        /// <summary>
-        /// An alias for Invert().
-        /// </summary>
-        public void Flip()
-        {
-            Invert();
-        }
-
-        /// <summary>
-        /// An alias for Invert().
-        /// </summary>
-        public void Reverse()
-        {
-            Invert();
-        }
-
-        /// <summary>
-        /// Multiplies this Vector by a scalar. 
-        /// </summary>
-        /// <param name="factor"></param>
-        public void Scale(double factor)
-        {
-            this.X *= factor;
-            this.Y *= factor;
-            this.Z *= factor;
-        }
-
-        /// <summary>
-        /// Rotates this Point by speficied Quaterion.
-        /// </summary>
-        /// <param name="r"></param>
-        public bool Rotate(Rotation r)
-        {
-            if (!r.IsUnit())
-            {
-                Console.WriteLine("Please use unit Quaternions to perform rotations");
-                return false;
-            }
-
-            // P.out = Q * P.in * conj(Q);
-            // From gl-matrix.js
-            double ix =  r.W * X + r.Y * Z - r.Z * Y,
-                   iy =  r.W * Y + r.Z * X - r.X * Z,
-                   iz =  r.W * Z + r.X * Y - r.Y * X,
-                   iw = -r.X * X - r.Y * Y - r.Z * Z;
-
-            this.X = ix * r.W - iw * r.X - iy * r.Z + iz * r.Y;
-            this.Y = iy * r.W - iw * r.Y - iz * r.X + ix * r.Z;
-            this.Z = iz * r.W - iw * r.Z - ix * r.Y + iy * r.X;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Rotates this Point specified degrees around specified vector. 
-        /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="angDegs"></param>
-        /// <returns></returns>
-        public bool Rotate(Point vec, double angDegs)
-        {
-            Rotation r = new Rotation(vec, angDegs);
-            return this.Rotate(r);
-        }
-
-        /// <summary>
-        /// Rotates this Point specified degrees around specified vector. 
-        /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="angDegs"></param>
-        /// <returns></returns>
-        public bool Rotate(double vecX, double vecY, double vecZ, double angDegs)
-        {
-            Rotation r = new Rotation(new Point(vecX, vecY, vecZ), angDegs);
-            return this.Rotate(r);
-        }
-
-
-
-
-
-
-
-
-
-
-
-        /// <summary>
-        /// Unit X Vector.
-        /// </summary>
-        public static Point XAxis = new Point(1, 0, 0);
-
-        /// <summary>
-        /// Unit Y Vector.
-        /// </summary>
-        public static Point YAxis = new Point(0, 1, 0);
-
-        /// <summary>
-        /// Unit Z Vector.
-        /// </summary>
-        public static Point ZAxis = new Point(0, 0, 1);
-
-        public static Point operator +(Point p1, Point p2)
-        {
-            return new Point(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z);
-        }
-
-        public static Point operator -(Point p)
-        {
-            return new Point(-p.X, -p.Y, -p.Z);
-        }
-
-        public static Point operator -(Point p1, Point p2)
-        {
-            return new Point(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
-        }
-
-        public static Point operator *(Double s, Point p)
-        {
-            return new Point(s * p.X, s * p.Y, s * p.Z);
-        }
-
-        public static Point operator *(Point p, Double s)
-        {
-            return new Point(s * p.X, s * p.Y, s * p.Z);
-        }
-
-        /// <summary>
-        /// Returns the dot product of specified Vectors. 
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double operator *(Point p1, Point p2)
-        {
-            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
-        }
-
-        /// <summary>
-        /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
-        /// of specified Points (Vectors).
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double DotProduct(Point p1, Point p2)
-        {
-            // A · B = Ax * Bx + Ay * By + Az * Bz
-            return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
-        }
-
-        /// <summary>
-        /// Returns the angle between two vectors in radians.
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double AngleBetween(Point p1, Point p2)
-        {
-            // A · B = ||A|| * ||B|| * cos(ang);
-            double lens = p1.Length() * p2.Length();
-
-            // Why was I returning 90 degs...? 
-            //if (lens < EPSILON)
-            //    return 0.5 * Math.PI;
-
-            if (lens < EPSILON)
-                return 0;  // should convert to nullable "double?" ? 
-            
-            double div = DotProduct(p1, p2) / lens;
-            
-            // Cap floating-point decimal precision on orthogonal angles to avoid NaN problems
-            // https://stackoverflow.com/questions/8961952/c-sharp-math-acos-how-prevent-nan
-            if (div > 1) div = 1;
-            if (div < -1) div = -1;
-
-            return Math.Acos(div);
-        }
-
-        /// <summary>
-        /// Returns the <a href="https://en.wikipedia.org/wiki/Cross_product">Cross Product</a>
-        /// of specified Vectors (Points).
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static Point CrossProduct(Point p1, Point p2)
-        {
-            return new Point(
-                p1.Y * p2.Z - p1.Z * p2.Y,
-                p1.Z * p2.X - p1.X * p2.Z,
-                p1.X * p2.Y - p1.Y * p2.X);
-        }
-
-        /// <summary>
-        /// Returns a unit Vector orthogonal to specified guiding Vector, contained
-        /// in the plane defined by guiding Vector and Point. The direction of the 
-        /// resulting Vector will be on the side of the guiding Point.
-        /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public static Point OrthogonalTo(Point vec, Point p)
-        {
-            return new CoordinateSystem(vec, p).YAxis;
-        }
-
-        /// <summary>
-        /// Returns the distance between two Points.
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double Distance(Point p1, Point p2)
-        {
-            double dx = p1.X - p2.X,
-                dy = p1.Y - p2.Y,
-                dz = p1.Z - p2.Z;
-
-            return Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
-        }
-
-        /// <summary>
-        /// Returns the squarde distance between two Points.
-        /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double SqDistance(Point p1, Point p2)
-        {
-            double dx = p1.X - p2.X,
-                dy = p1.Y - p2.Y,
-                dz = p1.Z - p2.Z;
-
-            return (dx * dx) + (dy * dy) + (dz * dz);
-        }
-
-        /// <summary>
-        /// Are specified vectors parallel? This includes vectors with opposite directions, 
-        /// even with different magnitudes.
-        /// </summary>
-        /// <param name="vec1"></param>
-        /// <param name="vec2"></param>
-        /// <returns></returns>
-        public static bool AreParallel(Point vec1, Point vec2)
-        {
-            double alpha = AngleBetween(vec1, vec2);
-            return alpha < EPSILON || (alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON);
-        }
-
-        /// <summary>
-        /// Are specified vectors orthogonal?
-        /// </summary>
-        /// <param name="vec1"></param>
-        /// <param name="vec2"></param>
-        /// <returns></returns>
-        public static bool AreOrthogonal(Point vec1, Point vec2)
-        {
-            double alpha = AngleBetween(vec1, vec2);
-            return alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON;
-        }
-
-        /// <summary>
-        /// Are these vectors parallel but in opposite directions? They can have different magnitudes.
-        /// </summary>
-        /// <param name="vec1"></param>
-        /// <param name="vec2"></param>
-        /// <returns></returns>
-        public static bool AreOpposite(Point vec1, Point vec2)
-        {
-            double alpha = AngleBetween(vec1, vec2);
-            return alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON;
-        }
-
-        /// <summary>
-        /// Compares the directions of two vectors, regardless of their magnitude.
-        /// </summary>
-        /// <param name="vec1"></param>
-        /// <param name="vec2"></param>
-        /// <returns>1 if parallel (same direction), 2 if orthogonal (perpendicularr
-        /// directions), 3 if opposite (parallel in opposite directions), 
-        /// 0 otherwise</returns>
-        public static int CompareDirections(Point vec1, Point vec2)
-        {
-            double alpha = AngleBetween(vec1, vec2);
-
-            if (alpha < EPSILON)
-            {
-                return 1;
-            }
-            else if (alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON)
-            {
-                return 2;
-            }
-            else if (Math.Abs(alpha - Math.PI) < EPSILON)
-            {
-                return 3;
-            }
-            return 0;
-        }
-
-        /// <summary>
-        /// Returns a random Point with coordinates between specified double ranges. 
-        /// Useful for testing and debugging.
-        /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        /// <returns></returns>
-        public static Point RandomFromDoubles(double min, double max)
-        {
-            return new BRobot.Point(Random(min, max), Random(min, max), Random(min, max));
-        }
-
-        public static Point RandomFromInts(int min, int max)
-        {
-            return new BRobot.Point(RandomInt(min, max), RandomInt(min, max), RandomInt(min, max));
-        }
-
-        /// <summary>
-        /// Returns a new Point as the rotation of Point 'p' by Rotation 'r'
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="r"></param>
-        /// <returns></returns>
-        public static Point Rotation(Point p, Rotation r)
-        {
-            Point v = new Point(p);
-            v.Rotate(r);
-            return v;
-        }
-
-        /// <summary>
-        /// Returns the squared distance from 'p' to the segment 'p1-p2'.
-        /// </summary>
-        /// <ref>https://github.com/imshz/simplify-net</ref>
-        /// <param name="p"></param>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <returns></returns>
-        public static double SqSegmentDistance(Point p, Point p1, Point p2)
-        {
-            var x = p1.X;
-            var y = p1.Y;
-            var z = p1.Z;
-            var dx = p2.X - x;
-            var dy = p2.Y - y;
-            var dz = p2.Z - z;
-
-            if (!dx.Equals(0.0) || !dy.Equals(0.0) || !dz.Equals(0.0))
-            {
-                var t = ((p.X - x) * dx + (p.Y - y) * dy + (p.Z - z) * dz) / (dx * dx + dy * dy + dz * dz);
-
-                if (t > 1)
-                {
-                    x = p2.X;
-                    y = p2.Y;
-                    z = p2.Z;
-                }
-                else if (t > 0)
-                {
-                    x += dx * t;
-                    y += dy * t;
-                    z += dz * t;
-                }
-            }
-
-            dx = p.X - x;
-            dy = p.Y - y;
-            dz = p.Z - z;
-
-            return (dx * dx) + (dy * dy) + (dz * dz);
-        }
-        
-        /// <summary>
-        /// Simplifies the path using a combination of radial distance and 
-        /// Ramer–Douglas–Peucker algorithm. 
-        /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="points"></param>
-        /// <param name="tolerance"></param>
-        /// <param name="highQuality"></param>
-        /// <returns></returns>
-        public static List<Point> SimplifyPointList(List<Point> points, double tolerance, bool highQuality)
-        {
-            if (points.Count < 1)
-            {
-                Console.WriteLine("List contains no points.");
-            }
-
-            int prev = points.Count;
-            List<Point> simplified;
-
-            double sqTolerance = tolerance * tolerance;
-
-            if (!highQuality)
-            {
-                simplified = Point.SimplifyRadialDistance(points, sqTolerance);
-                simplified = Point.SimplifyDouglasPeucker(simplified, sqTolerance);
-            }
-            else
-            {
-                simplified = SimplifyDouglasPeucker(points, sqTolerance);
-            }
-
-            Console.WriteLine("Point list simplified from " + prev + " to " + simplified.Count + " Points.");
-
-            return simplified;
-        }
-
-        /// <summary>
-        /// The Ramer-Douglas-Peucker algorithm.
-        /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="points"></param>
-        /// <param name="sqTolerance"></param>
-        /// <returns></returns>
-        public static List<Point> SimplifyDouglasPeucker(List<Point> points, double sqTolerance)
-        {
-            var len = points.Count;
-            var markers = new int?[len];
-            int? first = 0;
-            int? last = len - 1;
-            int? index = 0;
-            var stack = new List<int?>();
-            var newPoints = new List<Point>();
-
-            markers[first.Value] = markers[last.Value] = 1;
-
-            while (last != null)
-            {
-                var maxSqDist = 0.0d;
-
-                for (int? i = first + 1; i < last; i++)
-                {
-                    var sqDist = Point.SqSegmentDistance(points[i.Value], points[first.Value], points[last.Value]);
-
-                    if (sqDist > maxSqDist)
-                    {
-                        index = i;
-                        maxSqDist = sqDist;
-                    }
-                }
-
-                if (maxSqDist > sqTolerance)
-                {
-                    markers[index.Value] = 1;
-                    stack.AddRange(new[] { first, index, index, last });
-                }
-
-                if (stack.Count > 0)
-                {
-                    last = stack[stack.Count - 1];
-                    stack.RemoveAt(stack.Count - 1);
-                }
-                else
-                {
-                    last = null;
-                }
-
-                if (stack.Count > 0)
-                {
-                    first = stack[stack.Count - 1];
-                    stack.RemoveAt(stack.Count - 1);
-                }
-                else
-                {
-                    first = null;
-                }
-            }
-
-            for (int i = 0; i < len; i++)
-            {
-                if (markers[i] != null)
-                {
-                    newPoints.Add(points[i]);
-                }
-            }
-
-            return newPoints;
-        }
-
-        /// <summary>
-        /// Simple distance-based simplification. Consecutive points under 
-        /// threshold distance are removed. 
-        /// </summary>
-        /// <ref>Adapted from https://github.com/imshz/simplify-net </ref>
-        /// <param name="points"></param>
-        /// <param name="sqTolerance"></param>
-        /// <returns></returns>
-        public static List<Point> SimplifyRadialDistance(List<Point> points, double sqTolerance)
-        {
-            Point prevPoint = points[0];
-            List<Point> newPoints = new List<Point> { prevPoint };
-            Point pt = null;
-
-            for (int i = 1; i < points.Count; i++)
-            {
-                pt = points[i];
-
-                if (Point.SqDistance(pt, prevPoint) > sqTolerance)
-                {
-                    newPoints.Add(pt);
-                    prevPoint = pt;
-                }
-            }
-
-            // Add the last frame of the path (?)
-            if (pt != null && !prevPoint.Equals(pt))
-            {
-                newPoints.Add(pt);
-            }
-
-            return newPoints;
-        }
-
-        
-
-
-
-
-
-
-
-
-
-
-
-        /// <summary>
-        /// Equality checks.
-        /// </summary>
-        /// <ref>https://github.com/imshz/simplify-net</ref>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            //if (obj.GetType() != typeof(Point) && obj.GetType() != typeof(Point))
-            if (obj.GetType() != typeof(Point))
-                return false;
-            return Equals(obj as Point);
-        }
-
-        /// <summary>
-        /// Equality checks.
-        /// </summary>
-        /// <ref>https://github.com/imshz/simplify-net</ref>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public bool Equals(Point other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            //return other.X.Equals(X) && other.Y.Equals(Y) && other.Z.Equals(Z);
-            return Math.Abs(X - other.X) < EPSILON &&
-                   Math.Abs(Y - other.Y) < EPSILON &&
-                   Math.Abs(Z - other.Z) < EPSILON;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[{0},{1},{2}]",
-                Math.Round(X, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
-        }
-
-    }
 
 
     //██████╗  ██████╗ ████████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
@@ -951,7 +229,7 @@ namespace BRobot
         {
             double halfAngRad = 0.5 * TO_RADS * angDegs;   // ang / 2
             double s = Math.Sin(halfAngRad);
-            Point u = new Point(vecX, vecY, vecZ);
+            Vector u = new Vector(vecX, vecY, vecZ);
             u.Normalize();  // rotation quaternion must be unit
 
             this.W = Math.Cos(halfAngRad);
@@ -966,7 +244,7 @@ namespace BRobot
         /// </summary>
         /// <param name="vec"></param>
         /// <param name="angDegs"></param>
-        public Rotation(Point vec, double angDegs) : this(vec.X, vec.Y, vec.Z, angDegs) { }
+        public Rotation(Vector vec, double angDegs) : this(vec.X, vec.Y, vec.Z, angDegs) { }
         
 
         /// <summary>
@@ -1007,7 +285,7 @@ namespace BRobot
         /// </summary>
         /// <param name="vecX"></param>
         /// <param name="vecY"></param>
-        public Rotation(Point vecX, Point vecY) :
+        public Rotation(Vector vecX, Vector vecY) :
             this(new CoordinateSystem(vecX, vecY).GetQuaternion())
         { }
 
@@ -1363,9 +641,9 @@ namespace BRobot
         /// https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
         /// </summary>
         /// <returns></returns>
-        public Point GetRotationVector(bool radians)
+        public Vector GetRotationVector(bool radians)
         {
-            Point axisAng = GetRotationAxis() * GetRotationAngle();
+            Vector axisAng = GetRotationAxis() * GetRotationAngle();
             if (radians)
             {
                 axisAng.Scale(TO_RADS);
@@ -1374,7 +652,7 @@ namespace BRobot
             return axisAng;
         }
 
-        public Point GetRotationVector()
+        public Vector GetRotationVector()
         {
             return GetRotationVector(false);
         }
@@ -1386,18 +664,18 @@ namespace BRobot
         /// even if the quaternion was created from a negative one (flipped vector).
         /// </summary>
         /// <returns></returns>
-        public Point GetRotationAxis()
+        public Vector GetRotationAxis()
         {
             double theta2 = 2 * Math.Acos(W);
 
             // If angle == 0, no rotation is performed and this Quat is identity
             if (theta2 < EPSILON)
             {
-                return new Point();
+                return new Vector();
             }
 
             double s = Math.Sin(0.5 * theta2);
-            return new Point(this.X / s, this.Y / s, this.Z / s);
+            return new Vector(this.X / s, this.Y / s, this.Z / s);
         }
 
         /// <summary>
@@ -1437,9 +715,9 @@ namespace BRobot
         /// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Conversion
         /// </summary>
         /// <returns></returns>
-        public Point ToEulerZYX()
+        public Vector ToEulerZYX()
         {
-            Point eu = new Point();
+            Vector eu = new Vector();
 
             double y2, t0, t1, t2, t3, t4;
 
@@ -1715,16 +993,16 @@ namespace BRobot
     /// </summary>
     public class CoordinateSystem : Geometry
     {
-        public Point XAxis, YAxis, ZAxis;
+        public Vector XAxis, YAxis, ZAxis;
 
         /// <summary>
         /// Creates a global XYZ reference system.
         /// </summary>
         public CoordinateSystem()
         {
-            XAxis = new Point(1, 0, 0);
-            YAxis = new Point(0, 1, 0);
-            ZAxis = new Point(0, 0, 1);
+            XAxis = new Vector(1, 0, 0);
+            YAxis = new Vector(0, 1, 0);
+            ZAxis = new Vector(0, 0, 1);
         }
 
         /// <summary>
@@ -1734,24 +1012,24 @@ namespace BRobot
         /// </summary>
         /// <param name="vecX"></param>
         /// <param name="vecY"></param>
-        public CoordinateSystem(Point vecX, Point vecY)
+        public CoordinateSystem(Vector vecX, Vector vecY)
         {
             // Some sanity
-            if (Point.AreParallel(vecX, vecY))
+            if (Vector.AreParallel(vecX, vecY))
             {
                 throw new Exception("Cannot create a CoordinateSystem with two parallel vectors");
             }
 
             // Create unit X axis
-            XAxis = new Point(vecX);
+            XAxis = new Vector(vecX);
             XAxis.Normalize();
                        
             // Find normal vector to plane
-            ZAxis = Point.CrossProduct(vecX, vecY);
+            ZAxis = Vector.CrossProduct(vecX, vecY);
             ZAxis.Normalize();
 
             // Y axis is the cross product of both
-            YAxis = Point.CrossProduct(ZAxis, XAxis);
+            YAxis = Vector.CrossProduct(ZAxis, XAxis);
         }
 
         /// <summary>
@@ -1766,7 +1044,7 @@ namespace BRobot
         /// <param name="y1"></param>
         /// <param name="y2"></param>
         public CoordinateSystem(double x0, double x1, double x2, double y0, double y1, double y2) :
-            this( new Point(x0, x1, x2), new Point(y0, y1, y2) )
+            this( new Vector(x0, x1, x2), new Vector(y0, y1, y2) )
         { }
 
         /// <summary>
@@ -1827,7 +1105,7 @@ namespace BRobot
             //Console.WriteLine("Unit axes: " + valid);
             //if (!valid) Console.WriteLine("{0}-{1} {2}-{3} {4}-{5}", this.XAxis, this.XAxis.IsUnit(), this.YAxis, this.YAxis.IsUnit(), this.ZAxis, this.ZAxis.IsUnit());
 
-            Point z = Point.CrossProduct(this.XAxis, this.YAxis);
+            Vector z = Vector.CrossProduct(this.XAxis, this.YAxis);
             valid = valid && this.ZAxis.Equals(z);
             //Console.WriteLine("Orthonormal axes: " + valid);
             //if (!valid) Console.WriteLine("{0} {1}", this.ZAxis, z);
@@ -1903,14 +1181,14 @@ namespace BRobot
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
-        public Point Position;
+        public Vector Position;
         public Rotation Orientation;
         public double Speed;
         public double Zone;
 
         public Frame(double x, double y, double z)
         {
-            this.Position = new Point(x, y, z);
+            this.Position = new Vector(x, y, z);
             this.Orientation = DefaultOrientation;
             this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
@@ -1918,7 +1196,7 @@ namespace BRobot
 
         public Frame(double x, double y, double z, double speed, double zone)
         {
-            this.Position = new Point(x, y, z);
+            this.Position = new Vector(x, y, z);
             this.Orientation = DefaultOrientation;
             this.Speed = speed;
             this.Zone = zone;
@@ -1926,7 +1204,7 @@ namespace BRobot
 
         public Frame(double x, double y, double z, double qw, double qx, double qy, double qz)
         {
-            this.Position = new Point(x, y, z);
+            this.Position = new Vector(x, y, z);
             this.Orientation = new Rotation(qw, qx, qy, qz, true);
             this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
@@ -1934,39 +1212,39 @@ namespace BRobot
 
         public Frame(double x, double y, double z, double qw, double qx, double qy, double qz, double speed, double zone)
         {
-            this.Position = new Point(x, y, z);
+            this.Position = new Vector(x, y, z);
             this.Orientation = new Rotation(qw, qx, qy, qz, true);
             this.Speed = speed;
             this.Zone = zone;
         }
 
-        public Frame(Point position)
+        public Frame(Vector position)
         {
-            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
+            this.Position = new Vector(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = DefaultOrientation;
             this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
 
-        public Frame(Point position, double speed, double zone)
+        public Frame(Vector position, double speed, double zone)
         {
-            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
+            this.Position = new Vector(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = DefaultOrientation;
             this.Speed = speed;
             this.Zone = zone;
         }
 
-        public Frame(Point position, Rotation orientation)
+        public Frame(Vector position, Rotation orientation)
         {
-            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
+            this.Position = new Vector(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z, true);  // shallow copy
             this.Speed = DefaultSpeed;
             this.Zone = DefaultZone;
         }
 
-        public Frame(Point position, Rotation orientation, double speed, double zone)
+        public Frame(Vector position, Rotation orientation, double speed, double zone)
         {
-            this.Position = new Point(position.X, position.Y, position.Z);  // shallow copy
+            this.Position = new Vector(position.X, position.Y, position.Z);  // shallow copy
             this.Orientation = new Rotation(orientation.W, orientation.X, orientation.Y, orientation.Z, true);  // shallow copy
             this.Speed = speed;
             this.Zone = zone;
@@ -2131,7 +1409,7 @@ namespace BRobot
     //        Count++;
     //    }
 
-    //    public void Add(Point position)
+    //    public void Add(Vector position)
     //    {
     //        this.Add(new Frame(position));
     //    }
@@ -2141,7 +1419,7 @@ namespace BRobot
     //        this.Add(new Frame(x, y, z));
     //    }
 
-    //    public void Add(Point position, Rotation orientation)
+    //    public void Add(Vector position, Rotation orientation)
     //    {
     //        this.Add(new Frame(position, orientation));
     //    }
@@ -2283,7 +1561,7 @@ namespace BRobot
 
     //            for (int? i = first + 1; i < last; i++)
     //            {
-    //                var sqDist = Point.SqSegmentDistance(Targets[i.Value].Position,
+    //                var sqDist = Vector.SqSegmentDistance(Targets[i.Value].Position,
     //                    Targets[first.Value].Position, Targets[last.Value].Position);
 
     //                if (sqDist > maxSqDist)
@@ -2350,7 +1628,7 @@ namespace BRobot
     //        {
     //            frame = Targets[i];
 
-    //            if (Point.SqDistance(frame.Position, prevFrame.Position) > sqTolerance)
+    //            if (Vector.SqDistance(frame.Position, prevFrame.Position) > sqTolerance)
     //            {
     //                newTargets.Add(frame);
     //                prevFrame = frame;
@@ -2393,8 +1671,8 @@ namespace BRobot
 
     public class SpatialTriggerBox : SpatialTrigger
     {
-        Point p0;
-        Point p1;
+        Vector p0;
+        Vector p1;
 
         public bool isTriggered = false;
 
@@ -2406,7 +1684,7 @@ namespace BRobot
 
     public class SpatialTriggerPointProximity : SpatialTrigger
     {
-        Point p0;
+        Vector p0;
         double r;
         public override void Check(Robot robot)
         {

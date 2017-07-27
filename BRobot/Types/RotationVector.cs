@@ -90,7 +90,7 @@ namespace BRobot
         {
             if (normalize)
             {
-                double len = Point.Length(x, y, z);
+                double len = Vector.Length(x, y, z);
 
                 if (len < EPSILON)
                 {
@@ -148,9 +148,9 @@ namespace BRobot
         /// Returns the unit vector representing the axis of this rotation.
         /// </summary>
         /// <returns></returns>
-        public Point GetVector()
+        public Vector GetVector()
         {
-            Point v = new Point(this.X, this.Y, this.Z);
+            Vector v = new Vector(this.X, this.Y, this.Z);
             v.Normalize();
             return v;
         }

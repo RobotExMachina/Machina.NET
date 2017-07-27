@@ -16,51 +16,51 @@ namespace DataTypesTests
         [TestMethod]
         public void Point_CompareDirections()
         {
-            Point a = new Point(1, 0, 0);
+            Vector a = new Vector(1, 0, 0);
 
-            Point b = new Point(1, 1, 0);
-            Assert.AreEqual(0, Point.CompareDirections(a, b));  // nothing
+            Vector b = new Vector(1, 1, 0);
+            Assert.AreEqual(0, Vector.CompareDirections(a, b));  // nothing
 
-            b = new Point(1, 0, 0);
-            Assert.AreEqual(1, Point.CompareDirections(a, b));  // parallel
+            b = new Vector(1, 0, 0);
+            Assert.AreEqual(1, Vector.CompareDirections(a, b));  // parallel
 
-            b = new Point(5, 0, 0);
-            Assert.AreEqual(1, Point.CompareDirections(a, b));  // parallel
+            b = new Vector(5, 0, 0);
+            Assert.AreEqual(1, Vector.CompareDirections(a, b));  // parallel
 
-            b = new Point(10, 0, 0);
-            Assert.AreEqual(1, Point.CompareDirections(a, b));  // parallel
+            b = new Vector(10, 0, 0);
+            Assert.AreEqual(1, Vector.CompareDirections(a, b));  // parallel
 
-            b = new Point(0, 1, 0);
-            Assert.AreEqual(2, Point.CompareDirections(a, b));  // orthogonal
+            b = new Vector(0, 1, 0);
+            Assert.AreEqual(2, Vector.CompareDirections(a, b));  // orthogonal
 
-            b = new Point(0, 0, 1);
-            Assert.AreEqual(2, Point.CompareDirections(a, b));  // orthogonal
+            b = new Vector(0, 0, 1);
+            Assert.AreEqual(2, Vector.CompareDirections(a, b));  // orthogonal
 
-            b = new Point(0, -1, 0);
-            Assert.AreEqual(2, Point.CompareDirections(a, b));  // orthogonal
+            b = new Vector(0, -1, 0);
+            Assert.AreEqual(2, Vector.CompareDirections(a, b));  // orthogonal
 
-            b = new Point(0, 0, -1);
-            Assert.AreEqual(2, Point.CompareDirections(a, b));  // orthogonal
+            b = new Vector(0, 0, -1);
+            Assert.AreEqual(2, Vector.CompareDirections(a, b));  // orthogonal
 
-            b = new Point(-1, 0, 0);
-            Assert.AreEqual(3, Point.CompareDirections(a, b));  // opposed
+            b = new Vector(-1, 0, 0);
+            Assert.AreEqual(3, Vector.CompareDirections(a, b));  // opposed
 
-            b = new Point(-5, 0, 0);
-            Assert.AreEqual(3, Point.CompareDirections(a, b));  // opposed
+            b = new Vector(-5, 0, 0);
+            Assert.AreEqual(3, Vector.CompareDirections(a, b));  // opposed
 
-            b = new Point(-10, 0, 0);
-            Assert.AreEqual(3, Point.CompareDirections(a, b));  // opposed
+            b = new Vector(-10, 0, 0);
+            Assert.AreEqual(3, Vector.CompareDirections(a, b));  // opposed
 
-            a = new Point(Random(-100, 100), Random(-100, 100), Random(-100, 100));
-            b = new Point(5 * a.X, 5 * a.Y, 5 * a.Z);
+            a = new Vector(Random(-100, 100), Random(-100, 100), Random(-100, 100));
+            b = new Vector(5 * a.X, 5 * a.Y, 5 * a.Z);
             Trace.WriteLine(a);
             Trace.WriteLine(b);
-            Assert.AreEqual(1, Point.CompareDirections(a, b));  // parallel
+            Assert.AreEqual(1, Vector.CompareDirections(a, b));  // parallel
 
-            b = new Point(-a.X, -a.Y, -a.Z);
+            b = new Vector(-a.X, -a.Y, -a.Z);
             Trace.WriteLine(a);
             Trace.WriteLine(b);
-            Assert.AreEqual(3, Point.CompareDirections(a, b));  // opposed
+            Assert.AreEqual(3, Vector.CompareDirections(a, b));  // opposed
 
         }
 

@@ -85,12 +85,12 @@ namespace BRobot
             return new ActionCoordinates(referenceCS);
         }
 
-        public static ActionTranslation Move(Point pos)
+        public static ActionTranslation Move(Vector pos)
         {
             return new ActionTranslation(pos, true); 
         }
 
-        public static ActionTranslation MoveTo(Point pos)
+        public static ActionTranslation MoveTo(Vector pos)
         {
             return new ActionTranslation(pos, false);
         }
@@ -105,12 +105,12 @@ namespace BRobot
             return new ActionRotation(rot, false);
         }
 
-        public static ActionTransformation Transform(Point pos, Rotation rot, bool translationFirst)
+        public static ActionTransformation Transform(Vector pos, Rotation rot, bool translationFirst)
         {
             return new ActionTransformation(pos, rot, true, translationFirst);
         }
 
-        public static ActionTransformation TransformTo(Point pos, Rotation rot)
+        public static ActionTransformation TransformTo(Vector pos, Rotation rot)
         {
             return new ActionTransformation(pos, rot, false, true);
         }
@@ -340,7 +340,7 @@ namespace BRobot
     public class ActionTranslation : Action
     {
 
-        public Point translation;
+        public Vector translation;
         public bool relative;
 
         /// <summary>
@@ -352,11 +352,11 @@ namespace BRobot
         /// <param name="speed"></param>
         /// <param name="zone"></param>
         /// <param name="mType"></param>
-        public ActionTranslation(Point trans, bool relTrans) : base()
+        public ActionTranslation(Vector trans, bool relTrans) : base()
         {
             type = ActionType.Translation;
 
-            translation = new Point(trans);  // shallow copy
+            translation = new Vector(trans);  // shallow copy
             relative = relTrans;
         }
 
@@ -415,16 +415,16 @@ namespace BRobot
     /// </summary>
     public class ActionTransformation : Action
     {
-        public Point translation;
+        public Vector translation;
         public Rotation rotation;
         public bool relative;
         public bool translationFirst;  // for relative transforms, translate or rotate first?
 
-        public ActionTransformation(Point translation, Rotation rotation, bool relative, bool translationFirst) : base()
+        public ActionTransformation(Vector translation, Rotation rotation, bool relative, bool translationFirst) : base()
         {
             type = ActionType.Transformation;
 
-            this.translation = new Point(translation);
+            this.translation = new Vector(translation);
             this.rotation = new Rotation(rotation);
             this.relative = relative;
             this.translationFirst = translationFirst;

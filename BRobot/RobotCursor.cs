@@ -23,7 +23,7 @@ namespace BRobot
     {
         // Public props
         public string name;
-        public Point position;
+        public Vector position;
         public Rotation rotation;
         public Joints joints;
         public int speed;
@@ -114,10 +114,10 @@ namespace BRobot
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        public bool Initialize(Point position, Rotation rotation, Joints joints, 
+        public bool Initialize(Vector position, Rotation rotation, Joints joints, 
             int speed, int zone, MotionType mType, ReferenceCS refCS)
         {
-            if (position != null) this.position = new Point(position);
+            if (position != null) this.position = new Vector(position);
             if (rotation != null) this.rotation = new Rotation(rotation);
             if (joints != null) this.joints = new Joints(joints);
             this.speed = speed;
@@ -388,7 +388,7 @@ namespace BRobot
         /// <returns></returns>
         public bool ApplyAction(ActionTranslation action)
         {
-            Point newPosition = new Point();
+            Vector newPosition = new Vector();
 
             if (action.relative)
             {
@@ -405,8 +405,8 @@ namespace BRobot
                 }
                 else
                 {
-                    //Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
-                    Point worldVector = Point.Rotation(action.translation, this.rotation);
+                    //Vector worldVector = Vector.Rotation(action.translation, Rotation.Conjugate(this.rotation));
+                    Vector worldVector = Vector.Rotation(action.translation, this.rotation);
                     newPosition = position + worldVector;
                 }
             }
@@ -497,7 +497,7 @@ namespace BRobot
         /// <returns></returns>
         public bool ApplyAction(ActionTransformation action)
         {
-            Point newPos;
+            Vector newPos;
             Rotation newRot;
 
             // Relative transform
@@ -520,8 +520,8 @@ namespace BRobot
                     }
                     else
                     {
-                        //Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(this.rotation));
-                        Point worldVector = Point.Rotation(action.translation, this.rotation);
+                        //Vector worldVector = Vector.Rotation(action.translation, Rotation.Conjugate(this.rotation));
+                        Vector worldVector = Vector.Rotation(action.translation, this.rotation);
                         newPos = position + worldVector;
                         newRot = Rotation.Multiply(rotation, action.rotation);  // postmultiplication
                     }
@@ -540,8 +540,8 @@ namespace BRobot
                     {
                         // @TOCHECK: is this correct?
                         newRot = Rotation.Multiply(rotation, action.rotation);  // postmultiplication
-                        //Point worldVector = Point.Rotation(action.translation, Rotation.Conjugate(newRot));
-                        Point worldVector = Point.Rotation(action.translation, newRot);
+                        //Vector worldVector = Vector.Rotation(action.translation, Rotation.Conjugate(newRot));
+                        Vector worldVector = Vector.Rotation(action.translation, newRot);
                         newPos = position + worldVector;
                     }
 
@@ -552,7 +552,7 @@ namespace BRobot
             // Absolute transform
             else
             {
-                newPos = new Point(action.translation);
+                newPos = new Vector(action.translation);
                 newRot = new Rotation(action.rotation);
             }
 

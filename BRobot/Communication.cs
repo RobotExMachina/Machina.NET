@@ -115,10 +115,10 @@ namespace BRobot
         public abstract bool StopProgramExecution(bool immediate);
 
         /// <summary>
-        /// Returns a Point object representing the current robot's TCP position.
+        /// Returns a Vector object representing the current robot's TCP position.
         /// </summary>
         /// <returns></returns>
-        public abstract Point GetCurrentPosition();
+        public abstract Vector GetCurrentPosition();
 
         /// <summary>
         /// Returns a Rotation object representing the current robot's TCP orientation.
@@ -599,10 +599,10 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Returns a Point object representing the current robot's TCP position.
+        /// Returns a Vector object representing the current robot's TCP position.
         /// </summary>
         /// <returns></returns>
-        public override Point GetCurrentPosition()
+        public override Vector GetCurrentPosition()
         {
             if (!isConnected)
             {
@@ -612,7 +612,7 @@ namespace BRobot
 
             RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
 
-            return new Point(rt.Trans.X, rt.Trans.Y, rt.Trans.Z);
+            return new Vector(rt.Trans.X, rt.Trans.Y, rt.Trans.Z);
         }
 
         /// <summary>

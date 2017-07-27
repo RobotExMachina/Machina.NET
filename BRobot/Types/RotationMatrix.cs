@@ -193,7 +193,7 @@ namespace BRobot
         /// </summary>
         /// <param name="vecX"></param>
         /// <param name="vecY"></param>
-        public RotationMatrix(Point vecX, Point vecY)
+        public RotationMatrix(Vector vecX, Vector vecY)
         {
             // Rely on internal orthoginalization to correctly form this matrix
             this.Initialize(vecX.X, vecY.X, 0,
@@ -274,12 +274,12 @@ namespace BRobot
             // This algorithm will orthogonalize this matrix by
             // maintaining the main X direction and XY plane, 
             // and recomputing the Y and Z axes to comply with this condition.
-            Point vecX = new Point(R[0], R[3], R[6]),
-                vecY = new Point(R[1], R[4], R[7]),
+            Vector vecX = new Vector(R[0], R[3], R[6]),
+                vecY = new Vector(R[1], R[4], R[7]),
                 vecZ;
 
             // Some sanity
-            int dir = Point.CompareDirections(vecX, vecY);
+            int dir = Vector.CompareDirections(vecX, vecY);
             if (dir == 1 || dir == 3)
             {
                 Console.WriteLine("Cannot orthogonalize a Matrix with X & Y parallel vectors");
@@ -291,11 +291,11 @@ namespace BRobot
             vecX.Normalize();
 
             // Find normal vector to plane
-            vecZ = Point.CrossProduct(vecX, vecY);
+            vecZ = Vector.CrossProduct(vecX, vecY);
             vecZ.Normalize();
 
             // Y axis is the cross product of both
-            vecY = Point.CrossProduct(vecZ, vecX);
+            vecY = Vector.CrossProduct(vecZ, vecX);
 
             // Initialize the Matrix
             this.Initialize(vecX.X, vecY.X, vecZ.X,
