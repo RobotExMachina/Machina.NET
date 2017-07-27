@@ -140,7 +140,7 @@ namespace BRobot
             return new Quaternion(cX * cY * cZ + sX * sY * sZ,
                                   sX * cY * cZ - cX * sY * sZ,
                                   cX * sY * cZ + sX * cY * sZ,
-                                  cX * cY * sZ - sX * sY * cZ);
+                                  cX * cY * sZ - sX * sY * cZ, false);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace BRobot
                 z = (cX * cY * sZ - sX * sY * cZ) / s;
             }
 
-            return new AxisAngle(x, y, z, TO_DEGS * angle);
+            return new AxisAngle(x, y, z, TO_DEGS * angle, false);
         }
 
 

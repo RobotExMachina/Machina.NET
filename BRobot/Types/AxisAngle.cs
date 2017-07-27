@@ -288,8 +288,7 @@ namespace BRobot
                 Math.Cos(a2),
                 s * this.X,
                 s * this.Y,
-                s * this.Z,
-                false);
+                s * this.Z, false);
         }
 
         /// <summary>

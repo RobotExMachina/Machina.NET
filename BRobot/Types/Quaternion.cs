@@ -428,8 +428,6 @@ namespace BRobot
         /// <returns></returns>
         public bool IsUnit()
         {
-            //double zero = Math.Abs(this.SqLength() - 1);
-            //return zero < EPSILON;
             return Math.Abs(this.SqLength() - 1) < EPSILON;
         }
 
@@ -440,8 +438,7 @@ namespace BRobot
         [System.Obsolete("IsZero is deprecated, should always return false since the class will not allow zero-length quaternions to exist and always fallbak into an identity quaternion")]
         public bool IsZero()
         {
-            double sqlen = this.SqLength();
-            return Math.Abs(sqlen) < EPSILON;
+            return Math.Abs(this.SqLength()) < EPSILON;
         }
 
         /// <summary>
@@ -686,7 +683,7 @@ namespace BRobot
             }
 
             double s = Math.Sin(0.5 * theta2);
-            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, true);
+            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, false);
         }
 
         /// <summary>
@@ -697,16 +694,19 @@ namespace BRobot
         /// <returns></returns>
         public RotationVector ToRotationVector()
         {
-            double theta2 = 2 * Math.Acos(this.W);
+            //double theta2 = 2 * Math.Acos(this.W);
 
-            // If angle == 0, no rotation is performed and this Quat is identity
-            if (theta2 < EPSILON)
-            {
-                return new RotationVector(0, 0, 0, 0);
-            }
+            //// If angle == 0, no rotation is performed and this Quat is identity
+            //if (theta2 < EPSILON)
+            //{
+            //    return new RotationVector(0, 0, 0, 0);
+            //}
 
-            double s = Math.Sin(0.5 * theta2);
-            return new RotationVector(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, true);
+            //double s = Math.Sin(0.5 * theta2);
+            //return new RotationVector(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, true);
+
+            // Let's not be reduntant...
+            return this.ToAxisAngle().ToRotationVector();
         }
 
 
@@ -730,7 +730,7 @@ namespace BRobot
 
             return new RotationMatrix(1 - yy2 - zz2,         xy2 - zw2,         xz2 + yw2,
                                           xy2 + zw2,     1 - xx2 - zz2,         yz2 - xw2,
-                                          xz2 - yw2,         yz2 + xw2,     1 - xx2 - yy2);
+                                          xz2 - yw2,         yz2 + xw2,     1 - xx2 - yy2,   false);
         }
 
         /// <summary>

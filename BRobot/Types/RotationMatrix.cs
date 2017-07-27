@@ -472,6 +472,7 @@ namespace BRobot
             }
 
 
+            //// Alternative method?
             ////http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/christian.htm
             //Quaternion q = new Quaternion();
             //q.W = 0.5 * Math.Sqrt(Math.Max(0, 1 + m00 + m11 + m22));
@@ -570,7 +571,7 @@ namespace BRobot
                     }
                 }
 
-                return new AxisAngle(x, y, z, angle);
+                return new AxisAngle(x, y, z, angle, false);
             }
 
             // No singularities then, proceed normally
@@ -583,7 +584,7 @@ namespace BRobot
             y = (m02 - m20) / s;
             z = (m10 - m01) / s;
 
-            return new AxisAngle(x, y, z, angle);
+            return new AxisAngle(x, y, z, angle, false);
         }
 
         /// <summary>
