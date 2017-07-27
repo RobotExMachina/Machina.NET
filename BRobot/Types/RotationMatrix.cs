@@ -619,7 +619,7 @@ namespace BRobot
             double xAng, yAng, zAng;
 
             // North pole singularity (yAng ~ 90degs)? Note m02 is -sin(y) = -sin(90) = -1
-            if (this.m20 < -1 + EPSILON)
+            if (this.m20 < -1 + EPSILON3)
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
@@ -629,7 +629,7 @@ namespace BRobot
             }
 
             // South pole singularity (yAng ~ -90degs)? Note m02 is -sin(y) = -sin(-90) = 1
-            else if (this.m20 > 1 - EPSILON) 
+            else if (this.m20 > 1 - EPSILON3) 
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;

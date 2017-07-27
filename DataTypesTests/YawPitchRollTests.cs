@@ -138,8 +138,6 @@ namespace DataTypesTests
                     Assert.IsTrue(q1 == q2, "Quats not equal");
                 }
             }
-
-
         }
 
         [TestMethod]
@@ -206,6 +204,56 @@ namespace DataTypesTests
                 Assert.IsTrue(eu2.IsEquivalent(eu3), "Eulers2 not equal");
                 Assert.IsTrue(m1 == m2, "Matrices1 not equiv");
                 Assert.IsTrue(m2 == m3, "Matrices2 not equal");
+            }
+        }
+
+
+        [TestMethod]
+        public void YawPitchRoll_ToRotationMAtrix_ToYawPitchRoll_Singularities()
+        {
+            YawPitchRoll eu1, eu2;
+            RotationMatrix m1, m2;
+
+            double x, y, z;
+            int cycles = 500;
+
+            for (var i = 0; i < cycles; i++)
+            {
+                x = Random(-180, 180);
+                y = i > 0.5 * cycles ? Random(89.98, 90) : Random(-90, -89.98);
+                z = Random(-180, 180);
+
+                eu1 = new YawPitchRoll(x, y, z);
+                m1 = eu1.ToRotationMatrix();
+                eu2 = m1.ToYawPitchRoll();
+                m2 = eu2.ToRotationMatrix();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z);
+                Trace.WriteLine(eu1 + " " + eu1.ToQuaternion());
+                Trace.WriteLine(m1);
+                Trace.WriteLine(eu2 + " " + eu2.ToQuaternion());
+                Trace.WriteLine(m2);
+
+                if (eu1 != eu2)
+                {
+                    Trace.WriteLine("SINGULARITY");
+
+                    Assert.IsTrue(y > 90 - 0.03 || y < -90 + 0.03);
+                    // Is q == q or q = -q 
+                    //Assert.IsTrue(eu1.ToQuaternion().IsEquivalent(eu2.ToQuaternion()));  // too precise of a comparison, yields errors
+
+                    Quaternion q1 = eu1.ToQuaternion();
+                    Quaternion q2 = eu2.ToQuaternion();
+                    Assert.IsTrue(
+                            (Math.Abs(q1.W - q2.W) < 0.001 && Math.Abs(q1.X - q2.X) < 0.001 && Math.Abs(q1.Y - q2.Y) < 0.001 && Math.Abs(q1.Z - q2.Z) < 0.001)
+                            || (Math.Abs(q1.W + q2.W) < 0.001 && Math.Abs(q1.X + q2.X) < 0.001 && Math.Abs(q1.Y + q2.Y) < 0.001 && Math.Abs(q1.Z + q2.Z) < 0.001));
+                }
+                else
+                {
+                    Assert.IsTrue(eu1 == eu2, "Eulers not equal");
+                    Assert.IsTrue(m1 == m2, "Quats not equal");
+                }
             }
         }
 
