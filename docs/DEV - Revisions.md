@@ -19,10 +19,10 @@
 - [ ] Euler Angles --> Rename to YawPitchRoll
     - [x] Create class structure
     - [x] EU > Q > EU
-    - [ ] EU > RM > EU
+    - [x] EU > RM > EU
     - [ ] EU > AA > EU
     - [ ] EU > RV > EU
-
+- [x] This was really helpful, nice tool: http://danceswithcode.net/engineeringnotes/rotations_in_3d/demo3D/rotations_in_3d_tool.html
 
 ## BUILD 1207
 - [x] ROTATIONMATRIX

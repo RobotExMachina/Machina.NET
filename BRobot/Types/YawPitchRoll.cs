@@ -157,6 +157,39 @@ namespace BRobot
                                           -sY,                 sX * cY,                     cX * cY, false);
         }
 
+
+        public AxisAngle ToAxisAngle()
+        {
+            // This is just basically converting it to a quaternion, and then axis-angle: this.ToQuaternion().ToAxisAngle();
+            double x, y, z, angle;
+            double s;
+
+            double cX = Math.Cos(0.5 * TO_RADS * this.XAngle),
+                   cY = Math.Cos(0.5 * TO_RADS * this.YAngle),
+                   cZ = Math.Cos(0.5 * TO_RADS * this.ZAngle),
+                   sX = Math.Sin(0.5 * TO_RADS * this.XAngle),
+                   sY = Math.Sin(0.5 * TO_RADS * this.YAngle),
+                   sZ = Math.Sin(0.5 * TO_RADS * this.ZAngle);
+
+            angle = 2 * Math.Acos(cX * cY * cZ + sX * sY * sZ);
+            s = Math.Sin(0.5 * angle);
+            if (s < EPSILON)
+            {
+                // This AxisAngle represents no rotation (full turn).
+                x = y = z = 0;
+            }
+            else
+            {
+                // Untangle the underlying quaternion ;)
+                x = (sX * cY * cZ - cX * sY * sZ) / s;
+                y = (cX * sY * cZ + sX * cY * sZ) / s;
+                z = (cX * cY * sZ - sX * sY * cZ) / s;
+            }
+
+            return new AxisAngle(x, y, z, TO_DEGS * angle);
+        }
+
+
         public override string ToString()
         {
             return string.Format("EulerZYX[Z:{0}, Y:{1}, X:{2}]",

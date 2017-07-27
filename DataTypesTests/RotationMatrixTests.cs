@@ -286,6 +286,79 @@ namespace DataTypesTests
             }
         }
 
+        [TestMethod]
+        public void RotationMatrix_ToYawPitchRoll_ToRotationMatrix()
+        {
 
+            RotationMatrix m1, m2, m3;
+            YawPitchRoll eu1, eu2, eu3;
+            AxisAngle aa;
+
+            double x, y, z, angle;
+            Point axis;
+
+            // Test random permutations
+            for (var i = 0; i < 200; i++)
+            {
+                x = Random(-100, 100);
+                y = Random(-100, 100);
+                z = Random(-100, 100);
+                angle = Random(-1440, 1440);  // test any possible angle
+
+                aa = new AxisAngle(x, y, z, angle);  // a random AA is easier to create than a random RM
+                m1 = aa.ToRotationMatrix();
+                eu1 = m1.ToYawPitchRoll();
+                m2 = eu1.ToRotationMatrix();
+                eu2 = m2.ToYawPitchRoll();
+                m3 = eu2.ToRotationMatrix();
+                eu3 = m3.ToYawPitchRoll();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle);
+                Trace.WriteLine(aa);
+                Trace.WriteLine(m1);
+                Trace.WriteLine(eu1);
+                Trace.WriteLine(m2);
+                Trace.WriteLine(eu2);
+                Trace.WriteLine(m3);
+                Trace.WriteLine(eu3);
+
+                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(m2 == m3);
+                Assert.IsTrue(eu1.IsEquivalent(eu2));
+                Assert.IsTrue(eu2 == eu3);
+            }
+
+
+            // Test singularities
+            for (var i = 0; i < 500; i++)
+            {
+                axis = Point.RandomFromInts(-1, 1);
+                angle = 90 * RandomInt(-16, 16);
+
+                aa = new AxisAngle(axis, angle);  // a random AA is easier to create than a random RM
+                m1 = aa.ToRotationMatrix();
+                eu1 = m1.ToYawPitchRoll();
+                m2 = eu1.ToRotationMatrix();
+                eu2 = m2.ToYawPitchRoll();
+                m3 = eu2.ToRotationMatrix();
+                eu3 = m3.ToYawPitchRoll();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(axis + " " + angle);
+                Trace.WriteLine(aa);
+                Trace.WriteLine(m1);
+                Trace.WriteLine(eu1);
+                Trace.WriteLine(m2);
+                Trace.WriteLine(eu2);
+                Trace.WriteLine(m3);
+                Trace.WriteLine(eu3);
+
+                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(m2 == m3);
+                Assert.IsTrue(eu1.IsEquivalent(eu2));
+                Assert.IsTrue(eu2 == eu3);
+            }
+        }
     }
 }

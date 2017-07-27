@@ -257,5 +257,35 @@ namespace DataTypesTests
             }
         }
 
+        [TestMethod]
+        public void YawPitchRoll_ToAxisAngle_ComparisonWithQuaternions()
+        {
+            YawPitchRoll eu1;
+            AxisAngle aa1, aa2;
+            Quaternion q;
+
+            double x, y, z;
+
+            // Amp this up to 100000 cycles to hit singularities
+            for (var i = 0; i < 500; i++)
+            {
+                x = Random(-1440, 1440);
+                y = Random(-1440, 1440);
+                z = Random(-1440, 1440);
+
+                eu1 = new YawPitchRoll(x, y, z);
+                aa1 = eu1.ToAxisAngle();
+                q = eu1.ToQuaternion();
+                aa2 = q.ToAxisAngle();
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x + " " + y + " " + z);
+                Trace.WriteLine(eu1 + " --> " + aa1);
+                Trace.WriteLine(eu1 + " --> " + q + " --> " + aa2);
+
+                Assert.IsTrue(aa1 == aa2);
+
+            }
+        }
     }
 }
