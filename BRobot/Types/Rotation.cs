@@ -75,12 +75,16 @@ namespace BRobot
         public double Angle { get { return this.AA.Angle; } internal set { this.AA.Angle = value; } }
 
 
+        public static implicit operator Rotation(NuCoordinateSystem cs)
+        {
+            return new NuCoordinateSystem(cs.Q);
+        }
+
 
         /// <summary>
-        /// Create an empty rotation object.
+        /// Create an empty rotation object with no initialized fields.
         /// </summary>
-        internal Rotation()
-            : this(0, 0, 0, 0, false) { }
+        internal Rotation() { }
 
         /// <summary>
         /// Create a Rotation as a shallow copy of another one. 
@@ -247,6 +251,17 @@ namespace BRobot
         {
             return this.AA.ToRotationVector(radians);
         }
+
+        public override string ToString()
+        {
+            return string.Format("Rotation[X:{0}, Y:{1}, Z:{2}, A:{3}]",
+                Math.Round(AA.X, STRING_ROUND_DECIMALS_MM),
+                Math.Round(AA.Y, STRING_ROUND_DECIMALS_MM),
+                Math.Round(AA.Z, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
+        }
+
+        
 
     }
 }

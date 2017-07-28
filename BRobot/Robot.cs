@@ -350,7 +350,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Returns a Rottaion representation of the Robot's TCP orientation in quaternions.
+        /// Returns a Rotation representation of the Robot's TCP orientation in quaternions.
         /// </summary>
         /// <returns></returns>
         public Rotation GetCurrentOrientation()
@@ -578,7 +578,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Sets the reference system used for relative transformations ('local', 'global'...)
+        /// Sets the reference system used for relative transformations ("local", "global", etc.)
         /// </summary>
         /// <param name="type"></param>
         public void Coordinates(string type)
@@ -640,7 +640,6 @@ namespace BRobot
             return c.IssueApplyActionRequest(action);
         }
 
-
         /// <summary>
         /// Issue a relative movement action request on current coordinate system.
         /// </summary>
@@ -650,17 +649,6 @@ namespace BRobot
         {
             return c.IssueTranslationRequest(direction, true);
         }
-
-        ///// <summary>
-        ///// Issue a relative movement action request on current coordinate system.
-        ///// </summary>
-        ///// <param name="incX"></param>
-        ///// <param name="incY"></param>
-        ///// <returns></returns>
-        //public bool Move(double incX, double incY)
-        //{
-        //    return Move(new Vector(incX, incY, 0));
-        //}
 
         /// <summary>
         /// Issue a relative movement action request on current coordinate system.
@@ -697,7 +685,7 @@ namespace BRobot
         }
         
         /// <summary>
-        /// Issue a relative rotation action request around local/global axes.
+        /// Issue a RELATIVE rotation action request according to the current reference system.
         /// </summary>
         /// <param name="rotation"></param>
         /// <returns></returns>
@@ -707,18 +695,18 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Issue a relative rotation action request around local/global axes.
+        /// Issue a RELATIVE rotation action request according to the current reference system.
         /// </summary>
         /// <param name="vector"></param>
         /// <param name="angDegs"></param>
         /// <returns></returns>
         public bool Rotate(Vector vector, double angDegs)
         {
-            return Rotate(new Rotation(vector, angDegs));
+            return Rotate(new Rotation(vector.X, vector.Y, vector.Z, angDegs, true));
         }
 
         /// <summary>
-        /// Issue a relative rotation action request around local/global axes.
+        /// Issue a RELATIVE rotation action request according to the current reference system.
         /// </summary>
         /// <param name="rotVecX"></param>
         /// <param name="rotVecY"></param>
@@ -727,11 +715,11 @@ namespace BRobot
         /// <returns></returns>
         public bool Rotate(double rotVecX, double rotVecY, double rotVecZ, double angDegs)
         {
-            return Rotate(new Rotation(new Vector(rotVecX, rotVecY, rotVecZ), angDegs));
+            return Rotate(new Rotation(rotVecX, rotVecY, rotVecZ, angDegs, true));
         }
                 
         /// <summary>
-        /// Issue an absolute global reorientation request.
+        /// Issue an ABSOLUTE reorientation request according to the current reference system.
         /// </summary>
         /// <param name="rotation"></param>
         /// <returns></returns>
@@ -741,7 +729,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Issue an absolute global reorientation request.
+        /// Issue an ABSOLUTE reorientation request according to the current reference system.
         /// </summary>
         /// <param name="cs"></param>
         /// <returns></returns>
@@ -751,7 +739,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Issue an absolute global reorientation request.
+        /// Issue an ABSOLUTE reorientation request according to the current reference system.
         /// </summary>
         /// <param name="vecX"></param>
         /// <param name="vecY"></param>
@@ -762,7 +750,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Issue an absolute global reorientation request.
+        /// Issue an ABSOLUTE reorientation request according to the current reference system.
         /// </summary>
         /// <param name="x0"></param>
         /// <param name="x1"></param>
@@ -777,8 +765,9 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Issue a compound relative local Translation + Rotation request. 
-        /// Note that, if using local coordinates, order of actions will matter.
+        /// Issue a compound RELATIVE local Translation + Rotation request
+        /// according to the current reference system.
+        /// Note that, if using local coordinates, order of actions will matter.  // TODO: wouldn't they matter too if the are in global coordinates?
         /// </summary>
         /// <param name="direction"></param>
         /// <param name="rotation"></param>
@@ -792,8 +781,9 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Issue a compound relative local Rotation + Translation request.
-        /// Note that, if using local coordinates, order of actions will matter.
+        /// Issue a compound RELATIVE local Rotation + Translation request
+        /// according to the current reference system.
+        /// Note that, if using local coordinates, order of actions will matter. // TODO: wouldn't they matter too if the are in global coordinates?
         /// </summary>
         /// <param name="rotation"></param>
         /// <param name="direction"></param>
@@ -805,9 +795,10 @@ namespace BRobot
 
             return c.IssueTransformationRequest(direction, rotation, true, false);
         }
-        
+
         /// <summary>
-        /// Issue a compound absolute global Translation + Rotation request.
+        /// Issue a compound ABSOLUTE global Translation + Rotation request
+        /// according to the current reference system.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
@@ -821,7 +812,8 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Issue a compound absolute global Translation + Rotation request.
+        /// Issue a compound ABSOLUTE global Translation + Rotation request
+        /// according to the current reference system.
         /// </summary>
         /// <param name="rotation"></param>
         /// <param name="position"></param>

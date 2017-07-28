@@ -200,6 +200,26 @@ namespace BRobot
                             vecX.Z, vecY.Z, 1, true);
         }
 
+        /// <summary>
+        /// Create a RotationMatrix from the components of two Vectors. 
+        /// This constructor will create the best-fit orthogonal 3x3 matrix 
+        /// respecting the direction of the X vector and the plane formed with the Y vector. 
+        /// The Z vector will be normal to this planes, and all vectors will be unitized. 
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        public RotationMatrix(double x0, double x1, double x2, double y0, double y1, double y2)
+        {
+            // Rely on internal orthoginalization to correctly form this matrix
+            this.Initialize(x0, y0, 0,
+                            x2, y1, 0,
+                            x2, y2, 1, true);
+        }
+
 
         /// <summary>
         /// An internal initializator to start this matrix from its components. 
@@ -479,17 +499,16 @@ namespace BRobot
             //q.Y = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 + m11 - m22)), m02 - m20);
             //q.Z = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 - m11 + m22)), m10 - m01);
 
+            //// From the ABB Rapid manual p.1151
+            //double w = 0.5 * Math.Sqrt(1 + XAxis.X + YAxis.Y + ZAxis.Z);
+            //double x = 0.5 * Math.Sqrt(1 + XAxis.X - YAxis.Y - ZAxis.Z) * (YAxis.Z - ZAxis.Y >= 0 ? 1 : -1);
+            //double y = 0.5 * Math.Sqrt(1 - XAxis.X + YAxis.Y - ZAxis.Z) * (ZAxis.X - XAxis.Z >= 0 ? 1 : -1);
+            //double z = 0.5 * Math.Sqrt(1 - XAxis.X - YAxis.Y + ZAxis.Z) * (XAxis.Y - YAxis.X >= 0 ? 1 : -1);
+            //return new Quaternion(w, x, y, z, true);
+
             return q;
         }
 
-        //internal double Copysign(double x, double y)
-        //{
-        //    if ( (x > 0 && y > 0) || (x < 0 && y < 0) )
-        //    {
-        //        return x;
-        //    }
-        //    return -x;
-        //}
 
         /// <summary>
         /// Returns an Axis Angle representation of this Rotation Matrix. 
