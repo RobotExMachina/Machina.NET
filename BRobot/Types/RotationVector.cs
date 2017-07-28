@@ -68,6 +68,18 @@ namespace BRobot
                 || Math.Abs(rv1.Z - rv2.Z) > EPSILON;
         }
 
+        ///// <summary>
+        ///// Implicit conversion to Vector.
+        ///// </summary>
+        ///// <param name="rv"></param>
+        //public static implicit operator Vector(RotationVector rv)
+        //{
+        //    return new Vector(rv.X, rv.Y, rv.Y);
+        //}
+
+
+
+
         /// <summary>
         /// Creates a rotation represented by a RotationVector: an unit rotation
         /// axis multiplied by the rotation angle.

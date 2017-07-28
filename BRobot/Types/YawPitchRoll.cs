@@ -17,7 +17,7 @@ namespace BRobot
     //                                                                                                  
     /// <summary>
     /// A class representing a Yaw-Pitch-Roll rotation, e.g. Euler Angles over intrinsic
-    /// ZY'X'' axes (Tait-Bryan angles). See <see cref="https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles"/>
+    /// ZY'X'' axes (Tait-Bryan angles). See <see cref="http://en.wikipedia.org/wiki/Euler_angles"/>
     /// </summary>
     public class YawPitchRoll : Geometry
     {

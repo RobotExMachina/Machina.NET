@@ -105,7 +105,7 @@ namespace BRobot
         /// Returns a Quaternion representation of the current CoordinateSystem. 
         /// </summary>
         /// <returns></returns>
-        public Rotation GetQuaternion()
+        public Quaternion GetQuaternion()
         {
             // From the ABB Rapid manual p.1151
             double w = 0.5 * Math.Sqrt(1 + XAxis.X + YAxis.Y + ZAxis.Z);
@@ -117,7 +117,7 @@ namespace BRobot
             double z = 0.5 * Math.Sqrt(1 - XAxis.X - YAxis.Y + ZAxis.Z)
                 * (XAxis.Y - YAxis.X >= 0 ? 1 : -1);
 
-            return new Rotation(w, x, y, z, true);
+            return new Quaternion(w, x, y, z, true);
         }
 
         /// <summary>

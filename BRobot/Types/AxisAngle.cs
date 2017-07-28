@@ -80,13 +80,31 @@ namespace BRobot
         /// <param name="aa"></param>
         public static implicit operator Vector(AxisAngle aa)
         {
-            return new Vector(aa.Axis);
+            return new Vector(aa.Axis.X, aa.Axis.Y, aa.Axis.Z);
         }
+
+
+
 
         /// <summary>
         /// Creates an AxisAngle representing no rotation.
         /// </summary>
         public AxisAngle() : this(0, 0, 0, 0, false) { }
+
+        /// <summary>
+        /// Creates an AxisAngle as a shallow copy of another one.
+        /// The axis vector will be automatically normalized.
+        /// </summary>
+        /// <param name="axisAngle"></param>
+        public AxisAngle(AxisAngle axisAngle) : this(axisAngle.X, axisAngle.Y, axisAngle.Z, axisAngle.Angle, true) { }
+
+        /// <summary>
+        /// Creates an AxisAngle as a shallow copy of another one.
+        /// Internal constructor to bypass normalization.
+        /// </summary>
+        /// <param name="aa"></param>
+        /// <param name="normalize"></param>
+        internal AxisAngle(AxisAngle aa, bool normalize) : this(aa.X, aa.Y, aa.Z, aa.Angle, normalize) { }
 
         /// <summary>
         /// Create an AxisAngle representation of a spatial rotation from the XYZ components of the rotation axis, 
@@ -301,7 +319,16 @@ namespace BRobot
         /// <returns></returns>
         public RotationVector ToRotationVector()
         {
-            return new RotationVector(this.Axis.X, this.Axis.Y, this.Axis.Z, this.Angle, false);  // this vector should already be normalized
+            return this.ToRotationVector(false);
+        }
+
+        public RotationVector ToRotationVector(bool radians)
+        {
+            return new RotationVector(this.Axis.X, 
+                this.Axis.Y, 
+                this.Axis.Z, 
+                radians ? TO_RADS * this.Angle : this.Angle, 
+                false);  // this vector should already be normalized
         }
 
         /// <summary>

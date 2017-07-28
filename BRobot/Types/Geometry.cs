@@ -50,6 +50,7 @@ namespace BRobot
         internal static readonly double TO_DEGS = 180.0 / Math.PI;
         internal static readonly double TO_RADS = Math.PI / 180.0;
 
+        // TAU ;)
         internal static readonly double TAU = 2 * Math.PI;
 
 
@@ -132,7 +133,5 @@ namespace BRobot
         {
             return targetStart + (targetEnd - targetStart) * (value - sourceStart) / (sourceEnd - sourceStart);
         }
-
-
     }
 }

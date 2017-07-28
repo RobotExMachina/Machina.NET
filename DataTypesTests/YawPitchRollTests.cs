@@ -13,8 +13,6 @@ namespace DataTypesTests
     [TestClass]
     public class YawPitchRollTests : DataTypesTests
     {
-        private double TO_RADS = Math.PI / 180.0;
-
         [TestMethod]
         public void YawPitchRoll_ToQuaternion_ToYawPitchRoll()
         {

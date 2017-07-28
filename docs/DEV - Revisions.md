@@ -15,10 +15,13 @@
 ```
 
 
+## BUILD 1212
+- [ ] Rework the Rotation interface!
+
+
 ## BUILD 1211
 - [x] Quaternion cleanup
 - [x] AxisAngle now features a Vector Axis object
-
 
 ## BUILD 1210
 - [x] Internal rework of classes and files

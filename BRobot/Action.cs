@@ -396,7 +396,7 @@ namespace BRobot
         public override string ToString()
         {
             return relative ?
-                string.Format("Rotate {0}° around {1}", rotation.GetRotationAngle(), rotation.GetRotationAxis()) :
+                string.Format("Rotate {0}° around {1}", rotation.Angle, rotation.Axis) :
                 string.Format("Rotate to {0}", rotation.GetCoordinateSystem());
         }
 
@@ -437,9 +437,9 @@ namespace BRobot
             if (relative)
             {
                 if (translationFirst)
-                    str = string.Format("Transform: move {0} mm and rotate {1}° around {2}", translation, rotation.GetRotationAngle(), rotation.GetRotationAxis());
+                    str = string.Format("Transform: move {0} mm and rotate {1}° around {2}", translation, rotation.Angle, rotation.Axis);
                 else 
-                    str = string.Format("Transform: rotate {0}° around {1} and move {2} mm", rotation.GetRotationAngle(), rotation.GetRotationAxis(), translation);
+                    str = string.Format("Transform: rotate {0}° around {1} and move {2} mm", rotation.Angle, rotation.Axis, translation);
             }
             else
             {

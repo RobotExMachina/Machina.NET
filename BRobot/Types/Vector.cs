@@ -219,27 +219,32 @@ namespace BRobot
         /// <summary>
         /// Rotates this Vector by speficied Quaterion.
         /// </summary>
-        /// <param name="r"></param>
-        public bool Rotate(Rotation r)
+        /// <param name="q"></param>
+        public bool Rotate(Quaternion q)
         {
-            if (!r.IsUnit())
-            {
-                Console.WriteLine("Please use unit Quaternions to perform rotations");
-                return false;
-            }
-
             // P.out = Q * P.in * conj(Q);
             // From gl-matrix.js
-            double ix = r.W * X + r.Y * Z - r.Z * Y,
-                   iy = r.W * Y + r.Z * X - r.X * Z,
-                   iz = r.W * Z + r.X * Y - r.Y * X,
-                   iw = -r.X * X - r.Y * Y - r.Z * Z;
+            double ix = q.W * X + q.Y * Z - q.Z * Y,
+                   iy = q.W * Y + q.Z * X - q.X * Z,
+                   iz = q.W * Z + q.X * Y - q.Y * X,
+                   iw = -q.X * X - q.Y * Y - q.Z * Z;
 
-            this.X = ix * r.W - iw * r.X - iy * r.Z + iz * r.Y;
-            this.Y = iy * r.W - iw * r.Y - iz * r.X + ix * r.Z;
-            this.Z = iz * r.W - iw * r.Z - ix * r.Y + iy * r.X;
+            this.X = ix * q.W - iw * q.X - iy * q.Z + iz * q.Y;
+            this.Y = iy * q.W - iw * q.Y - iz * q.X + ix * q.Z;
+            this.Z = iz * q.W - iw * q.Z - ix * q.Y + iy * q.X;
 
             return true;
+        }
+
+        public bool Rotate(Rotation r)
+        {
+            return this.Rotate(r.Q);
+        }
+
+
+        public bool Rotate(AxisAngle aa)
+        {
+            return this.Rotate(aa.ToQuaternion());
         }
 
         /// <summary>
@@ -250,8 +255,7 @@ namespace BRobot
         /// <returns></returns>
         public bool Rotate(Vector vec, double angDegs)
         {
-            Rotation r = new Rotation(vec, angDegs);
-            return this.Rotate(r);
+            return this.Rotate(new AxisAngle(vec, angDegs).ToQuaternion());
         }
 
         /// <summary>
@@ -262,17 +266,8 @@ namespace BRobot
         /// <returns></returns>
         public bool Rotate(double vecX, double vecY, double vecZ, double angDegs)
         {
-            Rotation r = new Rotation(new Vector(vecX, vecY, vecZ), angDegs);
-            return this.Rotate(r);
+            return this.Rotate(new AxisAngle(vecX, vecY, vecZ, angDegs).ToQuaternion());
         }
-
-
-
-
-
-
-
-
 
 
 
@@ -515,8 +510,12 @@ namespace BRobot
         /// <returns></returns>
         public static Vector Rotation(Vector p, Rotation r)
         {
+            //Vector v = new Vector(p);
+            //v.Rotate(r);
+            //return v;
+
             Vector v = new Vector(p);
-            v.Rotate(r);
+            v.Rotate(r.Q);
             return v;
         }
 

@@ -465,11 +465,11 @@ namespace BRobot
 
                 if (referenceCS == ReferenceCS.World)
                 {
-                    rotation.PreMultiply(action.rotation);
+                    rotation.RotateGlobal(action.rotation);
                 }
                 else
                 {
-                    rotation.Multiply(action.rotation);
+                    rotation.RotateLocal(action.rotation);
                 }
             }
             else
@@ -516,14 +516,14 @@ namespace BRobot
                     if (referenceCS == ReferenceCS.World)
                     {
                         newPos = position + action.translation;
-                        newRot = Rotation.Multiply(action.rotation, rotation);  // premultiplication
+                        newRot = Rotation.Combine(action.rotation, rotation);  // premultiplication
                     }
                     else
                     {
                         //Vector worldVector = Vector.Rotation(action.translation, Rotation.Conjugate(this.rotation));
                         Vector worldVector = Vector.Rotation(action.translation, this.rotation);
                         newPos = position + worldVector;
-                        newRot = Rotation.Multiply(rotation, action.rotation);  // postmultiplication
+                        newRot = Rotation.Combine(rotation, action.rotation);  // postmultiplication
                     }
                 }
 
@@ -533,13 +533,13 @@ namespace BRobot
                     if (referenceCS == ReferenceCS.World)
                     {
                         newPos = position + action.translation;
-                        newRot = Rotation.Multiply(action.rotation, rotation);  // premultiplication
+                        newRot = Rotation.Combine(action.rotation, rotation);  // premultiplication
                     }
 
                     else
                     {
                         // @TOCHECK: is this correct?
-                        newRot = Rotation.Multiply(rotation, action.rotation);  // postmultiplication
+                        newRot = Rotation.Combine(rotation, action.rotation);  // postmultiplication
                         //Vector worldVector = Vector.Rotation(action.translation, Rotation.Conjugate(newRot));
                         Vector worldVector = Vector.Rotation(action.translation, newRot);
                         newPos = position + worldVector;

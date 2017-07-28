@@ -255,7 +255,6 @@ namespace DataTypesTests
         {
             RotationVector rv1, rv2;
             Quaternion q;
-            AxisAngle aa1;
 
             double x, y, z, angle;
             double len;
