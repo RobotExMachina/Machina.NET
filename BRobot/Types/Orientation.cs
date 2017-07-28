@@ -8,17 +8,15 @@ namespace BRobot
 {
 
     /// <summary>
-    /// Represents a Coordinate System composed of a triplet of orthogonal XYZ unit vectors
-    /// following right-hand rule orientations. Useful for spatial and rotational orientation
-    /// operations. 
+    /// Defines an Orientation in three-dimensional space represented by a triplet of orthogonal XYZ unit vectors
+    /// following right-hand rule orientations. Useful for spatial and rotational orientation operations. 
     /// </summary>
-    public class NuCoordinateSystem : Geometry
+    public class Orientation : Geometry
     {
         /**
          * NOTE: just as rotation, this class is just a wrapper around the underlying 
-         * rotational elements that represent the orientation of this Coordinate System in space, 
-         * namely a Quaternion.
-         * The main purpose of this class it to be an intuitive way of representing orientation 
+         * rotational elements that represent Orientation in space.
+         * The main purpose of this class it to be an intuitive way of representing Orientation 
          * in three-dimensional space. AxisAngle is therefore not used here, since conceptually
          * there is no need to represent rotations or store overturns in an object that represents
          * pure orientation. 
@@ -28,10 +26,10 @@ namespace BRobot
          **/
 
         internal Quaternion Q = null;
-        internal RotationMatrix RM = null;
+        internal RotationMatrix RM = null;  // useful for vector-to-quaternion conversions and as storage of orientation vectors
         
         /// <summary>
-        /// The main X direction of this Coordinate System.
+        /// The main X direction of this Orientation.
         /// </summary>
         public Vector XAxis
         {
@@ -44,7 +42,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// The main Y direction of this Coordinate System.
+        /// The main Y direction of this Orientation.
         /// </summary>
         public Vector YAxis
         {
@@ -57,7 +55,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// The main Y direction of this Coordinate System.
+        /// The main Z direction of this Orientation.
         /// </summary>
         public Vector ZAxis
         {
@@ -70,23 +68,33 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Create an empty CS object.
+        /// Implicit conversion from Rotation to Orientation via its Quaternion.
         /// </summary>
-        internal NuCoordinateSystem() { }
+        /// <param name="or"></param>
+        public static implicit operator Orientation(Rotation r)
+        {
+            return new Orientation(r.Q);
+        }
+
 
         /// <summary>
-        /// Create a CoordinateSystem from the main X and Y axes.
+        /// Create an empty CS object.
+        /// </summary>
+        internal Orientation() { }
+
+        /// <summary>
+        /// Create a new Orientation object from the main X and Y axes.
         /// This constructor will create the best-fit orthogonal coordinate system
         /// respecting the direction of the X vector and the plane formed with the Y vector. 
         /// The Z vector will be normal to this planes, and all vectors will be unitized. 
         /// </summary>
         /// <param name="vectorX"></param>
         /// <param name="vectorY"></param>
-        public NuCoordinateSystem(Vector vectorX, Vector vectorY) 
+        public Orientation(Vector vectorX, Vector vectorY) 
             : this(vectorX.X, vectorX.Y, vectorX.Z, vectorY.X, vectorY.Y, vectorY.Z) { }
 
         /// <summary>
-        /// Create a CoordinateSystem from the components of the main X and Y axes.
+        /// Create a new Orientation object from the main X and Y axes.
         /// This constructor will create the best-fit orthogonal coordinate system
         /// respecting the direction of the X vector and the plane formed with the Y vector. 
         /// The Z vector will be normal to this planes, and all vectors will be unitized. 
@@ -97,28 +105,28 @@ namespace BRobot
         /// <param name="y0"></param>
         /// <param name="y1"></param>
         /// <param name="y2"></param>
-        public NuCoordinateSystem(double x0, double x1, double x2, double y0, double y1, double y2)
+        public Orientation(double x0, double x1, double x2, double y0, double y1, double y2)
         {
             this.RM = new RotationMatrix(x0, x1, x2, y0, y1, y2);
             this.Q = this.RM.ToQuaternion();
         }
 
         /// <summary>
-        /// Create a CS from a Quaternion representation.
+        /// Create an Orientation object from a Quaternion representation.
         /// </summary>
         /// <param name="q"></param>
         /// <returns></returns>
-        internal NuCoordinateSystem(Quaternion q)
+        internal Orientation(Quaternion q)
         {
             this.Q = new Quaternion(q);
             this.RM = this.Q.ToRotationMatrix();
         }
 
         /// <summary>
-        /// Creates a CS from a Rotation representation.
+        /// Creates an Orientation object from a Rotation representation.
         /// </summary>
         /// <param name="r"></param>
-        internal NuCoordinateSystem(Rotation r)
+        internal Orientation(Rotation r)
             : this(r.Q) { }
 
 

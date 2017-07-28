@@ -75,9 +75,13 @@ namespace BRobot
         public double Angle { get { return this.AA.Angle; } internal set { this.AA.Angle = value; } }
 
 
-        public static implicit operator Rotation(NuCoordinateSystem cs)
+        /// <summary>
+        /// Implicit conversion from Orientation to Rotation via its Quaternion.
+        /// </summary>
+        /// <param name="or"></param>
+        public static implicit operator Rotation(Orientation or)
         {
-            return new NuCoordinateSystem(cs.Q);
+            return new Rotation(or.Q);
         }
 
 
@@ -127,32 +131,33 @@ namespace BRobot
             this.UpdateQuaternion();
         }
 
-
         /// <summary>
-        /// Create a Rotation from its Quaternion values. 
-        /// </summary>
-        /// <param name="w"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
-        public static Rotation FromQuaternion(double w, double x, double y, double z)
-        {
-            Rotation r = new Rotation();
-            r.Q = new Quaternion(w, x, y, z, true);
-            r.AA = r.Q.ToAxisAngle();
-            return r;
-        }
-
-        /// <summary>
-        /// Create a Rotation fror
+        /// Internal constructor from a normalized Quaternion object.
         /// </summary>
         /// <param name="q"></param>
-        /// <returns></returns>
-        public static Rotation FromQuaternion(Quaternion q)
+        internal Rotation(Quaternion q)
         {
-            return FromQuaternion(q.W, q.X, q.Y, q.Z);
+            this.Q = new Quaternion(q.W, q.X, q.Y, q.Z, false);
+            this.UpdateAxisAngle();
         }
+
+        ///// <summary>
+        ///// Create a Rotation from its Quaternion values. 
+        ///// This is a static method because it 
+        ///// </summary>
+        ///// <param name="w"></param>
+        ///// <param name="x"></param>
+        ///// <param name="y"></param>
+        ///// <param name="z"></param>
+        ///// <returns></returns>
+        //public static Rotation FromQuaternion(double w, double x, double y, double z)
+        //{
+        //    Rotation r = new Rotation();
+        //    r.Q = new Quaternion(w, x, y, z, true);
+        //    r.UpdateAxisAngle();
+        //    return r;
+        //}
+
 
 
 
@@ -190,7 +195,7 @@ namespace BRobot
         /// <returns></returns>
         public static Rotation Combine(Rotation r1, Rotation r2)
         {
-            Rotation r = Rotation.FromQuaternion(r1.Q);
+            Rotation r = new Rotation(r1.Q);
             r.RotateLocal(r2);
             return r;
         }

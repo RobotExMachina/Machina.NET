@@ -397,7 +397,7 @@ namespace BRobot
         {
             return relative ?
                 string.Format("Rotate {0}° around {1}", rotation.Angle, rotation.Axis) :
-                string.Format("Rotate to {0}", new NuCoordinateSystem(rotation));
+                string.Format("Rotate to {0}", new Orientation(rotation));
         }
 
     }
@@ -443,7 +443,7 @@ namespace BRobot
             }
             else
             {
-                str = string.Format("Transform: move to {0} mm and rotate to {1}", translation, new NuCoordinateSystem(rotation));
+                str = string.Format("Transform: move to {0} mm and rotate to {1}", translation, new Orientation(rotation));
             }
             return str;
         }

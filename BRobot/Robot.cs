@@ -353,7 +353,7 @@ namespace BRobot
         /// Returns a Rotation representation of the Robot's TCP orientation in quaternions.
         /// </summary>
         /// <returns></returns>
-        public Rotation GetCurrentOrientation()
+        public Orientation GetCurrentOrientation()
         {
             return c.GetCurrentOrientation();
         }
@@ -733,9 +733,9 @@ namespace BRobot
         /// </summary>
         /// <param name="cs"></param>
         /// <returns></returns>
-        public bool RotateTo(CoordinateSystem cs)
+        public bool RotateTo(Orientation cs)
         {
-            return RotateTo(cs.GetQuaternion());
+            return RotateTo((Rotation) cs);
         }
 
         /// <summary>
@@ -746,7 +746,7 @@ namespace BRobot
         /// <returns></returns>
         public bool RotateTo(Vector vecX, Vector vecY)
         {
-            return RotateTo(new Rotation(vecX, vecY));
+            return RotateTo((Rotation) new Orientation(vecX, vecY));
         }
 
         /// <summary>
@@ -761,7 +761,7 @@ namespace BRobot
         /// <returns></returns>
         public bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)
         {
-            return RotateTo(new Rotation(x0, x1, x2, y0, y1, y2));
+            return RotateTo((Rotation) new Orientation(x0, x1, x2, y0, y1, y2));
         }
 
         /// <summary>
@@ -803,12 +803,12 @@ namespace BRobot
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <returns></returns>
-        public bool TransformTo(Point position, Rotation rotation)
+        public bool TransformTo(Point position, Orientation orientation)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
             //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
 
-            return c.IssueTransformationRequest(position, rotation, false, true);
+            return c.IssueTransformationRequest(position, orientation, false, true);
         }
 
         /// <summary>
@@ -818,12 +818,12 @@ namespace BRobot
         /// <param name="rotation"></param>
         /// <param name="position"></param>
         /// <returns></returns>
-        public bool TransformTo(Rotation rotation, Point position)
+        public bool TransformTo(Orientation orientation, Point position)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
             //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
 
-            return c.IssueTransformationRequest(position, rotation, false, false);
+            return c.IssueTransformationRequest(position, orientation, false, false);
         }
 
 
