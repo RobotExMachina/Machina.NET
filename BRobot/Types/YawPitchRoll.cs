@@ -157,9 +157,9 @@ namespace BRobot
                    sY = Math.Sin(TO_RADS * this.YAngle),
                    sZ = Math.Sin(TO_RADS * this.ZAngle);
 
-            return new RotationMatrix(cY * cZ,  -cX * sZ + sX * sY * cZ,     sX * sZ + cX * sY * cZ,
-                                      cY * sZ,   cX * cZ + sX * sY * sZ,    -sX * cZ + cX * sY * sZ,
-                                          -sY,                 sX * cY,                     cX * cY, false);
+            return new RotationMatrix(cY * cZ,   sX * sY * cZ - cX * sZ,    cX * sY * cZ + sX * sZ,
+                                      cY * sZ,   sX * sY * sZ + cX * cZ,    cX * sY * sZ - sX * cZ,
+                                          -sY,                  sX * cY,                   cX * cY, false);
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace BRobot
     //  ╚██████╔╝╚██████╔╝██║  ██║   ██║   ███████╗██║  ██║██║ ╚████║██║╚██████╔╝██║ ╚████║
     //   ╚══▀▀═╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
     //                                                                                     
-    
+
     /// <summary>
     /// A class to represent a spatial rotation as a Quaternion.
     /// </summary>
@@ -39,6 +39,33 @@ namespace BRobot
         /// </summary>
         public double Z { get; internal set; }
 
+        /// <summary>
+        /// Equality operator.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static bool operator ==(Quaternion q1, Quaternion q2)
+        {
+            return Math.Abs(q1.W - q2.W) < EPSILON
+                && Math.Abs(q1.X - q2.X) < EPSILON
+                && Math.Abs(q1.Y - q2.Y) < EPSILON
+                && Math.Abs(q1.Z - q2.Z) < EPSILON;
+        }
+
+        /// <summary>
+        /// Inequality operator.
+        /// </summary>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
+        /// <returns></returns>
+        public static bool operator !=(Quaternion q1, Quaternion q2)
+        {
+            return Math.Abs(q1.W - q2.W) > EPSILON
+                || Math.Abs(q1.X - q2.X) > EPSILON
+                || Math.Abs(q1.Y - q2.Y) > EPSILON
+                || Math.Abs(q1.Z - q2.Z) > EPSILON;
+        }
 
         /// <summary>
         /// Quaternion addition
@@ -63,20 +90,6 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Equality operator.
-        /// </summary>
-        /// <param name="q1"></param>
-        /// <param name="q2"></param>
-        /// <returns></returns>
-        public static bool operator ==(Quaternion q1, Quaternion q2)
-        {
-            return Math.Abs(q1.W - q2.W) < EPSILON
-                && Math.Abs(q1.X - q2.X) < EPSILON
-                && Math.Abs(q1.Y - q2.Y) < EPSILON
-                && Math.Abs(q1.Z - q2.Z) < EPSILON;
-        }
-
-        /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> 
         /// of the first quaternion by the second.
         /// Remember quaternion multiplication is non-commutative.
@@ -86,7 +99,7 @@ namespace BRobot
         /// <returns></returns>
         public static Quaternion operator *(Quaternion q1, Quaternion q2)
         {
-            return Quaternion.Multiply(q1, q2);
+            return Quaternion.Multiplication(q1, q2);
         }
 
         /// <summary>
@@ -113,18 +126,18 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Inequality operator.
+        /// Division operator.
         /// </summary>
         /// <param name="q1"></param>
         /// <param name="q2"></param>
         /// <returns></returns>
-        public static bool operator !=(Quaternion q1, Quaternion q2)
+        public static Quaternion operator /(Quaternion q1, Quaternion q2)
         {
-            return Math.Abs(q1.W - q2.W) > EPSILON
-                || Math.Abs(q1.X - q2.X) > EPSILON
-                || Math.Abs(q1.Y - q2.Y) > EPSILON
-                || Math.Abs(q1.Z - q2.Z) > EPSILON;
+            return Quaternion.Division(q1, q2);
         }
+
+
+
 
         /// <summary>
         /// Create an identity Quaternion representing no rotation.
@@ -152,8 +165,17 @@ namespace BRobot
         /// This Quaternion will be vector-normalized. 
         /// </summary>
         /// <param name="q"></param>
-        public Quaternion(Quaternion q) 
+        public Quaternion(Quaternion q)
             : this(q.W, q.X, q.Y, q.Z, true) { }
+
+        internal Quaternion(Quaternion q, bool normalize) : this(q.W, q.X, q.Y, q.Z, false) { }
+
+        /// <summary>
+        /// Creates a Quaternion from a Vector and a scalar. 
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <param name="scalar"></param>
+        public Quaternion(Vector vec, double scalar) : this(vec.X, vec.Y, vec.Z, scalar, true) { }
 
         /// <summary>
         /// A private constructor with the option to bypass automatic quaternion normalization.
@@ -193,13 +215,13 @@ namespace BRobot
         /// <summary>
         /// Shallow-copies the values of specified Quaternion.
         /// </summary>
-        /// <param name="r"></param>
-        public void Set(Rotation r)
+        /// <param name="q"></param>
+        public void Set(Quaternion q)
         {
-            this.W = r.W;
-            this.X = r.X;
-            this.Y = r.Y;
-            this.Z = r.Z;
+            this.W = q.W;
+            this.X = q.X;
+            this.Y = q.Y;
+            this.Z = q.Z;
         }
 
         /// <summary>
@@ -211,7 +233,7 @@ namespace BRobot
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="normalize"></param>
-        protected void Set(double w, double x, double y, double z, bool normalize)
+        internal void Set(double w, double x, double y, double z, bool normalize)
         {
             this.W = w;
             this.X = x;
@@ -235,7 +257,7 @@ namespace BRobot
         /// <summary>
         /// Turns into an identity Quaternion.
         /// </summary>
-        protected void Identity(bool positive)
+        internal void Identity(bool positive)
         {
             this.W = positive ? 1 : -1;
             this.X = 0;
@@ -249,7 +271,7 @@ namespace BRobot
         /// <returns></returns>
         public double Length()
         {
-            return Math.Sqrt(W * W + X * X + Y * Y + Z * Z);
+            return Math.Sqrt(this.W * this.W + this.X * this.X + this.Y * this.Y + this.Z * this.Z);
         }
 
         /// <summary>
@@ -258,7 +280,7 @@ namespace BRobot
         /// <returns></returns>
         public double SqLength()
         {
-            return W * W + X * X + Y * Y + Z * Z;
+            return this.W * this.W + this.X * this.X + this.Y * this.Y + this.Z * this.Z;
         }
 
         /// <summary>
@@ -287,7 +309,7 @@ namespace BRobot
         /// Normalizes the complex portion of this Quaternion (the rotation vector)
         /// maintaining the scalar portion (the rotation angle) the same. This is useful when
         /// coming from a rotation specified by non-unit vectors, to maintain angular spin.
-        /// If the scalar is outside the [-1, 0] range, the entire quaternion will be normalized.
+        /// If the scalar is outside the [-1, 1] range, the entire quaternion will be normalized instead.
         /// </summary>
         /// <remarks>Homebrew algorithm, TO REVIEW</remarks>
         /// <returns></returns>
@@ -298,7 +320,7 @@ namespace BRobot
                 return this.Normalize();
             }
 
-            // Can't deal with a zero-length quaternions or axis vectors
+            // Can't deal with zero-length quaternions or axis vectors
             if (this.Length() < EPSILON || Geometry.Length(this.X, this.Y, this.Z) < EPSILON)
             {
                 this.Identity(this.W >= 0);
@@ -386,28 +408,27 @@ namespace BRobot
         /// </summary>
         public void Invert()
         {
-            //if (this.IsUnit())
-            //{
+            if (this.IsUnit())
+            {
                 // The inverse of unit vectors is its conjugate.
-                // This Quaternion will always be unit.
                 this.X = -this.X;
                 this.Y = -this.Y;
                 this.Z = -this.Z;
-            //}
-            //else if (this.IsZero())
-            //{
-            //    // The inverse of a zero quat is itself
-            //}
-            //else
-            //{
-            //    // The inverse of a quaternion is its conjugate divided by the squared norm.
-            //    double sqlen = this.SqLength();
+            }
+            else if (this.IsZero())
+            {
+                // The inverse of a zero quat is itself!
+            }
+            else
+            {
+                // The inverse of a quaternion is its conjugate divided by the squared norm.
+                double sqlen = this.SqLength();
 
-            //    this.W /= sqlen;
-            //    this.X /= -sqlen;
-            //    this.Y /= -sqlen;
-            //    this.Z /= -sqlen;
-            //}
+                this.W /= sqlen;
+                this.X /= -sqlen;
+                this.Y /= -sqlen;
+                this.Z /= -sqlen;
+            }
         }
 
         /// <summary>
@@ -435,7 +456,6 @@ namespace BRobot
         /// Is this a zero length quaternion?
         /// </summary>
         /// <returns></returns>
-        [System.Obsolete("IsZero is deprecated, should always return false since the class will not allow zero-length quaternions to exist and always fallbak into an identity quaternion")]
         public bool IsZero()
         {
             return Math.Abs(this.SqLength()) < EPSILON;
@@ -454,6 +474,13 @@ namespace BRobot
                 && Math.Abs(this.Z) < EPSILON;
         }
 
+        /// <summary>
+        /// Is the rotation represented by this Quaternion equivalent to another? 
+        /// Equivalence is defined as the rotation operation resulting in the same
+        /// orientation in three-dimensional space. 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool IsEquivalent(Quaternion other)
         {
             // Assuming this Quaternion is normalized, but the other may not:
@@ -461,7 +488,9 @@ namespace BRobot
 
             // A Quaternion multiplied by any real number represents an equivalent rotation.
             // Numerically, and because both quaternions are unit, they are equivalent if 
-            // the addition or subtraction of the sum of their components is zero.
+            // the addition or subtraction of the sum of their components is zero, i.e.:
+            //      q =  q;  // or
+            //      q = -q;
             double sumQ = this.Sum();
             double sumQn = qn.Sum();
             return (Math.Abs(sumQ + sumQn) < EPSILON || Math.Abs(sumQn - sumQ) < EPSILON);
@@ -482,6 +511,7 @@ namespace BRobot
         /// <param name="q"></param>
         public void Add(Quaternion q)
         {
+            // TODO: the resulting Quaternion may not be normalized. Allow this? 
             this.W += q.W;
             this.X += q.X;
             this.Y += q.Y;
@@ -496,11 +526,9 @@ namespace BRobot
         /// <returns></returns>
         public static Quaternion Addition(Quaternion q1, Quaternion q2)
         {
-            return new Quaternion(
-                q1.W + q2.W,
-                q1.X + q2.X,
-                q1.Y + q2.Y,
-                q1.Z + q2.Z, true);
+            Quaternion q = new Quaternion(q1, false);
+            q.Add(q2);
+            return q;
         }
 
         /// <summary>
@@ -509,6 +537,7 @@ namespace BRobot
         /// <param name="q"></param>
         public void Subtract(Quaternion q)
         {
+            // TODO: the resulting Quaternion may not be normalized. Allow this? 
             this.W -= q.W;
             this.X -= q.X;
             this.Y -= q.Y;
@@ -523,22 +552,21 @@ namespace BRobot
         /// <returns></returns>
         public static Quaternion Subtraction(Quaternion q1, Quaternion q2)
         {
-            return new Quaternion(
-                q1.W - q2.W,
-                q1.X - q2.X,
-                q1.Y - q2.Y,
-                q1.Z - q2.Z, true);
+            Quaternion q = new Quaternion(q1, false);
+            q.Subtract(q2);
+            return q;
         }
 
         /// <summary>
-        /// Multiply this Quaternion by the specified one, a.k.a. this = this * q. 
-        /// Conceptually, this means that a Rotation 'q' in Local coordinates is applied 
+        /// Post-Multiply this Quaternion by the specified one, a.k.a. this = this * q. 
+        /// Conceptually, this means that a Rotation 'q' in Local (intrinsic) coordinates is applied 
         /// to this Rotation.
         /// See https://en.wikipedia.org/wiki/Quaternion#Hamilton_product
         /// </summary>
         /// <param name="q"></param>
         public void Multiply(Quaternion q)
         {
+            // TODO: the resulting Quaternion may not be normalized. Allow this? 
             double w = this.W,
                    x = this.X,
                    y = this.Y,
@@ -552,13 +580,14 @@ namespace BRobot
 
         /// <summary>
         /// Premultiplies this Quaternion by the specified one, a.k.a. this = q * this. 
-        /// Conceptually, this means that a Rotation 'q' in Global coordinates is applied 
+        /// Conceptually, this means that a Rotation 'q' in Global (extrinsic) coordinates is applied 
         /// to this Rotation.
         /// See https://en.wikipedia.org/wiki/Quaternion#Hamilton_product
         /// </summary>
         /// <param name="q"></param>
         public void PreMultiply(Quaternion q)
         {
+            // TODO: the resulting Quaternion may not be normalized. Allow this? 
             double w = this.W,
                    x = this.X,
                    y = this.Y,
@@ -574,28 +603,24 @@ namespace BRobot
         /// Returns the <a href="https://en.wikipedia.org/wiki/Quaternion#Hamilton_product">Hamilton product</a> 
         /// of the first quaternion by the second.
         /// Remember quaternion multiplication is non-commutative.
-        /// The result is vector-normalized.
         /// </summary>
         /// <param name="q1"></param>
         /// <param name="q2"></param>
         /// <returns></returns>
-        public static Quaternion Multiply(Quaternion q1, Quaternion q2)
+        public static Quaternion Multiplication(Quaternion q1, Quaternion q2)
         {
-            double w = q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z;
-            double x = q1.X * q2.W + q1.W * q2.X + q1.Y * q2.Z - q1.Z * q2.Y;
-            double y = q1.Y * q2.W + q1.W * q2.Y + q1.Z * q2.X - q1.X * q2.Z;
-            double z = q1.Z * q2.W + q1.W * q2.Z + q1.X * q2.Y - q1.Y * q2.X;
-
-            return new Quaternion(w, x, y, z);
+            Quaternion q = new Quaternion(q1, false);
+            q.Multiply(q2);
+            return q;
         }
 
         /// <summary>
-        /// Multiply this Quaternion by a scalar. 
-        /// @TODO: this perhaps shouldn't be here, since it would de-unitize this Q and possibly break things after...
+        /// Multiply this Quaternion by a scalar.
         /// </summary>
         /// <param name="factor"></param>
         public void Scale(double factor)
         {
+            // TODO: the resulting Quaternion may not be normalized. Allow this? 
             this.W *= factor;
             this.X *= factor;
             this.Y *= factor;
@@ -610,7 +635,7 @@ namespace BRobot
         /// <returns></returns>
         public static Quaternion Scale(Quaternion q, double factor)
         {
-            Quaternion qScaled = new Quaternion(q);
+            Quaternion qScaled = new Quaternion(q, false);
             q.Scale(factor);
             return qScaled;
         }
@@ -622,29 +647,29 @@ namespace BRobot
         /// <param name="q"></param>
         public void Divide(Quaternion q)
         {
-            Quaternion arg = new Quaternion(q);
+            Quaternion arg = new Quaternion(q, false);
             arg.Invert();
             this.Multiply(arg);
         }
 
         /// <summary>
-        /// Returns the division of r1 by r2.
-        /// Under the hood, r1 is post-multiplied by the inverse of r2.
+        /// Returns the division of q1 by q2.
+        /// Under the hood, q1 is post-multiplied by the inverse of q2.
         /// </summary>
-        /// <param name="r1"></param>
-        /// <param name="r2"></param>
+        /// <param name="q1"></param>
+        /// <param name="q2"></param>
         /// <returns></returns>
-        public static Rotation Division(Rotation r1, Rotation r2)
+        public static Quaternion Division(Quaternion q1, Quaternion q2)
         {
-            Rotation a = new Rotation(r1),
-                     b = new Rotation(r2);
+            Quaternion a = new Quaternion(q1, false),
+                       b = new Quaternion(q2, false);
             b.Invert();
             a.Multiply(b);
             return a;
         }
 
         /// <summary>
-        /// Rotate this Quaternion by specified Rotation around GLOBAL reference system.
+        /// Rotate this Quaternion by specified Rotation around GLOBAL (extrinsic) reference system.
         /// </summary>
         /// <param name="rotation"></param>
         /// <returns></returns>
@@ -654,7 +679,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Rotate this Quaternion by specified Rotation around LOCAL reference system.
+        /// Rotate this Quaternion by specified Rotation around LOCAL (intrinsic) reference system.
         /// </summary>
         /// <param name="rotation"></param>
         /// <returns></returns>
@@ -662,6 +687,10 @@ namespace BRobot
         {
             this.Multiply(rotation);
         }
+
+
+
+        
 
 
 
@@ -728,9 +757,9 @@ namespace BRobot
                 zw2 = 2 * this.Z * this.W,
                 ww2 = 2 * this.W * this.W;
 
-            return new RotationMatrix(1 - yy2 - zz2,         xy2 - zw2,         xz2 + yw2,
-                                          xy2 + zw2,     1 - xx2 - zz2,         yz2 - xw2,
-                                          xz2 - yw2,         yz2 + xw2,     1 - xx2 - yy2,   false);
+            return new RotationMatrix(1 - yy2 - zz2, xy2 - zw2, xz2 + yw2,
+                                          xy2 + zw2, 1 - xx2 - zz2, yz2 - xw2,
+                                          xz2 - yw2, yz2 + xw2, 1 - xx2 - yy2, false);
         }
 
         /// <summary>
@@ -769,7 +798,7 @@ namespace BRobot
                 zAng = 2 * Math.Atan2(this.X, -this.W);
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
-            } 
+            }
             else if (test < -0.5 + EPSILON3)  // singularity at south pole
             {
                 xAng = 0;

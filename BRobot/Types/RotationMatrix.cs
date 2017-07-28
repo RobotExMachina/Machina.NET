@@ -424,7 +424,7 @@ namespace BRobot
         /// <returns></returns>
         public Quaternion ToQuaternion()
         {
-            // This conversion assumes the rotation matrix is special orthogonal .
+            // This conversion assumes the rotation matrix is special orthogonal.
             // As a result, the returned Quaternion will be a versor.
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
             double trace = m00 + m11 + m22;
@@ -596,7 +596,10 @@ namespace BRobot
             return this.ToAxisAngle().ToRotationVector();
         }
 
-
+        /// <summary>
+        /// Return the YawPitchRoll representation of this matrix.s
+        /// </summary>
+        /// <returns></returns>
         public YawPitchRoll ToYawPitchRoll()
         {
             /**

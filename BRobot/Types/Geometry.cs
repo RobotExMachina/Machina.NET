@@ -72,6 +72,21 @@ namespace BRobot
             return Math.Sqrt(w * w + x * x + y * y + z * z);
         }
 
+        public static double SqLength(double x, double y)
+        {
+            return x * x + y * y;
+        }
+
+        public static double SqLength(double x, double y, double z)
+        {
+            return x * x + y * y + z * z;
+        }
+
+        public static double SqLength(double w, double x, double y, double z)
+        {
+            return w * w + x * x + y * y + z * z;
+        }
+
         public static void Normalize(double x, double y, double z,
             out double newX, out double newY, out double newZ)
         {
