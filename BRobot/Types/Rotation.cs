@@ -88,7 +88,8 @@ namespace BRobot
         /// <summary>
         /// Create an empty rotation object with no initialized fields.
         /// </summary>
-        internal Rotation() { }
+        public Rotation()
+            : this(0, 0, 0, 0, false) { }
 
         /// <summary>
         /// Create a Rotation as a shallow copy of another one. 
@@ -141,22 +142,22 @@ namespace BRobot
             this.UpdateAxisAngle();
         }
 
-        ///// <summary>
-        ///// Create a Rotation from its Quaternion values. 
-        ///// This is a static method because it 
-        ///// </summary>
-        ///// <param name="w"></param>
-        ///// <param name="x"></param>
-        ///// <param name="y"></param>
-        ///// <param name="z"></param>
-        ///// <returns></returns>
-        //public static Rotation FromQuaternion(double w, double x, double y, double z)
-        //{
-        //    Rotation r = new Rotation();
-        //    r.Q = new Quaternion(w, x, y, z, true);
-        //    r.UpdateAxisAngle();
-        //    return r;
-        //}
+        /// <summary>
+        /// Create a Rotation from its Quaternion values. 
+        /// This is a static method because it 
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public static Rotation FromQuaternion(double w, double x, double y, double z)
+        {
+            Rotation r = new Rotation();
+            r.Q = new Quaternion(w, x, y, z, true);
+            r.UpdateAxisAngle();
+            return r;
+        }
 
 
 
@@ -184,6 +185,15 @@ namespace BRobot
         }
 
         /// <summary>
+        /// Invert this rotation to negative angle around the same axis.
+        /// </summary>
+        public void Invert()
+        {
+            this.AA.Angle *= -1;
+            this.Q.Conjugate();
+        }
+
+        /// <summary>
         /// Combine the effect of two Rotations. 
         /// Please note that rotations will be applied in the order specified by the arguments
         /// in intrinsic coordinates, i.e. r1, then r2 over the new LOCAL transformed coordinate system.
@@ -199,6 +209,15 @@ namespace BRobot
             r.RotateLocal(r2);
             return r;
         }
+
+        public static Rotation Inverse(Rotation r)
+        {
+            Rotation rinv = new Rotation(r);
+            rinv.Invert();
+            return rinv;
+        }
+
+
 
         ///// <summary>
         ///// Combine the effect of several Rotations. Please note that rotations will be successively

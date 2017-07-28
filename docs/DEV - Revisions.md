@@ -16,7 +16,9 @@
 
 
 ## BUILD 1212
-- [ ] Rework the Rotation interface!
+- [x] Rework the Rotation interface!
+- [x] Massive rework of all classes...
+- [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
 
 ## BUILD 1211

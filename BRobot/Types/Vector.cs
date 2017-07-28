@@ -378,18 +378,18 @@ namespace BRobot
                 p1.X * p2.Y - p1.Y * p2.X);
         }
 
-        /// <summary>
-        /// Returns a unit Vector orthogonal to specified guiding Vector, contained
-        /// in the plane defined by guiding Vector and Vector. The direction of the 
-        /// resulting Vector will be on the side of the guiding Vector.
-        /// </summary>
-        /// <param name="vec"></param>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public static Vector OrthogonalTo(Vector vec, Vector p)
-        {
-            return new CoordinateSystem(vec, p).YAxis;
-        }
+        ///// <summary>
+        ///// Returns a unit Vector orthogonal to specified guiding Vector, contained
+        ///// in the plane defined by guiding Vector and Vector. The direction of the 
+        ///// resulting Vector will be on the side of the guiding Vector.
+        ///// </summary>
+        ///// <param name="vec"></param>
+        ///// <param name="p"></param>
+        ///// <returns></returns>
+        //public static Vector OrthogonalTo(Vector vec, Vector p)
+        //{
+        //    return new CoordinateSystem(vec, p).YAxis;
+        //}
 
         /// <summary>
         /// Returns the distance between two Points.

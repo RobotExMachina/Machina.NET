@@ -115,7 +115,7 @@ namespace TEST_OfflineAPITests
             arm.Speed(100);  // relative increase
             arm.Zone(5);    // rel increase
             arm.Motion("joint");
-            arm.TransformTo(new Point(200, 300, 400), new Rotation(-1, 0, 0, 0, 1, 0));
+            arm.TransformTo(new Point(200, 300, 400), new Orientation(-1, 0, 0, 0, 1, 0));
 
             // Align TCP vertically
             //arm.Motion("linear");  // if this is joint mov, UR doesn't do it! XD
@@ -341,12 +341,12 @@ namespace TEST_OfflineAPITests
             Rotation rzn45 = new Rotation(new Vector(0, 0, 1), -45);
             Rotation rzn90 = new Rotation(new Vector(0, 0, 1), -90);
 
-            Vector xAxis = rx45.GetRotationAxis();
-            Vector yAxis = ry45.GetRotationAxis();
-            Vector zAxis = rz45.GetRotationAxis();
+            Vector xAxis = rx45.Axis;
+            Vector yAxis = ry45.Axis;
+            Vector zAxis = rz45.Axis;
 
-            double val45 = rx45.GetRotationAngle();
-            double val90 = rx90.GetRotationAngle();
+            double val45 = rx45.Angle;
+            double val90 = rx90.Angle;
 
             arm.SpeedTo(100);
             arm.MoveTo(300, 0, 500);
@@ -382,7 +382,7 @@ namespace TEST_OfflineAPITests
 
             Rotation z45 = new Rotation(new Vector(0, 0, 1), 45);
             Rotation z90 = new Rotation(new Vector(0, 0, 1), 90);
-            Rotation z190 = new Rotation(new Vector(0, 0, 1), 180);
+            Rotation z180 = new Rotation(new Vector(0, 0, 1), 180);
 
             Rotation zn45 = new Rotation(new Vector(0, 0, 1), -45);
             Rotation zn90 = new Rotation(new Vector(0, 0, 1), -90);
@@ -508,7 +508,7 @@ namespace TEST_OfflineAPITests
         {
             // Reset
             Point home = new Point(300, 0, 500);
-            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
@@ -521,17 +521,17 @@ namespace TEST_OfflineAPITests
             arm.PushSettings();
             arm.Coordinates("local");
             arm.Transform(50 * Vector.XAxis, z30);                          // Note the T+R action order
-            arm.Transform(-50 * Vector.XAxis, Rotation.Conjugate(z30));
+            arm.Transform(-50 * Vector.XAxis, Rotation.Inverse(z30));
             arm.Transform(z30, 50 * Vector.XAxis);                          // Note the R+T action order
-            arm.Transform(Rotation.Conjugate(z30), -50 * Vector.XAxis);
+            arm.Transform(Rotation.Inverse(z30), -50 * Vector.XAxis);
             arm.PopSettings();
 
             // Global tests, TR vs RT:
             // Action order is irrelevant in relative global mode (since translations are applied based on immutable world XYZ)
             arm.Transform(50 * Vector.XAxis, z30);
-            arm.Transform(-50 * Vector.XAxis, Rotation.Conjugate(z30));
+            arm.Transform(-50 * Vector.XAxis, Rotation.Inverse(z30));
             arm.Transform(z30, 50 * Vector.XAxis);
-            arm.Transform(Rotation.Conjugate(z30), -50 * Vector.XAxis);
+            arm.Transform(Rotation.Inverse(z30), -50 * Vector.XAxis);
 
             // Back home
             arm.SpeedTo(100);
@@ -543,7 +543,7 @@ namespace TEST_OfflineAPITests
         {
             // Reset
             Point home = new Point(300, 0, 500);
-            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
@@ -560,7 +560,7 @@ namespace TEST_OfflineAPITests
                     x + r * Math.Cos(2 * Math.PI * i / 36.0),
                     y + r * Math.Sin(2 * Math.PI * i / 36.0),
                     z);
-                Rotation rot = Rotation.Multiply(new Rotation(Vector.ZAxis, 360 * i / 36.0), y180);
+                Rotation rot = Rotation.Combine(new Rotation(Vector.ZAxis, 360 * i / 36.0), y180);
                 arm.TransformTo(target, rot);
             }
 
@@ -571,7 +571,7 @@ namespace TEST_OfflineAPITests
                     x + r * Math.Cos(2 * Math.PI * i / 36.0),
                     y + r * Math.Sin(2 * Math.PI * i / 36.0),
                     z);
-                Rotation rot = Rotation.Multiply(new Rotation(Vector.ZAxis, 360 * i / 36.0), y180);
+                Rotation rot = Rotation.Combine(new Rotation(Vector.ZAxis, 360 * i / 36.0), y180);
                 arm.TransformTo(target, rot);
             }
 
@@ -583,7 +583,7 @@ namespace TEST_OfflineAPITests
         {
             // Reset
             Point home = new Point(300, 0, 500);
-            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
@@ -623,7 +623,7 @@ namespace TEST_OfflineAPITests
         {
             // Reset
             Point home = new Point(300, 0, 500);
-            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
 
@@ -668,7 +668,7 @@ namespace TEST_OfflineAPITests
         {
             // Reset
             Point home = new Point(300, 0, 500);
-            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             Rotation noRot = new Rotation();
 
             arm.SpeedTo(100);
@@ -693,7 +693,7 @@ namespace TEST_OfflineAPITests
         {
             // Reset
             Point home = new Point(300, 0, 500);
-            Rotation homeXYZ = new Rotation(-1, 0, 0, 0, 1, 0);
+            Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
             

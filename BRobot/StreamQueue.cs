@@ -11,51 +11,54 @@ namespace BRobot
     /// </summary>
     internal class StreamQueue
     {
-        private List<Frame> sentTargets;
-        private List<Frame> queuedTargets;
+        // DEACTIVATED EVERYTHING BECAUSE FRAME OBJECTS ARE NOT UPDATED, AND ARE ONLY USED HERE. 
+        // TO REVIEW WHEN GOING BACK TO STREAMING MODE. 
 
-        public StreamQueue()
-        {
-            this.sentTargets = new List<Frame>();
-            this.queuedTargets = new List<Frame>();
-        }
+        //private List<Frame> sentTargets;
+        //private List<Frame> queuedTargets;
 
-        public void Add(Frame f)
-        {
-            this.queuedTargets.Add(f);
-        }
+        //public StreamQueue()
+        //{
+        //    this.sentTargets = new List<Frame>();
+        //    this.queuedTargets = new List<Frame>();
+        //}
 
-        public void Add(double x, double y, double z, double vel, double zon)
-        {
-            Add( new Frame(x, y, z, vel, zon) );
-        }
+        //public void Add(Frame f)
+        //{
+        //    this.queuedTargets.Add(f);
+        //}
 
-        public Frame GetNext()
-        {
-            if (queuedTargets.Count == 0) return null;
+        //public void Add(double x, double y, double z, double vel, double zon)
+        //{
+        //    Add( new Frame(x, y, z, vel, zon) );
+        //}
 
-            sentTargets.Add(queuedTargets[0]);
-            queuedTargets.RemoveAt(0);
+        //public Frame GetNext()
+        //{
+        //    if (queuedTargets.Count == 0) return null;
 
-            return sentTargets.Last();
-        }
+        //    sentTargets.Add(queuedTargets[0]);
+        //    queuedTargets.RemoveAt(0);
 
-        public bool AreFramesPending()
-        {
-            return queuedTargets.Count > 0;
-        }
+        //    return sentTargets.Last();
+        //}
 
-        public int FramesPending()
-        {
-            return queuedTargets.Count();
-        }
+        //public bool AreFramesPending()
+        //{
+        //    return queuedTargets.Count > 0;
+        //}
 
-        public bool EmptyQueue()
-        {
-            bool rem = AreFramesPending();
-            queuedTargets.Clear();
-            return rem;
-        }
+        //public int FramesPending()
+        //{
+        //    return queuedTargets.Count();
+        //}
+
+        //public bool EmptyQueue()
+        //{
+        //    bool rem = AreFramesPending();
+        //    queuedTargets.Clear();
+        //    return rem;
+        //}
         
 
     }
