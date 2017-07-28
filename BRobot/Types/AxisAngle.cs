@@ -23,17 +23,22 @@ namespace BRobot
         /// <summary>
         /// X coordinate of the rotation vector.
         /// </summary>
-        public double X { get; internal set; }
+        public double X { get { return this.Axis.X; } internal set { this.Axis.X = value; } }
 
         /// <summary>
         /// Y coordinate of the rotation vector.
         /// </summary>
-        public double Y { get; internal set; }
+        public double Y { get { return this.Axis.Y; } internal set { this.Axis.Y = value; } }
 
         /// <summary>
         /// Z coordinate of the rotation vector.
         /// </summary>
-        public double Z { get; internal set; }
+        public double Z { get { return this.Axis.Z; } internal set { this.Axis.Z = value; } }
+
+        /// <summary>
+        /// The rotation axis.
+        /// </summary>
+        public Vector Axis { get; internal set; }
 
         /// <summary>
         /// Rotation angle in degrees.
@@ -49,9 +54,9 @@ namespace BRobot
         /// <returns></returns>
         public static bool operator ==(AxisAngle aa1, AxisAngle aa2)
         {
-            return Math.Abs(aa1.X - aa2.X) < EPSILON
-                && Math.Abs(aa1.Y - aa2.Y) < EPSILON
-                && Math.Abs(aa1.Z - aa2.Z) < EPSILON
+            return Math.Abs(aa1.Axis.X - aa2.Axis.X) < EPSILON
+                && Math.Abs(aa1.Axis.Y - aa2.Axis.Y) < EPSILON
+                && Math.Abs(aa1.Axis.Z - aa2.Axis.Z) < EPSILON
                 && Math.Abs(aa1.Angle - aa2.Angle) < EPSILON;
         }
 
@@ -63,9 +68,9 @@ namespace BRobot
         /// <returns></returns>
         public static bool operator !=(AxisAngle aa1, AxisAngle aa2)
         {
-            return Math.Abs(aa1.X - aa2.X) > EPSILON
-                || Math.Abs(aa1.Y - aa2.Y) > EPSILON
-                || Math.Abs(aa1.Z - aa2.Z) > EPSILON
+            return Math.Abs(aa1.Axis.X - aa2.Axis.X) > EPSILON
+                || Math.Abs(aa1.Axis.Y - aa2.Axis.Y) > EPSILON
+                || Math.Abs(aa1.Axis.Z - aa2.Axis.Z) > EPSILON
                 || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
         }
 
@@ -75,7 +80,7 @@ namespace BRobot
         /// <param name="aa"></param>
         public static implicit operator Vector(AxisAngle aa)
         {
-            return new BRobot.Vector(aa.X, aa.Y, aa.Z);
+            return new Vector(aa.Axis);
         }
 
         /// <summary>
@@ -115,9 +120,7 @@ namespace BRobot
         /// <param name="normalize"></param>
         internal AxisAngle(double x, double y, double z, double angleDegs, bool normalize)
         {
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
+            this.Axis = new Vector(x, y, z);
             this.Angle = angleDegs;
 
             if (normalize)
@@ -131,20 +134,20 @@ namespace BRobot
         /// </summary>
         public bool Normalize()
         {
-            double len = Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+            double len = Axis.Length();
 
             if (len < EPSILON)
             {
-                this.X = 0;
-                this.Y = 0;
-                this.Z = 0;
+                this.Axis.X = 0;
+                this.Axis.Y = 0;
+                this.Axis.Z = 0;
 
                 return false;
             }
 
-            this.X /= len;
-            this.Y /= len;
-            this.Z /= len;
+            this.Axis.X /= len;
+            this.Axis.Y /= len;
+            this.Axis.Z /= len;
 
             return true;
         }
@@ -155,10 +158,13 @@ namespace BRobot
         /// <returns></returns>
         public bool IsZero()
         {
+            //return Math.Abs(this.Angle % 360) < EPSILON
+            //    || (Math.Abs(this.X) < EPSILON
+            //        && Math.Abs(this.Y) < EPSILON
+            //        && Math.Abs(this.Z) < EPSILON);
+
             return Math.Abs(this.Angle % 360) < EPSILON
-                || (Math.Abs(this.X) < EPSILON
-                    && Math.Abs(this.Y) < EPSILON
-                    && Math.Abs(this.Z) < EPSILON);
+                || this.Axis.IsZero();
         }
 
         /// <summary>
@@ -167,12 +173,12 @@ namespace BRobot
         /// <returns></returns>
         public double AxisLength()
         {
-            return Math.Sqrt(this.X * this.X + this.Y * this.Y + this.Z * this.Z);
+            return this.Axis.Length();
         }
 
         /// <summary>
-        /// Transforms this AxisAngle into a rotation around the same axis, but with a rotation angle
-        /// between 0 and 360. Note the axis vector will be flipped if the original angle was negative. 
+        /// Transforms this AxisAngle into a rotation around the same axis, but with an equivalent rotation angle
+        /// in the [0, 360]. Note the axis vector will be flipped if the original angle was negative. 
         /// </summary>
         public void Modulate()
         {
@@ -188,9 +194,7 @@ namespace BRobot
         /// </summary>
         public void Flip()
         {
-            this.X *= -1;
-            this.Y *= -1;
-            this.Z *= -1;
+            this.Axis.Invert();
             this.Angle *= -1;
         }
 
@@ -286,9 +290,9 @@ namespace BRobot
             // Remember that axis vector is already normalized ;)
             return new Quaternion(
                 Math.Cos(a2),
-                s * this.X,
-                s * this.Y,
-                s * this.Z, false);
+                s * this.Axis.X,
+                s * this.Axis.Y,
+                s * this.Axis.Z, false);
         }
 
         /// <summary>
@@ -297,7 +301,7 @@ namespace BRobot
         /// <returns></returns>
         public RotationVector ToRotationVector()
         {
-            return new RotationVector(this.X, this.Y, this.Z, this.Angle, false);  // this vector should already be normalized
+            return new RotationVector(this.Axis.X, this.Axis.Y, this.Axis.Z, this.Angle, false);  // this vector should already be normalized
         }
 
         /// <summary>
@@ -324,22 +328,22 @@ namespace BRobot
             double t = 1 - c;
 
             RotationMatrix m = new RotationMatrix();
-            m.m00 = c + t * this.X * this.X;
-            m.m11 = c + t * this.Y * this.Y;
-            m.m22 = c + t * this.Z * this.Z;
+            m.m00 = c + t * this.Axis.X * this.Axis.X;
+            m.m11 = c + t * this.Axis.Y * this.Axis.Y;
+            m.m22 = c + t * this.Axis.Z * this.Axis.Z;
 
-            double t1 = t * this.X * this.Y;
-            double t2 = s * this.Z;
+            double t1 = t * this.Axis.X * this.Axis.Y;
+            double t2 = s * this.Axis.Z;
             m.m10 = t1 + t2;
             m.m01 = t1 - t2;
 
-            t1 = t * this.X * this.Z;
-            t2 = s * this.Y;
+            t1 = t * this.Axis.X * this.Axis.Z;
+            t2 = s * this.Axis.Y;
             m.m20 = t1 - t2;
             m.m02 = t1 + t2;
 
-            t1 = t * this.Y * this.Z;
-            t2 = s * this.X;
+            t1 = t * this.Axis.Y * this.Axis.Z;
+            t2 = s * this.Axis.X;
             m.m21 = t1 + t2;
             m.m12 = t1 - t2;
 
@@ -366,7 +370,7 @@ namespace BRobot
             double c = Math.Cos(ang);
             double s = Math.Sin(ang);
             double t = 1 - c;
-            double trace = t * this.X * this.Z - this.Y * s;
+            double trace = t * this.Axis.X * this.Axis.Z - this.Axis.Y * s;
 
             double xAng, yAng, zAng;
 
@@ -375,7 +379,7 @@ namespace BRobot
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
-                zAng = Math.Atan2(t * this.Y * this.Z - s * this.X, t * this.X * this.Z + s * this.Y);
+                zAng = Math.Atan2(t * this.Axis.Y * this.Axis.Z - s * this.Axis.X, t * this.Axis.X * this.Axis.Z + s * this.Axis.Y);
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
             }
@@ -385,7 +389,7 @@ namespace BRobot
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;
-                zAng = Math.Atan2(-t * this.Y * this.Z + s * this.X, -t * this.X * this.Z - s * this.Y);
+                zAng = Math.Atan2(-t * this.Axis.Y * this.Axis.Z + s * this.Axis.X, -t * this.Axis.X * this.Axis.Z - s * this.Axis.Y);
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
             }
@@ -393,9 +397,9 @@ namespace BRobot
             // Regular derivation
             else
             {
-                xAng = Math.Atan2(t * this.Y * this.Z + s * this.X, c + t * this.Z * this.Z);
-                yAng = -Math.Asin(t * this.X * this.Z - s * this.Y);
-                zAng = Math.Atan2(t * this.X * this.Y + s * this.Z, c + t * this.X * this.X);
+                xAng = Math.Atan2(t * this.Axis.Y * this.Axis.Z + s * this.Axis.X, c + t * this.Axis.Z * this.Axis.Z);
+                yAng = -Math.Asin(t * this.Axis.X * this.Axis.Z - s * this.Axis.Y);
+                zAng = Math.Atan2(t * this.Axis.X * this.Axis.Y + s * this.Axis.Z, c + t * this.Axis.X * this.Axis.X);
             }
 
             return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
@@ -403,10 +407,10 @@ namespace BRobot
 
         public override string ToString()
         {
-            return string.Format("AxisAngle[{0}, {1}, {2}, {3}]",
-                Math.Round(X, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Z, STRING_ROUND_DECIMALS_MM),
+            return string.Format("AxisAngle[X:{0}, Y:{1}, Z:{2}, A:{3}]",
+                Math.Round(Axis.X, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Axis.Y, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Axis.Z, STRING_ROUND_DECIMALS_MM),
                 Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
         }
     }

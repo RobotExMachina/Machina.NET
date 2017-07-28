@@ -145,7 +145,7 @@ namespace BRobot
         /// Returns the squared length of this Vector.
         /// </summary>
         /// <returns></returns>
-        public double LengthSq()
+        public double SqLength()
         {
             return this.X * this.X + this.Y * this.Y + this.Z * this.Z;
         }
@@ -171,8 +171,12 @@ namespace BRobot
         /// <returns></returns>
         public bool IsUnit()
         {
-            double zero = Math.Abs(this.Length() - 1);
-            return zero < EPSILON;
+            return Math.Abs(this.SqLength() - 1) < EPSILON;
+        }
+
+        public bool IsZero()
+        {
+            return Math.Abs(this.SqLength()) < EPSILON;
         }
 
         /// <summary>
