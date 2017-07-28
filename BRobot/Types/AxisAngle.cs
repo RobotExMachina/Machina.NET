@@ -21,6 +21,16 @@ namespace BRobot
     public class AxisAngle : Geometry
     {
         /// <summary>
+        /// The rotation axis.
+        /// </summary>
+        public Vector Axis { get; internal set; }
+
+        /// <summary>
+        /// Rotation angle in degrees.
+        /// </summary>
+        public double Angle { get; internal set; }
+
+        /// <summary>
         /// X coordinate of the rotation vector.
         /// </summary>
         public double X { get { return this.Axis.X; } internal set { this.Axis.X = value; } }
@@ -34,16 +44,6 @@ namespace BRobot
         /// Z coordinate of the rotation vector.
         /// </summary>
         public double Z { get { return this.Axis.Z; } internal set { this.Axis.Z = value; } }
-
-        /// <summary>
-        /// The rotation axis.
-        /// </summary>
-        public Vector Axis { get; internal set; }
-
-        /// <summary>
-        /// Rotation angle in degrees.
-        /// </summary>
-        public double Angle { get; internal set; }
 
 
         /// <summary>

@@ -19,6 +19,19 @@ namespace BRobot
     //  ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
     //                                                                   
 
+    ///// <summary>
+    ///// Represents a rotation in three-dimensional space.
+    ///// This rotation is usually defined by its rotation axis and angles, although other
+    ///// definition inputs are possible, such as Quaternions, Rotation Matrices or
+    ///// Euler Angles (Yaw-Pitch-Roll).
+    ///// </summary>
+    //public class Rotation : Geometry
+    //{
+
+    //}
+
+
+
     /// <summary>
     /// Represents a rotation using quaternions.
     /// </summary>
@@ -630,7 +643,7 @@ namespace BRobot
         }
 
 
-       
+
 
         public override string ToString()
         {

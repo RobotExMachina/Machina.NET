@@ -26,7 +26,6 @@ namespace BRobot
         /// </summary>
         public double[] R { get; internal set; }
 
-
         /// <summary>
         /// Alias
         /// </summary>
