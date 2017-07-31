@@ -90,7 +90,7 @@ namespace BRobot
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1213;
+        public static readonly int Build = 1214;
 
         /// <summary>
         /// Version number.
@@ -934,6 +934,74 @@ namespace BRobot
         {
             return c.IssueDetachRequest();
         }
+
+
+
+
+
+
+
+        //   ██████╗ ███████╗████████╗████████╗███████╗██████╗ ███████╗
+        //  ██╔════╝ ██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗██╔════╝
+        //  ██║  ███╗█████╗     ██║      ██║   █████╗  ██████╔╝███████╗
+        //  ██║   ██║██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗╚════██║
+        //  ╚██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║███████║
+        //   ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
+        //                                                             
+
+        /// <summary>
+        /// Returns a Point represnting the current location of the Tool Center Point
+        /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
+        /// </summary>
+        /// <returns></returns>
+        public Point GetPosition()
+        {
+            return c.GetCurrentPosition();
+        }
+
+        /// <summary>
+        /// Return a Rotation object representing the current rotation of the Tool Center Point
+        /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
+        /// </summary>
+        /// <returns></returns>
+        public Rotation GetRotation()
+        {
+            return c.GetCurrentOrientation();
+        }
+
+        /// <summary>
+        /// Return a Orientation object representing the current orientation of the Tool Center Point
+        /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
+        /// </summary>
+        /// <returns></returns>
+        public Orientation GetOrientation()
+        {
+            return (Orientation) c.GetCurrentOrientation();
+        }
+
+        /// <summary>
+        /// Returns a Joint object representing the rotations in the robot axes.
+        /// </summary>
+        /// <returns></returns>
+        public Joints GetJoints()
+        {
+            return c.GetCurrentJoints();
+        }
+
+        /// <summary>
+        /// Returns the Tool object currently attached to this Robot, null if none.
+        /// </summary>
+        /// <returns>The Tool object currently attached to this Robot, null if none.</returns>
+        public Tool GetTool()
+        {
+            return c.GetCurrentTool();
+        }
+
+
+
+
+
+
 
 
 

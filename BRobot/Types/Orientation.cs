@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 namespace BRobot
 {
 
+    //   ██████╗ ██████╗ ██╗███████╗███╗   ██╗████████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+    //  ██╔═══██╗██╔══██╗██║██╔════╝████╗  ██║╚══██╔══╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+    //  ██║   ██║██████╔╝██║█████╗  ██╔██╗ ██║   ██║   ███████║   ██║   ██║██║   ██║██╔██╗ ██║
+    //  ██║   ██║██╔══██╗██║██╔══╝  ██║╚██╗██║   ██║   ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+    //  ╚██████╔╝██║  ██║██║███████╗██║ ╚████║   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+    //   ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //                                                                                        
+
     /// <summary>
     /// Defines an Orientation in three-dimensional space represented by a triplet of orthogonal XYZ unit vectors
     /// following right-hand rule orientations. Useful for spatial and rotational orientation operations. 

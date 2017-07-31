@@ -386,10 +386,12 @@ namespace BRobot
         /// <returns></returns>
         public Vector GetCurrentPosition()
         {
-            // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
-            // or the virtual one's (like in offline mode).
+            if (controlMode == ControlMode.Stream)
+            {
+                return comm.GetCurrentPosition();
+            }
 
-            return comm.GetCurrentPosition();
+            return virtualCursor.position;
         }
 
         /// <summary>
@@ -398,10 +400,12 @@ namespace BRobot
         /// <returns></returns>
         public Rotation GetCurrentOrientation()
         {
-            // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
-            // or the virtual one's (like in offline mode).
+            if (controlMode == ControlMode.Stream)
+            {
+                return comm.GetCurrentOrientation();
+            }
 
-            return comm.GetCurrentOrientation();
+            return virtualCursor.rotation;
         }
 
         ///// <summary>
@@ -423,10 +427,33 @@ namespace BRobot
         /// <returns></returns>
         public Joints GetCurrentJoints()
         {
-            // @TODO: same here as above
+            if (controlMode == ControlMode.Stream)
+            {
+                return comm.GetCurrentJoints();
+            }
 
-            return comm.GetCurrentJoints();
+            return virtualCursor.joints;
         }
+
+        /// <summary>
+        /// Returns a Tool object representing the currently attached tool, null if none.
+        /// </summary>
+        /// <returns></returns>
+        public Tool GetCurrentTool()
+        {
+            if (controlMode == ControlMode.Stream)
+            {
+                //return comm.getCurrentTool();
+                return null;  // TODO: implement when back to streaming
+            }
+
+            return virtualCursor.tool;
+        }
+
+
+
+
+
 
         /// <summary>
         ///  For Offline modes, it flushes all pending actions and returns a devide-specific program 

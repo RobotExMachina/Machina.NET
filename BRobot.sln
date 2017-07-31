@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEST_Workbench", "TESTS\TES
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTypesTests", "DataTypesTests\DataTypesTests.csproj", "{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotTests", "RobotTests\RobotTests.csproj", "{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,14 @@ Global
 		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Release|x64.ActiveCfg = Release|Any CPU
 		{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}.Release|x64.Build.0 = Release|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Debug|x64.Build.0 = Debug|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Release|x64.ActiveCfg = Release|Any CPU
+		{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

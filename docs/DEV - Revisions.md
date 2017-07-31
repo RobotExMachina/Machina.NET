@@ -16,6 +16,10 @@
 
 ## TODO
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
+- [ ] Test that Tool attach/detachment works good
+
+## BUILD 1214
+- [ ] Add a bunch of public getters to retrieve the state of the robot (useful for testing)
 
 
 ## BUILD 1213
@@ -26,7 +30,7 @@
     - [x] Tool to cursors
     - [x] Tool in CompilerABB
     - [x] TEST
-    - [ ] Implement .Detach()
+    - [x] Implement .Detach()
 
 
 ## BUILD 1212
