@@ -912,10 +912,27 @@ namespace BRobot
             return c.IssueCommentRequest(comment);
         }
 
-
+        /// <summary>
+        /// Attach a Tool to the flange of this Robot.
+        /// From this moment, all Actions like Move or Rotate will refer
+        /// to the Tool Center Point (TCP).
+        /// </summary>
+        /// <param name="tool"></param>
+        /// <returns></returns>
         public bool Attach(Tool tool)
         {
             return c.IssueAttachRequest(tool);
+        }
+
+        /// <summary>
+        /// Detach all Tools from the flange of this Robot.
+        /// From this moment, all Actions like Move or Rotate will refer
+        /// to the Flange Center Point (FCP).
+        /// </summary>
+        /// <returns></returns>
+        public bool Detach()
+        {
+            return c.IssueDetachRequest();
         }
 
 

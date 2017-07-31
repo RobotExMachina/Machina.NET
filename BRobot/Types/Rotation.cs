@@ -210,6 +210,11 @@ namespace BRobot
             return r;
         }
 
+        /// <summary>
+        /// Return a rotation around the same axis but negative angle.
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
         public static Rotation Inverse(Rotation r)
         {
             Rotation rinv = new Rotation(r);

@@ -14,8 +14,8 @@ namespace BRobot
     public class Tool
     {
         public string name { get; internal set; }
-        public Vector TCPPosition { get; internal set; }
-        public Rotation TCPOrientation { get; internal set; }
+        public Point TCPPosition { get; internal set; }
+        public Orientation TCPOrientation { get; internal set; }
 
         public double weight { get; internal set; }
         public Vector centerOfGravity { get; internal set; }
@@ -59,6 +59,16 @@ namespace BRobot
             this.centerOfGravity = centerOfGravity;
         }
 
+
+        public override string ToString()
+        {
+            return string.Format("Tool[\"{0}\", {1}, {2}, {3} kg, {4}]",
+                this.name,
+                this.TCPPosition,
+                this.TCPOrientation,
+                this.weight, 
+                this.centerOfGravity);
+        }
 
     }
 }

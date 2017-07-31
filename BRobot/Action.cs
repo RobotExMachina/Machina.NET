@@ -26,7 +26,8 @@ namespace BRobot
         Coordinates = 10,
         PushPop = 11, 
         Comment = 12,
-        Attach = 13
+        Attach = 13,
+        Detach = 14
     }
 
     
@@ -576,15 +577,17 @@ namespace BRobot
 
 
 
-    //   █████╗ ████████╗████████╗ █████╗  ██████╗██╗  ██╗
-    //  ██╔══██╗╚══██╔══╝╚══██╔══╝██╔══██╗██╔════╝██║  ██║
-    //  ███████║   ██║      ██║   ███████║██║     ███████║
-    //  ██╔══██║   ██║      ██║   ██╔══██║██║     ██╔══██║
-    //  ██║  ██║   ██║      ██║   ██║  ██║╚██████╗██║  ██║
-    //  ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
-    //                                                    
+
+    //  ██████╗ ███████╗    ██╗ █████╗ ████████╗████████╗ █████╗  ██████╗██╗  ██╗
+    //  ██╔══██╗██╔════╝   ██╔╝██╔══██╗╚══██╔══╝╚══██╔══╝██╔══██╗██╔════╝██║  ██║
+    //  ██║  ██║█████╗    ██╔╝ ███████║   ██║      ██║   ███████║██║     ███████║
+    //  ██║  ██║██╔══╝   ██╔╝  ██╔══██║   ██║      ██║   ██╔══██║██║     ██╔══██║
+    //  ██████╔╝███████╗██╔╝   ██║  ██║   ██║      ██║   ██║  ██║╚██████╗██║  ██║
+    //  ╚═════╝ ╚══════╝╚═╝    ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+    //                                                                           
     /// <summary>
-    /// Attaches a Tool to the robot flange.
+    /// Attaches a Tool to the robot flange. 
+    /// If the robot already had a tool, this will be substituted.
     /// </summary>
     public class ActionAttach : Action
     {
@@ -603,6 +606,21 @@ namespace BRobot
         {
             return string.Format("Attach tool \"{0}\"", this.tool.name);
         }
+    }
 
+    /// <summary>
+    /// Detaches any tool currently attached to the robot.
+    /// </summary>
+    public class ActionDetach : Action
+    {
+        public ActionDetach() : base()
+        {
+            type = ActionType.Detach;
+        }
+
+        public override string ToString()
+        {
+            return "Detach all tools";
+        }
     }
 }

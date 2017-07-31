@@ -1259,6 +1259,21 @@ namespace BRobot
             return success;
         }
 
+        public bool IssueDetachRequest()
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionDetach act = new ActionDetach();
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
 
 
 

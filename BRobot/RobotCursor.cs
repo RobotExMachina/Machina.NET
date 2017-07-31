@@ -164,7 +164,8 @@ namespace BRobot
             { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
             { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
             { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
-            { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) }
+            { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) },
+            { typeof (ActionDetach),                    (act, robCur) => robCur.ApplyAction((ActionDetach) act) }
 
         };
 
@@ -663,31 +664,64 @@ namespace BRobot
         public bool ApplyAction(ActionAttach action)
         {
             // The cursor has now a tool attached to it
-            tool = action.tool;
-
-            // Now transform the cursor position to the tool's transformation params:
-            Vector newPos;
-            Rotation newRot;
+            this.tool = action.tool;
 
             // Relative transform
             // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
-            if (position == null || rotation == null)
+            if (this.position == null || this.rotation == null)
             {
-                Console.WriteLine("Sorry, must provide absolute transform values before attaching a tool..." + this);
+                Console.WriteLine("Sorry, must provide absolute transform values before attaching a tool... " + this);
                 return false;
             }
 
+            // Now transform the cursor position to the tool's transformation params:
             // This is Translate + Rotate (the way Tool position + orientation is currently defined...)
             //if (action.translationFirst)  // as of #1213, this is always true
             //{
-                Vector worldVector = Vector.Rotation(action.tool.TCPPosition, this.rotation);
-                newPos = position + worldVector;
-                newRot = Rotation.Combine(rotation, action.tool.TCPOrientation);  // postmultiplication
+            Vector worldVector = Vector.Rotation(action.tool.TCPPosition, this.rotation);
+            Vector newPos = this.position + worldVector;
+            Rotation newRot = Rotation.Combine(this.rotation, action.tool.TCPOrientation);  // postmultiplication
             //}
 
-            position = newPos;
-            rotation = newRot;
-            joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
+            this.position = newPos;
+            this.rotation = newRot;
+            this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply Detach Tool action
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionDetach action)
+        {
+            if (this.tool == null)
+            {
+                Console.WriteLine("Robot had no tool attached");
+                return false;
+            }
+
+            // Relative transform
+            // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+            if (this.position == null || this.rotation == null)
+            {
+                Console.WriteLine("Sorry, must provide absolute transform values before detaching a tool... " + this);
+                return false;
+            }
+
+            // Now undo the tool's transforms
+            // TODO: at some point in the future, check for translationFirst here
+            Rotation newRot = Rotation.Combine(this.rotation, Rotation.Inverse(this.tool.TCPOrientation));  // postmultiplication by the inverse rotation
+            this.rotation = newRot;
+
+            Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
+            Vector newPos = this.position - worldVector;
+            this.position = newPos;
+
+            // Detach the tool
+            this.tool = null;
 
             return true;
         }
@@ -696,11 +730,17 @@ namespace BRobot
 
 
 
-
-
         public override string ToString()
         {
-            return string.Format("{0}: {1} p{2} r{3} j{4} v{5} z{6}", name, motionType, position, rotation, joints, speed, zone);
+            return string.Format("{0}: {1} p{2} r{3} j{4} v{5} z{6} {7}", 
+                name, 
+                motionType, 
+                position, 
+                rotation, 
+                joints, 
+                speed, 
+                zone,
+                this.tool == null ? "" : "t" + this.tool);
         }
 
     }

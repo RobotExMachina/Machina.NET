@@ -78,9 +78,13 @@ namespace BRobot
 
 
         /// <summary>
-        /// Create an empty CS object.
+        /// Create a  Rotation object representing no rotation.
         /// </summary>
-        internal Orientation() { }
+        public Orientation()
+        {
+            this.Q = new Quaternion();
+            this.RM = new RotationMatrix();
+        }
 
         /// <summary>
         /// Create a new Orientation object from the main X and Y axes.

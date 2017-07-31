@@ -25,7 +25,7 @@
     - [x] Tool API
     - [x] Tool to cursors
     - [x] Tool in CompilerABB
-    - [ ] TEST
+    - [x] TEST
     - [ ] Implement .Detach()
 
 

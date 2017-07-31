@@ -292,7 +292,6 @@ namespace BRobot
                 case ActionType.Joints:
                     dec = string.Format("  CONST jointtarget target{0} := {1};", id, GetJointTargetValue(cursor));
                     break;
-
             }
 
             declaration = dec;
@@ -352,6 +351,15 @@ namespace BRobot
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
                     dec = string.Format("    ! Tool \"{0}\" attached", aa.tool.name);  // this action has no actual RAPID instruction, just add a comment
+                    break;
+
+                case ActionType.Detach:
+                    ActionDetach ad = (ActionDetach)action;
+                    dec = string.Format("    ! Tool detached");  // this action has no actual RAPID instruction, just add a comment
+                    break;
+
+                default:
+                    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
                     break;
             }
 
@@ -416,6 +424,16 @@ namespace BRobot
                     ActionAttach aa = (ActionAttach)action;
                     dec = string.Format("    ! Tool \"{0}\" attached", aa.tool.name);  // this action has no actual RAPID instruction, just add a comment
                     break;
+
+                case ActionType.Detach:
+                    ActionDetach ad = (ActionDetach)action;
+                    dec = string.Format("    ! Tool detached");  // this action has no actual RAPID instruction, just add a comment
+                    break;
+
+                default:
+                    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    break;
+
             }
 
             declaration = dec;
@@ -658,6 +676,10 @@ namespace BRobot
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  # {0}", ac.comment);
                     break;
+
+                default:
+                    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    break;
             }
 
             declaration = dec;
@@ -710,6 +732,11 @@ namespace BRobot
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  # {0}", 
                         ac.comment);
+                    break;
+
+
+                default:
+                    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
                     break;
             }
 
@@ -992,6 +1019,11 @@ namespace BRobot
                         ac.comment,
                         ac.id);
                     break;
+
+
+                default:
+                    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    break;
             }
 
             declaration = dec;
@@ -1058,6 +1090,11 @@ namespace BRobot
                     dec = string.Format("  ; {0} [{1}]",
                         ac.comment,
                         ac.id);
+                    break;
+
+
+                default:
+                    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
                     break;
             }
 
