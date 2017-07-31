@@ -14,11 +14,24 @@
 ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝ 
 ```
 
+## TODO
+- [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
+
+
+## BUILD 1213
+- [ ] Add Tools
+    - [x] Tool class
+    - [x] Tool Action
+    - [x] Tool API
+    - [x] Tool to cursors
+    - [x] Tool in CompilerABB
+    - [ ] TEST
+    - [ ] Implement .Detach()
+
 
 ## BUILD 1212
 - [x] Rework the Rotation interface!
 - [x] Massive rework of all classes...
-- [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
 
 ## BUILD 1211

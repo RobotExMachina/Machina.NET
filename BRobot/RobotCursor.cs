@@ -30,6 +30,8 @@ namespace BRobot
         public int zone;
         public MotionType motionType;
         public ReferenceCS referenceCS;
+        public Tool tool;
+
         protected bool initialized = false;
         private bool applyImmediately = false;  // when an action is issued to this cursor, apply it immediately?
 
@@ -162,7 +164,7 @@ namespace BRobot
             { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
             { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
             { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
-
+            { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) }
 
         };
 
@@ -653,6 +655,42 @@ namespace BRobot
             return true;
         }
 
+        /// <summary>
+        /// Apply Attach Tool Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionAttach action)
+        {
+            // The cursor has now a tool attached to it
+            tool = action.tool;
+
+            // Now transform the cursor position to the tool's transformation params:
+            Vector newPos;
+            Rotation newRot;
+
+            // Relative transform
+            // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+            if (position == null || rotation == null)
+            {
+                Console.WriteLine("Sorry, must provide absolute transform values before attaching a tool..." + this);
+                return false;
+            }
+
+            // This is Translate + Rotate (the way Tool position + orientation is currently defined...)
+            //if (action.translationFirst)  // as of #1213, this is always true
+            //{
+                Vector worldVector = Vector.Rotation(action.tool.TCPPosition, this.rotation);
+                newPos = position + worldVector;
+                newRot = Rotation.Combine(rotation, action.tool.TCPOrientation);  // postmultiplication
+            //}
+
+            position = newPos;
+            rotation = newRot;
+            joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
+
+            return true;
+        }
 
 
 

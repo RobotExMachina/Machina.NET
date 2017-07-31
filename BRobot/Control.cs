@@ -1239,6 +1239,26 @@ namespace BRobot
             return success;
         }
 
+        /// <summary>
+        /// Issue a request to attach a Tool to the flange of the robot
+        /// </summary>
+        /// <param name="tool"></param>
+        /// <returns></returns>
+        public bool IssueAttachRequest(Tool tool)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionAttach act = new ActionAttach(tool);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
 
 
 

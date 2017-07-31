@@ -25,7 +25,8 @@ namespace BRobot
         Motion = 9,
         Coordinates = 10,
         PushPop = 11, 
-        Comment = 12
+        Comment = 12,
+        Attach = 13
     }
 
     
@@ -149,6 +150,11 @@ namespace BRobot
         public static ActionComment Comment(string comment)
         {
             return new ActionComment(comment);
+        }
+
+        public static ActionAttach Attach(Tool tool)
+        {
+            return new ActionAttach(tool);
         }
 
 
@@ -566,5 +572,37 @@ namespace BRobot
         {
             return string.Format("Comment: \"{0}\"", comment);
         }
+    }
+
+
+
+    //   █████╗ ████████╗████████╗ █████╗  ██████╗██╗  ██╗
+    //  ██╔══██╗╚══██╔══╝╚══██╔══╝██╔══██╗██╔════╝██║  ██║
+    //  ███████║   ██║      ██║   ███████║██║     ███████║
+    //  ██╔══██║   ██║      ██║   ██╔══██║██║     ██╔══██║
+    //  ██║  ██║   ██║      ██║   ██║  ██║╚██████╗██║  ██║
+    //  ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+    //                                                    
+    /// <summary>
+    /// Attaches a Tool to the robot flange.
+    /// </summary>
+    public class ActionAttach : Action
+    {
+        public Tool tool;
+        internal bool translationFirst;
+
+        public ActionAttach(Tool tool) : base()
+        {
+            type = ActionType.Attach;
+
+            this.tool = tool;
+            this.translationFirst = tool.translationFirst;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Attach tool \"{0}\"", this.tool.name);
+        }
+
     }
 }

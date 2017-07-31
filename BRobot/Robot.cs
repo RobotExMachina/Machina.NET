@@ -90,7 +90,7 @@ namespace BRobot
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1212;
+        public static readonly int Build = 1213;
 
         /// <summary>
         /// Version number.
@@ -912,6 +912,11 @@ namespace BRobot
             return c.IssueCommentRequest(comment);
         }
 
+
+        public bool Attach(Tool tool)
+        {
+            return c.IssueAttachRequest(tool);
+        }
 
 
 

@@ -128,9 +128,15 @@ namespace BRobot
             Dictionary<int, string> zoneNames = new Dictionary<int, string>();
             Dictionary<int, string> zoneDecs = new Dictionary<int, string>();
             Dictionary<int, bool> zonePredef = new Dictionary<int, bool>();
+
+            // TOOL DECLARATIONS
+            Dictionary<Tool, string> toolNames = new Dictionary<Tool, string>();
+            Dictionary<Tool, string> toolDecs = new Dictionary<Tool, string>();
+
             // Declarations
             List<string> velocityLines = new List<string>();
             List<string> zoneLines = new List<string>();
+            List<string> toolLines = new List<string>();
 
             // TARGETS AND INSTRUCTIONS
             List<string> variableLines = new List<string>();
@@ -160,10 +166,18 @@ namespace BRobot
                     zoneDecs.Add(writer.zone, predef ? "" : GetZoneValue(writer));
                 }
 
+                if (writer.tool != null && !toolNames.ContainsKey(writer.tool))
+                {
+                    toolNames.Add(writer.tool, writer.tool.name);
+                    toolDecs.Add(writer.tool, GetToolValue(writer));
+                }
+
+
+                // Generate program
                 if (inlineTargets)
                 {
                     // Generate lines of code
-                    if (GenerateInstructionDeclaration(a, writer, velNames, zoneNames, out line))
+                    if (GenerateInstructionDeclaration(a, writer, velNames, zoneNames, toolNames, out line))
                     {
                         instructionLines.Add(line);
                     }
@@ -176,7 +190,7 @@ namespace BRobot
                         variableLines.Add(line);
                     }
 
-                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, velNames, zoneNames, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, velNames, zoneNames, toolNames, out line))  // there will be a number jump on target-less instructions, but oh well...
                     {
                         instructionLines.Add(line);
                     }
@@ -187,20 +201,23 @@ namespace BRobot
             }
 
 
-            // Generate V+Z 
+            // Generate V+Z+T
+            foreach (Tool t in toolNames.Keys)
+            {
+                zoneLines.Add(string.Format("  CONST tooldata {0} := {1};", toolNames[t], toolDecs[t]));
+            }
             foreach (int v in velNames.Keys)
             {
-                velocityLines.Add(string.Format("  CONST speeddata {0}:={1};", velNames[v], velDecs[v]));
+                velocityLines.Add(string.Format("  CONST speeddata {0} := {1};", velNames[v], velDecs[v]));
             }
             foreach (int z in zoneNames.Keys)
             {
                 if (!zonePredef[z])  // no need to add declarations for predefined zones
                 {
-                    zoneLines.Add(string.Format("  CONST zonedata {0}:={1};", zoneNames[z], zoneDecs[z]));
+                    zoneLines.Add(string.Format("  CONST zonedata {0} := {1};", zoneNames[z], zoneDecs[z]));
                 }
             }
-
-
+            
 
 
             // PROGRAM ASSEMBLY
@@ -275,6 +292,7 @@ namespace BRobot
                 case ActionType.Joints:
                     dec = string.Format("  CONST jointtarget target{0} := {1};", id, GetJointTargetValue(cursor));
                     break;
+
             }
 
             declaration = dec;
@@ -282,8 +300,12 @@ namespace BRobot
         }
 
         static private bool GenerateInstructionDeclarationFromVariable(
-            Action action, RobotCursor cursor, int id,
-            Dictionary<int, string> velNames, Dictionary<int, string> zoneNames,
+            Action action, 
+            RobotCursor cursor, 
+            int id,
+            Dictionary<int, string> velNames, 
+            Dictionary<int, string> zoneNames,
+            Dictionary<Tool, string> toolNames,
             out string declaration)
         {
             string dec = null;
@@ -292,18 +314,24 @@ namespace BRobot
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("    {0} target{1}, {2}, {3}, Tool0\\WObj:=WObj0;",
+                    dec = string.Format("    {0} target{1}, {2}, {3}, {4}\\{5};  ! [{6}]",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         id,
                         velNames[cursor.speed],
-                        zoneNames[cursor.zone]);
+                        zoneNames[cursor.zone],
+                        cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
+                        "WObj:=WObj0",
+                        action.id);
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, Tool0\\WObj:=WObj0;",
+                    dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, {3}\\{4};  ! [{5}]",
                         id,
                         velNames[cursor.speed],
-                        zoneNames[cursor.zone]);
+                        zoneNames[cursor.zone],
+                        cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
+                        "WObj:=WObj0",
+                        action.id);
                     break;
 
                 case ActionType.Message:
@@ -320,6 +348,11 @@ namespace BRobot
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("    ! {0}", ac.comment);
                     break;
+
+                case ActionType.Attach:
+                    ActionAttach aa = (ActionAttach)action;
+                    dec = string.Format("    ! Tool \"{0}\" attached", aa.tool.name);  // this action has no actual RAPID instruction, just add a comment
+                    break;
             }
 
             declaration = dec;
@@ -327,8 +360,11 @@ namespace BRobot
         }
 
         static private bool GenerateInstructionDeclaration(
-            Action action, RobotCursor cursor,
-            Dictionary<int, string> velNames, Dictionary<int, string> zoneNames,
+            Action action, 
+            RobotCursor cursor,
+            Dictionary<int, string> velNames, 
+            Dictionary<int, string> zoneNames,
+            Dictionary<Tool, string> toolNames,
             out string declaration)
         {
             string dec = null;
@@ -337,19 +373,23 @@ namespace BRobot
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("    {0} {1}, {2}, {3}, Tool0\\WObj:=WObj0;  ! [{4}]",
+                    dec = string.Format("    {0} {1}, {2}, {3}, {4}\\{5};  ! [{6}]",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         GetUNSAFERobTargetValue(cursor),
                         velNames[cursor.speed],
                         zoneNames[cursor.zone],
+                        cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
+                        "WObj:=WObj0",
                         action.id);
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("    MoveAbsJ {0}, {1}, {2}, Tool0\\WObj:=WObj0;  ! [{3}]",
+                    dec = string.Format("    MoveAbsJ {0}, {1}, {2}, {3}\\{4};  ! [{5}]",
                         GetJointTargetValue(cursor),
                         velNames[cursor.speed],
                         zoneNames[cursor.zone],
+                        cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
+                        "WObj:=WObj0",
                         action.id);
                     break;
 
@@ -370,6 +410,11 @@ namespace BRobot
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("    ! {0}", ac.comment);
+                    break;
+
+                case ActionType.Attach:
+                    ActionAttach aa = (ActionAttach)action;
+                    dec = string.Format("    ! Tool \"{0}\" attached", aa.tool.name);  // this action has no actual RAPID instruction, just add a comment
                     break;
             }
 
@@ -410,7 +455,7 @@ namespace BRobot
         }
 
         /// <summary>
-        /// Returns a RAPID representaiton of cursor zone.
+        /// Returns a RAPID representatiton of cursor zone.
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
@@ -422,7 +467,29 @@ namespace BRobot
             return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", cursor.zone, high, high, low, high, low);
         }
 
+        /// <summary>
+        /// Returns a RAPID representation of a Tool object.
+        /// </summary>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        static public string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
+        {
+            if (cursor.tool == null)
+            {
+                throw new Exception("Cursor has no tool attached");
+            }
+
+            return string.Format("[TRUE, [{0},{1}], [{2},{3},{4},0,0,0]]",
+                cursor.tool.TCPPosition,
+                cursor.tool.TCPOrientation,
+                cursor.tool.weight,
+                cursor.tool.centerOfGravity,
+                "[1, 0, 0, 0]");  // no internial axes by default
+        }
+
     }
+
+
 
 
 
