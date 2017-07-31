@@ -308,7 +308,7 @@ namespace DataTypesTests
                 q2 = aa.ToQuaternion();
                 Trace.WriteLine(q2);
 
-                Assert.IsTrue(q1 == q2, "Booo! :(");
+                Assert.IsTrue(q1.IsSimilar(q2), "Booo! :(");
             }
 
             // Test all permutations of unitary components quaternions (including zero)
@@ -345,7 +345,7 @@ namespace DataTypesTests
                             }
                             else
                             {
-                                Assert.IsTrue(q1 == q2, "Booo!");
+                                Assert.IsTrue(q1.IsSimilar(q2), "Booo!");
                             }
                             
                         }
@@ -486,7 +486,7 @@ namespace DataTypesTests
                 Trace.WriteLine(q2);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(m1.IsSimilar(m2));
             }
 
             factor = -1;
@@ -511,7 +511,7 @@ namespace DataTypesTests
                             Trace.WriteLine(q2);
                             Trace.WriteLine(m2);
 
-                            Assert.IsTrue(m1 == m2);
+                            Assert.IsTrue(m1.IsSimilar(m2));
                         }
                     }
                 }
@@ -550,8 +550,8 @@ namespace DataTypesTests
                 Trace.WriteLine(q3);  // and this one too...
 
                 Assert.IsTrue(q1.IsEquivalent(q2), "Not equivalent");
-                Assert.IsTrue(q2 == q3, "Not equal");
-                Assert.IsTrue(eu1 == eu2, "Euler angles not equal");
+                Assert.IsTrue(q2.IsSimilar(q3), "Not equal");
+                Assert.IsTrue(eu1.IsSimilar(eu2), "Euler angles not equal");
             }
 
 
@@ -581,9 +581,9 @@ namespace DataTypesTests
                             Trace.WriteLine(eu3);  // and even more!
 
                             Assert.IsTrue(q1.IsEquivalent(q2), "Not equivalent");
-                            Assert.IsTrue(q2 == q3, "Not equal");
-                            Assert.IsTrue(eu1 == eu2, "Euler angles 12 not equal");
-                            Assert.IsTrue(eu2 == eu3, "Euler angles 23 not equal");
+                            Assert.IsTrue(q2.IsSimilar(q3), "Not equal");
+                            Assert.IsTrue(eu1.IsSimilar(eu2), "Euler angles 12 not equal");
+                            Assert.IsTrue(eu2.IsSimilar(eu3), "Euler angles 23 not equal");
                         }
                     }
                 }

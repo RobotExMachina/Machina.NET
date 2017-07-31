@@ -194,7 +194,7 @@ namespace DataTypesTests
             Quaternion q = m.ToQuaternion();
             RotationMatrix m1 = q.ToRotationMatrix();
 
-            Assert.IsTrue(m == m1);
+            Assert.IsTrue(m.IsSimilar(m1));
         }
 
 
@@ -224,7 +224,7 @@ namespace DataTypesTests
                 Trace.WriteLine(q);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(m1.IsSimilar(m2));
             }
         }
 
@@ -258,7 +258,7 @@ namespace DataTypesTests
                 Trace.WriteLine(aa2);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(m1.IsSimilar(m2));
                 Assert.IsTrue(aa1.IsEquivalent(aa2));  // just for the sake of it, not the point of this test ;)
             }
 
@@ -281,7 +281,7 @@ namespace DataTypesTests
                 Trace.WriteLine(aa2);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1 == m2);
+                Assert.IsTrue(m1.IsSimilar(m2));
                 Assert.IsTrue(aa1.IsEquivalent(aa2));  // just for the sake of it, not the point of this test ;)
             }
         }
@@ -323,10 +323,10 @@ namespace DataTypesTests
                 Trace.WriteLine(m3);
                 Trace.WriteLine(eu3);
 
-                Assert.IsTrue(m1 == m2);
-                Assert.IsTrue(m2 == m3);
+                Assert.IsTrue(m1.IsSimilar(m2));
+                Assert.IsTrue(m2.IsSimilar(m3));
                 Assert.IsTrue(eu1.IsEquivalent(eu2));
-                Assert.IsTrue(eu2 == eu3);
+                Assert.IsTrue(eu2.IsSimilar(eu3));
             }
 
 
@@ -354,10 +354,10 @@ namespace DataTypesTests
                 Trace.WriteLine(m3);
                 Trace.WriteLine(eu3);
 
-                Assert.IsTrue(m1 == m2);
-                Assert.IsTrue(m2 == m3);
+                Assert.IsTrue(m1.IsSimilar(m2));
+                Assert.IsTrue(m2.IsSimilar(m3));
                 Assert.IsTrue(eu1.IsEquivalent(eu2));
-                Assert.IsTrue(eu2 == eu3);
+                Assert.IsTrue(eu2.IsSimilar(eu3));
             }
         }
     }

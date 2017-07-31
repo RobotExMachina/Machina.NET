@@ -40,32 +40,46 @@ namespace BRobot
         public double Z { get; internal set; }
 
         /// <summary>
-        /// Equality operator.
+        /// Test if this Quaternion approximately equals another. 
         /// </summary>
-        /// <param name="q1"></param>
-        /// <param name="q2"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public static bool operator ==(Quaternion q1, Quaternion q2)
+        public bool IsSimilar(Quaternion other)
         {
-            return Math.Abs(q1.W - q2.W) < EPSILON
-                && Math.Abs(q1.X - q2.X) < EPSILON
-                && Math.Abs(q1.Y - q2.Y) < EPSILON
-                && Math.Abs(q1.Z - q2.Z) < EPSILON;
+            return Math.Abs(this.W - other.W) < EPSILON
+                && Math.Abs(this.X - other.X) < EPSILON
+                && Math.Abs(this.Y - other.Y) < EPSILON
+                && Math.Abs(this.Z - other.Z) < EPSILON;
         }
 
-        /// <summary>
-        /// Inequality operator.
-        /// </summary>
-        /// <param name="q1"></param>
-        /// <param name="q2"></param>
-        /// <returns></returns>
-        public static bool operator !=(Quaternion q1, Quaternion q2)
-        {
-            return Math.Abs(q1.W - q2.W) > EPSILON
-                || Math.Abs(q1.X - q2.X) > EPSILON
-                || Math.Abs(q1.Y - q2.Y) > EPSILON
-                || Math.Abs(q1.Z - q2.Z) > EPSILON;
-        }
+
+        ///// <summary>
+        ///// Equality operator.
+        ///// </summary>
+        ///// <param name="q1"></param>
+        ///// <param name="q2"></param>
+        ///// <returns></returns>
+        //public static bool operator ==(Quaternion q1, Quaternion q2)
+        //{
+        //    return Math.Abs(q1.W - q2.W) < EPSILON
+        //        && Math.Abs(q1.X - q2.X) < EPSILON
+        //        && Math.Abs(q1.Y - q2.Y) < EPSILON
+        //        && Math.Abs(q1.Z - q2.Z) < EPSILON;
+        //}
+
+        ///// <summary>
+        ///// Inequality operator.
+        ///// </summary>
+        ///// <param name="q1"></param>
+        ///// <param name="q2"></param>
+        ///// <returns></returns>
+        //public static bool operator !=(Quaternion q1, Quaternion q2)
+        //{
+        //    return Math.Abs(q1.W - q2.W) > EPSILON
+        //        || Math.Abs(q1.X - q2.X) > EPSILON
+        //        || Math.Abs(q1.Y - q2.Y) > EPSILON
+        //        || Math.Abs(q1.Z - q2.Z) > EPSILON;
+        //}
 
         /// <summary>
         /// Quaternion addition

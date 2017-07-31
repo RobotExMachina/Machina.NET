@@ -47,7 +47,7 @@ namespace DataTypesTests
                 v1.Normalize();
                 v2 = rv.GetVector();
 
-                Assert.IsTrue(v1 == v2);
+                Assert.IsTrue(v1.IsSimilar(v2));
             }
 
             // Test all permutations of unitary components (including zero)
@@ -86,7 +86,7 @@ namespace DataTypesTests
                                 v1.Normalize();
                                 v2 = rv.GetVector();
 
-                                Assert.IsTrue(v1 == v2);
+                                Assert.IsTrue(v1.IsSimilar(v2));
                             }
                         }
                     }
@@ -122,7 +122,7 @@ namespace DataTypesTests
                 v1.Normalize();
                 v1.Invert();
                 v2 = rv.GetVector();
-                Assert.IsTrue(v1 == v2);
+                Assert.IsTrue(v1.IsSimilar(v2));
 
 
                 // Raw check
@@ -172,7 +172,7 @@ namespace DataTypesTests
                                 v2 = rv.GetVector();
                                 v2.Invert();
 
-                                Assert.IsTrue(v1 == v2);
+                                Assert.IsTrue(v1.IsSimilar(v2));
                             }
                         }
                     }
@@ -207,7 +207,7 @@ namespace DataTypesTests
                 Trace.WriteLine(aa);
                 Trace.WriteLine(rv2);
 
-                Assert.IsTrue(rv1 == rv2);
+                Assert.IsTrue(rv1.IsSimilar(rv2));
                 Assert.AreEqual(angle > 0 ? angle : -angle, aa.Angle, 0.00001);
             }
 
@@ -240,7 +240,7 @@ namespace DataTypesTests
                             }
                             else
                             {
-                                Assert.IsTrue(rv1 == rv2);
+                                Assert.IsTrue(rv1.IsSimilar(rv2));
                                 Assert.AreEqual(angle > 0 ? angle : -angle, aa.Angle, 0.00001);
                             }
 

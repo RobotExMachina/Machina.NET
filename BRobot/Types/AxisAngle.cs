@@ -45,34 +45,46 @@ namespace BRobot
         /// </summary>
         public double Z { get { return this.Axis.Z; } internal set { this.Axis.Z = value; } }
 
-
         /// <summary>
-        /// Equality operator.
+        /// Test if this AxisAngle is approximately equal to another.
         /// </summary>
-        /// <param name="aa1"></param>
-        /// <param name="aa2"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public static bool operator ==(AxisAngle aa1, AxisAngle aa2)
+        public bool IsSimilar(AxisAngle other)
         {
-            return Math.Abs(aa1.Axis.X - aa2.Axis.X) < EPSILON
-                && Math.Abs(aa1.Axis.Y - aa2.Axis.Y) < EPSILON
-                && Math.Abs(aa1.Axis.Z - aa2.Axis.Z) < EPSILON
-                && Math.Abs(aa1.Angle - aa2.Angle) < EPSILON;
+            return Math.Abs(this.Axis.X - other.Axis.X) < EPSILON
+                && Math.Abs(this.Axis.Y - other.Axis.Y) < EPSILON
+                && Math.Abs(this.Axis.Z - other.Axis.Z) < EPSILON
+                && Math.Abs(this.Angle - other.Angle) < EPSILON;
         }
 
-        /// <summary>
-        /// Inequality operator.
-        /// </summary>
-        /// <param name="aa1"></param>
-        /// <param name="aa2"></param>
-        /// <returns></returns>
-        public static bool operator !=(AxisAngle aa1, AxisAngle aa2)
-        {
-            return Math.Abs(aa1.Axis.X - aa2.Axis.X) > EPSILON
-                || Math.Abs(aa1.Axis.Y - aa2.Axis.Y) > EPSILON
-                || Math.Abs(aa1.Axis.Z - aa2.Axis.Z) > EPSILON
-                || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
-        }
+        ///// <summary>
+        ///// Equality operator.
+        ///// </summary>
+        ///// <param name="aa1"></param>
+        ///// <param name="aa2"></param>
+        ///// <returns></returns>
+        //public static bool operator ==(AxisAngle aa1, AxisAngle aa2)
+        //{
+        //    return Math.Abs(aa1.Axis.X - aa2.Axis.X) < EPSILON
+        //        && Math.Abs(aa1.Axis.Y - aa2.Axis.Y) < EPSILON
+        //        && Math.Abs(aa1.Axis.Z - aa2.Axis.Z) < EPSILON
+        //        && Math.Abs(aa1.Angle - aa2.Angle) < EPSILON;
+        //}
+
+        ///// <summary>
+        ///// Inequality operator.
+        ///// </summary>
+        ///// <param name="aa1"></param>
+        ///// <param name="aa2"></param>
+        ///// <returns></returns>
+        //public static bool operator !=(AxisAngle aa1, AxisAngle aa2)
+        //{
+        //    return Math.Abs(aa1.Axis.X - aa2.Axis.X) > EPSILON
+        //        || Math.Abs(aa1.Axis.Y - aa2.Axis.Y) > EPSILON
+        //        || Math.Abs(aa1.Axis.Z - aa2.Axis.Z) > EPSILON
+        //        || Math.Abs(aa1.Angle - aa2.Angle) > EPSILON;
+        //}
 
         /// <summary>
         /// Implicit conversion to Vector object.

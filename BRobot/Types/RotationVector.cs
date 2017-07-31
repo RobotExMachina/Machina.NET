@@ -43,30 +43,42 @@ namespace BRobot
         public double Z { get; internal set; }
 
         /// <summary>
-        /// Equality operator.
+        /// Test if this RotationVector is approximately equal to another. 
         /// </summary>
-        /// <param name="rv1"></param>
-        /// <param name="rv2"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public static bool operator ==(RotationVector rv1, RotationVector rv2)
+        public bool IsSimilar(RotationVector other)
         {
-            return Math.Abs(rv1.X - rv2.X) < EPSILON
-                && Math.Abs(rv1.Y - rv2.Y) < EPSILON
-                && Math.Abs(rv1.Z - rv2.Z) < EPSILON;
+            return Math.Abs(this.X - other.X) < EPSILON
+                && Math.Abs(this.Y - other.Y) < EPSILON
+                && Math.Abs(this.Z - other.Z) < EPSILON;
         }
 
-        /// <summary>
-        /// Inequality operator.
-        /// </summary>
-        /// <param name="rv1"></param>
-        /// <param name="rv2"></param>
-        /// <returns></returns>
-        public static bool operator !=(RotationVector rv1, RotationVector rv2)
-        {
-            return Math.Abs(rv1.X - rv2.X) > EPSILON
-                || Math.Abs(rv1.Y - rv2.Y) > EPSILON
-                || Math.Abs(rv1.Z - rv2.Z) > EPSILON;
-        }
+        ///// <summary>
+        ///// Equality operator.
+        ///// </summary>
+        ///// <param name="rv1"></param>
+        ///// <param name="rv2"></param>
+        ///// <returns></returns>
+        //public static bool operator ==(RotationVector rv1, RotationVector rv2)
+        //{
+        //    return Math.Abs(rv1.X - rv2.X) < EPSILON
+        //        && Math.Abs(rv1.Y - rv2.Y) < EPSILON
+        //        && Math.Abs(rv1.Z - rv2.Z) < EPSILON;
+        //}
+
+        ///// <summary>
+        ///// Inequality operator.
+        ///// </summary>
+        ///// <param name="rv1"></param>
+        ///// <param name="rv2"></param>
+        ///// <returns></returns>
+        //public static bool operator !=(RotationVector rv1, RotationVector rv2)
+        //{
+        //    return Math.Abs(rv1.X - rv2.X) > EPSILON
+        //        || Math.Abs(rv1.Y - rv2.Y) > EPSILON
+        //        || Math.Abs(rv1.Z - rv2.Z) > EPSILON;
+        //}
 
         ///// <summary>
         ///// Implicit conversion to Vector.
@@ -154,7 +166,7 @@ namespace BRobot
             double sqlen = this.SqLength();
             return sqlen < EPSILON;
         }
-        
+
 
         /// <summary>
         /// Returns the unit vector representing the axis of this rotation.
@@ -189,7 +201,7 @@ namespace BRobot
         {
             return this.ToAxisAngle().IsEquivalent(rv.ToAxisAngle());
         }
-        
+
         /// <summary>
         /// Returns an Axis-Angle representation of this rotation.
         /// </summary>

@@ -35,20 +35,32 @@ namespace BRobot
         /// </summary>
         public double Z { get; internal set; }
 
-
-        public static bool operator ==(Vector p1, Vector p2)
+        /// <summary>
+        /// Test if this Vector is approximately equal to another.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool IsSimilar(Vector other)
         {
-            return Math.Abs(p1.X - p2.X) < EPSILON
-                && Math.Abs(p1.Y - p2.Y) < EPSILON
-                && Math.Abs(p1.Z - p2.Z) < EPSILON;
+            return Math.Abs(this.X - other.X) < EPSILON
+                && Math.Abs(this.Y - other.Y) < EPSILON
+                && Math.Abs(this.Z - other.Z) < EPSILON;
         }
 
-        public static bool operator !=(Vector p1, Vector p2)
-        {
-            return Math.Abs(p1.X - p2.X) > EPSILON
-                || Math.Abs(p1.Y - p2.Y) > EPSILON
-                || Math.Abs(p1.Z - p2.Z) > EPSILON;
-        }
+        //public static bool operator ==(Vector p1, Vector p2)
+        //{
+        //    return Math.Abs(p1.X - p2.X) < EPSILON
+        //        && Math.Abs(p1.Y - p2.Y) < EPSILON
+        //        && Math.Abs(p1.Z - p2.Z) < EPSILON;
+        //}
+
+        //public static bool operator !=(Vector p1, Vector p2)
+        //{
+        //    return Math.Abs(p1.X - p2.X) > EPSILON
+        //        || Math.Abs(p1.Y - p2.Y) > EPSILON
+        //        || Math.Abs(p1.Z - p2.Z) > EPSILON;
+        //}
+
 
         /// <summary>
         /// Implicit conversion to Point object.

@@ -67,30 +67,42 @@ namespace BRobot
         public double Heading { get { return this.ZAngle; } }
 
         /// <summary>
-        /// Equality operator.
+        /// Test if this YawPitchRoll is approximately equal to another. 
         /// </summary>
-        /// <param name="eu1"></param>
-        /// <param name="eu2"></param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public static bool operator ==(YawPitchRoll eu1, YawPitchRoll eu2)
+        public bool IsSimilar(YawPitchRoll other)
         {
-            return Math.Abs(eu1.XAngle - eu2.XAngle) < EPSILON
-                && Math.Abs(eu1.YAngle - eu2.YAngle) < EPSILON
-                && Math.Abs(eu1.ZAngle - eu2.ZAngle) < EPSILON;
+            return Math.Abs(this.XAngle - other.XAngle) < EPSILON
+                && Math.Abs(this.YAngle - other.YAngle) < EPSILON
+                && Math.Abs(this.ZAngle - other.ZAngle) < EPSILON;
         }
 
-        /// <summary>
-        /// Inequality operator. 
-        /// </summary>
-        /// <param name="eu1"></param>
-        /// <param name="eu2"></param>
-        /// <returns></returns>
-        public static bool operator !=(YawPitchRoll eu1, YawPitchRoll eu2)
-        {
-            return Math.Abs(eu1.XAngle - eu2.XAngle) > EPSILON
-                || Math.Abs(eu1.YAngle - eu2.YAngle) > EPSILON
-                || Math.Abs(eu1.ZAngle - eu2.ZAngle) > EPSILON;
-        }
+        ///// <summary>
+        ///// Equality operator.
+        ///// </summary>
+        ///// <param name="eu1"></param>
+        ///// <param name="eu2"></param>
+        ///// <returns></returns>
+        //public static bool operator ==(YawPitchRoll eu1, YawPitchRoll eu2)
+        //{
+        //    return Math.Abs(eu1.XAngle - eu2.XAngle) < EPSILON
+        //        && Math.Abs(eu1.YAngle - eu2.YAngle) < EPSILON
+        //        && Math.Abs(eu1.ZAngle - eu2.ZAngle) < EPSILON;
+        //}
+
+        ///// <summary>
+        ///// Inequality operator. 
+        ///// </summary>
+        ///// <param name="eu1"></param>
+        ///// <param name="eu2"></param>
+        ///// <returns></returns>
+        //public static bool operator !=(YawPitchRoll eu1, YawPitchRoll eu2)
+        //{
+        //    return Math.Abs(eu1.XAngle - eu2.XAngle) > EPSILON
+        //        || Math.Abs(eu1.YAngle - eu2.YAngle) > EPSILON
+        //        || Math.Abs(eu1.ZAngle - eu2.ZAngle) > EPSILON;
+        //}
 
         /// <summary>
         /// Create a zero rotation.
@@ -157,9 +169,9 @@ namespace BRobot
                    sY = Math.Sin(TO_RADS * this.YAngle),
                    sZ = Math.Sin(TO_RADS * this.ZAngle);
 
-            return new RotationMatrix(cY * cZ,   sX * sY * cZ - cX * sZ,    cX * sY * cZ + sX * sZ,
-                                      cY * sZ,   sX * sY * sZ + cX * cZ,    cX * sY * sZ - sX * cZ,
-                                          -sY,                  sX * cY,                   cX * cY, false);
+            return new RotationMatrix(cY * cZ, sX * sY * cZ - cX * sZ, cX * sY * cZ + sX * sZ,
+                                      cY * sZ, sX * sY * sZ + cX * cZ, cX * sY * sZ - sX * cZ,
+                                          -sY, sX * cY, cX * cY, false);
         }
 
         /// <summary>

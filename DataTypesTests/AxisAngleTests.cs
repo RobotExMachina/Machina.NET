@@ -246,7 +246,7 @@ namespace DataTypesTests
 
                             if (zero)
                             {
-                                Assert.IsTrue(new Quaternion(1, 0, 0, 0) == q, "Failed zero quaternion");
+                                Assert.IsTrue(new Quaternion(1, 0, 0, 0).IsSimilar(q), "Failed zero quaternion");
                             }
                             else
                             {
@@ -299,7 +299,7 @@ namespace DataTypesTests
                 Trace.WriteLine(q);
                 Trace.WriteLine(aa2);
 
-                Assert.IsTrue(aa1 == aa2, "Boooo! :(");
+                Assert.IsTrue(aa1.IsSimilar(aa2), "Boooo! :(");
             }
 
 
@@ -331,7 +331,7 @@ namespace DataTypesTests
                             }
                             else
                             {
-                                Assert.IsTrue(aa1 == aa2, "Booooo! :(");
+                                Assert.IsTrue(aa1.IsSimilar(aa2), "Booooo! :(");
                             }
                             
                         }
@@ -373,7 +373,7 @@ namespace DataTypesTests
                 aa2.Flip();  // from quaternion conversion, aa2 will be inverted. Flip for comparison
                 Trace.WriteLine(aa2 + " (flipped)");
 
-                Assert.IsTrue(aa1 == aa2, "Boooo! :(");
+                Assert.IsTrue(aa1.IsSimilar(aa2), "Boooo! :(");
             }
         }
 
@@ -418,9 +418,9 @@ namespace DataTypesTests
                     Trace.WriteLine(q);
                     Trace.WriteLine(aa2);
                 }
-
+                
                 // Now this should work
-                Assert.IsTrue(aa1 == aa2);
+                Assert.IsTrue(aa1.IsSimilar(aa2));
             }
         }
 
@@ -503,7 +503,7 @@ namespace DataTypesTests
                 Trace.WriteLine(aa + " --> " + eu1);
                 Trace.WriteLine(aa + " --> " + m + " --> " + eu2);
 
-                Assert.IsTrue(eu1 == eu2);
+                Assert.IsTrue(eu1.IsSimilar(eu2));
             }
 
             // Test singularities
@@ -522,7 +522,7 @@ namespace DataTypesTests
                 Trace.WriteLine(aa + " --> " + eu1);
                 Trace.WriteLine(aa + " --> " + m + " --> " + eu2);
 
-                Assert.IsTrue(eu1 == eu2);
+                Assert.IsTrue(eu1.IsSimilar(eu2));
             }
         }
 
@@ -557,9 +557,9 @@ namespace DataTypesTests
                 Trace.WriteLine("--> " + aa3 + " --> " + eu3);
 
                 Assert.IsTrue(aa1.IsEquivalent(aa2));
-                Assert.IsTrue(aa2 == aa3);
-                Assert.IsTrue(eu1 == eu2);
-                Assert.IsTrue(eu2 == eu3);
+                Assert.IsTrue(aa2.IsSimilar(aa3));
+                Assert.IsTrue(eu1.IsSimilar(eu2));
+                Assert.IsTrue(eu2.IsSimilar(eu3));
             }
 
             // Test singularities
@@ -582,9 +582,9 @@ namespace DataTypesTests
                 Trace.WriteLine("--> " + aa3 + " --> " + eu3);
 
                 Assert.IsTrue(aa1.IsEquivalent(aa2));
-                Assert.IsTrue(aa2 == aa3);
-                Assert.IsTrue(eu1 == eu2);
-                Assert.IsTrue(eu2 == eu3);
+                Assert.IsTrue(aa2.IsSimilar(aa3));
+                Assert.IsTrue(eu1.IsSimilar(eu2));
+                Assert.IsTrue(eu2.IsSimilar(eu3));
             }
         }
     }
