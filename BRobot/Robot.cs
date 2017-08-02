@@ -6,6 +6,15 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
+
+//  ██████╗ ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
+//  ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
+//  ██████╔╝██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
+//  ██╔══██╗██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   
+//  ██████╔╝██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   
+//  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
+//                                                     
+
 namespace BRobot
 {
     /// <summary>
@@ -98,7 +107,10 @@ namespace BRobot
         public static readonly string Version = "0.2.5";
        
 
-
+        /// <summary>
+        /// A nickname for this Robot.
+        /// </summary>
+        public string Name { get; internal set; }
 
         /// <summary>
         /// The main Control object, acts as an interface to all classes that
@@ -128,15 +140,20 @@ namespace BRobot
         ///// Base constructor.
         ///// </summary>                                                       
         [System.Obsolete("Deprecated constructor, defaults to a human-readable interpretation of the actions. Please use Robot(\"BrandName\") instead. Example: `Robot arm = new Robot(\"ABB\");`")]
-        public Robot() : this("HUMAN") { }
+        public Robot() : this("Machina", "HUMAN") { }
+
+        [System.Obsolete("Deprecated constructor, use Robot(name, make) instead")]
+        public Robot(string make) : this("Machina", make) { }
 
         /// <summary>
         /// Base constructor.
         /// </summary>
-        /// <param name="brand"></param>
-        public Robot(string brand)
+        /// <param name="name">A name for this Robot</param>
+        /// <param name="make"></param>
+        public Robot(string name, string make)
         {
-            string b = brand.ToUpper();
+            this.Name = name;
+            string b = make.ToUpper();
             
             if (b.Equals("ABB"))
             {
@@ -156,7 +173,7 @@ namespace BRobot
             }
             else
             {
-                Console.WriteLine(brand + " is not a valis Robot type. Please specify one of the following: ");
+                Console.WriteLine(make + " is not a valis Robot type. Please specify one of the following: ");
                 for (var i = 1; i < 4; i++)
                 {
                     Console.WriteLine(((RobotType)i).ToString());
@@ -1064,6 +1081,14 @@ namespace BRobot
         {
             //c.DebugSettingsBuffer();
         }
-        
+
+
+        public override string ToString()
+        {
+            return string.Format("Robot[\"{0}\", {1}]",
+                this.Name,
+                this.c.robotBrand);
+        }
+
     }
 }

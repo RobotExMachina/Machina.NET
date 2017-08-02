@@ -842,10 +842,20 @@ namespace BRobot
 
         public override string ToString()
         {
-            return string.Format("Quaternion[{0}, {1}, {2}, {3}]",
+            return this.ToString(true);
+        }
+
+        public string ToString(bool labels)
+        {
+            return string.Format("{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}]",
+                labels ? "Quaternion" : "",
+                labels ? "W:" : "",
                 Math.Round(W, STRING_ROUND_DECIMALS_RADS),
+                labels ? "X:" : "",
                 Math.Round(X, STRING_ROUND_DECIMALS_RADS),
+                labels ? "Y:" : "",
                 Math.Round(Y, STRING_ROUND_DECIMALS_RADS),
+                labels ? "Z:" : "",
                 Math.Round(Z, STRING_ROUND_DECIMALS_RADS));
         }
 

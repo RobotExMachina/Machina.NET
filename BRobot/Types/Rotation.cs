@@ -290,7 +290,5 @@ namespace BRobot
                 Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
         }
 
-        
-
     }
 }

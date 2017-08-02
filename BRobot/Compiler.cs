@@ -358,9 +358,9 @@ namespace BRobot
                     dec = string.Format("    ! Tool detached");  // this action has no actual RAPID instruction, just add a comment
                     break;
 
-                default:
-                    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
-                    break;
+                //default:
+                //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
             }
 
             declaration = dec;
@@ -430,9 +430,9 @@ namespace BRobot
                     dec = string.Format("    ! Tool detached");  // this action has no actual RAPID instruction, just add a comment
                     break;
 
-                default:
-                    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
-                    break;
+                //default:
+                //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
 
             }
 
@@ -448,7 +448,11 @@ namespace BRobot
         /// <returns></returns>
         static public string GetUNSAFERobTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0}, {1}, [0,0,0,0], [0,9E9,9E9,9E9,9E9,9E9]]", cursor.position, cursor.rotation);
+            return string.Format("[{0}, {1}, {2}, {3}]",
+                cursor.position.ToString(false),
+                cursor.rotation.Q.ToString(false),
+                "[0,0,0,0]",  // no IK at this moment
+                "[0,9E9,9E9,9E9,9E9,9E9]");  // no external axes at this moment
         }
 
         /// <summary>
@@ -502,7 +506,7 @@ namespace BRobot
                 cursor.tool.TCPOrientation,
                 cursor.tool.weight,
                 cursor.tool.centerOfGravity,
-                "[1, 0, 0, 0]");  // no internial axes by default
+                "[1,0,0,0]");  // no internial axes by default
         }
 
     }
@@ -677,9 +681,9 @@ namespace BRobot
                     dec = string.Format("  # {0}", ac.comment);
                     break;
 
-                default:
-                    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
-                    break;
+                //default:
+                //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
             }
 
             declaration = dec;
@@ -735,9 +739,9 @@ namespace BRobot
                     break;
 
 
-                default:
-                    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
-                    break;
+                //default:
+                //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
             }
 
             declaration = dec;
@@ -1021,9 +1025,9 @@ namespace BRobot
                     break;
 
 
-                default:
-                    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
-                    break;
+                //default:
+                //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
             }
 
             declaration = dec;

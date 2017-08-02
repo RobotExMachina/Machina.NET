@@ -17,9 +17,41 @@
 ## TODO
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 - [ ] Test that Tool attach/detachment works good
+- [ ] Add Tooling for KUKA+UR
+
+
+
+## BUILD 1215
+- _Notes on new Reference system_:
+    + Right now `.Coordinates()` accepts a `global` (robot base) or `local` (TCP) setting. This means:
+        * On `global`, `.MoveTo()` does absolute XYZ in cartesian space and `.Move()` does relative transformations in that system
+        * On `local`, `.Move()` uses the dynamic TCP reference frame and `MoveTo()` still does absolute location based on global coordinates. This is probably not very consistent. 
+    + For starters, `global` could be renamed to `base` or `robotBase` and `local` to `tool`. This is probably more understandable. After that, the following will apply:
+        * On `base`, `.MoveTo()` does absolute XYZ in cartesian space and `.Move()` does relative transformations in that orientation. ABB compilation would use WObj0
+        * On `tool`, `.Move()` uses the TCP reference frame. Because of the dynamic nature of the TCP, `MoveTo()` would effectively have the same effect as `.Move()`. ABB compilation would use WObj0 and frame is computed internally? Use `RelTool` instead?
+    + On top of this, this would allow for custom reference systems to be entered.
+        * Let's say we could do: 
+            ```
+            ReferenceSystem bench = new ReferenceSystem("bench", 
+                new Point(300, 0, 200), 
+                new Orientation(1, 0, 0, 0, 1, 0));
+            bot.Coordinates(bench);
+
+            // Alternatively:
+            ReferenceSystem gig = ReferenceSystem.FromABBWObj("gig", "...wobj declaration string goes here...");
+            bot.Coordinates(gig);
+
+
+            ```
+        * From there, postprocessing/compilation could happen with wobjs or the like. 
+        * Cursors will have two additional properties: `Enum CoordinateType {Base, Tool, Custom}`, and `CustomCoodinate {null if Base/Tool, Reference obj if Custom}` 
+        * Cursors would have two internal frames: one in the chosen reference system, and another one in robot base coordinates. Both representations would be managed simultaneously.
+
+
+
 
 ## BUILD 1214
-- [ ] Add a bunch of public getters to retrieve the state of the robot (useful for testing)
+- [x] Add a bunch of public getters to retrieve the state of the robot (useful for testing)
 
 
 ## BUILD 1213

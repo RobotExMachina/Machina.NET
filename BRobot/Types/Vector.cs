@@ -761,11 +761,19 @@ namespace BRobot
 
         public override string ToString()
         {
-            return string.Format("[{0},{1},{2}]",
-                Math.Round(X, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
+            return this.ToString(false);
         }
 
+        public string ToString(bool labels)
+        {
+            return string.Format("{0}[{1}{2}, {3}{4}, {5}{6}]",
+                labels ? "Vector" : "",
+                labels ? "X:" : "",
+                Math.Round(X, STRING_ROUND_DECIMALS_MM),
+                labels ? "Y:" : "",
+                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
+                labels ? "Z:" : "",
+                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
+        }
     }
 }

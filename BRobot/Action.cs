@@ -205,7 +205,7 @@ namespace BRobot
         public override string ToString()
         {
             return relative ?
-                string.Format("Increase speed by {0} mm/s", speed) :
+                string.Format("{0} speed by {1} mm/s", this.speed < 0 ? "Decrease" : "Increase", speed) :
                 string.Format("Set speed to {0} mm/s", speed);
         }
     }
@@ -236,8 +236,8 @@ namespace BRobot
         public override string ToString()
         {
             return relative ?
-                string.Format("Increase zone by {0} mm", zone) :
-                string.Format("Set zone to {0} mm", zone);
+                string.Format("{0} zone by {1} mm", this.zone < 0 ? "Decrease" : "Increase", this.zone) :
+                string.Format("Set zone to {0} mm", this.zone);
         }
     }
 

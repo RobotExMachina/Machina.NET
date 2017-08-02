@@ -56,5 +56,13 @@ namespace BRobot
             this.Y = y;
             this.Z = z;
         }
+        public override string ToString()
+        {
+            return string.Format("[{0},{1},{2}]",
+                Math.Round(X, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
+        }
+
     }
 }
