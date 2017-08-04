@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BRobot
+namespace Machina
 {
     /// <summary>
     /// A queue manager for 'stream' mode and Frame objects

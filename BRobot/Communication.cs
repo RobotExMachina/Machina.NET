@@ -12,7 +12,7 @@ using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
 
 
-namespace BRobot
+namespace Machina
 {
     //  ██████╗  █████╗ ███████╗███████╗
     //  ██╔══██╗██╔══██╗██╔════╝██╔════╝
@@ -27,7 +27,7 @@ namespace BRobot
     abstract class Communication
     {
         /// <summary>
-        /// A reference to parent BRobot Control object commanding this Comm.
+        /// A reference to parent Machina Control object commanding this Comm.
         /// </summary>
         protected Control masterControl = null;
 
@@ -226,7 +226,7 @@ namespace BRobot
         private static string localBufferDirname = "C:";                 // Route names to be used for file handling
         private static string localBufferFilename = "buffer";
         private static string localBufferFileExtension = "mod";
-        private static string remoteBufferDirectory = "BRobot";
+        private static string remoteBufferDirectory = "Machina";
         
         //protected RobotCursorABB writeCursor;
         protected RobotCursor writeCursor;

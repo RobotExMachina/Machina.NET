@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BRobot
+namespace Machina
 {
     //██████╗  ██████╗ ██╗███╗   ██╗████████╗
     //██╔══██╗██╔═══██╗██║████╗  ██║╚══██╔══╝
@@ -41,7 +41,7 @@ namespace BRobot
         /// <param name="p"></param>
         public static implicit operator Vector(Point p)
         {
-            return new BRobot.Vector(p.X, p.Y, p.Z);
+            return new Machina.Vector(p.X, p.Y, p.Z);
         }
 
         /// <summary>

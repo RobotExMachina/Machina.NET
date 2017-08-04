@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BRobot
+namespace Machina
 {
 
     //  ███╗   ███╗ █████╗ ████████╗██████╗ ██╗██╗  ██╗██████╗ ██████╗ 
@@ -640,7 +640,7 @@ namespace BRobot
         {
             /**
              * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/index.htm with:
-             *      - BRobot conventions: ES uses different heading/pitch/bank axes, fixed here
+             *      - Machina conventions: ES uses different heading/pitch/bank axes, fixed here
              *      - More singularity precision: using 0.001 triggers on angles above 86.3 degrees, 
              *        resulting in imprecise sets of conversions in those areas, like:
              *              Quaternion[0.027125, 0.691126, -0.058642, 0.71984]

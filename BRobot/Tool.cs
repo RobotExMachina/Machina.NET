@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BRobot
+namespace Machina
 {
     /// <summary>
     /// Represents a tool object that can be attached to the end effector of the robot.

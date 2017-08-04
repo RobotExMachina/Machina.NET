@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BRobot
+namespace Machina
 {
 
     //  ██╗   ██╗███████╗ ██████╗████████╗ ██████╗ ██████╗ 
@@ -68,7 +68,7 @@ namespace BRobot
         /// <param name="vec"></param>
         public static implicit operator Point(Vector vec)
         {
-            return new BRobot.Point(vec.X, vec.Y, vec.Z);
+            return new Machina.Point(vec.X, vec.Y, vec.Z);
         }
 
         /// <summary>
@@ -506,12 +506,12 @@ namespace BRobot
         /// <returns></returns>
         public static Vector RandomFromDoubles(double min, double max)
         {
-            return new BRobot.Vector(Random(min, max), Random(min, max), Random(min, max));
+            return new Machina.Vector(Random(min, max), Random(min, max), Random(min, max));
         }
 
         public static Vector RandomFromInts(int min, int max)
         {
-            return new BRobot.Vector(RandomInt(min, max), RandomInt(min, max), RandomInt(min, max));
+            return new Machina.Vector(RandomInt(min, max), RandomInt(min, max), RandomInt(min, max));
         }
 
         /// <summary>

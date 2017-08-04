@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BRobot
+namespace Machina
 {
     //   ██████╗ ██████╗ ███╗   ███╗██████╗ ██╗██╗     ███████╗██████╗ 
     //  ██╔════╝██╔═══██╗████╗ ████║██╔══██╗██║██║     ██╔════╝██╔══██╗
@@ -74,7 +74,7 @@ namespace BRobot
             List<string> module = new List<string>();
 
             // Code lines
-            module.Add("// BRobot code for '" + programName + "'");
+            module.Add("// Machina code for '" + programName + "'");
             module.Add("");
             module.AddRange(actionLines);
             
@@ -1005,7 +1005,7 @@ namespace BRobot
                 // Will figure this out later.
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in BRobot)",
+                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in Machina)",
                         am.message,
                         am.id);
                     break;
@@ -1077,7 +1077,7 @@ namespace BRobot
                 // Will figure this out later.
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in BRobot)",
+                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in Machina)",
                         am.message,
                         am.id);
                     break;

@@ -6,16 +6,15 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
+//  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ 
+//  ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗
+//  ██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║███████║
+//  ██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══██║
+//  ██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║██║  ██║
+//  ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝
+//                                                          
 
-//  ██████╗ ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
-//  ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
-//  ██████╔╝██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
-//  ██╔══██╗██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   
-//  ██████╔╝██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   
-//  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
-//                                                     
-
-namespace BRobot
+namespace Machina
 {
     /// <summary>
     /// Represents the type of control that will be performed over the real/virtual robot.
@@ -91,7 +90,7 @@ namespace BRobot
     //  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝   
     //                                             
     /// <summary>
-    /// The core Class in BRobot. Represents a state and action-based virtual robot, 
+    /// The core Class in Machina. Represents a state and action-based virtual robot, 
     /// and exposes the public API for robot manipulation and control.
     /// </summary>
     public class Robot
@@ -229,15 +228,15 @@ namespace BRobot
             bool success = true;
             if (mode.Equals("offline"))
             {
-                return Mode(BRobot.ControlMode.Offline);
+                return Mode(Machina.ControlMode.Offline);
             }
             else if (mode.Equals("execute"))
             {
-                return Mode(BRobot.ControlMode.Execute);
+                return Mode(Machina.ControlMode.Execute);
             }
             else if (mode.Equals("stream"))
             {
-                return Mode(BRobot.ControlMode.Stream);
+                return Mode(Machina.ControlMode.Stream);
             }
             else
             {
@@ -267,11 +266,11 @@ namespace BRobot
 
             if (mode.Equals("once"))
             {
-                return RunMode(global::BRobot.RunMode.Once);
+                return RunMode(global::Machina.RunMode.Once);
             }
             else if (mode.Equals("loop"))
             {
-                return RunMode(global::BRobot.RunMode.Once);
+                return RunMode(global::Machina.RunMode.Once);
             }
             else
             {

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace BRobot
+namespace Machina
 {
     /// <summary>
     /// The core class that centralizes all private control.
