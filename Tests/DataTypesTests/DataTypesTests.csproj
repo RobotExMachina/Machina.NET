@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6356E0BF-3E02-47A0-99AC-906BF57FF0C4}</ProjectGuid>
+    <ProjectGuid>{909725D3-0D12-473A-AEA9-19255CA1F66B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DataTypesTests</RootNamespace>
@@ -62,9 +62,9 @@
     <Compile Include="RotationVectorTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BRobot\BRobot.csproj">
-      <Project>{12d4098e-2f9e-4e15-892b-fded71da4b47}</Project>
-      <Name>BRobot</Name>
+    <ProjectReference Include="..\..\Machina\Machina.csproj">
+      <Project>{15951838-f9d6-4988-a103-b7c72bfe81a2}</Project>
+      <Name>Machina</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

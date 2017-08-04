@@ -1,4 +1,4 @@
-# QUICK API REFERENCE - v0.1.0
+# QUICK API REFERENCE - v0.2.5
 
 ### Constructors
 - [Robot](#robot)
@@ -42,7 +42,7 @@
 ### Events
 - [BufferEmpty](#bufferempty)
 
-### BRobot Data Types
+### Machina Data Types
 - [Point](#point)
 - [Rotation](#rotation)
 - [Joints](#joints)
@@ -86,7 +86,7 @@ _bool Mode(ControlMode mode)_
 
 _bool Mode(string mode)_
 
-Sets the control mode the robot will operate under: __"offline"__ (default), __"execute"__ or __"stream."__ Check the [Walkthrough section](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Walkthrough.md) for more information about what this means.
+Sets the control mode the robot will operate under: __"offline"__ (default), __"execute"__ or __"stream."__ Check the [Walkthrough section](https://github.com/garciadelcastillo/Machina/blob/master/docs/Walkthrough.md) for more information about what this means.
 
 ```csharp
 Robot arm = new Robot();
@@ -575,7 +575,7 @@ _NOTE: works only in 'stream' mode._
 
 
 
-## BRobot Data Types
+## Machina Data Types
 
 ### Point
 

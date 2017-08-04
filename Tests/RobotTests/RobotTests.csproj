@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{695DFBC0-AAFC-48FA-9DCF-3F371C6AD6ED}</ProjectGuid>
+    <ProjectGuid>{64F4D5FF-624E-46C7-8900-3174FA2C3730}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RobotTests</RootNamespace>
@@ -57,13 +57,13 @@
     <Compile Include="RobotTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BRobot\BRobot.csproj">
-      <Project>{12d4098e-2f9e-4e15-892b-fded71da4b47}</Project>
-      <Name>BRobot</Name>
-    </ProjectReference>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <ProjectReference Include="..\..\Machina\Machina.csproj">
+      <Project>{15951838-f9d6-4988-a103-b7c72bfe81a2}</Project>
+      <Name>Machina</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

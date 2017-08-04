@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9E155754-5524-45C8-A72E-43F472F502C0}</ProjectGuid>
+    <ProjectGuid>{16AF5FDC-0CA2-4934-B565-FE7A53045BB5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EXAMPLE_OfflineCodeGeneration</RootNamespace>
-    <AssemblyName>EXAMPLE_OfflineCodeGeneration</AssemblyName>
+    <RootNamespace>EXAMPLE_StreamTargets2</RootNamespace>
+    <AssemblyName>EXAMPLE_StreamTargets2</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -44,17 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OfflineCodeGeneration.cs" />
+    <Compile Include="StreamTargets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\BRobot\BRobot.csproj">
-      <Project>{12d4098e-2f9e-4e15-892b-fded71da4b47}</Project>
-      <Name>BRobot</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
