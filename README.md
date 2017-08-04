@@ -4,11 +4,11 @@
 
 Machina is a .NET library for action-based real-time control of mechanical actuators. 
 
+Or in more _human terms_, it allows you to talk to a robot and tell it what to do.
+
 Machina simplifies all the hassle of connecting to a mechanical controller, writing programs in platform-specific languages and managing the asynchronous communication between a machine and a connected application, by providing a [human-relatable API](https://github.com/garciadelcastillo/Machina/blob/master/docs/Reference.md) of Actions, unified for all the different devices.
 
-Or in more _human terms_, it allows you to talk to a robot and tell it what to do. 
-
-Machina was previously known as _BRobot_.
+Machina was formerly known as _BRobot_.
 
 ## Disclaimer
 
