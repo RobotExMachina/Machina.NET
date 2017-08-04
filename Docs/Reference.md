@@ -1,4 +1,6 @@
-# QUICK API REFERENCE - v0.2.5
+_Note:_ for the latest version, please visit the [Documentation on the Wiki](https://github.com/garciadelcastillo/Machina/wiki)
+
+# QUICK API REFERENCE - v0.1.0
 
 ### Constructors
 - [Robot](#robot)
@@ -55,9 +57,9 @@
 
 ### Robot
 
-_Robot()_
+_Robot(string name, string make)_
 
-Creates a new instance of a Robot object.
+Creates a new instance of a Robot object with given name and brand ("ABB", "KUKA", "UR" or "HUMAN").
 
 ```csharp
 Robot bot = new Robot();
@@ -77,7 +79,6 @@ Console.WriteLine(Robot.Version);  // "0.1.0"
 ```
 
 
-
 ## Methods
 
 ### Mode
@@ -86,7 +87,7 @@ _bool Mode(ControlMode mode)_
 
 _bool Mode(string mode)_
 
-Sets the control mode the robot will operate under: __"offline"__ (default), __"execute"__ or __"stream."__ Check the [Walkthrough section](https://github.com/garciadelcastillo/Machina/blob/master/docs/Walkthrough.md) for more information about what this means.
+Sets the control mode the robot will operate under: __"offline"__ (default), __"execute"__ or __"stream."__ Check the [Walkthrough section](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Walkthrough.md) for more information about what this means.
 
 ```csharp
 Robot arm = new Robot();

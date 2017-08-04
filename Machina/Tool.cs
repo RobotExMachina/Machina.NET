@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace Machina
 {
+
+    //  ████████╗ ██████╗  ██████╗ ██╗     
+    //  ╚══██╔══╝██╔═══██╗██╔═══██╗██║     
+    //     ██║   ██║   ██║██║   ██║██║     
+    //     ██║   ██║   ██║██║   ██║██║     
+    //     ██║   ╚██████╔╝╚██████╔╝███████╗
+    //     ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝
+    //                                     
+
     /// <summary>
     /// Represents a tool object that can be attached to the end effector of the robot.
     /// This class is public and will be used directly by the user, so careful design of the API

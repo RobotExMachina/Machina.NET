@@ -30,7 +30,7 @@ Setting up a BRobot project is extremely easy:
 
 - First, clone this repo to your local machine and open it in Visual Studio. The project comes with the core library, as well as many app examples.
 
-- If you have not installed RobotStudio in your machine, make sure you do so by [reading this guide](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Setting_up_RobotStudio.md). As specified in the guide, create a station with your choice of robot manipulator, and make sure it is started and running in auto mode.
+- If you have not installed RobotStudio in your machine, make sure you do so by [reading this guide](https://github.com/garciadelcastillo/BRobot/blob/master/Docs/Setting_up_RobotStudio.md). As specified in the guide, create a station with your choice of robot manipulator, and make sure it is started and running in auto mode.
 
 - To make sure everything is working, run the 'EXAMPLE_ConnectionCheck' project. If you see a long debug dump with a lot of information from this station, it means connection is live and we can start working!
 
@@ -41,11 +41,11 @@ At this point, you should have the BRobot project correctly installed in your pl
 
 Let's run a .NET interactive shell (REPL) with the referenced BRobot assembly. In Visual Studio, go to the Solution Explorer, right click on the BRobot project and choose "Initialize Interactive with Project:"
 
-![](https://github.com/garciadelcastillo/BRobot/blob/master/docs/VS_REPL_01.png)
+![](https://github.com/garciadelcastillo/BRobot/blob/master/Docs/VS_REPL_01.png)
 
 A C# interactive window should pop up looking like this:
 
-![](https://github.com/garciadelcastillo/BRobot/blob/master/docs/VS_REPL_02.png)
+![](https://github.com/garciadelcastillo/BRobot/blob/master/Docs/VS_REPL_02.png)
 
 You can think of this as a command line window that has BRobot loaded in it, and through which you can start talking to the robot.
 
@@ -344,7 +344,7 @@ Offline mode is useful for testing purposes, to get acquaintanced with your devi
 
 ## Examples
 
-Many interesting and cool things can be done when controlling robotic devices in real time. A full list of the actions available in BRobot can be found in the [quick reference API card](https://github.com/garciadelcastillo/BRobot/blob/master/docs/Reference.md). Let's take a look at some examples of cool things that can be done with BRobot.
+Many interesting and cool things can be done when controlling robotic devices in real time. A full list of the actions available in BRobot can be found in the [quick reference API card](https://github.com/garciadelcastillo/BRobot/blob/master/Docs/Reference.md). Let's take a look at some examples of cool things that can be done with BRobot.
 
 ### Motion
 
@@ -529,7 +529,7 @@ bot.Transform(new Point(0, -100, 0), new Rotation(0, 0, 1, -45));       // [300,
 
 All absolute actions, i.e. all those with the `To` suffix, work on _**global coordinates**_ defined by the device's reference frame. For example, for robotic arms, it is usually the base center. By default, _relative actions also use the global reference system_. This means that a `Move(100, 0)` instruction will move the device 100 mm in the positive global X direction, no matter where the device is or its orientation. However, it is possible to choose to work in the device's _**local coordinate system**_, and define movement and rotation based on its current position and orientation. This is set with the `Coordinates` method, accepting `"global"` or `"local"` parameters.
 
-![](https://github.com/garciadelcastillo/BRobot/blob/master/docs/global_local_coordinates.png)
+![](https://github.com/garciadelcastillo/BRobot/blob/master/Docs/global_local_coordinates.png)
 
 Assuming a robotic arm with global/local coordinates like the above diagram:
 

@@ -1,12 +1,12 @@
 # Machina
 
-![](https://github.com/garciadelcastillo/Machina/blob/master/docs/brobot_banner_888x500.png)
+![](https://github.com/garciadelcastillo/Machina/blob/master/Docs/brobot_banner_888x500.png)
 
 Machina is a .NET library for action-based real-time control of mechanical actuators. 
 
 Or in more _human terms_, it allows you to talk to a robot and tell it what to do.
 
-Machina simplifies all the hassle of connecting to a mechanical controller, writing programs in platform-specific languages and managing the asynchronous communication between a machine and a connected application, by providing a [human-relatable API](https://github.com/garciadelcastillo/Machina/blob/master/docs/Reference.md) of Actions, unified for all the different devices.
+Machina simplifies all the hassle of connecting to a mechanical controller, writing programs in platform-specific languages and managing the asynchronous communication between a machine and a connected application, by providing a [human-relatable API](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Reference.md) of Actions, unified for all the different devices.
 
 Machina was formerly known as _BRobot_.
 
@@ -26,7 +26,7 @@ __Machina is in a very early stage of development.__ You are using this software
 
 ## Hello World
 
-Assuming your computer is [connected to a real or virtual robotic arm](https://github.com/garciadelcastillo/Machina/blob/master/docs/Setting_up_RobotStudio.md), here is a simple .NET program that traces a vertical 50 x 50 mm square:
+Assuming your computer is [connected to a real or virtual robotic arm](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Setting_up_RobotStudio.md), here is a simple .NET program that traces a vertical 50 x 50 mm square:
 
 ```csharp
 // Load assembly
@@ -66,9 +66,9 @@ bot.Disconnect();
 
 Machina is its infancy, and rapid changes are happening with every commit! Your most reliable and up-to-date source of documentation is probably the code itself, and the comments within.
 
-To learn how to start using Machina, and examples of some of its features, please take a look at the [Walkthrough page](https://github.com/garciadelcastillo/Machina/blob/master/docs/Walkthrough.md).
+To learn how to start using Machina, and examples of some of its features, please take a look at the [Walkthrough page](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Walkthrough.md).
 
-Documentation on Machina's API can be found on the [Reference](https://github.com/garciadelcastillo/Machina/blob/master/docs/Reference.md).
+Documentation on Machina's API can be found on the [Reference](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Reference.md).
 
 
 ## Related Projects
@@ -104,7 +104,7 @@ Machina is an open-source project, with a lot of room for improvement and collab
 
 ## Acknowledgments
 
-The development of Machina was sponsored by [Autodesk, Inc](https://www.autodesk.com/), as part of a summer research residency project in Boston, 2016. Please take a look at the [detailed list of acknowledgments](https://github.com/garciadelcastillo/Machina/blob/master/docs/Acknowledgments.md)
+The development of Machina was sponsored by [Autodesk, Inc](https://www.autodesk.com/), as part of a summer research residency project in Boston, 2016. Please take a look at the [detailed list of acknowledgments](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Acknowledgments.md)
 
 Machina was created and is maintained by [Jose Luis Garcia del Castillo](http://www.garciadelcastillo.es).
 
