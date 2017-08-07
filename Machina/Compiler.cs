@@ -681,9 +681,14 @@ namespace Machina
                     dec = string.Format("  # {0}", ac.comment);
                     break;
 
-                //default:
-                //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
+                case ActionType.Attach:
+                case ActionType.Detach:
+                    dec = string.Format("  # TOOLING NOT AVAILABLE FOR UR", action);
+                    break;
+
+                    //default:
+                    //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    //    break;
             }
 
             declaration = dec;
@@ -738,10 +743,15 @@ namespace Machina
                         ac.comment);
                     break;
 
+                case ActionType.Attach:
+                case ActionType.Detach:
+                    dec = string.Format("  # TOOLING NOT AVAILABLE FOR UR", action);
+                    break;
 
-                //default:
-                //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
+
+                    //default:
+                    //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    //    break;
             }
 
             declaration = dec;
@@ -1024,10 +1034,14 @@ namespace Machina
                         ac.id);
                     break;
 
+                case ActionType.Attach:
+                case ActionType.Detach:
+                    dec = string.Format("  ; TOOLING NOT AVAILABLE FOR KUKA", action);
+                    break;
 
-                //default:
-                //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
+                    //default:
+                    //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    //    break;
             }
 
             declaration = dec;
@@ -1097,9 +1111,14 @@ namespace Machina
                     break;
 
 
-                default:
-                    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
+                case ActionType.Attach:
+                case ActionType.Detach:
+                    dec = string.Format("  ; TOOLING NOT AVAILABLE FOR KUKA", action);
                     break;
+
+                //default:
+                //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
             }
 
             declaration = dec;
