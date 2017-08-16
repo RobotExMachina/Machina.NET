@@ -575,6 +575,39 @@ namespace Machina
         }
 
         /// <summary>
+        /// Given two vectors, this method outputs two new orthogonal vectors, where the first one is 
+        /// parallel to the original (although normalized), and the second one is perpendicular to the 
+        /// first, maintaining the orientation of the first one. 
+        /// Returns false if operation could not be processed (both vectors have the same direction)
+        /// </summary>
+        /// <param name="X"></param>
+        /// <param name="Y"></param>
+        /// <param name="nX"></param>
+        /// <param name="nY"></param>
+        public static bool Orthogonalize(Vector X, Vector Y, out Vector nX, out Vector nY, out Vector nZ)
+        {
+            // Some sanity
+            int dir = Vector.CompareDirections(X, Y);
+            if (dir == 1 || dir == 3)
+            {
+                Console.WriteLine("Cannot orthogonalize vectors with the same direction");
+                nX = null;
+                nY = null;
+                nZ = null;
+                return false;
+            }
+
+            nX = new Vector(X);  // shallow copy
+            nX.Normalize();
+
+            nZ = Vector.CrossProduct(nX, Y);
+            nZ.Normalize();
+            nY = Vector.CrossProduct(nZ, nX);
+
+            return true;
+        }
+
+        /// <summary>
         /// Simplifies the path using a combination of radial distance and 
         /// Ramer–Douglas–Peucker algorithm. 
         /// </summary>
@@ -583,7 +616,7 @@ namespace Machina
         /// <param name="tolerance"></param>
         /// <param name="highQuality"></param>
         /// <returns></returns>
-        public static List<Vector> SimplifyPointList(List<Vector> points, double tolerance, bool highQuality)
+        internal static List<Vector> SimplifyPointList(List<Vector> points, double tolerance, bool highQuality)
         {
             if (points.Count < 1)
             {
@@ -617,7 +650,7 @@ namespace Machina
         /// <param name="points"></param>
         /// <param name="sqTolerance"></param>
         /// <returns></returns>
-        public static List<Vector> SimplifyDouglasPeucker(List<Vector> points, double sqTolerance)
+        internal static List<Vector> SimplifyDouglasPeucker(List<Vector> points, double sqTolerance)
         {
             var len = points.Count;
             var markers = new int?[len];
@@ -690,7 +723,7 @@ namespace Machina
         /// <param name="points"></param>
         /// <param name="sqTolerance"></param>
         /// <returns></returns>
-        public static List<Vector> SimplifyRadialDistance(List<Vector> points, double sqTolerance)
+        internal static List<Vector> SimplifyRadialDistance(List<Vector> points, double sqTolerance)
         {
             Vector prevPoint = points[0];
             List<Vector> newPoints = new List<Vector> { prevPoint };

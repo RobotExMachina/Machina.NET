@@ -23,7 +23,8 @@
 
 
 ## BUILD 1301
-
+- [ ] Vector.Orthoginalize(...)
+- [ ] 
 
 
 ## BUILD 1300

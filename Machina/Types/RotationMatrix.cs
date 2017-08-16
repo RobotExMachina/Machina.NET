@@ -312,27 +312,15 @@ namespace Machina
             // maintaining the main X direction and XY plane, 
             // and recomputing the Y and Z axes to comply with this condition.
             Vector vecX = new Vector(R[0], R[3], R[6]),
-                vecY = new Vector(R[1], R[4], R[7]),
-                vecZ;
+                   vecY = new Vector(R[1], R[4], R[7]),
+                   vecZ; 
 
-            // Some sanity
-            int dir = Vector.CompareDirections(vecX, vecY);
-            if (dir == 1 || dir == 3)
+            if (Vector.Orthogonalize(vecX, vecY, out vecX, out vecY, out vecZ) == false)
             {
                 Console.WriteLine("Cannot orthogonalize a Matrix with X & Y parallel vectors");
                 this.Identity();
                 return false;
             }
-
-            // Create unit X axis
-            vecX.Normalize();
-
-            // Find normal vector to plane
-            vecZ = Vector.CrossProduct(vecX, vecY);
-            vecZ.Normalize();
-
-            // Y axis is the cross product of both
-            vecY = Vector.CrossProduct(vecZ, vecX);
 
             // Initialize the Matrix
             this.Initialize(vecX.X, vecY.X, vecZ.X,
