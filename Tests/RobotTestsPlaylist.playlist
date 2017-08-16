@@ -1,0 +1,1 @@
+<Playlist Version="1.0"><Add Test="RobotTests.RobotMoveTests.Robot_Rotate_Simple" /><Add Test="RobotTests.RobotMoveTests.Robot_Move_Simple" /></Playlist>

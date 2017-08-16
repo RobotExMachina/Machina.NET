@@ -23,7 +23,7 @@ namespace RobotTests
 
             // Init some virtual cursors
             Vector botpos = bot.GetCurrentPosition();
-            SysVec syspos = new SysVec((float) botpos.X, (float) botpos.Y, (float) botpos.Z);
+            SysVec syspos = new SysVec((float)botpos.X, (float)botpos.Y, (float)botpos.Z);
 
             double x, y, z;
 
@@ -44,7 +44,7 @@ namespace RobotTests
                 Trace.WriteLine(syspos);
 
                 Assert.IsTrue(AreSimilar(botpos, syspos));
-                
+
             }
 
             // Reset the robot
@@ -72,6 +72,38 @@ namespace RobotTests
                 Assert.IsTrue(AreSimilar(botpos, syspos));
             }
 
+        }
+
+
+
+        [TestMethod]
+        public void Robot_Rotate_Simple()
+        {
+            Robot bot = new Robot("foo", "ABB");
+            bot.MoveTo(300, 300, 300);
+
+            Rotation ror = bot.GetCurrentOrientation();
+            Trace.WriteLine("");
+            Trace.WriteLine(ror);
+            Trace.WriteLine(ror.Q);
+
+            bot.Rotate(0, 1, 0, -90);
+            ror = bot.GetCurrentOrientation();
+            Trace.WriteLine(ror);
+            Trace.WriteLine(ror.Q);
+
+            Orientation ori = new Orientation(1, 1, 0, 1, -1, 0);
+            Point pos = new Point(200, 200, 200);
+            bot.TransformTo(ori, pos);
+            ror = bot.GetCurrentOrientation();
+            Trace.WriteLine(ror);
+            Trace.WriteLine(ror.Q);
+
+            List<string> code = bot.Export();
+            foreach (string s in code)
+            {
+                Trace.WriteLine(s);
+            }
         }
     }
 }

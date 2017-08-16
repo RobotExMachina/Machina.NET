@@ -142,8 +142,8 @@ namespace Machina
         /// <param name="r21"></param>
         /// <param name="r22"></param>
         public RotationMatrix(double r00, double r01, double r02,
-                        double r10, double r11, double r12,
-                        double r20, double r21, double r22)
+                              double r10, double r11, double r12,
+                              double r20, double r21, double r22)
         {
             this.Initialize(r00, r01, r02,
                             r10, r11, r12,
@@ -234,7 +234,7 @@ namespace Machina
         {
             // Rely on internal orthoginalization to correctly form this matrix
             this.Initialize(x0, y0, 0,
-                            x2, y1, 0,
+                            x1, y1, 0,
                             x2, y2, 1, true);
         }
 

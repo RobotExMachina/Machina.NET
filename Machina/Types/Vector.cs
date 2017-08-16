@@ -472,12 +472,13 @@ namespace Machina
 
         /// <summary>
         /// Compares the directions of two vectors, regardless of their magnitude.
+        /// Returns 1 if parallel (same direction), 2 if orthogonal (perpendicular
+        /// directions), 3 if opposite (parallel in opposite directions), 
+        /// 0 otherwise
         /// </summary>
         /// <param name="vec1"></param>
         /// <param name="vec2"></param>
-        /// <returns>1 if parallel (same direction), 2 if orthogonal (perpendicularr
-        /// directions), 3 if opposite (parallel in opposite directions), 
-        /// 0 otherwise</returns>
+        /// <returns></returns>
         public static int CompareDirections(Vector vec1, Vector vec2)
         {
             double alpha = AngleBetween(vec1, vec2);

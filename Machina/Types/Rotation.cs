@@ -57,12 +57,12 @@ namespace Machina
         /// <summary>
         /// Internal AxisAngle representation of this rotation. Used as high-level representation.
         /// </summary>
-        internal AxisAngle AA = null;
+        public AxisAngle AA = null;
 
         /// <summary>
         /// Internal Quaternion representation of this rotation. Used for computations.
         /// </summary>
-        internal Quaternion Q = null;
+        public Quaternion Q = null;
 
         /// <summary>
         /// The axis vector around which this rotation revolves.

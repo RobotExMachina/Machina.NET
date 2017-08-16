@@ -21,7 +21,7 @@ namespace DataTypesTests
     [TestClass]
     public class RotationMatrixTests : DataTypesTests
     {
-        
+
 
         [TestMethod]
         public void RotationMatrix_OrthogonalOnCreation_RandomValues()
@@ -159,7 +159,7 @@ namespace DataTypesTests
                     vecX = Vector.RandomFromInts(-1, 1);
                     vecY = Vector.RandomFromInts(-1, 1);
                 }
-                
+
                 dir = Vector.CompareDirections(vecX, vecY);
                 m = new RotationMatrix(vecX, vecY);
                 q = m.ToQuaternion();
@@ -358,6 +358,60 @@ namespace DataTypesTests
                 Assert.IsTrue(m2.IsSimilar(m3));
                 Assert.IsTrue(eu1.IsEquivalent(eu2));
                 Assert.IsTrue(eu2.IsSimilar(eu3));
+            }
+        }
+
+        [TestMethod]
+        public void RotationMatrix_FromOrientation_MaintainParallelism()
+        {
+            Orientation ori;
+
+            double x0, y0, z0, x1, y1, z1;
+            Vector xAxis, yAxis;
+            int dir;
+
+            // Test random permutations
+            for (var i = 0; i < 200; i++)
+            {
+                x0 = Random(-100, 100);
+                y0 = Random(-100, 100);
+                z0 = Random(-100, 100);
+                x1 = Random(-100, 100);
+                y1 = Random(-100, 100);
+                z1 = Random(-100, 100);
+
+                ori = new Orientation(x0, y0, z0, x1, y1, z1);
+                xAxis = new Vector(x0, y0, z0);
+
+                Trace.WriteLine("");
+                Trace.WriteLine(x0 + " " + y0 + " " + z0 + " " + x1 + " " + y1 + " " + z1);
+                Trace.WriteLine(ori);
+
+                Assert.IsTrue(Vector.AreParallel(xAxis, ori.XAxis));
+
+            }
+
+            // Test orthogonal vectors
+            for (var i = 0; i < 200; i++)
+            {
+                xAxis = Vector.RandomFromInts(-1, 1);
+                yAxis = Vector.RandomFromInts(-1, 1);
+                ori = new Orientation(xAxis, yAxis);
+                dir = Vector.CompareDirections(xAxis, yAxis);
+
+                Trace.WriteLine("");
+                Trace.WriteLine(xAxis + " " + yAxis + " dir: " + dir);
+                Trace.WriteLine(ori);
+
+                // If parallel or opposite, rotation matrix should be identity...
+                if (dir == 1 || dir == 3)
+                {
+                    Assert.IsTrue(ori.XAxis.IsSimilar(Vector.XAxis));
+                }
+                else
+                {
+                    Assert.IsTrue(Vector.AreParallel(xAxis, ori.XAxis));
+                }
             }
         }
     }
