@@ -337,11 +337,11 @@ namespace Machina
         public double Determinant()
         {
             return R[0] * R[4] * R[8]
-                + R[1] * R[5] * R[6]
-                + R[2] * R[3] * R[7]
-                - R[0] * R[5] * R[7]
-                - R[1] * R[3] * R[8]
-                - R[2] * R[4] * R[6];
+                 + R[1] * R[5] * R[6]
+                 + R[2] * R[3] * R[7]
+                 - R[0] * R[5] * R[7]
+                 - R[1] * R[3] * R[8]
+                 - R[2] * R[4] * R[6];
         }
 
         /// <summary>

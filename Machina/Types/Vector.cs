@@ -607,6 +607,9 @@ namespace Machina
             return true;
         }
 
+
+
+
         /// <summary>
         /// Simplifies the path using a combination of radial distance and 
         /// Ramer–Douglas–Peucker algorithm. 

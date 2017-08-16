@@ -24,7 +24,9 @@
 
 ## BUILD 1301
 - [ ] Vector.Orthoginalize(...)
-- [ ] 
+- [ ] First stub at Plane object:
+    - [ ] Constructors with origin and orientation
+    - [ ] 
 
 
 ## BUILD 1300
