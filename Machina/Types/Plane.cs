@@ -60,7 +60,7 @@ namespace Machina.Types
         }
 
         /// <summary>
-        /// Turns this Plane into an identity Plane
+        /// Turns this Plane into an identity Plane (World centered and oriented)
         /// </summary>
         public void Identity()
         {

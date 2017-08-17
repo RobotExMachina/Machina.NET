@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 
 namespace Machina
 {
@@ -69,6 +70,12 @@ namespace Machina
         public static implicit operator Point(Vector vec)
         {
             return new Machina.Point(vec.X, vec.Y, vec.Z);
+        }
+
+        // TESTS
+        public static implicit operator Vector(Vector3 v)
+        {
+            return new Machina.Vector(v.X, v.Y, v.Z);
         }
 
         /// <summary>

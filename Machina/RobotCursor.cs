@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 
 namespace Machina
 {
@@ -31,6 +32,7 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
+        
 
         protected bool initialized = false;
         private bool applyImmediately = false;  // when an action is issued to this cursor, apply it immediately?

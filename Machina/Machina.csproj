@@ -64,6 +64,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -74,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ActionBuffer.cs" />
+    <Compile Include="DummyCursor.cs" />
     <Compile Include="Types\AxisAngle.cs" />
     <Compile Include="Types\Orientation.cs" />
     <Compile Include="Types\Geometry.cs" />

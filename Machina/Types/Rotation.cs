@@ -22,14 +22,12 @@ namespace Machina
     /// </summary>
     public class Rotation : Geometry
     {
-
         // NOTE: this class is basically a wrapper containing both the AxisAngle and Quaternion 
         // representations of a rotation in space. While AA could have been implemented directly, 
         // The purpose of this class is to present a more intuitive API for the user to express
         // rotations in three-dimensional space, and handle the complexities of their mathematical
         // meaning underneath.
-
-
+        
         /// <summary>
         /// An empty Rotation representing the orientation of the global XYZ coordinate system.
         /// </summary>
