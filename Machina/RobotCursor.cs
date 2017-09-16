@@ -266,7 +266,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBuffer(bool inlineTargets)
         {
-            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, false, inlineTargets);
+            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, false, inlineTargets);
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBlock(bool inlineTargets)
         {
-            return compiler.UNSAFEProgramFromBuffer("BRobotProgram", this, true, inlineTargets);
+            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, true, inlineTargets);
         }
 
         public void LogBufferedActions()

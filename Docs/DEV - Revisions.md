@@ -17,16 +17,18 @@
 
 ## TODO
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
-- [ ] Test that Tool attach/detachment works good
-- [ ] Add Tooling for KUKA+UR
 
+
+
+## BUILD 1302
+- [X] Add Tooling for KUKA+UR
+- [x] Test that Tool attach/detachment works good
 
 
 ## BUILD 1301
 - [ ] Vector.Orthoginalize(...)
 - [ ] First stub at Plane object:
     - [ ] Constructors with origin and orientation
-    - [ ] 
 
 
 ## BUILD 1300

@@ -25,6 +25,10 @@
 - [ ] Add enhanced CS selection and WObj use
 - [ ] Create Grasshopper library
 
+- [ ] In DynamoMachina, Tools can only be created once, and any modifications break the component. Assembly name conflict?
+- [ ] Deactivate action# display, and substitute it with the human version?
+- [ ] Print a disclaimer header for exported code
+
 
 ## LOW-LEVEL
 - [ ] Rotation problem: the following R construction returns a CS system with the Y inverted!:

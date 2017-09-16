@@ -98,12 +98,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1301;
+        public static readonly int Build = 1302;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.3.1";
+        public static readonly string Version = "0.3.1 [" + Build + "]";
        
 
         /// <summary>

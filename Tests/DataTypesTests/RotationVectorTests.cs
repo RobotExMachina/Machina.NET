@@ -272,7 +272,7 @@ namespace DataTypesTests
 
                 rv1 = new RotationVector(x, y, z, angle);
                 q = rv1.ToQuaternion();
-                rv2 = q.ToRotationVector();
+                rv2 = q.ToRotationVector(false);
                 Trace.WriteLine(rv1 + " (" + rv1.ToAxisAngle() + ")");
                 Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
                 Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");
@@ -310,7 +310,7 @@ namespace DataTypesTests
 
                             rv1 = new RotationVector(x, y, z, angle);
                             q = rv1.ToQuaternion();
-                            rv2 = q.ToRotationVector();
+                            rv2 = q.ToRotationVector(false);
                             Trace.WriteLine(rv1 + " (" + rv1.ToAxisAngle() + ")");
                             Trace.WriteLine(q + " (" + q.ToAxisAngle() + ")");
                             Trace.WriteLine(rv2 + " (" + rv2.ToAxisAngle() + ")");

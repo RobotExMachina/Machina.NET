@@ -204,7 +204,7 @@ namespace Machina
             // Generate V+Z+T
             foreach (Tool t in toolNames.Keys)
             {
-                zoneLines.Add(string.Format("  CONST tooldata {0} := {1};", toolNames[t], toolDecs[t]));
+                zoneLines.Add(string.Format("  PERS tooldata {0} := {1};", toolNames[t], toolDecs[t]));
             }
             foreach (int v in velNames.Keys)
             {
@@ -422,12 +422,15 @@ namespace Machina
 
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
-                    dec = string.Format("    ! Tool \"{0}\" attached", aa.tool.name);  // this action has no actual RAPID instruction, just add a comment
+                    dec = string.Format("    ! Tool \"{0}\" attached [{1}]",  // this action has no actual RAPID instruction, just add a comment
+                        aa.tool.name,
+                        aa.id);  
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("    ! Tool detached");  // this action has no actual RAPID instruction, just add a comment
+                    dec = string.Format("    ! Tools detached [{0}]",   // this action has no actual RAPID instruction, just add a comment
+                        ad.id); 
                     break;
 
                 //default:
@@ -503,7 +506,7 @@ namespace Machina
 
             return string.Format("[TRUE, [{0},{1}], [{2},{3},{4},0,0,0]]",
                 cursor.tool.TCPPosition,
-                cursor.tool.TCPOrientation,
+                cursor.tool.TCPOrientation.Q.ToString(false),
                 cursor.tool.weight,
                 cursor.tool.centerOfGravity,
                 "[1,0,0,0]");  // no internial axes by default
@@ -682,8 +685,16 @@ namespace Machina
                     break;
 
                 case ActionType.Attach:
+                    ActionAttach aa = (ActionAttach)action;
+                    dec = string.Format("  set_tcp({0})  # [{1}]",  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
+                        GetToolValue(cursor),
+                        aa.id);
+                    break;
+
                 case ActionType.Detach:
-                    dec = string.Format("  # TOOLING NOT AVAILABLE FOR UR", action);
+                    ActionDetach ad = (ActionDetach)action;
+                    dec = string.Format("  set_tcp(p[0,0,0,0,0,0])  # [{0}]",  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
+                        ad.id);
                     break;
 
                     //default:
@@ -744,10 +755,17 @@ namespace Machina
                     break;
 
                 case ActionType.Attach:
-                case ActionType.Detach:
-                    dec = string.Format("  # TOOLING NOT AVAILABLE FOR UR", action);
+                    ActionAttach aa = (ActionAttach)action;
+                    dec = string.Format("  set_tcp({0})  # [{1}]",   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
+                        GetToolValue(cursor),
+                        aa.id);
                     break;
 
+                case ActionType.Detach:
+                    ActionDetach ad = (ActionDetach)action;
+                    dec = string.Format("  set_tcp(p[0,0,0,0,0,0])  # [{0}]",   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
+                        ad.id);
+                    break;
 
                     //default:
                     //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
@@ -769,9 +787,9 @@ namespace Machina
         {
             RotationVector axisAng = cursor.rotation.GetRotationVector(true);
             return string.Format("p[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(0.001 * cursor.position.X, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(0.001 * cursor.position.Y, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(0.001 * cursor.position.Z, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(0.001 * cursor.position.X, Geometry.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_M),
                 Math.Round(axisAng.X, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(axisAng.Y, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(axisAng.Z, Geometry.STRING_ROUND_DECIMALS_RADS));
@@ -794,6 +812,31 @@ namespace Machina
                 Math.Round(jrad.J4, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(jrad.J5, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(jrad.J6, Geometry.STRING_ROUND_DECIMALS_RADS));
+        }
+
+        /// <summary>
+        /// Returns a UR representation of a Tool object.
+        /// </summary>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        static public string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
+        {
+            if (cursor.tool == null)
+            {
+                throw new Exception("Cursor has no tool attached");
+            }
+
+            RotationVector axisAng = cursor.tool.TCPOrientation.Q.ToRotationVector(true);
+
+            return string.Format("p[{0},{1},{2},{3},{4},{5}]",
+                Math.Round(0.001 * cursor.tool.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.tool.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.tool.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_M),
+                Math.Round(axisAng.X, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Y, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Z, Geometry.STRING_ROUND_DECIMALS_RADS));
+
+
         }
 
     }
@@ -1035,8 +1078,16 @@ namespace Machina
                     break;
 
                 case ActionType.Attach:
+                    ActionAttach at = (ActionAttach)action;
+                    dec = string.Format("  $TOOL = {0}  ; [{1}]",
+                        GetToolValue(cursor),
+                        at.id);
+                    break;
+
                 case ActionType.Detach:
-                    dec = string.Format("  ; TOOLING NOT AVAILABLE FOR KUKA", action);
+                    ActionDetach ad = (ActionDetach)action;
+                    dec = string.Format("  $TOOL = $NULLFRAME  ; [{0}]",
+                        ad.id);
                     break;
 
                     //default:
@@ -1112,13 +1163,21 @@ namespace Machina
 
 
                 case ActionType.Attach:
-                case ActionType.Detach:
-                    dec = string.Format("  ; TOOLING NOT AVAILABLE FOR KUKA", action);
+                    ActionAttach at = (ActionAttach)action;
+                    dec = string.Format("  $TOOL = {0}  ; [{1}]",
+                        GetToolValue(cursor),
+                        at.id);
                     break;
 
-                //default:
-                //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
+                case ActionType.Detach:
+                    ActionDetach ad = (ActionDetach)action;
+                    dec = string.Format("  $TOOL = $NULLFRAME  ; [{0}]",
+                        ad.id);
+                    break;
+
+                    //default:
+                    //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    //    break;
             }
 
             declaration = dec;
@@ -1162,5 +1221,29 @@ namespace Machina
                 Math.Round(cursor.joints.J6, Geometry.STRING_ROUND_DECIMALS_DEGS));
         }
 
+        /// <summary>
+        /// Returns a KRL representation of a Tool object
+        /// </summary>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        static public string GetToolValue(RobotCursor cursor)
+        {
+            if (cursor.tool == null)
+            {
+                throw new Exception("Cursor has no tool attached");
+            }
+
+            YawPitchRoll euler = cursor.tool.TCPOrientation.Q.ToYawPitchRoll(); 
+
+            return string.Format("{{X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
+                Math.Round(cursor.tool.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.tool.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.tool.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                // note reversed ZYX order
+                Math.Round(euler.ZAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.YAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.XAngle, Geometry.STRING_ROUND_DECIMALS_DEGS));
+        }
+        
     }
 }

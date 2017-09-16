@@ -42,6 +42,7 @@ namespace Machina
         /// <summary>
         /// Amount of decimals for rounding on ToString() operations.
         /// </summary>
+        internal static readonly int STRING_ROUND_DECIMALS_M = 6;
         internal static readonly int STRING_ROUND_DECIMALS_MM = 3;
         internal static readonly int STRING_ROUND_DECIMALS_DEGS = 3;
         internal static readonly int STRING_ROUND_DECIMALS_RADS = 6;

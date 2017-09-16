@@ -71,12 +71,12 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("Tool[\"{0}\", {1}, {2}, {3} kg, {4}]",
+            return string.Format("Tool[\"{0}\", Tip{1}, Orientation{2}, {3} kg]",
                 this.name,
                 this.TCPPosition,
                 this.TCPOrientation,
-                this.weight, 
-                this.centerOfGravity);
+                this.weight); 
+                //this.centerOfGravity);
         }
 
     }

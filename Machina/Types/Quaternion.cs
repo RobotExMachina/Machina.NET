@@ -735,7 +735,7 @@ namespace Machina
         /// even if the quaternion was created from a negative one (flipped vector).
         /// </summary>
         /// <returns></returns>
-        public RotationVector ToRotationVector()
+        public RotationVector ToRotationVector(bool radians)
         {
             //double theta2 = 2 * Math.Acos(this.W);
 
@@ -749,7 +749,7 @@ namespace Machina
             //return new RotationVector(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, true);
 
             // Let's not be reduntant...
-            return this.ToAxisAngle().ToRotationVector();
+            return this.ToAxisAngle().ToRotationVector(radians);
         }
 
 
