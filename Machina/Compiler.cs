@@ -866,7 +866,7 @@ namespace Machina
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
                 writer.actionBuffer.GetBlockPending(false) :
-                writer.actionBuffer.GetAllPending(false);
+                writer.actionBuffer.GetAllPending(false);    
 
 
             // CODE LINES GENERATION
@@ -877,14 +877,15 @@ namespace Machina
 
             //KUKA INITIALIZATION BOILERPLATE
             declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
-            declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");  // import BAS sys function
+            declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");              // import BAS sys function
 
             initializationLines.Add("  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM()");  // legacy support for user-programming safety
             initializationLines.Add("  INTERRUPT ON 3");
             initializationLines.Add("  BAS (#INITMOV, 0)");  // use base function to initialize sys vars to defaults
+            initializationLines.Add("");
             initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
-            initializationLines.Add("  $LOAD.M = 1");
-            initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
+            initializationLines.Add("  $LOAD.M = 0");   // no mass
+            initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
 
             // DATA GENERATION
             // Use the write RobotCursor to generate the data
@@ -929,8 +930,17 @@ namespace Machina
             // Initialize a module list
             List<string> module = new List<string>();
 
+            // SOME INTERFACE INITIALIZATION
+            // These are all for interface handling, ignored by the compiler (?)
+            module.Add(@"&ACCESS RVP");  // read-write permissions
+            module.Add(@"&REL 1");       // release number (increments on file changes)
+            module.Add(@"&COMMENT MACHINA PROGRAM");
+            module.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
+            module.Add(@"&PARAM EDITMASK = *");
+            module.Add("");
+
             // MODULE HEADER
-            module.Add("DEF " + programName + "():");
+            module.Add("DEF " + programName + "()");
             module.Add("");
 
             // Declarations

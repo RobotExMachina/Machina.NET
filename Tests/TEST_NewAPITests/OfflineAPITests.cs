@@ -12,7 +12,7 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Robot arm = new Robot("KUKA");
+            Robot arm = new Robot("foo", "KUKA");
             arm.Mode("offline");
 
             // An generic test program
@@ -69,7 +69,7 @@ namespace TEST_OfflineAPITests
 
             arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" : 
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" : 
-                arm.IsBrand("KUKA") ? @"C:\offlineTests.SRC" : @"C:\offlineTests.brobot", false);
+                arm.IsBrand("KUKA") ? @"C:\offlineTests.SRC" : @"C:\offlineTests.brobot", true);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
@@ -87,7 +87,7 @@ namespace TEST_OfflineAPITests
         static public void GeneralTest(Robot arm, double size)
         {
             // Add inline comment in code
-            arm.Comment("GENERAL BROBOT CODE COMPILATION TEST! :)");
+            arm.Comment("GENERAL MACHINA CODE COMPILATION TEST! :)");
 
             // Move to 'home' position
             arm.Motion("joint");

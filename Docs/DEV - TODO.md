@@ -26,7 +26,7 @@
 - [ ] Create Grasshopper library
 
 - [ ] In DynamoMachina, Tools can only be created once, and any modifications break the component. Assembly name conflict?
-- [ ] Deactivate action# display, and substitute it with the human version?
+- [ ] Deactivate action# display, and replace with the human version?
 - [ ] Print a disclaimer header for exported code
 
 

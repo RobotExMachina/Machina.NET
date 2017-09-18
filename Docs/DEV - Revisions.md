@@ -21,7 +21,7 @@
 
 
 ## BUILD 1302
-- [X] Add Tooling for KUKA+UR
+- [x] Add Tooling for KUKA+UR
 - [x] Test that Tool attach/detachment works good
 
 
