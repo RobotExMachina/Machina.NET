@@ -461,7 +461,7 @@ namespace Machina
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public List<string> Export(bool inlineTargets)
+        public List<string> Export(bool inlineTargets, bool humanComments)
         {
             if (controlMode != ControlMode.Offline)
             {
@@ -472,7 +472,7 @@ namespace Machina
             //List<Action> actions = actionBuffer.GetAllPending();
             //return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
 
-            return writeCursor.ProgramFromBuffer(inlineTargets);
+            return writeCursor.ProgramFromBuffer(inlineTargets, humanComments);
         }
 
         /// <summary>
@@ -481,11 +481,11 @@ namespace Machina
         /// <param name="filepath"></param>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public bool Export(string filepath, bool inlineTargets)
+        public bool Export(string filepath, bool inlineTargets, bool humanComments)
         {
             // @TODO: add some filepath sanity here
 
-            List<string> programCode = Export(inlineTargets);
+            List<string> programCode = Export(inlineTargets, humanComments);
             if (programCode == null) return false;
             return SaveStringListToFile(programCode, filepath);
         }
@@ -1434,7 +1434,7 @@ namespace Machina
             {
                 if (!comm.IsRunning() && areCursorsInitialized && writeCursor.AreActionsPending() && (actionsExecuter == null || !actionsExecuter.IsAlive))
                 {
-                    actionsExecuter = new Thread(() => RunActionsBlockInController(true));  // http://stackoverflow.com/a/3360582
+                    actionsExecuter = new Thread(() => RunActionsBlockInController(true, false));  // http://stackoverflow.com/a/3360582
                     actionsExecuter.Start();
                 }
             }
@@ -1452,9 +1452,9 @@ namespace Machina
         /// Cretes a program with the first block of Actions in the cursor, uploads it to the controller
         /// and runs it. 
         /// </summary>
-        private void RunActionsBlockInController(bool inlineTargets)
+        private void RunActionsBlockInController(bool inlineTargets, bool humanComments)
         {
-            List<string> program = writeCursor.ProgramFromBlock(inlineTargets);
+            List<string> program = writeCursor.ProgramFromBlock(inlineTargets, humanComments);
             comm.LoadProgramToController(program);
             comm.StartProgramExecution();
         }

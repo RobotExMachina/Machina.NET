@@ -264,9 +264,9 @@ namespace Machina
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public List<string> ProgramFromBuffer(bool inlineTargets)
+        public List<string> ProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, false, inlineTargets);
+            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, false, inlineTargets, humanComments);
         }
 
         /// <summary>
@@ -274,9 +274,9 @@ namespace Machina
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public List<string> ProgramFromBlock(bool inlineTargets)
+        public List<string> ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, true, inlineTargets);
+            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, true, inlineTargets, humanComments);
         }
 
         public void LogBufferedActions()

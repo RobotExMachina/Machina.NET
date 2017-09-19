@@ -69,7 +69,7 @@ namespace TEST_OfflineAPITests
 
             arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" : 
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" : 
-                arm.IsBrand("KUKA") ? @"C:\offlineTests.SRC" : @"C:\offlineTests.brobot", true);
+                arm.IsBrand("KUKA") ? @"C:\offlineTests.src" : @"C:\offlineTests.machina", true, true);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);

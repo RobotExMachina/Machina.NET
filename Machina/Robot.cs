@@ -418,7 +418,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> Export()
         {
-            return c.Export(true);
+            return c.Export(true, true);
         }
 
         /// <summary>
@@ -427,9 +427,9 @@ namespace Machina
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public List<string> Export(bool inlineTargets)
+        public List<string> Export(bool inlineTargets, bool humanComments)
         {
-            return c.Export(inlineTargets);
+            return c.Export(inlineTargets, humanComments);
         }
 
         /// <summary>
@@ -440,7 +440,7 @@ namespace Machina
         /// <returns></returns>
         public bool Export(string filepath)
         {
-            return c.Export(filepath, true);
+            return c.Export(filepath, true, true);
         }
 
         /// <summary>
@@ -450,9 +450,9 @@ namespace Machina
         /// <param name="filepath"></param>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <returns></returns>
-        public bool Export(string filepath, bool inlineTargets)
+        public bool Export(string filepath, bool inlineTargets, bool humanComments)
         {
-            return c.Export(filepath, inlineTargets);
+            return c.Export(filepath, inlineTargets, humanComments);
         }
 
 

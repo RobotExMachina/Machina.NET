@@ -16,6 +16,30 @@ namespace Machina
     internal abstract class Compiler
     {
         /// <summary>
+        /// Add a trailing action id to each declaration?
+        /// </summary>
+        internal bool ADD_ACTION_ID = false;
+
+        /// <summary>
+        /// Add a trailing human representation of the action after
+        /// </summary>
+        internal bool ADD_ACTION_STRING = false;
+
+        /// <summary>
+        /// Character used for comments by the compiler
+        /// </summary>
+        internal string commentCharacter = "";
+
+        /// <summary>
+        /// A constructor that takes several parameters particular to each compiler type
+        /// </summary>
+        /// <param name="commentChar"></param>
+        protected Compiler(string commentChar)
+        {
+            this.commentCharacter = commentChar;
+        }
+
+        /// <summary>
         /// Creates a textual program representation of a set of Actions using a brand-specific RobotCursor.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
         /// robot configuration and assumes the robot controller will figure out the correct one.
@@ -23,7 +47,7 @@ namespace Machina
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
         /// <returns></returns>
-        public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets);
+        public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments);
         
     }
 
@@ -40,7 +64,9 @@ namespace Machina
     /// </summary>
     internal class CompilerHuman : Compiler
     {
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
+        internal CompilerHuman() : base("//") { }
+
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -93,6 +119,9 @@ namespace Machina
     //  ╚═╝  ╚═╝╚═════╝ ╚═════╝                         
     internal class CompilerABB : Compiler
     {
+
+        internal CompilerABB() : base("!") { }
+
         /// <summary>
         /// A Set of RAPID's predefined zone values. 
         /// </summary>
@@ -111,8 +140,10 @@ namespace Machina
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
         //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
+            ADD_ACTION_STRING = humanComments;
+
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
@@ -278,7 +309,7 @@ namespace Machina
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        static private bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -298,7 +329,7 @@ namespace Machina
             return dec != null;
         }
 
-        static private bool GenerateInstructionDeclarationFromVariable(
+        internal bool GenerateInstructionDeclarationFromVariable(
             Action action, 
             RobotCursor cursor, 
             int id,
@@ -313,49 +344,54 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("    {0} target{1}, {2}, {3}, {4}\\{5};  ! [{6}]",
+                    dec = string.Format("    {0} target{1}, {2}, {3}, {4}\\{5};",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         id,
                         velNames[cursor.speed],
                         zoneNames[cursor.zone],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
-                        "WObj:=WObj0",
-                        action.id);
+                        "WObj:=WObj0");
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, {3}\\{4};  ! [{5}]",
+                    dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, {3}\\{4};",
                         id,
                         velNames[cursor.speed],
                         zoneNames[cursor.zone],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
-                        "WObj:=WObj0",
-                        action.id);
+                        "WObj:=WObj0");
                     break;
 
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("    TPWrite \"{0}\";", am.message);
+                    dec = string.Format("    TPWrite \"{0}\";", 
+                        am.message);
                     break;
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("    WaitTime {0};", 0.001 * aw.millis);
+                    dec = string.Format("    WaitTime {0};", 
+                        0.001 * aw.millis);
                     break;
 
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
-                    dec = string.Format("    ! {0}", ac.comment);
+                    dec = string.Format("    {0} {1}", 
+                        commentCharacter,
+                        ac.comment);
                     break;
 
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
-                    dec = string.Format("    ! Tool \"{0}\" attached", aa.tool.name);  // this action has no actual RAPID instruction, just add a comment
+                    dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
+                        commentCharacter,
+                        aa.tool.name);  
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("    ! Tool detached");  // this action has no actual RAPID instruction, just add a comment
+                    dec = string.Format("    {0} Tool detached",  // this action has no actual RAPID instruction, just add a comment
+                        commentCharacter);  
                     break;
 
                 //default:
@@ -363,11 +399,26 @@ namespace Machina
                 //    break;
             }
 
+            if (ADD_ACTION_STRING)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.ToString());
+            }
+            else if (ADD_ACTION_ID)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.id);
+            }
+
             declaration = dec;
             return dec != null;
         }
 
-        static private bool GenerateInstructionDeclaration(
+        internal bool GenerateInstructionDeclaration(
             Action action, 
             RobotCursor cursor,
             Dictionary<int, string> velNames, 
@@ -381,62 +432,75 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("    {0} {1}, {2}, {3}, {4}\\{5};  ! [{6}]",
+                    dec = string.Format("    {0} {1}, {2}, {3}, {4}\\{5};",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         GetUNSAFERobTargetValue(cursor),
                         velNames[cursor.speed],
                         zoneNames[cursor.zone],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
-                        "WObj:=WObj0",
-                        action.id);
+                        "WObj:=WObj0");
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("    MoveAbsJ {0}, {1}, {2}, {3}\\{4};  ! [{5}]",
+                    dec = string.Format("    MoveAbsJ {0}, {1}, {2}, {3}\\{4};",
                         GetJointTargetValue(cursor),
                         velNames[cursor.speed],
                         zoneNames[cursor.zone],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
-                        "WObj:=WObj0",
-                        action.id);
+                        "WObj:=WObj0");
                     break;
 
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("    TPWrite \"{0}\";  ! [{1}]", 
-                        am.message,
-                        action.id);
+                    dec = string.Format("    TPWrite \"{0}\";",
+                        am.message);
                     break;
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("    WaitTime {0};  ! [{1}]", 
-                        0.001 * aw.millis,
-                        action.id);
+                    dec = string.Format("    WaitTime {0};",
+                        0.001 * aw.millis);
                     break;
 
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
-                    dec = string.Format("    ! {0}", ac.comment);
+                    dec = string.Format("    {0} {1}", 
+                        commentCharacter,
+                        ac.comment);
                     break;
 
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
-                    dec = string.Format("    ! Tool \"{0}\" attached [{1}]",  // this action has no actual RAPID instruction, just add a comment
-                        aa.tool.name,
-                        aa.id);  
+                    dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
+                        commentCharacter, 
+                        aa.tool.name);
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("    ! Tools detached [{0}]",   // this action has no actual RAPID instruction, just add a comment
-                        ad.id); 
+                    dec = string.Format("    {0} Tools detached",   // this action has no actual RAPID instruction, just add a comment
+                        commentCharacter);
                     break;
 
                 //default:
                 //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
                 //    break;
 
+            }
+
+            if (ADD_ACTION_STRING)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.ToString());
+            }
+            else if (ADD_ACTION_ID)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.id);
             }
 
             declaration = dec;
@@ -449,7 +513,7 @@ namespace Machina
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <returns></returns>
-        static public string GetUNSAFERobTargetValue(RobotCursor cursor)
+        static internal string GetUNSAFERobTargetValue(RobotCursor cursor)
         {
             return string.Format("[{0}, {1}, {2}, {3}]",
                 cursor.position.ToString(false),
@@ -462,7 +526,7 @@ namespace Machina
         /// Returns an RAPID jointtarget representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        static public string GetJointTargetValue(RobotCursor cursor)
+        static internal string GetJointTargetValue(RobotCursor cursor)
         {
             return string.Format("[{0}, [0,9E9,9E9,9E9,9E9,9E9]]", cursor.joints);
         }
@@ -472,7 +536,7 @@ namespace Machina
         /// </summary>
         /// <param name="speed"></param>
         /// <returns></returns>
-        static public string GetSpeedValue(RobotCursor cursor)
+        static internal string GetSpeedValue(RobotCursor cursor)
         {
             // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
             // Using the same value as lin motion here.
@@ -484,7 +548,7 @@ namespace Machina
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        static public string GetZoneValue(RobotCursor cursor)
+        static internal string GetZoneValue(RobotCursor cursor)
         {
             // Following conventions for default RAPID zones.
             double high = 1.5 * cursor.zone;
@@ -497,7 +561,7 @@ namespace Machina
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        static public string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
+        static internal string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
         {
             if (cursor.tool == null)
             {
@@ -526,6 +590,9 @@ namespace Machina
     //   ╚═════╝ ╚═╝  ╚═╝
     internal class CompilerUR : Compiler
     {
+        
+        internal CompilerUR() : base("#") { }
+
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native UR Script.
         /// </summary>
@@ -533,9 +600,10 @@ namespace Machina
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
+            ADD_ACTION_STRING = humanComments;
+
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
@@ -621,7 +689,7 @@ namespace Machina
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        static public bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -641,7 +709,7 @@ namespace Machina
             return dec != null;
         }
 
-        static public bool GenerateInstructionDeclarationFromVariable(
+        internal bool GenerateInstructionDeclarationFromVariable(
             Action action, RobotCursor cursor, int id,
             out string declaration)
         {
@@ -681,20 +749,20 @@ namespace Machina
 
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
-                    dec = string.Format("  # {0}", ac.comment);
+                    dec = string.Format("  {0} {1}", 
+                        commentCharacter,
+                        ac.comment);
                     break;
 
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
-                    dec = string.Format("  set_tcp({0})  # [{1}]",  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
-                        GetToolValue(cursor),
-                        aa.id);
+                    dec = string.Format("  set_tcp({0})",  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
+                        GetToolValue(cursor));
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("  set_tcp(p[0,0,0,0,0,0])  # [{0}]",  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
-                        ad.id);
+                    dec = string.Format("  set_tcp(p[0,0,0,0,0,0])");  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                     break;
 
                     //default:
@@ -702,11 +770,26 @@ namespace Machina
                     //    break;
             }
 
+            if (ADD_ACTION_STRING)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.ToString());
+            }
+            else if (ADD_ACTION_ID)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.id);
+            }
+
             declaration = dec;
             return dec != null;
         }
 
-        static public bool GenerateInstructionDeclaration(
+        internal bool GenerateInstructionDeclaration(
             Action action, RobotCursor cursor,
             out string declaration)
         {
@@ -716,60 +799,70 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})  # [{4}]",
+                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})",
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         GetPoseTargetValue(cursor),
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        action.id);
+                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Joints:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
-                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})  # [{4}]",
+                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})",
                         "movej",
                         GetJointTargetValue(cursor),
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        action.id);
+                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  popup(\"{0}\", title=\"{0}\", warning=False, error=False)  # [{1}]",
-                        am.message,
-                        am.id);
+                    dec = string.Format("  popup(\"{0}\", title=\"{0}\", warning=False, error=False)",
+                        am.message);
                     break;
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("  sleep({0})  # [{1}]",
-                        0.001 * aw.millis,
-                        aw.id);
+                    dec = string.Format("  sleep({0})",
+                        0.001 * aw.millis);
                     break;
 
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
-                    dec = string.Format("  # {0}", 
+                    dec = string.Format("  {0} {1}",
+                        commentCharacter, 
                         ac.comment);
                     break;
 
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
-                    dec = string.Format("  set_tcp({0})  # [{1}]",   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
-                        GetToolValue(cursor),
-                        aa.id);
+                    dec = string.Format("  set_tcp({0})",   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
+                        GetToolValue(cursor));
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("  set_tcp(p[0,0,0,0,0,0])  # [{0}]",   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
-                        ad.id);
+                    dec = string.Format("  set_tcp(p[0,0,0,0,0,0])");   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                     break;
 
                     //default:
                     //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
                     //    break;
+            }
+
+            if (ADD_ACTION_STRING)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.ToString());
+            }
+            else if (ADD_ACTION_ID)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.id);
             }
 
             declaration = dec;
@@ -783,7 +876,7 @@ namespace Machina
         /// Returns an UR pose representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        static public string GetPoseTargetValue(RobotCursor cursor)
+        internal string GetPoseTargetValue(RobotCursor cursor)
         {
             RotationVector axisAng = cursor.rotation.GetRotationVector(true);
             return string.Format("p[{0},{1},{2},{3},{4},{5}]",
@@ -799,7 +892,7 @@ namespace Machina
         /// Returns a UR joint representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        static public string GetJointTargetValue(RobotCursor cursor)
+        internal string GetJointTargetValue(RobotCursor cursor)
         {
             Joints jrad = new Joints(cursor.joints);  // use a shallow copy
             Console.WriteLine(jrad);
@@ -819,7 +912,7 @@ namespace Machina
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        static public string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
+        internal string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
         {
             if (cursor.tool == null)
             {
@@ -852,6 +945,9 @@ namespace Machina
     //  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
     internal class CompilerKUKA : Compiler
     {
+
+        internal CompilerKUKA() : base(";") { }
+
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
         /// </summary>
@@ -860,8 +956,10 @@ namespace Machina
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
         //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets)
+        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
+            ADD_ACTION_STRING = humanComments;
+
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
@@ -980,7 +1078,7 @@ namespace Machina
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        static public bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -1002,7 +1100,7 @@ namespace Machina
             return dec != null;
         }
 
-        static public bool GenerateVariableInitialization(Action action, RobotCursor cursor, int id, out string declaration)
+        internal bool GenerateVariableInitialization(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -1026,8 +1124,7 @@ namespace Machina
             return dec != null;
         }
 
-        static public bool GenerateInstructionDeclarationFromVariable(
-            Action action, RobotCursor cursor, int id,
+        internal bool GenerateInstructionDeclarationFromVariable(Action action, RobotCursor cursor, int id,
             out string declaration)
         {
             string dec = null;
@@ -1035,69 +1132,61 @@ namespace Machina
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
-                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}  ; [{1}]",
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        action.id);
+                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Zone:
-                    dec = string.Format("  $APO.CDIS = {0}  ; [{1}]",
-                        cursor.zone,
-                        action.id);
+                    dec = string.Format("  $APO.CDIS = {0}",
+                        cursor.zone);
                     break;
 
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0} target{1} {2}  ; [{3}]",
+                    dec = string.Format("  {0} target{1} {2}",
                         cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
                         id,
-                        cursor.zone >= 1 ? "C_DIS" : "",
-                        action.id);
+                        cursor.zone >= 1 ? "C_DIS" : "");
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("  {0} target{1} {2}  ; [{3}]",
+                    dec = string.Format("  {0} target{1} {2}",
                         "PTP",
                         id,
-                        cursor.zone >= 1 ? "C_DIS" : "",  // @TODO: figure out how to turn this into C_PTP
-                        action.id);
+                        cursor.zone >= 1 ? "C_DIS" : "");  // @TODO: figure out how to turn this into C_PTP
                     break;
 
                 // @TODO: apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it.
                 // Will figure this out later.
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in Machina)",
-                        am.message,
-                        am.id);
+                    dec = string.Format("  ; MESSAGE: \"{0}\" (messages in KRL currently not supported in Machina)",
+                        am.message);
                     break;
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("  WAIT SEC {0}  ; [{1}]",
-                        0.001 * aw.millis,
-                        aw.id);
+                    dec = string.Format("  WAIT SEC {0}",
+                        0.001 * aw.millis);
                     break;
 
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
-                    dec = string.Format("  ; {0} [{1}]",
-                        ac.comment,
-                        ac.id);
+                    dec = string.Format("  {0} {1}",
+                        cursor.compiler.commentCharacter,
+                        ac.comment);
                     break;
 
                 case ActionType.Attach:
                     ActionAttach at = (ActionAttach)action;
-                    dec = string.Format("  $TOOL = {0}  ; [{1}]",
-                        GetToolValue(cursor),
-                        at.id);
+                    dec = string.Format("  $TOOL = {0}",
+                        GetToolValue(cursor));
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("  $TOOL = $NULLFRAME  ; [{0}]",
-                        ad.id);
+                    dec = string.Format("  $TOOL = $NULLFRAME");
                     break;
 
                     //default:
@@ -1105,12 +1194,27 @@ namespace Machina
                     //    break;
             }
 
+            if (ADD_ACTION_STRING)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.ToString());
+            }
+            else if (ADD_ACTION_ID)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.id);
+            }
+
             declaration = dec;
             return dec != null;
         }
 
 
-        static public bool GenerateInstructionDeclaration(
+        internal bool GenerateInstructionDeclaration(
             Action action, RobotCursor cursor,
             out string declaration)
         {
@@ -1119,75 +1223,83 @@ namespace Machina
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
-                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}  ; [{1}]",
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        action.id);
+                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
+                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Zone:
-                    dec = string.Format("  $APO.CDIS = {0}  ; [{1}]",
-                        cursor.zone,
-                        action.id);
+                    dec = string.Format("  $APO.CDIS = {0}",
+                        cursor.zone);
                     break;
 
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0} {1} {2}  ; [{3}]",
+                    dec = string.Format("  {0} {1} {2}",
                         cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
                         GetPositionTargetValue(cursor),
-                        cursor.zone >= 1 ? "C_DIS" : "",
-                        action.id);
+                        cursor.zone >= 1 ? "C_DIS" : "");
                     break;
 
                 case ActionType.Joints:
-                    dec = string.Format("  {0} {1} {2}  ; [{3}]",
+                    dec = string.Format("  {0} {1} {2}",
                         "PTP",
                         GetAxisTargetValue(cursor),
-                        cursor.zone >= 1 ? "C_DIS" : "",  // @TODO: figure out how to turn this into C_PTP
-                        action.id);
+                        cursor.zone >= 1 ? "C_DIS" : "");  // @TODO: figure out how to turn this into C_PTP
                     break;
 
                 // @TODO: apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it.
                 // Will figure this out later.
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  ; MESSAGE: \"{0}\" [{1}] (messages in KRL currently not supported in Machina)",
-                        am.message,
-                        am.id);
+                    dec = string.Format("  {0} MESSAGE: \"{1}\" (messages in KRL currently not supported in Machina)",
+                        commentCharacter,
+                        am.message);
                     break;
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("  WAIT SEC {0}  ; [{1}]",
-                        0.001 * aw.millis,
-                        aw.id);
+                    dec = string.Format("  WAIT SEC {0}",
+                        0.001 * aw.millis);
                     break;
 
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
-                    dec = string.Format("  ; {0} [{1}]",
-                        ac.comment,
-                        ac.id);
+                    dec = string.Format("  {0} {1}",
+                        commentCharacter,
+                        ac.comment);
                     break;
 
 
                 case ActionType.Attach:
                     ActionAttach at = (ActionAttach)action;
-                    dec = string.Format("  $TOOL = {0}  ; [{1}]",
-                        GetToolValue(cursor),
-                        at.id);
+                    dec = string.Format("  $TOOL = {0}",
+                        GetToolValue(cursor));
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("  $TOOL = $NULLFRAME  ; [{0}]",
-                        ad.id);
+                    dec = string.Format("  $TOOL = $NULLFRAME");
                     break;
 
                     //default:
                     //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
                     //    break;
+            }
+
+            if (ADD_ACTION_STRING)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.ToString());
+            }
+            else if (ADD_ACTION_ID)
+            {
+                dec = string.Format("{0}  {1}[{2}]",
+                    dec,
+                    commentCharacter,
+                    action.id);
             }
 
             declaration = dec;
@@ -1202,7 +1314,7 @@ namespace Machina
         /// Note POS also accept T and S parameters for unambiguous arm configuration def. @TODO: implement?
         /// </summary>
         /// <returns></returns>
-        static public string GetPositionTargetValue(RobotCursor cursor)
+        internal string GetPositionTargetValue(RobotCursor cursor)
         {
             YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
 
@@ -1220,7 +1332,7 @@ namespace Machina
         /// Returns a KRL AXIS joint representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        static public string GetAxisTargetValue(RobotCursor cursor)
+        internal string GetAxisTargetValue(RobotCursor cursor)
         {
             return string.Format("{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
                 Math.Round(cursor.joints.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
@@ -1236,7 +1348,7 @@ namespace Machina
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        static public string GetToolValue(RobotCursor cursor)
+        internal string GetToolValue(RobotCursor cursor)
         {
             if (cursor.tool == null)
             {
