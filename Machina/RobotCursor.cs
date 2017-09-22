@@ -31,7 +31,12 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
+        public bool[] digitalOutputs = new bool[14];
+        public double[] analogOutputs = new double[14];
+        public string[] digitalOutputNames = new string[14];  // ABB robots can have io ports named, UR + KUKA use standard names
+        public string[] analogOutputNames = new string[14];
 
+        public Action lastAction = null;  // the last action that was applied to this cursor
         protected bool initialized = false;
         private bool applyImmediately = false;  // when an action is issued to this cursor, apply it immediately?
 
@@ -107,6 +112,15 @@ namespace Machina
 
             actionBuffer = new ActionBuffer();
             settingsBuffer = new SettingsBuffer();
+
+            for (int i = 0; i < digitalOutputNames.Length;  i++)
+            {
+                digitalOutputNames[i] = "do" + i;
+            }
+            for (int i = 0; i < digitalOutputNames.Length; i++)
+            {
+                analogOutputNames[i] = "ao" + i;
+            }
         }
 
         /// <summary>
@@ -165,7 +179,9 @@ namespace Machina
             { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
             { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
             { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) },
-            { typeof (ActionDetach),                    (act, robCur) => robCur.ApplyAction((ActionDetach) act) }
+            { typeof (ActionDetach),                    (act, robCur) => robCur.ApplyAction((ActionDetach) act) },
+            { typeof (ActionIODigital),                 (act, robCur) => robCur.ApplyAction((ActionIODigital) act) },
+            { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) }
 
         };
 
@@ -195,12 +211,12 @@ namespace Machina
         {
             lock(actionBufferLock)
             {
-                Action next = actionBuffer.GetNext();
-                if (next == null) return false;
-                bool success = Apply(next);
+                lastAction = actionBuffer.GetNext();
+                if (lastAction == null) return false;
+                bool success = Apply(lastAction);
                 if (success)
                 {
-                    child.Issue(next);
+                    child.Issue(lastAction);
                 }
                 return success;
             }
@@ -726,6 +742,39 @@ namespace Machina
             return true;
         }
 
+        /// <summary>
+        /// Apply ActionIODigital write action to this cursor.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionIODigital action)
+        {
+            if (action.pin < 0 || action.pin >= digitalOutputs.Length)
+            {
+                Console.WriteLine("Cannot write to digital IO: robot has no pin #" + action.pin);
+                return false;
+            }
+
+            this.digitalOutputs[action.pin] = action.on;
+            return true;
+        }
+
+        /// <summary>
+        /// Apply ActionIOAnalog write action to this cursor. 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionIOAnalog action)
+        {
+            if (action.pin < 0 || action.pin >= analogOutputs.Length)
+            {
+                Console.WriteLine("Cannot write to analog IO: robot has no analog pin #" + action.pin);
+                return false;
+            }
+
+            this.analogOutputs[action.pin] = action.value;
+            return true;
+        }
 
 
 

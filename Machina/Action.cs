@@ -27,7 +27,9 @@ namespace Machina
         PushPop = 11, 
         Comment = 12,
         Attach = 13,
-        Detach = 14
+        Detach = 14,
+        IODigital = 15,
+        IOAnalog = 16
     }
 
     
@@ -54,6 +56,7 @@ namespace Machina
         //  ╚═╝ ╩ ╩ ╩ ╩ ╩╚═╝  ╚═╝ ╩ ╚═╝╚  ╚  
         internal static int currentId = 1;  // a rolling id counter
 
+        // Static constructors for APIs creating abstract actions (Dynamo ehem!)
         public static ActionSpeed Speed(int speedInc)
         {
             return new ActionSpeed(speedInc, true);
@@ -153,6 +156,16 @@ namespace Machina
         public static ActionAttach Attach(Tool tool)
         {
             return new ActionAttach(tool);
+        }
+
+        public static ActionIODigital WriteDigital(int pinNum, bool isOn)
+        {
+            return new ActionIODigital(pinNum, isOn);
+        }
+
+        public static ActionIOAnalog WriteAnalog(int pinNum, double value)
+        {
+            return new ActionIOAnalog(pinNum, value);
         }
 
 
@@ -400,7 +413,7 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                string.Format("Rotate {0}° around {1}", rotation.Angle, rotation.Axis) :
+                string.Format("Rotate {0} deg around {1}", rotation.Angle, rotation.Axis) :
                 string.Format("Rotate to {0}", new Orientation(rotation));
         }
 
@@ -441,9 +454,9 @@ namespace Machina
             if (relative)
             {
                 if (translationFirst)
-                    str = string.Format("Transform: move {0} mm and rotate {1}° around {2}", translation, rotation.Angle, rotation.Axis);
+                    str = string.Format("Transform: move {0} mm and rotate {1} deg around {2}", translation, rotation.Angle, rotation.Axis);
                 else 
-                    str = string.Format("Transform: rotate {0}° around {1} and move {2} mm", rotation.Angle, rotation.Axis, translation);
+                    str = string.Format("Transform: rotate {0} deg around {1} and move {2} mm", rotation.Angle, rotation.Axis, translation);
             }
             else
             {
@@ -483,8 +496,8 @@ namespace Machina
         public override string ToString() 
         {
             return relative ?
-                string.Format("Increase joint rotations by {0}°", joints) :
-                string.Format("Set joint rotations to {0}°", joints);
+                string.Format("Increase joint rotations by {0} deg", joints) :
+                string.Format("Set joint rotations to {0} deg", joints);
         }
     }
 
@@ -620,4 +633,64 @@ namespace Machina
             return "Detach all tools";
         }
     }
+
+
+
+
+
+    //  ██╗    ██╗ ██████╗ 
+    //  ██║   ██╔╝██╔═══██╗
+    //  ██║  ██╔╝ ██║   ██║
+    //  ██║ ██╔╝  ██║   ██║
+    //  ██║██╔╝   ╚██████╔╝
+    //  ╚═╝╚═╝     ╚═════╝ 
+    //                     
+    /// <summary>
+    /// Turns digital pin # on or off.
+    /// </summary>
+    public class ActionIODigital : Action
+    {
+        public int pin;
+        public bool on;
+
+        public ActionIODigital(int pinNum, bool isOn) : base()
+        {
+            this.type = ActionType.IODigital;
+
+            this.pin = pinNum;
+            this.on = isOn; 
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Turn digital IO {0} {1}",
+                this.pin,
+                this.on ? "ON" : "OFF");
+        }
+    }
+
+    /// <summary>
+    /// Writes a value to analog pin #.
+    /// </summary>
+    public class ActionIOAnalog : Action
+    {
+        public int pin;
+        public double value;
+
+        public ActionIOAnalog(int pinNum, double value) : base()
+        {
+            this.type = ActionType.IOAnalog;
+
+            this.pin = pinNum;
+            this.value = value;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Set analog IO {0} to {1}",
+                this.pin,
+                this.value);
+        }
+    }
+    
 }

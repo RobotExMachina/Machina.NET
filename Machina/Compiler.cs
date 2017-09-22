@@ -164,6 +164,9 @@ namespace Machina
             Dictionary<Tool, string> toolNames = new Dictionary<Tool, string>();
             Dictionary<Tool, string> toolDecs = new Dictionary<Tool, string>();
 
+            // Intro
+            List<string> introLines = new List<string>();
+            
             // Declarations
             List<string> velocityLines = new List<string>();
             List<string> zoneLines = new List<string>();
@@ -177,10 +180,17 @@ namespace Machina
             // Use the write robot pointer to generate the data
             int it = 0;
             string line = null;
+            bool usesIO = false;
             foreach (Action a in actions)
             {
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them 
+
+                // For ABB robots, check if any IO command is issued, and display a warning about configuring their names in the controller.
+                if (!usesIO && (writer.lastAction.type == ActionType.IODigital || writer.lastAction.type == ActionType.IOAnalog))
+                {
+                    usesIO = true;
+                }
 
                 // Check velocity + zone and generate data accordingly
                 if (!velNames.ContainsKey(writer.speed))
@@ -248,6 +258,13 @@ namespace Machina
                     zoneLines.Add(string.Format("  CONST zonedata {0} := {1};", zoneNames[z], zoneDecs[z]));
                 }
             }
+
+            // Generate IO warning
+            if (usesIO)
+            {
+                introLines.Add(string.Format("  {0} NOTE: your program is interfacing with the robot's IOs. Make sure to properly configure their names/properties through system preferences in the ABB controller. See Machina's `SetIOName()` for more information.", 
+                    commentCharacter));
+            }
             
 
 
@@ -258,6 +275,13 @@ namespace Machina
             // MODULE HEADER
             module.Add("MODULE " + programName);
             module.Add("");
+
+            // INTRO LINES
+            if (introLines.Count != 0)
+            {
+                module.AddRange(introLines);
+                module.Add("");
+            }
 
             // VARIABLE DECLARATIONS
             // Velocities
@@ -365,7 +389,9 @@ namespace Machina
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
                     dec = string.Format("    TPWrite \"{0}\";", 
-                        am.message);
+                        am.message.Length <= 80 ? 
+                            am.message :
+                            am.message.Substring(0, 80));  // ABB TPWrite messages can only be 80 chars long
                     break;
 
                 case ActionType.Wait:
@@ -394,21 +420,53 @@ namespace Machina
                         commentCharacter);  
                     break;
 
+                case ActionType.IODigital:
+                    ActionIODigital aiod = (ActionIODigital)action;
+                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
+                    {
+                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("    SetDO {0}, {1};",
+                        cursor.digitalOutputNames[aiod.pin],
+                        aiod.on ? "1" : "0");
+                    }
+                    break;
+
+                case ActionType.IOAnalog:
+                    ActionIOAnalog aioa = (ActionIOAnalog)action;
+                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
+                    {
+                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("    SetAO {0}, {1};",
+                        cursor.analogOutputNames[aioa.pin],
+                        aioa.value);
+                    }
+                    break;
+
                 //default:
                 //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
                 //    break;
             }
 
-            if (ADD_ACTION_STRING)
+            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.id);
@@ -453,7 +511,9 @@ namespace Machina
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
                     dec = string.Format("    TPWrite \"{0}\";",
-                        am.message);
+                        am.message.Length <= 80 ?
+                            am.message :
+                            am.message.Substring(0, 80));  // ABB TPWrite messages can only be 80 chars long
                     break;
 
                 case ActionType.Wait:
@@ -482,23 +542,57 @@ namespace Machina
                         commentCharacter);
                     break;
 
-                //default:
-                //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
+                case ActionType.IODigital:
+                    ActionIODigital aiod = (ActionIODigital)action;
+                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
+                    {
+                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("    SetDO {0}, {1};",
+                        cursor.digitalOutputNames[aiod.pin],
+                        aiod.on ? "1" : "0");
+                    }
+                    break;
+
+                case ActionType.IOAnalog:
+                    ActionIOAnalog aioa = (ActionIOAnalog)action;
+                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
+                    {
+                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("    SetAO {0}, {1};",
+                        cursor.analogOutputNames[aioa.pin],
+                        aioa.value);
+                    }
+                    break;
+
+                    //default:
+                    //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    //    break;
 
             }
 
-            if (ADD_ACTION_STRING)
+            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}{1}  {2} [{3}]",
                     dec,
+                    dec == null ? "  " : "",  // add indentation to align with code
                     commentCharacter,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}{1}  {2} [{3}]",
                     dec,
+                    dec == null ? "  " : "",  // add indentation to align with code
                     commentCharacter,
                     action.id);
             }
@@ -765,21 +859,71 @@ namespace Machina
                     dec = string.Format("  set_tcp(p[0,0,0,0,0,0])");  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                     break;
 
+                case ActionType.IODigital:
+                    ActionIODigital aiod = (ActionIODigital)action;
+                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else if (aiod.pin > 7)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  set_standard_digital_out({0}, {1})",
+                            aiod.pin,
+                            aiod.on ? "True" : "False");
+                    }
+                    break;
+
+                case ActionType.IOAnalog:
+                    ActionIOAnalog aioa = (ActionIOAnalog)action;
+                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else if (aioa.pin > 1)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else if (aioa.value < 0 || aioa.value > 1)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  set_standard_analog_out({0}, {1})",
+                            aioa.pin,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                    }
+                    break;
+
                     //default:
                     //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
                     //    break;
             }
 
-            if (ADD_ACTION_STRING)
+            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.id);
@@ -845,21 +989,71 @@ namespace Machina
                     dec = string.Format("  set_tcp(p[0,0,0,0,0,0])");   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                     break;
 
+                case ActionType.IODigital:
+                    ActionIODigital aiod = (ActionIODigital)action;
+                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else if (aiod.pin > 7)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  set_standard_digital_out({0}, {1})",
+                            aiod.pin,
+                            aiod.on ? "True" : "False");
+                    }
+                    break;
+
+                case ActionType.IOAnalog:
+                    ActionIOAnalog aioa = (ActionIOAnalog)action;
+                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
+                    {
+                        dec = string.Format("   {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else if (aioa.pin > 1)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else if (aioa.value < 0 || aioa.value > 1)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  set_standard_analog_out({0}, {1})",
+                            aioa.pin,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                    }
+                    break;
+
                     //default:
                     //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
                     //    break;
             }
 
-            if (ADD_ACTION_STRING)
+            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.id);
@@ -928,8 +1122,7 @@ namespace Machina
                 Math.Round(axisAng.X, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(axisAng.Y, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(axisAng.Z, Geometry.STRING_ROUND_DECIMALS_RADS));
-
-
+            
         }
 
     }
@@ -1189,21 +1382,59 @@ namespace Machina
                     dec = string.Format("  $TOOL = $NULLFRAME");
                     break;
 
+                case ActionType.IODigital:
+                    ActionIODigital aiod = (ActionIODigital)action;
+                    if (aiod.pin < 1 || aiod.pin >= cursor.digitalOutputs.Length)  // KUKA starts counting pins by 1
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  $OUT[{0}] = {1}",
+                            aiod.pin,
+                            aiod.on ? "TRUE" : "FALSE");
+                    }
+                    break;
+
+                case ActionType.IOAnalog:
+                    ActionIOAnalog aioa = (ActionIOAnalog)action;
+                    if (aioa.pin < 1 || aioa.pin >= cursor.analogOutputNames.Length || aioa.pin > 16)    // KUKA: analog pins [1 to 16]
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else if (aioa.value < -1 || aioa.value > 1)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [-1.0, 1.0]",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  $ANOUT[{0}] = {1}",
+                            aioa.pin,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                    }
+                    break;
+
                     //default:
                     //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
                     //    break;
             }
 
-            if (ADD_ACTION_STRING)
+            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.id);
@@ -1282,21 +1513,59 @@ namespace Machina
                     dec = string.Format("  $TOOL = $NULLFRAME");
                     break;
 
+                case ActionType.IODigital:
+                    ActionIODigital aiod = (ActionIODigital)action;
+                    if (aiod.pin < 1 || aiod.pin >= cursor.digitalOutputs.Length)  // KUKA starts counting pins by 1
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aiod.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  $OUT[{0}] = {1}",
+                            aiod.pin,
+                            aiod.on ? "TRUE" : "FALSE");
+                    }
+                    break;
+
+                case ActionType.IOAnalog:
+                    ActionIOAnalog aioa = (ActionIOAnalog)action;
+                    if (aioa.pin < 1 || aioa.pin >= cursor.analogOutputNames.Length || aioa.pin > 16)    // KUKA: analog pins [1 to 16]
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else if (aioa.value < -1 || aioa.value > 1)
+                    {
+                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [-1.0, 1.0]",
+                            commentCharacter,
+                            aioa.ToString());
+                    }
+                    else
+                    {
+                        dec = string.Format("  $ANOUT[{0}] = {1}",
+                            aioa.pin,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                    }
+                    break;
+
                     //default:
                     //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
                     //    break;
             }
 
-            if (ADD_ACTION_STRING)
+            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
-                dec = string.Format("{0}  {1}[{2}]",
+                dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commentCharacter,
                     action.id);

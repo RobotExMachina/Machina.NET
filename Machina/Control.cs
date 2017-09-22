@@ -1286,6 +1286,10 @@ namespace Machina
             return success;
         }
 
+        /// <summary>
+        /// Issue a request to return the robot to no tools attached. 
+        /// </summary>
+        /// <returns></returns>
         public bool IssueDetachRequest()
         {
             if (!areCursorsInitialized)
@@ -1295,6 +1299,48 @@ namespace Machina
             }
 
             ActionDetach act = new ActionDetach();
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+        /// <summary>
+        /// Issue a request to turn digital IO on/off.
+        /// </summary>
+        /// <param name="pinNum"></param>
+        /// <param name="isOn"></param>
+        /// <returns></returns>
+        public bool IssueWriteToDigitalIORequest(int pinNum, bool isOn)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionIODigital act = new ActionIODigital(pinNum, isOn);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+        /// <summary>
+        /// Issue a request to write to analog pin.
+        /// </summary>
+        /// <param name="pinNum"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool IssueWriteToAnalogIORequest(int pinNum, double value)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionIOAnalog act = new ActionIOAnalog(pinNum, value);
 
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);

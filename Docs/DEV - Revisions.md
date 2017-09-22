@@ -19,6 +19,12 @@
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
 
+## BUILD 1303 - 0.4.0
+- [x] FREAKING IOs ;)
+- [x] Remove id comments
+- [x] Add option to include robot actions as comments
+- [x] Fix TPWrite length message on ABB compilers
+
 
 ## BUILD 1302
 - [x] Add Tooling for KUKA+UR

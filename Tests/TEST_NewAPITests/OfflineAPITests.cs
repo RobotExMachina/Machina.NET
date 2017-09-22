@@ -12,7 +12,7 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Robot arm = new Robot("foo", "KUKA");
+            Robot arm = new Robot("foo", "UR");
             arm.Mode("offline");
 
             // An generic test program
@@ -125,6 +125,8 @@ namespace TEST_OfflineAPITests
             // Draw rectangle
             arm.Motion("linear");
             arm.Message("Drawing rectangle");
+            arm.WriteDigital(1, true);
+            arm.WriteAnalog(1, 0.9);
             arm.Wait(2000);
             arm.PushSettings();
             arm.SpeedTo(25);
@@ -133,16 +135,21 @@ namespace TEST_OfflineAPITests
             arm.Move(0, 0, size);
             arm.Move(0, -size, 0);
             arm.Move(0, 0, -size);
+            arm.WriteDigital(1, false);
+            arm.WriteAnalog(1, 0);
 
             // Draw half an arc up
             arm.Message("Drawing arc");
             arm.Coordinates("local");
+            arm.TurnOn(1);
             for (var i = 0; i < 18; i++)
             {
                 arm.Move(0, 0.2 * size, 0);
                 arm.Rotate(0, 0, 1, 10);
             }
             arm.PopSettings();
+
+            arm.TurnOff(1);
             arm.Wait(2000);
 
             arm.Message("Back home");

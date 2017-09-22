@@ -98,12 +98,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1302;
+        public static readonly int Build = 1303;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.3.1 [" + Build + "]";
+        public static readonly string Version = "0.3.1." + Build;
        
 
         /// <summary>
@@ -952,6 +952,65 @@ namespace Machina
         }
 
 
+        /// <summary>
+        /// Writes to the digital IO pin.
+        /// </summary>
+        /// <param name="pinNumber"></param>
+        /// <param name="isOn"></param>
+        public bool WriteDigital(int pinNumber, bool isOn)
+        {
+            return c.IssueWriteToDigitalIORequest(pinNumber, isOn);
+        }
+
+        /// <summary>
+        /// Writes to the analog IO pin.
+        /// </summary>
+        /// <param name="pinNumber"></param>
+        /// <param name="value"></param>
+        public bool WriteAnalog(int pinNumber, double value)
+        {
+            return c.IssueWriteToAnalogIORequest(pinNumber, value);
+        }
+
+        /// <summary>
+        /// Reads from the digital IO pin.
+        /// </summary>
+        /// <param name="pinNumber"></param>
+        /// <returns></returns>
+        private bool ReadDigital(int pinNumber)
+        {
+            Console.WriteLine("ReadDigital not implemented yet!");
+            return false;
+        }
+
+        /// <summary>
+        /// Reads from the analog IO pin.
+        /// </summary>
+        /// <param name="pinNumber"></param>
+        /// <returns></returns>
+        private double ReadAnalog(int pinNumber)
+        {
+            Console.WriteLine("ReadAnalog not implemented yet!");
+            return 0.0;
+        }
+
+        /// <summary>
+        /// Turn digital IO on. Is alias for `WriteDigital(pinNumber, true)`
+        /// </summary>
+        /// <param name="pinNumber"></param>
+        public bool TurnOn(int pinNumber)
+        {
+            return this.WriteDigital(pinNumber, true);
+        }
+
+        /// <summary>
+        /// Turn digital IO off. Is alias for `WriteDigital(pinNumber, false)`
+        /// </summary>
+        /// <param name="pinNumber"></param>
+        public bool TurnOff(int pinNumber)
+        {
+            return this.WriteDigital(pinNumber, false);
+        }
 
 
 
@@ -964,7 +1023,6 @@ namespace Machina
         //  ╚██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║███████║
         //   ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
         //                                                             
-
         /// <summary>
         /// Returns a Point represnting the current location of the Tool Center Point
         /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
