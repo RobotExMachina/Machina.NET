@@ -98,12 +98,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1303;
+        public static readonly int Build = 1304;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.3.1." + Build;
+        public static readonly string Version = "0.4.1." + Build;
        
 
         /// <summary>
@@ -465,6 +465,18 @@ namespace Machina
         {
             c.Execute();
         }
+
+        /// <summary>
+        /// ABB IOs must have a name corresponding to their definition in the controller. This function is useful to give them
+        /// a custom name that matches the controller's, and is used in code generation.
+        /// </summary>
+        /// <param name="ioName"></param>
+        /// <param name="pinNumber"></param>
+        /// <param name="isDigital"></param>
+        public bool SetIOName(string ioName, int pinNumber, bool isDigital)
+        {
+            return c.SetIOName(ioName, pinNumber, isDigital);
+        }
         
 
 
@@ -647,7 +659,7 @@ namespace Machina
         //                                                         
 
         /// <summary>
-        /// Applies an action to this robot. 
+        /// Applies an Action object to this robot. 
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>

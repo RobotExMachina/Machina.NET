@@ -22,11 +22,11 @@
 - [x] Add support for KUKA + UR compilation
 - [x] Add Tools 
 - [x] Improve BRobot for Dynamo, create package, publish
+- [x] Deactivate action# display, and replace with the human version?
 - [ ] Add enhanced CS selection and WObj use
 - [ ] Create Grasshopper library
 
 - [ ] In DynamoMachina, Tools can only be created once, and any modifications break the component. Assembly name conflict?
-- [ ] Deactivate action# display, and replace with the human version?
 - [ ] Print a disclaimer header for exported code
 
 

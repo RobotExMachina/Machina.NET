@@ -574,6 +574,39 @@ namespace Machina
         //    currentSettings = settingsBuffer.Pop();
         //    //Console.WriteLine("Reverted to {0}", currentSettings);
         //}
+         
+        public bool SetIOName(string ioName, int pinNumber, bool isDigital)
+        {
+            
+            if (isDigital)
+            {
+                if (pinNumber < 0 || pinNumber >= virtualCursor.digitalOutputs.Length)
+                {
+                    Console.WriteLine("ERROR: pin # out of range");
+                    return false;
+                }
+                else
+                {
+                    virtualCursor.digitalOutputNames[pinNumber] = ioName;
+                    writeCursor.digitalOutputNames[pinNumber] = ioName;
+                }
+                return true;
+            }
+            else
+            {
+                if (pinNumber < 0 || pinNumber >= virtualCursor.analogOutputs.Length)
+                {
+                    Console.WriteLine("ERROR: pin # out of range");
+                    return false;
+                }
+                else
+                {
+                    virtualCursor.analogOutputNames[pinNumber] = ioName;
+                    writeCursor.analogOutputNames[pinNumber] = ioName;
+                }
+                return true;
+            }
+        }
 
 
 

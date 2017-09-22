@@ -19,6 +19,10 @@
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
 
+## BUILD 1304
+- [ ] Add `SetIOName()` to customize IO names
+
+
 ## BUILD 1303 - 0.4.0
 - [x] FREAKING IOs ;)
 - [x] Remove id comments

@@ -12,7 +12,9 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Robot arm = new Robot("foo", "UR");
+            Console.WriteLine("--> GENERAL TEST");
+
+            Robot arm = new Robot("foo", "ABB");
             arm.Mode("offline");
 
             // An generic test program
@@ -88,6 +90,8 @@ namespace TEST_OfflineAPITests
         {
             // Add inline comment in code
             arm.Comment("GENERAL MACHINA CODE COMPILATION TEST! :)");
+
+            Console.WriteLine(arm.SetIOName("custom_DO_name_1", 1, true));
 
             // Move to 'home' position
             arm.Motion("joint");
