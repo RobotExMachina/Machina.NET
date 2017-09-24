@@ -246,8 +246,8 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                string.Format("{0} zone by {1} mm", this.zone < 0 ? "Decrease" : "Increase", this.zone) :
-                string.Format("Set zone to {0} mm", this.zone);
+                string.Format("{0} precision by {1} mm", this.zone < 0 ? "Decrease" : "Increase", this.zone) :
+                string.Format("Set precision to {0} mm", this.zone);
         }
     }
 

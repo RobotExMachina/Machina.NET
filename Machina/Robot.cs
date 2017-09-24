@@ -529,6 +529,7 @@ namespace Machina
         /// Increase the default zone value new actions will be given.
         /// </summary>
         /// <param name="zoneInc"></param>
+        [System.Obsolete("Deprecated method, use Precision(radiusInc) instead")]
         public void Zone(int zoneInc)
         {
             c.IssueZoneRequest(zoneInc, true);
@@ -538,10 +539,36 @@ namespace Machina
         /// Sets the default zone value new actions will be given.
         /// </summary>
         /// <param name="zone"></param>
+        [System.Obsolete("Deprecated method, use PrecisionTo(radius) instead")]
         public void ZoneTo(int zone)
         {
             c.IssueZoneRequest(zone, false);
         }
+
+        /// <summary>
+        /// Increase the default precision value new actions will be given. 
+        /// Precision is measured as the radius of the smooth interpolation
+        /// between motion targets. This is refered to as "Zone", "Approximate
+        /// Positioning" or "Blending Radius" in different platforms. 
+        /// </summary>
+        /// <param name="smoothingRadius">Smoothing radius increment in mm</param>
+        public void Precision(int radiusInc)
+        {
+            c.IssueZoneRequest(radiusInc, true);
+        }
+
+        /// <summary>
+        /// Set the default precision value new actions will be given. 
+        /// Precision is measured as the radius of the smooth interpolation
+        /// between motion targets. This is refered to as "Zone", "Approximate
+        /// Positioning" or "Blending Radius" in different platforms. 
+        /// </summary>
+        /// <param name="radius">Smoothing radius in mm</param>
+        public void PrecisionTo(int radius)
+        {
+            c.IssueZoneRequest(radius, false);
+        }
+
 
         /// <summary>
         /// Gets the current MotionType setting.

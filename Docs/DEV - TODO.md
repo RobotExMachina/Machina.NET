@@ -25,6 +25,8 @@
 - [x] Deactivate action# display, and replace with the human version?
 - [ ] Add enhanced CS selection and WObj use
 - [ ] Create Grasshopper library
+- [ ] Rename Zone to Precision
+- [ ] Verify program names and IOnames cannot start with a digit
 
 - [ ] In DynamoMachina, Tools can only be created once, and any modifications break the component. Assembly name conflict?
 - [ ] Print a disclaimer header for exported code

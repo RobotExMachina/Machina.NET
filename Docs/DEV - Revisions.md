@@ -20,8 +20,8 @@
 
 
 ## BUILD 1304
-- [ ] Add `SetIOName()` to customize IO names
-
+- [x] Add `SetIOName()` to customize IO names
+- [x] Rename and migrate `Zone` to `Precision`
 
 ## BUILD 1303 - 0.4.0
 - [x] FREAKING IOs ;)
