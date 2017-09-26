@@ -108,10 +108,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF ($(ConfigurationName)) == (Debug) GOTO END
-cd $(ProjectDir)
-copy /y bin\Release\Machina.dll "D:\Dropbox\Jose Luis\code\MachinaDynamo\package\Machina\bin"
-:END</PostBuildEvent>
+    <PostBuildEvent>REM JL: for the time being, only copy ddlls manually to avoid breaking the dependent projects
+REM IF ($(ConfigurationName)) == (Debug) GOTO END
+REM cd $(ProjectDir)
+REM copy /y bin\Release\Machina.dll "D:\Dropbox\Jose Luis\code\MachinaDynamo\package\Machina\bin"
+REM :END</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

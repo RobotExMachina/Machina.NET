@@ -441,8 +441,8 @@ namespace Machina
         {
             type = ActionType.Transformation;
 
-            this.translation = new Vector(translation);
-            this.rotation = new Rotation(rotation);
+            this.translation = new Vector(translation);  // shallow copy
+            this.rotation = new Rotation(rotation);  // shallow copy
             this.relative = relative;
             this.translationFirst = translationFirst;
 
@@ -485,11 +485,22 @@ namespace Machina
         public Joints joints;
         public bool relative;
 
-        public ActionJoints(Joints joints, bool relative) : base()
+        //public ActionJoints(double j1, double j2, double j3, double j4, double j5, double j6, bool relative) : base()
+        //{
+        //    type = ActionType.Joints;
+
+        //    this.joints = new Joints(j1, j2, j3, j4, j5, j6);
+        //    this.relative = relative;
+        //}
+
+        //public ActionJoints(Joints joints, bool relative)
+        //    : this(joints.J1, joints.J2, joints.J3, joints.J4, joints.J5, joints.J6, relative) { }  // shallow copy
+
+        public ActionJoints(Joints joints, bool relative)
         {
             type = ActionType.Joints;
 
-            this.joints = new Joints(joints);
+            this.joints = new Joints(joints);  // shallow copy
             this.relative = relative;
         }
 

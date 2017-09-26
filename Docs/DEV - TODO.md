@@ -27,6 +27,15 @@
 - [ ] Create Grasshopper library
 - [ ] Rename Zone to Precision
 - [ ] Verify program names and IOnames cannot start with a digit
+- [ ] Add Acceleration
+- [ ] Change Joints/To to Axes/To
+- [ ] Redo github banner
+- [ ] Post links to some Machina videos on YouTube
+- [ ] Add Action constructors that take atomic primitives (x,y,z instead of a point object): they shallow copy it anyway... optimization
+    - [ ] Use these constructors in Dynamo
+    - [ ] Use these constructors in Grasshopper
+- [ ] Are the Action... static constructors still necessary?
+
 
 - [ ] In DynamoMachina, Tools can only be created once, and any modifications break the component. Assembly name conflict?
 - [ ] Print a disclaimer header for exported code

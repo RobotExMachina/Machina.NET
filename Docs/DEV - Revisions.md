@@ -19,7 +19,7 @@
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
 
-## BUILD 1304
+## BUILD 1304 - 0.4.1
 - [x] Add `SetIOName()` to customize IO names
 - [x] Rename and migrate `Zone` to `Precision`
 

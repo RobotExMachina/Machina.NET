@@ -22,12 +22,17 @@ namespace Machina
     /// </summary>
     public class Tool
     {
+        /// <summary>
+        /// Gets a Tool object representing no tool attached. 
+        /// </summary>
+        public static Tool Unset => new Tool("noTool", Point.Origin, Orientation.WorldXY, 0, Point.Origin);
+
         public string name { get; internal set; }
         public Point TCPPosition { get; internal set; }
         public Orientation TCPOrientation { get; internal set; }
 
         public double weight { get; internal set; }
-        public Vector centerOfGravity { get; internal set; }
+        public Vector centerOfGravity { get; internal set; }   
 
         // For the time being, tools will be defined through position (first) and orientation
         internal bool translationFirst = true;

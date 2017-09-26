@@ -21,6 +21,11 @@ namespace Machina
     public class Point : Geometry
     {
         /// <summary>
+        /// Gets a Point at (0, 0, 0).
+        /// </summary>
+        public static Point Origin => new Point(0, 0, 0);
+
+        /// <summary>
         /// X property of the Point.
         /// </summary>
         public double X { get; internal set; }

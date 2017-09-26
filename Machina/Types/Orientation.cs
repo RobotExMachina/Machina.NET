@@ -33,6 +33,25 @@ namespace Machina
          * (even though all internal computation is based on Quaternion algebra). 
          **/
 
+
+        /// <summary>
+        /// Get an Orientation matching the World XY plane.
+        /// </summary>
+        public static Orientation WorldXY => new Orientation(1, 0, 0, 0, 1, 0);
+
+        /// <summary>
+        /// Get an Orientation matching the World XZ plane.
+        /// </summary>
+        public static Orientation WorldXZ => new Orientation(1, 0, 0, 0, 0, 1);
+
+        /// <summary>
+        /// Get an Orientation matching the World YZ plane.
+        /// </summary>
+        public static Orientation WorldYZ => new Orientation(0, 1, 0, 0, 0, 1);
+
+
+
+
         internal Quaternion Q = null;
         internal RotationMatrix RM = null;  // useful for vector-to-quaternion conversions and as storage of orientation vectors
         
