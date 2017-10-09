@@ -75,9 +75,20 @@ Documentation on Machina's API can be found on the [Reference](https://github.co
 
 Machina comes with a bunch of sample projects that may help you understand its possibilities. Take a look at them, and please don't blame me if they broke during development... :sweat_smile:
 
+Here are some videos of things you can do with Machina:
+
+- [Real-time Command-line Control](https://youtu.be/8jgYJddvkfg)
+- [Trajectory Replication](https://youtu.be/09SHaaBKIi0)
+- [Motion Mirroring](https://youtu.be/FryK_wDr-Gc)
+- [Robot Drawing](https://youtu.be/txlTEjiPtCw)
+- [Real-time Movement through Video Game Controller](https://youtu.be/-8rCfHdKsPY)
+- [Surface Milling](https://youtu.be/054s9XlslVs)
+- [Metal Forming](https://youtu.be/_6Bbm7Scs4w)
+
 There are other projects that use Machina at their core:
 
 - [Machina for Dynamo](https://github.com/garciadelcastillo/Machina-Dynamo)
+
 
 
 ## Current Limitations
