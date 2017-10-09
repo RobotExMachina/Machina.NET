@@ -33,23 +33,23 @@ namespace Machina
         /// <summary>
         /// An empty Rotation representing the orientation of the global XYZ coordinate system.
         /// </summary>
-        public static readonly Rotation GlobalXYZ = new Rotation(0, 0, 0, 0, false);
+        public static Rotation GlobalXYZ => new Rotation(0, 0, 0, 0, false);
 
         /// <summary>
         /// A Rotation of 180 degs around the X axis.
         /// </summary>
-        public static readonly Rotation FlippedAroundX = new Rotation(1, 0, 0, 180, false);
+        public static Rotation FlippedAroundX => new Rotation(1, 0, 0, 180, false);
 
         /// <summary>
         /// A Rotation of 180 degs around the Y axis. 
         /// This is the most common orientation of the coordiante system of the flange of a robot in 'home' position.
         /// </summary>
-        public static readonly Rotation FlippedAroundY = new Rotation(0, 1, 0, 180, false);
+        public static Rotation FlippedAroundY => new Rotation(0, 1, 0, 180, false);
 
         /// <summary>
         /// A Rotation of 180 degs around the Z axis. 
         /// </summary>
-        public static readonly Rotation FlippedAroundZ = new Rotation(0, 0, 1, 180, false);
+        public static Rotation FlippedAroundZ => new Rotation(0, 0, 1, 180, false);
 
 
 

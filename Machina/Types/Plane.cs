@@ -8,14 +8,14 @@ namespace Machina.Types
 {
     class Plane : Geometry
     {
-        public static Plane World { get { return new Plane(); } }
+        public static Plane WorldXY => new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);
         
         public Point Origin { get; internal set; }
         public Orientation Orientation { get; internal set; }
 
-        public Vector XAxis { get { return this.Orientation.XAxis; } }
-        public Vector YAxis { get { return this.Orientation.YAxis; } }
-        public Vector ZAxis { get { return this.Orientation.ZAxis; } }
+        public Vector XAxis => this.Orientation.XAxis;
+        public Vector YAxis => this.Orientation.YAxis;
+        public Vector ZAxis => this.Orientation.ZAxis;
 
 
 
@@ -67,6 +67,12 @@ namespace Machina.Types
             this.Origin = new Point(0, 0, 0);
             this.Orientation = new Orientation(1, 0, 0, 0, 1, 0);
         }
+
+        // @TODO: create a function that returns the plane that is targetPlane in basePlane coordinates
+        //public static Plane Remap(Plane basePlane, Plane targetPlane)
+        //{
+        //    // must apply to targetPlane the inverse transformation represented by baseplane
+        //}
 
 
     }

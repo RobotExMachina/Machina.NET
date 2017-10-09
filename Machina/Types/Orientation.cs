@@ -58,50 +58,28 @@ namespace Machina
         /// <summary>
         /// The main X direction of this Orientation.
         /// </summary>
-        public Vector XAxis
-        {
-            get
-            {
-                return this.RM == null ? 
+        public Vector XAxis => this.RM == null ? 
                     new Vector(1, 0, 0) : 
                     new Vector(this.RM.m00, this.RM.m10, this.RM.m20);
-            }
-        }
 
         /// <summary>
         /// The main Y direction of this Orientation.
         /// </summary>
-        public Vector YAxis
-        {
-            get
-            {
-                return this.RM == null ? 
+        public Vector YAxis => this.RM == null ? 
                     new Vector(0, 1, 0) : 
                     new Vector(this.RM.m01, this.RM.m11, this.RM.m21);
-            }
-        }
 
         /// <summary>
         /// The main Z direction of this Orientation.
         /// </summary>
-        public Vector ZAxis
-        {
-            get
-            {
-                return this.RM == null ? 
+        public Vector ZAxis => this.RM == null ? 
                     new Vector(0, 0, 1) : 
                     new Vector(this.RM.m02, this.RM.m12, this.RM.m22);
-            }
-        }
-
         /// <summary>
         /// Implicit conversion from Rotation to Orientation via its Quaternion.
         /// </summary>
         /// <param name="or"></param>
-        public static implicit operator Orientation(Rotation r)
-        {
-            return new Orientation(r.Q);
-        }
+        public static implicit operator Orientation(Rotation r) => new Orientation(r.Q);
 
 
         /// <summary>
