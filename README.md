@@ -88,7 +88,7 @@ Here are some videos of things you can do with Machina:
 There are other projects that use Machina at their core:
 
 - [Machina for Dynamo](https://github.com/garciadelcastillo/Machina-Dynamo)
-
+- [Machina for Grasshopper](https://github.com/garciadelcastillo/Machina-Grasshopper)
 
 
 ## Current Limitations
