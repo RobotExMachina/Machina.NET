@@ -1,6 +1,6 @@
 # Machina
 
-![](https://github.com/garciadelcastillo/Machina/blob/master/Docs/brobot_banner_888x500.png)
+![](https://github.com/garciadelcastillo/Machina/blob/master/assets/banner_888x331.png)
 
 Machina is a .NET library for action-based real-time control of mechanical actuators. 
 
