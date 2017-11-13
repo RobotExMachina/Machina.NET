@@ -16,6 +16,9 @@ namespace Machina
     //  ██╔═██╗ ██║   ██║██╔═██╗ ██╔══██║
     //  ██║  ██╗╚██████╔╝██║  ██╗██║  ██║
     //  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+    /// <summary>
+    /// A compiler for KUKA 6-axis industrial robotic arms.
+    /// </summary>
     internal class CompilerKUKA : Compiler
     {
 
@@ -38,7 +41,6 @@ namespace Machina
             List<Action> actions = block ?
                 writer.actionBuffer.GetBlockPending(false) :
                 writer.actionBuffer.GetAllPending(false);
-
 
             // CODE LINES GENERATION
             // TARGETS AND INSTRUCTIONS

@@ -22,7 +22,7 @@
 ## BUILD 1305 - 0.4.2
 - [x] Change Joints/To to Axes/To
 - [x] Split Compliers into indiv cs 
-- [ ] Implement GCode compiler
+- [ ] Implement ZMorph compiler
 
 ## BUILD 1304 - 0.4.1
 - [x] Add `SetIOName()` to customize IO names

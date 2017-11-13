@@ -23,7 +23,7 @@ namespace Machina
         internal bool ADD_ACTION_ID = false;
 
         /// <summary>
-        /// Add a trailing human representation of the action after
+        /// Add a trailing human representation of the action after the code line
         /// </summary>
         internal bool ADD_ACTION_STRING = false;
 

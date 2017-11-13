@@ -111,7 +111,7 @@ namespace Machina
             } 
             else if (this.parentControl.robotBrand == RobotType.ZMORPH)
             {
-                //compiler = new CompilerZMORPH();
+                compiler = new CompilerZMORPH();
             }
 
             actionBuffer = new ActionBuffer();
