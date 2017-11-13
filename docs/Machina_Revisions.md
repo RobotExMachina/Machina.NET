@@ -19,6 +19,10 @@
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
 
+## BUILD 1305 - 0.4.2
+- [x] Change Joints/To to Axes/To
+- [ ] Implement GCode compiler
+
 ## BUILD 1304 - 0.4.1
 - [x] Add `SetIOName()` to customize IO names
 - [x] Rename and migrate `Zone` to `Precision`

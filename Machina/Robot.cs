@@ -888,6 +888,11 @@ namespace Machina
         /// </summary>
         /// <param name="incJoints"></param>
         /// <returns></returns>
+        public bool Axes(Joints incJoints)
+        {
+            return c.IssueJointsRequest(incJoints, true);
+        }
+        [System.Obsolete("Deprecated, use Axes() instead")]
         public bool Joints(Joints incJoints)
         {
             return c.IssueJointsRequest(incJoints, true);
@@ -904,6 +909,11 @@ namespace Machina
         /// <param name="incJ5"></param>
         /// <param name="incJ6"></param>
         /// <returns></returns>
+        public bool Axes(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
+        {
+            return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
+        }
+        [System.Obsolete("Deprecated, use Axes() instead")]
         public bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
         {
             return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
@@ -915,6 +925,12 @@ namespace Machina
         /// </summary>
         /// <param name="joints"></param>
         /// <returns></returns>
+        /// 
+        public bool AxesTo(Joints joints)
+        {
+            return c.IssueJointsRequest(joints, false);
+        }
+        [System.Obsolete("Deprecated, use Axes() instead")]
         public bool JointsTo(Joints joints)
         {
             return c.IssueJointsRequest(joints, false);
@@ -931,6 +947,11 @@ namespace Machina
         /// <param name="j5"></param>
         /// <param name="j6"></param>
         /// <returns></returns>
+        public bool AxesTo(double j1, double j2, double j3, double j4, double j5, double j6)
+        {
+            return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
+        }
+        [System.Obsolete("Deprecated, use Axes() instead")]
         public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
         {
             return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
