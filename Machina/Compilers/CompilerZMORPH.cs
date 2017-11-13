@@ -156,7 +156,6 @@ namespace Machina
                     break;
 
                 case ActionType.Translation:
-                case ActionType.Rotation:
                 case ActionType.Transformation:
                     dec = string.Format("G1 {0}",
                         GetPositionTargetValue(cursor));
@@ -165,7 +164,7 @@ namespace Machina
                 // Only available in MakerBot? http://reprap.org/wiki/G-code#M70:_Display_message
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("M70 P1000 {0}",
+                    dec = string.Format("M70 P1000 ({0})",
                         am.message);
                     break;
 
@@ -212,6 +211,7 @@ namespace Machina
                 //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
                 //    break;
 
+                case ActionType.Rotation:
                 case ActionType.Zone:
                 case ActionType.Joints:
                 case ActionType.Attach:

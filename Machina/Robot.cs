@@ -157,8 +157,6 @@ namespace Machina
         public Robot(string name, string make)
         {
             this.Name = name;
-            //string b = make.ToUpper();
-
             RobotType rt;
 
             try
@@ -188,36 +186,6 @@ namespace Machina
                 }
                 c = new Control(this, RobotType.Undefined);
             }
-            
-            //if (b.Equals("ABB"))
-            //{
-            //    c = new Control(this, RobotType.ABB);
-            //}
-            //else if (b.Equals("UR"))
-            //{
-            //    c = new Control(this, RobotType.UR);
-            //}
-            //else if (b.Equals("KUKA"))
-            //{
-            //    c = new Control(this, RobotType.KUKA);
-            //} 
-            //else if (b.Equals("ZMORPH"))
-            //{
-
-            //}
-            //else if (b.Equals("HUMAN"))
-            //{
-            //    c = new Control(this, RobotType.Undefined);
-            //}
-            //else
-            //{
-            //    Console.WriteLine(make + " is not a valid Robot type. Please specify one of the following: ");
-            //    for (var i = 1; i < 4; i++)
-            //    {
-            //        Console.WriteLine(((RobotType)i).ToString());
-            //    }
-            //    c = new Control(this, RobotType.Undefined);
-            //}
         }
 
 
@@ -225,36 +193,7 @@ namespace Machina
 
         public bool IsBrand(string brandName)
         {
-            RobotType rt;
-
-            try
-            {
-                rt = (RobotType)Enum.Parse(typeof(RobotType), brandName, true);
-                return Enum.IsDefined(typeof(RobotType), rt);
-            }
-            catch
-            {
-                return false;
-            }
-
-            //brandName = brandName.ToUpper();
-
-            //switch (c.robotBrand)
-            //{
-            //    case RobotType.Undefined:
-            //        return brandName.Equals("HUMAN");
-
-            //    case RobotType.ABB:
-            //        return brandName.Equals("ABB");
-
-            //    case RobotType.UR:
-            //        return brandName.Equals("UR");
-
-            //    case RobotType.KUKA:
-            //        return brandName.Equals("KUKA");
-            //}
-
-            //return false;
+            return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());
         }
 
 

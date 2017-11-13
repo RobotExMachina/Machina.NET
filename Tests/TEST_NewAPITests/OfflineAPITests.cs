@@ -14,11 +14,15 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = new Robot("foo", "ABB");
-            arm.Mode("offline");
+            Robot arm = new Robot("3dprinter", "ZMorph");
+            ZMorphTest(arm);
 
-            // An generic test program
-            GeneralTest(arm, 50);
+
+            //Robot arm = new Robot("foo", "ZMorph");
+            //arm.Mode("offline");
+
+            //// An generic test program
+            //GeneralTest(arm, 50);
 
             //// Trace a planar square in space
             //TracePlanarRectangle(arm);
@@ -69,9 +73,10 @@ namespace TEST_OfflineAPITests
             arm.DebugBuffer();  // read all pending buffered actions
             arm.DebugRobotCursors();
 
-            arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" : 
-                arm.IsBrand("UR") ? @"C:\offlineTests.script" : 
-                arm.IsBrand("KUKA") ? @"C:\offlineTests.src" : @"C:\offlineTests.machina", true, true);
+            arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" :
+                arm.IsBrand("UR") ? @"C:\offlineTests.script" :
+                arm.IsBrand("KUKA") ? @"C:\offlineTests.src" : 
+                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
@@ -113,7 +118,7 @@ namespace TEST_OfflineAPITests
             {
                 arm.JointsTo(0, 0, 0, 0, 0, 0);
             }
-            
+
             // Transform to starting point (needs a transform after a joint movement)
             arm.PushSettings();
             arm.Speed(100);  // relative increase
@@ -178,12 +183,12 @@ namespace TEST_OfflineAPITests
 
         static public void TracePlanarRectangle(Robot arm)
         {
-            arm.SpeedTo(100); 
-            arm.ZoneTo(20);
+            arm.SpeedTo(100);
+            arm.PrecisionTo(20);
             arm.MoveTo(300, 300, 300);
 
             arm.SpeedTo(50);
-            arm.ZoneTo(2);  // non predef zone
+            arm.PrecisionTo(2);  // non predef zone
             arm.Move(50, 0, 0);
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
@@ -256,7 +261,7 @@ namespace TEST_OfflineAPITests
             arm.Move(0, 0, 200);
             arm.DebugSettingsBuffer();
             arm.PopSettings();
-            
+
             arm.MoveTo(300, 0, 500);
 
             arm.DebugSettingsBuffer();
@@ -368,7 +373,7 @@ namespace TEST_OfflineAPITests
             // Velocity is expresses in both mm/s and °/s
             arm.SpeedTo(45);
 
-            
+
             arm.RotateTo(ry135);
             arm.RotateTo(ry180);
             arm.RotateTo(ry90);
@@ -412,7 +417,7 @@ namespace TEST_OfflineAPITests
 
             // Now lets try relative rotation over world Z
             arm.Rotate(0, 0, 1, -90);
-            
+
             // Now a series of relative transforms on world coordinates
             for (int i = 0; i < 10; i++)
             {
@@ -694,7 +699,7 @@ namespace TEST_OfflineAPITests
             arm.Transform(new Point(0, 0, 2), noRot);
             arm.Coordinates("global");
             arm.Transform(new Point(0, 0, -2), noRot);
-            
+
             // Back home
             arm.TransformTo(home, homeXYZ);
         }
@@ -707,7 +712,7 @@ namespace TEST_OfflineAPITests
             Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
-            
+
             arm.MoveTo(300, -300, 250);
 
             arm.SpeedTo(200);
@@ -715,7 +720,7 @@ namespace TEST_OfflineAPITests
             for (int i = 0; i < 100; i++)
             {
                 Rotation rz = new Rotation(Vector.ZAxis, 15 * Math.Cos(2.0 * Math.PI * i / 25.0));
-                arm.Transform(rz, 8  * Vector.YAxis);
+                arm.Transform(rz, 8 * Vector.YAxis);
             }
 
             // Back home
@@ -753,7 +758,7 @@ namespace TEST_OfflineAPITests
         public static void TestRandomJointMovements(Robot arm)
         {
             Console.WriteLine("WARNING: DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF");
-         
+
             // Reset
             arm.SpeedTo(300);
             arm.JointsTo(0, 0, 0, 0, 90, 0);
@@ -829,7 +834,7 @@ namespace TEST_OfflineAPITests
             arm.MoveTo(300, 0, 500);
 
             arm.Message("Waiting 1.5s to go start");
-            arm.Wait(1500); 
+            arm.Wait(1500);
 
             arm.Message("Starting first path");
             arm.Move(0, 200, -100);
@@ -840,6 +845,51 @@ namespace TEST_OfflineAPITests
             arm.Message("Going home");
             //arm.JointsTo(0, 0, 0, 0, 90, 0);
             arm.JointsTo(0, -90, -90, -90, 90, 90);
+        }
+
+        static public void ZMorphTest(Robot bot)
+        {
+            double x = 117.5,
+                    y = 125,
+                    z = 50;
+
+            bot.SpeedTo(100);
+            bot.Message("Let's start the party!");
+            bot.MoveTo(x, y, z);
+
+            bot.Move(50, 0);
+            bot.Move(0, 50);
+            bot.Move(-50, 0);
+            bot.Move(0, -50);
+            bot.Move(0, 0, 50);
+            bot.Move(50, 0);
+            bot.Move(0, 50);
+            bot.Move(-50, 0);
+            bot.Move(0, -50);
+            bot.Wait(1000);
+            bot.SpeedTo(10);
+            bot.MoveTo(x, y, z);
+            bot.Wait(2000);
+
+            bot.SpeedTo(100);
+            var r = 10;
+            var loops = 5;
+            var loopHeight = 2.0;
+            var def = 12;
+
+            int pts = def * loops;
+            double angle = 0;
+            double h = 0;
+            double TAU = 2 * Math.PI;
+            for (var i = 0; i < pts; i++)
+            {
+                bot.MoveTo(x + r * Math.Cos(angle), y + r * Math.Sin(angle), z + h);
+                angle += TAU / def;
+                h += loopHeight / def;
+            }
+            bot.Wait(1000);
+            bot.MoveTo(x, y, z);
+
         }
 
 
