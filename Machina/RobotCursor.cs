@@ -92,7 +92,7 @@ namespace Machina
             this.name = name;
             this.applyImmediately = applyImmediately;
 
-            // 
+            // @TODO: make this programmatic
             if (this.parentControl.robotBrand == RobotType.Undefined)
             {
                 compiler = new CompilerHuman();
@@ -108,6 +108,10 @@ namespace Machina
             else if (this.parentControl.robotBrand == RobotType.KUKA)
             {
                 compiler = new CompilerKUKA();
+            } 
+            else if (this.parentControl.robotBrand == RobotType.ZMORPH)
+            {
+                //compiler = new CompilerZMORPH();
             }
 
             actionBuffer = new ActionBuffer();

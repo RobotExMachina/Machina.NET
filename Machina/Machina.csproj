@@ -74,6 +74,10 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ActionBuffer.cs" />
+    <Compile Include="Compilers\CompilerKUKA.cs" />
+    <Compile Include="Compilers\CompilerUR.cs" />
+    <Compile Include="Compilers\CompilerABB.cs" />
+    <Compile Include="Compilers\CompilerHuman.cs" />
     <Compile Include="Types\AxisAngle.cs" />
     <Compile Include="Types\Orientation.cs" />
     <Compile Include="Types\Geometry.cs" />

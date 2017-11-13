@@ -61,7 +61,7 @@ namespace Machina
     }
 
     /// <summary>
-    /// Defines which type of motion to use for translation actions.;
+    /// Defines which type of motion to use for translation actions.
     /// </summary>
     public enum MotionType : int
     {
@@ -70,12 +70,17 @@ namespace Machina
         Joint = 2
     }
 
-    public enum RobotType : int
+    /// <summary>
+    /// Defines the type of robotic device.
+    /// </summary>
+    public enum RobotType
     {
-        Undefined = 0,
-        ABB = 1,
-        UR = 2,
-        KUKA = 3
+        Undefined,
+        HUMAN,
+        ABB,
+        UR,
+        KUKA,
+        ZMORPH,
     }
 
     public delegate void BufferEmptyHandler(object sender, EventArgs e);
@@ -98,12 +103,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1304;
+        public static readonly int Build = 1305;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.4.1." + Build;
+        public static readonly string Version = "0.4.2." + Build;
        
 
         /// <summary>
@@ -148,60 +153,108 @@ namespace Machina
         /// Base constructor.
         /// </summary>
         /// <param name="name">A name for this Robot</param>
-        /// <param name="make"></param>
+        /// <param name="make">The robot make. This will determine which drivers/compilers are used to manage it.</param>
         public Robot(string name, string make)
         {
             this.Name = name;
-            string b = make.ToUpper();
-            
-            if (b.Equals("ABB"))
+            //string b = make.ToUpper();
+
+            RobotType rt;
+
+            try
             {
-                c = new Control(this, RobotType.ABB);
-            }
-            else if (b.Equals("UR"))
-            {
-                c = new Control(this, RobotType.UR);
-            }
-            else if (b.Equals("KUKA"))
-            {
-                c = new Control(this, RobotType.KUKA);
-            } 
-            else if (b.Equals("HUMAN"))
-            {
-                c = new Control(this, RobotType.Undefined);
-            }
-            else
-            {
-                Console.WriteLine(make + " is not a valis Robot type. Please specify one of the following: ");
-                for (var i = 1; i < 4; i++)
+                rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
+                if (Enum.IsDefined(typeof(RobotType), rt))
                 {
-                    Console.WriteLine(((RobotType)i).ToString());
+                    //Console.WriteLine("Converted '{0}' to {1}", make, rt.ToString());
+                    c = new Control(this, rt);
+                }
+                else
+                {
+                    Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
+                    foreach (string str in Enum.GetNames(typeof(RobotType)))
+                    {
+                        Console.WriteLine(str.ToString());
+                    }
+                    c = new Control(this, RobotType.Undefined);
+                }
+            }
+            catch
+            {
+                Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
+                foreach (string str in Enum.GetNames(typeof(RobotType)))
+                {
+                    Console.WriteLine(str.ToString());
                 }
                 c = new Control(this, RobotType.Undefined);
             }
+            
+            //if (b.Equals("ABB"))
+            //{
+            //    c = new Control(this, RobotType.ABB);
+            //}
+            //else if (b.Equals("UR"))
+            //{
+            //    c = new Control(this, RobotType.UR);
+            //}
+            //else if (b.Equals("KUKA"))
+            //{
+            //    c = new Control(this, RobotType.KUKA);
+            //} 
+            //else if (b.Equals("ZMORPH"))
+            //{
+
+            //}
+            //else if (b.Equals("HUMAN"))
+            //{
+            //    c = new Control(this, RobotType.Undefined);
+            //}
+            //else
+            //{
+            //    Console.WriteLine(make + " is not a valid Robot type. Please specify one of the following: ");
+            //    for (var i = 1; i < 4; i++)
+            //    {
+            //        Console.WriteLine(((RobotType)i).ToString());
+            //    }
+            //    c = new Control(this, RobotType.Undefined);
+            //}
         }
 
 
+        /// What was this even for?
+
         public bool IsBrand(string brandName)
         {
-            brandName = brandName.ToUpper();
+            RobotType rt;
 
-            switch (c.robotBrand)
+            try
             {
-                case RobotType.Undefined:
-                    return brandName.Equals("HUMAN");
-
-                case RobotType.ABB:
-                    return brandName.Equals("ABB");
-
-                case RobotType.UR:
-                    return brandName.Equals("UR");
-
-                case RobotType.KUKA:
-                    return brandName.Equals("KUKA");
+                rt = (RobotType)Enum.Parse(typeof(RobotType), brandName, true);
+                return Enum.IsDefined(typeof(RobotType), rt);
+            }
+            catch
+            {
+                return false;
             }
 
-            return false;
+            //brandName = brandName.ToUpper();
+
+            //switch (c.robotBrand)
+            //{
+            //    case RobotType.Undefined:
+            //        return brandName.Equals("HUMAN");
+
+            //    case RobotType.ABB:
+            //        return brandName.Equals("ABB");
+
+            //    case RobotType.UR:
+            //        return brandName.Equals("UR");
+
+            //    case RobotType.KUKA:
+            //        return brandName.Equals("KUKA");
+            //}
+
+            //return false;
         }
 
 
