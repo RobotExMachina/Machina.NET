@@ -23,22 +23,31 @@
 - [x] Add Tools 
 - [x] Improve BRobot for Dynamo, create package, publish
 - [x] Deactivate action# display, and replace with the human version?
+- [x] Rename Zone to Precision
+- [x] Redo github banner
+- [x] Post links to some Machina videos on YouTube
 - [ ] Add enhanced CS selection and WObj use
 - [ ] Create Grasshopper library
-- [ ] Rename Zone to Precision
 - [ ] Verify program names and IOnames cannot start with a digit
 - [ ] Add Acceleration
 - [ ] Change Joints/To to Axes/To
-- [ ] Redo github banner
-- [ ] Post links to some Machina videos on YouTube
 - [ ] Add Action constructors that take atomic primitives (x,y,z instead of a point object): they shallow copy it anyway... optimization
     - [ ] Use these constructors in Dynamo
     - [ ] Use these constructors in Grasshopper
 - [ ] Are the Action... static constructors still necessary?
-
+- [ ] Rename 'Attach' to 'AttachTool', and 'Detach' to 'DetachTools'...?
+- [ ] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
+- [ ] Rename 'PushSettings' to 'SettingsPush' and same for Pop?
+- [ ] Implement GCode compiler
+- [ ] Print a disclaimer header for exported code
+- [ ] Add 'null' checks for Action lists before compile (Dynamo + GH?)
 
 - [ ] In DynamoMachina, Tools can only be created once, and any modifications break the component. Assembly name conflict?
-- [ ] Print a disclaimer header for exported code
+
+- [ ] Create `Program` as a class that contains a list of actions? It could be interesting as a way to enforce the idea of Programs as a list of Actions, especially in VPL interfaces. Also, it would allow to do things such as adding an `Instruction` (like a function) to the scope of a program, that could be called from the Program itself.
+
+
+
 
 
 ## LOW-LEVEL
