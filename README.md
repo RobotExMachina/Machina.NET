@@ -81,6 +81,7 @@ Here are some videos of things you can do with Machina:
 - [Trajectory Replication](https://youtu.be/09SHaaBKIi0)
 - [Motion Mirroring](https://youtu.be/FryK_wDr-Gc)
 - [Robot Drawing](https://youtu.be/txlTEjiPtCw)
+- [Robot Drawing (2)](https://youtu.be/hAxY0jyRVNE)
 - [Real-time Movement through Video Game Controller](https://youtu.be/-8rCfHdKsPY)
 - [Surface Milling](https://youtu.be/054s9XlslVs)
 - [Metal Forming](https://youtu.be/_6Bbm7Scs4w)
