@@ -90,6 +90,7 @@ There are other projects that use Machina at their core:
 
 - [Machina for Dynamo](https://github.com/garciadelcastillo/Machina-Dynamo)
 - [Machina for Grasshopper](https://github.com/garciadelcastillo/Machina-Grasshopper)
+- [Robotic Drawing](https://github.com/garciadelcastillo/robot-drawing)
 
 
 ## Current Limitations
