@@ -80,7 +80,8 @@ Here are some videos of things you can do with Machina:
 - [Real-time Command-line Control](https://youtu.be/8jgYJddvkfg)
 - [Trajectory Replication](https://youtu.be/09SHaaBKIi0)
 - [Motion Mirroring](https://youtu.be/FryK_wDr-Gc)
-- [Robot Drawing](https://youtu.be/txlTEjiPtCw)
+- [Robot Drawing - Kids at Autodesk Day](https://youtu.be/hAxY0jyRVNE)
+- [Robot Drawing - Real-time streaming](https://youtu.be/txlTEjiPtCw)
 - [Real-time Movement through Video Game Controller](https://youtu.be/-8rCfHdKsPY)
 - [Surface Milling](https://youtu.be/054s9XlslVs)
 - [Metal Forming](https://youtu.be/_6Bbm7Scs4w)
@@ -89,6 +90,7 @@ There are other projects that use Machina at their core:
 
 - [Machina for Dynamo](https://github.com/garciadelcastillo/Machina-Dynamo)
 - [Machina for Grasshopper](https://github.com/garciadelcastillo/Machina-Grasshopper)
+- [Robotic Drawing](https://github.com/garciadelcastillo/robot-drawing)
 
 
 ## Current Limitations
