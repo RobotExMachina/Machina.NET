@@ -720,6 +720,27 @@ namespace Machina
             return success;
         }
 
+        public bool IssueTemperatureRequest(double temp, RobotPart robotPart, bool waitToReachTemp)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            if (robotPart != RobotPart.Bed && robotPart != RobotPart.Extruder)
+            {
+                Console.WriteLine("Cannot set temperature of part " + Enum.GetName(typeof(RobotPart), robotPart));
+                return false;
+            }
+
+            ActionTemperature act = new ActionTemperature(temp, robotPart, waitToReachTemp, false);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
 
 
 

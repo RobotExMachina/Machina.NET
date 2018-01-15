@@ -83,6 +83,26 @@ namespace Machina
         ZMORPH,
     }
 
+    /// <summary>
+    /// Defines if Actions will be applied in absolute (setting) or relative (incrementing) mode.
+    /// </summary>
+    public enum ActionMode
+    {
+        Absolute, 
+        Relative
+    }
+
+    /// <summary>
+    /// An enum with different robotic parts, to be used as targets for execution operations, 
+    /// e.g. 3D printing, I/O, etc.
+    /// @TODO: temp, this should probably go somewhere else... 
+    /// </summary>
+    public enum RobotPart
+    {
+        Extruder,
+        Bed
+    }
+
     public delegate void BufferEmptyHandler(object sender, EventArgs e);
 
 
@@ -667,22 +687,61 @@ namespace Machina
             c.IssuePushPopRequest(false);
         }
 
-
-
-        //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
-        //  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
-        //  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
-        //  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
-        //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
-        //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-        //                                                         
-
         /// <summary>
-        /// Applies an Action object to this robot. 
+        /// Sets the working temperature of one of the device's parts. Useful for 3D printing operations. 
         /// </summary>
-        /// <param name="action"></param>
+        /// <param name="temp">Temperature in °C.</param>
+        /// <param name="devicePart">Device's part that will change temperature, e.g. "extruder", "bed", etc.</param>
+        /// <param name="waitToReachTemp">If true, execution will wait for the part to heat up and resume when reached the target.</param>
         /// <returns></returns>
-        public bool Do(Action action)
+        public bool Temperature(double temp, string devicePart = "extruder", bool waitToReachTemp = true)
+        {
+            RobotPart tt;
+            try
+            {
+                tt = (RobotPart)Enum.Parse(typeof(RobotPart), devicePart, true);
+                if (Enum.IsDefined(typeof(RobotPart), tt))
+                {
+                    return c.IssueTemperatureRequest(temp, tt, waitToReachTemp);
+                }
+            }
+            catch { }
+            
+            Console.WriteLine("{0} is not a valid target part for temperature changes, please specify one of the following: ", devicePart);
+            foreach (string str in Enum.GetNames(typeof(RobotPart)))
+            {
+                Console.WriteLine(str);
+            }
+            return false;
+        }
+
+
+
+
+
+
+//        /// What was this even for?
+
+//        public bool IsBrand(string brandName)
+//{
+//    return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());
+//}
+
+
+//   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
+//  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
+//  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
+//  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
+//  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
+//  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+//                                                         
+
+/// <summary>
+/// Applies an Action object to this robot. 
+/// </summary>
+/// <param name="action"></param>
+/// <returns></returns>
+public bool Do(Action action)
         {
             return c.IssueApplyActionRequest(action);
         }

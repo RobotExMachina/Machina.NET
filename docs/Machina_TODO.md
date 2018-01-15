@@ -28,24 +28,32 @@
 - [x] Post links to some Machina videos on YouTube
 - [x] Create Grasshopper library
 
-- [ ] Implement GCode compiler
+- [ ] Implement 'Temperature'
+- [ ] Implement 'FeedRate'
+- [ ] Implement 'Extrude'
+- [ ] Implement GCode compiler for ZMorph
 
 - [ ] REMOVE THE REGULAR/TO MODEL, and add a ActionMode("absolute"/"relative") to substitute it
-- [ ] Add enhanced CS selection and WObj use
+- [ ] Rename "MotionType" to "MotionMode"
+- [ ] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
+- [ ] Rename 'Attach' to 'AttachTool', and 'Detach' to 'DetachTools'...?
+- [ ] Rename 'PushSettings' to 'SettingsPush' and same for Pop?
+- [ ] Print a disclaimer header for exported code
+
+- [ ] Add enhanced CoordSys selection and WObj use
+
+- [ ] Rework the ABB real-time connection
+
 - [ ] Verify program names and IOnames cannot start with a digit
 - [ ] Add Acceleration
 - [ ] Add Action constructors that take atomic primitives (x,y,z instead of a point object): they shallow copy it anyway... optimization
     - [ ] Use these constructors in Dynamo
     - [ ] Use these constructors in Grasshopper
 - [ ] Are the Action... static constructors still necessary?
-- [ ] Rename 'Attach' to 'AttachTool', and 'Detach' to 'DetachTools'...?
-- [ ] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
-- [ ] Rename 'PushSettings' to 'SettingsPush' and same for Pop?
-- [ ] Print a disclaimer header for exported code
 - [ ] Add 'null' checks for Action lists before compile (Dynamo + GH?)
+- [ ] Remove TurnOn/Off
 
 - [ ] Create `Program` as a class that contains a list of actions? It could be interesting as a way to enforce the idea of Programs as a list of Actions, especially in VPL interfaces. Also, it would allow to do things such as adding an `Instruction` (like a function) to the scope of a program, that could be called from the Program itself.
-
 
 
 

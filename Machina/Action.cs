@@ -29,7 +29,8 @@ namespace Machina
         Attach = 13,
         Detach = 14,
         IODigital = 15,
-        IOAnalog = 16
+        IOAnalog = 16, 
+        Temperature = 17
     }
 
     
@@ -168,6 +169,10 @@ namespace Machina
             return new ActionIOAnalog(pinNum, value);
         }
 
+        public static ActionTemperature Temperature(double temp, RobotPart devicePart, bool wait, bool relative)
+        {
+            return new ActionTemperature(temp, devicePart, wait, relative);
+        }
 
 
 
@@ -703,5 +708,56 @@ namespace Machina
                 this.value);
         }
     }
-    
+
+
+
+    //  ████████╗███████╗███╗   ███╗██████╗ ███████╗██████╗  █████╗ ████████╗██╗   ██╗██████╗ ███████╗
+    //  ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██║   ██║██╔══██╗██╔════╝
+    //     ██║   █████╗  ██╔████╔██║██████╔╝█████╗  ██████╔╝███████║   ██║   ██║   ██║██████╔╝█████╗  
+    //     ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██╔══╝  ██╔══██╗██╔══██║   ██║   ██║   ██║██╔══██╗██╔══╝  
+    //     ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║██║  ██║   ██║   ╚██████╔╝██║  ██║███████╗
+    //     ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝
+    //                                                                                                
+    /// <summary>
+    /// Sets the temperature of the 3D printer part, and optionally waits for the part to reach the temp to resume eexecution.
+    /// </summary>
+    public class ActionTemperature : Action
+    {
+        public double temperature;
+        public RobotPart robotPart;
+        public bool wait;
+        public bool relative;
+
+        public ActionTemperature(double temperature, RobotPart robotPart, bool wait, bool relative) : base()
+        {
+            this.type = ActionType.Temperature;
+
+            this.temperature = temperature;
+            this.robotPart = robotPart;
+            this.wait = wait; 
+            this.relative = relative;
+        }
+
+        public override string ToString()
+        {
+            if (relative)
+            {
+                return string.Format("{0} {1} temperature by {2} °C{3}",
+                    this.temperature < 0 ? "Decrease" : "Increase",
+                    Enum.GetName(typeof(RobotPart), this.robotPart),
+                    this.temperature,
+                    this.wait ? " and wait" : "");
+            }
+            else
+            {
+                return string.Format("Set {0} temperature to {1} °C{2}",
+                    Enum.GetName(typeof(RobotPart), this.robotPart),
+                    this.temperature,
+                    this.wait ? " and wait" : "");
+            }
+            
+        }
+    }
+
+
 }
