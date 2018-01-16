@@ -145,6 +145,15 @@ namespace Machina
             return J1 * J1 + J2 * J2 + J3 * J3 + J4 * J4 + J5 * J5 + J6 * J6;
         }
 
+        public static Joints Add(Joints j1, Joints j2)
+        {
+            return new Joints(j1.J1 + j2.J1,
+                              j1.J2 + j2.J2,
+                              j1.J3 + j2.J3,
+                              j1.J4 + j2.J4,
+                              j1.J5 + j2.J5,
+                              j1.J6 + j2.J6);
+        }
 
         public override string ToString()
         {

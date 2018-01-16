@@ -196,7 +196,7 @@ namespace Machina
         /// <summary>
         /// Combine the effect of two Rotations. 
         /// Please note that rotations will be applied in the order specified by the arguments
-        /// in intrinsic coordinates, i.e. r1, then r2 over the new LOCAL transformed coordinate system.
+        /// in intrinsic coordinates (post-multiply), i.e. r1, then r2 over the new LOCAL transformed coordinate system.
         /// This means that, if you want to rotate a Rotation A with another Rotation B in GLOBAL coordinates, 
         /// you will need to pre-multiply the rotations as in: Combine(B, A).
         /// </summary>
@@ -208,6 +208,29 @@ namespace Machina
             Rotation r = new Rotation(r1.Q);
             r.RotateLocal(r2);
             return r;
+        }
+
+        /// <summary>
+        /// Rotate r1 over r2 in GLOBAL coordinates. 
+        /// This is an alias for Rotation.Combine(r2, r1), see Rotation.Combine() for more details.
+        /// @TODO: optimize, can probably do this with a direct Quaternion pre-multiplication.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
+        public static Rotation Global(Rotation r1, Rotation r2)
+        {
+            return Combine(r2, r1);
+        }
+
+        /// <summary>
+        /// Rotate r1 with r2 in LOCAL coordinates. 
+        /// This is an alias for Rotation.Combine(r1, r2), see Rotation.Combine() for more details.
+        /// @TODO: optimize, can probably do this with a direct Quaternion post-multiplication.
+        /// </summary>
+        public static Rotation Local(Rotation r1, Rotation r2)
+        {
+            return Combine(r1, r2);
         }
 
         /// <summary>

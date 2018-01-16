@@ -23,9 +23,9 @@ namespace Machina
     {
         // Public props
         public string name;
-        public Vector position;
-        public Rotation rotation;
-        public Joints joints;
+        public Vector position, prevPosition;
+        public Rotation rotation, prevRotation;
+        public Joints joints, prevJoints;
         public int speed;
         public int zone;
         public MotionType motionType;
@@ -150,9 +150,21 @@ namespace Machina
         public bool Initialize(Vector position, Rotation rotation, Joints joints, 
             int speed, int zone, MotionType mType, ReferenceCS refCS)
         {
-            if (position != null) this.position = new Vector(position);
-            if (rotation != null) this.rotation = new Rotation(rotation);
-            if (joints != null) this.joints = new Joints(joints);
+            if (position != null)
+            {
+                this.position = new Vector(position);
+                this.prevPosition = new Vector(position);
+            }
+            if (rotation != null)
+            {
+                this.rotation = new Rotation(rotation);
+                this.prevRotation = new Rotation(rotation);
+            }
+            if (joints != null)
+            {
+                this.joints = new Joints(joints);
+                this.prevJoints = new Joints(joints);
+            }
             this.speed = speed;
             this.zone = zone;
             this.motionType = mType;
@@ -476,7 +488,10 @@ namespace Machina
                 }
             }
 
+            prevPosition = position;
             position = newPosition;
+
+            prevJoints = joints;
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             return true;
@@ -490,37 +505,46 @@ namespace Machina
         /// <returns></returns>
         public bool ApplyAction(ActionRotation action)
         {
+            Rotation newRot;
+
             // @TODO: implement some kind of security check here...
             if (action.relative)
             {
-                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                // If user issued a relative action, make sure there are absolute values to work with (this limitation is due to current lack of FK/IK solvers).
                 if (position == null || rotation == null)
                 {
                     Console.WriteLine("Sorry, must provide absolute rotation values first before applying relative ones... " + this);
                     return false;
                 }
 
+                prevRotation = rotation;
                 if (referenceCS == ReferenceCS.World)
                 {
-                    rotation.RotateGlobal(action.rotation);
+                    //rotation.RotateGlobal(action.rotation);
+                    newRot = Rotation.Global(rotation, action.rotation);  // @TODO: TEST THIS
                 }
                 else
                 {
-                    rotation.RotateLocal(action.rotation);
+                    //rotation.RotateLocal(action.rotation);
+                    newRot = Rotation.Local(rotation, action.rotation);  // @TODO: TEST THIS
                 }
             }
             else
             {
-                // Fail if issued abs rotation without prior position info. (This limitation is due to current lack of FK/IK solvers)
+                // Fail if issued abs rotation without prior position info (this limitation is due to current lack of FK/IK solvers).
                 if (position == null)
                 {
                     Console.WriteLine("Sorry, currently missing TCP position to work with... " + this);
                     return false;
                 }
 
-                rotation = new Rotation(action.rotation);
+                newRot = new Rotation(action.rotation);
             }
 
+            prevRotation = rotation;
+            rotation = newRot;
+
+            prevJoints = joints;
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             return true;
@@ -610,8 +634,12 @@ namespace Machina
                 }
             }
 
+            prevPosition = position;
             position = newPos;
+            prevRotation = rotation;
             rotation = newRot;
+
+            prevJoints = joints;
             joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             return true;
@@ -624,6 +652,7 @@ namespace Machina
         /// <returns></returns>
         public bool ApplyAction(ActionAxes action)
         {
+            Joints newJnt;
 
             // @TODO: implement joint limits checks and general safety...
 
@@ -637,15 +666,21 @@ namespace Machina
                     Console.WriteLine("Sorry, must provide absolute Joints values first before applying relative ones..." + this);
                     return false;
                 }
-                joints.Add(action.joints);
+
+                newJnt = Joints.Add(joints, action.joints);
             }
             else
             {
-                joints = new Joints(action.joints);  // create a new object since it was probably null
+                newJnt = new Joints(action.joints);
             }
 
+            prevJoints = joints;
+            joints = newJnt;
+
             // Flag the lack of other geometric data
+            prevPosition = position;
             position = null;
+            prevRotation = rotation;
             rotation = null;
 
             return true;
@@ -717,8 +752,11 @@ namespace Machina
             Rotation newRot = Rotation.Combine(this.rotation, action.tool.TCPOrientation);  // postmultiplication
             //}
 
+            this.prevPosition = this.position;
             this.position = newPos;
+            this.prevRotation = this.rotation;
             this.rotation = newRot;
+            this.prevJoints = this.joints;
             this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             return true;
@@ -748,11 +786,15 @@ namespace Machina
             // Now undo the tool's transforms
             // TODO: at some point in the future, check for translationFirst here
             Rotation newRot = Rotation.Combine(this.rotation, Rotation.Inverse(this.tool.TCPOrientation));  // postmultiplication by the inverse rotation
-            this.rotation = newRot;
-
             Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
             Vector newPos = this.position - worldVector;
+
+            this.prevPosition = this.position;
             this.position = newPos;
+            this.prevRotation = this.rotation;
+            this.rotation = newRot;
+            this.prevJoints = this.joints;
+            this.joints = null;
 
             // Detach the tool
             this.tool = null;

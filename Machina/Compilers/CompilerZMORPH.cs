@@ -170,7 +170,7 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Transformation:
                     dec = string.Format("G1 {0}",
-                        GetPositionTargetValue(cursor));
+                        GetPositionTargetValue(cursor, action));
                     break;
 
                 // Only available in MakerBot? http://reprap.org/wiki/G-code#M70:_Display_message
@@ -268,6 +268,18 @@ namespace Machina
                 Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM));
+        }
+
+        /// <summary>
+        /// Computes how much the cursor has moved in this action, and returns how much
+        /// filament it should extrude based on extrusion rate.
+        /// </summary>
+        /// <param name="cursor"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        internal double GetExtrusionTargetValue(RobotCursor cursor)
+        {
+
         }
 
     }
