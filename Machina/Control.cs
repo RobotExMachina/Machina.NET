@@ -741,7 +741,35 @@ namespace Machina
             return success;
         }
 
+        public bool IssueExtrudeRequest(bool extrude)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
 
+            ActionExtrusion act = new ActionExtrusion(extrude);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
+
+        public bool IssueExtrusionRateRequest(double rate)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionExtrusionRate act = new ActionExtrusionRate(rate, false);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
 
 
 

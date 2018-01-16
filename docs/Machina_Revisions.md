@@ -22,6 +22,7 @@
 ## BUILD 1305 - 0.4.2
 - [x] Change Joints/To to Axes/To
 - [x] Split Compliers into indiv cs 
+- [ ] Add Temperature()
 - [ ] Implement ZMorph compiler
 
 ## BUILD 1304 - 0.4.1

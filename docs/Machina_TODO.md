@@ -28,10 +28,13 @@
 - [x] Post links to some Machina videos on YouTube
 - [x] Create Grasshopper library
 
-- [ ] Implement 'Temperature'
-- [ ] Implement 'FeedRate'
-- [ ] Implement 'Extrude'
+- [x] Implement 'Temperature'
+- [x] Implement 'FeedRate'
+- [x] Implement 'Extrude'
+- [ ] Test 'Temperature' etc
 - [ ] Implement GCode compiler for ZMorph
+
+- [ ] Rename `FeedRate` to `ExtrusionRate` in DYN+GH
 
 - [ ] REMOVE THE REGULAR/TO MODEL, and add a ActionMode("absolute"/"relative") to substitute it
 - [ ] Rename "MotionType" to "MotionMode"

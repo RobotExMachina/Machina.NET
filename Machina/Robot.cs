@@ -715,6 +715,26 @@ namespace Machina
             return false;
         }
 
+        /// <summary>
+        /// Turns extrusion in 3D printers on/off.
+        /// </summary>
+        /// <param name="extrude">True/false for on/off.</param>
+        /// <returns></returns>
+        public bool Extrude(bool extrude)
+        {
+            return c.IssueExtrudeRequest(extrude);
+        }
+
+        /// <summary>
+        /// Sets the extrusion rate for 3D printers in mm of filament per mm of movement.
+        /// </summary>
+        /// <param name="rate">In mm of filament per mm of movement.</param>
+        /// <returns></returns>
+        public bool ExtrusionRate(double rate)
+        {
+            return c.IssueExtrusionRateRequest(rate);
+        }
+
 
 
 

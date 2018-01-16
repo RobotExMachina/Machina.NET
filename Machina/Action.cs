@@ -11,7 +11,7 @@ namespace Machina
     /// Defines an Action Type, like Translation, Rotation, Wait... 
     /// Useful to flag base Actions into children classes.
     /// </summary>
-    public enum ActionType : int
+    public enum ActionType
     {
         Undefined = 0,
         Translation = 1,
@@ -30,7 +30,9 @@ namespace Machina
         Detach = 14,
         IODigital = 15,
         IOAnalog = 16, 
-        Temperature = 17
+        Temperature = 17,
+        Extrusion = 18,
+        ExtrusionRate = 19
     }
 
     
@@ -172,6 +174,16 @@ namespace Machina
         public static ActionTemperature Temperature(double temp, RobotPart devicePart, bool wait, bool relative)
         {
             return new ActionTemperature(temp, devicePart, wait, relative);
+        }
+
+        public static ActionExtrusion Extrude(bool extrude)
+        {
+            return new ActionExtrusion(extrude);
+        }
+
+        public static ActionExtrusionRate FeedRate(double rate, bool relative)
+        {
+            return new ActionExtrusionRate(rate, relative);
         }
 
 
@@ -755,7 +767,59 @@ namespace Machina
                     this.temperature,
                     this.wait ? " and wait" : "");
             }
-            
+        }
+    }
+
+    
+
+    //  ███████╗██╗  ██╗████████╗██████╗ ██╗   ██╗███████╗██╗ ██████╗ ███╗   ██╗
+    //  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔══██╗██║   ██║██╔════╝██║██╔═══██╗████╗  ██║
+    //  █████╗   ╚███╔╝    ██║   ██████╔╝██║   ██║███████╗██║██║   ██║██╔██╗ ██║
+    //  ██╔══╝   ██╔██╗    ██║   ██╔══██╗██║   ██║╚════██║██║██║   ██║██║╚██╗██║
+    //  ███████╗██╔╝ ██╗   ██║   ██║  ██║╚██████╔╝███████║██║╚██████╔╝██║ ╚████║
+    //  ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //
+    /// <summary>
+    /// Turns extrusion on/off in 3D printers.
+    /// </summary>
+    public class ActionExtrusion : Action
+    {
+        public bool extrude;
+
+        public ActionExtrusion(bool extrude)
+        {
+            this.type = ActionType.Extrusion;
+
+            this.extrude = extrude; 
+        }
+
+        public override string ToString()
+        {
+            return $"Turn extrusion {(this.extrude ? "on" : "off")}";
+        }
+    }
+
+    /// <summary>
+    /// Sets the extrusion rate in 3D printers in mm of filament per mm of lineal travel.
+    /// </summary>
+    public class ActionExtrusionRate : Action
+    {
+        public double rate;
+        public bool relative;
+
+        public ActionExtrusionRate(double rate, bool relative) : base()
+        {
+            this.type = ActionType.ExtrusionRate;
+
+            this.rate = rate;
+            this.relative = relative;
+        }
+
+        public override string ToString()
+        {
+            return this.relative ? 
+                $"{(this.rate < 0 ? "Decrease" : "Increase")} feed rate by {this.rate} mm/s" :
+                $"Set feed rate to {this.rate} mm/s";
         }
     }
 
