@@ -1380,7 +1380,7 @@ namespace Machina
                             SetRapidDataVariable(RD_act[fid], writeCursor.motionType == MotionType.Linear ? 1 : 2);
                             break;
 
-                        case ActionType.Joints:
+                        case ActionType.Axes:
                             //SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
                             //SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
                             //SetRapidDataVariable(RD_jt[fid], writeCursor.GetJointTargetValue());

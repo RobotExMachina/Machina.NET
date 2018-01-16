@@ -131,7 +131,7 @@ namespace Machina
                     dec = string.Format("  target{0}={1}", id, GetPoseTargetValue(cursor));
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("  target{0}={1}", id, GetJointTargetValue(cursor));
                     break;
             }
@@ -157,7 +157,7 @@ namespace Machina
                         Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
                     dec = string.Format("  {0}(target{1}, a=1, v={2}, r={3})",
                         "movej",
@@ -287,7 +287,7 @@ namespace Machina
                         Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
                     dec = string.Format("  {0}({1}, a=1, v={2}, r={3})",
                         "movej",

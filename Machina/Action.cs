@@ -17,11 +17,11 @@ namespace Machina
         Translation = 1,
         Rotation = 2,
         Transformation = 3,
-        Joints = 4,
+        Axes = 4,
         Message = 5,
         Wait = 6,
         Speed = 7,
-        Zone = 8,
+        Precision = 8,
         Motion = 9,
         Coordinates = 10,
         PushPop = 11, 
@@ -70,14 +70,14 @@ namespace Machina
             return new ActionSpeed(speed, false);
         }
 
-        public static ActionZone Zone(int zoneInc)
+        public static ActionPrecision Zone(int zoneInc)
         {
-            return new ActionZone(zoneInc, true);
+            return new ActionPrecision(zoneInc, true);
         }
 
-        public static ActionZone ZoneTo(int zone)
+        public static ActionPrecision ZoneTo(int zone)
         {
-            return new ActionZone(zone, false);
+            return new ActionPrecision(zone, false);
         }
 
         public static ActionMotion Motion(MotionType motionType)
@@ -120,14 +120,14 @@ namespace Machina
             return new ActionTransformation(pos, rot, false, true);
         }
 
-        public static ActionJoints Joints(Joints jointsInc)
+        public static ActionAxes Joints(Joints jointsInc)
         {
-            return new ActionJoints(jointsInc, true);
+            return new ActionAxes(jointsInc, true);
         }
 
-        public static ActionJoints JointsTo(Joints joints)
+        public static ActionAxes JointsTo(Joints joints)
         {
-            return new ActionJoints(joints, false);
+            return new ActionAxes(joints, false);
         }
         
         public static ActionWait Wait(long millis)
@@ -247,14 +247,14 @@ namespace Machina
     /// <summary>
     /// An Action to change current zone setting.
     /// </summary>
-    public class ActionZone : Action
+    public class ActionPrecision : Action
     {
         public int zone;
         public bool relative;
 
-        public ActionZone(int zone, bool relative) : base()
+        public ActionPrecision(int zone, bool relative) : base()
         {
-            type = ActionType.Zone;
+            type = ActionType.Precision;
 
             this.zone = zone;
             this.relative = relative;
@@ -497,7 +497,7 @@ namespace Machina
     /// <summary>
     /// An Action representing the raw angular values of the device's joint rotations.
     /// </summary>
-    public class ActionJoints : Action
+    public class ActionAxes : Action
     {
         public Joints joints;
         public bool relative;
@@ -513,9 +513,9 @@ namespace Machina
         //public ActionJoints(Joints joints, bool relative)
         //    : this(joints.J1, joints.J2, joints.J3, joints.J4, joints.J5, joints.J6, relative) { }  // shallow copy
 
-        public ActionJoints(Joints joints, bool relative)
+        public ActionAxes(Joints joints, bool relative)
         {
-            type = ActionType.Joints;
+            type = ActionType.Axes;
 
             this.joints = new Joints(joints);  // shallow copy
             this.relative = relative;

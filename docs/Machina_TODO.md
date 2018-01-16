@@ -33,6 +33,7 @@
 - [x] Implement 'Extrude'
 - [ ] Test 'Temperature' etc
 - [ ] Implement GCode compiler for ZMorph
+- [ ] Make sure Extrusion Actions don't cause weird effects in non-3D printer compilers and viceversa
 
 - [ ] Rename `FeedRate` to `ExtrusionRate` in DYN+GH
 
@@ -42,6 +43,7 @@
 - [ ] Rename 'Attach' to 'AttachTool', and 'Detach' to 'DetachTools'...?
 - [ ] Rename 'PushSettings' to 'SettingsPush' and same for Pop?
 - [ ] Print a disclaimer header for exported code
+- [ ] Rename `Zone` and `Joints` Actions in actions
 
 - [ ] Add enhanced CoordSys selection and WObj use
 

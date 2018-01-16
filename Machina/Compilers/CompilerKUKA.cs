@@ -165,7 +165,7 @@ namespace Machina
                         id);
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("  AXIS target{0}",
                         id);
                     break;
@@ -188,7 +188,7 @@ namespace Machina
                         GetPositionTargetValue(cursor));
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("  target{0} = {1}",
                         id,
                         GetAxisTargetValue(cursor));
@@ -211,7 +211,7 @@ namespace Machina
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
-                case ActionType.Zone:
+                case ActionType.Precision:
                     dec = string.Format("  $APO.CDIS = {0}",
                         cursor.zone);
                     break;
@@ -225,7 +225,7 @@ namespace Machina
                         cursor.zone >= 1 ? "C_DIS" : "");
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("  {0} target{1} {2}",
                         "PTP",
                         id,
@@ -340,7 +340,7 @@ namespace Machina
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
-                case ActionType.Zone:
+                case ActionType.Precision:
                     dec = string.Format("  $APO.CDIS = {0}",
                         cursor.zone);
                     break;
@@ -354,7 +354,7 @@ namespace Machina
                         cursor.zone >= 1 ? "C_DIS" : "");
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("  {0} {1} {2}",
                         "PTP",
                         GetAxisTargetValue(cursor),

@@ -100,7 +100,8 @@ namespace Machina
     public enum RobotPart
     {
         Extruder,
-        Bed
+        Bed, 
+        Chamber
     }
 
     public delegate void BufferEmptyHandler(object sender, EventArgs e);

@@ -22,8 +22,21 @@ namespace Machina
     /// </summary>
     internal class CompilerZMORPH : Compiler
     {
+        // A 'multidimensional' Dict to store permutations of (part, wait) to their corresponding GCode command
+        // https://stackoverflow.com/a/15826532/1934487
+        Dictionary<Tuple<RobotPart, bool>, String> tempToGCode;  
+        
 
-        internal CompilerZMORPH() : base(";") { }
+        internal CompilerZMORPH() : base(";")
+        {
+            tempToGCode = new Dictionary<Tuple<RobotPart, bool>, String>();
+            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Extruder, true), "M109");
+            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Extruder, false), "M104");
+            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Bed, true), "M190");
+            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Bed, false), "M140");
+            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Chamber, true), "M191");
+            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Chamber, false), "M141");
+        }
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
@@ -149,7 +162,6 @@ namespace Machina
             string dec = null;
             switch (action.type)
             {
-                // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
                     dec = string.Format("G1 F{0}",
                         Math.Round(60.0 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM));
@@ -186,40 +198,46 @@ namespace Machina
                 // http://reprap.org/wiki/G-code#M42:_Switch_I.2FO_pin
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    dec = string.Format("M42 P{0} S{1}",
-                        aiod.pin,
-                        aiod.on ? "1" : "0");
+                    dec = $"M42 P{aiod.pin} S{(cursor.digitalOutputs[aiod.pin] ? "1" : "0")}";
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (aioa.value < 0 || aioa.value > 255)
                     {
-                        dec = string.Format("{0} ERROR on \"{1}\": value out of range [0..255]",
-                            commentCharacter,
-                            aioa.ToString());
+                        dec = $"{commentCharacter} ERROR on \"{aioa.ToString()}\": value out of range [0..255]";
                     }
                     else
                     {
-                        dec = string.Format("M42 P{0} S{1}",
-                            aioa.pin,
-                            Math.Round(aioa.value));
+                        dec = $"M42 P{aioa.pin} S{Math.Round(cursor.analogOutputs[aioa.pin], 0)}";
                     }
                     break;
 
-                //default:
-                //    dec = string.Format("  ; ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
-
-                case ActionType.Rotation:
-                case ActionType.Zone:
-                case ActionType.Joints:
-                case ActionType.Attach:
-                case ActionType.Detach:
-                    dec = string.Format("; ACTION \"{0}\" NOT IMPLEMENTED IN THIS DEVICE", action);
+                case ActionType.Temperature:
+                    ActionTemperature at = (ActionTemperature)action;
+                    dec = $"{tempToGCode[new Tuple<RobotPart, bool>(at.robotPart, at.wait)]} S{Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE)}";
                     break;
+
+                case ActionType.Extrusion:
+                case ActionType.ExtrusionRate:
+                    dec = $"{commentCharacter} {action.ToString()}";  // has no direct G-code, simply annotate it as a comment
+                    break;
+
+                // If action wasn't implemented before, then it doesn't apply to this device
+                default:
+                    dec = $"{commentCharacter} ACTION \"{action}\" NOT APPLICABLE TO THIS DEVICE";
+                    break;
+
+                //case ActionType.Rotation:
+                //case ActionType.Zone:
+                //case ActionType.Joints:
+                //case ActionType.Attach:
+                //case ActionType.Detach:
+                //    dec = string.Format("; ACTION \"{0}\" NOT IMPLEMENTED IN THIS DEVICE", action);
+                //    break;
             }
 
+            // Add trailing comments or ids if speficied
             if (ADD_ACTION_STRING && action.type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",

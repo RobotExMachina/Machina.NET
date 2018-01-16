@@ -246,7 +246,7 @@ namespace Machina
                     dec = string.Format("  CONST robtarget target{0} := {1};", id, GetUNSAFERobTargetValue(cursor));
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("  CONST jointtarget target{0} := {1};", id, GetJointTargetValue(cursor));
                     break;
             }
@@ -279,7 +279,7 @@ namespace Machina
                         "WObj:=WObj0");
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, {3}\\{4};",
                         id,
                         velNames[cursor.speed],
@@ -401,7 +401,7 @@ namespace Machina
                         "WObj:=WObj0");
                     break;
 
-                case ActionType.Joints:
+                case ActionType.Axes:
                     dec = string.Format("    MoveAbsJ {0}, {1}, {2}, {3}\\{4};",
                         GetJointTargetValue(cursor),
                         velNames[cursor.speed],

@@ -35,6 +35,9 @@ namespace Machina
         public double[] analogOutputs = new double[14];
         public string[] digitalOutputNames = new string[14];  // ABB robots can have io ports named, UR + KUKA use standard names
         public string[] analogOutputNames = new string[14];
+        public bool isExtruding;
+        public double extrusionRate;
+        public Dictionary<RobotPart, double> partTemperature = new Dictionary<RobotPart, double>();
 
         public Action lastAction = null;  // the last action that was applied to this cursor
         protected bool initialized = false;
@@ -114,9 +117,11 @@ namespace Machina
                 compiler = new CompilerZMORPH();
             }
 
+            // Initialize buffers
             actionBuffer = new ActionBuffer();
             settingsBuffer = new SettingsBuffer();
 
+            // Basics io names
             for (int i = 0; i < digitalOutputNames.Length;  i++)
             {
                 digitalOutputNames[i] = "do" + i;
@@ -125,6 +130,14 @@ namespace Machina
             {
                 analogOutputNames[i] = "ao" + i;
             }
+
+            // Initialize temps to zero
+            foreach (RobotPart part in Enum.GetValues(typeof(RobotPart)))
+            {
+                partTemperature[part] = 0;
+            }
+            isExtruding = false;  // should these go into Initilize()?
+            extrusionRate = 0;
         }
 
         /// <summary>
@@ -171,21 +184,22 @@ namespace Machina
         Dictionary<Type, Func<Machina.Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
         {
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
-            { typeof (ActionZone),                      (act, robCur) => robCur.ApplyAction((ActionZone) act) },
+            { typeof (ActionPrecision),                      (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
             { typeof (ActionMotion),                    (act, robCur) => robCur.ApplyAction((ActionMotion) act) },
             { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
             { typeof (ActionPushPop),                   (act, robCur) => robCur.ApplyAction((ActionPushPop) act) },
             { typeof (ActionTranslation),               (act, robCur) => robCur.ApplyAction((ActionTranslation) act) },
             { typeof (ActionRotation),                  (act, robCur) => robCur.ApplyAction((ActionRotation) act) },
             { typeof (ActionTransformation),            (act, robCur) => robCur.ApplyAction((ActionTransformation) act) },
-            { typeof (ActionJoints),                    (act, robCur) => robCur.ApplyAction((ActionJoints) act) },
+            { typeof (ActionAxes),                    (act, robCur) => robCur.ApplyAction((ActionAxes) act) },
             { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
             { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
             { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
             { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) },
             { typeof (ActionDetach),                    (act, robCur) => robCur.ApplyAction((ActionDetach) act) },
             { typeof (ActionIODigital),                 (act, robCur) => robCur.ApplyAction((ActionIODigital) act) },
-            { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) }
+            { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) },
+            { typeof (ActionTemperature),               (act, robCur) => robCur.ApplyAction((ActionTemperature) act) }     
 
         };
 
@@ -336,7 +350,7 @@ namespace Machina
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public bool ApplyAction(ActionZone action)
+        public bool ApplyAction(ActionPrecision action)
         {
             if (action.relative)
                 this.zone += action.zone;
@@ -608,7 +622,7 @@ namespace Machina
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public bool ApplyAction(ActionJoints action)
+        public bool ApplyAction(ActionAxes action)
         {
 
             // @TODO: implement joint limits checks and general safety...
@@ -780,6 +794,60 @@ namespace Machina
             return true;
         }
 
+
+        //  ╔╦╗╔═╗╔╦╗╔═╗   ╔═╗═╗ ╦╔╦╗╦═╗╦ ╦╔╦╗╔═╗  ┌─┐┌─┐┌┬┐┬┌─┐┌┐┌┌─┐
+        //   ║ ║╣ ║║║╠═╝───║╣ ╔╩╦╝ ║ ╠╦╝║ ║ ║║║╣   ├─┤│   │ ││ ││││└─┐
+        //   ╩ ╚═╝╩ ╩╩     ╚═╝╩ ╚═ ╩ ╩╚═╚═╝═╩╝╚═╝  ┴ ┴└─┘ ┴ ┴└─┘┘└┘└─┘
+        /// <summary>
+        /// Apply ActionTemperature write action to this cursor.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionTemperature action)
+        {
+            if (action.relative)
+            {
+                this.partTemperature[action.robotPart] += action.temperature;
+            }
+            else
+            {
+                this.partTemperature[action.robotPart] = action.temperature;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply ActionExtrusion write action to this cursor.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionExtrusion action)
+        {
+            this.isExtruding = action.extrude;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply ActionExtrusionRate write action to this cursor. 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionExtrusionRate action)
+        {
+            if (action.relative)
+            {
+                this.extrusionRate += action.rate;
+            }
+            else
+            {
+                this.extrusionRate = action.rate;
+            }
+
+            return true;
+        }
+       
 
 
 

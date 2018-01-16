@@ -668,7 +668,7 @@ namespace Machina
                 return false;
             }
 
-            ActionZone act = new ActionZone(zone, relative);
+            ActionPrecision act = new ActionPrecision(zone, relative);
 
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
@@ -1240,7 +1240,7 @@ namespace Machina
                 //}
             }
 
-            ActionJoints act = new ActionJoints(joints, relJnts);
+            ActionAxes act = new ActionAxes(joints, relJnts);
             
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
