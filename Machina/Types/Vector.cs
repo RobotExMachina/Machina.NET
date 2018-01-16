@@ -281,6 +281,18 @@ namespace Machina
             return this.Rotate(new AxisAngle(vecX, vecY, vecZ, angDegs).ToQuaternion());
         }
 
+        /// <summary>
+        /// Returns the euclidean distance from this Vector to another.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public double DistanceTo(Vector other)
+        {
+            double dx = this.X - other.X,
+                   dy = this.Y - other.Y,
+                   dz = this.Z - other.Z;
+            return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
 
 
         /// <summary>

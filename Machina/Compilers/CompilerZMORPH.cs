@@ -169,8 +169,9 @@ namespace Machina
 
                 case ActionType.Translation:
                 case ActionType.Transformation:
-                    dec = string.Format("G1 {0}",
-                        GetPositionTargetValue(cursor, action));
+                    dec = string.Format("G1 {0}{1}",
+                        GetPositionTargetValue(cursor),
+                        cursor.isExtruding ? " " + GetExtrusionTargetValue(cursor) : "");
                     break;
 
                 // Only available in MakerBot? http://reprap.org/wiki/G-code#M70:_Display_message
@@ -277,9 +278,9 @@ namespace Machina
         /// <param name="cursor"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        internal double GetExtrusionTargetValue(RobotCursor cursor)
+        internal string GetExtrusionTargetValue(RobotCursor cursor)
         {
-
+            return $"E{Math.Round(cursor.extrusionRate * cursor.position.DistanceTo(cursor.prevPosition), 6)}";
         }
 
     }
