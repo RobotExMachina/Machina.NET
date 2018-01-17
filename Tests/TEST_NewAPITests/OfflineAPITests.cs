@@ -14,8 +14,11 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
+
             Robot arm = new Robot("3dprinter", "ZMorph");
-            ZMorphTest(arm);
+            //ZMorphSimpleMovementTest(arm);
+            ZMorphSimple3DPrintTest(arm);
+
 
 
             //Robot arm = new Robot("foo", "ZMorph");
@@ -76,7 +79,7 @@ namespace TEST_OfflineAPITests
             arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" :
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" :
                 arm.IsBrand("KUKA") ? @"C:\offlineTests.src" : 
-                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
+                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, false);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
@@ -847,7 +850,7 @@ namespace TEST_OfflineAPITests
             arm.JointsTo(0, -90, -90, -90, 90, 90);
         }
 
-        static public void ZMorphTest(Robot bot)
+        static public void ZMorphSimpleMovementTest(Robot bot)
         {
             double x = 117.5,
                     y = 125,
@@ -857,6 +860,8 @@ namespace TEST_OfflineAPITests
             bot.Message("Let's start the party!");
             bot.MoveTo(x, y, z);
 
+            bot.Comment("");
+            bot.Comment("TRACE A SQUARE IN THE AIR");
             bot.Move(50, 0);
             bot.Move(0, 50);
             bot.Move(-50, 0);
@@ -871,6 +876,8 @@ namespace TEST_OfflineAPITests
             bot.MoveTo(x, y, z);
             bot.Wait(2000);
 
+            bot.Comment("");
+            bot.Comment("TRACE A CYLINDER IN THE AIR");
             bot.SpeedTo(100);
             var r = 10;
             var loops = 5;
@@ -889,6 +896,72 @@ namespace TEST_OfflineAPITests
             }
             bot.Wait(1000);
             bot.MoveTo(x, y, z);
+        }
+
+
+        static public void ZMorphSimple3DPrintTest(Robot bot)
+        {
+            /* Eyeballed 3D printing data from a file exported from Vxlizr:
+             * layer height: 0.115 mm 
+             * path width: 0.23 mm
+             * extrusion rate: 0.011 mm/mm 
+             * print speed: 30 mm/s
+             * travel speed: 90 mm/s
+             * travel speed z: 5 mm/s
+             * bed temp: 60 C
+             * extruder temp: 200 C
+             * material: PLA Zmorph
+             */
+
+            int    travelS = 90,
+                   printS = 30;
+            double x = 100,
+                   y = 100,
+                   z = 0,
+                   w = 10,
+                   d = 10,
+                   h = 10,
+                   layerH = 0.115,
+                   pathW = 0.23;
+
+            // It's typical to heat up the printer this way: nowait, wait, wait
+            bot.Temperature(60, "bed", false);
+            bot.Temperature(200, "extruder");
+            bot.Temperature(60, "bed");
+
+            bot.ExtrusionRate(0.011);
+
+            // Print a double wall cube
+            bot.SpeedTo(travelS);
+            bot.MoveTo(x, y, z);
+
+            int layerCount = (int) Math.Round(h / layerH);
+            for (var i = 0; i < layerCount; i++)
+            {
+                bot.Comment("");
+                bot.Comment($"Layer {i}");
+                bot.Extrude(false);
+                bot.SpeedTo(travelS);
+                bot.Move(pathW, pathW, layerH);
+
+                bot.Extrude();
+                bot.SpeedTo(printS);
+                bot.Move(w - 2 * pathW, 0);
+                bot.Move(0, d - 2 * pathW);
+                bot.Move(-w + 2 * pathW, 0);
+                bot.Move(0, -d + 2 * pathW);
+
+                bot.Extrude(false);
+                bot.SpeedTo(travelS);
+                bot.Move(-pathW, -pathW);
+
+                bot.Extrude();
+                bot.SpeedTo(printS);
+                bot.Move(w, 0);
+                bot.Move(0, d);
+                bot.Move(-w, 0);
+                bot.Move(0, -d);
+            }
 
         }
 

@@ -38,7 +38,7 @@ namespace Machina
         double extrusionLengthResetPosition = 0;
 
         // Every n mm of extrusion, reset "E" to zero: "G92 E0"
-        double extrusionLengthResetEvery = 500;
+        double extrusionLengthResetEvery = 10;
 
         // Made this class members to be able to insert more thatn one line of code per Action
         // @TODO: make adding several lines of code per Action more programmatic
@@ -77,19 +77,21 @@ namespace Machina
 
             // SOME INITIAL BOILERPLATE TO HEAT UP THE PRINTER, CALIBRATE IT, ETC.
             // ZMorph boilerplate
+            // HEATUP -> For the user, may not want to use the printer as printer...
             //initializationLines.Add("M140 S60");                // set bed temp and move on to next inst
             //initializationLines.Add("M109 S200");               // set extruder bed temp and wait till heat up
             //initializationLines.Add("M190 S60");                // set bed temp and wait till heat up
+            // HOMING
             this.initializationLines.Add("G91");                     // set rel motion
-            this.initializationLines.Add("G1 Z1.000 F200.000");      // move up 1mm and set printhead speed to 200 mm/min
+            this.initializationLines.Add("G1 Z1.000 F200.000");      // move up 1mm and accelerate printhead to 200 mm/min
             this.initializationLines.Add("G90");                     // set absolute positioning
             this.initializationLines.Add("G28 X0.000 Y0.00");        // home XY axes
             this.initializationLines.Add("G1 X117.500 Y125.000 F8000.000");  // move to bed center for Z homing
             this.initializationLines.Add("G28 Z0.000");              // home Z
-            this.initializationLines.Add("G92 E0.00000");            // home filament
-            this.initializationLines.Add("M82");                     // set extruder to absolute mode
+            this.initializationLines.Add("G92 E0.00000");            // set filament position to zero
 
             // Machina bolierplate
+            this.initializationLines.Add("M82");                     // set extruder to absolute mode (this is axtually ZMorph, but useful here
             this.initializationLines.Add($"G1 F{Math.Round(writer.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)}");  // initialize feed speed to the writer's state
 
             // DATA GENERATION
@@ -112,13 +114,13 @@ namespace Machina
             }
 
             // END THE PROGRAM AND LEAVE THE PRINTER READY
-            // ZMorph
+            // ZMorph boilerplate
             this.closingLines.Add("G92 E0.0000");
-            //closingLines.Add("G91");
-            //closingLines.Add("G1 E-3.00000 F1800.000");
-            //closingLines.Add("G90");
-            //closingLines.Add("G92 E0.00000");
-            //closingLines.Add("G1 X117.500 Y220.000 Z30.581 F300.000");
+            this.closingLines.Add("G91");
+            this.closingLines.Add("G1 E-3.00000 F1800.000");
+            this.closingLines.Add("G90");
+            this.closingLines.Add("G92 E0.00000");
+            this.closingLines.Add("G1 X117.500 Y220.000 Z30.581 F300.000");
 
             this.closingLines.Add("T0");         // choose tool 0: is this for multihead? 
             this.closingLines.Add("M104 S0");    // set extruder temp and move on
@@ -300,7 +302,7 @@ namespace Machina
                 len = cursor.extrudedLength - this.extrusionLengthResetPosition;
             }
 
-            return $"E{len}";
+            return $"E{Math.Round(len, 5)}";
         }
 
     }

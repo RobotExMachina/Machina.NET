@@ -462,6 +462,7 @@ namespace Machina
         /// </summary>
         /// <param name="filepath"></param>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
         public bool Export(string filepath, bool inlineTargets, bool humanComments)
         {
@@ -695,7 +696,7 @@ namespace Machina
         /// <param name="devicePart">Device's part that will change temperature, e.g. "extruder", "bed", etc.</param>
         /// <param name="waitToReachTemp">If true, execution will wait for the part to heat up and resume when reached the target.</param>
         /// <returns></returns>
-        public bool Temperature(double temp, string devicePart = "extruder", bool waitToReachTemp = true)
+        public bool Temperature(double temp, string devicePart, bool waitToReachTemp = true)
         {
             RobotPart tt;
             try
@@ -721,7 +722,7 @@ namespace Machina
         /// </summary>
         /// <param name="extrude">True/false for on/off.</param>
         /// <returns></returns>
-        public bool Extrude(bool extrude)
+        public bool Extrude(bool extrude = true)
         {
             return c.IssueExtrudeRequest(extrude);
         }

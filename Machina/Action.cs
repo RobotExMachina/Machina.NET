@@ -545,7 +545,7 @@ namespace Machina
 
         public ActionMessage(string message) : base()
         {
-            type = ActionType.Message;
+            this.type = ActionType.Message;
 
             this.message = message;
         }
