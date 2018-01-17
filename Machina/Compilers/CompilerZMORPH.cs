@@ -24,20 +24,31 @@ namespace Machina
     {
         // A 'multidimensional' Dict to store permutations of (part, wait) to their corresponding GCode command
         // https://stackoverflow.com/a/15826532/1934487
-        Dictionary<Tuple<RobotPart, bool>, String> tempToGCode;  
-        
-
-        internal CompilerZMORPH() : base(";")
+        Dictionary<Tuple<RobotPart, bool>, String> tempToGCode = new Dictionary<Tuple<RobotPart, bool>, String>()
         {
-            tempToGCode = new Dictionary<Tuple<RobotPart, bool>, String>();
-            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Extruder, true), "M109");
-            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Extruder, false), "M104");
-            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Bed, true), "M190");
-            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Bed, false), "M140");
-            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Chamber, true), "M191");
-            tempToGCode.Add(new Tuple<RobotPart, bool>(RobotPart.Chamber, false), "M141");
-        }
+            { new Tuple<RobotPart, bool>(RobotPart.Extruder, true), "M109" },
+            { new Tuple<RobotPart, bool>(RobotPart.Extruder, false), "M104" },
+            { new Tuple<RobotPart, bool>(RobotPart.Bed, true), "M190" },
+            { new Tuple<RobotPart, bool>(RobotPart.Bed, false), "M140" },
+            { new Tuple<RobotPart, bool>(RobotPart.Chamber, true), "M191" },
+            { new Tuple<RobotPart, bool>(RobotPart.Chamber, false), "M141" }
+        };
 
+        // On extrusion length reset, keep track of the reset point ("G92")
+        double extrusionLengthResetPosition = 0;
+
+        // Every n mm of extrusion, reset "E" to zero: "G92 E0"
+        double extrusionLengthResetEvery = 500;
+
+        // Made this class members to be able to insert more thatn one line of code per Action
+        // @TODO: make adding several lines of code per Action more programmatic
+        List<string> initializationLines,
+                     instructionLines,
+                     closingLines;
+
+        // Base constructor
+        internal CompilerZMORPH() : base(";") { }
+    
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
@@ -60,26 +71,26 @@ namespace Machina
 
             // CODE LINES GENERATION
             // TARGETS AND INSTRUCTIONS
-            List<string> initializationLines = new List<string>();
-            List<string> instructionLines = new List<string>();
-            List<string> closingLines = new List<string>();
+            this.initializationLines = new List<string>();
+            this.instructionLines = new List<string>();
+            this.closingLines = new List<string>();
 
             // SOME INITIAL BOILERPLATE TO HEAT UP THE PRINTER, CALIBRATE IT, ETC.
             // ZMorph boilerplate
             //initializationLines.Add("M140 S60");                // set bed temp and move on to next inst
             //initializationLines.Add("M109 S200");               // set extruder bed temp and wait till heat up
             //initializationLines.Add("M190 S60");                // set bed temp and wait till heat up
-            initializationLines.Add("G91");                     // set rel motion
-            initializationLines.Add("G1 Z1.000 F200.000");      // move up 1mm and set printhead speed to 200 mm/min
-            initializationLines.Add("G90");                     // set absolute positioning
-            initializationLines.Add("G28 X0.000 Y0.00");        // home XY axes
-            initializationLines.Add("G1 X117.500 Y125.000 F8000.000");  // move to bed center for Z homing
-            initializationLines.Add("G28 Z0.000");              // home Z
-            initializationLines.Add("G92 E0.00000");            // home filament
-            initializationLines.Add("M82");                     // set extruder to absolute mode
+            this.initializationLines.Add("G91");                     // set rel motion
+            this.initializationLines.Add("G1 Z1.000 F200.000");      // move up 1mm and set printhead speed to 200 mm/min
+            this.initializationLines.Add("G90");                     // set absolute positioning
+            this.initializationLines.Add("G28 X0.000 Y0.00");        // home XY axes
+            this.initializationLines.Add("G1 X117.500 Y125.000 F8000.000");  // move to bed center for Z homing
+            this.initializationLines.Add("G28 Z0.000");              // home Z
+            this.initializationLines.Add("G92 E0.00000");            // home filament
+            this.initializationLines.Add("M82");                     // set extruder to absolute mode
 
             // Machina bolierplate
-            initializationLines.Add(string.Format("G1 F{0}", Math.Round(writer.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)));  // initialize feed speed to the writer's state
+            this.initializationLines.Add($"G1 F{Math.Round(writer.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)}");  // initialize feed speed to the writer's state
 
             // DATA GENERATION
             // Use the write RobotCursor to generate the data
@@ -93,7 +104,7 @@ namespace Machina
                 // GCode is super straightforward, so no need to pre-declare anything
                 if (GenerateInstructionDeclaration(a, writer, out line))
                 {
-                    instructionLines.Add(line);
+                    this.instructionLines.Add(line);
                 }
 
                 //// Move on
@@ -102,47 +113,46 @@ namespace Machina
 
             // END THE PROGRAM AND LEAVE THE PRINTER READY
             // ZMorph
-            closingLines.Add("G92 E0.0000");
+            this.closingLines.Add("G92 E0.0000");
             //closingLines.Add("G91");
             //closingLines.Add("G1 E-3.00000 F1800.000");
             //closingLines.Add("G90");
             //closingLines.Add("G92 E0.00000");
             //closingLines.Add("G1 X117.500 Y220.000 Z30.581 F300.000");
 
-            closingLines.Add("T0");         // choose tool 0: is this for multihead? 
-            closingLines.Add("M104 S0");    // set extruder temp and move on
-            closingLines.Add("T1");         // choose tool 1
-            closingLines.Add("M104 S0");    // ibid
-            closingLines.Add("M140 S0");    // set bed temp and move on
-            closingLines.Add("M106 S0");    // fan speed 0 (off)
-            closingLines.Add("M84");        // stop idle hold (?)
-            closingLines.Add("M220 S100");  // set speed factor override percentage 
+            this.closingLines.Add("T0");         // choose tool 0: is this for multihead? 
+            this.closingLines.Add("M104 S0");    // set extruder temp and move on
+            this.closingLines.Add("T1");         // choose tool 1
+            this.closingLines.Add("M104 S0");    // ibid
+            this.closingLines.Add("M140 S0");    // set bed temp and move on
+            this.closingLines.Add("M106 S0");    // fan speed 0 (off)
+            this.closingLines.Add("M84");        // stop idle hold (?)
+            this.closingLines.Add("M220 S100");  // set speed factor override percentage 
 
-
-
+            
             // PROGRAM ASSEMBLY
             // Initialize a module list
             List<string> module = new List<string>();
 
             // Initializations
-            if (initializationLines.Count != 0)
+            if (this.initializationLines.Count != 0)
             {
-                module.AddRange(initializationLines);
+                module.AddRange(this.initializationLines);
                 module.Add("");
             }
 
             // MAIN PROCEDURE
             // Instructions
-            if (instructionLines.Count != 0)
+            if (this.instructionLines.Count != 0)
             {
-                module.AddRange(instructionLines);
+                module.AddRange(this.instructionLines);
                 module.Add("");
             }
 
             // Wrapping up
-            if (closingLines.Count != 0)
+            if (this.closingLines.Count != 0)
             {
-                module.AddRange(closingLines);
+                module.AddRange(this.closingLines);
                 module.Add("");
             }
 
@@ -280,7 +290,17 @@ namespace Machina
         /// <returns></returns>
         internal string GetExtrusionTargetValue(RobotCursor cursor)
         {
-            return $"E{Math.Round(cursor.extrusionRate * cursor.position.DistanceTo(cursor.prevPosition), 6)}";
+            double len = cursor.extrudedLength - this.extrusionLengthResetPosition;
+
+            // If extruded over the limit, reset extrude position and start over
+            if (len > extrusionLengthResetEvery) {
+                this.instructionLines.Add($"{commentCharacter} Homing extrusion length after {cursor.prevExtrudedLength - this.extrusionLengthResetPosition} mm ({this.extrusionLengthResetEvery} mm limit)");
+                this.instructionLines.Add($"G92 E0.0000");
+                this.extrusionLengthResetPosition = cursor.prevExtrudedLength;
+                len = cursor.extrudedLength - this.extrusionLengthResetPosition;
+            }
+
+            return $"E{len}";
         }
 
     }

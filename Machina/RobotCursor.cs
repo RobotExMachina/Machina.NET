@@ -35,9 +35,12 @@ namespace Machina
         public double[] analogOutputs = new double[14];
         public string[] digitalOutputNames = new string[14];  // ABB robots can have io ports named, UR + KUKA use standard names
         public string[] analogOutputNames = new string[14];
+
+        // 3D printing
         public bool isExtruding;
         public double extrusionRate;
         public Dictionary<RobotPart, double> partTemperature = new Dictionary<RobotPart, double>();
+        public double extrudedLength, prevExtrudedLength;  // the length of filament that has been extruded, i.e. the "E" parameter
 
         public Action lastAction = null;  // the last action that was applied to this cursor
         protected bool initialized = false;
@@ -138,6 +141,7 @@ namespace Machina
             }
             isExtruding = false;  // should these go into Initilize()?
             extrusionRate = 0;
+            extrudedLength = 0;
         }
 
         /// <summary>
@@ -182,39 +186,7 @@ namespace Machina
         {
             child = childCursor;
         }
-
-
-
-
-        //  ╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
-        //  ╠═╣║   ║ ║║ ║║║║╚═╗
-        //  ╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
-        /// <summary>
-        /// A dict that maps Action types to the cursor's applicable method.
-        /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
-        /// </summary>
-        Dictionary<Type, Func<Machina.Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
-        {
-            { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
-            { typeof (ActionPrecision),                      (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
-            { typeof (ActionMotion),                    (act, robCur) => robCur.ApplyAction((ActionMotion) act) },
-            { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
-            { typeof (ActionPushPop),                   (act, robCur) => robCur.ApplyAction((ActionPushPop) act) },
-            { typeof (ActionTranslation),               (act, robCur) => robCur.ApplyAction((ActionTranslation) act) },
-            { typeof (ActionRotation),                  (act, robCur) => robCur.ApplyAction((ActionRotation) act) },
-            { typeof (ActionTransformation),            (act, robCur) => robCur.ApplyAction((ActionTransformation) act) },
-            { typeof (ActionAxes),                    (act, robCur) => robCur.ApplyAction((ActionAxes) act) },
-            { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
-            { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
-            { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
-            { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) },
-            { typeof (ActionDetach),                    (act, robCur) => robCur.ApplyAction((ActionDetach) act) },
-            { typeof (ActionIODigital),                 (act, robCur) => robCur.ApplyAction((ActionIODigital) act) },
-            { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) },
-            { typeof (ActionTemperature),               (act, robCur) => robCur.ApplyAction((ActionTemperature) act) }     
-
-        };
-
+        
         /// <summary>
         /// Add an action to this cursor's buffer, to be released whenever assigned priority.
         /// </summary>
@@ -282,28 +254,6 @@ namespace Machina
         {
             return actionBuffer.ActionsPending();
         }
-        
-        /// <summary>
-        /// Applies the directives of an Action to this cursor. 
-        /// </summary>
-        /// <remarks>
-        /// While this Dictionary dispatch pattern is a bit convoluted, it is faster than dynamic casting, 
-        /// more stable and allows for compiler-time checks and non-error fallback.
-        /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
-        /// </remarks>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool Apply(Action action)
-        {
-            Type t = action.GetType();
-            if (ActionsMap.ContainsKey(t))
-            {
-                return ActionsMap[t](action, this);
-            }
-            
-            Console.WriteLine("Found no suitable method for this Action " + action);
-            return false;
-        }
 
         /// <summary>
         /// Return a device-specific program with all the Actions pending in the buffer.
@@ -335,6 +285,65 @@ namespace Machina
 
 
 
+
+
+
+        //   █████╗ ██████╗ ██████╗ ██╗  ██╗   ██╗ █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗
+        //  ██╔══██╗██╔══██╗██╔══██╗██║  ╚██╗ ██╔╝██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║
+        //  ███████║██████╔╝██████╔╝██║   ╚████╔╝ ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║
+        //  ██╔══██║██╔═══╝ ██╔═══╝ ██║    ╚██╔╝  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║
+        //  ██║  ██║██║     ██║     ███████╗██║   ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║
+        //  ╚═╝  ╚═╝╚═╝     ╚═╝     ╚══════╝╚═╝   ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+        //                                                                                       
+
+        /// <summary>
+        /// A dict that maps Action types to the cursor's applicable method.
+        /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
+        /// </summary>
+        Dictionary<Type, Func<Machina.Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
+        {
+            { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
+            { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
+            { typeof (ActionMotion),                    (act, robCur) => robCur.ApplyAction((ActionMotion) act) },
+            { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
+            { typeof (ActionPushPop),                   (act, robCur) => robCur.ApplyAction((ActionPushPop) act) },
+            { typeof (ActionTranslation),               (act, robCur) => robCur.ApplyAction((ActionTranslation) act) },
+            { typeof (ActionRotation),                  (act, robCur) => robCur.ApplyAction((ActionRotation) act) },
+            { typeof (ActionTransformation),            (act, robCur) => robCur.ApplyAction((ActionTransformation) act) },
+            { typeof (ActionAxes),                      (act, robCur) => robCur.ApplyAction((ActionAxes) act) },
+            { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
+            { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
+            { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
+            { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) },
+            { typeof (ActionDetach),                    (act, robCur) => robCur.ApplyAction((ActionDetach) act) },
+            { typeof (ActionIODigital),                 (act, robCur) => robCur.ApplyAction((ActionIODigital) act) },
+            { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) },
+            { typeof (ActionTemperature),               (act, robCur) => robCur.ApplyAction((ActionTemperature) act) },
+            { typeof (ActionExtrusion),                 (act, robCur) => robCur.ApplyAction((ActionExtrusion) act) },
+            { typeof (ActionExtrusionRate),             (act, robCur) => robCur.ApplyAction((ActionExtrusionRate) act) }
+        };
+
+        /// <summary>
+        /// Applies the directives of an Action to this cursor. 
+        /// </summary>
+        /// <remarks>
+        /// While this Dictionary dispatch pattern is a bit convoluted, it is faster than dynamic casting, 
+        /// more stable and allows for compiler-time checks and non-error fallback.
+        /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
+        /// </remarks>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool Apply(Action action)
+        {
+            Type t = action.GetType();
+            if (ActionsMap.ContainsKey(t))
+            {
+                return ActionsMap[t](action, this);
+            }
+
+            Console.WriteLine("Found no suitable method for this Action " + action);
+            return false;
+        }
 
 
         //  ╔═╗╔═╗╔╦╗╔╦╗╦╔╗╔╔═╗╔═╗  ╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -494,6 +503,8 @@ namespace Machina
             prevJoints = joints;
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
+            if (isExtruding) this.ComputeExtrudedLength();
+
             return true;
         }
 
@@ -546,6 +557,8 @@ namespace Machina
 
             prevJoints = joints;
             joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
+
+            if (isExtruding) this.ComputeExtrudedLength();
 
             return true;
         }
@@ -642,6 +655,8 @@ namespace Machina
             prevJoints = joints;
             joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
+            if (isExtruding) this.ComputeExtrudedLength();
+
             return true;
         }
 
@@ -682,6 +697,8 @@ namespace Machina
             position = null;
             prevRotation = rotation;
             rotation = null;
+
+            if (isExtruding) this.ComputeExtrudedLength();
 
             return true;
         }
@@ -889,7 +906,31 @@ namespace Machina
 
             return true;
         }
-       
+
+
+
+
+        //  ██╗   ██╗████████╗██╗██╗     ███████╗
+        //  ██║   ██║╚══██╔══╝██║██║     ██╔════╝
+        //  ██║   ██║   ██║   ██║██║     ███████╗
+        //  ██║   ██║   ██║   ██║██║     ╚════██║
+        //  ╚██████╔╝   ██║   ██║███████╗███████║
+        //   ╚═════╝    ╚═╝   ╚═╝╚══════╝╚══════╝
+        //                                       
+        /// <summary>
+        /// Update the current extrudedLength.
+        /// </summary>
+        public void ComputeExtrudedLength()
+        {
+            if (this.prevPosition == null || this.position == null)
+            {
+                Console.WriteLine("Cannot compute new extrusion length: cursor position missing");
+                return;
+            }
+
+            this.prevExtrudedLength = this.extrudedLength;
+            this.extrudedLength += this.extrusionRate * this.prevPosition.DistanceTo(this.position);
+        }
 
 
 
