@@ -19,11 +19,16 @@
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
 
+
 ## BUILD 1305 - 0.4.2
 - [x] Change Joints/To to Axes/To
 - [x] Split Compliers into indiv cs 
-- [ ] Add Temperature()
-- [ ] Implement ZMorph compiler
+- [x] Add `Temperature()`
+- [x] Add `Extrude()`
+- [x] Add `ExtrusionRate()`
+- [x] Test 'Temperature' etc
+- [x] Implement GCode compiler for ZMorph
+- [x] Basic 3D Printing example
 
 ## BUILD 1304 - 0.4.1
 - [x] Add `SetIOName()` to customize IO names
