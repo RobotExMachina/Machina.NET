@@ -904,7 +904,8 @@ namespace TEST_OfflineAPITests
             /* Eyeballed 3D printing data from a file exported from Vxlizr:
              * layer height: 0.115 mm 
              * path width: 0.23 mm
-             * extrusion rate: 0.011 mm/mm 
+             * extrusion rate base: 0.0665 mm/mm
+             * extrusion rate walls: 0.011 mm/mm 
              * print speed: 30 mm/s
              * travel speed: 90 mm/s
              * travel speed z: 5 mm/s
@@ -915,53 +916,141 @@ namespace TEST_OfflineAPITests
 
             int    travelS = 90,
                    printS = 30;
-            double x = 100,
+            double x = 130,
                    y = 100,
                    z = 0,
                    w = 10,
                    d = 10,
                    h = 10,
                    layerH = 0.115,
-                   pathW = 0.23;
+                   pathW = 0.23,
+                   brimMargin = 5;
 
-            // It's typical to heat up the printer this way: nowait, wait, wait
+
+            // Heat the printer up: it's typical to heat up the printer this way: nowait, wait, wait
             bot.Temperature(60, "bed", false);
             bot.Temperature(200, "extruder");
             bot.Temperature(60, "bed");
 
+            // Calibrate, home, etc.
+            bot.Initialize();
+
             bot.ExtrusionRate(0.011);
 
-            // Print a double wall cube
-            bot.SpeedTo(travelS);
-            bot.MoveTo(x, y, z);
+            bot.Comment("");
+            bot.Comment("PRINT A BASE OF CONCENTRIC SQUARES");
 
-            int layerCount = (int) Math.Round(h / layerH);
+            bot.SpeedTo(travelS);
+            bot.MoveTo(x - brimMargin, y - brimMargin, z);
+            bot.Move(0, 0, 0.5 * layerH);
+
+            bot.SpeedTo(printS);
+            bot.Extrude();
+
+            double dX = w + 2 * brimMargin,
+                   dY = d + 2 * brimMargin;
+            while(dY > 0 && dX > 0)
+            {
+                bot.Move(dX + pathW, 0);
+                bot.Move(0, dY);
+                bot.Move(-dX, 0);
+                bot.Move(0, -dY + pathW);
+
+                dX -= 2 * pathW;
+                dY -= 2 * pathW;
+            }
+            bot.Extrude(false);
+
+            bot.Comment("");
+            bot.Comment("PRINT A LAYER OF DIAGONAL ZIGZAGS");
+            bot.SpeedTo(travelS);
+            bot.Move(0, 0, layerH);
+            bot.MoveTo(x - brimMargin, y - brimMargin, z + 1.5 * layerH);
+
+            double s = 2 * Math.Sqrt(0.5 * pathW * pathW);  // 2x to leave a gap between diagonals for easier detachment of the main print
+
+            bot.Comment("");
+            bot.Comment("FIRST DIAGONAL");
+            bot.SpeedTo(printS);
+            bot.Extrude();
+            dX = w + 2 * brimMargin;
+            dY = d + 2 * brimMargin;
+            while (dX > 0 && dY > 0)
+            {
+                bot.Move(dX, dY);
+                bot.Move(-s, 0);
+                bot.Move(-dX + s, -dY + s);
+                bot.Move(0, s);
+
+                dX -= 2 * s;
+                dY -= 2 * s;
+            }
+            bot.Extrude(false);
+
+            bot.Comment("");
+            bot.Comment("SECOND DIAGONAL");
+            bot.SpeedTo(travelS);
+            bot.MoveTo(x + w + brimMargin, y + d + brimMargin - s, z + 1.5 * layerH);
+
+            bot.SpeedTo(printS);
+            bot.Extrude(true);
+            dX = w + 2 * brimMargin - s;
+            dY = d + 2 * brimMargin - s;
+            while (dX > 0 && dY > 0)
+            {
+                bot.Move(-dX, -dY);
+                bot.Move(s, 0);
+                bot.Move(dX - s, dY - s);
+                bot.Move(0, -s);
+
+                dX -= 2 * s;
+                dY -= 2 * s;
+            }
+            bot.Extrude(false);
+
+
+            // Print a double wall cube
+            bot.Comment("");
+            bot.Comment("PRINTING CUBE");
+            bot.SpeedTo(travelS);
+            bot.MoveTo(x, y, 1.5 * z);
+
+            // Bogus Actions that should not affect the code (show up as comments)
+            bot.Detach();
+            bot.Rotate(1, 0, 0, 90);
+            bot.Precision(20);
+
+            int layerCount = (int)Math.Round(h / layerH);
             for (var i = 0; i < layerCount; i++)
             {
                 bot.Comment("");
                 bot.Comment($"Layer {i}");
                 bot.Extrude(false);
                 bot.SpeedTo(travelS);
-                bot.Move(pathW, pathW, layerH);
+                //bot.Move(pathW, pathW, layerH);
+                bot.Move(0, 0, layerH);
+
+                //bot.Extrude();
+                //bot.SpeedTo(printS);
+                //bot.Move(w - 2 * pathW, 0);
+                //bot.Move(0, d - 2 * pathW);
+                //bot.Move(-w + 2 * pathW, 0);
+                //bot.Move(0, -d + 2 * pathW);
+
+                //bot.Extrude(false);
+                //bot.SpeedTo(travelS);
+                //bot.Move(-pathW, -pathW);
 
                 bot.Extrude();
-                bot.SpeedTo(printS);
-                bot.Move(w - 2 * pathW, 0);
-                bot.Move(0, d - 2 * pathW);
-                bot.Move(-w + 2 * pathW, 0);
-                bot.Move(0, -d + 2 * pathW);
-
-                bot.Extrude(false);
-                bot.SpeedTo(travelS);
-                bot.Move(-pathW, -pathW);
-
-                bot.Extrude();
-                bot.SpeedTo(printS);
+                bot.SpeedTo(printS / 2);
                 bot.Move(w, 0);
                 bot.Move(0, d);
                 bot.Move(-w, 0);
                 bot.Move(0, -d);
             }
+
+            // We are done, wrap up
+            bot.Terminate();
 
         }
 

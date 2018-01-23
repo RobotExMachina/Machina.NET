@@ -320,7 +320,8 @@ namespace Machina
             { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) },
             { typeof (ActionTemperature),               (act, robCur) => robCur.ApplyAction((ActionTemperature) act) },
             { typeof (ActionExtrusion),                 (act, robCur) => robCur.ApplyAction((ActionExtrusion) act) },
-            { typeof (ActionExtrusionRate),             (act, robCur) => robCur.ApplyAction((ActionExtrusionRate) act) }
+            { typeof (ActionExtrusionRate),             (act, robCur) => robCur.ApplyAction((ActionExtrusionRate) act) },
+            { typeof (ActionInitialization),            (act, robCur) => robCur.ApplyAction((ActionInitialization) act) }
         };
 
         /// <summary>
@@ -904,6 +905,17 @@ namespace Machina
                 this.extrusionRate = action.rate;
             }
 
+            return true;
+        }
+
+        /// <summary>
+        /// This is just to write start/end boilerplates for 3D printers. 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionInitialization action)
+        {
+            // nothing to do here really... 
             return true;
         }
 

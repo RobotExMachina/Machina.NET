@@ -124,12 +124,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1305;
+        public static readonly int Build = 1306;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.4.2." + Build;
+        public static readonly string Version = "0.4.3." + Build;
        
 
         /// <summary>
@@ -716,17 +716,7 @@ namespace Machina
             }
             return false;
         }
-
-        /// <summary>
-        /// Turns extrusion in 3D printers on/off.
-        /// </summary>
-        /// <param name="extrude">True/false for on/off.</param>
-        /// <returns></returns>
-        public bool Extrude(bool extrude = true)
-        {
-            return c.IssueExtrudeRequest(extrude);
-        }
-
+        
         /// <summary>
         /// Sets the extrusion rate for 3D printers in mm of filament per mm of movement.
         /// </summary>
@@ -742,28 +732,28 @@ namespace Machina
 
 
 
-//        /// What was this even for?
+        //        /// What was this even for?
 
-//        public bool IsBrand(string brandName)
-//{
-//    return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());
-//}
+        //        public bool IsBrand(string brandName)
+        //{
+        //    return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());
+        //}
 
 
-//   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
-//  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
-//  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
-//  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
-//  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
-//  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-//                                                         
+        //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
+        //  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
+        //  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
+        //  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
+        //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
+        //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+        //                                                         
 
-/// <summary>
-/// Applies an Action object to this robot. 
-/// </summary>
-/// <param name="action"></param>
-/// <returns></returns>
-public bool Do(Action action)
+        /// <summary>
+        /// Applies an Action object to this robot. 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool Do(Action action)
         {
             return c.IssueApplyActionRequest(action);
         }
@@ -1143,6 +1133,38 @@ public bool Do(Action action)
         public bool TurnOff(int pinNumber)
         {
             return this.WriteDigital(pinNumber, false);
+        }
+
+        /// <summary>
+        /// Turns extrusion in 3D printers on/off.
+        /// </summary>
+        /// <param name="extrude">True/false for on/off.</param>
+        /// <returns></returns>
+        public bool Extrude(bool extrude = true)
+        {
+            return c.IssueExtrudeRequest(extrude);
+        }
+
+        /// <summary>
+        /// Initialize this device for action. Initialization uses device-specific
+        /// common initialization routines, like homing and calibration, to set the 
+        /// device ready for typical procedures like 3D printing. 
+        /// </summary>
+        /// <returns></returns>
+        public bool Initialize()
+        {
+            return c.IssueInitializationRequest(true);
+        }
+
+        /// <summary>
+        /// Terminate this device. Termination uses device-specific
+        /// common termination routines, like cooling or turning fans off, to prepare
+        /// the device for idleness.
+        /// </summary>
+        /// <returns></returns>
+        public bool Terminate()
+        {
+            return c.IssueInitializationRequest(false);
         }
 
 

@@ -18,7 +18,12 @@
 ## TODO
 - [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
 
-
+## BUILD 1306 - 0.4.3
+- [x] Make sure Extrusion Actions don't cause weird effects in non-3D printer compilers and viceversa
+- [x] Rethink what the 3D printer does automatically and what needs to be managed by the user: temperature, calibration, homing... --> The philosophy of the library is that it is a very low-level 3D printer interface as a result of the ibject being a machine that can move in 3D space. It is for simple custom operations, not really for hi-end printing (user would be much better off using a slicer software). 
+    - [x] Focus on the ZMorph for now; if at some point I use other printer, will expand functionality.
+    - [x] Add `Initialize()` and `Terminate()` for custom initialization and ending boilerplates.
+    - [ ] Change `Extrude(bool)` to `Extrude(double)` to include ExtrusionRate, and remove `ExtrusionRate` --> let's keep it like this for the moment, might be confusing/tyring to combine them. --> Perhaps add a `Extrude(double)` overload tht combines them both?
 
 ## BUILD 1305 - 0.4.2
 - [x] Change Joints/To to Axes/To

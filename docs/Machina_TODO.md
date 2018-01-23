@@ -15,36 +15,37 @@
 //                                                          
 ```
 
-# PHASE 2
 
-## HIGH-LEVEL
-- [x] RENAME THE PROJECT!
-- [x] Add support for KUKA + UR compilation
-- [x] Add Tools 
-- [x] Improve BRobot for Dynamo, create package, publish
-- [x] Deactivate action# display, and replace with the human version?
-- [x] Rename Zone to Precision
-- [x] Redo github banner
-- [x] Post links to some Machina videos on YouTube
-- [x] Create Grasshopper library
+## FOR 0.5.0 RELEASE
+- [x] Add `Temperature()`
+- [x] Add `Extrude()`
+- [x] Add `ExtrusionRate()`
+- [x] Test 'Temperature' etc
+- [x] Implement GCode compiler for ZMorph
+- [x] Basic 3D Printing example
+- [x] Make sure Extrusion Actions don't cause weird effects in non-3D printer compilers and viceversa
 
-- [x] Implement 'Temperature'
-- [x] Implement 'FeedRate'
-- [x] Implement 'Extrude'
-- [ ] Test 'Temperature' etc
-- [ ] Implement GCode compiler for ZMorph
-- [ ] Make sure Extrusion Actions don't cause weird effects in non-3D printer compilers and viceversa
-
-- [ ] Rename `FeedRate` to `ExtrusionRate` in DYN+GH
+- [x] Rethink what the 3D printer does automatically and what needs to be managed by the user: temperature, calibration, homing... --> The philosophy of the library is that it is a very low-level 3D printer interface as a result of the ibject being a machine that can move in 3D space. It is for simple custom operations, not really for hi-end printing (user would be much better off using a slicer software). 
+    - [x] Focus on the ZMorph for now; if at some point I use other printer, will expand functionality.
+    - [x] Add `Initialize()` and `Terminate()` for custom initialization and ending boilerplates.
+    - [ ] Change `Extrude(bool)` to `Extrude(double)` to include ExtrusionRate, and remove `ExtrusionRate` --> let's keep it like this for the moment, might be confusing/tyring to combine them. --> Perhaps add a `Extrude(double)` overload tht combines them both?
 
 - [ ] REMOVE THE REGULAR/TO MODEL, and add a ActionMode("absolute"/"relative") to substitute it
+- [ ] Remove all obsolete components, and create new ones with GUID to avoid overwrite
 - [ ] Rename "MotionType" to "MotionMode"
 - [ ] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
 - [ ] Rename 'Attach' to 'AttachTool', and 'Detach' to 'DetachTools'...?
 - [ ] Rename 'PushSettings' to 'SettingsPush' and same for Pop?
 - [ ] Print a disclaimer header for exported code
 - [ ] Rename `Zone` and `Joints` Actions in actions
+- [ ] Rename `FeedRate` to `ExtrusionRate` in DYN+GH
+- [ ] Update Dyn+GH in general
+- [ ] Wrap up Icons
+- [ ] Redo DYN+GH sample files
 
+
+
+## LATER..
 - [ ] Add enhanced CoordSys selection and WObj use
 
 - [ ] Rework the ABB real-time connection
@@ -59,6 +60,24 @@
 - [ ] Remove TurnOn/Off
 
 - [ ] Create `Program` as a class that contains a list of actions? It could be interesting as a way to enforce the idea of Programs as a list of Actions, especially in VPL interfaces. Also, it would allow to do things such as adding an `Instruction` (like a function) to the scope of a program, that could be called from the Program itself.
+
+
+
+
+----
+# PHASE 2
+
+## HIGH-LEVEL
+- [x] RENAME THE PROJECT!
+- [x] Add support for KUKA + UR compilation
+- [x] Add Tools 
+- [x] Improve BRobot for Dynamo, create package, publish
+- [x] Deactivate action# display, and replace with the human version?
+- [x] Rename Zone to Precision
+- [x] Redo github banner
+- [x] Post links to some Machina videos on YouTube
+- [x] Create Grasshopper library
+
 
 
 

@@ -1429,6 +1429,26 @@ namespace Machina
             return success;
         }
 
+        /// <summary>
+        /// Issue a request to add common initialization/termination procedures on the device, 
+        /// like homing, calibration, fans, etc.
+        /// </summary>
+        /// <param name="initiate"></param>
+        /// <returns></returns>
+        public bool IssueInitializationRequest(bool initiate)
+        {
+            if (!areCursorsInitialized)
+            {
+                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                return false;
+            }
+
+            ActionInitialization act = new ActionInitialization(initiate);
+
+            bool success = virtualCursor.Issue(act);
+            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            return success;
+        }
 
 
 

@@ -32,7 +32,8 @@ namespace Machina
         IOAnalog = 16, 
         Temperature = 17,
         Extrusion = 18,
-        ExtrusionRate = 19
+        ExtrusionRate = 19,
+        Initialization = 20
     }
 
     
@@ -184,6 +185,11 @@ namespace Machina
         public static ActionExtrusionRate FeedRate(double rate, bool relative)
         {
             return new ActionExtrusionRate(rate, relative);
+        }
+
+        public static ActionInitialization Initialize(bool init)
+        {
+            return new ActionInitialization(init);
         }
 
 
@@ -820,6 +826,32 @@ namespace Machina
             return this.relative ? 
                 $"{(this.rate < 0 ? "Decrease" : "Increase")} feed rate by {this.rate} mm/s" :
                 $"Set feed rate to {this.rate} mm/s";
+        }
+    }
+
+
+    //  ██╗███╗   ██╗██╗████████╗██╗ █████╗ ██╗     ██╗███████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+    //  ██║████╗  ██║██║╚══██╔══╝██║██╔══██╗██║     ██║╚══███╔╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+    //  ██║██╔██╗ ██║██║   ██║   ██║███████║██║     ██║  ███╔╝ ███████║   ██║   ██║██║   ██║██╔██╗ ██║
+    //  ██║██║╚██╗██║██║   ██║   ██║██╔══██║██║     ██║ ███╔╝  ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+    //  ██║██║ ╚████║██║   ██║   ██║██║  ██║███████╗██║███████╗██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+    //  ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝   ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //                                                                                                
+
+    public class ActionInitialization : Action
+    {
+        public bool initialize;
+
+        public ActionInitialization(bool initialize) : base()
+        {
+            this.type = ActionType.Initialization;
+
+            this.initialize = initialize;
+        }
+
+        public override string ToString()
+        {
+            return $"{(this.initialize ? "Initialize" : "Terminate")} this device.";
         }
     }
 
