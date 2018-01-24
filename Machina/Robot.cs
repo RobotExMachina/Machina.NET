@@ -19,7 +19,7 @@ namespace Machina
     /// <summary>
     /// Represents the type of control that will be performed over the real/virtual robot.
     /// </summary>
-    public enum ControlMode : int
+    public enum ControlType : int
     {
         /// <summary>
         /// Not connected to any controller. Useful for robot code generation and export.
@@ -42,9 +42,9 @@ namespace Machina
     }
 
     /// <summary>
-    /// Defines the different modes a program can be ran.
+    /// Defines the different cycle type modes a program can be ran.
     /// </summary>
-    public enum RunMode : int
+    public enum CycleType : int
     {
         None = 0,
         Once = 1,
@@ -83,21 +83,22 @@ namespace Machina
         ZMORPH,
     }
 
-    /// <summary>
-    /// Defines if Actions will be applied in absolute (setting) or relative (incrementing) mode.
-    /// </summary>
-    public enum ActionMode
-    {
-        Absolute, 
-        Relative
-    }
+    ///// <summary>
+    ///// Defines if the parameters for new Actions will be considered in absolute values 
+    ///// or relative increments.
+    ///// </summary>
+    //public enum ActionModes
+    //{
+    //    Absolute, 
+    //    Relative
+    //}
 
     /// <summary>
     /// An enum with different robotic parts, to be used as targets for execution operations, 
     /// e.g. 3D printing, I/O, etc.
     /// @TODO: temp, this should probably go somewhere else... 
     /// </summary>
-    public enum RobotPart
+    public enum RobotPartType
     {
         Extruder,
         Bed, 
@@ -124,12 +125,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1306;
+        public static readonly int Build = 1307;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.4.3." + Build;
+        public static readonly string Version = "0.5.0." + Build;
        
 
         /// <summary>
@@ -210,86 +211,79 @@ namespace Machina
         }
 
 
-        /// What was this even for?
-
+        /// What was this even for? Exposrt checks?
         public bool IsBrand(string brandName)
         {
             return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());
         }
 
-
-
-
+        
         /// <summary>
         /// Sets the control mode the robot will operate under.
         /// </summary>
-        /// <param name="mode"></param>
+        /// <param name="controlType"></param>
         /// <returns></returns>
-        public bool Mode(ControlMode mode)
+        public bool ControlMode(ControlType controlType)
         {
-            return c.SetControlMode(mode);
+            return c.SetControlMode(controlType);
         }
 
         /// <summary>
-        /// Sets the control mode the robot will operate under.
+        /// Sets the control type the robot will operate under, like "offline", "execute" or "stream".
         /// </summary>
-        /// <param name="mode"></param>
+        /// <param name="controlType"></param>
         /// <returns></returns>
-        public bool Mode(string mode)
+        public bool ControlMode(string controlType)
         {
-            mode = mode.ToLower();
-            bool success = true;
-            if (mode.Equals("offline"))
+            ControlType ct;
+            try
             {
-                return Mode(Machina.ControlMode.Offline);
+                ct = (ControlType)Enum.Parse(typeof(ControlType), controlType, true);
+                if (Enum.IsDefined(typeof(ControlType), ct))
+                {
+                    return c.SetControlMode(ct);
+                }
             }
-            else if (mode.Equals("execute"))
+            catch
             {
-                return Mode(Machina.ControlMode.Execute);
+                Console.WriteLine($"{controlType} is not a valid ControlMode type, please specify one of the following:");
+                foreach (string str in Enum.GetNames(typeof(ControlType)))
+                {
+                    Console.WriteLine(str);
+                }
             }
-            else if (mode.Equals("stream"))
-            {
-                return Mode(Machina.ControlMode.Stream);
-            }
-            else
-            {
-                Console.WriteLine("ConnectionMode '" + mode + "' is not available.");
-                success = false;
-            }
-            return success;
+            return false;
         }
         
         /// <summary>
         /// Sets the cycle the robot will run program in (Once or Loop).
         /// </summary>
-        /// <param name="mode"></param>
+        /// <param name="cycleType"></param>
         /// <returns></returns>
-        public bool RunMode(RunMode mode)
+        public bool CycleMode(CycleType cycleType)
         {
-            return c.SetRunMode(mode);
+            return c.SetRunMode(cycleType);
         }
 
         /// <summary>
         /// Sets the cycle the robot will run program in (Once or Loop).
         /// </summary>
-        /// <param name="mode"></param>
-        public bool RunMode(string mode)
+        /// <param name="cycleType"></param>
+        public bool CycleMode(string cycleType)
         {
-            mode = mode.ToLower();
-
-            if (mode.Equals("once"))
+            CycleType ct;
+            try
             {
-                return RunMode(global::Machina.RunMode.Once);
+                ct = (CycleType)Enum.Parse(typeof(CycleType), cycleType, true);
+                if (Enum.IsDefined(typeof(CycleType), ct))
+                    return c.SetRunMode(ct);
             }
-            else if (mode.Equals("loop"))
+            catch
             {
-                return RunMode(global::Machina.RunMode.Once);
+                Console.WriteLine($"{cycleType} is not a valid CycleMode type, please specify one of the following:");
+                foreach (string str in Enum.GetNames(typeof(CycleType)))
+                    Console.WriteLine(str);
             }
-            else
-            {
-                Console.WriteLine("RunMode '" + mode + "' is not available.");
-            }
-
             return false;
         }
 
@@ -583,49 +577,68 @@ namespace Machina
             c.IssueZoneRequest(radius, false);
         }
 
+        ///// <summary>
+        ///// Gets the current MotionType setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //public MotionType MotionMode()
+        //{
+        //    return c.GetCurrentMotionTypeSetting();
+        //}
 
         /// <summary>
-        /// Gets the current MotionType setting.
+        /// Sets the motion type (linear, joint...) for future issued actions.
         /// </summary>
-        /// <returns></returns>
-        public MotionType Motion()
+        /// <param name="motionType"></param>
+        public bool MotionMode(MotionType motionType)
         {
-            return c.GetCurrentMotionTypeSetting();
+            return c.IssueMotionRequest(motionType);
         }
 
         /// <summary>
         /// Sets the motion type (linear, joint...) for future issued actions.
         /// </summary>
-        /// <param name="type"></param>
-        public void Motion(MotionType type)
+        /// <param name="motionType">"linear", "joint", etc."</param>
+        public bool MotionMode(string motionType)
         {
-            c.IssueMotionRequest(type);
-        }
+            //MotionType t = MotionType.Undefined;
+            //type = type.ToLower();
+            //if (type.Equals("linear"))
+            //{
+            //    t = MotionType.Linear;
+            //}
+            //else if (type.Equals("joint"))
+            //{
+            //    t = MotionType.Joint;
+            //}
 
-        /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued actions.
-        /// </summary>
-        /// <param name="type">"linear", "joint" or "joints"</param>
-        public void Motion(string type)
-        {
-            MotionType t = MotionType.Undefined;
-            type = type.ToLower();
-            if (type.Equals("linear"))
-            {
-                t = MotionType.Linear;
-            }
-            else if (type.Equals("joint"))
-            {
-                t = MotionType.Joint;
-            }
+            //if (t == MotionType.Undefined)
+            //{
+            //    Console.WriteLine("Invalid motion type");
+            //    return;
+            //}
 
-            if (t == MotionType.Undefined)
-            {
-                Console.WriteLine("Invalid motion type");
-                return;
-            }
+            //c.IssueMotionRequest(t);
 
-            Motion(t);
+
+            MotionType mt;
+            try
+            {
+                mt = (MotionType)Enum.Parse(typeof(MotionType), motionType, true);
+                if (Enum.IsDefined(typeof(MotionType), mt))
+                {
+                    return c.IssueMotionRequest(mt);
+                }
+            }
+            catch
+            {
+                Console.WriteLine($"{motionType} is not a valid target part for motion type changes, please specify one of the following: ");
+                foreach(string str in Enum.GetNames(typeof(MotionType)))
+                {
+                    Console.WriteLine(str);
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -690,43 +703,84 @@ namespace Machina
         }
 
         /// <summary>
-        /// Sets the working temperature of one of the device's parts. Useful for 3D printing operations. 
+        /// Increments the working temperature of one of the device's parts. Useful for 3D printing operations. 
         /// </summary>
-        /// <param name="temp">Temperature in °C.</param>
+        /// <param name="temp">Temperature increment in °C.</param>
         /// <param name="devicePart">Device's part that will change temperature, e.g. "extruder", "bed", etc.</param>
         /// <param name="waitToReachTemp">If true, execution will wait for the part to heat up and resume when reached the target.</param>
         /// <returns></returns>
         public bool Temperature(double temp, string devicePart, bool waitToReachTemp = true)
         {
-            RobotPart tt;
+            RobotPartType tt;
             try
             {
-                tt = (RobotPart)Enum.Parse(typeof(RobotPart), devicePart, true);
-                if (Enum.IsDefined(typeof(RobotPart), tt))
+                tt = (RobotPartType)Enum.Parse(typeof(RobotPartType), devicePart, true);
+                if (Enum.IsDefined(typeof(RobotPartType), tt))
                 {
-                    return c.IssueTemperatureRequest(temp, tt, waitToReachTemp);
+                    return c.IssueTemperatureRequest(temp, tt, waitToReachTemp, true);
                 }
             }
-            catch { }
-            
-            Console.WriteLine("{0} is not a valid target part for temperature changes, please specify one of the following: ", devicePart);
-            foreach (string str in Enum.GetNames(typeof(RobotPart)))
+            catch
             {
-                Console.WriteLine(str);
+                Console.WriteLine("{0} is not a valid target part for temperature changes, please specify one of the following: ", devicePart);
+                foreach (string str in Enum.GetNames(typeof(RobotPartType)))
+                {
+                    Console.WriteLine(str);
+                }
             }
             return false;
         }
-        
+
         /// <summary>
-        /// Sets the extrusion rate for 3D printers in mm of filament per mm of movement.
+        /// Sets the working temperature of one of the device's parts. Useful for 3D printing operations. 
         /// </summary>
-        /// <param name="rate">In mm of filament per mm of movement.</param>
+        /// <param name="temp">Temperature increment in °C.</param>
+        /// <param name="devicePart">Device's part that will change temperature, e.g. "extruder", "bed", etc.</param>
+        /// <param name="waitToReachTemp">If true, execution will wait for the part to heat up and resume when reached the target.</param>
+        /// <returns></returns>
+        public bool TemperatureTo(double temp, string devicePart, bool waitToReachTemp = true)
+        {
+            RobotPartType tt;
+            try
+            {
+                tt = (RobotPartType)Enum.Parse(typeof(RobotPartType), devicePart, true);
+                if (Enum.IsDefined(typeof(RobotPartType), tt))
+                {
+                    return c.IssueTemperatureRequest(temp, tt, waitToReachTemp, false);
+                }
+            }
+            catch
+            {
+                Console.WriteLine("{0} is not a valid target part for temperature changes, please specify one of the following: ", devicePart);
+                foreach (string str in Enum.GetNames(typeof(RobotPartType)))
+                {
+                    Console.WriteLine(str);
+                }
+            }
+            return false;
+        }
+
+
+
+        /// <summary>
+        /// Increases the extrusion rate for 3D printers in mm of filament per mm of movement.
+        /// </summary>
+        /// <param name="rate">Increment of mm of filament per mm of movement.</param>
         /// <returns></returns>
         public bool ExtrusionRate(double rate)
         {
-            return c.IssueExtrusionRateRequest(rate);
+            return c.IssueExtrusionRateRequest(rate, true);
         }
 
+        /// <summary>
+        /// Sets the extrusion rate for 3D printers in mm of filament per mm of movement.
+        /// </summary>
+        /// <param name="rate">mm of filament per mm of movement.</param>
+        /// <returns></returns>
+        public bool ExtrusionRateTo(double rate)
+        {
+            return c.IssueExtrusionRateRequest(rate, false);
+        }
 
 
 

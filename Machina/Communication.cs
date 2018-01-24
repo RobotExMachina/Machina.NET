@@ -84,7 +84,7 @@ namespace Machina
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public abstract bool SetRunMode(RunMode mode);
+        public abstract bool SetRunMode(CycleType mode);
 
         /// <summary>
         /// Loads a program to the device.
@@ -347,7 +347,7 @@ namespace Machina
             isConnected = true;
 
             // If on 'stream' mode, set up stream connection flow
-            if (masterControl.GetControlMode() == ControlMode.Stream)
+            if (masterControl.GetControlMode() == ControlType.Stream)
             {
                 if (!SetupStreamingMode())
                 {
@@ -377,7 +377,7 @@ namespace Machina
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public override bool SetRunMode(RunMode mode)
+        public override bool SetRunMode(CycleType mode)
         {
             if (!isConnected)
             {
@@ -389,7 +389,7 @@ namespace Machina
             {
                 using (Mastership.Request(controller.Rapid))
                 {
-                    controller.Rapid.Cycle = mode == RunMode.Once ? ExecutionCycle.Once : mode == RunMode.Loop ? ExecutionCycle.Forever : ExecutionCycle.None;
+                    controller.Rapid.Cycle = mode == CycleType.Once ? ExecutionCycle.Once : mode == CycleType.Loop ? ExecutionCycle.Forever : ExecutionCycle.None;
                     return true;
                 }
             }
@@ -1623,7 +1623,7 @@ namespace Machina
                 isRunning = false;
 
                 // Only trigger Instruct queue
-                if (masterControl.GetControlMode() == ControlMode.Execute)
+                if (masterControl.GetControlMode() == ControlType.Execute)
                 {
                     // Tick queue to move forward
                     //masterControl.TriggerQueue();

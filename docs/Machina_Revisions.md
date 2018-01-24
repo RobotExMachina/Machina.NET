@@ -15,15 +15,31 @@
 //                                                          
 ```
 
-## TODO
-- [ ] TEST THAT THE ROBOT MOVES FINE NOW...!
+
+## BUILD 0.5.0.1307 
+- [ ] ~~REMOVE THE REGULAR/TO MODEL, and add a ActionMode("absolute"/"relative") to substitute it!~~
+    - ActionMode becomes a property of the cursor.
+    - Under this, Actions cannot be independently defined, but their meaning varies depending on when/where in the program they have been issued! :( This detracts from the conceptual independence of the Action and its platform-agnosticity... This may make sense in command-line environments, but will be quite shitty in VPLs
+    - Make `Push/PopSettings()` store `ActionMode` too?
+--> Decided not to go for this. The focus of this project is the CORE library, not the VPLs APIS... And when writting Machina code, the ...To() suffix is quite convenient and literal to quickly switch between modes, makes different explicit, is faster to type/read, and works better with auto completion in dev IDEs. Furtehrmore, it is interesting to keep the idea that Actions are agnostic to the medium; it would be weird if the same line of code would mean different things depending on the state of the cursor: the action should be absolute or relative on its own. 
+--> VPLs will have selector tabs to change the mode, or additional parameters to set abs/rel mode (the most typical usage scenario is using abs mode anyway...).
+
+- [x] Add `ExtrusionRateTo()` and `TemperatureTo()`
+- [x] Add `ExtrusionRateTo()` and `TemperatureTo()`
+- [x] Rename "MotionType" to "MotionMode": action API and enum value
+- [x] Rename `Mode()` to `ControlMode()`
+- [x] Rename `RunMode()` to `CycleMode()`
+- [ ] ~~Rename '`Attach`' to '`AttachTool`', and '`Detach`' to '`DetachTools`'...?~~
+- [ ] ~~Rename '`PushSettings`' to '`SettingsPush`' and same for `Pop`?~~
+
+
 
 ## BUILD 1306 - 0.4.3
 - [x] Make sure Extrusion Actions don't cause weird effects in non-3D printer compilers and viceversa
 - [x] Rethink what the 3D printer does automatically and what needs to be managed by the user: temperature, calibration, homing... --> The philosophy of the library is that it is a very low-level 3D printer interface as a result of the ibject being a machine that can move in 3D space. It is for simple custom operations, not really for hi-end printing (user would be much better off using a slicer software). 
     - [x] Focus on the ZMorph for now; if at some point I use other printer, will expand functionality.
     - [x] Add `Initialize()` and `Terminate()` for custom initialization and ending boilerplates.
-    - [ ] Change `Extrude(bool)` to `Extrude(double)` to include ExtrusionRate, and remove `ExtrusionRate` --> let's keep it like this for the moment, might be confusing/tyring to combine them. --> Perhaps add a `Extrude(double)` overload tht combines them both?
+    - [ ] ~~Change `Extrude(bool)` to `Extrude(double)` to include ExtrusionRate, and remove `ExtrusionRate`~~ --> let's keep it like this for the moment, might be confusing/tyring to combine them. --> Perhaps add a `Extrude(double)` overload tht combines them both?
 
 ## BUILD 1305 - 0.4.2
 - [x] Change Joints/To to Axes/To

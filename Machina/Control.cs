@@ -23,8 +23,8 @@ namespace Machina
         public const int DEFAULT_ZONE = 5;                                    // default zone for new actions
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
-        public const ControlMode DEFAULT_CONTROLMODE = ControlMode.Offline;
-        public const RunMode DEFAULT_RUNMODE = RunMode.Once;                  
+        public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
+        public const CycleType DEFAULT_RUNMODE = CycleType.Once;                  
         
 
 
@@ -33,8 +33,8 @@ namespace Machina
         /// <summary>
         /// Operation modes by default
         /// </summary>
-        private ControlMode controlMode = DEFAULT_CONTROLMODE;
-        private RunMode runMode = DEFAULT_RUNMODE;
+        private ControlType controlMode = DEFAULT_CONTROLMODE;
+        private CycleType runMode = DEFAULT_RUNMODE;
 
 
         internal Robot parent;
@@ -134,7 +134,7 @@ namespace Machina
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public bool SetControlMode(ControlMode mode)
+        public bool SetControlMode(ControlType mode)
         {
             controlMode = mode;
 
@@ -148,7 +148,7 @@ namespace Machina
             //    InitializeCommunication();  // online modes
             //}
 
-            if (mode == ControlMode.Offline)
+            if (mode == ControlType.Offline)
             {
                 DropCommunication();
 
@@ -167,7 +167,7 @@ namespace Machina
         /// Returns current Control Mode.
         /// </summary>
         /// <returns></returns>
-        public ControlMode GetControlMode()
+        public ControlType GetControlMode()
         {
             return controlMode;
         }
@@ -177,11 +177,11 @@ namespace Machina
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public bool SetRunMode(RunMode mode)
+        public bool SetRunMode(CycleType mode)
         {
             runMode = mode;
 
-            if (controlMode == ControlMode.Offline)
+            if (controlMode == ControlType.Offline)
             {
                 Console.WriteLine("Remember RunMode.{0} will have no effect in Offline mode", mode);
             }
@@ -198,7 +198,7 @@ namespace Machina
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public RunMode GetRunMode(RunMode mode)
+        public CycleType GetRunMode(CycleType mode)
         {
             return runMode;
         }
@@ -211,7 +211,7 @@ namespace Machina
         public bool ConnectToDevice(int robotId)
         {
             // Sanity
-            if (controlMode == ControlMode.Offline)
+            if (controlMode == ControlType.Offline)
             {
                 Console.WriteLine("No robot to connect to in 'offline' mode ;)");
                 return false;
@@ -243,7 +243,7 @@ namespace Machina
         public bool DisconnectFromDevice()
         {
             // Sanity
-            if (controlMode == ControlMode.Offline)
+            if (controlMode == ControlType.Offline)
             {
                 Console.WriteLine("No robot to disconnect from in 'offline' mode ;)");
                 return false;
@@ -287,7 +287,7 @@ namespace Machina
         /// <returns></returns>
         public bool LoadProgramToDevice(string filepath)
         {
-            if (controlMode == ControlMode.Offline)
+            if (controlMode == ControlType.Offline)
             {
                 Console.WriteLine("Cannot load modules in Offline mode");
                 return false;
@@ -355,7 +355,7 @@ namespace Machina
         /// <returns></returns>
         public bool StartProgramOnDevice()
         {
-            if (controlMode == ControlMode.Offline)
+            if (controlMode == ControlType.Offline)
             {
                 Console.WriteLine("No program to start in Offline mode");
                 return false;
@@ -371,7 +371,7 @@ namespace Machina
         /// <returns></returns>
         public bool StopProgramOnDevice(bool immediate)
         {
-            if (controlMode == ControlMode.Offline)
+            if (controlMode == ControlType.Offline)
             {
                 Console.WriteLine("No program to stop in Offline mode");
                 return false;
@@ -386,7 +386,7 @@ namespace Machina
         /// <returns></returns>
         public Vector GetCurrentPosition()
         {
-            if (controlMode == ControlMode.Stream)
+            if (controlMode == ControlType.Stream)
             {
                 return comm.GetCurrentPosition();
             }
@@ -400,7 +400,7 @@ namespace Machina
         /// <returns></returns>
         public Rotation GetCurrentOrientation()
         {
-            if (controlMode == ControlMode.Stream)
+            if (controlMode == ControlType.Stream)
             {
                 return comm.GetCurrentOrientation();
             }
@@ -427,7 +427,7 @@ namespace Machina
         /// <returns></returns>
         public Joints GetCurrentJoints()
         {
-            if (controlMode == ControlMode.Stream)
+            if (controlMode == ControlType.Stream)
             {
                 return comm.GetCurrentJoints();
             }
@@ -441,7 +441,7 @@ namespace Machina
         /// <returns></returns>
         public Tool GetCurrentTool()
         {
-            if (controlMode == ControlMode.Stream)
+            if (controlMode == ControlType.Stream)
             {
                 //return comm.getCurrentTool();
                 return null;  // TODO: implement when back to streaming
@@ -463,7 +463,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> Export(bool inlineTargets, bool humanComments)
         {
-            if (controlMode != ControlMode.Offline)
+            if (controlMode != ControlType.Offline)
             {
                 Console.WriteLine("Export() only works in Offline mode");
                 return null;
@@ -497,7 +497,7 @@ namespace Machina
         /// <returns></returns>
         public void Execute()
         {
-            if (controlMode != ControlMode.Execute)
+            if (controlMode != ControlType.Execute)
             {
                 Console.WriteLine("Execute() only works in Execute mode");
                 return;
@@ -636,7 +636,7 @@ namespace Machina
             }
 
             bool success = virtualCursor.Issue(action);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -655,7 +655,7 @@ namespace Machina
             ActionSpeed act = new ActionSpeed(speed, relative);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -671,7 +671,7 @@ namespace Machina
             ActionPrecision act = new ActionPrecision(zone, relative);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -686,7 +686,7 @@ namespace Machina
             ActionMotion act = new ActionMotion(motionType);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -701,7 +701,7 @@ namespace Machina
             ActionCoordinates act = new ActionCoordinates(referenceCS);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -716,11 +716,11 @@ namespace Machina
             ActionPushPop act = new ActionPushPop(push);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
-        public bool IssueTemperatureRequest(double temp, RobotPart robotPart, bool waitToReachTemp)
+        public bool IssueTemperatureRequest(double temp, RobotPartType robotPart, bool waitToReachTemp, bool relative)
         {
             if (!areCursorsInitialized)
             {
@@ -728,16 +728,16 @@ namespace Machina
                 return false;
             }
 
-            if (robotPart != RobotPart.Bed && robotPart != RobotPart.Extruder)
+            if (robotPart != RobotPartType.Bed && robotPart != RobotPartType.Extruder)
             {
-                Console.WriteLine("Cannot set temperature of part " + Enum.GetName(typeof(RobotPart), robotPart));
+                Console.WriteLine("Cannot set temperature of part " + Enum.GetName(typeof(RobotPartType), robotPart));
                 return false;
             }
 
-            ActionTemperature act = new ActionTemperature(temp, robotPart, waitToReachTemp, false);
+            ActionTemperature act = new ActionTemperature(temp, robotPart, waitToReachTemp, relative);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -752,11 +752,11 @@ namespace Machina
             ActionExtrusion act = new ActionExtrusion(extrude);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
-        public bool IssueExtrusionRateRequest(double rate)
+        public bool IssueExtrusionRateRequest(double rate, bool relative)
         {
             if (!areCursorsInitialized)
             {
@@ -764,10 +764,10 @@ namespace Machina
                 return false;
             }
 
-            ActionExtrusionRate act = new ActionExtrusionRate(rate, false);
+            ActionExtrusionRate act = new ActionExtrusionRate(rate, relative);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -811,7 +811,7 @@ namespace Machina
             ActionTranslation act = new ActionTranslation(trans, relative);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -898,7 +898,7 @@ namespace Machina
             ActionRotation act = new ActionRotation(rot, relative);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
@@ -991,7 +991,7 @@ namespace Machina
             ActionTransformation act = new ActionTransformation(trans, rot, rel, translationFirst);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
@@ -1243,7 +1243,7 @@ namespace Machina
             ActionAxes act = new ActionAxes(joints, relJnts);
             
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
@@ -1288,7 +1288,7 @@ namespace Machina
             ActionMessage act = new ActionMessage(message);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
@@ -1322,7 +1322,7 @@ namespace Machina
             ActionWait act = new ActionWait(millis);
             
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
@@ -1344,7 +1344,7 @@ namespace Machina
             ActionComment act = new ActionComment(comment);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -1364,7 +1364,7 @@ namespace Machina
             ActionAttach act = new ActionAttach(tool);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -1383,7 +1383,7 @@ namespace Machina
             ActionDetach act = new ActionDetach();
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -1404,7 +1404,7 @@ namespace Machina
             ActionIODigital act = new ActionIODigital(pinNum, isOn);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -1425,7 +1425,7 @@ namespace Machina
             ActionIOAnalog act = new ActionIOAnalog(pinNum, value);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -1446,7 +1446,7 @@ namespace Machina
             ActionInitialization act = new ActionInitialization(initiate);
 
             bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlMode.Stream) comm.TickStreamQueue(true);
+            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
 
@@ -1483,7 +1483,7 @@ namespace Machina
 
             // Pass the streamQueue object as a shared reference
             //comm.LinkStreamQueue(streamQueue);
-            if (controlMode == ControlMode.Stream)
+            if (controlMode == ControlType.Stream)
             {
                 comm.LinkWriteCursor(ref writeCursor);
             }
@@ -1578,7 +1578,7 @@ namespace Machina
         /// </summary>
         public void TickWriteCursor()
         {
-            if (controlMode == ControlMode.Execute)
+            if (controlMode == ControlType.Execute)
             {
                 if (!comm.IsRunning() && areCursorsInitialized && writeCursor.AreActionsPending() && (actionsExecuter == null || !actionsExecuter.IsAlive))
                 {

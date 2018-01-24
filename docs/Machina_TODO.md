@@ -28,17 +28,27 @@
 - [x] Rethink what the 3D printer does automatically and what needs to be managed by the user: temperature, calibration, homing... --> The philosophy of the library is that it is a very low-level 3D printer interface as a result of the ibject being a machine that can move in 3D space. It is for simple custom operations, not really for hi-end printing (user would be much better off using a slicer software). 
     - [x] Focus on the ZMorph for now; if at some point I use other printer, will expand functionality.
     - [x] Add `Initialize()` and `Terminate()` for custom initialization and ending boilerplates.
-    - [ ] Change `Extrude(bool)` to `Extrude(double)` to include ExtrusionRate, and remove `ExtrusionRate` --> let's keep it like this for the moment, might be confusing/tyring to combine them. --> Perhaps add a `Extrude(double)` overload tht combines them both?
+    - [ ] ~~Change `Extrude(bool)` to `Extrude(double)` to include ExtrusionRate, and remove `ExtrusionRate`~~ --> let's keep it like this for the moment, might be confusing/tyring to combine them. --> Perhaps add a `Extrude(double)` overload tht combines them both?
 
-- [ ] REMOVE THE REGULAR/TO MODEL, and add a ActionMode("absolute"/"relative") to substitute it
-- [ ] Remove all obsolete components, and create new ones with GUID to avoid overwrite
-- [ ] Rename "MotionType" to "MotionMode"
-- [ ] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
-- [ ] Rename 'Attach' to 'AttachTool', and 'Detach' to 'DetachTools'...?
-- [ ] Rename 'PushSettings' to 'SettingsPush' and same for Pop?
+- [ ] ~~REMOVE THE REGULAR/TO MODEL, and add a ActionMode("absolute"/"relative") to substitute it!~~
+    - ActionMode becomes a property of the cursor.
+    - Under this, Actions cannot be independently defined, but their meaning varies depending on when/where in the program they have been issued! :( This detracts from the conceptual independence of the Action and its platform-agnosticity... This may make sense in command-line environments, but will be quite shitty in VPLs
+    - Make `Push/PopSettings()` store `ActionMode` too?
+--> Decided not to go for this. The focus of this project is the CORE library, not the VPLs APIS... And when writting Machina code, the ...To() suffix is quite convenient and literal to quickly switch between modes, makes different explicit, is faster to type/read, and works better with auto completion in dev IDEs. Furtehrmore, it is interesting to keep the idea that Actions are agnostic to the medium; it would be weird if the same line of code would mean different things depending on the state of the cursor: the action should be absolute or relative on its own. 
+
+- [x] Add `ExtrusionRateTo()` and `TemperatureTo()`
+- [x] Rename "MotionType" to "MotionMode": action API and enum value
+- [x] Rename `Mode()` to `ControlMode()`
+- [x] Rnemae `RunMode()` to `CycleMode()`
+- [ ] ~~Rename '`Attach`' to '`AttachTool`', and '`Detach`' to '`DetachTools`'...?~~
+- [ ] ~~Rename '`PushSettings`' to '`SettingsPush`' and same for `Pop`?~~
 - [ ] Print a disclaimer header for exported code
 - [ ] Rename `Zone` and `Joints` Actions in actions
+
+
+- [ ] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
 - [ ] Rename `FeedRate` to `ExtrusionRate` in DYN+GH
+- [ ] Remove all obsolete components, and create new ones with GUID to avoid overwrite
 - [ ] Update Dyn+GH in general
 - [ ] Wrap up Icons
 - [ ] Redo DYN+GH sample files

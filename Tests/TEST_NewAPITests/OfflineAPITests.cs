@@ -102,7 +102,7 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(arm.SetIOName("custom_DO_name_1", 1, true));
 
             // Move to 'home' position
-            arm.Motion("joint");
+            arm.MotionMode("joint");
             arm.SpeedTo(100);
             arm.ZoneTo(5);  // predef zone
             if (arm.IsBrand("ABB"))
@@ -126,7 +126,7 @@ namespace TEST_OfflineAPITests
             arm.PushSettings();
             arm.Speed(100);  // relative increase
             arm.Zone(5);    // rel increase
-            arm.Motion("joint");
+            arm.MotionMode("joint");
             arm.TransformTo(new Point(200, 300, 400), new Orientation(-1, 0, 0, 0, 1, 0));
 
             // Align TCP vertically
@@ -135,7 +135,7 @@ namespace TEST_OfflineAPITests
             arm.PopSettings();
 
             // Draw rectangle
-            arm.Motion("linear");
+            arm.MotionMode("linear");
             arm.Message("Drawing rectangle");
             arm.WriteDigital(1, true);
             arm.WriteAnalog(1, 0.9);
@@ -205,7 +205,7 @@ namespace TEST_OfflineAPITests
 
         static public void TraceYLine(Robot arm, bool jointMovement)
         {
-            if (jointMovement) arm.Motion("joint");
+            if (jointMovement) arm.MotionMode("joint");
 
             arm.SpeedTo(100);
             arm.ZoneTo(1);
@@ -214,7 +214,7 @@ namespace TEST_OfflineAPITests
             arm.Move(0, 378, 0);
             arm.MoveTo(300, 0, 600);
 
-            if (jointMovement) arm.Motion("linear");  // back to where it was... this will improve with arm.PushSettings(); 
+            if (jointMovement) arm.MotionMode("linear");  // back to where it was... this will improve with arm.PushSettings(); 
         }
 
         static public void ApproachBaseXYPlane(Robot arm, double height, double zStep)
@@ -253,7 +253,7 @@ namespace TEST_OfflineAPITests
             arm.PopSettings();
 
             arm.PushSettings();
-            arm.Motion("joint");
+            arm.MotionMode("joint");
             arm.SpeedTo(100);
             arm.Move(0, 0, 200);
             arm.DebugSettingsBuffer();

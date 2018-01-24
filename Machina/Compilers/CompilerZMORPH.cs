@@ -24,14 +24,14 @@ namespace Machina
     {
         // A 'multidimensional' Dict to store permutations of (part, wait) to their corresponding GCode command
         // https://stackoverflow.com/a/15826532/1934487
-        Dictionary<Tuple<RobotPart, bool>, String> tempToGCode = new Dictionary<Tuple<RobotPart, bool>, String>()
+        Dictionary<Tuple<RobotPartType, bool>, String> tempToGCode = new Dictionary<Tuple<RobotPartType, bool>, String>()
         {
-            { new Tuple<RobotPart, bool>(RobotPart.Extruder, true), "M109" },
-            { new Tuple<RobotPart, bool>(RobotPart.Extruder, false), "M104" },
-            { new Tuple<RobotPart, bool>(RobotPart.Bed, true), "M190" },
-            { new Tuple<RobotPart, bool>(RobotPart.Bed, false), "M140" },
-            { new Tuple<RobotPart, bool>(RobotPart.Chamber, true), "M191" },
-            { new Tuple<RobotPart, bool>(RobotPart.Chamber, false), "M141" }
+            { new Tuple<RobotPartType, bool>(RobotPartType.Extruder, true), "M109" },
+            { new Tuple<RobotPartType, bool>(RobotPartType.Extruder, false), "M104" },
+            { new Tuple<RobotPartType, bool>(RobotPartType.Bed, true), "M190" },
+            { new Tuple<RobotPartType, bool>(RobotPartType.Bed, false), "M140" },
+            { new Tuple<RobotPartType, bool>(RobotPartType.Chamber, true), "M191" },
+            { new Tuple<RobotPartType, bool>(RobotPartType.Chamber, false), "M141" }
         };
 
         // On extrusion length reset, keep track of the reset point ("G92")
@@ -94,6 +94,8 @@ namespace Machina
             //// Machina bolierplate
             //this.initializationLines.Add("M82");                     // set extruder to absolute mode (this is actually ZMorph, but useful here
             //this.initializationLines.Add($"G1 F{Math.Round(writer.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)}");  // initialize feed speed to the writer's state
+
+            this.initializationLines.AddRange(GenerateDisclaimerHeader(programName));
 
             // DATA GENERATION
             // Use the write RobotCursor to generate the data
@@ -219,18 +221,14 @@ namespace Machina
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (aioa.value < 0 || aioa.value > 255)
-                    {
                         dec = $"{commentCharacter} ERROR on \"{aioa.ToString()}\": value out of range [0..255]";
-                    }
                     else
-                    {
                         dec = $"M42 P{aioa.pin} S{Math.Round(cursor.analogOutputs[aioa.pin], 0)}";
-                    }
                     break;
 
                 case ActionType.Temperature:
                     ActionTemperature at = (ActionTemperature)action;
-                    dec = $"{tempToGCode[new Tuple<RobotPart, bool>(at.robotPart, at.wait)]} S{Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE)}";
+                    dec = $"{tempToGCode[new Tuple<RobotPartType, bool>(at.robotPart, at.wait)]} S{Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE)}";
                     break;
 
                 case ActionType.Extrusion:

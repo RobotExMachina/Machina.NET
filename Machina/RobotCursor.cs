@@ -39,7 +39,7 @@ namespace Machina
         // 3D printing
         public bool isExtruding;
         public double extrusionRate;
-        public Dictionary<RobotPart, double> partTemperature = new Dictionary<RobotPart, double>();
+        public Dictionary<RobotPartType, double> partTemperature = new Dictionary<RobotPartType, double>();
         public double extrudedLength, prevExtrudedLength;  // the length of filament that has been extruded, i.e. the "E" parameter
 
         public Action lastAction = null;  // the last action that was applied to this cursor
@@ -135,7 +135,7 @@ namespace Machina
             }
 
             // Initialize temps to zero
-            foreach (RobotPart part in Enum.GetValues(typeof(RobotPart)))
+            foreach (RobotPartType part in Enum.GetValues(typeof(RobotPartType)))
             {
                 partTemperature[part] = 0;
             }
@@ -174,8 +174,8 @@ namespace Machina
             this.motionType = mType;
             this.referenceCS = refCS; 
 
-            initialized = true;
-            return initialized;
+            this.initialized = true;
+            return this.initialized;
         }
         
         /// <summary>
@@ -866,13 +866,9 @@ namespace Machina
         public bool ApplyAction(ActionTemperature action)
         {
             if (action.relative)
-            {
                 this.partTemperature[action.robotPart] += action.temperature;
-            }
             else
-            {
                 this.partTemperature[action.robotPart] = action.temperature;
-            }
 
             return true;
         }
@@ -897,13 +893,9 @@ namespace Machina
         public bool ApplyAction(ActionExtrusionRate action)
         {
             if (action.relative)
-            {
                 this.extrusionRate += action.rate;
-            }
             else
-            {
                 this.extrusionRate = action.rate;
-            }
 
             return true;
         }
