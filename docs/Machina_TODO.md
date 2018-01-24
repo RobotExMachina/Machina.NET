@@ -42,7 +42,7 @@
 - [x] Rnemae `RunMode()` to `CycleMode()`
 - [ ] ~~Rename '`Attach`' to '`AttachTool`', and '`Detach`' to '`DetachTools`'...?~~
 - [ ] ~~Rename '`PushSettings`' to '`SettingsPush`' and same for `Pop`?~~
-- [ ] Print a disclaimer header for exported code
+- [x] Print a disclaimer header for exported code
 - [ ] Rename `Zone` and `Joints` Actions in actions
 
 

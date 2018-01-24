@@ -31,6 +31,7 @@
 - [x] Rename `RunMode()` to `CycleMode()`
 - [ ] ~~Rename '`Attach`' to '`AttachTool`', and '`Detach`' to '`DetachTools`'...?~~
 - [ ] ~~Rename '`PushSettings`' to '`SettingsPush`' and same for `Pop`?~~
+- [x] Print a disclaimer header for exported code
 
 
 
