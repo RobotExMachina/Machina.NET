@@ -71,14 +71,14 @@ namespace Machina
             return new ActionSpeed(speed, false);
         }
 
-        public static ActionPrecision Zone(int zoneInc)
+        public static ActionPrecision Precision(int precisionInc)
         {
-            return new ActionPrecision(zoneInc, true);
+            return new ActionPrecision(precisionInc, true);
         }
 
-        public static ActionPrecision ZoneTo(int zone)
+        public static ActionPrecision PrecisionTo(int precision)
         {
-            return new ActionPrecision(zone, false);
+            return new ActionPrecision(precision, false);
         }
 
         public static ActionMotion Motion(MotionType motionType)
@@ -121,12 +121,12 @@ namespace Machina
             return new ActionTransformation(pos, rot, false, true);
         }
 
-        public static ActionAxes Joints(Joints jointsInc)
+        public static ActionAxes Axes(Joints jointsInc)
         {
             return new ActionAxes(jointsInc, true);
         }
 
-        public static ActionAxes JointsTo(Joints joints)
+        public static ActionAxes AxesTo(Joints joints)
         {
             return new ActionAxes(joints, false);
         }
@@ -243,34 +243,36 @@ namespace Machina
         }
     }
 
-    //  ███████╗ ██████╗ ███╗   ██╗███████╗
-    //  ╚══███╔╝██╔═══██╗████╗  ██║██╔════╝
-    //    ███╔╝ ██║   ██║██╔██╗ ██║█████╗  
-    //   ███╔╝  ██║   ██║██║╚██╗██║██╔══╝  
-    //  ███████╗╚██████╔╝██║ ╚████║███████╗
-    //  ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-    //                                     
+
+
+    //  ██████╗ ██████╗ ███████╗ ██████╗██╗███████╗██╗ ██████╗ ███╗   ██╗
+    //  ██╔══██╗██╔══██╗██╔════╝██╔════╝██║██╔════╝██║██╔═══██╗████╗  ██║
+    //  ██████╔╝██████╔╝█████╗  ██║     ██║███████╗██║██║   ██║██╔██╗ ██║
+    //  ██╔═══╝ ██╔══██╗██╔══╝  ██║     ██║╚════██║██║██║   ██║██║╚██╗██║
+    //  ██║     ██║  ██║███████╗╚██████╗██║███████║██║╚██████╔╝██║ ╚████║
+    //  ╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //                                                                   
     /// <summary>
-    /// An Action to change current zone setting.
+    /// An Action to change current precision settings.
     /// </summary>
     public class ActionPrecision : Action
     {
-        public int zone;
+        public int precision;
         public bool relative;
 
-        public ActionPrecision(int zone, bool relative) : base()
+        public ActionPrecision(int value, bool relative) : base()
         {
             type = ActionType.Precision;
 
-            this.zone = zone;
+            this.precision = value;
             this.relative = relative;
         }
 
         public override string ToString()
         {
             return relative ?
-                string.Format("{0} precision by {1} mm", this.zone < 0 ? "Decrease" : "Increase", this.zone) :
-                string.Format("Set precision to {0} mm", this.zone);
+                string.Format("{0} precision by {1} mm", this.precision < 0 ? "Decrease" : "Increase", this.precision) :
+                string.Format("Set precision to {0} mm", this.precision);
         }
     }
 
@@ -336,7 +338,7 @@ namespace Machina
     //  ╚═╝      ╚═════╝ ╚══════╝╚═╝  ╚═╝      ╚═╝      ╚═════╝ ╚═╝     
     //                                                                  
     /// <summary>
-    /// An Action to Push or Pop current device settings (such as speed, zone, etc.)
+    /// An Action to Push or Pop current device settings (such as speed, precision, etc.)
     /// </summary>
     public class ActionPushPop: Action
     {
@@ -383,15 +385,6 @@ namespace Machina
         public Vector translation;
         public bool relative;
 
-        /// <summary>
-        /// Full constructor.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <param name="mType"></param>
         public ActionTranslation(Vector trans, bool relTrans) : base()
         {
             type = ActionType.Translation;

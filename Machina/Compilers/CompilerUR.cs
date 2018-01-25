@@ -154,7 +154,7 @@ namespace Machina
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         id,
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Axes:
@@ -163,7 +163,7 @@ namespace Machina
                         "movej",
                         id,
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Message:
@@ -181,7 +181,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        commentCharacter,
+                        commChar,
                         ac.comment);
                     break;
 
@@ -201,13 +201,13 @@ namespace Machina
                     if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else if (aiod.pin > 7)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else
@@ -223,19 +223,19 @@ namespace Machina
                     if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else if (aioa.pin > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else
@@ -255,14 +255,14 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.id);
             }
 
@@ -284,7 +284,7 @@ namespace Machina
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         GetPoseTargetValue(cursor),
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Axes:
@@ -293,7 +293,7 @@ namespace Machina
                         "movej",
                         GetJointTargetValue(cursor),
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.zone, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Message:
@@ -311,7 +311,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        commentCharacter,
+                        commChar,
                         ac.comment);
                     break;
 
@@ -331,13 +331,13 @@ namespace Machina
                     if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else if (aiod.pin > 7)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else
@@ -353,19 +353,19 @@ namespace Machina
                     if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
                     {
                         dec = string.Format("   {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else if (aioa.pin > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else
@@ -385,14 +385,14 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.id);
             }
 

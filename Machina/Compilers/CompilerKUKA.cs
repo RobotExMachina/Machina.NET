@@ -213,7 +213,7 @@ namespace Machina
 
                 case ActionType.Precision:
                     dec = string.Format("  $APO.CDIS = {0}",
-                        cursor.zone);
+                        cursor.precision);
                     break;
 
                 case ActionType.Translation:
@@ -222,14 +222,14 @@ namespace Machina
                     dec = string.Format("  {0} target{1} {2}",
                         cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
                         id,
-                        cursor.zone >= 1 ? "C_DIS" : "");
+                        cursor.precision >= 1 ? "C_DIS" : "");
                     break;
 
                 case ActionType.Axes:
                     dec = string.Format("  {0} target{1} {2}",
                         "PTP",
                         id,
-                        cursor.zone >= 1 ? "C_DIS" : "");  // @TODO: figure out how to turn this into C_PTP
+                        cursor.precision >= 1 ? "C_DIS" : "");  // @TODO: figure out how to turn this into C_PTP
                     break;
 
                 // @TODO: apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it.
@@ -249,7 +249,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        cursor.compiler.commentCharacter,
+                        cursor.compiler.commChar,
                         ac.comment);
                     break;
 
@@ -269,7 +269,7 @@ namespace Machina
                     if (aiod.pin < 1 || aiod.pin >= cursor.digitalOutputs.Length)  // KUKA starts counting pins by 1
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else
@@ -285,13 +285,13 @@ namespace Machina
                     if (aioa.pin < 1 || aioa.pin >= cursor.analogOutputNames.Length || aioa.pin > 16)    // KUKA: analog pins [1 to 16]
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else if (aioa.value < -1 || aioa.value > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": value out of range [-1.0, 1.0]",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else
@@ -311,14 +311,14 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.id);
             }
 
@@ -342,7 +342,7 @@ namespace Machina
 
                 case ActionType.Precision:
                     dec = string.Format("  $APO.CDIS = {0}",
-                        cursor.zone);
+                        cursor.precision);
                     break;
 
                 case ActionType.Translation:
@@ -351,14 +351,14 @@ namespace Machina
                     dec = string.Format("  {0} {1} {2}",
                         cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
                         GetPositionTargetValue(cursor),
-                        cursor.zone >= 1 ? "C_DIS" : "");
+                        cursor.precision >= 1 ? "C_DIS" : "");
                     break;
 
                 case ActionType.Axes:
                     dec = string.Format("  {0} {1} {2}",
                         "PTP",
                         GetAxisTargetValue(cursor),
-                        cursor.zone >= 1 ? "C_DIS" : "");  // @TODO: figure out how to turn this into C_PTP
+                        cursor.precision >= 1 ? "C_DIS" : "");  // @TODO: figure out how to turn this into C_PTP
                     break;
 
                 // @TODO: apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it.
@@ -366,7 +366,7 @@ namespace Machina
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
                     dec = string.Format("  {0} MESSAGE: \"{1}\" (messages in KRL currently not supported in Machina)",
-                        commentCharacter,
+                        commChar,
                         am.message);
                     break;
 
@@ -379,7 +379,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        commentCharacter,
+                        commChar,
                         ac.comment);
                     break;
 
@@ -400,7 +400,7 @@ namespace Machina
                     if (aiod.pin < 1 || aiod.pin >= cursor.digitalOutputs.Length)  // KUKA starts counting pins by 1
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else
@@ -416,13 +416,13 @@ namespace Machina
                     if (aioa.pin < 1 || aioa.pin >= cursor.analogOutputNames.Length || aioa.pin > 16)    // KUKA: analog pins [1 to 16]
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else if (aioa.value < -1 || aioa.value > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": value out of range [-1.0, 1.0]",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else
@@ -442,14 +442,14 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.id);
             }
 

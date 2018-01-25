@@ -27,7 +27,7 @@ namespace Machina
         public Rotation rotation, prevRotation;
         public Joints joints, prevJoints;
         public int speed;
-        public int zone;
+        public int precision;
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
@@ -170,7 +170,7 @@ namespace Machina
                 this.prevJoints = new Joints(joints);
             }
             this.speed = speed;
-            this.zone = zone;
+            this.precision = zone;
             this.motionType = mType;
             this.referenceCS = refCS; 
 
@@ -375,11 +375,11 @@ namespace Machina
         public bool ApplyAction(ActionPrecision action)
         {
             if (action.relative)
-                this.zone += action.zone;
+                this.precision += action.precision;
             else
-                this.zone = action.zone;
+                this.precision = action.precision;
 
-            if (this.zone < 0) zone = 0;
+            if (this.precision < 0) precision = 0;
 
             return true;
         }
@@ -417,7 +417,7 @@ namespace Machina
         {
             if (action.push)
             {
-                Settings s = new Settings(this.speed, this.zone, this.motionType, this.referenceCS);
+                Settings s = new Settings(this.speed, this.precision, this.motionType, this.referenceCS);
                 return this.settingsBuffer.Push(s);
             }
             else
@@ -426,7 +426,7 @@ namespace Machina
                 if (s != null)
                 {
                     this.speed = s.Speed;
-                    this.zone = s.Zone;
+                    this.precision = s.Zone;
                     this.motionType = s.MotionType;
                     this.referenceCS = s.RefCS;
                     return true;
@@ -947,7 +947,7 @@ namespace Machina
                 rotation, 
                 joints, 
                 speed, 
-                zone,
+                precision,
                 this.tool == null ? "" : "t" + this.tool);
         }
 

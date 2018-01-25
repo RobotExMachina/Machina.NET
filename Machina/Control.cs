@@ -20,7 +20,7 @@ namespace Machina
         public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
 
         public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
-        public const int DEFAULT_ZONE = 5;                                    // default zone for new actions
+        public const int DEFAULT_PRECISION = 5;                               // default precision for new actions
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
@@ -425,7 +425,7 @@ namespace Machina
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public Joints GetCurrentJoints()
+        public Joints getCurrentAxes()
         {
             if (controlMode == ControlType.Stream)
             {
@@ -528,12 +528,12 @@ namespace Machina
         }
 
         /// <summary>
-        /// Gets current zone setting.
+        /// Gets current precision setting.
         /// </summary>
         /// <returns></returns>
-        public int GetCurrentZoneSetting()
+        public int GetCurrentPrecisionSettings()
         {
-            return virtualCursor.zone;
+            return virtualCursor.precision;
         }
 
         /// <summary>
@@ -660,7 +660,7 @@ namespace Machina
         }
 
 
-        public bool IssueZoneRequest(int zone, bool relative)
+        public bool IssuePrecisionRequest(int precision, bool relative)
         {
             if (!areCursorsInitialized)
             {
@@ -668,7 +668,7 @@ namespace Machina
                 return false;
             }
 
-            ActionPrecision act = new ActionPrecision(zone, relative);
+            ActionPrecision act = new ActionPrecision(precision, relative);
 
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
@@ -782,12 +782,8 @@ namespace Machina
         /// <summary>
         /// Issue a Translation action request that falls back on the state of current settings.
         /// </summary>
-        /// <param name="world"></param>
         /// <param name="trans"></param>
         /// <param name="relative"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <param name="mType"></param>
         /// <returns></returns>
         public bool IssueTranslationRequest(Vector trans, bool relative)
         {
@@ -869,12 +865,8 @@ namespace Machina
         /// <summary>
         /// Issue a Rotation action request with fully customized parameters.
         /// </summary>
-        /// <param name="world"></param>
         /// <param name="rot"></param>
         /// <param name="relative"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <param name="mType"></param>
         /// <returns></returns>
         public bool IssueRotationRequest(Rotation rot, bool relative)
         {
@@ -956,15 +948,10 @@ namespace Machina
         /// <summary>
         /// Issue a Translation + Rotation action request with fully customized parameters.
         /// </summary>
-        /// <param name="worldTrans"></param>
         /// <param name="trans"></param>
-        /// <param name="relTrans"></param>
-        /// <param name="worldRot"></param>
         /// <param name="rot"></param>
-        /// <param name="relRot"></param>
-        /// <param name="speed"></param>
-        /// <param name="zone"></param>
-        /// <param name="mType"></param>
+        /// <param name="rel"></param>
+        /// <param name="translationFirst"></param>
         /// <returns></returns>
         public bool IssueTransformationRequest(Vector trans, Rotation rot, bool rel, bool translationFirst)
         {
@@ -1529,14 +1516,14 @@ namespace Machina
         /// <param name="joints"></param>
         /// <returns></returns>
         internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
-            int speed = Control.DEFAULT_SPEED, int zone = Control.DEFAULT_ZONE,
+            int speed = Control.DEFAULT_SPEED, int precision = Control.DEFAULT_PRECISION,
             MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
 
         {
             bool success = true;
-            success = success && virtualCursor.Initialize(position, rotation, joints, speed, zone, mType, refCS);
-            success = success && writeCursor.Initialize(position, rotation, joints, speed, zone, mType, refCS);
-            success = success && motionCursor.Initialize(position, rotation, joints, speed, zone, mType, refCS);
+            success = success && virtualCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
+            success = success && writeCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
+            success = success && motionCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
 
             areCursorsInitialized = success;
 

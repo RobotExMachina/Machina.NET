@@ -32,7 +32,10 @@
 - [ ] ~~Rename '`Attach`' to '`AttachTool`', and '`Detach`' to '`DetachTools`'...?~~
 - [ ] ~~Rename '`PushSettings`' to '`SettingsPush`' and same for `Pop`?~~
 - [x] Print a disclaimer header for exported code
-
+- [x] Print a disclaimer header for exported code 
+    - [x] Fix ASCII art --> It is bad when writting text from UTF-8 to ASCII (every filetype but human...)
+- [x] Rename `Zone` and `Joints` Actions in actions
+- [x] Fix OfflineAPIs
 
 
 ## BUILD 1306 - 0.4.3

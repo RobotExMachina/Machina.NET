@@ -207,7 +207,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("{0} {1}",
-                        commentCharacter,
+                        commChar,
                         ac.comment);
                     break;
 
@@ -221,7 +221,7 @@ namespace Machina
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (aioa.value < 0 || aioa.value > 255)
-                        dec = $"{commentCharacter} ERROR on \"{aioa.ToString()}\": value out of range [0..255]";
+                        dec = $"{commChar} ERROR on \"{aioa.ToString()}\": value out of range [0..255]";
                     else
                         dec = $"M42 P{aioa.pin} S{Math.Round(cursor.analogOutputs[aioa.pin], 0)}";
                     break;
@@ -233,7 +233,7 @@ namespace Machina
 
                 case ActionType.Extrusion:
                 case ActionType.ExtrusionRate:
-                    dec = $"{commentCharacter} {action.ToString()}";  // has no direct G-code, simply annotate it as a comment
+                    dec = $"{commChar} {action.ToString()}";  // has no direct G-code, simply annotate it as a comment
                     break;
 
                 case ActionType.Initialization:
@@ -247,7 +247,7 @@ namespace Machina
 
                 // If action wasn't implemented before, then it doesn't apply to this device
                 default:
-                    dec = $"{commentCharacter} ACTION \"{action}\" NOT APPLICABLE TO THIS DEVICE";
+                    dec = $"{commChar} ACTION \"{action}\" NOT APPLICABLE TO THIS DEVICE";
                     break;
 
                 //case ActionType.Rotation:
@@ -264,14 +264,14 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.id);
             }
 
@@ -305,7 +305,7 @@ namespace Machina
 
             // If extruded over the limit, reset extrude position and start over
             if (len > extrusionLengthResetEvery) {
-                this.instructionLines.Add($"{commentCharacter} Homing extrusion length after {cursor.prevExtrudedLength - this.extrusionLengthResetPosition} mm ({this.extrusionLengthResetEvery} mm limit)");
+                this.instructionLines.Add($"{commChar} Homing extrusion length after {cursor.prevExtrudedLength - this.extrusionLengthResetPosition} mm ({this.extrusionLengthResetEvery} mm limit)");
                 this.instructionLines.Add($"G92 E0.0000");
                 this.extrusionLengthResetPosition = cursor.prevExtrudedLength;
                 len = cursor.extrudedLength - this.extrusionLengthResetPosition;

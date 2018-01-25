@@ -383,7 +383,7 @@ namespace Machina
 
         ///// <summary>
         ///// Returns a Frame object representing the Robot's current TCP position and orientation.
-        ///// NOTE: the Frame's velocity and zone are still not representative of the current state.
+        ///// NOTE: the Frame's velocity and precision are still not representative of the current state.
         ///// </summary>
         ///// <returns></returns>
         //public Frame GetCurrentFrame()
@@ -391,14 +391,14 @@ namespace Machina
         //    return c.GetCurrentFrame();
         //}
 
-        /// <summary>
-        /// Returns a Joint object representing the current angular rotations of the robot's 6 axes.
-        /// </summary>
-        /// <returns></returns>
-        public Joints GetCurrentJoints()
-        {
-            return c.GetCurrentJoints();
-        }
+        ///// <summary>
+        ///// Returns a Joint object representing the current angular rotations of the robot's 6 axes.
+        ///// </summary>
+        ///// <returns></returns>
+        //public Joints GetCurrentAxes()
+        //{
+        //    return c.getCurrentAxes();
+        //}
 
         ///// <summary>
         ///// Loads the path to the queue manager and triggers execution of the program if applicable.
@@ -528,9 +528,10 @@ namespace Machina
         /// Gets the current zone setting.
         /// </summary>
         /// <returns></returns>
+        [System.Obsolete("Deprecated method, use Precision() instead")]
         public int Zone()
         {
-            return c.GetCurrentZoneSetting();
+            return c.GetCurrentPrecisionSettings();
         }
 
         /// <summary>
@@ -540,7 +541,7 @@ namespace Machina
         [System.Obsolete("Deprecated method, use Precision(radiusInc) instead")]
         public void Zone(int zoneInc)
         {
-            c.IssueZoneRequest(zoneInc, true);
+            c.IssuePrecisionRequest(zoneInc, true);
         }
 
         /// <summary>
@@ -550,7 +551,7 @@ namespace Machina
         [System.Obsolete("Deprecated method, use PrecisionTo(radius) instead")]
         public void ZoneTo(int zone)
         {
-            c.IssueZoneRequest(zone, false);
+            c.IssuePrecisionRequest(zone, false);
         }
 
         /// <summary>
@@ -562,7 +563,7 @@ namespace Machina
         /// <param name="smoothingRadius">Smoothing radius increment in mm</param>
         public void Precision(int radiusInc)
         {
-            c.IssueZoneRequest(radiusInc, true);
+            c.IssuePrecisionRequest(radiusInc, true);
         }
 
         /// <summary>
@@ -574,7 +575,7 @@ namespace Machina
         /// <param name="radius">Smoothing radius in mm</param>
         public void PrecisionTo(int radius)
         {
-            c.IssueZoneRequest(radius, false);
+            c.IssuePrecisionRequest(radius, false);
         }
 
         ///// <summary>
@@ -601,26 +602,6 @@ namespace Machina
         /// <param name="motionType">"linear", "joint", etc."</param>
         public bool MotionMode(string motionType)
         {
-            //MotionType t = MotionType.Undefined;
-            //type = type.ToLower();
-            //if (type.Equals("linear"))
-            //{
-            //    t = MotionType.Linear;
-            //}
-            //else if (type.Equals("joint"))
-            //{
-            //    t = MotionType.Joint;
-            //}
-
-            //if (t == MotionType.Undefined)
-            //{
-            //    Console.WriteLine("Invalid motion type");
-            //    return;
-            //}
-
-            //c.IssueMotionRequest(t);
-
-
             MotionType mt;
             try
             {
@@ -685,7 +666,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Buffers current state settings (speed, zone, motion type...), and opens up for 
+        /// Buffers current state settings (speed, precision, motion type...), and opens up for 
         /// temporary settings changes to be reverted by PopSettings().
         /// </summary>
         public void PushSettings()
@@ -694,7 +675,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Reverts the state settings (speed, zone, motion type...) to the previously buffered
+        /// Reverts the state settings (speed, precision, motion type...) to the previously buffered
         /// state by PushSettings().
         /// </summary>
         public void PopSettings()
@@ -1000,7 +981,7 @@ namespace Machina
 
 
         /// <summary>
-        /// Issue a request to increment the angular values of the robot joint rotations.
+        /// Issue a request to increment the angular values of the robot joint axes rotations.
         /// Values expressed in degrees.
         /// </summary>
         /// <param name="incJoints"></param>
@@ -1016,7 +997,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Issue a request to increment the angular values of the robot joint rotations.
+        /// Issue a request to increment the angular values of the robot joint axes rotations.
         /// Values expressed in degrees.
         /// </summary>
         /// <param name="incJ1"></param>
@@ -1037,7 +1018,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Issue a request to set the angular values of the robot joint rotations.
+        /// Issue a request to set the angular values of the robot joint axes rotations.
         /// Values expressed in degrees.
         /// </summary>
         /// <param name="joints"></param>
@@ -1047,14 +1028,14 @@ namespace Machina
         {
             return c.IssueJointsRequest(joints, false);
         }
-        [System.Obsolete("Deprecated, use Axes() instead")]
+        [System.Obsolete("Deprecated, use AxesTo() instead")]
         public bool JointsTo(Joints joints)
         {
             return c.IssueJointsRequest(joints, false);
         }
 
         /// <summary>
-        /// Issue a request to set the angular values of the robot joint rotations.
+        /// Issue a request to set the angular values of the robot joint axes rotations.
         /// Values expressed in degrees.
         /// </summary>
         /// <param name="j1"></param>
@@ -1068,7 +1049,7 @@ namespace Machina
         {
             return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
         }
-        [System.Obsolete("Deprecated, use Axes() instead")]
+        [System.Obsolete("Deprecated, use AxesTo() instead")]
         public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
         {
             return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
@@ -1266,9 +1247,9 @@ namespace Machina
         /// Returns a Joint object representing the rotations in the robot axes.
         /// </summary>
         /// <returns></returns>
-        public Joints GetJoints()
+        public Joints GetAxes()
         {
-            return c.GetCurrentJoints();
+            return c.getCurrentAxes();
         }
 
         /// <summary>

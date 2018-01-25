@@ -101,12 +101,12 @@ namespace Machina
                     velDecs.Add(writer.speed, GetSpeedValue(writer));
                 }
 
-                if (!zoneNames.ContainsKey(writer.zone))
+                if (!zoneNames.ContainsKey(writer.precision))
                 {
-                    bool predef = PredefinedZones.Contains(writer.zone);
-                    zonePredef.Add(writer.zone, predef);
-                    zoneNames.Add(writer.zone, (predef ? "z" : "zone") + writer.zone);  // use predef syntax or clean new one
-                    zoneDecs.Add(writer.zone, predef ? "" : GetZoneValue(writer));
+                    bool predef = PredefinedZones.Contains(writer.precision);
+                    zonePredef.Add(writer.precision, predef);
+                    zoneNames.Add(writer.precision, (predef ? "z" : "zone") + writer.precision);  // use predef syntax or clean new one
+                    zoneDecs.Add(writer.precision, predef ? "" : GetZoneValue(writer));
                 }
 
                 if (writer.tool != null && !toolNames.ContainsKey(writer.tool))
@@ -165,7 +165,7 @@ namespace Machina
             if (usesIO)
             {
                 introLines.Add(string.Format("  {0} NOTE: your program is interfacing with the robot's IOs. Make sure to properly configure their names/properties through system preferences in the ABB controller. See Machina's `SetIOName()` for more information.",
-                    commentCharacter));
+                    commChar));
             }
 
 
@@ -274,7 +274,7 @@ namespace Machina
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         id,
                         velNames[cursor.speed],
-                        zoneNames[cursor.zone],
+                        zoneNames[cursor.precision],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
                         "WObj:=WObj0");
                     break;
@@ -283,7 +283,7 @@ namespace Machina
                     dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, {3}\\{4};",
                         id,
                         velNames[cursor.speed],
-                        zoneNames[cursor.zone],
+                        zoneNames[cursor.precision],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
                         "WObj:=WObj0");
                     break;
@@ -305,21 +305,21 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("    {0} {1}",
-                        commentCharacter,
+                        commChar,
                         ac.comment);
                     break;
 
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
                     dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
-                        commentCharacter,
+                        commChar,
                         aa.tool.name);
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
                     dec = string.Format("    {0} Tool detached",  // this action has no actual RAPID instruction, just add a comment
-                        commentCharacter);
+                        commChar);
                     break;
 
                 case ActionType.IODigital:
@@ -327,7 +327,7 @@ namespace Machina
                     if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
                     {
                         dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else
@@ -343,7 +343,7 @@ namespace Machina
                     if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
                     {
                         dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else
@@ -363,14 +363,14 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commentCharacter,
+                    commChar,
                     action.id);
             }
 
@@ -396,7 +396,7 @@ namespace Machina
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
                         GetUNSAFERobTargetValue(cursor),
                         velNames[cursor.speed],
-                        zoneNames[cursor.zone],
+                        zoneNames[cursor.precision],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
                         "WObj:=WObj0");
                     break;
@@ -405,7 +405,7 @@ namespace Machina
                     dec = string.Format("    MoveAbsJ {0}, {1}, {2}, {3}\\{4};",
                         GetJointTargetValue(cursor),
                         velNames[cursor.speed],
-                        zoneNames[cursor.zone],
+                        zoneNames[cursor.precision],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
                         "WObj:=WObj0");
                     break;
@@ -427,21 +427,21 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("    {0} {1}",
-                        commentCharacter,
+                        commChar,
                         ac.comment);
                     break;
 
                 case ActionType.Attach:
                     ActionAttach aa = (ActionAttach)action;
                     dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
-                        commentCharacter,
+                        commChar,
                         aa.tool.name);
                     break;
 
                 case ActionType.Detach:
                     ActionDetach ad = (ActionDetach)action;
                     dec = string.Format("    {0} Tools detached",   // this action has no actual RAPID instruction, just add a comment
-                        commentCharacter);
+                        commChar);
                     break;
 
                 case ActionType.IODigital:
@@ -449,7 +449,7 @@ namespace Machina
                     if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
                     {
                         dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aiod.ToString());
                     }
                     else
@@ -465,7 +465,7 @@ namespace Machina
                     if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
                     {
                         dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commentCharacter,
+                            commChar,
                             aioa.ToString());
                     }
                     else
@@ -487,7 +487,7 @@ namespace Machina
                 dec = string.Format("{0}{1}  {2} [{3}]",
                     dec,
                     dec == null ? "  " : "",  // add indentation to align with code
-                    commentCharacter,
+                    commChar,
                     action.ToString());
             }
             else if (ADD_ACTION_ID)
@@ -495,7 +495,7 @@ namespace Machina
                 dec = string.Format("{0}{1}  {2} [{3}]",
                     dec,
                     dec == null ? "  " : "",  // add indentation to align with code
-                    commentCharacter,
+                    commChar,
                     action.id);
             }
 
@@ -547,9 +547,9 @@ namespace Machina
         static internal string GetZoneValue(RobotCursor cursor)
         {
             // Following conventions for default RAPID zones.
-            double high = 1.5 * cursor.zone;
-            double low = 0.15 * cursor.zone;
-            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", cursor.zone, high, high, low, high, low);
+            double high = 1.5 * cursor.precision;
+            double low = 0.15 * cursor.precision;
+            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", cursor.precision, high, high, low, high, low);
         }
 
         /// <summary>

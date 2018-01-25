@@ -104,28 +104,28 @@ namespace TEST_OfflineAPITests
             // Move to 'home' position
             arm.MotionMode("joint");
             arm.SpeedTo(100);
-            arm.ZoneTo(5);  // predef zone
+            arm.PrecisionTo(5);  // predef Precision
             if (arm.IsBrand("ABB"))
             {
-                arm.JointsTo(0, 0, 0, 0, 90, 0);  // 'homie' for ABB
+                arm.AxesTo(0, 0, 0, 0, 90, 0);  // 'homie' for ABB
             }
             else if (arm.IsBrand("UR"))
             {
-                arm.JointsTo(0, -90, -90, -90, 90, 90);
+                arm.AxesTo(0, -90, -90, -90, 90, 90);
             }
             else if (arm.IsBrand("KUKA"))
             {
-                arm.JointsTo(0, -90, 90, 0, 90, 0);
+                arm.AxesTo(0, -90, 90, 0, 90, 0);
             }
             else
             {
-                arm.JointsTo(0, 0, 0, 0, 0, 0);
+                arm.AxesTo(0, 0, 0, 0, 0, 0);
             }
 
             // Transform to starting point (needs a transform after a joint movement)
             arm.PushSettings();
             arm.Speed(100);  // relative increase
-            arm.Zone(5);    // rel increase
+            arm.Precision(5);    // rel increase
             arm.MotionMode("joint");
             arm.TransformTo(new Point(200, 300, 400), new Orientation(-1, 0, 0, 0, 1, 0));
 
@@ -142,7 +142,7 @@ namespace TEST_OfflineAPITests
             arm.Wait(2000);
             arm.PushSettings();
             arm.SpeedTo(25);
-            arm.ZoneTo(1);
+            arm.PrecisionTo(1);
             arm.Move(0, size, 0);
             arm.Move(0, 0, size);
             arm.Move(0, -size, 0);
@@ -167,19 +167,19 @@ namespace TEST_OfflineAPITests
             arm.Message("Back home");
             if (arm.IsBrand("ABB"))
             {
-                arm.JointsTo(0, 0, 0, 0, 90, 0);  // 'homie' for ABB
+                arm.AxesTo(0, 0, 0, 0, 90, 0);  // 'homie' for ABB
             }
             else if (arm.IsBrand("UR"))
             {
-                arm.JointsTo(0, -90, -90, -90, 90, 90);
+                arm.AxesTo(0, -90, -90, -90, 90, 90);
             }
             else if (arm.IsBrand("KUKA"))
             {
-                arm.JointsTo(0, -90, 90, 0, 90, 0);
+                arm.AxesTo(0, -90, 90, 0, 90, 0);
             }
             else
             {
-                arm.JointsTo(0, 0, 0, 0, 0, 0);
+                arm.AxesTo(0, 0, 0, 0, 0, 0);
             }
         }
 
@@ -191,14 +191,14 @@ namespace TEST_OfflineAPITests
             arm.MoveTo(300, 300, 300);
 
             arm.SpeedTo(50);
-            arm.PrecisionTo(2);  // non predef zone
+            arm.PrecisionTo(2);  // non predef Precision
             arm.Move(50, 0, 0);
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
             arm.Move(0, -50, 50);
 
             arm.SpeedTo(100);
-            arm.ZoneTo(10);
+            arm.PrecisionTo(10);
             arm.MoveTo(300, 0, 500);
         }
 
@@ -208,7 +208,7 @@ namespace TEST_OfflineAPITests
             if (jointMovement) arm.MotionMode("joint");
 
             arm.SpeedTo(100);
-            arm.ZoneTo(1);
+            arm.PrecisionTo(1);
             arm.MoveTo(300, 0, 600);
             arm.MoveTo(200, -200, 400);
             arm.Move(0, 378, 0);
@@ -238,7 +238,7 @@ namespace TEST_OfflineAPITests
             arm.MoveTo(300, -200, 300);
 
             arm.SpeedTo(100);
-            arm.ZoneTo(1);
+            arm.PrecisionTo(1);
 
             arm.PushSettings();
             arm.SpeedTo(50);
@@ -247,7 +247,7 @@ namespace TEST_OfflineAPITests
             arm.PopSettings();
 
             arm.PushSettings();
-            arm.ZoneTo(4);
+            arm.PrecisionTo(4);
             arm.Move(0, 200, 0);
             arm.DebugSettingsBuffer();
             arm.PopSettings();
@@ -518,7 +518,7 @@ namespace TEST_OfflineAPITests
 
             // 'Disentangle' axis 6
             //arm.RotateTo(-1, 0, 0, 0, 1, 0);
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.AxesTo(0, 0, 0, 0, 90, 0);
             //arm.TransformTo(new Vector(300, 0, 500), new Rotation(new Vector(0, 1, 0), 180));
         }
 
@@ -738,23 +738,23 @@ namespace TEST_OfflineAPITests
 
             // Reset
             arm.SpeedTo(500);
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.AxesTo(0, 0, 0, 0, 90, 0);
 
             // Go from lower to higher configuration space (ABB IRB120)
-            arm.JointsTo(-164, -109, -109, -159, -119, -399);
-            arm.JointsTo(164, 109, 69, 159, 119, 399);
+            arm.AxesTo(-164, -109, -109, -159, -119, -399);
+            arm.AxesTo(164, 109, 69, 159, 119, 399);
 
             // Now sweep all spectrum for each joint
-            arm.JointsTo(-164, -109, -109, -159, -119, -399);
-            arm.Joints(328, 0, 0, 0, 0, 0);
-            arm.Joints(0, 218, 0, 0, 0, 0);
-            arm.Joints(0, 0, 178, 0, 0, 0);
-            arm.Joints(0, 0, 0, 318, 0, 0);
-            arm.Joints(0, 0, 0, 0, 238, 0);
-            arm.Joints(0, 0, 0, 0, 0, 798);
+            arm.AxesTo(-164, -109, -109, -159, -119, -399);
+            arm.Axes(328, 0, 0, 0, 0, 0);
+            arm.Axes(0, 218, 0, 0, 0, 0);
+            arm.Axes(0, 0, 178, 0, 0, 0);
+            arm.Axes(0, 0, 0, 318, 0, 0);
+            arm.Axes(0, 0, 0, 0, 238, 0);
+            arm.Axes(0, 0, 0, 0, 0, 798);
 
             // Back home
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
         // DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF
@@ -764,13 +764,13 @@ namespace TEST_OfflineAPITests
 
             // Reset
             arm.SpeedTo(300);
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.AxesTo(0, 0, 0, 0, 90, 0);
 
             // DO NOT RUN THIS PROGRAM ON A REAL ROBOT, YOU WILL MOST LIKELY HIT SOMETHING OR ITSELF
             Random rnd = new Random();
             for (var i = 0; i < 10; i++)
             {
-                arm.JointsTo(
+                arm.AxesTo(
                     rnd.Next(-164, 164),
                     rnd.Next(-109, 109),
                     rnd.Next(-109, 69),
@@ -780,15 +780,15 @@ namespace TEST_OfflineAPITests
             }
 
             // Back home
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
+            arm.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
         public static void TestChangesInMovementModes(Robot arm)
         {
             // Go home
             arm.SpeedTo(100);
-            //arm.JointsTo(0, 0, 0, 0, 90, 0);  // ABB
-            arm.JointsTo(0, -90, -90, -90, 90, 90);  // UR
+            //arm.AxesTo(0, 0, 0, 0, 90, 0);  // ABB
+            arm.AxesTo(0, -90, -90, -90, 90, 90);  // UR
 
             // Issue an absolute RT movement (should work)
             arm.TransformTo(new Point(200, 200, 200), Rotation.FlippedAroundY);
@@ -796,14 +796,14 @@ namespace TEST_OfflineAPITests
             // Issue a relative one (should work)
             arm.Transform(new Vector(50, 0, 0), new Rotation(Vector.XAxis, 45));
 
-            // Issue a relative Joints one (SHOULDN'T WORK)
-            arm.Joints(-45, 0, 0, 0, 0, 0);
+            // Issue a relative Axes one (SHOULDN'T WORK)
+            arm.Axes(-45, 0, 0, 0, 0, 0);
 
-            // Issue abs joints (should work)
-            arm.JointsTo(45, 0, 0, 0, 90, 0);
+            // Issue abs Axes (should work)
+            arm.AxesTo(45, 0, 0, 0, 90, 0);
 
-            // Issue rel Joints (should work)
-            arm.Joints(30, 0, 0, 0, 0, 0);
+            // Issue rel Axes (should work)
+            arm.Axes(30, 0, 0, 0, 0, 0);
 
             // Issue a bunch of relative ones (NONE SHOULD WORK)
             arm.Coordinates("local");
@@ -817,16 +817,16 @@ namespace TEST_OfflineAPITests
             arm.Transform(new Vector(100, 0, 0), new Rotation(Vector.XAxis, 45));
             arm.Transform(new Rotation(Vector.XAxis, 45), new Vector(100, 0, 0));
 
-            // Rel joints (should work)
-            arm.Joints(0, 30, 0, 0, 0, 0);
+            // Rel Axes (should work)
+            arm.Axes(0, 30, 0, 0, 0, 0);
 
             // Issue absolute movement (SHOULD NOT WORK)
             arm.MoveTo(400, 0, 200);                // missing rotation information
             arm.RotateTo(Rotation.FlippedAroundY);  // missing point information
 
             // Back home (should work)
-            //arm.JointsTo(0, 0, 0, 0, 90, 0);    // ABB
-            arm.JointsTo(0, -90, -90, -90, 90, 90);  // UR
+            //arm.AxesTo(0, 0, 0, 0, 90, 0);    // ABB
+            arm.AxesTo(0, -90, -90, -90, 90, 90);  // UR
         }
 
         static public void TestWaitAndMessage(Robot arm)
@@ -846,8 +846,8 @@ namespace TEST_OfflineAPITests
             arm.Wait(5000);
 
             arm.Message("Going home");
-            //arm.JointsTo(0, 0, 0, 0, 90, 0);
-            arm.JointsTo(0, -90, -90, -90, 90, 90);
+            //arm.AxesTo(0, 0, 0, 0, 90, 0);
+            arm.AxesTo(0, -90, -90, -90, 90, 90);
         }
 
         static public void ZMorphSimpleMovementTest(Robot bot)

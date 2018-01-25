@@ -31,15 +31,15 @@ namespace Machina
         /// <summary>
         /// Character used for comments by the compiler
         /// </summary>
-        internal string commentCharacter = "";
+        internal string commChar = "";
 
         /// <summary>
         /// A constructor that takes several parameters particular to each compiler type
         /// </summary>
-        /// <param name="commentChar"></param>
-        protected Compiler(string commentChar)
+        /// <param name="commentCharacter"></param>
+        protected Compiler(string commentCharacter)
         {
-            this.commentCharacter = commentChar;
+            this.commChar = commentCharacter;
         }
 
         /// <summary>
@@ -55,39 +55,46 @@ namespace Machina
         public List<String> GenerateDisclaimerHeader(string programName)
         {
             var header = new List<String>();
-            header.Add($"{commentCharacter}{commentCharacter} ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ ");
-            header.Add($"{commentCharacter}{commentCharacter} ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗");
-            header.Add($"{commentCharacter}{commentCharacter} ██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║███████║");
-            header.Add($"{commentCharacter}{commentCharacter} ██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══██║");
-            header.Add($"{commentCharacter}{commentCharacter} ██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║██║  ██║");
-            header.Add($"{commentCharacter}{commentCharacter} ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝");
-            header.Add($"{commentCharacter}{commentCharacter} ");
-            header.Add($"{commentCharacter}{commentCharacter} Program name: {programName}");
-            header.Add($"{commentCharacter}{commentCharacter} Created: {DateTime.Now.ToString()}");
-            header.Add($"{commentCharacter}{commentCharacter} ");
-            header.Add($"{commentCharacter}{commentCharacter} DISCLAIMER"); 
-            header.Add($"{commentCharacter}{commentCharacter} WORKING WITH ROBOTS CAN BE DANGEROUS!");
-            header.Add($"{commentCharacter}{commentCharacter} When using robots in a real-time interactive environment, please make sure:");
-            header.Add($"{commentCharacter}{commentCharacter}     - You have been adequately trained to use that particular machine,");
-            header.Add($"{commentCharacter}{commentCharacter}     - you are in good physical and mental condition,");
-            header.Add($"{commentCharacter}{commentCharacter}     - you are operating the robot under the utmost security measures,");
-            header.Add($"{commentCharacter}{commentCharacter}     - you are following the facility's and facility staff's security protocols,");
-            header.Add($"{commentCharacter}{commentCharacter}     - and the robot has the appropriate guarding in place, including, but not reduced to:");
-            header.Add($"{commentCharacter}{commentCharacter}         e -stops, physical barriers, light curtains, etc.");
-            header.Add($"{commentCharacter}{commentCharacter} The Machina software framework and its generated code is provided as is;");
-            header.Add($"{commentCharacter}{commentCharacter} use at your own risk. This product is not intended for any use that may");
-            header.Add($"{commentCharacter}{commentCharacter} involve potential risks of death (including lifesaving equipment),");
-            header.Add($"{commentCharacter}{commentCharacter} personal injury, or severe property or environmental damage.");
-            header.Add($"{commentCharacter}{commentCharacter} Machina is in a very early stage of development. You are using this software");
-            header.Add($"{commentCharacter}{commentCharacter} at your own risk, no warranties are provided herewith, and unexpected");
-            header.Add($"{commentCharacter}{commentCharacter} results / bugs may arise during its use. Always test and simulate your");
-            header.Add($"{commentCharacter}{commentCharacter} applications thoroughly before running them on a real device.");
-            header.Add($"{commentCharacter}{commentCharacter} The author/s shall not be liable for any injuries, damages or losses");
-            header.Add($"{commentCharacter}{commentCharacter} consequence of using this software in any way whatsoever.");
-            header.Add($"{commentCharacter}{commentCharacter} ");
-            header.Add($"{commentCharacter}{commentCharacter} (c) Jose Luis Garcia del Castillo y Lopez, {DateTime.Now.Year}");
-            header.Add($"{commentCharacter}{commentCharacter} https://github.com/garciadelcastillo/Machina");
-            header.Add($"{commentCharacter}{commentCharacter} MIT License");
+            // UTF chars don't convert well to ASCII... :(
+            //header.Add($"{commChar}{commChar} ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ ");
+            //header.Add($"{commChar}{commChar} ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗");
+            //header.Add($"{commChar}{commChar} ██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║███████║");
+            //header.Add($"{commChar}{commChar} ██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══██║");
+            //header.Add($"{commChar}{commChar} ██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║██║  ██║");
+            //header.Add($"{commChar}{commChar} ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝");
+            header.Add($@"{commChar}{commChar} ###\   ###\ #####\  ######\##\  ##\##\###\   ##\ #####\ ");
+            header.Add($@"{commChar}{commChar} ####\ ####\##\\\##\##\\\\\\##\  ##\##\####\  ##\##\\\##\");
+            header.Add($@"{commChar}{commChar} ##\####\##\#######\##\     #######\##\##\##\ ##\#######\");
+            header.Add($@"{commChar}{commChar} ##\\##\\##\##\\\##\##\     ##\\\##\##\##\\##\##\##\\\##\");
+            header.Add($@"{commChar}{commChar} ##\ \\\ ##\##\  ##\\######\##\  ##\##\##\ \####\##\  ##\");
+            header.Add($@"{commChar}{commChar} \\\     \\\\\\  \\\ \\\\\\\\\\  \\\\\\\\\  \\\\\\\\  \\\");
+            header.Add($"{commChar}{commChar} ");
+            header.Add($"{commChar}{commChar} Program name: {programName}");
+            header.Add($"{commChar}{commChar} Created: {DateTime.Now.ToString()}");
+            header.Add($"{commChar}{commChar} ");
+            header.Add($"{commChar}{commChar} DISCLAIMER"); 
+            header.Add($"{commChar}{commChar} WORKING WITH ROBOTS CAN BE DANGEROUS!");
+            header.Add($"{commChar}{commChar} When using robots in a real-time interactive environment, please make sure:");
+            header.Add($"{commChar}{commChar}     - You have been adequately trained to use that particular machine,");
+            header.Add($"{commChar}{commChar}     - you are in good physical and mental condition,");
+            header.Add($"{commChar}{commChar}     - you are operating the robot under the utmost security measures,");
+            header.Add($"{commChar}{commChar}     - you are following the facility's and facility staff's security protocols,");
+            header.Add($"{commChar}{commChar}     - and the robot has the appropriate guarding in place, including, but not reduced to:");
+            header.Add($"{commChar}{commChar}         e -stops, physical barriers, light curtains, etc.");
+            header.Add($"{commChar}{commChar} The Machina software framework and its generated code is provided as is;");
+            header.Add($"{commChar}{commChar} use at your own risk. This product is not intended for any use that may");
+            header.Add($"{commChar}{commChar} involve potential risks of death (including lifesaving equipment),");
+            header.Add($"{commChar}{commChar} personal injury, or severe property or environmental damage.");
+            header.Add($"{commChar}{commChar} Machina is in a very early stage of development. You are using this software");
+            header.Add($"{commChar}{commChar} at your own risk, no warranties are provided herewith, and unexpected");
+            header.Add($"{commChar}{commChar} results / bugs may arise during its use. Always test and simulate your");
+            header.Add($"{commChar}{commChar} applications thoroughly before running them on a real device.");
+            header.Add($"{commChar}{commChar} The author/s shall not be liable for any injuries, damages or losses");
+            header.Add($"{commChar}{commChar} consequence of using this software in any way whatsoever.");
+            header.Add($"{commChar}{commChar} ");
+            header.Add($"{commChar}{commChar} (c) Jose Luis Garcia del Castillo y Lopez, {DateTime.Now.Year}");
+            header.Add($"{commChar}{commChar} https://github.com/garciadelcastillo/Machina");
+            header.Add($"{commChar}{commChar} MIT License");
 
             return header;
         }
