@@ -42,7 +42,7 @@ namespace Machina
         /// <summary>
         /// Instances of the main robot Controller and Task
         /// </summary>
-        private Communication comm;
+        private Driver comm;
 
         /// <summary>
         /// What brand of robot is this?
@@ -1466,7 +1466,7 @@ namespace Machina
             }
             
             // @TODO: shim assignment of correct robot model/brand
-            comm = new CommunicationABB(this);
+            comm = new DriverABB(this);
 
             // Pass the streamQueue object as a shared reference
             //comm.LinkStreamQueue(streamQueue);

@@ -11,202 +11,8 @@ using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
 
-
 namespace Machina
 {
-    //  ██████╗  █████╗ ███████╗███████╗
-    //  ██╔══██╗██╔══██╗██╔════╝██╔════╝
-    //  ██████╔╝███████║███████╗█████╗  
-    //  ██╔══██╗██╔══██║╚════██║██╔══╝  
-    //  ██████╔╝██║  ██║███████║███████╗
-    //  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-    //                                  
-    /// <summary>
-    /// A class to handle communication with external controllers, real or virtual
-    /// </summary>
-    abstract class Communication
-    {
-        /// <summary>
-        /// A reference to parent Machina Control object commanding this Comm.
-        /// </summary>
-        protected Control masterControl = null;
-
-        //// ADDED A WRITE ROBOT CURSOR IN THE ABB OBJECT
-        ///// <summary>
-        ///// A reference to the shared streamQueue object
-        ///// </summary>
-        //protected StreamQueue streamQueue = null;
-        //public abstract RobotCursor writeCursor = null;
-
-        public abstract RobotCursor WriteCursor { get; set; }
-
-
-        /// <summary>
-        /// Is the connection to the controller fully operative?
-        /// </summary>
-        protected bool isConnected = false;
-        
-        /// <summary>
-        /// Is the device currently running a program?
-        /// </summary>
-        protected bool isRunning = true;
-        protected string IP = "";
-
-
-
-        //  ███████╗██╗ ██████╗ ███╗   ██╗ █████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗
-        //  ██╔════╝██║██╔════╝ ████╗  ██║██╔══██╗╚══██╔══╝██║   ██║██╔══██╗██╔════╝██╔════╝
-        //  ███████╗██║██║  ███╗██╔██╗ ██║███████║   ██║   ██║   ██║██████╔╝█████╗  ███████╗
-        //  ╚════██║██║██║   ██║██║╚██╗██║██╔══██║   ██║   ██║   ██║██╔══██╗██╔══╝  ╚════██║
-        //  ███████║██║╚██████╔╝██║ ╚████║██║  ██║   ██║   ╚██████╔╝██║  ██║███████╗███████║
-        //  ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-        //                                                                                  
-        /// <summary>
-        /// Reverts the Comm object to a blank state before any connection attempt, objects retrieved, subscriptions, etc,
-        /// </summary>
-        public abstract void Reset();
-
-        /// <summary>
-        /// Performs all necessary operations for a successful real-time connection to a real/virtual device.
-        /// </summary>
-        /// <param name="deviceId"></param>
-        /// <returns></returns>
-        public abstract bool ConnectToDevice(int deviceId);
-
-        /// <summary>
-        /// Performs all necessary operations and disposals for a full disconnection (and reset) from a real/virtual device.
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool DisconnectFromDevice();
-
-        /// <summary>
-        /// Sets the execution mode on the device to once or loop (useful for ControlMode.Execute)
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public abstract bool SetRunMode(CycleType mode);
-
-        /// <summary>
-        /// Loads a program to the device.
-        /// </summary>
-        /// <param name="dirname"></param>
-        /// <param name="filename"></param>
-        /// <param name="extension"></param>
-        /// <returns></returns>
-        public abstract bool LoadProgramToController(string dirname, string filename, string extension);
-
-        /// <summary>
-        /// Loads a program to the device.
-        /// </summary>
-        /// <param name="program"></param>
-        /// <returns></returns>
-        public abstract bool LoadProgramToController(List<string> program);
-
-        /// <summary>
-        /// Request the start of the program loaded on the device.
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool StartProgramExecution();
-
-        /// <summary>
-        /// Request immediate or deferred stop of the program running on the device.
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool StopProgramExecution(bool immediate);
-
-        /// <summary>
-        /// Returns a Vector object representing the current robot's TCP position.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Vector GetCurrentPosition();
-
-        /// <summary>
-        /// Returns a Rotation object representing the current robot's TCP orientation.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Rotation GetCurrentOrientation();
-
-        /// <summary>
-        /// Returns a Joints object representing the rotations of the 6 axes of this robot.
-        /// </summary>
-        /// <returns></returns>
-        public abstract Joints GetCurrentJoints();
-
-        ///// <summary>
-        ///// Returns a Frame object representing the current robot's TCP position and orientation. 
-        ///// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
-        ///// </summary>
-        ///// <returns></returns>
-        //public abstract Frame GetCurrentFrame();
-
-        /// <summary>
-        /// Ticks the queue manager and potentially triggers streaming of targets to the controller.
-        /// </summary>
-        /// <param name="priority"></param>
-        public abstract void TickStreamQueue(bool priority);
-
-        /// <summary>
-        /// Dumps a bunch of info to the console.
-        /// </summary>
-        public abstract void DebugDump();
-
-
-        // Base constructor
-        public Communication(Control ctrl)
-        {
-            masterControl = ctrl;
-            Reset();
-        }
-
-        //public void LinkStreamQueue(StreamQueue q)
-        //{
-        //    streamQueue = q;
-        //}
-        public void LinkWriteCursor(ref RobotCursor wc)
-        {
-            WriteCursor = wc;
-        }
-
-        public bool IsConnected()
-        {
-            return isConnected;
-        }
-
-        public bool IsRunning()
-        {
-            return isRunning;
-        }
-
-        public string GetIP()
-        {
-            return IP;
-        }
-
-        /// <summary>
-        /// Saves a string representation of a program to a local file. 
-        /// </summary>
-        /// <param name="module"></param>
-        /// <param name="filepath"></param>
-        protected bool SaveProgramToFilename(List<string> module, string filepath)
-        {
-            try
-            {
-                System.IO.File.WriteAllLines(filepath, module, System.Text.Encoding.ASCII);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Could not save module to file...");
-                Console.WriteLine(ex);
-            }
-            return false;
-        }
-
-    }
-
-
-
-
 
     //   █████╗ ██████╗ ██████╗ 
     //  ██╔══██╗██╔══██╗██╔══██╗
@@ -215,7 +21,7 @@ namespace Machina
     //  ██║  ██║██████╔╝██████╔╝
     //  ╚═╝  ╚═╝╚═════╝ ╚═════╝ 
     //                          
-    class CommunicationABB : Communication
+    class DriverABB : Driver
     {
         // ABB stuff and flags
         private Controller controller;
@@ -227,7 +33,7 @@ namespace Machina
         private static string localBufferFilename = "buffer";
         private static string localBufferFileExtension = "mod";
         private static string remoteBufferDirectory = "Machina";
-        
+
         //protected RobotCursorABB writeCursor;
         protected RobotCursor writeCursor;
 
@@ -243,7 +49,7 @@ namespace Machina
         /// <summary>
         /// Main constructor
         /// </summary>
-        public CommunicationABB(Control ctrl) : base(ctrl) { }
+        public DriverABB(Control ctrl) : base(ctrl) { }
 
         public override RobotCursor WriteCursor
         {
@@ -366,7 +172,7 @@ namespace Machina
         /// </summary>
         /// <returns></returns>
         public override bool DisconnectFromDevice()
-        {           
+        {
             Reset();
             UnhookStreamingVariables();
             return true;
@@ -398,7 +204,7 @@ namespace Machina
                 Console.WriteLine("Error setting RunMode in controller...");
                 Console.WriteLine(ex);
             }
-  
+
             return false;
         }
 
@@ -482,7 +288,7 @@ namespace Machina
                         Console.WriteLine("Creating {0} on remote controller", remotePath);
                         fs.CreateDirectory(remoteBufferDirectory);
                     }
-                    
+
                     //@TODO: Should implement some kind of file cleanup at somepoint...
 
                     // Copy the file to the remote controller
@@ -742,7 +548,7 @@ namespace Machina
                 //Console.WriteLine("     TimeServer: " + controller.TimeServer);
                 //Console.WriteLine("     TimeZone: " + controller.TimeZone);
                 //Console.WriteLine("     UICulture: " + controller.UICulture);
-                        
+
                 Console.WriteLine("");
                 Console.WriteLine("DEBUG TASK DUMP:");
                 Console.WriteLine("    Cycle: " + mainTask.Cycle);
@@ -755,7 +561,7 @@ namespace Machina
                 catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
                 {
                     Console.WriteLine("    ExecutionType: UNSUPPORTED BY CONTROLLER");
-                    Console.WriteLine(e); 
+                    Console.WriteLine(e);
                 }
                 Console.WriteLine("    Motion: " + mainTask.Motion);
                 Console.WriteLine("    MotionPointer: " + mainTask.MotionPointer.Module);
@@ -768,7 +574,7 @@ namespace Machina
             }
         }
 
-        
+
 
 
 
@@ -856,7 +662,7 @@ namespace Machina
                 IP = controller.IPAddress.ToString();
                 return true;
             }
-            return false;            
+            return false;
         }
 
         /// <summary>
@@ -970,7 +776,7 @@ namespace Machina
                 Console.WriteLine("Could not retrieve main task from controller");
                 Console.WriteLine(ex);
             }
-            
+
             return false;
         }
 
@@ -1052,7 +858,7 @@ namespace Machina
             }
 
             return false;
-        }   
+        }
 
         /// <summary>
         /// Deletes all existing modules from main task in the controller. 
@@ -1183,10 +989,10 @@ namespace Machina
                 Console.WriteLine("Could not load streaming variables");
                 return false;
             }
-            
+
             return true;
         }
-        
+
         /// <summary>
         /// Loads the default StreamModule designed for streaming.
         /// </summary>
@@ -1229,7 +1035,7 @@ namespace Machina
                 RD_wt[i] = LoadRapidDataVariable("wt" + i);
                 RD_msg[i] = LoadRapidDataVariable("msg" + i);
 
-                if (RD_pset[i] == null || RD_vel[i] == null || RD_zone[i] == null || 
+                if (RD_pset[i] == null || RD_vel[i] == null || RD_zone[i] == null ||
                     RD_rt[i] == null || RD_jt[i] == null || RD_wt[i] == null || RD_msg[i] == null)
                     return false;
 
@@ -1382,7 +1188,7 @@ namespace Machina
                         throw new Exception("Last action wasn't correctly stored...?");
 
                     bool moveOn = true;
-                    switch(a.type)
+                    switch (a.type)
                     {
                         case ActionType.Translation:
                         case ActionType.Rotation:
@@ -1424,20 +1230,20 @@ namespace Machina
                             SetRapidDataVariable(RD_msg[fid], string.Format("\"{0}\"", str));  // when setting the value for a string rapidvar, the double quotes are needed as part of the value
                             SetRapidDataVariable(RD_act[fid], 5);
                             break;
-                            
+
                         // speed, zone, motion, refcs...
                         default:
                             // A speed change doesn't create a new target: do nothing, and prevent triggering a new target
                             moveOn = false;
                             break;
                     }
-                    
+
                     if (moveOn)
                     {
                         SetRapidDataVariable(RD_pset[fid], "TRUE");
                         virtualStepCounter++;
                     }
-                        
+
                 }
             }
         }
@@ -1697,7 +1503,7 @@ namespace Machina
             // Do not add target if pnum is being reset to initial value (like on program load)
             if (!rd.StringValue.Equals("-1"))
             {
-                
+
                 // If no actions pending, raise BufferEmpty event
                 if (writeCursor.AreActionsPending())
                 {
@@ -1708,7 +1514,7 @@ namespace Machina
                 {
                     Console.WriteLine("Raising OnBufferEmpty event");
                     masterControl.parent.OnBufferEmpty(EventArgs.Empty);
-                }                
+                }
             }
 
             if (rd != null)
@@ -1744,5 +1550,4 @@ namespace Machina
 
 
     }
-
 }
