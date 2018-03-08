@@ -15,23 +15,26 @@ namespace Machina
         public int Zone;
         public MotionType MotionType;
         public ReferenceCS RefCS;
-        
-        public Settings(int speed, int zone, MotionType mType, ReferenceCS refcs)
+        public double ExtrusionRate;
+
+
+        public Settings(int speed, int zone, MotionType mType, ReferenceCS refcs, double extrusionRate)
         {
             Speed = speed;
             Zone = zone;
             MotionType = mType;
             RefCS = refcs;
+            this.ExtrusionRate = extrusionRate;
         }
 
         public Settings Clone()
         {
-            return new Settings(Speed, Zone, MotionType, RefCS);
+            return new Settings(Speed, Zone, MotionType, RefCS, ExtrusionRate);
         }
 
         public override string ToString()
         {
-            return string.Format("{0} {1} {2}-{3}", RefCS, MotionType, Speed, Zone);
+            return $"{RefCS} {MotionType} {Speed}-{Zone} {ExtrusionRate}";
         }
     }
 

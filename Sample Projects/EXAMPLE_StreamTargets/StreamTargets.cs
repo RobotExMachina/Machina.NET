@@ -1,6 +1,6 @@
 ﻿using System;
 
-using BRobot;
+using Machina;
 
 namespace EXAMPLE_StreamTargets2
 {
@@ -13,10 +13,10 @@ namespace EXAMPLE_StreamTargets2
             int leadSpeed = 100;
             int traceSpeed = 50;
 
-            Robot arm = new Robot();
+            Robot arm = new Robot("StreamingTest", "ABB");
 
             // Set connection properties
-            arm.Mode("stream");
+            arm.ControlMode("stream");
             arm.Connect();
 
             arm.DebugDump();
@@ -25,42 +25,42 @@ namespace EXAMPLE_StreamTargets2
             arm.Start();
 
             // Set some properties from here on
-            arm.Speed(traceSpeed);    // in mm/s
-            arm.Zone(20);                // in mm
+            arm.SpeedTo(traceSpeed);    // in mm/s
+            arm.PrecisionTo(20);                // in mm
 
             // A set of horizontal squares
             //arm.MoveTo("home");             // a 'bookmarked' target
             arm.MoveTo(300, 0, 500);
 
-            arm.Speed(leadSpeed);
+            arm.SpeedTo(leadSpeed);
             arm.MoveTo(250, 250, 250);      // absolute movement
-            arm.Speed(traceSpeed);
+            arm.SpeedTo(traceSpeed);
             arm.Move(50, 0, 0);             // relative movement
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
 
-            arm.Speed(leadSpeed);
+            arm.SpeedTo(leadSpeed);
             arm.Move(0, -50, 50);
-            arm.Speed(traceSpeed);
+            arm.SpeedTo(traceSpeed);
             arm.Move(50, 0, 0);
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
 
-            arm.Speed(leadSpeed);
+            arm.SpeedTo(leadSpeed);
             arm.Move(0, -50, 50);
-            arm.Speed(traceSpeed);
+            arm.SpeedTo(traceSpeed);
             arm.Move(50, 0, 0);
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
 
-            arm.Speed(leadSpeed);
+            arm.SpeedTo(leadSpeed);
             arm.Move(0, -50, 50);
-            arm.Speed(traceSpeed);
+            arm.SpeedTo(traceSpeed);
             arm.Move(50, 0, 0);
             arm.Move(0, 50, 0);
             arm.Move(-50, 0, 0);
 
-            arm.Speed(leadSpeed);
+            arm.SpeedTo(leadSpeed);
             //arm.MoveTo("home");
             arm.MoveTo(300, 0, 500);
 

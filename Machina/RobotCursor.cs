@@ -417,7 +417,7 @@ namespace Machina
         {
             if (action.push)
             {
-                Settings s = new Settings(this.speed, this.precision, this.motionType, this.referenceCS);
+                Settings s = new Settings(this.speed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
                 return this.settingsBuffer.Push(s);
             }
             else
@@ -429,6 +429,7 @@ namespace Machina
                     this.precision = s.Zone;
                     this.motionType = s.MotionType;
                     this.referenceCS = s.RefCS;
+                    this.extrusionRate = s.ExtrusionRate;
                     return true;
                 }
             }

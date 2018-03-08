@@ -16,6 +16,25 @@
 ```
 
 
+## FOR 0.6.0 RELEASE
+This release will focus on reworking the Streaming mode to base it off TCP connection with the controller server. 
+
+### Machina_Driver.mod
+- [x] Cleanup dead code
+- [x] Refactor function names and variables
+- [ ] ~~Make parsing variables global for performance... (?)~~
+- [x] Add circular logic to the actions buffer: when written more than 1000, start again
+- [ ] Add support for all Machina actions
+- [ ] Implement more robust connect/disconnect logic, like in Robo_DK
+- [ ] Implement ack messages, tell the client what's happening
+- [ ] Add `Stream\Execute` modes: actions are executed immediately upon reception or buffered until instructed to perform an execution
+- [ ] Add a handshake of versions and ips and stuff
+
+- [ ] `Precision()` should accept `double` input
+
+
+
+
 ## FOR 0.5.0 RELEASE
 - [x] Add `Temperature()`
 - [x] Add `Extrude()`
@@ -44,16 +63,22 @@
 - [ ] ~~Rename '`PushSettings`' to '`SettingsPush`' and same for `Pop`?~~
 - [x] Print a disclaimer header for exported code 
     - [x] Fix ASCII art --> It is bad when writting text from UTF-8 to ASCII (every filetype but human...)
-- [ ] Rename `Zone` and `Joints` Actions in actions
-- [ ] Fix OfflineAPIs
+- [x] Rename `Zone` and `Joints` Actions in actions
+- [x] Fix OfflineAPIs
 
-- [ ] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
-- [ ] Rename `FeedRate` to `ExtrusionRate` in DYN+GH
-- [ ] Remove all obsolete components, and create new ones with GUID to avoid overwrite
-- [ ] Update Dyn+GH in general
-- [ ] Wrap up Icons
-- [ ] Redo DYN+GH sample files
+- [x] Make components have the option to choose between abs/rel
+- [x] Rename 'Motion' to 'MotionType' here and Dyn (GH is changed)
+- [x] Rename `FeedRate` to `ExtrusionRate` in DYN+GH
+- [x] Remove all obsolete components, and create new ones with GUID to avoid overwrite
+- [x] Update Dyn+GH in general
+- [x] Wrap up Icons
+- [x] Redo DYN+GH sample files
 
+
+## AL·GO MEETING
+- [ ] HUMAN mode not working...
+- [ ] Add a json mode? Any form of de/serializable format that can become "Machina" code, like a Machina save format, that could be loaded and executed, also exchanged between apps
+- [ ] Export doesn' flush automatically in oflline mode, this should be made explicit with a .ClearMemory() function or similar...
 
 
 ## LATER..
@@ -72,7 +97,16 @@
 
 - [ ] Create `Program` as a class that contains a list of actions? It could be interesting as a way to enforce the idea of Programs as a list of Actions, especially in VPL interfaces. Also, it would allow to do things such as adding an `Instruction` (like a function) to the scope of a program, that could be called from the Program itself.
 
+- [ ] Create `Combine` action where two or more Actions are combined into a single one. Useful for example for Move+DO actions, Temp+Wait actions, Move+Rotate (=Transform), or any other combination allowed by the compiler...? -
 
+- [ ] `Execute` mode should have some way of signaling if the uploaded program finished, like an event or something.
+
+- [ ] If on online mode, if connection is lost with the controller, the app throws an error. Implement softreset
+
+- [ ] Fix C:/mod permissions for non-admins, use ENV system path
+- [ ] Improve the AxesTo -> TransformTo message, make it understandable... 
+- [ ] Add an overload for TransformTo that takes single values as x, y, z, xvec0, xvec1, xvec2, yvec0, yvec1, yvec2. 
+- [ ] Add a .Home() function?
 
 
 ----

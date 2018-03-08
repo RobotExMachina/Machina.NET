@@ -16,6 +16,14 @@
 ```
 
 
+## BUILD 1308
+- [x] Remove Undefined from MotionMode
+- [ ] Add some kind of descriptive text for each MotionMode
+- [x] Add `ExtrusionRate` to `Settings`
+
+
+
+
 ## BUILD 0.5.0.1307 
 - [ ] ~~REMOVE THE REGULAR/TO MODEL, and add a ActionMode("absolute"/"relative") to substitute it!~~
     - ActionMode becomes a property of the cursor.

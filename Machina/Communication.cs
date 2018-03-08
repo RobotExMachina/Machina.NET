@@ -663,9 +663,17 @@ namespace Machina
                 return null;
             }
 
-            JointTarget jt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition();
-
-            return new Joints(jt.RobAx.Rax_1, jt.RobAx.Rax_2, jt.RobAx.Rax_3, jt.RobAx.Rax_4, jt.RobAx.Rax_5, jt.RobAx.Rax_6);
+            try
+            {
+                JointTarget jt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition();
+                return new Joints(jt.RobAx.Rax_1, jt.RobAx.Rax_2, jt.RobAx.Rax_3, jt.RobAx.Rax_4, jt.RobAx.Rax_5, jt.RobAx.Rax_6);
+            }
+            catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
+            {
+                Console.WriteLine("CANNOT RETRIEVE JOINTS FROM CONTROLLER");
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         /// <summary>
@@ -740,7 +748,15 @@ namespace Machina
                 Console.WriteLine("    Cycle: " + mainTask.Cycle);
                 Console.WriteLine("    Enabled: " + mainTask.Enabled);
                 Console.WriteLine("    ExecutionStatus: " + mainTask.ExecutionStatus);
-                Console.WriteLine("    ExecutionType: " + mainTask.ExecutionType);
+                try
+                {
+                    Console.WriteLine("    ExecutionType: " + mainTask.ExecutionType);
+                }
+                catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
+                {
+                    Console.WriteLine("    ExecutionType: UNSUPPORTED BY CONTROLLER");
+                    Console.WriteLine(e); 
+                }
                 Console.WriteLine("    Motion: " + mainTask.Motion);
                 Console.WriteLine("    MotionPointer: " + mainTask.MotionPointer.Module);
                 Console.WriteLine("    Name: " + mainTask.Name);
@@ -787,6 +803,7 @@ namespace Machina
             bool success = false;
 
             // This is specific to ABB, should become abstracted at some point...
+            Console.WriteLine("Scanning the network for controllers...");
             NetworkScanner scanner = new NetworkScanner();
             ControllerInfo[] controllers = scanner.GetControllers();
             if (controllers.Length > 0)

@@ -63,11 +63,10 @@ namespace Machina
     /// <summary>
     /// Defines which type of motion to use for translation actions.
     /// </summary>
-    public enum MotionType : int
+    public enum MotionType
     {
-        Undefined = 0,
-        Linear = 1,
-        Joint = 2
+        Linear,
+        Joint
     }
 
     /// <summary>
@@ -125,7 +124,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1307;
+        public static readonly int Build = 1308;
 
         /// <summary>
         /// Version number.
@@ -560,7 +559,7 @@ namespace Machina
         /// between motion targets. This is refered to as "Zone", "Approximate
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
-        /// <param name="smoothingRadius">Smoothing radius increment in mm</param>
+        /// <param name="radiusInc">Smoothing radius increment in mm</param>
         public void Precision(int radiusInc)
         {
             c.IssuePrecisionRequest(radiusInc, true);
@@ -744,17 +743,17 @@ namespace Machina
 
 
         /// <summary>
-        /// Increases the extrusion rate for 3D printers in mm of filament per mm of movement.
+        /// Increases the extrusion rate of filament for 3D printers.
         /// </summary>
-        /// <param name="rate">Increment of mm of filament per mm of movement.</param>
+        /// <param name="rateInc">Increment of mm of filament per mm of movement.</param>
         /// <returns></returns>
-        public bool ExtrusionRate(double rate)
+        public bool ExtrusionRate(double rateInc)
         {
-            return c.IssueExtrusionRateRequest(rate, true);
+            return c.IssueExtrusionRateRequest(rateInc, true);
         }
 
         /// <summary>
-        /// Sets the extrusion rate for 3D printers in mm of filament per mm of movement.
+        /// Sets the extrusion rate of filament for 3D printers.
         /// </summary>
         /// <param name="rate">mm of filament per mm of movement.</param>
         /// <returns></returns>

@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BRobot;
+using Machina;
 
 
 namespace EXAMPLE_ConnectionCheck
@@ -27,9 +27,9 @@ namespace EXAMPLE_ConnectionCheck
         {
             Console.WriteLine("Initializing Connection Check Program");
 
-            Robot arm = new Robot();
+            Robot arm = new Robot("Connection test", "ABB");
 
-            arm.Mode("execute");
+            arm.ControlMode("execute");
             arm.Connect();
 
             arm.DebugDump();

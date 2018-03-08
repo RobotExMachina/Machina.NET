@@ -546,9 +546,12 @@ namespace Machina
         /// <returns></returns>
         static internal string GetZoneValue(RobotCursor cursor)
         {
+            if (cursor.precision < Geometry.EPSILON2)
+                return "fine";
+
             // Following conventions for default RAPID zones.
             double high = 1.5 * cursor.precision;
-            double low = 0.15 * cursor.precision;
+            double low = 0.10 * cursor.precision;
             return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", cursor.precision, high, high, low, high, low);
         }
 

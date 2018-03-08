@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BRobot;
+using Machina;
 
 namespace EXAMPLE_LoadModule
 {
@@ -19,9 +19,9 @@ namespace EXAMPLE_LoadModule
 
             string moduleFilepath = @"D:\temp\simple_line.mod";
 
-            Robot arm = new Robot();
+            Robot arm = new Robot("LoadModuleTest", "ABB");
 
-            arm.Mode("execute");
+            arm.ControlMode("execute");
             arm.Connect();
 
             arm.DebugDump();
