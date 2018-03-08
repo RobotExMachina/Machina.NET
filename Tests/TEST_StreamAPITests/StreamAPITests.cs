@@ -4,36 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BRobot;
+using Machina;
 
 namespace TEST_StreamAPITests
 {
     class StreamAPITests
     {
-        static Robot arm = new Robot();
-        static Point dir = new Point(20, 0, 0);
-        static int it = 0;
-        static int maxTargets = 36;
+        //static Robot arm = new Robot();
+        //static Point dir = new Point(20, 0, 0);
+        //static int it = 0;
+        //static int maxTargets = 36;
 
         static void Main(string[] args)
         {
-            // Set control mode
-            arm.Mode("stream");
 
-            // Connect to a controller
-            arm.Connect();
-            arm.Start();
+            Robot arm = new Robot("StreamTests", "ABB");
 
             // arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
 
-            // TESTING MULTIPLE STREAM ACTIONS
-            TestDifferentActions();
+            OneActionTest(arm);
 
-            arm.DebugRobotCursors();
-            arm.DebugBuffer();
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffer();
 
             Console.WriteLine(" ");
-            Console.WriteLine("Press any key to EXIT...");
+            Console.WriteLine("Press any key to DISCONNECT...");
             Console.ReadKey();
 
             arm.Disconnect();
@@ -43,51 +38,91 @@ namespace TEST_StreamAPITests
             Console.ReadKey();
         }
 
-        static public void TestDifferentActions()
+        static public void VerticalRectangle(Robot bot)
         {
-            // Test MoveAbsJ
-            arm.Speed(50);
-            arm.JointsTo(0, 0, 15, 0, 90, 0);
 
-            // Test MoveL
-            arm.Speed(200);
-            arm.TransformTo(new Point(300, 300, 300), Rotation.FlippedAroundY);
-            arm.Speed(25);
-            arm.Move(50, 0);
-            arm.Move(0, 50);
-            arm.Move(-50, 0);
-            arm.Move(0, -50);
-            arm.Move(0, 0, 50);
+        }
 
-            // Test Wait + Msg
+        static public void OneActionTest(Robot bot) 
+        {
+            bot.ControlMode(ControlType.Stream);
+
+            bot.Connect();
+            bot.Start();
+
+            // Message
+            bot.Message("Starting vertical square");
+
+            // Home
+            bot.SpeedTo(200);
+            bot.PrecisionTo(10);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+
+            // Joint move and rotate to starting point
+            bot.PushSettings();
+            bot.MotionMode(MotionType.Joint);
+            bot.SpeedTo(100);
+            bot.PrecisionTo(5);
+            bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
+            bot.Rotate(0, 1, 0, -90);
+            bot.PopSettings();
+            bot.Wait(1500);
+
+            // Back home
+            bot.SpeedTo(200);
+            bot.PrecisionTo(10);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
             
-            arm.Wait(1525);
-            arm.Message("The quick brown fox jumps over the lazy dog, the quick brown fox jumps over the lazy dog, the quick brown fox jumps over the lazy dog");
-
-            // Test MoveJ
-            arm.Motion("joint");
-            arm.Speed(100);
-            arm.Move(0, -300);
-
-            // MoveAbsJ
-            arm.Speed(50);
-            arm.JointsTo(0, 0, 0, 0, 90, 0);
         }
+                
 
 
-        static public void GenerateMovements(object sender, EventArgs args)
-        {
-            if (it < maxTargets)
-            {
-                arm.Move(dir);
-                dir.Rotate(Point.ZAxis, 10);
-            }
-            else if (it == maxTargets)
-            {
-                arm.Speed(100);
-                arm.MoveTo(302, 0, 558);
-            }
-            it++;
-        }
+
+        //static public void TestDifferentActions()
+        //{
+        //    // Test MoveAbsJ
+        //    arm.Speed(50);
+        //    arm.JointsTo(0, 0, 15, 0, 90, 0);
+
+        //    // Test MoveL
+        //    arm.Speed(200);
+        //    arm.TransformTo(new Point(300, 300, 300), Rotation.FlippedAroundY);
+        //    arm.Speed(25);
+        //    arm.Move(50, 0);
+        //    arm.Move(0, 50);
+        //    arm.Move(-50, 0);
+        //    arm.Move(0, -50);
+        //    arm.Move(0, 0, 50);
+
+        //    // Test Wait + Msg
+            
+        //    arm.Wait(1525);
+        //    arm.Message("The quick brown fox jumps over the lazy dog, the quick brown fox jumps over the lazy dog, the quick brown fox jumps over the lazy dog");
+
+        //    // Test MoveJ
+        //    arm.Motion("joint");
+        //    arm.Speed(100);
+        //    arm.Move(0, -300);
+
+        //    // MoveAbsJ
+        //    arm.Speed(50);
+        //    arm.JointsTo(0, 0, 0, 0, 90, 0);
+        //}
+
+
+        //static public void GenerateMovements(object sender, EventArgs args)
+        //{
+        //    if (it < maxTargets)
+        //    {
+        //        arm.Move(dir);
+        //        dir.Rotate(Point.ZAxis, 10);
+        //    }
+        //    else if (it == maxTargets)
+        //    {
+        //        arm.Speed(100);
+        //        arm.MoveTo(302, 0, 558);
+        //    }
+        //    it++;
+        //}
     }
 }

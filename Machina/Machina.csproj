@@ -79,6 +79,8 @@
     <Compile Include="Compilers\CompilerUR.cs" />
     <Compile Include="Compilers\CompilerABB.cs" />
     <Compile Include="Compilers\CompilerHuman.cs" />
+    <Compile Include="Drivers\Driver.cs" />
+    <Compile Include="Drivers\DriverABBAutomatic.cs" />
     <Compile Include="Types\AxisAngle.cs" />
     <Compile Include="Types\Orientation.cs" />
     <Compile Include="Types\Geometry.cs" />
@@ -97,7 +99,7 @@
     <Compile Include="Types\Quaternion.cs" />
     <Compile Include="Types\RotationVector.cs" />
     <Compile Include="SettingsBuffer.cs" />
-    <Compile Include="Communication.cs" />
+    <Compile Include="Drivers\OldDriver.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="Library.cs" />
     <Compile Include="Queue.cs" />
@@ -121,7 +123,7 @@ REM :END</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
-</PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

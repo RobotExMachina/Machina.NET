@@ -20,17 +20,22 @@
 This release will focus on reworking the Streaming mode to base it off TCP connection with the controller server. 
 
 ### Machina_Driver.mod
-- [x] Cleanup dead code
-- [x] Refactor function names and variables
-- [ ] ~~Make parsing variables global for performance... (?)~~
-- [x] Add circular logic to the actions buffer: when written more than 1000, start again
-- [ ] Add support for all Machina actions
-- [ ] Implement more robust connect/disconnect logic, like in Robo_DK
-- [ ] Implement ack messages, tell the client what's happening
-- [ ] Add `Stream\Execute` modes: actions are executed immediately upon reception or buffered until instructed to perform an execution
-- [ ] Add a handshake of versions and ips and stuff
+[x] Cleanup dead code
+[x] Refactor function names and variables
+[ ] Make parsing variables global for performance... (?)
+[x] Add circular logic to the actions buffer: when written more than 1000, start again
+[x] Add support for all Machina actions
+[x] Implement more robust connect/disconnect logic, like in Robo_DK
+[x] Implement ack messages, tell the client what's happening
+[x] Add optional ids to the messages
+[ ] ~~Add `Stream\Execute` modes: actions are executed immediately upon reception or buffered until instructed to perform an execution~~ → Leave for later
+[x] Add a handshake of versions and ips and stuff
+[x] Add `USE_STRICT` flag to exit execution on anything going wrong
 
 - [ ] `Precision()` should accept `double` input
+
+---
+## THINGS CHANGED IN MACHINA TO IMPLEMENT THIS THING
 
 
 

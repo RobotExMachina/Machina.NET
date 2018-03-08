@@ -210,7 +210,7 @@ namespace Machina
         }
 
 
-        /// What was this even for? Exposrt checks?
+        /// What was this even for? Exports checks?
         public bool IsBrand(string brandName)
         {
             return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());

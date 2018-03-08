@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 
 namespace Machina
 {
-    //  ██████╗  █████╗ ███████╗███████╗
-    //  ██╔══██╗██╔══██╗██╔════╝██╔════╝
-    //  ██████╔╝███████║███████╗█████╗  
-    //  ██╔══██╗██╔══██║╚════██║██╔══╝  
-    //  ██████╔╝██║  ██║███████║███████╗
-    //  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-    //                                  
+    //  ██████╗ ██████╗ ██╗██╗   ██╗███████╗██████╗ 
+    //  ██╔══██╗██╔══██╗██║██║   ██║██╔════╝██╔══██╗
+    //  ██║  ██║██████╔╝██║██║   ██║█████╗  ██████╔╝
+    //  ██║  ██║██╔══██╗██║╚██╗ ██╔╝██╔══╝  ██╔══██╗
+    //  ██████╔╝██║  ██║██║ ╚████╔╝ ███████╗██║  ██║
+    //  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
+    //                                              
     /// <summary>
     /// A class to handle communication with external controllers, real or virtual
     /// </summary>
     abstract class Driver
     {
         /// <summary>
-        /// A reference to parent Machina Control object commanding this Comm.
+        /// A reference to parent Machina Control object commanding this Driver.
         /// </summary>
         protected Control masterControl = null;
 
@@ -33,31 +33,43 @@ namespace Machina
         //protected StreamQueue streamQueue = null;
         //public abstract RobotCursor writeCursor = null;
 
-        public abstract RobotCursor WriteCursor { get; set; }
+        /// <summary>
+        /// A reference to the shared Write RobotCursor object
+        /// </summary>
+        private RobotCursor _writeCursor;
 
+        /// <summary>
+        /// A reference to the shared streamQueue object
+        /// </summary>
+        public RobotCursor WriteCursor
+        {
+            get { return _writeCursor; }
+            set { _writeCursor = value; }
+        }
+        
 
         /// <summary>
         /// Is the connection to the controller fully operative?
         /// </summary>
         protected bool isConnected = false;
-        
+
         /// <summary>
         /// Is the device currently running a program?
         /// </summary>
         protected bool isRunning = true;
         protected string IP = "";
+        protected int PORT = 7000;  // @TODO: figure this out as an input somewhere
 
 
 
-        //  ███████╗██╗ ██████╗ ███╗   ██╗ █████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗
-        //  ██╔════╝██║██╔════╝ ████╗  ██║██╔══██╗╚══██╔══╝██║   ██║██╔══██╗██╔════╝██╔════╝
-        //  ███████╗██║██║  ███╗██╔██╗ ██║███████║   ██║   ██║   ██║██████╔╝█████╗  ███████╗
-        //  ╚════██║██║██║   ██║██║╚██╗██║██╔══██║   ██║   ██║   ██║██╔══██╗██╔══╝  ╚════██║
-        //  ███████║██║╚██████╔╝██║ ╚████║██║  ██║   ██║   ╚██████╔╝██║  ██║███████╗███████║
-        //  ╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
-        //                                                                                  
+
+
+        //  ┌─┐┬┌─┐┌┐┌┌─┐┌┬┐┬ ┬┬─┐┌─┐┌─┐
+        //  └─┐││ ┬│││├─┤ │ │ │├┬┘├┤ └─┐
+        //  └─┘┴└─┘┘└┘┴ ┴ ┴ └─┘┴└─└─┘└─┘
+        //
         /// <summary>
-        /// Reverts the Comm object to a blank state before any connection attempt, objects retrieved, subscriptions, etc,
+        /// Reverts the Driver object to a blank state before any connection attempt, objects retrieved, subscriptions, etc,
         /// </summary>
         public abstract void Reset();
 
@@ -82,16 +94,16 @@ namespace Machina
         public abstract bool SetRunMode(CycleType mode);
 
         /// <summary>
-        /// Loads a program to the device.
+        /// Loads a program to the device from a file in the system.
         /// </summary>
         /// <param name="dirname"></param>
         /// <param name="filename"></param>
         /// <param name="extension"></param>
         /// <returns></returns>
-        public abstract bool LoadProgramToController(string dirname, string filename, string extension);
+        public abstract bool LoadFileToController(string dirname, string filename, string extension);
 
         /// <summary>
-        /// Loads a program to the device.
+        /// Loads a program to the device from a list of lines of code as strings.
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
@@ -127,13 +139,6 @@ namespace Machina
         /// <returns></returns>
         public abstract Joints GetCurrentJoints();
 
-        ///// <summary>
-        ///// Returns a Frame object representing the current robot's TCP position and orientation. 
-        ///// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
-        ///// </summary>
-        ///// <returns></returns>
-        //public abstract Frame GetCurrentFrame();
-
         /// <summary>
         /// Ticks the queue manager and potentially triggers streaming of targets to the controller.
         /// </summary>
@@ -146,10 +151,13 @@ namespace Machina
         public abstract void DebugDump();
 
 
-        // Base constructor
+        /// <summary>
+        /// Create a new instance of a Driver object given a Controller.
+        /// </summary>
+        /// <param name="ctrl"></param>
         public Driver(Control ctrl)
         {
-            masterControl = ctrl;
+            this.masterControl = ctrl;
             Reset();
         }
 
@@ -157,6 +165,7 @@ namespace Machina
         //{
         //    streamQueue = q;
         //}
+
         public void LinkWriteCursor(ref RobotCursor wc)
         {
             WriteCursor = wc;
@@ -177,27 +186,7 @@ namespace Machina
             return IP;
         }
 
-        /// <summary>
-        /// Saves a string representation of a program to a local file. 
-        /// </summary>
-        /// <param name="module"></param>
-        /// <param name="filepath"></param>
-        protected bool SaveProgramToFilename(List<string> module, string filepath)
-        {
-            try
-            {
-                System.IO.File.WriteAllLines(filepath, module, System.Text.Encoding.ASCII);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Could not save module to file...");
-                Console.WriteLine(ex);
-            }
-            return false;
-        }
-
     }
 
-    
+
 }
