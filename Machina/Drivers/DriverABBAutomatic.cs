@@ -40,7 +40,30 @@ namespace Machina
         //protected RobotCursor writeCursor;
 
         private TcpClient clientSocket = new TcpClient();
-        private NetworkStream clientStream;
+        private NetworkStream clientNetworkStream;
+        //private Stream clientStream;
+        //private StreamReader clientStreamReader;
+        //private StreamWriter clientStreamWriter;
+
+        // From the Machina_Server.mod file, must be consistent!
+        const string STR_MESSAGE_END_CHAR = ";";
+        const string STR_MESSAGE_ID_CHAR = "@";
+
+        // A RAPID-code oriented API:
+        //                                     // INSTRUCTION P1 P2 P3 P4...
+        const int INST_MOVEL = 1;              // MoveL X Y Z QW QX QY QZ
+        const int INST_MOVEJ = 2;              // MoveJ X Y Z QW QX QY QZ
+        const int INST_MOVEABSJ = 3;           // MoveAbsJ J1 J2 J3 J4 J5 J6
+        const int INST_SPEED = 4;              // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
+        const int INST_ZONE = 5;               // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
+        const int INST_WAITTIME = 6;           // WaitTime T
+        const int INST_TPWRITE = 7;            // TPWrite "MSG"
+        const int INST_TOOL = 8;               // (settool X Y Z QW QX QY QZ KG CX CY CZ)
+        const int INST_NOTOOL = 9;             // (settool tool0)
+        const int INST_SETDO = 10;             // SetDO "NAME" ON
+        const int INST_SETAO = 11;             // SetAO "NAME" V
+
+
 
 
 
@@ -1028,7 +1051,10 @@ namespace Machina
         {
             clientSocket = new TcpClient();
             clientSocket.Connect(IP, PORT);
-            clientStream = clientSocket.GetStream();
+            clientNetworkStream = clientSocket.GetStream();
+            //clientStream = clientSocket.GetStream();
+            //clientStreamReader = new StreamReader(clientStream, Encoding.ASCII);
+            //clientStreamWriter = new StreamWriter(clientStream, Encoding.ASCII);
 
             return clientSocket.Connected;
         }
@@ -1064,7 +1090,6 @@ namespace Machina
 
         private bool SendActionAsMessage(bool hasPriority)
         {
-
             if (!WriteCursor.ApplyNextAction())
             {
                 Console.WriteLine("Could not apply next action");
@@ -1077,13 +1102,90 @@ namespace Machina
                 throw new Exception("Last action wasn't correctly stored...?");
 
             // dummy message to request version number
-            string msg = $"@{a.id} 101 1;";
+            //string msg = $"@{a.id} 101 1;";
+            //byte[] msgBytes = Encoding.ASCII.GetBytes(msg);
+            //clientNetworkStream.Write(msgBytes, 0, msgBytes.Length);
+
+            string msg = GetActionMessage(a, WriteCursor);
             byte[] msgBytes = Encoding.ASCII.GetBytes(msg);
-            clientStream.Write(msgBytes, 0, msgBytes.Length);
+
+            clientNetworkStream.Write(msgBytes, 0, msgBytes.Length);
+
+            Console.WriteLine("Sending mgs: " + msg);
+            
+
+            //Console.WriteLine("Received: " + sr.Read());
 
             return true;
         }
 
+        private string GetActionMessage(Action action, RobotCursor cursor)
+        {
+            string msg = "";
+
+            switch (action.type)
+            {
+                case ActionType.Translation:
+                case ActionType.Rotation:
+                case ActionType.Transformation:
+                    // MoveL/J X Y Z QW QX QY QZ
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {(cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ)} {cursor.position.X} {cursor.position.Y} {cursor.position.Z} {cursor.rotation.Q.W} {cursor.rotation.Q.X} {cursor.rotation.Q.Y} {cursor.rotation.Q.Z}{STR_MESSAGE_END_CHAR}";
+                    break;
+
+                case ActionType.Axes:
+                    // MoveAbsJ J1 J2 J3 J4 J5 J6
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_MOVEABSJ} {cursor.joints.J1} {cursor.joints.J2} {cursor.joints.J3} {cursor.joints.J4} {cursor.joints.J5} {cursor.joints.J6}{STR_MESSAGE_END_CHAR}";
+                    break;
+
+                case ActionType.Speed:
+                    // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}";  // this accepts more velocity params, but those are still not implemented in Machina... 
+                    break;
+
+                case ActionType.Precision:
+                    // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}";  // this accepts more zone params, but those are still not implemented in Machina... 
+                    break;
+
+                case ActionType.Wait:
+                    // !WaitTime T
+                    ActionWait aw = (ActionWait)action;
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_WAITTIME} {0.001 * aw.millis}{STR_MESSAGE_END_CHAR}";
+                    break;
+
+                case ActionType.Message:
+                    // !TPWrite "MSG"
+                    ActionMessage am = (ActionMessage)action;
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_TPWRITE} \"{am.message}\"{STR_MESSAGE_END_CHAR}";
+                    break;
+
+                case ActionType.Attach:
+                    // !(settool X Y Z QW QX QY QZ KG CX CY CZ)
+                    ActionAttach aa = (ActionAttach)action;
+                    Tool t = aa.tool;
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_TOOL} {t.TCPPosition.X} {t.TCPPosition.Y} {t.TCPPosition.Z} {t.TCPOrientation.Q.W} {t.TCPOrientation.Q.X} {t.TCPOrientation.Q.Y} {t.TCPOrientation.Q.Z} {t.weight} {t.centerOfGravity.X} {t.centerOfGravity.Y} {t.centerOfGravity.Z} {STR_MESSAGE_END_CHAR}";
+                    break;
+
+                case ActionType.Detach:
+                    // !(settool0)
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_NOTOOL}{STR_MESSAGE_END_CHAR}";
+                    break;
+
+                case ActionType.IODigital:
+                    // !SetDO "NAME" ON
+                    ActionIODigital aiod = (ActionIODigital)action;
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETDO} \"{cursor.digitalOutputNames[aiod.pin]}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}";
+                    break;
+
+                case ActionType.IOAnalog:
+                    // !SetAO "NAME" V
+                    ActionIOAnalog aioa = (ActionIOAnalog)action;
+                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETAO} \"{cursor.digitalOutputNames[aioa.pin]}\" {aioa.value}{STR_MESSAGE_END_CHAR}";
+                    break;
+            }
+
+            return msg;
+        }
 
         ///// <summary>
         ///// Figures out the appropriate virtual target in the streaming module and 

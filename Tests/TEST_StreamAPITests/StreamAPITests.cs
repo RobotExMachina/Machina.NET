@@ -50,13 +50,22 @@ namespace TEST_StreamAPITests
             bot.Connect();
             bot.Start();
 
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to START THE PROGRAM...");
+            Console.ReadKey();
+
             // Message
             bot.Message("Starting vertical square");
-
+            
             // Home
             bot.SpeedTo(200);
             bot.PrecisionTo(10);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
+
+            // A 100 mm long tool with no TCP rotation
+            //r.write('8 0 0 100 1 0 0 0;');
+            Tool rod = new Tool("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
+            bot.Attach(rod);
 
             // Joint move and rotate to starting point
             bot.PushSettings();
@@ -68,9 +77,26 @@ namespace TEST_StreamAPITests
             bot.PopSettings();
             bot.Wait(1500);
 
-            // Back home
+            // Turn on "DO_15"
+            bot.SetIOName("DO_15", 15, true);
+            bot.WriteDigital(15, true);
+
+            // Slow MoveL a square with precision
+            bot.SpeedTo(20);
+            bot.PrecisionTo(1);
+            bot.Move(0, 50, 0);
+            bot.Move(0, 0, 50);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, -50);
+            bot.Wait(1000);
+
+            // Turn off "DO_15"
+            bot.WriteDigital(15, false);
+
+            // No tool and back home
+            bot.Detach();
             bot.SpeedTo(200);
-            bot.PrecisionTo(10);
+            bot.PrecisionTo(5);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
             
         }
