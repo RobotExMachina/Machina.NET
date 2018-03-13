@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.IO;
+using System.Reflection;
 
 namespace Machina
 {
@@ -32,8 +33,8 @@ namespace Machina
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
-        public const CycleType DEFAULT_RUNMODE = CycleType.Once;                  
-        
+        public const CycleType DEFAULT_RUNMODE = CycleType.Once;
+
 
 
 
@@ -56,7 +57,7 @@ namespace Machina
         /// What brand of robot is this?
         /// </summary>
         internal RobotType robotBrand;
-        
+
         /// <summary>
         /// A virtual representation of the state of the device after application of issued actions.
         /// </summary>
@@ -158,7 +159,7 @@ namespace Machina
             {
                 InitializeCommunication();
             }
-            
+
             return true;
         }
 
@@ -191,7 +192,7 @@ namespace Machina
 
             return false;
         }
-        
+
         /// <summary>
         /// Returns current RunMode.
         /// </summary>
@@ -268,7 +269,7 @@ namespace Machina
         {
             return comm.GetIP();
         }
-        
+
         /// <summary>
         /// Loads a programm to the connected device and executes it. 
         /// </summary>
@@ -291,7 +292,7 @@ namespace Machina
                 Console.WriteLine("Cannot load modules in Offline mode");
                 return false;
             }
-            
+
             // Sanity
             string fullPath = "";
 
@@ -552,7 +553,7 @@ namespace Machina
         {
             return virtualCursor.referenceCS;
         }
-        
+
         ///// <summary>
         ///// Buffers current state settings (speed, zone, motion type...), and opens up for 
         ///// temporary settings changes to be reverted by PopSettings().
@@ -573,10 +574,10 @@ namespace Machina
         //    currentSettings = settingsBuffer.Pop();
         //    //Console.WriteLine("Reverted to {0}", currentSettings);
         //}
-         
+
         public bool SetIOName(string ioName, int pinNumber, bool isDigital)
         {
-            
+
             if (isDigital)
             {
                 if (pinNumber < 0 || pinNumber >= virtualCursor.digitalOutputs.Length)
@@ -650,7 +651,7 @@ namespace Machina
                 Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                 return false;
             }
-            
+
             ActionSpeed act = new ActionSpeed(speed, relative);
 
             bool success = virtualCursor.Issue(act);
@@ -769,7 +770,7 @@ namespace Machina
             if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
-        
+
         /// <summary>
         /// Issue a Translation action request that falls back on the state of current settings.
         /// </summary>
@@ -791,7 +792,7 @@ namespace Machina
             if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
         }
-        
+
         /// <summary>
         /// Issue a Rotation action request with fully customized parameters.
         /// </summary>
@@ -813,7 +814,7 @@ namespace Machina
             return success;
 
         }
-        
+
         /// <summary>
         /// Issue a Translation + Rotation action request with fully customized parameters.
         /// </summary>
@@ -840,7 +841,7 @@ namespace Machina
             return success;
 
         }
-        
+
         /// <summary>
         /// Issue a request to set the values of joint angles in configuration space. 
         /// </summary>
@@ -858,7 +859,7 @@ namespace Machina
             }
 
             ActionAxes act = new ActionAxes(joints, relJnts);
-            
+
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
@@ -885,7 +886,7 @@ namespace Machina
             return success;
 
         }
-        
+
         /// <summary>
         /// Issue a request for the device to stay idle for a certain amount of time.
         /// </summary>
@@ -900,13 +901,13 @@ namespace Machina
             }
 
             ActionWait act = new ActionWait(millis);
-            
+
             bool success = virtualCursor.Issue(act);
             if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
             return success;
 
         }
-        
+
         /// <summary>
         /// Issue a request to add an internal comment in the compiled code. 
         /// </summary>
@@ -1056,7 +1057,7 @@ namespace Machina
                 Console.WriteLine("Communication protocol might be active. Please CloseControllerCommunication() first.");
                 return false;
             }
-            
+
             // @TODO: shim assignment of correct robot model/brand
             comm = new DriverABBAutomatic(this);
 
@@ -1085,7 +1086,7 @@ namespace Machina
             comm = null;
             return success;
         }
-        
+
         /// <summary>
         /// If there was a running Communication protocol, drop it and restart it again.
         /// </summary>
@@ -1150,6 +1151,46 @@ namespace Machina
                 Console.WriteLine(ex);
             }
             return false;
+        }
+
+        /// <summary>
+        /// Saves a resource text file to a path
+        /// </summary>
+        /// <param name="resourceName"></param>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        internal bool SaveTextResourceToFile(string resourceName, string filepath)
+        {
+            try
+            {
+                System.IO.File.WriteAllLines(filepath, ReadLines(() => Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)), robotBrand == RobotType.Undefined ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Could not save program to file...");
+                Console.WriteLine(ex);
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Returns an IEnumerable of strings from a streamReader provider. https://stackoverflow.com/a/13312954/1934487
+        /// </summary>
+        /// <param name="streamProvider"></param>
+        /// <returns></returns>
+        private IEnumerable<string> ReadLines(Func<Stream> streamProvider)
+        {
+            using (var stream = streamProvider())
+            using (var reader = new StreamReader(stream))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    yield return line;
+                }
+            }
         }
 
         /// <summary>
@@ -1358,6 +1399,6 @@ namespace Machina
             Console.WriteLine("");
         }
 
-        
+
     }
 }

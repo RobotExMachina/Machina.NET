@@ -113,6 +113,10 @@
     <Compile Include="Tool.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Modules\MachinaServerABB.txt" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM JL: for the time being, only copy ddlls manually to avoid breaking the dependent projects
