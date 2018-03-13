@@ -62,7 +62,7 @@ namespace TEST_StreamAPITests
             bot.PrecisionTo(10);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
 
-            // A 100 mm long tool with no TCP rotation
+            // A 100 mm long tool with no TCP rotatio
             //r.write('8 0 0 100 1 0 0 0;');
             Tool rod = new Tool("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
             bot.Attach(rod);
