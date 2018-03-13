@@ -29,6 +29,10 @@ namespace Machina
         // ABB stuff and flags
         private Controller controller;
         private ABB.Robotics.Controllers.RapidDomain.Task tRob1Task;
+        private RobotWare robotWare;
+        private RobotWareOptionCollection robotWareOptions;
+        private bool hasMultiTasking = false;
+        private bool hasEGM = false;
 
         private bool isLogged = false;
 
@@ -631,10 +635,23 @@ namespace Machina
                 Console.WriteLine("    TaskType: " + tRob1Task.TaskType);
                 Console.WriteLine("    Type: " + tRob1Task.Type);
                 Console.WriteLine("");
+
+                Console.WriteLine("HAS MULTITASKING: " + this.hasMultiTasking);
+                Console.WriteLine("HAS EGM: " + this.hasEGM);
+
+                
             }
         }
 
-
+        private void DebugDumpDomain(ABB.Robotics.Controllers.ConfigurationDomain.Domain dom)
+        {
+            Console.WriteLine(dom);
+            var types = dom.Types;
+            Console.WriteLine("");
+            foreach (var item in types)
+                Console.WriteLine(item);
+            Console.WriteLine("");
+        }
 
 
 
@@ -681,6 +698,12 @@ namespace Machina
                     //isConnected = true;
                     Console.WriteLine($"Found controller {controller.SystemName} on {controller.Name}");
                     success = true;
+
+                    this.robotWare = this.controller.RobotWare;
+                    this.robotWareOptions = this.robotWare.Options;
+
+                    this.hasMultiTasking = HasMultiTaskOption(this.robotWareOptions);
+                    this.hasEGM = HasEGMOption(this.robotWareOptions);
                 }
                 else
                 {
@@ -692,6 +715,8 @@ namespace Machina
                 Console.WriteLine("No controllers found on the network");
             }
 
+            
+            
             return success;
         }
 
@@ -839,7 +864,8 @@ namespace Machina
                 Console.WriteLine("Could not retrieve main task from controller");
                 Console.WriteLine(ex);
             }
-
+             
+            
             return false;
         }
 
@@ -1096,6 +1122,45 @@ namespace Machina
         }
 
 
+        private bool HasMultiTaskOption(RobotWareOptionCollection options)
+        {
+            var available  = false;
+            foreach (RobotWareOption option in options)
+            {
+                if (option.Description.Contains("623-1"))
+                {
+                    available = true;
+                    break;
+                }
+            }
+            return available;
+        }
+
+        private bool HasEGMOption(RobotWareOptionCollection options)
+        {
+            var available = false;
+            foreach (RobotWareOption option in options)
+            {
+                if (option.Description.Contains("689-1"))
+                {
+                    available = true;
+                    break;
+                }
+            }
+            return available;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
         private bool SendActionAsMessage(bool hasPriority)
         {
             if (!WriteCursor.ApplyNextAction())
@@ -1126,6 +1191,7 @@ namespace Machina
 
             return true;
         }
+        
 
         private string GetActionMessage(Action action, RobotCursor cursor)
         {
