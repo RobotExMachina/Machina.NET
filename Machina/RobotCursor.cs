@@ -426,7 +426,7 @@ namespace Machina
                 if (s != null)
                 {
                     this.speed = s.Speed;
-                    this.precision = s.Zone;
+                    this.precision = s.Precision;
                     this.motionType = s.MotionType;
                     this.referenceCS = s.RefCS;
                     this.extrusionRate = s.ExtrusionRate;
@@ -483,21 +483,21 @@ namespace Machina
             }
 
             // @TODO: this must be more programmatically implemented 
-            if (Control.SAFETY_CHECK_TABLE_COLLISION)
-            {
-                if (Control.IsBelowTable(newPosition.Z))
-                {
-                    if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
-                    {
-                        Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPosition.Z);
-                        return false;
-                    }
-                    else
-                    {
-                        Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPosition.Z);
-                    }
-                }
-            }
+            //if (Control.SAFETY_CHECK_TABLE_COLLISION)
+            //{
+            //    if (Control.IsBelowTable(newPosition.Z))
+            //    {
+            //        if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
+            //        {
+            //            Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPosition.Z);
+            //            return false;
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPosition.Z);
+            //        }
+            //    }
+            //}
 
             prevPosition = position;
             position = newPosition;
@@ -632,22 +632,22 @@ namespace Machina
                 newRot = new Rotation(action.rotation);
             }
 
-            // @TODO: this must be more programmatically implemented 
-            if (Control.SAFETY_CHECK_TABLE_COLLISION)
-            {
-                if (Control.IsBelowTable(newPos.Z))
-                {
-                    if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
-                    {
-                        Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPos.Z);
-                        return false;
-                    }
-                    else
-                    {
-                        Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPos.Z);
-                    }
-                }
-            }
+            //// @TODO: this must be more programmatically implemented 
+            //if (Control.SAFETY_CHECK_TABLE_COLLISION)
+            //{
+            //    if (Control.IsBelowTable(newPos.Z))
+            //    {
+            //        if (Control.SAFETY_STOP_ON_TABLE_COLLISION)
+            //        {
+            //            Console.WriteLine("Cannot perform action: too close to base XY plane --> TCP.z = {0}", newPos.Z);
+            //            return false;
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("WARNING: too close to base XY plane, USE CAUTION! --> TCP.z = {0}", newPos.Z);
+            //        }
+            //    }
+            //}
 
             prevPosition = position;
             position = newPos;

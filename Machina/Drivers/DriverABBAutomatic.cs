@@ -555,7 +555,7 @@ namespace Machina
         /// </summary>
         public override void TickStreamQueue(bool hasPriority)
         {
-            Console.WriteLine("TICKING StreamQueue: {0} actions pending", WriteCursor.ActionsPending());
+            Console.WriteLine($"TICKING StreamQueue: {WriteCursor.ActionsPending()} actions pending");
             if (WriteCursor.AreActionsPending())
             {
                 Console.WriteLine("About to set targets");

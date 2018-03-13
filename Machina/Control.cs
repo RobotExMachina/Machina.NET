@@ -54,7 +54,6 @@ namespace Machina
         /// Instances of the main robot Controller and Task
         /// </summary>
         private Driver comm;
-
         
         /// <summary>
         /// A virtual representation of the state of the device after application of issued actions.
@@ -111,7 +110,6 @@ namespace Machina
         public Control(Robot parentBot)
         {
             parent = parentBot;
-            //robotBrand = brand;
 
             Reset();  // @TODO necessary?
         }
@@ -272,6 +270,7 @@ namespace Machina
         /// Loads a programm to the connected device and executes it. 
         /// </summary>
         /// <param name="programLines">A string list representation of the program's code.</param>
+        /// <param name="programName">Program name</param>
         /// <returns></returns>
         public bool LoadProgramToDevice(List<string> programLines, string programName = "Program")
         {
@@ -282,6 +281,7 @@ namespace Machina
         /// Loads a programm to the connected device and executes it. 
         /// </summary>
         /// <param name="filepath">Full filepath including root, directory structure, filename and extension.</param>
+        /// <param name="wipeout">Delete all previous modules in the device?</param>
         /// <returns></returns>
         public bool LoadProgramToDevice(string filepath, bool wipeout)
         {
@@ -407,18 +407,6 @@ namespace Machina
             return virtualCursor.rotation;
         }
 
-        ///// <summary>
-        ///// Returns a Frame object representing the current robot's TCP position and orientation. 
-        ///// NOTE: the Frame object's speed and zone still do not represent the acutal state of the robot.
-        ///// </summary>
-        ///// <returns></returns>
-        //public Frame GetCurrentFrame()
-        //{
-        //    // @TODO: at some point when virtual robots are implemented, this will return either the real robot's TCP
-        //    // or the virtual one's (like in offline mode).
-
-        //    return comm.GetCurrentFrame();
-        //}
 
         /// <summary>
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
@@ -451,14 +439,12 @@ namespace Machina
 
 
 
-
-
-
         /// <summary>
-        ///  For Offline modes, it flushes all pending actions and returns a devide-specific program 
+        /// For Offline modes, it flushes all pending actions and returns a devide-specific program 
         /// as a stringList representation.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
         public List<string> Export(bool inlineTargets, bool humanComments)
         {
@@ -479,6 +465,7 @@ namespace Machina
         /// </summary>
         /// <param name="filepath"></param>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
         public bool Export(string filepath, bool inlineTargets, bool humanComments)
         {
@@ -574,6 +561,9 @@ namespace Machina
         //    //Console.WriteLine("Reverted to {0}", currentSettings);
         //}
 
+
+
+        // TODO: take another look at this, it was quick and dirty...
         public bool SetIOName(string ioName, int pinNumber, bool isDigital)
         {
 
@@ -614,12 +604,15 @@ namespace Machina
 
 
 
-        // █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
-        //██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
-        //███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
-        //██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
-        //██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
-        //╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+
+
+        //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
+        //  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
+        //  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
+        //  ██╔══██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
+        //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
+        //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+        //                                                         
 
         /// <summary>
         /// Issue an Action of whatever kind...
@@ -1113,9 +1106,9 @@ namespace Machina
 
         {
             bool success = true;
-            success = success && virtualCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
-            success = success && writeCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
-            success = success && motionCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
+            success &= virtualCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
+            success &= writeCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
+            success &= motionCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
 
             areCursorsInitialized = success;
 
@@ -1133,15 +1126,7 @@ namespace Machina
         {
             try
             {
-                if (this.parent.Brand == RobotType.Undefined)
-                {
-                    System.IO.File.WriteAllLines(filepath, lines, System.Text.Encoding.UTF8);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
-                }
-                else
-                {
-                    System.IO.File.WriteAllLines(filepath, lines, System.Text.Encoding.ASCII);
-                }
-
+                System.IO.File.WriteAllLines(filepath, lines, this.parent.Brand == RobotType.Undefined ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
                 return true;
             }
             catch (Exception ex)
@@ -1228,24 +1213,7 @@ namespace Machina
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        
 
 
 
@@ -1323,11 +1291,11 @@ namespace Machina
         //    streamQueue.Add(frame);
         //}
 
-        // This should be moved somewhere else
-        public static bool IsBelowTable(double z)
-        {
-            return z < SAFETY_TABLE_Z_LIMIT;
-        }
+        //// This should be moved somewhere else
+        //public static bool IsBelowTable(double z)
+        //{
+        //    return z < SAFETY_TABLE_Z_LIMIT;
+        //}
 
 
 
