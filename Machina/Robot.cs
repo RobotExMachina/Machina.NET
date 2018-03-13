@@ -48,6 +48,11 @@ namespace Machina
         public string Name { get; internal set; }
 
         /// <summary>
+        /// What brand of robot is this?
+        /// </summary>
+        public RobotType Brand { get; internal set; }
+
+        /// <summary>
         /// The main Control object, acts as an interface to all classes that
         /// manage robot control.
         /// </summary>
@@ -96,7 +101,8 @@ namespace Machina
                 if (Enum.IsDefined(typeof(RobotType), rt))
                 {
                     //Console.WriteLine("Converted '{0}' to {1}", make, rt.ToString());
-                    c = new Control(this, rt);
+                    this.Brand = rt;
+                    c = new Control(this);
                 }
                 else
                 {
@@ -105,7 +111,8 @@ namespace Machina
                     {
                         Console.WriteLine(str.ToString());
                     }
-                    c = new Control(this, RobotType.Undefined);
+                    this.Brand = RobotType.Undefined;
+                    c = new Control(this);
                 }
             }
             catch
@@ -115,7 +122,8 @@ namespace Machina
                 {
                     Console.WriteLine(str.ToString());
                 }
-                c = new Control(this, RobotType.Undefined);
+                this.Brand = RobotType.Undefined;
+                c = new Control(this);
             }
         }
 
@@ -123,7 +131,7 @@ namespace Machina
         /// What was this even for? Exports checks?
         public bool IsBrand(string brandName)
         {
-            return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());
+            return this.Brand.ToString().Equals(brandName, StringComparison.OrdinalIgnoreCase);
         }
 
         
@@ -1239,12 +1247,7 @@ namespace Machina
         }
 
 
-        public override string ToString()
-        {
-            return string.Format("Robot[\"{0}\", {1}]",
-                this.Name,
-                this.c.robotBrand);
-        }
+        public override string ToString() => $"Robot[\"{this.Name}\", {this.Brand}]";
 
     }
 }

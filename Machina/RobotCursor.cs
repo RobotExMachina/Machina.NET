@@ -99,23 +99,23 @@ namespace Machina
             this.applyImmediately = applyImmediately;
 
             // @TODO: make this programmatic
-            if (this.parentControl.robotBrand == RobotType.Undefined)
+            if (this.parentControl.parent.Brand == RobotType.Undefined)
             {
                 compiler = new CompilerHuman();
             }
-            else if (this.parentControl.robotBrand == RobotType.ABB)
+            else if (this.parentControl.parent.Brand == RobotType.ABB)
             {
                 compiler = new CompilerABB();
             }
-            else if (this.parentControl.robotBrand == RobotType.UR)
+            else if (this.parentControl.parent.Brand == RobotType.UR)
             {
                 compiler = new CompilerUR();
             }
-            else if (this.parentControl.robotBrand == RobotType.KUKA)
+            else if (this.parentControl.parent.Brand == RobotType.KUKA)
             {
                 compiler = new CompilerKUKA();
             } 
-            else if (this.parentControl.robotBrand == RobotType.ZMORPH)
+            else if (this.parentControl.parent.Brand == RobotType.ZMORPH)
             {
                 compiler = new CompilerZMORPH();
             }

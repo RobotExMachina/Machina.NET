@@ -55,11 +55,7 @@ namespace Machina
         /// </summary>
         private Driver comm;
 
-        /// <summary>
-        /// What brand of robot is this?
-        /// </summary>
-        internal RobotType robotBrand;
-
+        
         /// <summary>
         /// A virtual representation of the state of the device after application of issued actions.
         /// </summary>
@@ -112,10 +108,10 @@ namespace Machina
         /// <summary>
         /// Main constructor.
         /// </summary>
-        public Control(Robot parentBot, RobotType brand)
+        public Control(Robot parentBot)
         {
             parent = parentBot;
-            robotBrand = brand;
+            //robotBrand = brand;
 
             Reset();  // @TODO necessary?
         }
@@ -1137,7 +1133,7 @@ namespace Machina
         {
             try
             {
-                if (robotBrand == RobotType.Undefined)
+                if (this.parent.Brand == RobotType.Undefined)
                 {
                     System.IO.File.WriteAllLines(filepath, lines, System.Text.Encoding.UTF8);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
                 }
@@ -1166,7 +1162,7 @@ namespace Machina
         {
             try
             {
-                System.IO.File.WriteAllLines(filepath, ReadLines(() => Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)), robotBrand == RobotType.Undefined ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
+                System.IO.File.WriteAllLines(filepath, ReadLines(() => Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)), this.parent.Brand == RobotType.Undefined ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
                 return true;
             }
             catch (Exception ex)

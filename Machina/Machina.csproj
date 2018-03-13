@@ -79,8 +79,10 @@
     <Compile Include="Compilers\CompilerUR.cs" />
     <Compile Include="Compilers\CompilerABB.cs" />
     <Compile Include="Compilers\CompilerHuman.cs" />
+    <Compile Include="Delegates.cs" />
     <Compile Include="Drivers\Driver.cs" />
     <Compile Include="Drivers\DriverABBAutomatic.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Types\AxisAngle.cs" />
     <Compile Include="Types\Orientation.cs" />
     <Compile Include="Types\Geometry.cs" />
