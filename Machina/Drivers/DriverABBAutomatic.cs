@@ -476,24 +476,7 @@ namespace Machina
             // ABB's convention is Q1..Q4 as W..Z
             return Rotation.FromQuaternion(rt.Rot.Q1, rt.Rot.Q2, rt.Rot.Q3, rt.Rot.Q4);
         }
-
-        ///// <summary>
-        ///// Returns a Frame object representing the current robot's TCP position and orientation. 
-        ///// NOTE: the Frame object's velocity and zone still do not represent the acutal state of the robot.
-        ///// </summary>
-        ///// <returns></returns>
-        //public override Frame GetCurrentFrame()
-        //{
-        //    if (!isConnected)
-        //    {
-        //        Console.WriteLine("Cannot GetCurrentFrame, not connected to controller");
-        //        return null;
-        //    }
-
-        //    RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
-
-        //    return new Frame(rt.Trans.X, rt.Trans.Y, rt.Trans.Z, rt.Rot.Q1, rt.Rot.Q2, rt.Rot.Q3, rt.Rot.Q4);
-        //}
+        
 
         /// <summary>
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
@@ -1187,87 +1170,6 @@ namespace Machina
             return msg;
         }
 
-        ///// <summary>
-        ///// Figures out the appropriate virtual target in the streaming module and 
-        ///// sets new values according to the streaming queue.
-        ///// </summary>
-        ///// <param name="hasPriority"></param>
-        //private void SetNextVirtualTarget(bool hasPriority)
-        //{
-        //    Console.WriteLine("Setting frame #{0}", virtualStepCounter);
-
-        //    lock (rapidDataLock)
-        //    {
-        //        bool applied = writeCursor.ApplyNextAction();
-        //        if (applied)
-        //        {
-        //            int fid = virtualStepCounter % virtualRDCount;
-
-        //            Action a = writeCursor.GetLastAction();
-
-        //            if (a == null)
-        //                throw new Exception("Last action wasn't correctly stored...?");
-
-        //            bool moveOn = true;
-        //            switch (a.type)
-        //            {
-        //                case ActionType.Translation:
-        //                case ActionType.Rotation:
-        //                case ActionType.Transformation:
-        //                    //SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
-        //                    //SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
-        //                    //SetRapidDataVariable(RD_rt[fid], writeCursor.GetUNSAFERobTargetValue());    
-        //                    //SetRapidDataVariable(RD_act[fid], writeCursor.motionType == MotionType.Linear ? 1 : 2);
-        //                    SetRapidDataVariable(RD_vel[fid], CompilerABB.GetSpeedValue(writeCursor));
-        //                    SetRapidDataVariable(RD_zone[fid], CompilerABB.GetZoneValue(writeCursor));
-        //                    SetRapidDataVariable(RD_rt[fid], CompilerABB.GetUNSAFERobTargetValue(writeCursor));
-        //                    SetRapidDataVariable(RD_act[fid], writeCursor.motionType == MotionType.Linear ? 1 : 2);
-        //                    break;
-
-        //                case ActionType.Axes:
-        //                    //SetRapidDataVariable(RD_vel[fid], writeCursor.GetSpeedValue());
-        //                    //SetRapidDataVariable(RD_zone[fid], writeCursor.GetZoneValue());
-        //                    //SetRapidDataVariable(RD_jt[fid], writeCursor.GetJointTargetValue());
-        //                    //SetRapidDataVariable(RD_act[fid], 3);
-        //                    SetRapidDataVariable(RD_vel[fid], CompilerABB.GetSpeedValue(writeCursor));
-        //                    SetRapidDataVariable(RD_zone[fid], CompilerABB.GetZoneValue(writeCursor));
-        //                    SetRapidDataVariable(RD_jt[fid], CompilerABB.GetJointTargetValue(writeCursor));
-        //                    SetRapidDataVariable(RD_act[fid], 3);
-        //                    break;
-
-        //                case ActionType.Wait:
-        //                    ActionWait aw = (ActionWait)a;
-        //                    SetRapidDataVariable(RD_wt[fid], 0.001 * aw.millis);
-        //                    SetRapidDataVariable(RD_act[fid], 4);
-        //                    break;
-
-        //                case ActionType.Message:
-        //                    ActionMessage am = (ActionMessage)a;
-        //                    // TPWrite can only handle 40 chars
-        //                    string str = am.message;
-        //                    if (am.message.Length > 40)
-        //                        str = am.message.Substring(0, 40);
-
-        //                    SetRapidDataVariable(RD_msg[fid], string.Format("\"{0}\"", str));  // when setting the value for a string rapidvar, the double quotes are needed as part of the value
-        //                    SetRapidDataVariable(RD_act[fid], 5);
-        //                    break;
-
-        //                // speed, zone, motion, refcs...
-        //                default:
-        //                    // A speed change doesn't create a new target: do nothing, and prevent triggering a new target
-        //                    moveOn = false;
-        //                    break;
-        //            }
-
-        //            if (moveOn)
-        //            {
-        //                SetRapidDataVariable(RD_pset[fid], "TRUE");
-        //                virtualStepCounter++;
-        //            }
-
-        //        }
-        //    }
-        //}
 
 
 
