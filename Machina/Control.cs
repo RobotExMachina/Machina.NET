@@ -24,9 +24,9 @@ namespace Machina
     {
         // Some 'environment variables' to define check states and behavior
         public const bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
-        public const bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
-        public const bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
-        public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
+        //public const bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
+        //public const bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
+        //public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
 
         // TODO: move to cursors, make it device specific
         public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
@@ -36,9 +36,7 @@ namespace Machina
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
         public const CycleType DEFAULT_RUNMODE = CycleType.Once;
-
-
-
+        
 
 
         /// <summary>
@@ -47,7 +45,9 @@ namespace Machina
         private ControlType controlMode = DEFAULT_CONTROLMODE;
         private CycleType runMode = DEFAULT_RUNMODE;
 
-
+        /// <summary>
+        /// A reference to the Robot object this class is driving.
+        /// </summary>
         internal Robot parent;
 
         /// <summary>

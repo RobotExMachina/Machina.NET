@@ -134,6 +134,11 @@ namespace Machina
             return this.Brand.ToString().Equals(brandName, StringComparison.OrdinalIgnoreCase);
         }
 
+        public bool IsBrand(RobotType brand)
+        {
+            return brand == this.Brand;
+        }
+
         
         /// <summary>
         /// Sets the control mode the robot will operate under.
@@ -210,19 +215,9 @@ namespace Machina
         /// </summary>
         /// <param name="mode">If multiple devices are connected, choose this id from the list.</param>
         /// <returns></returns>
-        public bool Connect(int robotId)
+        public bool Connect(int robotId = 0)
         {
             return c.ConnectToDevice(robotId);
-        }
-
-        /// <summary>
-        /// Performs all necessary operations to connect to the first robot device found on the network, real or virtual.
-        /// This is necessary for 'online' modes.
-        /// </summary>
-        /// <returns></returns>
-        public bool Connect()
-        {
-            return c.ConnectToDevice(0);
         }
 
         /// <summary>
@@ -298,73 +293,16 @@ namespace Machina
             return c.GetCurrentOrientation();
         }
 
-        ///// <summary>
-        ///// Returns a Frame object representing the Robot's current TCP position and orientation.
-        ///// NOTE: the Frame's velocity and precision are still not representative of the current state.
-        ///// </summary>
-        ///// <returns></returns>
-        //public Frame GetCurrentFrame()
-        //{
-        //    return c.GetCurrentFrame();
-        //}
-
-        ///// <summary>
-        ///// Returns a Joint object representing the current angular rotations of the robot's 6 axes.
-        ///// </summary>
-        ///// <returns></returns>
-        //public Joints GetCurrentAxes()
-        //{
-        //    return c.getCurrentAxes();
-        //}
-
-        ///// <summary>
-        ///// Loads the path to the queue manager and triggers execution of the program if applicable.
-        ///// </summary>
-        ///// <param name="path"></param>
-        //public void LoadPath(Path path)
-        //{
-        //    c.AddPathToQueue(path);
-        //}
-
-        ///// <summary>
-        ///// Stops the robot after execution of current program. This will also clear the queue.
-        ///// </summary>
-        //public void StopAfterProgram()
-        //{
-        //    c.ClearQueue();
-        //    c.StopProgramOnDevice(false);
-        //}
-
-        /// <summary>
-        /// Create a program with all the buffered actions and return it as a string List.
-        /// Note all buffered actions will be removed from the queue.
-        /// </summary>
-        /// <returns></returns>
-        public List<string> Export()
-        {
-            return c.Export(true, true);
-        }
-
         /// <summary>
         /// Create a program with all the buffered actions and return it as a string List.
         /// Note all buffered actions will be removed from the queue.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> Export(bool inlineTargets, bool humanComments)
+        public List<string> Export(bool inlineTargets = true, bool humanComments = true)
         {
             return c.Export(inlineTargets, humanComments);
-        }
-
-        /// <summary>
-        /// Create a program with all the buffered actions and save it to a file. 
-        /// Note all buffered actions will be removed from the queue.
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <returns></returns>
-        public bool Export(string filepath)
-        {
-            return c.Export(filepath, true, true);
         }
 
         /// <summary>
@@ -375,7 +313,7 @@ namespace Machina
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public bool Export(string filepath, bool inlineTargets, bool humanComments)
+        public bool Export(string filepath, bool inlineTargets = true, bool humanComments = true)
         {
             return c.Export(filepath, inlineTargets, humanComments);
         }
@@ -683,15 +621,6 @@ namespace Machina
 
 
 
-
-        //        /// What was this even for?
-
-        //        public bool IsBrand(string brandName)
-        //{
-        //    return c.robotBrand.ToString().ToUpper().Equals(brandName.ToUpper());
-        //}
-
-
         //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
         //  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
         //  ███████║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
@@ -895,6 +824,23 @@ namespace Machina
 
             return c.IssueTransformationRequest(position, orientation, false, false);
         }
+
+        /// <summary>
+        /// Issue a compound ABSOLUTE global Translation + Rotation request
+        /// according to the current reference system.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="vX0"></param>
+        /// <param name="vX1"></param>
+        /// <param name="vX2"></param>
+        /// <param name="vY0"></param>
+        /// <param name="vY1"></param>
+        /// <param name="vY2"></param>
+        /// <returns></returns>
+        public bool TransformTo(double x, double y, double z, double vX0, double vX1, double vX2, double vY0, double vY1, double vY2) =>
+            c.IssueTransformationRequest(new Vector(x, y, z), new Orientation(vX0, vX1, vX2, vY0, vY1, vY2), false, true);
 
 
         /// <summary>
@@ -1179,31 +1125,7 @@ namespace Machina
         }
 
 
-
-
-
-
-
-
-
-
-        //// @TODO: feels like Path is too much of a spatial geometry description. 
-        //// Should it become something more action-related? Like Instructions, Program, Commands?
-        //// Could implement Procedure, as an ordered collection of abstract Actions...
-        //public bool Follow(Path path)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-
-
-
-
-
-
-
-
-
+        
 
 
 
