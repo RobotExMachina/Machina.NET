@@ -643,22 +643,6 @@ namespace Machina
             }
         }
 
-        private void DebugDumpDomain(ABB.Robotics.Controllers.ConfigurationDomain.Domain dom)
-        {
-            Console.WriteLine(dom);
-            var types = dom.Types;
-            Console.WriteLine("");
-            foreach (var item in types)
-                Console.WriteLine(item);
-            Console.WriteLine("");
-        }
-
-
-
-
-
-
-
 
 
 
@@ -1107,6 +1091,7 @@ namespace Machina
             if (clientSocket != null)
             {
                 clientSocket.Close();
+                clientNetworkStream.Dispose();
                 return true;
             }
 
