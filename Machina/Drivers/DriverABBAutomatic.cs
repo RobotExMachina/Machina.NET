@@ -28,23 +28,14 @@ namespace Machina
     {
         // ABB stuff and flags
         private Controller controller;
-        private ABB.Robotics.Controllers.RapidDomain.Task mainTask;
-        //public object rapidDataLock = new object();
+        private ABB.Robotics.Controllers.RapidDomain.Task tRob1Task;
+
         private bool isLogged = false;
 
-        //private static string localBufferDirname = "C:";                 // Route names to be used for file handling
-        //private static string localBufferFilename = "buffer";
-        //private static string localBufferFileExtension = "mod";
-        private static string remoteBufferDirectory = "Machina";
-
-        //protected RobotCursorABB writeCursor;
-        //protected RobotCursor writeCursor;
+        private const string REMOTE_BUFFER_DIR = "Machina";
 
         private TcpClient clientSocket = new TcpClient();
         private NetworkStream clientNetworkStream;
-        //private Stream clientStream;
-        //private StreamReader clientStreamReader;
-        //private StreamWriter clientStreamWriter;
 
         // From the Machina_Server.mod file, must be consistent!
         const string STR_MESSAGE_END_CHAR = ";";
@@ -177,7 +168,8 @@ namespace Machina
                     return false;
                 }
             }
-            
+
+            DebugDump();
 
             return isConnected;
         }
@@ -190,7 +182,6 @@ namespace Machina
         public override bool DisconnectFromDevice()
         {
             Reset();
-            //UnhookStreamingVariables();
             return true;
         }
 
@@ -255,7 +246,7 @@ namespace Machina
             //    return false;
             //}
 
-            if (!LoadFileToController(path))
+            if (!LoadFileToDevice(path))
             {
                 Console.WriteLine("Could not load module to controller");
                 return false;
@@ -269,8 +260,9 @@ namespace Machina
         /// Loads a module to the ABB controller given as a string list of Rapid code lines.
         /// </summary>
         /// <param name="module"></param>
+        /// <param name="programName"></param>
         /// <returns></returns>
-        public override bool LoadProgramToController(List<string> module)
+        public override bool LoadProgramToController(List<string> module, string programName)
         {
             if (!isConnected)
             {
@@ -278,15 +270,9 @@ namespace Machina
                 return false;
             }
 
-            string path = Path.Combine(Path.GetTempPath(), "Machina_Program.mod");
+            string path = Path.Combine(Path.GetTempPath(), $"Machina_{programName}.mod");
 
             // Modules can only be uploaded to ABB controllers using a file
-            if (!this.masterControl.SaveStringListToFile(module, path))
-            {
-                Console.WriteLine("Could not save module to file");
-                return false;
-            }
-
             if (!this.masterControl.SaveStringListToFile(module, path))
             {
                 Console.WriteLine("Could not save module to temp file");
@@ -294,10 +280,10 @@ namespace Machina
             }
             else
             {
-                Console.WriteLine("Saved module to " + path);
+                Console.WriteLine($"Saved {programName} to {path}");
             }
 
-            if (!LoadFileToController(path))
+            if (!LoadFileToDevice(path))
             {
                 Console.WriteLine("Could not load module to controller");
                 return false;
@@ -313,11 +299,9 @@ namespace Machina
         /// <param name="fullPath"></param>
         /// <param name="wipeout"></param>
         /// <returns></returns>
-        public override bool LoadFileToController(string fullPath, bool wipeout = true)
+        public override bool LoadFileToDevice(string fullPath, bool wipeout = true)
         {
-
-
-
+            
             string extension = Path.GetExtension(fullPath),     // ".mod"
                 filename = Path.GetFileName(fullPath);          // "Machina_Server.mod"
 
@@ -353,22 +337,22 @@ namespace Machina
 
                     // Create the remoteBufferDirectory if applicable
                     FileSystem fs = controller.FileSystem;
-                    string remotePath = fs.RemoteDirectory + "/" + remoteBufferDirectory;
-                    bool dirExists = fs.DirectoryExists(remoteBufferDirectory);
+                    string remotePath = fs.RemoteDirectory + "/" + REMOTE_BUFFER_DIR;
+                    bool dirExists = fs.DirectoryExists(REMOTE_BUFFER_DIR);
                     if (!dirExists)
                     {
                         Console.WriteLine("Creating {0} on remote controller", remotePath);
-                        fs.CreateDirectory(remoteBufferDirectory);
+                        fs.CreateDirectory(REMOTE_BUFFER_DIR);
                     }
 
                     //@TODO: Should implement some kind of file cleanup at somepoint...
 
                     // Copy the file to the remote controller
-                    controller.FileSystem.PutFile(fullPath, $"{remoteBufferDirectory}/{filename}", wipeout);
-                    Console.WriteLine($"Copied {filename} to {remoteBufferDirectory}");
+                    controller.FileSystem.PutFile(fullPath, $"{REMOTE_BUFFER_DIR}/{filename}", wipeout);
+                    Console.WriteLine($"Copied {filename} to {REMOTE_BUFFER_DIR}");
                     
                     // Loads a Rapid module to the task in the robot controller
-                    success = mainTask.LoadModuleFromFile($"{remotePath}/{filename}", RapidLoadMode.Replace);
+                    success = tRob1Task.LoadModuleFromFile($"{remotePath}/{filename}", RapidLoadMode.Replace);
                 }
             }
             catch (Exception ex)
@@ -627,25 +611,25 @@ namespace Machina
 
                 Console.WriteLine("");
                 Console.WriteLine("DEBUG TASK DUMP:");
-                Console.WriteLine("    Cycle: " + mainTask.Cycle);
-                Console.WriteLine("    Enabled: " + mainTask.Enabled);
-                Console.WriteLine("    ExecutionStatus: " + mainTask.ExecutionStatus);
+                Console.WriteLine("    Cycle: " + tRob1Task.Cycle);
+                Console.WriteLine("    Enabled: " + tRob1Task.Enabled);
+                Console.WriteLine("    ExecutionStatus: " + tRob1Task.ExecutionStatus);
                 try
                 {
-                    Console.WriteLine("    ExecutionType: " + mainTask.ExecutionType);
+                    Console.WriteLine("    ExecutionType: " + tRob1Task.ExecutionType);
                 }
                 catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
                 {
                     Console.WriteLine("    ExecutionType: UNSUPPORTED BY CONTROLLER");
                     Console.WriteLine(e);
                 }
-                Console.WriteLine("    Motion: " + mainTask.Motion);
-                Console.WriteLine("    MotionPointer: " + mainTask.MotionPointer.Module);
-                Console.WriteLine("    Name: " + mainTask.Name);
-                Console.WriteLine("    ProgramPointer: " + mainTask.ProgramPointer.Module);
-                Console.WriteLine("    RemainingCycles: " + mainTask.RemainingCycles);
-                Console.WriteLine("    TaskType: " + mainTask.TaskType);
-                Console.WriteLine("    Type: " + mainTask.Type);
+                Console.WriteLine("    Motion: " + tRob1Task.Motion);
+                Console.WriteLine("    MotionPointer: " + tRob1Task.MotionPointer.Module);
+                Console.WriteLine("    Name: " + tRob1Task.Name);
+                Console.WriteLine("    ProgramPointer: " + tRob1Task.ProgramPointer.Module);
+                Console.WriteLine("    RemainingCycles: " + tRob1Task.RemainingCycles);
+                Console.WriteLine("    TaskType: " + tRob1Task.TaskType);
+                Console.WriteLine("    Type: " + tRob1Task.Type);
                 Console.WriteLine("");
             }
         }
@@ -680,7 +664,6 @@ namespace Machina
         /// <returns></returns>
         private bool LoadController(int controllerID)
         {
-
             // Scan the network and hookup to the specified controller
             bool success = false;
 
@@ -841,13 +824,13 @@ namespace Machina
                 ABB.Robotics.Controllers.RapidDomain.Task[] tasks = controller.Rapid.GetTasks();
                 if (tasks.Length > 0)
                 {
-                    mainTask = tasks[0];
-                    Console.WriteLine("Retrieved task " + mainTask.Name);
+                    tRob1Task = tasks[0];
+                    Console.WriteLine("Retrieved task " + tRob1Task.Name);
                     return true;
                 }
                 else
                 {
-                    mainTask = null;
+                    tRob1Task = null;
                     Console.WriteLine("Could not retrieve any task from the controller");
                 }
             }
@@ -867,10 +850,10 @@ namespace Machina
         /// <returns></returns>
         private bool ReleaseMainTask()
         {
-            if (mainTask != null)
+            if (tRob1Task != null)
             {
-                mainTask.Dispose();
-                mainTask = null;
+                tRob1Task.Dispose();
+                tRob1Task = null;
                 return true;
             }
             return false;
@@ -953,7 +936,7 @@ namespace Machina
                 return -1;
             }
 
-            if (mainTask == null)
+            if (tRob1Task == null)
             {
                 Console.WriteLine("Cannot clear modules: main task not retrieved");
                 return -1;
@@ -961,7 +944,7 @@ namespace Machina
 
             int count = -1;
 
-            ABB.Robotics.Controllers.RapidDomain.Module[] modules = mainTask.GetModules();
+            ABB.Robotics.Controllers.RapidDomain.Module[] modules = tRob1Task.GetModules();
             count = 0;
 
             try
@@ -998,7 +981,7 @@ namespace Machina
                 return false;
             }
 
-            if (mainTask == null)
+            if (tRob1Task == null)
             {
                 Console.WriteLine("Cannot reset pointer: mainTask not present");
                 return false;
@@ -1008,7 +991,7 @@ namespace Machina
             {
                 using (Mastership.Request(controller.Rapid))
                 {
-                    mainTask.ResetProgramPointer();
+                    tRob1Task.ResetProgramPointer();
                     return true;
                 }
 
@@ -1035,23 +1018,6 @@ namespace Machina
         //╚════██║   ██║   ██╔══██╗██╔══╝  ██╔══██║██║╚██╔╝██║██║██║╚██╗██║██║   ██║
         //███████║   ██║   ██║  ██║███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝
         //╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
-
-        //private static int virtualRDCount = 4;
-        //private int virtualStepCounter = 0;  // this keeps track of what is the next target index that needs to be assigned. Its %4 should asynchronously be ~4 units ahead of the 'pnum' rapid counter
-
-        ////private RapidData
-        ////    RD_aborted,
-        ////    RD_pnum;
-        ////private RapidData[]
-        ////    RD_pset = new RapidData[virtualRDCount],
-        ////    RD_act = new RapidData[virtualRDCount],
-        ////    RD_vel = new RapidData[virtualRDCount],
-        ////    RD_zone = new RapidData[virtualRDCount],
-        ////    RD_rt = new RapidData[virtualRDCount],
-        ////    RD_jt = new RapidData[virtualRDCount],
-        ////    RD_wt = new RapidData[virtualRDCount],
-        ////    RD_msg = new RapidData[virtualRDCount];
-
 
         /// <summary>
         /// Performs necessary operations to set up 'stream' control mode in the controller
@@ -1126,17 +1092,7 @@ namespace Machina
         /// </summary>
         private bool LoadStreamingModule()
         {
-
             return LoadModuleToController("Machina.Resources.Modules.MachinaServerABB.txt", "Machina_Server.mod");
-            
-            //return LoadProgramToController(StreamModuleV2.ToList());
-
-            //if (!LoadFileToController("C:", "Machina_Driver", "mod"))
-            //{
-            //    Console.WriteLine("Could not load module to controller");
-            //    return false;
-            //}
-            //return true;
         }
 
 

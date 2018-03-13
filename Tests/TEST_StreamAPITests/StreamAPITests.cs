@@ -27,6 +27,7 @@ namespace TEST_StreamAPITests
             //arm.DebugRobotCursors();
             //arm.DebugBuffer();
 
+
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to DISCONNECT...");
             Console.ReadKey();

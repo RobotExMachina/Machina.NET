@@ -99,14 +99,15 @@ namespace Machina
         /// <param name="fullPath"></param>
         /// <param name="wipeout"></param>
         /// <returns></returns>
-        public abstract bool LoadFileToController(string fullPath, bool wipeout);
+        public abstract bool LoadFileToDevice(string fullPath, bool wipeout);
 
         /// <summary>
         /// Loads a program to the device from a list of lines of code as strings.
         /// </summary>
         /// <param name="program"></param>
+        /// <param name="programName"></param>
         /// <returns></returns>
-        public abstract bool LoadProgramToController(List<string> program);
+        public abstract bool LoadProgramToController(List<string> program, string programName);
 
         /// <summary>
         /// Request the start of the program loaded on the device.

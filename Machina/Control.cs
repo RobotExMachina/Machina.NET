@@ -275,9 +275,9 @@ namespace Machina
         /// </summary>
         /// <param name="programLines">A string list representation of the program's code.</param>
         /// <returns></returns>
-        public bool LoadProgramToDevice(List<string> programLines)
+        public bool LoadProgramToDevice(List<string> programLines, string programName = "Program")
         {
-            return comm.LoadProgramToController(programLines);
+            return comm.LoadProgramToController(programLines, programName);
         }
 
         /// <summary>
@@ -347,7 +347,7 @@ namespace Machina
             //Console.WriteLine("  extension: " + extension);
 
             //return comm.LoadFileToController(dirname, filename, extension, true);
-            return comm.LoadFileToController(fullPath, wipeout);
+            return comm.LoadFileToDevice(fullPath, wipeout);
         }
 
         /// <summary>
@@ -1224,7 +1224,7 @@ namespace Machina
         private void RunActionsBlockInController(bool inlineTargets, bool humanComments)
         {
             List<string> program = writeCursor.ProgramFromBlock(inlineTargets, humanComments);
-            comm.LoadProgramToController(program);
+            comm.LoadProgramToController(program, "Buffer");
             comm.StartProgramExecution();
         }
 
