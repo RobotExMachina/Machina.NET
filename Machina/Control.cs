@@ -285,7 +285,7 @@ namespace Machina
         /// </summary>
         /// <param name="filepath">Full filepath including root, directory structure, filename and extension.</param>
         /// <returns></returns>
-        public bool LoadProgramToDevice(string filepath)
+        public bool LoadProgramToDevice(string filepath, bool wipeout)
         {
             if (controlMode == ControlType.Offline)
             {
@@ -325,28 +325,29 @@ namespace Machina
                 return false;
             }
 
-            // Split the full path into directory, file and extension names
-            string dirname;     // full directory path
-            string filename;    // filename without extension
-            string extension;   // file extension
+            //// Split the full path into directory, file and extension names
+            //string dirname;     // full directory path
+            //string filename;    // filename without extension
+            //string extension;   // file extension
 
-            string[] parts = fullPath.Split('\\');
-            int len = parts.Length;
-            if (len < 2)
-            {
-                Console.WriteLine("Weird filepath");
-                return false;
-            }
-            dirname = string.Join("\\", parts, 0, len - 1);
-            string[] fileparts = parts[len - 1].Split('.');
-            filename = fileparts.Length > 2 ? string.Join(".", fileparts, 0, fileparts.Length - 1) : fileparts[0];  // account for filenames with multiple dots
-            extension = fileparts[fileparts.Length - 1];
+            //string[] parts = fullPath.Split('\\');
+            //int len = parts.Length;
+            //if (len < 2)
+            //{
+            //    Console.WriteLine("Weird filepath");
+            //    return false;
+            //}
+            //dirname = string.Join("\\", parts, 0, len - 1);
+            //string[] fileparts = parts[len - 1].Split('.');
+            //filename = fileparts.Length > 2 ? string.Join(".", fileparts, 0, fileparts.Length - 1) : fileparts[0];  // account for filenames with multiple dots
+            //extension = fileparts[fileparts.Length - 1];
 
-            Console.WriteLine("  filename: " + filename);
-            Console.WriteLine("  dirname: " + dirname);
-            Console.WriteLine("  extension: " + extension);
+            //Console.WriteLine("  filename: " + filename);
+            //Console.WriteLine("  dirname: " + dirname);
+            //Console.WriteLine("  extension: " + extension);
 
-            return comm.LoadFileToController(dirname, filename, extension);
+            //return comm.LoadFileToController(dirname, filename, extension, true);
+            return comm.LoadFileToController(fullPath, wipeout);
         }
 
         /// <summary>

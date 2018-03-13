@@ -96,11 +96,10 @@ namespace Machina
         /// <summary>
         /// Loads a program to the device from a file in the system.
         /// </summary>
-        /// <param name="dirname"></param>
-        /// <param name="filename"></param>
-        /// <param name="extension"></param>
+        /// <param name="fullPath"></param>
+        /// <param name="wipeout"></param>
         /// <returns></returns>
-        public abstract bool LoadFileToController(string dirname, string filename, string extension);
+        public abstract bool LoadFileToController(string fullPath, bool wipeout);
 
         /// <summary>
         /// Loads a program to the device from a list of lines of code as strings.

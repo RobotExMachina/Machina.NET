@@ -332,7 +332,7 @@ namespace Machina
         /// <returns></returns>
         public bool LoadProgram(string filepath)
         {
-            return c.LoadProgramToDevice(filepath);
+            return c.LoadProgramToDevice(filepath, true);
         }
 
         /// <summary>

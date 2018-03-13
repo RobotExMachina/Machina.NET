@@ -306,22 +306,20 @@ namespace Machina
             return true;
         }
 
-        public override bool LoadFileToController(string dirname, string filename, string extension)
+        /// <summary>
+        /// Loads a module into de controller from a local file. 
+        /// @TODO: This is an expensive operation, should probably become threaded. 
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <param name="wipeout"></param>
+        /// <returns></returns>
+        public override bool LoadFileToController(string fullPath, bool wipeout = true)
         {
-            return LoadFileToController(string.Format(@"{0}\{1}.{2}", dirname, filename, extension));
-        }
 
-        public bool LoadFileToController(string fullPath)
-        {
-            // When connecting to a real controller, the reference filesystem 
-            // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
-            // to copy the file to the system first, and then load it. 
-            //string fullPath = dirname + "\\" + filename + "." ;
-            //string fullPath = string.Format(@"{0}\{1}.{2}", dirname, filename, extension);
+
 
             string extension = Path.GetExtension(fullPath),     // ".mod"
-                filename = Path.GetFileName(fullPath),          // "Machina_Server.mod"
-                dirname = Path.GetDirectoryName(fullPath);      // "C:\\Users\\jlx\\AppData\\Local\\Temp"
+                filename = Path.GetFileName(fullPath);          // "Machina_Server.mod"
 
             if (!isConnected)
             {
@@ -349,6 +347,10 @@ namespace Machina
             {
                 using (Mastership.Request(controller.Rapid))
                 {
+                    // When connecting to a real controller, the reference filesystem 
+                    // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
+                    // to copy the file to the system first, and then load it. 
+
                     // Create the remoteBufferDirectory if applicable
                     FileSystem fs = controller.FileSystem;
                     string remotePath = fs.RemoteDirectory + "/" + remoteBufferDirectory;
@@ -362,9 +364,9 @@ namespace Machina
                     //@TODO: Should implement some kind of file cleanup at somepoint...
 
                     // Copy the file to the remote controller
-                    controller.FileSystem.PutFile(fullPath, $"{remoteBufferDirectory}/{filename}", true);
+                    controller.FileSystem.PutFile(fullPath, $"{remoteBufferDirectory}/{filename}", wipeout);
                     Console.WriteLine($"Copied {filename} to {remoteBufferDirectory}");
-
+                    
                     // Loads a Rapid module to the task in the robot controller
                     success = mainTask.LoadModuleFromFile($"{remotePath}/{filename}", RapidLoadMode.Replace);
                 }
@@ -402,101 +404,7 @@ namespace Machina
 
             return success;
         }
-
-        ///// <summary>
-        ///// Loads a module into de controller from a local file. 
-        ///// @TODO: This is an expensive operation, should probably become threaded. 
-        ///// @TODO: By default, wipes out all previous modules --> parameterize.
-        ///// </summary>
-        ///// <param name="dirname"></param>
-        ///// <returns></returns>
-        //public bool LoadFileToController(string dirname, string filename, string extension)
-        //{
-        //    // When connecting to a real controller, the reference filesystem 
-        //    // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
-        //    // to copy the file to the system first, and then load it. 
-        //    //string fullPath = dirname + "\\" + filename + "." ;
-        //    string fullPath = string.Format(@"{0}\{1}.{2}", dirname, filename, extension);
-
-        //    if (!isConnected)
-        //    {
-        //        Console.WriteLine("Could not load module '{0}', not connected to controller", fullPath);
-        //        return false;
-        //    }
-
-        //    // check for correct ABB file extension
-        //    if (!extension.ToLower().Equals("mod"))
-        //    {
-        //        Console.WriteLine("Wrong file type, must use .mod files for ABB robots");
-        //        return false;
-        //    }
-
-        //    // For the time being, we will always wipe out previous modules on load
-        //    if (ClearAllModules() < 0)
-        //    {
-        //        Console.WriteLine("Error clearing modules");
-        //        return false;
-        //    }
-
-        //    // Load the module
-        //    bool success = false;
-        //    try
-        //    {
-        //        using (Mastership.Request(controller.Rapid))
-        //        {
-        //            // Create the remoteBufferDirectory if applicable
-        //            FileSystem fs = controller.FileSystem;
-        //            string remotePath = fs.RemoteDirectory + "/" + remoteBufferDirectory;
-        //            bool dirExists = fs.DirectoryExists(remoteBufferDirectory);
-        //            //Console.WriteLine("Exists? " + dirExists);
-        //            if (!dirExists)
-        //            {
-        //                Console.WriteLine("Creating {0} on remote controller", remotePath);
-        //                fs.CreateDirectory(remoteBufferDirectory);
-        //            }
-
-        //            //@TODO: Should implement some kind of file cleanup at somepoint...
-
-        //            // Copy the file to the remote controller
-        //            controller.FileSystem.PutFile(fullPath, remoteBufferDirectory + "/" + filename + "." + extension, true);
-        //            Console.WriteLine("Copied {0} to {1}", filename + "." + extension, remoteBufferDirectory);
-
-        //            // Loads a Rapid module to the task in the robot controller
-        //            success = mainTask.LoadModuleFromFile(remotePath + "/" + filename + "." + extension, RapidLoadMode.Replace);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("ERROR: Could not load module: {0}", ex);
-        //    }
-
-        //    // True if loading succeeds without any errors, otherwise false.  
-        //    if (!success)
-        //    {
-        //        //// Gets the available categories of the EventLog. 
-        //        //foreach (EventLogCategory category in controller.EventLog.GetCategories())
-        //        //{
-        //        //    if (category.Name == "Common")
-        //        //    {
-        //        //        if (category.Messages.Count > 0)
-        //        //        {
-        //        //            foreach (EventLogMessage message in category.Messages)
-        //        //            {
-        //        //                Console.WriteLine("Program [{1}:{2}({0})] {3} {4}",
-        //        //                    message.Name, message.SequenceNumber,
-        //        //                    message.Timestamp, message.Title, message.Body);
-        //        //            }
-        //        //        }
-        //        //    }
-        //        //}
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Sucessfully loaded {0}", fullPath);
-        //    }
-
-        //    return success;
-        //}
+        
 
         /// <summary>
         /// Requests start executing the program in the main task. Remember to call ResetProgramPointer() before. 
