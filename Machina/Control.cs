@@ -31,7 +31,6 @@ namespace Machina
         // TODO: move to cursors, make it device specific
         public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
         public const int DEFAULT_PRECISION = 5;                               // default precision for new actions
-
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;

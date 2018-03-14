@@ -60,7 +60,9 @@ namespace Machina
         {
             if (pending.Count == 0) return null;
 
-            released.Add(pending[0]);
+            Action next = pending[0];
+
+            released.Add(next);
             pending.RemoveAt(0);
 
             // update blockcounts
@@ -72,7 +74,7 @@ namespace Machina
                 }
             }
 
-            return released.Last();
+            return next;
         }
 
         /// <summary>
@@ -84,15 +86,6 @@ namespace Machina
             if (released.Count == 0) return null;
             return released[released.Count - 1];
         }
-
-        ///// <summary>
-        ///// Stores especified action in the released buffer.
-        ///// </summary>
-        ///// <param name="action"></param>
-        //public void Save(Action action)
-        //{
-        //    released.Add(action);
-        //}
 
         /// <summary>
         /// Release all pending Actions in the order they were issued.

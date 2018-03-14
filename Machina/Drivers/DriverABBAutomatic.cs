@@ -1091,7 +1091,7 @@ namespace Machina
             if (clientSocket != null)
             {
                 clientSocket.Close();
-                clientNetworkStream.Dispose();
+                if (clientNetworkStream != null) clientNetworkStream.Dispose();
                 return true;
             }
 

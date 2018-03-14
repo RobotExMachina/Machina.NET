@@ -184,7 +184,7 @@ namespace Machina
         /// <param name="childCursor"></param>
         public void SetChild(RobotCursor childCursor)
         {
-            child = childCursor;
+            this.child = childCursor;
         }
         
         /// <summary>
@@ -250,6 +250,10 @@ namespace Machina
             return actionBuffer.AreActionsPending();
         }
 
+        /// <summary>
+        /// Returns the number of actions pending in this cursor's buffer.
+        /// </summary>
+        /// <returns></returns>
         public int ActionsPending()
         {
             return actionBuffer.ActionsPending();
@@ -259,6 +263,7 @@ namespace Machina
         /// Return a device-specific program with all the Actions pending in the buffer.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
         public List<string> ProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
@@ -269,6 +274,7 @@ namespace Machina
         /// Return a device-specific program with the next block of Actions pending in the buffer.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
         public List<string> ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
