@@ -1089,10 +1089,10 @@ namespace Machina
                 sendingThread.IsBackground = true;
                 sendingThread.Start();
 
-                //receivingThread = new Thread(ReceivingMethod);
-                //receivingThread.IsBackground = true;
-                //receivingThread.Start();
-                
+                receivingThread = new Thread(ReceivingMethod);
+                receivingThread.IsBackground = true;
+                receivingThread.Start();
+
 
                 return clientSocket.Connected;
             } 
@@ -1113,14 +1113,27 @@ namespace Machina
                 while (this.WriteCursor.actionBuffer.AreActionsPending())
                 {
                     SendActionAsMessage(true);
-
-                    //MessageQueue.RemoveAt(0);
                 }
 
                 Thread.Sleep(30);
             }
         }
 
+        private void ReceivingMethod(object obj)
+        {
+            while (Status != StatusEnum.Disconnected)
+            {
+                if (clientSocket.Available > 0)
+                {
+                    var buffer = new byte[1024];
+                    var byteCount = clientSocket.GetStream().Read(buffer, 0, buffer.Length);
+                    var response = Encoding.UTF8.GetString(buffer, 0, byteCount);
+                    Console.WriteLine("  RES: Server response was {0}", response);
+                }
+
+                Thread.Sleep(30);
+            }
+        }
 
 
         private bool CloseTCPConnection()
