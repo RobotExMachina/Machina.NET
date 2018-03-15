@@ -71,6 +71,12 @@ namespace Machina
         const int INST_SETAO = 11;             // SetAO "NAME" V
 
 
+        private int sentMessages = 0;
+        private int receivedMessages = 0;
+        private int maxStreamCount = 10;
+        private int sendNewBatchOn = 2; 
+
+
 
         //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
         //  ██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
@@ -1105,14 +1111,45 @@ namespace Machina
             return false;
         }
 
+        private bool hasRobotBufferFilled = false;
+        private bool ShouldSend()
+        {
+            if (hasRobotBufferFilled)
+            {
+                if (sentMessages - receivedMessages < sendNewBatchOn)
+                {
+                    hasRobotBufferFilled = false;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            } 
+            else
+            {
+                if (sentMessages - receivedMessages < maxStreamCount)
+                {
+                    return true;
+                }
+                else
+                {
+                    hasRobotBufferFilled = true;
+                    return false;
+                }
+            }
+        }
+
 
         private void SendingMethod(object obj)
         {
+            // Expire the thread on disconnection
             while (Status != StatusEnum.Disconnected)
             {
-                while (this.WriteCursor.actionBuffer.AreActionsPending())
+                //while (this.WriteCursor.actionBuffer.AreActionsPending())
+                while (this.ShouldSend() && this.WriteCursor.actionBuffer.AreActionsPending())
                 {
-                    SendActionAsMessage(true);
+                    if (SendActionAsMessage(true)) sentMessages++;
                 }
 
                 Thread.Sleep(30);
@@ -1121,6 +1158,7 @@ namespace Machina
 
         private void ReceivingMethod(object obj)
         {
+            // Expire the thread on disconnection
             while (Status != StatusEnum.Disconnected)
             {
                 if (clientSocket.Available > 0)
@@ -1128,7 +1166,14 @@ namespace Machina
                     var buffer = new byte[1024];
                     var byteCount = clientSocket.GetStream().Read(buffer, 0, buffer.Length);
                     var response = Encoding.UTF8.GetString(buffer, 0, byteCount);
-                    Console.WriteLine("  RES: Server response was {0}", response);
+
+                    //Console.WriteLine($"  RES: Server response was {response}");
+                    var messages = response.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var res in messages)
+                    {
+                        Console.WriteLine($"  RES: Server response was {res};");
+                        receivedMessages++;
+                    }
                 }
 
                 Thread.Sleep(30);
@@ -1214,12 +1259,18 @@ namespace Machina
                 throw new Exception("Last action wasn't correctly stored...?");
              
             string msg = GetActionMessage(a, WriteCursor);
+            if (msg == "")
+            {
+                Console.WriteLine("Applied action to cursor, but not necessary to stream to robot");
+                return false;
+            }
+                
             byte[] msgBytes = Encoding.ASCII.GetBytes(msg);
 
             clientNetworkStream.Write(msgBytes, 0, msgBytes.Length);
 
             Console.WriteLine("Sending mgs: " + msg);
-         
+
             return true;
         }
         
@@ -1233,8 +1284,22 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    // MoveL/J X Y Z QW QX QY QZ
-                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {(cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ)} {cursor.position.X} {cursor.position.Y} {cursor.position.Z} {cursor.rotation.Q.W} {cursor.rotation.Q.X} {cursor.rotation.Q.Y} {cursor.rotation.Q.Z}{STR_MESSAGE_END_CHAR}";
+                    //// MoveL/J X Y Z QW QX QY QZ
+                    //msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {(cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ)} {cursor.position.X} {cursor.position.Y} {cursor.position.Z} {cursor.rotation.Q.W} {cursor.rotation.Q.X} {cursor.rotation.Q.Y} {cursor.rotation.Q.Z}{STR_MESSAGE_END_CHAR}";
+
+                    msg = string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9}{10}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.id,
+                        cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ,
+                        Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.rotation.Q.W, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        STR_MESSAGE_END_CHAR);
+                    
                     break;
 
                 case ActionType.Axes:

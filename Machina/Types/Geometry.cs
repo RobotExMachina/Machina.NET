@@ -45,6 +45,7 @@ namespace Machina
         internal static readonly int STRING_ROUND_DECIMALS_M = 6;
         internal static readonly int STRING_ROUND_DECIMALS_MM = 3;
         internal static readonly int STRING_ROUND_DECIMALS_DEGS = 3;
+        internal static readonly int STRING_ROUND_DECIMALS_QUAT = 4;
         internal static readonly int STRING_ROUND_DECIMALS_RADS = 6;
         internal static readonly int STRING_ROUND_DECIMALS_VOLTAGE = 3;
         internal static readonly int STRING_ROUND_DECIMALS_TEMPERATURE = 0;

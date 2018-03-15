@@ -25,8 +25,20 @@ namespace TEST_StreamAPITests
 
             // arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
 
-            OneActionTest(arm);
-            OneActionTest(arm);
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
+            Console.ReadKey();
+            VerticalSqaure(arm);
+
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
+            //Console.ReadKey();
+            //VerticalSqaure(arm);
+
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to START THE SPIRAL...");
+            Console.ReadKey();
+            Spiral(arm, 10);
 
             //arm.DebugRobotCursors();
             //arm.DebugBuffer();
@@ -42,16 +54,9 @@ namespace TEST_StreamAPITests
             Console.ReadKey();
         }
 
-        static public void VerticalRectangle(Robot bot)
+        static public void VerticalSqaure(Robot bot)
         {
-
-        }
-
-        static public void OneActionTest(Robot bot) 
-        {
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START THE PROGRAM...");
-            Console.ReadKey();
+            
 
             // Message
             bot.Message("Starting vertical square");
@@ -97,13 +102,53 @@ namespace TEST_StreamAPITests
             bot.PrecisionTo(5);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
 
-            for (var i = 0; i < 10; i++)
-            {
-                Console.WriteLine(" --> ASYNC TEST");
-            }
-            
         }
-                
+
+        static double x = 400,
+            y = 400,
+            z = 400;
+
+        static double dx = 50,
+            dy = 50,
+            dz = 1;
+
+        static int segments = 36;
+        static double angle = 0;
+        static double da = 2 * Math.PI / segments;
+
+
+        static private void Spiral(Robot bot, int loops)
+        {
+            // Home
+            bot.SpeedTo(500);
+            bot.PrecisionTo(10);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+
+            // Joint move and rotate to starting point
+            bot.PushSettings();
+            bot.MotionMode(MotionType.Joint);
+            bot.SpeedTo(300);
+            bot.PrecisionTo(5);
+            bot.TransformTo(new Point(x, y, z), new Orientation(-1, 0, 0, 0, 1, 0));
+            bot.PopSettings();
+            bot.Wait(500);
+
+            for (var i = 0; i < loops; i++)
+            {
+                for (var j = 0; j < segments; j++)
+                {
+                    bot.MoveTo(x + dx * Math.Cos(angle), y + dy * Math.Sin(angle), z + j * dz / segments);
+                    angle += da;
+                }
+                z += dz;
+            }
+
+            // Home
+            bot.SpeedTo(500);
+            bot.PrecisionTo(5);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+        }
+
 
 
 
@@ -124,7 +169,7 @@ namespace TEST_StreamAPITests
         //    arm.Move(0, 0, 50);
 
         //    // Test Wait + Msg
-            
+
         //    arm.Wait(1525);
         //    arm.Message("The quick brown fox jumps over the lazy dog, the quick brown fox jumps over the lazy dog, the quick brown fox jumps over the lazy dog");
 
