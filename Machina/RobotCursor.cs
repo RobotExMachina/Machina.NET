@@ -224,6 +224,10 @@ namespace Machina
             }
         }
 
+        /// <summary>
+        /// Returns the last Action that was released by the buffer.
+        /// </summary>
+        /// <returns></returns>
         public Action GetLastAction()
         {
             lock(actionBufferLock)

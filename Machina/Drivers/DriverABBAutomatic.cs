@@ -13,6 +13,7 @@ using ABB.Robotics.Controllers.Discovery;
 using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
+using System.Threading;
 
 namespace Machina
 {
@@ -40,6 +41,16 @@ namespace Machina
 
         private TcpClient clientSocket = new TcpClient();
         private NetworkStream clientNetworkStream;
+        private Thread receivingThread;
+        private Thread sendingThread;
+        public enum StatusEnum
+        {
+            Connected,
+            Disconnected,
+            Validated,
+            InSession
+        }
+        static public StatusEnum Status { get; private set; }
 
         // From the Machina_Server.mod file, must be consistent!
         const string STR_MESSAGE_END_CHAR = ";";
@@ -555,18 +566,18 @@ namespace Machina
         /// </summary>
         public override void TickStreamQueue(bool hasPriority)
         {
-            Console.WriteLine($"TICKING StreamQueue: {WriteCursor.ActionsPending()} actions pending");
-            if (WriteCursor.AreActionsPending())
-            {
-                Console.WriteLine("About to set targets");
-                //SetNextVirtualTarget(hasPriority);
-                SendActionAsMessage(hasPriority);
-                TickStreamQueue(hasPriority);  // call this in case there are more in the queue...
-            }
-            else
-            {
-                Console.WriteLine($"Not setting targets, actions pending {WriteCursor.ActionsPending()}");
-            }
+            //Console.WriteLine($"TICKING StreamQueue: {WriteCursor.ActionsPending()} actions pending");
+            //if (WriteCursor.AreActionsPending())
+            //{
+            //    Console.WriteLine("About to set targets");
+            //    //SetNextVirtualTarget(hasPriority);
+            //    //SendActionAsMessage(hasPriority);  // this is now watched by the thread
+            //    //TickStreamQueue(hasPriority);  // call this in case there are more in the queue...
+            //}
+            //else
+            //{
+            //    Console.WriteLine($"Not setting targets, actions pending {WriteCursor.ActionsPending()}");
+            //}
         }
 
         /// <summary>
@@ -1069,10 +1080,20 @@ namespace Machina
             {
                 clientSocket = new TcpClient();
                 clientSocket.Connect(IP, PORT);
+                Status = StatusEnum.Connected;
                 clientNetworkStream = clientSocket.GetStream();
-                //clientStream = clientSocket.GetStream();
-                //clientStreamReader = new StreamReader(clientStream, Encoding.ASCII);
-                //clientStreamWriter = new StreamWriter(clientStream, Encoding.ASCII);\
+                clientSocket.ReceiveBufferSize = 1024;
+                clientSocket.SendBufferSize = 1024;
+
+                sendingThread = new Thread(SendingMethod);
+                sendingThread.IsBackground = true;
+                sendingThread.Start();
+
+                //receivingThread = new Thread(ReceivingMethod);
+                //receivingThread.IsBackground = true;
+                //receivingThread.Start();
+                
+
                 return clientSocket.Connected;
             } 
             catch (Exception ex)
@@ -1084,12 +1105,32 @@ namespace Machina
             return false;
         }
 
+
+        private void SendingMethod(object obj)
+        {
+            while (Status != StatusEnum.Disconnected)
+            {
+                while (this.WriteCursor.actionBuffer.AreActionsPending())
+                {
+                    SendActionAsMessage(true);
+
+                    //MessageQueue.RemoveAt(0);
+                }
+
+                Thread.Sleep(30);
+            }
+        }
+
+
+
         private bool CloseTCPConnection()
         {
             if (controller == null) return true;
 
             if (clientSocket != null)
             {
+                Status = StatusEnum.Disconnected;
+                clientSocket.Client.Disconnect(false);
                 clientSocket.Close();
                 if (clientNetworkStream != null) clientNetworkStream.Dispose();
                 return true;
@@ -1158,11 +1199,6 @@ namespace Machina
 
             if (a == null)
                 throw new Exception("Last action wasn't correctly stored...?");
-
-            // dummy message to request version number
-            //string msg = $"@{a.id} 101 1;";
-            //byte[] msgBytes = Encoding.ASCII.GetBytes(msg);
-            //clientNetworkStream.Write(msgBytes, 0, msgBytes.Length);
              
             string msg = GetActionMessage(a, WriteCursor);
             byte[] msgBytes = Encoding.ASCII.GetBytes(msg);
@@ -1170,10 +1206,7 @@ namespace Machina
             clientNetworkStream.Write(msgBytes, 0, msgBytes.Length);
 
             Console.WriteLine("Sending mgs: " + msg);
-            
-
-            //Console.WriteLine("Received: " + sr.Read());
-
+         
             return true;
         }
         
