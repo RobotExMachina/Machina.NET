@@ -1285,8 +1285,6 @@ namespace Machina
                 case ActionType.Rotation:
                 case ActionType.Transformation:
                     //// MoveL/J X Y Z QW QX QY QZ
-                    //msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {(cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ)} {cursor.position.X} {cursor.position.Y} {cursor.position.Z} {cursor.rotation.Q.W} {cursor.rotation.Q.X} {cursor.rotation.Q.Y} {cursor.rotation.Q.Z}{STR_MESSAGE_END_CHAR}";
-
                     msg = string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9}{10}",
                         STR_MESSAGE_ID_CHAR,
                         action.id,
@@ -1299,12 +1297,21 @@ namespace Machina
                         Math.Round(cursor.rotation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         Math.Round(cursor.rotation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         STR_MESSAGE_END_CHAR);
-                    
                     break;
 
                 case ActionType.Axes:
                     // MoveAbsJ J1 J2 J3 J4 J5 J6
-                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_MOVEABSJ} {cursor.joints.J1} {cursor.joints.J2} {cursor.joints.J3} {cursor.joints.J4} {cursor.joints.J5} {cursor.joints.J6}{STR_MESSAGE_END_CHAR}";
+                    msg = string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8}{9}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.id,
+                        INST_MOVEABSJ,
+                        Math.Round(cursor.joints.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.joints.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.joints.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.joints.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.joints.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.joints.J6, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        STR_MESSAGE_END_CHAR);
                     break;
 
                 case ActionType.Speed:
@@ -1333,7 +1340,23 @@ namespace Machina
                     // !(settool X Y Z QW QX QY QZ KG CX CY CZ)
                     ActionAttach aa = (ActionAttach)action;
                     Tool t = aa.tool;
-                    msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_TOOL} {t.TCPPosition.X} {t.TCPPosition.Y} {t.TCPPosition.Z} {t.TCPOrientation.Q.W} {t.TCPOrientation.Q.X} {t.TCPOrientation.Q.Y} {t.TCPOrientation.Q.Z} {t.weight} {t.centerOfGravity.X} {t.centerOfGravity.Y} {t.centerOfGravity.Z} {STR_MESSAGE_END_CHAR}";
+
+                    msg = string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}{14}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.id,
+                        INST_TOOL,
+                        Math.Round(t.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPOrientation.Q.W, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.TCPOrientation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.TCPOrientation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.TCPOrientation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.weight, Geometry.STRING_ROUND_DECIMALS_KG),
+                        Math.Round(t.centerOfGravity.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.centerOfGravity.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.centerOfGravity.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                        STR_MESSAGE_END_CHAR);
                     break;
 
                 case ActionType.Detach:

@@ -49,6 +49,7 @@ namespace Machina
         internal static readonly int STRING_ROUND_DECIMALS_RADS = 6;
         internal static readonly int STRING_ROUND_DECIMALS_VOLTAGE = 3;
         internal static readonly int STRING_ROUND_DECIMALS_TEMPERATURE = 0;
+        internal static readonly int STRING_ROUND_DECIMALS_KG = 3;
 
         // Angle conversion
         internal static readonly double TO_DEGS = 180.0 / Math.PI;
