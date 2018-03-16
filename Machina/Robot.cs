@@ -210,6 +210,43 @@ namespace Machina
         }
 
         /// <summary>
+        /// Sets who will be in charge of managing the connection to the device,
+        /// i.e. having "Machina" try to load a server/firmata modules to the controller or 
+        /// leave that task to the "User" (default).
+        /// </summary>
+        /// <param name="connectionManager">"User" or "Machina"</param>
+        /// <returns></returns>
+        public bool ConnectionManager(string connectionManager)
+        {
+            ConnectionManagerType cm;
+            try
+            {
+                cm = (ConnectionManagerType)Enum.Parse(typeof(ConnectionManagerType), connectionManager, true);
+                if (Enum.IsDefined(typeof(ConnectionManagerType), cm))
+                    return c.SetConnectionMode(cm);
+            }
+            catch
+            {
+                Console.WriteLine($"{connectionManager} is not a valid ConnectionManagerType type, please specify one of the following:");
+                foreach (string str in Enum.GetNames(typeof(ConnectionManagerType)))
+                    Console.WriteLine(str);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Sets who will be in charge of managing the connection to the device,
+        /// i.e. having "Machina" try to load a server/firmata modules to the controller or 
+        /// leave that task to the "User" (default).
+        /// </summary>
+        /// <param name="connectionManager">"User" or "Machina"</param>
+        /// <returns></returns>
+        public bool ConnectionManager(ConnectionManagerType connectionManager)
+        {
+            return c.SetConnectionMode(connectionManager);
+        }
+
+        /// <summary>
         /// Scans the network for robotic devices, real or virtual, and performs all necessary 
         /// operations to connect to it. This is necessary for 'online' modes such as 'execute' and 'stream.'
         /// </summary>

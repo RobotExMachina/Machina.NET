@@ -31,10 +31,12 @@ namespace Machina
         // TODO: move to cursors, make it device specific
         public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
         public const int DEFAULT_PRECISION = 5;                               // default precision for new actions
+
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
         public const CycleType DEFAULT_RUNMODE = CycleType.Once;
+        public const ConnectionManagerType DEFAULT_CONNECTIONMODE = ConnectionManagerType.User;
         
 
 
@@ -43,6 +45,7 @@ namespace Machina
         /// </summary>
         private ControlType controlMode = DEFAULT_CONTROLMODE;
         private CycleType runMode = DEFAULT_RUNMODE;
+        private ConnectionManagerType connectionMode = DEFAULT_CONNECTIONMODE;
 
         /// <summary>
         /// A reference to the Robot object this class is driving.
@@ -197,6 +200,22 @@ namespace Machina
         {
             return runMode;
         }
+
+        /// <summary>
+        /// Sets the current ConnectionManagerType.
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public bool SetConnectionMode(ConnectionManagerType mode)
+        {
+            this.connectionMode = mode;
+
+            // What to do here?
+
+            return true;
+        }
+
+
 
         /// <summary>
         /// Searches the network for a robot controller and establishes a connection with the specified one by position. 

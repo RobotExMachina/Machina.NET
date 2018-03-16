@@ -36,8 +36,19 @@ namespace Machina
     /// </summary>
     public enum CycleType : int
     {
+        /// <summary>
+        /// It will not run.
+        /// </summary>
         None = 0,
+
+        /// <summary>
+        /// Program will be executed once.
+        /// </summary>
         Once = 1,
+
+        /// <summary>
+        /// Program will be executed in a loop.
+        /// </summary>
         Loop = 2
     }
 
@@ -55,7 +66,19 @@ namespace Machina
     /// </summary>
     public enum MotionType
     {
+        /// <summary>
+        /// Motion between targets will happen linearly in Euclidean space, 
+        /// this is, a straight line in 3D space. 
+        /// </summary>
         Linear,
+
+        /// <summary>
+        /// USE WITH CAUTION. Motion between targets will hapen linearly in Configuration space, 
+        /// this is, a linear interpolation between the joint angular values for 
+        /// each target. This is much easier for the robot, and generally avoids some
+        /// singularity problems. However, it may produce unpredictable trajectories 
+        /// and reorientations, specially between targets far apart. 
+        /// </summary>
         Joint
     }
 
@@ -69,7 +92,7 @@ namespace Machina
         ABB,
         UR,
         KUKA,
-        ZMORPH,
+        ZMORPH
     }
 
     ///// <summary>
@@ -92,5 +115,16 @@ namespace Machina
         Extruder,
         Bed,
         Chamber
+    }
+
+    /// <summary>
+    /// Defines who will be in charge of setting up a device for correct connection, 
+    /// i.e. having Machina try to load a server/firmata modules to the controller or 
+    /// leave that task to the User (default). 
+    /// </summary>
+    public enum ConnectionManagerType
+    {
+        User, 
+        Machina
     }
 }
