@@ -19,6 +19,11 @@
 ## FOR 0.6.0 RELEASE
 This release will focus on reworking the Streaming mode to base it off TCP connection with the controller server. 
 
+- [x] New factory constructor: `new Robot(...)` is now `Robot.Create(...)`
+- [x] `Offline` mode working with new architecture
+- [ ] 
+
+
 ### Machina_Driver.mod
 [x] Cleanup dead code
 [x] Refactor function names and variables
@@ -34,12 +39,8 @@ This release will focus on reworking the Streaming mode to base it off TCP conne
 
 - [ ] `Precision()` should accept `double` input
 
+
 ---
-## THINGS CHANGED IN MACHINA TO IMPLEMENT THIS THING
-
-
-
-
 ## FOR 0.5.0 RELEASE
 - [x] Add `Temperature()`
 - [x] Add `Extrude()`
@@ -81,7 +82,7 @@ This release will focus on reworking the Streaming mode to base it off TCP conne
 
 
 ## AL·GO MEETING
-- [ ] HUMAN mode not working...
+- [x] HUMAN mode not working...
 - [ ] Add a json mode? Any form of de/serializable format that can become "Machina" code, like a Machina save format, that could be loaded and executed, also exchanged between apps
 - [ ] Export doesn' flush automatically in oflline mode, this should be made explicit with a .ClearMemory() function or similar...
 

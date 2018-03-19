@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
 
+using Machina.Drivers;
+using Machina.Controllers;
+
 namespace Machina
 {
     //   ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     
@@ -36,16 +39,21 @@ namespace Machina
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
         public const CycleType DEFAULT_RUNMODE = CycleType.Once;
-        public const ConnectionManagerType DEFAULT_CONNECTIONMODE = ConnectionManagerType.User;
-        
+        public const ConnectionType DEFAULT_CONNECTIONMODE = ConnectionType.User;
+
 
 
         /// <summary>
         /// Operation modes by default
         /// </summary>
-        private ControlType controlMode = DEFAULT_CONTROLMODE;
-        private CycleType runMode = DEFAULT_RUNMODE;
-        private ConnectionManagerType connectionMode = DEFAULT_CONNECTIONMODE;
+        internal ControlType _controlMode;
+        public ControlType ControlMode { get { return _controlMode; } internal set { _controlMode = value; } }
+        internal ControlManager _controlManager;
+
+
+        internal CycleType runMode = DEFAULT_RUNMODE;
+        internal ConnectionType connectionMode;
+
 
         /// <summary>
         /// A reference to the Robot object this class is driving.
@@ -55,12 +63,14 @@ namespace Machina
         /// <summary>
         /// Instances of the main robot Controller and Task
         /// </summary>
-        private Driver comm;
-        
+        private Driver _comm;
+        public Driver Comm { get { return _comm; } internal set { _comm = value; } }
+
+
         /// <summary>
         /// A virtual representation of the state of the device after application of issued actions.
         /// </summary>
-        private RobotCursor virtualCursor;
+        internal RobotCursor virtualCursor;
 
         /// <summary>
         /// A virtual representation of the state of the device after releasing pending actions to the controller.
@@ -68,12 +78,24 @@ namespace Machina
         /// actionsbuffer to target device defined by controlMode, like an offline program, a full intruction execution 
         /// or a streamed target.
         /// </summary>
-        private RobotCursor writeCursor;
+        internal RobotCursor writeCursor;
 
         /// <summary>
         /// A virtual representation of the current motion state of the device.
         /// </summary>
-        private RobotCursor motionCursor;
+        internal RobotCursor motionCursor;
+
+        /// <summary>
+        /// Are cursors ready to start working?
+        /// </summary>
+        private bool _areCursorsInitialized = false;
+
+        /// <summary>
+        /// An mutable alias for the cursor that will be used to return the current state for the robot,
+        /// aka which cursor to use for sync GetJoints(), GetPose()-kind of functions...
+        /// Mainly the virtualCursor for Offline modes, motionCursor for Stream, etc.
+        /// </summary>
+        internal RobotCursor stateCursor;
 
         /// <summary>
         /// A shared instance of a Thread to manage sending and executing actions
@@ -82,17 +104,9 @@ namespace Machina
         /// </summary>
         private Thread actionsExecuter;
 
-        /// <summary>
-        /// Are cursors ready to start working?
-        /// </summary>
-        private bool areCursorsInitialized = false;
 
         //// @TODO: this will need to get reallocated when fixing stream mode...
         //public StreamQueue streamQueue;
-
-
-
-
 
 
 
@@ -113,28 +127,35 @@ namespace Machina
         {
             parent = parentBot;
 
-            Reset();  // @TODO necessary?
-        }
+            // Reset();
 
-        /// <summary>
-        /// Resets all internal state properties to default values. To be invoked upon
-        /// an internal robot reset.
-        /// @TODO rethink this
-        /// </summary>
-        public void Reset()
-        {
-            virtualCursor = new RobotCursor(this, "virtualCursor", true);
-            writeCursor = new RobotCursor(this, "writeCursor", false);
-            virtualCursor.SetChild(writeCursor);
-            motionCursor = new RobotCursor(this, "motionCursor", false);
-            writeCursor.SetChild(motionCursor);
-            areCursorsInitialized = false;
+            motionCursor = new RobotCursor(this, "motionCursor", false, null);
+            writeCursor = new RobotCursor(this, "writeCursor", false, motionCursor);
+            virtualCursor = new RobotCursor(this, "virtualCursor", true, writeCursor);
 
             SetControlMode(DEFAULT_CONTROLMODE);
-
-            //currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REFCS);
-            //settingsBuffer = new SettingsBuffer();
+            SetConnectionMode(DEFAULT_CONNECTIONMODE);
         }
+
+        ///// <summary>
+        ///// Resets all internal state properties to default values. To be invoked upon
+        ///// an internal robot reset.
+        ///// @TODO rethink this
+        ///// </summary>
+        //public void Reset()
+        //{
+        //    virtualCursor = new RobotCursor(this, "virtualCursor", true);
+        //    writeCursor = new RobotCursor(this, "writeCursor", false);
+        //    virtualCursor.SetChild(writeCursor);
+        //    motionCursor = new RobotCursor(this, "motionCursor", false);
+        //    writeCursor.SetChild(motionCursor);
+        //    areCursorsInitialized = false;
+
+        //    SetControlMode(DEFAULT_CONTROLMODE);
+
+        //    //currentSettings = new Settings(DEFAULT_SPEED, DEFAULT_ZONE, DEFAULT_MOTION_TYPE, DEFAULT_REFCS);
+        //    //settingsBuffer = new SettingsBuffer();
+        //}
 
         /// <summary>
         /// Sets current Control Mode and establishes communication if applicable.
@@ -143,23 +164,41 @@ namespace Machina
         /// <returns></returns>
         public bool SetControlMode(ControlType mode)
         {
-            controlMode = mode;
+            _controlMode = mode;
+            _controlManager = ControlFactory.GetControlManager(this);
 
-            //// @TODO: Make changes in ControlMode at runtime possible, i.e. resetting controllers and communication, flushing queues, etc.
+            bool success = _controlManager.Initialize();
+
             if (mode == ControlType.Offline)
             {
-                if (comm != null) DropCommunication();
-
-                // In offline modes, initialize the robot to a bogus standard transform
-                InitializeRobotCursors(new Vector(), Rotation.FlippedAroundY);  // @TODO: defaults should depend on robot make/model
-            }
-            else
-            {
-                InitializeCommunication();
+                InitializeRobotCursors();
             }
 
-            return true;
+            return success;
         }
+
+
+        //private bool InitializeMode(ControlType mode)
+        //{
+        //    switch (mode) {
+        //        case ControlType.Stream:
+        //            return InitializeCommunication();
+        //            break;
+
+        //        case ControlType.Execute:
+        //            // @TODO
+        //            return false;
+        //            break;
+
+        //        // Offline
+        //        default:
+        //            if (comm != null) DropCommunication();
+        //            // In offline modes, initialize the robot to a bogus standard transform
+        //            return InitializeRobotCursors(new Vector(), Rotation.FlippedAroundY);  // @TODO: defaults should depend on robot make/model
+        //            break;
+        //    }
+        //}
+
 
         /// <summary>
         /// Returns current Control Mode.
@@ -167,46 +206,46 @@ namespace Machina
         /// <returns></returns>
         public ControlType GetControlMode()
         {
-            return controlMode;
+            return _controlMode;
         }
 
-        /// <summary>
-        /// Sets current RunMode. 
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public bool SetRunMode(CycleType mode)
-        {
-            runMode = mode;
+        ///// <summary>
+        ///// Sets current RunMode. 
+        ///// </summary>
+        ///// <param name="mode"></param>
+        ///// <returns></returns>
+        //public bool SetRunMode(CycleType mode)
+        //{
+        //    runMode = mode;
 
-            if (controlMode == ControlType.Offline)
-            {
-                Console.WriteLine($"Remember RunMode.{mode} will have no effect in Offline mode");
-            }
-            else
-            {
-                return comm.SetRunMode(mode);
-            }
+        //    if (controlMode == ControlType.Offline)
+        //    {
+        //        Console.WriteLine($"Remember RunMode.{mode} will have no effect in Offline mode");
+        //    }
+        //    else
+        //    {
+        //        return comm.SetRunMode(mode);
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
-        /// <summary>
-        /// Returns current RunMode.
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public CycleType GetRunMode(CycleType mode)
-        {
-            return runMode;
-        }
+        ///// <summary>
+        ///// Returns current RunMode.
+        ///// </summary>
+        ///// <param name="mode"></param>
+        ///// <returns></returns>
+        //public CycleType GetRunMode(CycleType mode)
+        //{
+        //    return runMode;
+        //}
 
         /// <summary>
         /// Sets the current ConnectionManagerType.
         /// </summary>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public bool SetConnectionMode(ConnectionManagerType mode)
+        public bool SetConnectionMode(ConnectionType mode)
         {
             this.connectionMode = mode;
 
@@ -225,26 +264,24 @@ namespace Machina
         public bool ConnectToDevice(int robotId)
         {
             // Sanity
-            if (controlMode == ControlType.Offline)
-            {
-                Console.WriteLine("No robot to connect to in 'offline' mode ;)");
-                return false;
-            }
-
-            if (!comm.ConnectToDevice(robotId))
+            if (!_comm.ConnectToDevice(robotId))
             {
                 Console.WriteLine("Cannot connect to device");
                 return false;
             }
             else
             {
-                SetRunMode(runMode);
+                //SetRunMode(runMode);
 
-                // If successful, initialize robot cursors to mirror the state of the device
-                Vector currPos = comm.GetCurrentPosition();
-                Rotation currRot = comm.GetCurrentOrientation();
-                Joints currJnts = comm.GetCurrentJoints();
-                InitializeRobotCursors(currPos, currRot, currJnts);
+                //// If successful, initialize robot cursors to mirror the state of the device
+                //Vector currPos = _comm.GetCurrentPosition();
+                //Rotation currRot = _comm.GetCurrentOrientation();
+                //Joints currJnts = _comm.GetCurrentJoints();
+                //InitializeRobotCursors(currPos, currRot, currJnts);
+
+                // If successful, initialize robot cursors to mirror the state of the device.
+                // The function will initialize them based on the _comm object.
+                InitializeRobotCursors();
             }
 
             return true;
@@ -256,14 +293,7 @@ namespace Machina
         /// <returns></returns>
         public bool DisconnectFromDevice()
         {
-            // Sanity
-            if (controlMode == ControlType.Offline)
-            {
-                Console.WriteLine("No robot to disconnect from in 'offline' mode ;)");
-                return false;
-            }
-
-            return comm.DisconnectFromDevice();
+            return _comm.DisconnectFromDevice();
         }
 
         /// <summary>
@@ -272,7 +302,7 @@ namespace Machina
         /// <returns></returns>
         public bool IsConnectedToDevice()
         {
-            return comm.IsConnected();
+            return _comm.Connected;
         }
 
         /// <summary>
@@ -281,179 +311,148 @@ namespace Machina
         /// <returns></returns>
         public string GetControllerIP()
         {
-            return comm.GetIP();
+            return _comm.IP;
         }
 
-        /// <summary>
-        /// Loads a programm to the connected device and executes it. 
-        /// </summary>
-        /// <param name="programLines">A string list representation of the program's code.</param>
-        /// <param name="programName">Program name</param>
-        /// <returns></returns>
-        public bool LoadProgramToDevice(List<string> programLines, string programName = "Program")
-        {
-            return comm.LoadProgramToController(programLines, programName);
-        }
+        ///// <summary>
+        ///// Loads a programm to the connected device and executes it. 
+        ///// </summary>
+        ///// <param name="programLines">A string list representation of the program's code.</param>
+        ///// <param name="programName">Program name</param>
+        ///// <returns></returns>
+        //public bool LoadProgramToDevice(List<string> programLines, string programName = "Program")
+        //{
+        //    return comm.LoadProgramToController(programLines, programName);
+        //}
 
-        /// <summary>
-        /// Loads a programm to the connected device and executes it. 
-        /// </summary>
-        /// <param name="filepath">Full filepath including root, directory structure, filename and extension.</param>
-        /// <param name="wipeout">Delete all previous modules in the device?</param>
-        /// <returns></returns>
-        public bool LoadProgramToDevice(string filepath, bool wipeout)
-        {
-            if (controlMode == ControlType.Offline)
-            {
-                Console.WriteLine("Cannot load modules in Offline mode");
-                return false;
-            }
+        ///// <summary>
+        ///// Loads a programm to the connected device and executes it. 
+        ///// </summary>
+        ///// <param name="filepath">Full filepath including root, directory structure, filename and extension.</param>
+        ///// <param name="wipeout">Delete all previous modules in the device?</param>
+        ///// <returns></returns>
+        //public bool LoadProgramToDevice(string filepath, bool wipeout)
+        //{
+        //    if (controlMode == ControlType.Offline)
+        //    {
+        //        Console.WriteLine("Cannot load modules in Offline mode");
+        //        return false;
+        //    }
 
-            // Sanity
-            string fullPath = "";
+        //    // Sanity
+        //    string fullPath = "";
 
-            // Is the filepath a valid Windows path?
-            try
-            {
-                fullPath = System.IO.Path.GetFullPath(filepath);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("'{0}' is not a valid filepath", filepath);
-                Console.WriteLine(e);
-                return false;
-            }
+        //    // Is the filepath a valid Windows path?
+        //    try
+        //    {
+        //        fullPath = System.IO.Path.GetFullPath(filepath);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("'{0}' is not a valid filepath", filepath);
+        //        Console.WriteLine(e);
+        //        return false;
+        //    }
 
-            // Is it an absolute path?
-            try
-            {
-                bool absolute = System.IO.Path.IsPathRooted(fullPath);
-                if (!absolute)
-                {
-                    Console.WriteLine("Relative paths are currently not supported");
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("'{0}' is not a valid absolute filepath", filepath);
-                Console.WriteLine(e);
-                return false;
-            }
+        //    // Is it an absolute path?
+        //    try
+        //    {
+        //        bool absolute = System.IO.Path.IsPathRooted(fullPath);
+        //        if (!absolute)
+        //        {
+        //            Console.WriteLine("Relative paths are currently not supported");
+        //            return false;
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("'{0}' is not a valid absolute filepath", filepath);
+        //        Console.WriteLine(e);
+        //        return false;
+        //    }
 
-            //// Split the full path into directory, file and extension names
-            //string dirname;     // full directory path
-            //string filename;    // filename without extension
-            //string extension;   // file extension
+        //    //// Split the full path into directory, file and extension names
+        //    //string dirname;     // full directory path
+        //    //string filename;    // filename without extension
+        //    //string extension;   // file extension
 
-            //string[] parts = fullPath.Split('\\');
-            //int len = parts.Length;
-            //if (len < 2)
-            //{
-            //    Console.WriteLine("Weird filepath");
-            //    return false;
-            //}
-            //dirname = string.Join("\\", parts, 0, len - 1);
-            //string[] fileparts = parts[len - 1].Split('.');
-            //filename = fileparts.Length > 2 ? string.Join(".", fileparts, 0, fileparts.Length - 1) : fileparts[0];  // account for filenames with multiple dots
-            //extension = fileparts[fileparts.Length - 1];
+        //    //string[] parts = fullPath.Split('\\');
+        //    //int len = parts.Length;
+        //    //if (len < 2)
+        //    //{
+        //    //    Console.WriteLine("Weird filepath");
+        //    //    return false;
+        //    //}
+        //    //dirname = string.Join("\\", parts, 0, len - 1);
+        //    //string[] fileparts = parts[len - 1].Split('.');
+        //    //filename = fileparts.Length > 2 ? string.Join(".", fileparts, 0, fileparts.Length - 1) : fileparts[0];  // account for filenames with multiple dots
+        //    //extension = fileparts[fileparts.Length - 1];
 
-            //Console.WriteLine("  filename: " + filename);
-            //Console.WriteLine("  dirname: " + dirname);
-            //Console.WriteLine("  extension: " + extension);
+        //    //Console.WriteLine("  filename: " + filename);
+        //    //Console.WriteLine("  dirname: " + dirname);
+        //    //Console.WriteLine("  extension: " + extension);
 
-            //return comm.LoadFileToController(dirname, filename, extension, true);
-            return comm.LoadFileToDevice(fullPath, wipeout);
-        }
+        //    //return comm.LoadFileToController(dirname, filename, extension, true);
+        //    return comm.LoadFileToDevice(fullPath, wipeout);
+        //}
 
-        /// <summary>
-        /// Triggers program start on device.
-        /// </summary>
-        /// <returns></returns>
-        public bool StartProgramOnDevice()
-        {
-            if (controlMode == ControlType.Offline)
-            {
-                Console.WriteLine("No program to start in Offline mode");
-                return false;
-            }
+        ///// <summary>
+        ///// Triggers program start on device.
+        ///// </summary>
+        ///// <returns></returns>
+        //public bool StartProgramOnDevice()
+        //{
+        //    if (controlMode == ControlType.Offline)
+        //    {
+        //        Console.WriteLine("No program to start in Offline mode");
+        //        return false;
+        //    }
 
-            return comm.StartProgramExecution();
-        }
+        //    return comm.StartProgramExecution();
+        //}
 
-        /// <summary>
-        /// Stops execution of running program on device.
-        /// </summary>
-        /// <param name="immediate"></param>
-        /// <returns></returns>
-        public bool StopProgramOnDevice(bool immediate)
-        {
-            if (controlMode == ControlType.Offline)
-            {
-                Console.WriteLine("No program to stop in Offline mode");
-                return false;
-            }
+        ///// <summary>
+        ///// Stops execution of running program on device.
+        ///// </summary>
+        ///// <param name="immediate"></param>
+        ///// <returns></returns>
+        //public bool StopProgramOnDevice(bool immediate)
+        //{
+        //    if (controlMode == ControlType.Offline)
+        //    {
+        //        Console.WriteLine("No program to stop in Offline mode");
+        //        return false;
+        //    }
 
-            return comm.StopProgramExecution(immediate);
-        }
+        //    return comm.StopProgramExecution(immediate);
+        //}
 
         /// <summary>
         /// Returns a Vector object representing the current robot's TCP position.
         /// </summary>
         /// <returns></returns>
-        public Vector GetCurrentPosition()
-        {
-            if (controlMode == ControlType.Stream)
-            {
-                return comm.GetCurrentPosition();
-            }
-
-            return virtualCursor.position;
-        }
+        public Vector GetCurrentPosition() => stateCursor.position;
 
         /// <summary>
         /// Returns a Rotation object representing the current robot's TCP orientation.
         /// </summary>
         /// <returns></returns>
-        public Rotation GetCurrentOrientation()
-        {
-            if (controlMode == ControlType.Stream)
-            {
-                return comm.GetCurrentOrientation();
-            }
-
-            return virtualCursor.rotation;
-        }
-
+        public Rotation GetCurrentOrientation() => stateCursor.rotation;
 
         /// <summary>
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public Joints getCurrentAxes()
-        {
-            if (controlMode == ControlType.Stream)
-            {
-                return comm.GetCurrentJoints();
-            }
-
-            return virtualCursor.joints;
-        }
+        public Joints getCurrentAxes() => stateCursor.joints;
 
         /// <summary>
         /// Returns a Tool object representing the currently attached tool, null if none.
         /// </summary>
         /// <returns></returns>
-        public Tool GetCurrentTool()
-        {
-            if (controlMode == ControlType.Stream)
-            {
-                //return comm.getCurrentTool();
-                return null;  // TODO: implement when back to streaming
-            }
+        public Tool GetCurrentTool() => stateCursor.tool;
 
-            return virtualCursor.tool;
-        }
+
+
 
 
 
@@ -466,7 +465,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> Export(bool inlineTargets, bool humanComments)
         {
-            if (controlMode != ControlType.Offline)
+            if (_controlMode != ControlType.Offline)
             {
                 Console.WriteLine("Export() only works in Offline mode");
                 return null;
@@ -501,14 +500,16 @@ namespace Machina
         /// <returns></returns>
         public void Execute()
         {
-            if (controlMode != ControlType.Execute)
-            {
-                Console.WriteLine("Execute() only works in Execute mode");
-                return;
-            }
+            //if (_controlMode != ControlType.Execute)
+            //{
+            //    Console.WriteLine("Execute() only works in Execute mode");
+            //    return;
+            //}
 
-            writeCursor.QueueActions();
-            TickWriteCursor();
+            //writeCursor.QueueActions();
+            //TickWriteCursor();
+
+            throw new NotImplementedException();
         }
 
 
@@ -639,14 +640,14 @@ namespace Machina
         /// <returns></returns>
         public bool IssueApplyActionRequest(Action action)
         {
-            if (!areCursorsInitialized)
+            if (!_areCursorsInitialized)
             {
                 Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
                 return false;
             }
 
             bool success = virtualCursor.Issue(action);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
+            //if (_controlMode == ControlType.Stream) _comm.TickStreamQueue(true);
             return success;
         }
 
@@ -654,132 +655,36 @@ namespace Machina
         /// Sets the speed parameter for future issued actions.
         /// </summary>
         /// <param name="speed">In mm/s</param>
-        public bool IssueSpeedRequest(int speed, bool relative)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
-
-            ActionSpeed act = new ActionSpeed(speed, relative);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
+        public bool IssueSpeedRequest(int speed, bool relative) => 
+                IssueApplyActionRequest(new ActionSpeed(speed, relative));
 
 
-        public bool IssuePrecisionRequest(int precision, bool relative)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssuePrecisionRequest(int precision, bool relative) =>
+                IssueApplyActionRequest(new ActionPrecision(precision, relative));
 
-            ActionPrecision act = new ActionPrecision(precision, relative);
 
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
+        public bool IssueMotionRequest(MotionType motionType) =>
+                IssueApplyActionRequest(new ActionMotion(motionType));
 
-        public bool IssueMotionRequest(MotionType motionType)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
 
-            ActionMotion act = new ActionMotion(motionType);
+        public bool IssueCoordinatesRequest(ReferenceCS referenceCS) =>
+                IssueApplyActionRequest(new ActionCoordinates(referenceCS));
 
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
-        public bool IssueCoordinatesRequest(ReferenceCS referenceCS)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssuePushPopRequest(bool push) =>
+                IssueApplyActionRequest(new ActionPushPop(push));
 
-            ActionCoordinates act = new ActionCoordinates(referenceCS);
 
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
+        public bool IssueTemperatureRequest(double temp, RobotPartType robotPart, bool waitToReachTemp, bool relative) =>
+                IssueApplyActionRequest(new ActionTemperature(temp, robotPart, waitToReachTemp, relative));
 
-        public bool IssuePushPopRequest(bool push)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
 
-            ActionPushPop act = new ActionPushPop(push);
+        public bool IssueExtrudeRequest(bool extrude) =>
+                IssueApplyActionRequest(new ActionExtrusion(extrude));
 
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
-        public bool IssueTemperatureRequest(double temp, RobotPartType robotPart, bool waitToReachTemp, bool relative)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
-
-            if (robotPart != RobotPartType.Bed && robotPart != RobotPartType.Extruder)
-            {
-                Console.WriteLine("Cannot set temperature of part " + Enum.GetName(typeof(RobotPartType), robotPart));
-                return false;
-            }
-
-            ActionTemperature act = new ActionTemperature(temp, robotPart, waitToReachTemp, relative);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
-
-        public bool IssueExtrudeRequest(bool extrude)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
-
-            ActionExtrusion act = new ActionExtrusion(extrude);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
-
-        public bool IssueExtrusionRateRequest(double rate, bool relative)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
-
-            ActionExtrusionRate act = new ActionExtrusionRate(rate, relative);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
+        public bool IssueExtrusionRateRequest(double rate, bool relative) =>
+                IssueApplyActionRequest(new ActionExtrusionRate(rate, relative));
 
         /// <summary>
         /// Issue a Translation action request that falls back on the state of current settings.
@@ -787,21 +692,9 @@ namespace Machina
         /// <param name="trans"></param>
         /// <param name="relative"></param>
         /// <returns></returns>
-        public bool IssueTranslationRequest(Vector trans, bool relative)
-        {
-            if (!areCursorsInitialized)
-            {
+        public bool IssueTranslationRequest(Vector trans, bool relative) =>
+                IssueApplyActionRequest(new ActionTranslation(trans, relative));
 
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
-
-            ActionTranslation act = new ActionTranslation(trans, relative);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
         /// <summary>
         /// Issue a Rotation action request with fully customized parameters.
@@ -809,21 +702,9 @@ namespace Machina
         /// <param name="rot"></param>
         /// <param name="relative"></param>
         /// <returns></returns>
-        public bool IssueRotationRequest(Rotation rot, bool relative)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueRotationRequest(Rotation rot, bool relative) =>
+                IssueApplyActionRequest(new ActionRotation(rot, relative));
 
-            ActionRotation act = new ActionRotation(rot, relative);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-
-        }
 
         /// <summary>
         /// Issue a Translation + Rotation action request with fully customized parameters.
@@ -833,24 +714,9 @@ namespace Machina
         /// <param name="rel"></param>
         /// <param name="translationFirst"></param>
         /// <returns></returns>
-        public bool IssueTransformationRequest(Vector trans, Rotation rot, bool rel, bool translationFirst)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueTransformationRequest(Vector trans, Rotation rot, bool rel, bool translationFirst) =>
+                IssueApplyActionRequest(new ActionTransformation(trans, rot, rel, translationFirst));
 
-            //ActionTranslationAndRotation act = new ActionTranslationAndRotation(worldTrans, trans, relTrans, worldRot, rot, relRot, speed, zone, mType);
-            //return virtualCursor.Issue(act);
-
-            ActionTransformation act = new ActionTransformation(trans, rot, rel, translationFirst);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-
-        }
 
         /// <summary>
         /// Issue a request to set the values of joint angles in configuration space. 
@@ -860,122 +726,53 @@ namespace Machina
         /// <param name="speed"></param>
         /// <param name="zone"></param>
         /// <returns></returns>
-        public bool IssueJointsRequest(Joints joints, bool relJnts)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueJointsRequest(Joints joints, bool relJnts) =>
+                IssueApplyActionRequest(new ActionAxes(joints, relJnts));
 
-            ActionAxes act = new ActionAxes(joints, relJnts);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-
-        }
 
         /// <summary>
         /// Issue a request to display a string message on the device.
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public bool IssueMessageRequest(string message)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueMessageRequest(string message) =>
+                IssueApplyActionRequest(new ActionMessage(message));
 
-            ActionMessage act = new ActionMessage(message);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-
-        }
 
         /// <summary>
         /// Issue a request for the device to stay idle for a certain amount of time.
         /// </summary>
         /// <param name="millis"></param>
         /// <returns></returns>
-        public bool IssueWaitRequest(long millis)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueWaitRequest(long millis) =>
+                IssueApplyActionRequest(new ActionWait(millis));
 
-            ActionWait act = new ActionWait(millis);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-
-        }
 
         /// <summary>
         /// Issue a request to add an internal comment in the compiled code. 
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
-        public bool IssueCommentRequest(string comment)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueCommentRequest(string comment) =>
+                IssueApplyActionRequest(new ActionComment(comment));
 
-            ActionComment act = new ActionComment(comment);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
         /// <summary>
         /// Issue a request to attach a Tool to the flange of the robot
         /// </summary>
         /// <param name="tool"></param>
         /// <returns></returns>
-        public bool IssueAttachRequest(Tool tool)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueAttachRequest(Tool tool) =>
+                IssueApplyActionRequest(new ActionAttach(tool));
 
-            ActionAttach act = new ActionAttach(tool);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
         /// <summary>
         /// Issue a request to return the robot to no tools attached. 
         /// </summary>
         /// <returns></returns>
-        public bool IssueDetachRequest()
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueDetachRequest() =>
+                IssueApplyActionRequest(new ActionDetach());
 
-            ActionDetach act = new ActionDetach();
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
         /// <summary>
         /// Issue a request to turn digital IO on/off.
@@ -983,20 +780,9 @@ namespace Machina
         /// <param name="pinNum"></param>
         /// <param name="isOn"></param>
         /// <returns></returns>
-        public bool IssueWriteToDigitalIORequest(int pinNum, bool isOn)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueWriteToDigitalIORequest(int pinNum, bool isOn) =>
+                IssueApplyActionRequest(new ActionIODigital(pinNum, isOn));
 
-            ActionIODigital act = new ActionIODigital(pinNum, isOn);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
         /// <summary>
         /// Issue a request to write to analog pin.
@@ -1004,20 +790,9 @@ namespace Machina
         /// <param name="pinNum"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool IssueWriteToAnalogIORequest(int pinNum, double value)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
+        public bool IssueWriteToAnalogIORequest(int pinNum, double value) =>
+                IssueApplyActionRequest(new ActionIOAnalog(pinNum, value));
 
-            ActionIOAnalog act = new ActionIOAnalog(pinNum, value);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
 
         /// <summary>
         /// Issue a request to add common initialization/termination procedures on the device, 
@@ -1025,20 +800,8 @@ namespace Machina
         /// </summary>
         /// <param name="initiate"></param>
         /// <returns></returns>
-        public bool IssueInitializationRequest(bool initiate)
-        {
-            if (!areCursorsInitialized)
-            {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
-                return false;
-            }
-
-            ActionInitialization act = new ActionInitialization(initiate);
-
-            bool success = virtualCursor.Issue(act);
-            if (controlMode == ControlType.Stream) comm.TickStreamQueue(true);
-            return success;
-        }
+        public bool IssueInitializationRequest(bool initiate) =>
+                IssueApplyActionRequest(new ActionInitialization(initiate));
 
 
 
@@ -1062,20 +825,20 @@ namespace Machina
         private bool InitializeCommunication()
         {
             // If there is already some communication going on
-            if (comm != null)
+            if (_comm != null)
             {
                 Console.WriteLine("Communication protocol might be active. Please CloseControllerCommunication() first.");
                 return false;
             }
 
             // @TODO: shim assignment of correct robot model/brand
-            comm = new DriverABBAutomatic(this);
+            _comm = new DriverABB(this);
 
             // Pass the streamQueue object as a shared reference
             //comm.LinkStreamQueue(streamQueue);
-            if (controlMode == ControlType.Stream)
+            if (_controlMode == ControlType.Stream)
             {
-                comm.LinkWriteCursor(ref writeCursor);
+                _comm.LinkWriteCursor(ref writeCursor);
             }
 
             return true;
@@ -1087,13 +850,13 @@ namespace Machina
         /// <returns></returns>
         private bool DropCommunication()
         {
-            if (comm == null)
+            if (_comm == null)
             {
                 Console.WriteLine("Communication protocol not established.");
                 return false;
             }
-            bool success = comm.DisconnectFromDevice();
-            comm = null;
+            bool success = _comm.DisconnectFromDevice();
+            _comm = null;
             return success;
         }
 
@@ -1103,7 +866,7 @@ namespace Machina
         /// <returns></returns>
         private bool ResetCommunication()
         {
-            if (comm == null)
+            if (_comm == null)
             {
                 Console.WriteLine("Communication protocol not established, please initialize first.");
             }
@@ -1128,9 +891,25 @@ namespace Machina
             success &= writeCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
             success &= motionCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
 
-            areCursorsInitialized = success;
+            _areCursorsInitialized = success;
 
             return success;
+        }
+
+
+        internal bool InitializeRobotCursors()
+        {
+            if (_comm == null)
+            {
+                throw new Exception("Cannot initialize Robotcursors without a _comm object");
+            }
+
+            // If successful, initialize robot cursors to mirror the state of the device
+            Vector currPos = _comm.GetCurrentPosition();
+            Rotation currRot = _comm.GetCurrentOrientation();
+            Joints currJnts = _comm.GetCurrentJoints();
+
+            return InitializeRobotCursors(currPos ?? null, currRot ?? null, currJnts ?? null);
         }
 
 
@@ -1144,28 +923,7 @@ namespace Machina
         {
             try
             {
-                System.IO.File.WriteAllLines(filepath, lines, this.parent.Brand == RobotType.Undefined ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Could not save program to file...");
-                Console.WriteLine(ex);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Saves a resource text file to a path
-        /// </summary>
-        /// <param name="resourceName"></param>
-        /// <param name="filepath"></param>
-        /// <returns></returns>
-        internal bool SaveTextResourceToFile(string resourceName, string filepath)
-        {
-            try
-            {
-                System.IO.File.WriteAllLines(filepath, ReadLines(() => Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)), this.parent.Brand == RobotType.Undefined ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
+                System.IO.File.WriteAllLines(filepath, lines, this.parent.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
                 return true;
             }
             catch (Exception ex)
@@ -1177,61 +935,47 @@ namespace Machina
         }
 
 
-        /// <summary>
-        /// Returns an IEnumerable of strings from a streamReader provider. https://stackoverflow.com/a/13312954/1934487
-        /// </summary>
-        /// <param name="streamProvider"></param>
-        /// <returns></returns>
-        private IEnumerable<string> ReadLines(Func<Stream> streamProvider)
-        {
-            using (var stream = streamProvider())
-            using (var reader = new StreamReader(stream))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    yield return line;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Triggers a thread to send instructions to the connected device if applicable. 
-        /// </summary>
-        public void TickWriteCursor()
-        {
-            if (controlMode == ControlType.Execute)
-            {
-                if (!comm.IsRunning() && areCursorsInitialized && writeCursor.AreActionsPending() && (actionsExecuter == null || !actionsExecuter.IsAlive))
-                {
-                    actionsExecuter = new Thread(() => RunActionsBlockInController(true, false));  // http://stackoverflow.com/a/3360582
-                    actionsExecuter.Start();
-                }
-            }
-            //else if (controlMode == ControlMode.Stream)
-            //{
-            //    comm.TickStreamQueue(true);
-            //}
-            else
-            {
-                Console.WriteLine("Nothing to tick here");
-            }
-        }
-
-        /// <summary>
-        /// Creates a program with the first block of Actions in the cursor, uploads it to the controller
-        /// and runs it. 
-        /// </summary>
-        private void RunActionsBlockInController(bool inlineTargets, bool humanComments)
-        {
-            List<string> program = writeCursor.ProgramFromBlock(inlineTargets, humanComments);
-            comm.LoadProgramToController(program, "Buffer");
-            comm.StartProgramExecution();
-        }
 
 
 
-        
+
+        ///// <summary>
+        ///// Triggers a thread to send instructions to the connected device if applicable. 
+        ///// </summary>
+        //public void TickWriteCursor()
+        //{
+        //    if (_controlMode == ControlType.Execute)
+        //    {
+        //        if (!_comm.IsRunning() && _areCursorsInitialized && writeCursor.AreActionsPending() && (actionsExecuter == null || !actionsExecuter.IsAlive))
+        //        {
+        //            actionsExecuter = new Thread(() => RunActionsBlockInController(true, false));  // http://stackoverflow.com/a/3360582
+        //            actionsExecuter.Start();
+        //        }
+        //    }
+        //    //else if (controlMode == ControlMode.Stream)
+        //    //{
+        //    //    comm.TickStreamQueue(true);
+        //    //}
+        //    else
+        //    {
+        //        Console.WriteLine("Nothing to tick here");
+        //    }
+        //}
+
+        ///// <summary>
+        ///// Creates a program with the first block of Actions in the cursor, uploads it to the controller
+        ///// and runs it. 
+        ///// </summary>
+        //private void RunActionsBlockInController(bool inlineTargets, bool humanComments)
+        //{
+        //    List<string> program = writeCursor.ProgramFromBlock(inlineTargets, humanComments);
+        //    _comm.LoadProgramToController(program, "Buffer");
+        //    _comm.StartProgramExecution();
+        //}
+
+
+
+
 
 
 
@@ -1333,7 +1077,7 @@ namespace Machina
         public void DebugDump()
         {
             DebugBanner();
-            comm.DebugDump();
+            _comm.DebugDump();
         }
 
         public void DebugBuffer()

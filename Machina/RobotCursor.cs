@@ -92,14 +92,15 @@ namespace Machina
         /// </summary>
         /// <param name="name"></param>
         /// <param name="applyImmediately"></param>
-        public RobotCursor(Control parentControl, string name,  bool applyImmediately)
+        public RobotCursor(Control parentControl, string name,  bool applyImmediately, RobotCursor childCursor)
         {
             this.parentControl = parentControl;
             this.name = name;
             this.applyImmediately = applyImmediately;
+            this.child = childCursor;
 
             // @TODO: make this programmatic
-            if (this.parentControl.parent.Brand == RobotType.Undefined)
+            if (this.parentControl.parent.Brand == RobotType.HUMAN)
             {
                 compiler = new CompilerHuman();
             }
@@ -178,14 +179,6 @@ namespace Machina
             return this.initialized;
         }
         
-        /// <summary>
-        /// Set specified RobotCursor as child to this one.
-        /// </summary>
-        /// <param name="childCursor"></param>
-        public void SetChild(RobotCursor childCursor)
-        {
-            this.child = childCursor;
-        }
         
         /// <summary>
         /// Add an action to this cursor's buffer, to be released whenever assigned priority.

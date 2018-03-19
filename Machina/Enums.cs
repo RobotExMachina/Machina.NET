@@ -14,21 +14,21 @@ namespace Machina
         /// <summary>
         /// Not connected to any controller. Useful for robot code generation and export.
         /// </summary>
-        Offline = 0,
+        Offline,
 
         /// <summary>
         /// Online connection to a controller, the library will upload complete programs 
         /// and run them. Provides robust and fluid movement, useful on real-time 
         /// interactivity where response time is not a priority. 
         /// </summary>
-        Execute = 1,
+        Execute,
 
         /// <summary>
         /// Online connection to a controller, the library will stream individual targets
         /// at run time as they get priority. Provides the closest approximation to real-time
         /// interaction, useful on situations where low latency is required.
         /// </summary>
-        Stream = 2
+        Stream
     }
 
     /// <summary>
@@ -39,17 +39,17 @@ namespace Machina
         /// <summary>
         /// It will not run.
         /// </summary>
-        None = 0,
+        None,
 
         /// <summary>
         /// Program will be executed once.
         /// </summary>
-        Once = 1,
+        Once,
 
         /// <summary>
         /// Program will be executed in a loop.
         /// </summary>
-        Loop = 2
+        Loop
     }
 
     /// <summary>
@@ -57,8 +57,8 @@ namespace Machina
     /// </summary>
     public enum ReferenceCS : int
     {
-        World = 0,
-        Local = 1
+        World,
+        Local
     }
 
     /// <summary>
@@ -87,7 +87,6 @@ namespace Machina
     /// </summary>
     public enum RobotType
     {
-        Undefined,
         HUMAN,
         ABB,
         UR,
@@ -122,9 +121,17 @@ namespace Machina
     /// i.e. having Machina try to load a server/firmata modules to the controller or 
     /// leave that task to the User (default). 
     /// </summary>
-    public enum ConnectionManagerType
+    public enum ConnectionType
     {
         User, 
         Machina
+    }
+
+    internal enum TCPConnectionStatus
+    {
+        Connected,
+        Disconnected,
+        Validated,
+        InSession
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 
 
-namespace Machina
+namespace Machina.Drivers
 {
     //  ██████╗ ██████╗ ██╗██╗   ██╗███████╗██████╗ 
     //  ██╔══██╗██╔══██╗██║██║   ██║██╔════╝██╔══██╗
@@ -47,21 +47,31 @@ namespace Machina
             set { _writeCursor = value; }
         }
         
+        
 
-        /// <summary>
-        /// Is the connection to the controller fully operative?
-        /// </summary>
-        protected bool isConnected = false;
+        private bool _connected = false;
+        public bool Connected
+        {
+            get { return _connected; }
+            internal set { _connected = value; }
+        }
 
-        /// <summary>
-        /// Is the device currently running a program?
-        /// </summary>
-        protected bool isRunning = true;
-        protected string IP = "";
-        protected int PORT = 7000;  // @TODO: figure this out as an input somewhere
+        private string _ip = "";
+        public string IP
+        {
+            get { return _ip; }
+            internal set { _ip = value; }
+        }
+
+        private int _port = 0;  // @TODO: figure this out as an input somewhere
+        public int Port
+        {
+            get { return _port; }
+            internal set { _port = value; }
+        }
 
 
-
+        
 
 
         //  ┌─┐┬┌─┐┌┐┌┌─┐┌┬┐┬ ┬┬─┐┌─┐┌─┐
@@ -80,46 +90,48 @@ namespace Machina
         /// <returns></returns>
         public abstract bool ConnectToDevice(int deviceId);
 
+        public abstract bool ConnectToDevice(string ip, int port);
+
         /// <summary>
         /// Performs all necessary operations and disposals for a full disconnection (and reset) from a real/virtual device.
         /// </summary>
         /// <returns></returns>
         public abstract bool DisconnectFromDevice();
 
-        /// <summary>
-        /// Sets the execution mode on the device to once or loop (useful for ControlMode.Execute)
-        /// </summary>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public abstract bool SetRunMode(CycleType mode);
+        ///// <summary>
+        ///// Sets the execution mode on the device to once or loop (useful for ControlMode.Execute)
+        ///// </summary>
+        ///// <param name="mode"></param>
+        ///// <returns></returns>
+        //public abstract bool SetRunMode(CycleType mode);
 
-        /// <summary>
-        /// Loads a program to the device from a file in the system.
-        /// </summary>
-        /// <param name="fullPath"></param>
-        /// <param name="wipeout"></param>
-        /// <returns></returns>
-        public abstract bool LoadFileToDevice(string fullPath, bool wipeout);
+        ///// <summary>
+        ///// Loads a program to the device from a file in the system.
+        ///// </summary>
+        ///// <param name="fullPath"></param>
+        ///// <param name="wipeout"></param>
+        ///// <returns></returns>
+        //public abstract bool LoadFileToDevice(string fullPath, bool wipeout);
 
-        /// <summary>
-        /// Loads a program to the device from a list of lines of code as strings.
-        /// </summary>
-        /// <param name="program"></param>
-        /// <param name="programName"></param>
-        /// <returns></returns>
-        public abstract bool LoadProgramToController(List<string> program, string programName);
+        ///// <summary>
+        ///// Loads a program to the device from a list of lines of code as strings.
+        ///// </summary>
+        ///// <param name="program"></param>
+        ///// <param name="programName"></param>
+        ///// <returns></returns>
+        //public abstract bool LoadProgramToController(List<string> program, string programName);
 
-        /// <summary>
-        /// Request the start of the program loaded on the device.
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool StartProgramExecution();
+        ///// <summary>
+        ///// Request the start of the program loaded on the device.
+        ///// </summary>
+        ///// <returns></returns>
+        //public abstract bool StartProgramExecution();
 
-        /// <summary>
-        /// Request immediate or deferred stop of the program running on the device.
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool StopProgramExecution(bool immediate);
+        ///// <summary>
+        ///// Request immediate or deferred stop of the program running on the device.
+        ///// </summary>
+        ///// <returns></returns>
+        //public abstract bool StopProgramExecution(bool immediate);
 
         /// <summary>
         /// Returns a Vector object representing the current robot's TCP position.
@@ -139,11 +151,11 @@ namespace Machina
         /// <returns></returns>
         public abstract Joints GetCurrentJoints();
 
-        /// <summary>
-        /// Ticks the queue manager and potentially triggers streaming of targets to the controller.
-        /// </summary>
-        /// <param name="priority"></param>
-        public abstract void TickStreamQueue(bool priority);
+        ///// <summary>
+        ///// Ticks the queue manager and potentially triggers streaming of targets to the controller.
+        ///// </summary>
+        ///// <param name="priority"></param>
+        //public abstract void TickStreamQueue(bool priority);
 
         /// <summary>
         /// Dumps a bunch of info to the console.
@@ -158,7 +170,7 @@ namespace Machina
         public Driver(Control ctrl)
         {
             this.masterControl = ctrl;
-            Reset();
+            //Reset();
         }
 
         //public void LinkStreamQueue(StreamQueue q)
@@ -171,20 +183,6 @@ namespace Machina
             WriteCursor = wc;
         }
 
-        public bool IsConnected()
-        {
-            return isConnected;
-        }
-
-        public bool IsRunning()
-        {
-            return isRunning;
-        }
-
-        public string GetIP()
-        {
-            return IP;
-        }
 
     }
 

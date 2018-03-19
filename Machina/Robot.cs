@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Machina
 {
-   
+
 
     //  ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
     //  ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
@@ -40,7 +40,7 @@ namespace Machina
         /// Version number.
         /// </summary>
         public static readonly string Version = "0.6.0." + Build;
-       
+
 
         /// <summary>
         /// A nickname for this Robot.
@@ -79,10 +79,10 @@ namespace Machina
         ///// <summary>
         ///// Base constructor.
         ///// </summary>                                                       
-        [System.Obsolete("Deprecated constructor, defaults to a human-readable interpretation of the actions. Please use Robot(\"BrandName\") instead. Example: `Robot arm = new Robot(\"ABB\");`")]
+        [System.Obsolete("Deprecated constructor, defaults to a human-readable interpretation of the actions. Please use Robot.Create(name, make) instead. Example: `Robot arm = Robot.Create(\"Machina\", \"ABB\");`")]
         public Robot() : this("Machina", "HUMAN") { }
 
-        [System.Obsolete("Deprecated constructor, use Robot(name, make) instead")]
+        [System.Obsolete("Deprecated constructor, use Robot.Create(name, make) instead")]
         public Robot(string make) : this("Machina", make) { }
 
         /// <summary>
@@ -90,6 +90,7 @@ namespace Machina
         /// </summary>
         /// <param name="name">A name for this Robot</param>
         /// <param name="make">The robot make. This will determine which drivers/compilers are used to manage it.</param>
+        [System.Obsolete("Deprecated constructor, use Robot.Create(name, make) instead")]
         public Robot(string name, string make)
         {
             this.Name = name;
@@ -111,7 +112,7 @@ namespace Machina
                     {
                         Console.WriteLine(str.ToString());
                     }
-                    this.Brand = RobotType.Undefined;
+                    this.Brand = RobotType.HUMAN;
                     c = new Control(this);
                 }
             }
@@ -122,9 +123,54 @@ namespace Machina
                 {
                     Console.WriteLine(str.ToString());
                 }
-                this.Brand = RobotType.Undefined;
+                this.Brand = RobotType.HUMAN;
                 c = new Control(this);
             }
+        }
+
+        internal Robot(string name, RobotType make)
+        {
+            this.Name = name;
+            this.Brand = make;
+            c = new Control(this);
+        }
+
+        static public Robot Create(string name, RobotType make)
+        {
+            return new Robot(name, make);
+        }
+
+        static public Robot Create(string name, string make)
+        {
+            RobotType rt;
+
+            //try
+            //{
+            rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
+            if (Enum.IsDefined(typeof(RobotType), rt))
+            {
+                return new Robot(name, rt);
+            }
+            else
+            {
+                Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
+                foreach (string str in Enum.GetNames(typeof(RobotType)))
+                {
+                    Console.WriteLine(str.ToString());
+                }
+                return null;
+            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex);
+            //    Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
+            //    foreach (string str in Enum.GetNames(typeof(RobotType)))
+            //    {
+            //        Console.WriteLine(str.ToString());
+            //    }
+            //}
+            return null;
         }
 
 
@@ -139,7 +185,7 @@ namespace Machina
             return brand == this.Brand;
         }
 
-        
+
         /// <summary>
         /// Sets the control mode the robot will operate under.
         /// </summary>
@@ -176,7 +222,7 @@ namespace Machina
             }
             return false;
         }
-        
+
         /// <summary>
         /// Sets the cycle the robot will run program in (Once or Loop).
         /// </summary>
@@ -184,7 +230,8 @@ namespace Machina
         /// <returns></returns>
         public bool CycleMode(CycleType cycleType)
         {
-            return c.SetRunMode(cycleType);
+            //return c.SetRunMode(cycleType);
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -193,20 +240,22 @@ namespace Machina
         /// <param name="cycleType"></param>
         public bool CycleMode(string cycleType)
         {
-            CycleType ct;
-            try
-            {
-                ct = (CycleType)Enum.Parse(typeof(CycleType), cycleType, true);
-                if (Enum.IsDefined(typeof(CycleType), ct))
-                    return c.SetRunMode(ct);
-            }
-            catch
-            {
-                Console.WriteLine($"{cycleType} is not a valid CycleMode type, please specify one of the following:");
-                foreach (string str in Enum.GetNames(typeof(CycleType)))
-                    Console.WriteLine(str);
-            }
-            return false;
+            //CycleType ct;
+            //try
+            //{
+            //    ct = (CycleType)Enum.Parse(typeof(CycleType), cycleType, true);
+            //    if (Enum.IsDefined(typeof(CycleType), ct))
+            //        return c.SetRunMode(ct);
+            //}
+            //catch
+            //{
+            //    Console.WriteLine($"{cycleType} is not a valid CycleMode type, please specify one of the following:");
+            //    foreach (string str in Enum.GetNames(typeof(CycleType)))
+            //        Console.WriteLine(str);
+            //}
+            //return false;
+
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -218,17 +267,17 @@ namespace Machina
         /// <returns></returns>
         public bool ConnectionManager(string connectionManager)
         {
-            ConnectionManagerType cm;
+            ConnectionType cm;
             try
             {
-                cm = (ConnectionManagerType)Enum.Parse(typeof(ConnectionManagerType), connectionManager, true);
-                if (Enum.IsDefined(typeof(ConnectionManagerType), cm))
+                cm = (ConnectionType)Enum.Parse(typeof(ConnectionType), connectionManager, true);
+                if (Enum.IsDefined(typeof(ConnectionType), cm))
                     return c.SetConnectionMode(cm);
             }
             catch
             {
                 Console.WriteLine($"{connectionManager} is not a valid ConnectionManagerType type, please specify one of the following:");
-                foreach (string str in Enum.GetNames(typeof(ConnectionManagerType)))
+                foreach (string str in Enum.GetNames(typeof(ConnectionType)))
                     Console.WriteLine(str);
             }
             return false;
@@ -241,7 +290,7 @@ namespace Machina
         /// </summary>
         /// <param name="connectionManager">"User" or "Machina"</param>
         /// <returns></returns>
-        public bool ConnectionManager(ConnectionManagerType connectionManager)
+        public bool ConnectionManager(ConnectionType connectionManager)
         {
             return c.SetConnectionMode(connectionManager);
         }
@@ -282,7 +331,8 @@ namespace Machina
         /// <returns></returns>
         public bool LoadProgram(string filepath)
         {
-            return c.LoadProgramToDevice(filepath, true);
+            //return c.LoadProgramToDevice(filepath, true);
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -292,7 +342,8 @@ namespace Machina
         /// <returns></returns>
         public bool LoadProgram(List<string> code)
         {
-            return c.LoadProgramToDevice(code);
+            //return c.LoadProgramToDevice(code);
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -301,7 +352,8 @@ namespace Machina
         /// </summary>
         public bool Start()
         {
-            return c.StartProgramOnDevice();
+            //return c.StartProgramOnDevice();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -309,7 +361,8 @@ namespace Machina
         /// </summary>
         public bool Stop()
         {
-            return c.StopProgramOnDevice(true);
+            //return c.StopProgramOnDevice(true);
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -377,7 +430,7 @@ namespace Machina
         {
             return c.SetIOName(ioName, pinNumber, isDigital);
         }
-        
+
 
 
 
@@ -397,7 +450,7 @@ namespace Machina
         {
             return c.GetCurrentSpeedSetting();
         }
-                                                            
+
         /// <summary>
         /// Increase the default velocity new actions will be run at.
         /// </summary>
@@ -506,7 +559,7 @@ namespace Machina
             catch
             {
                 Console.WriteLine($"{motionType} is not a valid target part for motion type changes, please specify one of the following: ");
-                foreach(string str in Enum.GetNames(typeof(MotionType)))
+                foreach (string str in Enum.GetNames(typeof(MotionType)))
                 {
                     Console.WriteLine(str);
                 }
@@ -719,7 +772,7 @@ namespace Machina
         {
             return MoveTo(new Vector(x, y, z));
         }
-        
+
         /// <summary>
         /// Issue a RELATIVE rotation action request according to the current reference system.
         /// </summary>
@@ -753,7 +806,7 @@ namespace Machina
         {
             return Rotate(new Rotation(rotVecX, rotVecY, rotVecZ, angDegs, true));
         }
-                
+
         /// <summary>
         /// Issue an ABSOLUTE reorientation request according to the current reference system.
         /// </summary>
@@ -771,7 +824,7 @@ namespace Machina
         /// <returns></returns>
         public bool RotateTo(Orientation cs)
         {
-            return RotateTo((Rotation) cs);
+            return RotateTo((Rotation)cs);
         }
 
         /// <summary>
@@ -782,7 +835,7 @@ namespace Machina
         /// <returns></returns>
         public bool RotateTo(Vector vecX, Vector vecY)
         {
-            return RotateTo((Rotation) new Orientation(vecX, vecY));
+            return RotateTo((Rotation)new Orientation(vecX, vecY));
         }
 
         /// <summary>
@@ -797,7 +850,7 @@ namespace Machina
         /// <returns></returns>
         public bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)
         {
-            return RotateTo((Rotation) new Orientation(x0, x1, x2, y0, y1, y2));
+            return RotateTo((Rotation)new Orientation(x0, x1, x2, y0, y1, y2));
         }
 
         /// <summary>
@@ -1140,7 +1193,7 @@ namespace Machina
         /// <returns></returns>
         public Orientation GetOrientation()
         {
-            return (Orientation) c.GetCurrentOrientation();
+            return (Orientation)c.GetCurrentOrientation();
         }
 
         /// <summary>
@@ -1162,7 +1215,7 @@ namespace Machina
         }
 
 
-        
+
 
 
 

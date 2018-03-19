@@ -14,18 +14,19 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
+            Robot arm = Robot.Create("Test", "HUMAN");
 
-            Robot arm = new Robot("3dprinter", "ZMorph");
+            //Robot arm = new Robot("3dprinter", "ZMorph");
             //ZMorphSimpleMovementTest(arm);
-            ZMorphSimple3DPrintTest(arm);
+            //ZMorphSimple3DPrintTest(arm);
 
 
 
             //Robot arm = new Robot("foo", "ZMorph");
             //arm.Mode("offline");
 
-            //// An generic test program
-            //GeneralTest(arm, 50);
+            // An generic test program
+            GeneralTest(arm, 50);
 
             //// Trace a planar square in space
             //TracePlanarRectangle(arm);

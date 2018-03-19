@@ -68,7 +68,7 @@ namespace Machina
         /// <param name="vec"></param>
         public static implicit operator Point(Vector vec)
         {
-            return new Machina.Point(vec.X, vec.Y, vec.Z);
+            return vec == null ? null : new Machina.Point(vec.X, vec.Y, vec.Z);
         }
 
         /// <summary>

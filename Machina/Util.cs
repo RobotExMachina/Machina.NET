@@ -30,5 +30,7 @@ namespace Machina
             return newMin + (val - min) * (newMax - newMin) / (max - min);
         }
     }
+
+
     
 }
