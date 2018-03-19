@@ -79,7 +79,10 @@
     <Compile Include="Compilers\CompilerUR.cs" />
     <Compile Include="Compilers\CompilerABB.cs" />
     <Compile Include="Compilers\CompilerHuman.cs" />
+    <Compile Include="Controllers\ControlFactory.cs" />
     <Compile Include="Controllers\ControlManager.cs" />
+    <Compile Include="Controllers\OfflineControlManager.cs" />
+    <Compile Include="Controllers\StreamControlManager.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="Drivers\Communication\RobotStudioManager.cs" />
     <Compile Include="Drivers\Communication\ThreadedTCPClient.cs" />
