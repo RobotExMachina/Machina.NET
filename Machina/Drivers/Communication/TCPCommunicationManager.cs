@@ -44,6 +44,8 @@ namespace Machina.Drivers.Communication
         private int _maxStreamCount = 10;
         private int _sendNewBatchOn = 2;
 
+        private bool _bufferEmptyEventIsRaiseable = true;
+
 
         internal TCPCommunicationManager(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string ip, int port)
         {
@@ -100,7 +102,7 @@ namespace Machina.Drivers.Communication
 
             return false;
         }
-        
+
 
         private void SendingMethod(object obj)
         {
@@ -121,6 +123,8 @@ namespace Machina.Drivers.Communication
                         }
                     }
                 }
+
+                RaiseBufferEmptyEventCheck();
 
                 Thread.Sleep(30);
             }
@@ -148,7 +152,7 @@ namespace Machina.Drivers.Communication
                 Thread.Sleep(30);
             }
         }
-       
+
         private bool ShouldSend()
         {
             if (_isDeviceBufferFull)
@@ -176,6 +180,22 @@ namespace Machina.Drivers.Communication
                 }
             }
         }
+
+        private void RaiseBufferEmptyEventCheck()
+        {
+            if (this._writeCursor.AreActionsPending())
+            {
+                _bufferEmptyEventIsRaiseable = true;
+            }
+            else if (_bufferEmptyEventIsRaiseable)
+            {
+                Console.WriteLine("Raising OnBufferEmpty event");
+                this._parentDriver.parentControl.parentRobot.OnBufferEmpty(EventArgs.Empty);
+                _bufferEmptyEventIsRaiseable = false;
+            }
+        }
+
+
 
         /// <summary>
         /// Parse the response and decide what to do with it.

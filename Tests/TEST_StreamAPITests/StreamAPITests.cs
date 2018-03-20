@@ -16,9 +16,18 @@ namespace TEST_StreamAPITests
         //static int it = 0;
         //static int maxTargets = 36;
 
+        static public void LogEvent(object sender, EventArgs args)
+        {
+            Console.WriteLine("EVENT RAISED");
+            Console.WriteLine(sender);
+            Console.WriteLine(args);
+        }
+
         static void Main(string[] args)
         {
             Robot arm = Robot.Create("StreamTests", "ABB");
+
+            arm.BufferEmpty += LogEvent;
 
             arm.ConnectionManager("machina");
             arm.ControlMode("stream");
@@ -30,7 +39,6 @@ namespace TEST_StreamAPITests
             arm.Message("Hello Robot!");
 
             //arm.Start();
-            // arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
@@ -62,6 +70,7 @@ namespace TEST_StreamAPITests
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
         }
+
 
         static public void VerticalSquare(Robot bot)
         {
