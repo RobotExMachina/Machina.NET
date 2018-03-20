@@ -100,7 +100,7 @@ namespace Machina.Drivers.Communication
                 throw new Exception("ERROR: could not establish TCP connection");
             }
 
-            return false;
+            //return false;
         }
 
 
@@ -119,7 +119,7 @@ namespace Machina.Drivers.Communication
                             _sendMsgBytes = Encoding.ASCII.GetBytes(msg);
                             clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
                             _sentMessages++;
-                            Console.WriteLine("Sending mgs: " + msg);
+                            //Console.WriteLine("Sending mgs: " + msg);
                         }
                     }
                 }
@@ -143,7 +143,7 @@ namespace Machina.Drivers.Communication
                     var msgs = _response.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var msg in msgs)
                     {
-                        Console.WriteLine($"  RES: Server response was {msg};");
+                        //Console.WriteLine($"  RES: Server response was {msg};");
                         ParseResponse(msg);
                         _receivedMessages++;
                     }
@@ -189,7 +189,7 @@ namespace Machina.Drivers.Communication
             }
             else if (_bufferEmptyEventIsRaiseable)
             {
-                Console.WriteLine("Raising OnBufferEmpty event");
+                //Console.WriteLine("Raising OnBufferEmpty event");
                 this._parentDriver.parentControl.parentRobot.OnBufferEmpty(EventArgs.Empty);
                 _bufferEmptyEventIsRaiseable = false;
             }
@@ -213,6 +213,7 @@ namespace Machina.Drivers.Communication
                 int id = Convert.ToInt32(idStr);
                 this._motionCursor.ApplyActionsUntilId(id);
                 //Console.WriteLine(_motionCursor);
+                this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
             }
         }
 

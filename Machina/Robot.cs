@@ -64,11 +64,19 @@ namespace Machina
 
         internal virtual void OnBufferEmpty(EventArgs e)
         {
-            Console.WriteLine("Event raised, about to call handlers");
-            if (BufferEmpty != null)
-                BufferEmpty(this, e);
+            //Console.WriteLine("Event raised, about to call handlers");
+
+            //if (BufferEmpty != null)
+            //    BufferEmpty(this, e);
+            BufferEmpty?.Invoke(this, e);  // same as above
         }
 
+        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
+        public event MotionCursorUpdatedHandler MotionCursorUpdated;
+        internal virtual void OnMotionCursorUpdated(EventArgs e)
+        {
+            MotionCursorUpdated?.Invoke(this, e);
+        }
 
 
 
