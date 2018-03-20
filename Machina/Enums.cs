@@ -134,4 +134,14 @@ namespace Machina
         Validated,
         InSession
     }
+
+    /// <summary>
+    /// Defines what state is being represented by a cursor.
+    /// </summary>
+    public enum CursorType
+    {
+        Virtual, 
+        Write, 
+        Motion
+    }
 }

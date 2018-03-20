@@ -819,25 +819,23 @@ namespace Machina
             if (this.position == null || this.rotation == null)
             {
                 Console.WriteLine("Sorry, must provide absolute transform values before attaching a tool... " + this);
-                return false;
             }
+            else
+            {
+                // Now transform the cursor position to the tool's transformation params:
+                Vector worldVector = Vector.Rotation(action.tool.TCPPosition, this.rotation);
+                Vector newPos = this.position + worldVector;
+                Rotation newRot = Rotation.Combine(this.rotation, action.tool.TCPOrientation);  // postmultiplication
 
-            // Now transform the cursor position to the tool's transformation params:
-            // This is Translate + Rotate (the way Tool position + orientation is currently defined...)
-            //if (action.translationFirst)  // as of #1213, this is always true
-            //{
-            Vector worldVector = Vector.Rotation(action.tool.TCPPosition, this.rotation);
-            Vector newPos = this.position + worldVector;
-            Rotation newRot = Rotation.Combine(this.rotation, action.tool.TCPOrientation);  // postmultiplication
-            //}
-
-            this.prevPosition = this.position;
-            this.position = newPos;
-            this.prevRotation = this.rotation;
-            this.rotation = newRot;
-            this.prevJoints = this.joints;
-            this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
-
+                this.prevPosition = this.position;
+                this.position = newPos;
+                this.prevRotation = this.rotation;
+                this.rotation = newRot;
+                this.prevJoints = this.joints;
+                
+                // this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data --> no need to do this, joints remain the same anyway?
+            }
+            
             return true;
         }
 

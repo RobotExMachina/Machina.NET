@@ -173,6 +173,10 @@ namespace Machina
             // PROGRAM ASSEMBLY
             // Initialize a module list
             List<string> module = new List<string>();
+            
+            // Banner
+            module.AddRange(GenerateDisclaimerHeader(programName));
+            module.Add("");
 
             // MODULE HEADER
             module.Add("MODULE " + programName);

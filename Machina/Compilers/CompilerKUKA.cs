@@ -103,6 +103,10 @@ namespace Machina
             // Initialize a module list
             List<string> module = new List<string>();
 
+            // Banner
+            module.AddRange(GenerateDisclaimerHeader(programName));
+            module.Add("");
+
             // SOME INTERFACE INITIALIZATION
             // These are all for interface handling, ignored by the compiler (?)
             module.Add(@"&ACCESS RVP");  // read-write permissions

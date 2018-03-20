@@ -56,9 +56,11 @@ namespace Machina
             // Initialize a module list
             List<string> module = new List<string>();
 
-            // Code lines
-            module.Add("// Machina code for '" + programName + "'");
+            // Banner
+            module.AddRange(GenerateDisclaimerHeader(programName));
             module.Add("");
+
+            // Code lines
             module.AddRange(actionLines);
 
             return module;

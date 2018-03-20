@@ -14,7 +14,9 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = Robot.Create("Test", "HUMAN");
+            Robot arm = Robot.Create("Offline_Tests", "ABB");
+
+            VerticalSquare(arm);
 
             //Robot arm = new Robot("3dprinter", "ZMorph");
             //ZMorphSimpleMovementTest(arm);
@@ -25,8 +27,8 @@ namespace TEST_OfflineAPITests
             //Robot arm = new Robot("foo", "ZMorph");
             //arm.Mode("offline");
 
-            // An generic test program
-            GeneralTest(arm, 50);
+            //// An generic test program
+            //GeneralTest(arm, 50);
 
             //// Trace a planar square in space
             //TracePlanarRectangle(arm);
@@ -91,6 +93,54 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static public void VerticalSquare(Robot bot)
+        {
+            // Message
+            bot.Message("Starting vertical square");
+            
+            // A 100 mm long tool with no TCP rotation
+            Tool rod = new Tool("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
+            bot.Attach(rod);
+
+            // Home
+            bot.SpeedTo(500);
+            bot.PrecisionTo(10);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+            
+            // Joint move and rotate to starting point
+            bot.PushSettings();
+            bot.MotionMode(MotionType.Joint);
+            bot.SpeedTo(300);
+            bot.PrecisionTo(5);
+            bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
+            bot.Rotate(0, 1, 0, -90);
+            bot.PopSettings();
+            bot.Wait(500);
+
+            // Turn on "DO_15"
+            bot.SetIOName("DO_15", 1, true);
+            bot.WriteDigital(1, true);
+
+            // Slow MoveL a square with precision
+            bot.SpeedTo(100);
+            bot.PrecisionTo(1);
+            bot.Move(0, 50, 0);
+            bot.Move(0, 0, 50);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, -50);
+            bot.Wait(500);
+
+            // Turn off "DO_15"
+            bot.WriteDigital(1, false);
+
+            // No tool and back home
+            bot.Detach();
+            bot.SpeedTo(500);
+            bot.PrecisionTo(5);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+
         }
 
 

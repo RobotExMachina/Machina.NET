@@ -20,12 +20,12 @@ namespace TEST_StreamAPITests
         {
 
             Robot arm = Robot.Create("StreamTests", "ABB");
+
             arm.ControlMode(ControlType.Stream);
             arm.Connect("127.0.0.1", 7000);
 
             arm.Message("Hello Robot!");
-
-
+            
             //arm.Start();
 
             // arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
@@ -35,20 +35,15 @@ namespace TEST_StreamAPITests
             Console.ReadKey();
             VerticalSquare(arm);
 
-            ////Console.WriteLine(" ");
-            ////Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
-            ////Console.ReadKey();
-            ////VerticalSqaure(arm);
-
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to START THE SPIRAL...");
             Console.ReadKey();
-            Spiral(arm, 10);
+            Spiral(arm, 5);
 
             int frame = 0;
             while(frame < 20 * 1000/30.0)
             {
-                Console.WriteLine(frame++ + " " + arm.GetCurrentPosition());
+                Console.WriteLine("Frame: " + (frame++) + " " + arm.GetCurrentPosition());
                 Thread.Sleep(30);
             }
 
@@ -71,9 +66,9 @@ namespace TEST_StreamAPITests
             // Message
             bot.Message("Starting vertical square");
 
-            //// A 100 mm long tool with no TCP rotation
-            //Tool rod = new Tool("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
-            //bot.Attach(rod);
+            // A 100 mm long tool with no TCP rotation
+            Tool rod = new Tool("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
+            bot.Attach(rod);
 
             // Home
             bot.SpeedTo(500);
@@ -91,8 +86,8 @@ namespace TEST_StreamAPITests
             bot.Wait(500);
 
             // Turn on "DO_15"
-            //bot.SetIOName("DO_15", 1, true);
-            //bot.WriteDigital(1, true);
+            bot.SetIOName("DO_16", 1, true);
+            bot.WriteDigital(1, true);
 
             // Slow MoveL a square with precision
             bot.SpeedTo(100);
@@ -104,7 +99,7 @@ namespace TEST_StreamAPITests
             bot.Wait(500);
 
             // Turn off "DO_15"
-            //bot.WriteDigital(1, false);
+            bot.WriteDigital(1, false);
 
             // No tool and back home
             bot.Detach();
@@ -122,7 +117,7 @@ namespace TEST_StreamAPITests
             dy = 50,
             dz = 1;
 
-        static int segments = 36;
+        static int segments = 72;
         static double angle = 0;
         static double da = 2 * Math.PI / segments;
 
