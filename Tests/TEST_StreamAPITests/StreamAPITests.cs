@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Machina;
+using System.Threading;
 
 namespace TEST_StreamAPITests
 {
@@ -43,6 +44,13 @@ namespace TEST_StreamAPITests
             Console.WriteLine("Press any key to START THE SPIRAL...");
             Console.ReadKey();
             Spiral(arm, 10);
+
+            int frame = 0;
+            while(frame < 20 * 1000/30.0)
+            {
+                Console.WriteLine(frame++ + " " + arm.GetCurrentPosition());
+                Thread.Sleep(30);
+            }
 
             ////arm.DebugRobotCursors();
             ////arm.DebugBuffer();

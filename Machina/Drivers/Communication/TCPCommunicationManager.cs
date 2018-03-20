@@ -189,11 +189,12 @@ namespace Machina.Drivers.Communication
             // @TODO: this is hardcoded for ABB, do this programmatically...
             if (res[0] == '@')
             {
+                // @TODO: dd some sanity here for incorrectly formatted messages
                 _responseChunks = res.Split(' ');
                 string idStr = _responseChunks[0].Substring(1);
                 int id = Convert.ToInt32(idStr);
                 this._motionCursor.ApplyActionsUntilId(id);
-                Console.WriteLine(_motionCursor);
+                //Console.WriteLine(_motionCursor);
             }
         }
 
