@@ -125,7 +125,7 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Modules\MachinaServerABB.txt" />
+    <EmbeddedResource Include="Resources\Modules\Machina_ABB_Server_SingleTask.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -165,11 +165,28 @@ namespace Machina
         public bool SetControlMode(ControlType mode)
         {
             _controlMode = mode;
+            //_controlManager = ControlFactory.GetControlManager(this);
+
+            //bool success = _controlManager.Initialize();
+
+            //if (mode == ControlType.Offline)
+            //{
+            //    InitializeRobotCursors();
+            //}
+
+            //if (!success)
+            //    throw new Exception("Couldn't SetControlMode()");
+
+            return ResetControl();
+        }
+
+        private bool ResetControl()
+        {
             _controlManager = ControlFactory.GetControlManager(this);
 
             bool success = _controlManager.Initialize();
 
-            if (mode == ControlType.Offline)
+            if (ControlMode == ControlType.Offline)
             {
                 InitializeRobotCursors();
             }
@@ -203,14 +220,14 @@ namespace Machina
         //}
 
 
-        /// <summary>
-        /// Returns current Control Mode.
-        /// </summary>
-        /// <returns></returns>
-        public ControlType GetControlMode()
-        {
-            return _controlMode;
-        }
+        ///// <summary>
+        ///// Returns current Control Mode.
+        ///// </summary>
+        ///// <returns></returns>
+        //public ControlType GetControlMode()
+        //{
+        //    return _controlMode;
+        //}
 
         ///// <summary>
         ///// Sets current RunMode. 
@@ -250,11 +267,21 @@ namespace Machina
         /// <returns></returns>
         public bool SetConnectionMode(ConnectionType mode)
         {
+            if (_driver == null)
+            {
+                throw new Exception("Missing Driver object");
+            }
+
+            if (!_driver.AvailableConnectionTypes[mode])
+            {
+                Console.WriteLine($"WARNING: this device's driver does not accept ConnectionType {mode}");
+                Console.WriteLine($"ConnectionMode remains {this.connectionMode}");
+                return false;
+            }
+
             this.connectionMode = mode;
 
-            // What to do here?
-
-            return true;
+            return ResetControl();
         }
 
 
@@ -270,7 +297,6 @@ namespace Machina
             {
                 throw new Exception("Cannot search for robots automatically, please use ConnectToDevice(ip, port) instead");
             }
-
 
             // Sanity
             if (!_driver.ConnectToDevice(robotId))
@@ -938,7 +964,7 @@ namespace Machina
             Rotation currRot = _driver.GetCurrentOrientation();
             Joints currJnts = _driver.GetCurrentJoints();
 
-            return InitializeRobotCursors(currPos ?? null, currRot ?? null, currJnts ?? null);
+            return InitializeRobotCursors(currPos, currRot, currJnts);
         }
 
 

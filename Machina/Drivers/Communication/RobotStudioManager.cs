@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Reflection;
 
 using ABB.Robotics;
 using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
-using ABB.Robotics.Controllers.RapidDomain;  // This is for the Task Class
+using ABB.Robotics.Controllers.RapidDomain;
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
 
@@ -29,14 +30,30 @@ namespace Machina.Drivers.Communication
         private ABB.Robotics.Controllers.RapidDomain.Task tRob1Task;
         private RobotWare robotWare;
         private RobotWareOptionCollection robotWareOptions;
-        private int _deviceId; 
-        private bool hasMultiTasking = false;
-        private bool hasEGM = false;
-        private bool isLogged = false;
-        private bool isConnected = false;
-        private bool isRunning = false;
+        private int _deviceId;
+        private bool _hasMultiTasking = false;
+        private bool _hasEGM = false;
+        private bool _isLogged = false;
+        private bool _isRunning = false;
+        private bool _isConnected = false;
+        public bool Connected => _isConnected;
 
+        private string _ip = "";
+        public string IP => _ip;
+
+        private int _writePort;
+        public int WritePort => _writePort;
+        private int _readPort;
+        public int ReadPort => _readPort;
+        
+        private string _streamingModule;
+            
         private const string REMOTE_BUFFER_DIR = "Machina";
+
+
+
+
+
 
         public RobotStudioManager(Driver parent)
         {
@@ -47,20 +64,29 @@ namespace Machina.Drivers.Communication
         /// <summary>
         /// Reverts the Comm object to a blank state before any connection attempt. 
         /// </summary>
-        public void Disconnect()
+        public bool Disconnect()
         {
             StopProgramExecution(true);
             ReleaseIP();
             LogOff();
             ReleaseMainTask();
             ReleaseController();
-            isConnected = false;
+            _isConnected = false;
+            return !_isConnected;
         }
 
-
+        /// <summary>
+        /// Performs all necessary steps to successfuly connect to the device using the RobotStudio API.
+        /// </summary>
+        /// <param name="deviceId"></param>
+        /// <returns></returns>
         public bool Connect(int deviceId)
         {
             _deviceId = deviceId;
+
+            // In general, the Disconnect() + return false pattern instead of throwing errors
+            // avoids the controller getting hung with an undisposed mastership or log from the client,
+            // making failures a little more robust (and less annoying...)
 
             // Connect to the ABB real/virtual controller
             if (!LoadController(deviceId))
@@ -119,7 +145,9 @@ namespace Machina.Drivers.Communication
 
             if (!SetRunMode(CycleType.Once))
             {
-
+                Console.WriteLine("Could not set runmode to once");
+                Disconnect();
+                return false;
             }
 
             // Subscribe to relevant events to keep track of robot execution
@@ -130,7 +158,9 @@ namespace Machina.Drivers.Communication
                 return false;
             }
 
-            return true;
+            _isConnected = true;
+
+            return _isConnected;
         }
 
         /// <summary>
@@ -161,8 +191,8 @@ namespace Machina.Drivers.Communication
                     this.robotWare = this.controller.RobotWare;
                     this.robotWareOptions = this.robotWare.Options;
 
-                    this.hasMultiTasking = HasMultiTaskOption(this.robotWareOptions);
-                    this.hasEGM = HasEGMOption(this.robotWareOptions);
+                    this._hasMultiTasking = HasMultiTaskOption(this.robotWareOptions);
+                    this._hasEGM = HasEGMOption(this.robotWareOptions);
                 }
                 else
                 {
@@ -174,7 +204,11 @@ namespace Machina.Drivers.Communication
                 Console.WriteLine("No controllers found on the network");
             }
 
-
+            if (!success)
+            {
+                Disconnect();
+                throw new Exception("ERROR: could not LoadController()");
+            }
 
             return success;
         }
@@ -203,8 +237,8 @@ namespace Machina.Drivers.Communication
         {
             if (controller != null && controller.IPAddress != null)
             {
-                this._driver.IP = controller.IPAddress.ToString();
-                Console.WriteLine($"Loaded IP {this._driver.IP}");
+                this._ip = controller.IPAddress.ToString();
+                Console.WriteLine($"Loaded IP {this._ip}");
                 return true;
             }
             return false;
@@ -216,7 +250,7 @@ namespace Machina.Drivers.Communication
         /// <returns></returns>
         private bool ReleaseIP()
         {
-            this._driver.IP = "";
+            this._ip = "";
             return true;
         }
 
@@ -228,7 +262,7 @@ namespace Machina.Drivers.Communication
         private bool LogOn()
         {
             // Sanity
-            if (isLogged) LogOff();
+            if (_isLogged) LogOff();
 
             if (controller != null)
             {
@@ -236,17 +270,17 @@ namespace Machina.Drivers.Communication
                 {
                     controller.Logon(UserInfo.DefaultUser);
                     Console.WriteLine("Logged on as DefaultUser");
-                    isLogged = true;
+                    _isLogged = true;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Could not log on to the controller");
                     Console.WriteLine(ex);
-                    isLogged = false;
+                    _isLogged = false;
                 }
             }
 
-            return isLogged;
+            return _isLogged;
         }
 
         /// <summary>
@@ -259,7 +293,7 @@ namespace Machina.Drivers.Communication
             {
                 controller.Logoff();
             }
-            isLogged = false;
+            _isLogged = false;
             return true;
         }
 
@@ -427,15 +461,12 @@ namespace Machina.Drivers.Communication
                 return -1;
             }
 
-            int count = -1;
-
-            ABB.Robotics.Controllers.RapidDomain.Module[] modules = tRob1Task.GetModules();
-            count = 0;
-
+            int count = 0;
             try
             {
                 using (Mastership.Request(controller.Rapid))
                 {
+                    ABB.Robotics.Controllers.RapidDomain.Module[] modules = tRob1Task.GetModules();
                     foreach (ABB.Robotics.Controllers.RapidDomain.Module m in modules)
                     {
                         Console.WriteLine("Deleting module: {0}", m.Name);
@@ -525,13 +556,13 @@ namespace Machina.Drivers.Communication
         /// </summary>
         public bool StartProgramExecution()
         {
-            if (!isConnected)
+            if (!_isConnected)
             {
                 Console.WriteLine("Cannot start program: not connected to controller");
                 return false;
             }
 
-            if (isRunning)
+            if (_isRunning)
             {
                 Console.WriteLine("Program is already running...");
                 return false;
@@ -549,7 +580,7 @@ namespace Machina.Drivers.Communication
                 {
                     bool isControllerRunning = controller.Rapid.ExecutionStatus == ExecutionStatus.Running;
 
-                    if (isControllerRunning != isRunning)
+                    if (isControllerRunning != _isRunning)
                     {
                         throw new Exception("isRunning mismatch state");
                     }
@@ -561,7 +592,7 @@ namespace Machina.Drivers.Communication
                     }
                     else
                     {
-                        isRunning = true;
+                        _isRunning = true;
                         return true;
                     }
                 }
@@ -584,13 +615,13 @@ namespace Machina.Drivers.Communication
         {
             if (controller == null) return true;
 
-            if (!isConnected)
+            if (!_isConnected)
             {
                 Console.WriteLine("Cannot stop program: not connected to controller");
                 return false;
             }
 
-            if (!isRunning)
+            if (!_isRunning)
             {
                 Console.WriteLine("Cannot stop program: execution is already stopped");
                 return false;
@@ -601,7 +632,7 @@ namespace Machina.Drivers.Communication
                 using (Mastership.Request(controller.Rapid))
                 {
                     controller.Rapid.Stop(immediate ? StopMode.Immediate : StopMode.Cycle);
-                    isRunning = false;
+                    _isRunning = false;
                     return true;
                 }
             }
@@ -621,7 +652,7 @@ namespace Machina.Drivers.Communication
         /// <returns></returns>
         public bool SetRunMode(CycleType mode)
         {
-            if (!isConnected)
+            if (controller == null)
             {
                 Console.WriteLine("Cannot set RunMode, not connected to any controller");
                 return false;
@@ -644,82 +675,149 @@ namespace Machina.Drivers.Communication
             return false;
         }
 
+
+
+        public bool SetupStreamingMode()
+        {
+            if (!SetupStreamingModules())
+            {
+                Console.WriteLine("Could not setup streaming modules");
+                return false;
+            }
+
+            if (!UploadStreamingModules())
+            {
+                Console.WriteLine("Could not upload streaming modules");
+                return false;
+            }
+
+            if (!ResetProgramPointer())
+            {
+                Console.WriteLine("Could not reset the program pointer");
+                return false;
+            }
+
+            if (!StartProgramExecution())
+            {
+                Console.WriteLine("Could not load start the streaming module");
+                return false;
+            }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// Read
+        /// </summary>
+        /// <returns></returns>
+        private bool SetupStreamingModules()
+        {
+            //if (hasMultiTasking)
+            //{
+            //    // TODO: depending on availability of multitasking, upload different modules... 
+            //}
+
+
+            // Read the resource as a string
+            _streamingModule = Machina.IO.ReadTextResource("Machina.Resources.Modules.Machina_ABB_Server_SingleTask.txt");
+
+            // Get the port number/s from the file's "CONST num SERVER_PORT := 7000;"
+            // @TODO: this is super flimsy, use regex here...
+            int portPos = _streamingModule.IndexOf("SERVER_PORT") + 15;
+            string portStr = _streamingModule.Substring(portPos, 4);
+            _writePort = Convert.ToInt32(portStr);
+
+            Console.WriteLine($"_writePort set to {_writePort}");
+
+            // Replace the IP in the module with the one found by this manager: "CONST string SERVER_IP := "127.0.0.1";"
+            _streamingModule = _streamingModule.Replace("127.0.0.1", IP);
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// Loads the default StreamModule designed for streaming.
+        /// </summary>
+        internal bool UploadStreamingModules()
+        {
+            //if (hasMultiTasking)
+            //{
+            //    // TODO: depending on availability of multitasking, upload different modules... 
+            //}
+
+            return LoadModuleToController(_streamingModule, "Machina_ABB_Server_SingleTask.mod");
+        }
+
+
+
         /// <summary>
         /// Loads a module to the device from a text resource in the assembly, with a target name on the controller.
         /// </summary>
         /// <param name="resourceName"></param>
         /// <param name="targetName"></param>
         /// <returns></returns>
-        public bool LoadModuleToController(string resourceName, string targetName)
+        public bool LoadModuleToController(string module, string targetName)
         {
-            if (!isConnected)
+            if (!_isConnected)
             {
-                Console.WriteLine("Cannot load program, not connected to controller");
-                return false;
+                throw new Exception("Cannot load program, not connected to controller");
             }
 
             string path = Path.Combine(Path.GetTempPath(), targetName);
-            if (!Machina.IO.SaveTextResourceToFile(resourceName, path, Encoding.ASCII))
+            if (!Machina.IO.SaveStringToFile(path, module, Encoding.ASCII))
             {
-                Console.WriteLine("Could not save module to temp file");
-                return false;
+                throw new Exception("Could not save module to temp file");
             }
             else
             {
                 Console.WriteLine("Saved module to " + path);
             }
 
-            //if (!LoadFileToController(localBufferDirname, localBufferFilename, localBufferFileExtension))
-            //{
-            //    Console.WriteLine("Could not load module to controller");
-            //    return false;
-            //}
-
             if (!LoadFileToDevice(path))
             {
-                Console.WriteLine("Could not load module to controller");
-                return false;
-            }
-
-            return true;
-
-        }
-
-        /// <summary>
-        /// Loads a module to the ABB controller given as a string list of Rapid code lines.
-        /// </summary>
-        /// <param name="module"></param>
-        /// <param name="programName"></param>
-        /// <returns></returns>
-        public bool LoadProgramToController(List<string> module, string programName)
-        {
-            if (!isConnected)
-            {
-                Console.WriteLine("Cannot load program, not connected to controller");
-                return false;
-            }
-
-            string path = Path.Combine(Path.GetTempPath(), $"Machina_{programName}.mod");
-
-            // Modules can only be uploaded to ABB controllers using a file
-            if (!Machina.IO.SaveStringListToFile(module, path, Encoding.ASCII))  // 
-            {
-                Console.WriteLine("Could not save module to temp file");
-                return false;
-            }
-            else
-            {
-                Console.WriteLine($"Saved {programName} to {path}");
-            }
-
-            if (!LoadFileToDevice(path))
-            {
-                Console.WriteLine("Could not load module to controller");
-                return false;
+                throw new Exception("Could not load module to controller");
             }
 
             return true;
         }
+
+        ///// <summary>
+        ///// Loads a module to the ABB controller given as a string list of Rapid code lines.
+        ///// </summary>
+        ///// <param name="module"></param>
+        ///// <param name="programName"></param>
+        ///// <returns></returns>
+        //public bool LoadProgramToController(List<string> module, string programName)
+        //{
+        //    if (!isConnected)
+        //    {
+        //        Console.WriteLine("Cannot load program, not connected to controller");
+        //        return false;
+        //    }
+
+        //    string path = Path.Combine(Path.GetTempPath(), $"Machina_{programName}.mod");
+
+        //    // Modules can only be uploaded to ABB controllers using a file
+        //    if (!Machina.IO.SaveStringListToFile(path, module, Encoding.ASCII))  // 
+        //    {
+        //        Console.WriteLine("Could not save module to temp file");
+        //        return false;
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine($"Saved {programName} to {path}");
+        //    }
+
+        //    if (!LoadFileToDevice(path))
+        //    {
+        //        Console.WriteLine("Could not load module to controller");
+        //        return false;
+        //    }
+
+        //    return true;
+        //}
 
         /// <summary>
         /// Loads a module into de controller from a local file. 
@@ -730,28 +828,24 @@ namespace Machina.Drivers.Communication
         /// <returns></returns>
         public bool LoadFileToDevice(string fullPath, bool wipeout = true)
         {
-
             string extension = Path.GetExtension(fullPath),     // ".mod"
                 filename = Path.GetFileName(fullPath);          // "Machina_Server.mod"
 
-            if (!isConnected)
+            if (!_isConnected)
             {
-                Console.WriteLine("Could not load module '{0}', not connected to controller", fullPath);
-                return false;
+                throw new Exception($"Could not load module '{fullPath}', not connected to controller");
             }
 
             // check for correct ABB file extension
             if (!extension.ToLower().Equals(".mod"))
             {
-                Console.WriteLine("Wrong file type, must use .mod files for ABB robots");
-                return false;
+                throw new Exception("Wrong file type, must use .mod files for ABB robots");
             }
 
             // For the time being, we will always wipe out previous modules on load
             if (ClearAllModules() < 0)
             {
-                Console.WriteLine("Error clearing modules");
-                return false;
+                throw new Exception("Error clearing modules");
             }
 
             // Load the module
@@ -786,8 +880,9 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR: Could not load module");
+                //Console.WriteLine("ERROR: Could not load module");
                 Console.WriteLine(ex);
+                throw new Exception("ERROR: Could not load module");
             }
 
             // True if loading succeeds without any errors, otherwise false.  
@@ -818,14 +913,14 @@ namespace Machina.Drivers.Communication
             return success;
         }
 
-        
+
         /// <summary>
         /// Returns a Vector object representing the current robot's TCP position.
         /// </summary>
         /// <returns></returns>
         public Vector GetCurrentPosition()
         {
-            if (!isConnected)
+            if (!_isConnected)
             {
                 Console.WriteLine("Cannot GetCurrentPosition: not connected to controller");
                 return null;
@@ -842,7 +937,7 @@ namespace Machina.Drivers.Communication
         /// <returns></returns>
         public Rotation GetCurrentOrientation()
         {
-            if (!isConnected)
+            if (!_isConnected)
             {
                 Console.WriteLine("Cannot GetCurrentRotation, not connected to controller");
                 return null;
@@ -861,7 +956,7 @@ namespace Machina.Drivers.Communication
         /// <returns></returns>
         public Joints GetCurrentJoints()
         {
-            if (!isConnected)
+            if (!_isConnected)
             {
                 Console.WriteLine("Cannot GetCurrentJoints, not connected to controller");
                 return null;
@@ -885,7 +980,7 @@ namespace Machina.Drivers.Communication
         /// </summary>
         public void DebugDump()
         {
-            if (isConnected)
+            if (_isConnected)
             {
                 Console.WriteLine("");
                 Console.WriteLine("DEBUG CONTROLLER DUMP:");
@@ -947,20 +1042,13 @@ namespace Machina.Drivers.Communication
                 Console.WriteLine("    Type: " + tRob1Task.Type);
                 Console.WriteLine("");
 
-                Console.WriteLine("HAS MULTITASKING: " + this.hasMultiTasking);
-                Console.WriteLine("HAS EGM: " + this.hasEGM);
-                
+                Console.WriteLine("HAS MULTITASKING: " + this._hasMultiTasking);
+                Console.WriteLine("HAS EGM: " + this._hasEGM);
+
             }
         }
 
-        /// <summary>
-        /// Loads the default StreamModule designed for streaming.
-        /// </summary>
-        internal bool LoadStreamingModule()
-        {
-            // TODO: depending on avilability of multitasking, upload different modules... 
-            return LoadModuleToController("Machina.Resources.Modules.MachinaServerABB.txt", "Machina_Server.mod");
-        }
+
 
 
 
@@ -984,11 +1072,11 @@ namespace Machina.Drivers.Communication
 
             if (e.Status == ExecutionStatus.Running)
             {
-                isRunning = true;
+                _isRunning = true;
             }
             else
             {
-                isRunning = false;
+                _isRunning = false;
 
                 //// Only trigger Instruct queue
                 //if (masterControl.GetControlMode() == ControlType.Execute)
@@ -1034,7 +1122,7 @@ namespace Machina.Drivers.Communication
         {
             Console.WriteLine("OPERATING MODE CHANGED: {0}", e.NewMode);
         }
-        
+
 
         private void OnStateChanged(object sender, StateChangedEventArgs e)
         {

@@ -11,12 +11,47 @@ namespace Machina
     static class IO
     {
         /// <summary>
+        /// Reads a text resource file and returns it as a string.
+        /// https://stackoverflow.com/a/3314213/1934487
+        /// </summary>
+        /// <param name="resourceName"></param>
+        /// <returns></returns>
+        internal static string ReadTextResource(string resourceName)
+        {
+            string resource;
+            var assembly = Assembly.GetExecutingAssembly();
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                resource = reader.ReadToEnd();
+            }
+
+            return resource;
+        }
+
+        internal static bool SaveStringToFile(string filepath, string text, Encoding encoding)
+        {
+            try
+            {
+                System.IO.File.WriteAllText(filepath, text, encoding);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Could not save string to file...");
+                Console.WriteLine(ex);
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Saves a string List to a file.
         /// </summary>
         /// <param name="lines"></param>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        internal static bool SaveStringListToFile(List<string> lines, string filepath, Encoding encoding)
+        internal static bool SaveStringListToFile(string filepath, List<string> lines, Encoding encoding)
         {
             try
             {
@@ -25,7 +60,7 @@ namespace Machina
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Could not save program to file...");
+                Console.WriteLine("Could not save stringList to file...");
                 Console.WriteLine(ex);
             }
             return false;
@@ -37,7 +72,7 @@ namespace Machina
         /// <param name="resourceName"></param>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        internal static bool SaveTextResourceToFile(string resourceName, string filepath, Encoding encoding)
+        internal static bool SaveTextResourceToFile(string filepath, string resourceName, Encoding encoding)
         {
             try
             {

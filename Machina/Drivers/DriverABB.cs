@@ -23,10 +23,15 @@ namespace Machina.Drivers
     //                          
     class DriverABB : Driver
     {
-        //private RobotStudioManager _rsBridge;
-
         private TCPCommunicationManager _tcpManager;
+        private RobotStudioManager _rsBridge;
 
+        private Dictionary<ConnectionType, bool> _availableConnectionTypes = new Dictionary<ConnectionType, bool>()
+        {
+            { ConnectionType.User, true },
+            { ConnectionType.Machina, true }
+        };
+        public override Dictionary<ConnectionType, bool> AvailableConnectionTypes { get { return _availableConnectionTypes; } }
 
 
         //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
@@ -39,12 +44,24 @@ namespace Machina.Drivers
         /// <summary>
         /// Main constructor
         /// </summary>
-        public DriverABB(Control ctrl) : base(ctrl) { }
+        public DriverABB(Control ctrl) : base(ctrl)
+        {
+            if (this.parentControl.connectionMode == ConnectionType.Machina)
+            {
+                _rsBridge = new RobotStudioManager(this);
+            }
+        }
 
-
+        /// <summary>
+        /// Start a TCP connection to device via its address on the network.
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
         public override bool ConnectToDevice(string ip, int port)
         {
             _tcpManager = new TCPCommunicationManager(this, this.WriteCursor, this.parentControl.motionCursor, ip, port);  // @TODO: the motionCursor should be part of the driver props?
+
             if (_tcpManager.Connect())
             {
                 this.IP = ip;
@@ -62,51 +79,48 @@ namespace Machina.Drivers
         /// <param name="deviceId"></param>
         public override bool ConnectToDevice(int deviceId)
         {
-            //_isConnected = false;
+            if (this.parentControl.connectionMode != ConnectionType.Machina)
+            {
+                throw new Exception("Can only connect to ConnectToDevice(int deviceId) in ConnectionType.Machina mode");
+            }
 
-            //if (this.masterControl.connectionMode == ConnectionManagerType.Machina)
-            //{
+            // 1. use RSmanager to connecto to devide
+            //    load the streaming module
+            // 2. if successful, use the fetched address to initialize the TCP server
+            // 3. release mastership right away to make the program more solid? 
 
-            //    _rsBridge = new RobotStudioManager(this);
-            //    _rsBridge.Connect(deviceId);
+            if (!_rsBridge.Connect(deviceId))
+            {
+                throw new Exception("Could not connect automatically to device");
+            }
 
+            
 
-            //    //// If here, everything went well and successfully connected 
-            //    //isConnected = true;
+            // If on 'stream' mode, set up stream connection flow
+            if (this.parentControl.ControlMode == ControlType.Stream)
+            {
+                if (!_rsBridge.SetupStreamingMode())
+                {
+                     throw new Exception("Could not initialize Streaming Mode in the controller");
+                }
+            }
+            else
+            {
+                // if on Execute mode on _rsBridge, do nothing (programs will be uploaded in batch)
+                throw new NotImplementedException();
+            }
 
-            //    // If on 'stream' mode, set up stream connection flow
-            //    if (masterControl.GetControlMode() == ControlType.Stream)
-            //    {
-            //        if (!SetupStreamingMode())
-            //        {
-            //            Console.WriteLine("Could not initialize 'stream' mode in controller");
-            //            Reset();
-            //            return false;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // if on Execute mode on _rsBridge, do nothing (programs will be uploaded in batch)
-            //    }
+            this.IP = _rsBridge.IP;
+            this.Port = _rsBridge.WritePort;
 
+            if (!this.ConnectToDevice(this.IP, this.Port))
+            {
+                throw new Exception("Could not establish TCP connection to the controller");
+            }
 
-            //}
-            //else
-            //{
-            //    if (!SetupStreamingMode())
-            //    {
-            //        Console.WriteLine("Could not initialize 'stream' mode in controller");
-            //        Reset();
-            //        return false;
-            //    }
-            //}
+            DebugDump();
 
-
-            //DebugDump();
-
-            //return _isConnected;
-
-            throw new NotImplementedException();
+            return true;
         }
 
 
@@ -120,37 +134,68 @@ namespace Machina.Drivers
             //Reset();
             //_rsBridge.Disconnect();
 
-            bool success = _tcpManager.Disconnect();
+            bool success = true;
+
+            if (_tcpManager != null)
+            {
+                success &= _tcpManager.Disconnect();
+            }
+
+            if (_rsBridge != null)
+            {
+                success &= _rsBridge.Disconnect();
+            }
 
             return success;
         }
 
         public override bool Dispose()
         {
-            throw new NotImplementedException();
+            return DisconnectFromDevice();
         }
 
         public override Joints GetCurrentJoints()
         {
-            // @TODO: make a sync request to the server and get position from it!
+            if (_rsBridge != null && _rsBridge.Connected)
+            {
+                var jnt = _rsBridge.GetCurrentJoints();
+                Console.WriteLine($"CurrentJoints: {jnt}");
+                return jnt;
+            }
+
+            // @TODO: if on TCP without bridge, make a sync request to the server and fetch state from it!
             return null;
         }
 
         public override Rotation GetCurrentOrientation()
         {
-            // @TODO: make a sync request to the server and get position from it!
+            if (_rsBridge != null && _rsBridge.Connected)
+            {
+                var ori = _rsBridge.GetCurrentOrientation();
+                Console.WriteLine($"GetCurrentOrientation: {ori}");
+                return ori;
+            }
+
+            // @TODO: if on TCP without bridge, make a sync request to the server and fetch state from it!
             return null;
         }
 
         public override Vector GetCurrentPosition()
         {
-            // @TODO: make a sync request to the server and get position from it!
+            if (_rsBridge != null && _rsBridge.Connected)
+            {
+                var pos = _rsBridge.GetCurrentPosition();
+                Console.WriteLine($"GetCurrentPosition: {pos}");
+                return pos;
+            }
+
+            // @TODO: if on TCP without bridge, make a sync request to the server and fetch state from it!
             return null;
         }
 
         public override void DebugDump()
         {
-            throw new NotImplementedException();
+            
         }
 
         public override void Reset()
@@ -203,6 +248,11 @@ namespace Machina.Drivers
             return true;
         }
 
+        public override bool SetRunMode(CycleType mode)
+        {
+            throw new NotImplementedException();
+        }
+
 
 
 
@@ -237,7 +287,7 @@ namespace Machina.Drivers
 
 
 
-        
+
 
     }
 }

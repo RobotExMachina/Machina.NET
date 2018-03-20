@@ -11,6 +11,14 @@ namespace Machina.Drivers
     /// </summary>
     class DriverOffline : Driver
     {
+        private Dictionary<ConnectionType, bool> _availableConnectionTypes = new Dictionary<ConnectionType, bool>()
+        {
+            { ConnectionType.User, true },
+            { ConnectionType.Machina, true }
+        };
+        public override Dictionary<ConnectionType, bool> AvailableConnectionTypes { get { return _availableConnectionTypes; } }
+
+
         public DriverOffline(Control ctrl) : base(ctrl) { }
 
         public override bool ConnectToDevice(int deviceId)
@@ -59,6 +67,11 @@ namespace Machina.Drivers
         public override bool Dispose()
         {
             return true;
+        }
+
+        public override bool SetRunMode(CycleType mode)
+        {
+            throw new NotImplementedException();
         }
     }
 

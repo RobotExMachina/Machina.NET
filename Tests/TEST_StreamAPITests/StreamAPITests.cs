@@ -18,16 +18,18 @@ namespace TEST_StreamAPITests
 
         static void Main(string[] args)
         {
-
             Robot arm = Robot.Create("StreamTests", "ABB");
 
-            arm.ControlMode(ControlType.Stream);
-            arm.Connect("127.0.0.1", 7000);
+            arm.ConnectionManager("machina");
+            arm.ControlMode("stream");
+            arm.Connect();
+
+            //arm.ControlMode("stream");
+            //arm.Connect("127.0.0.1", 7000);
 
             arm.Message("Hello Robot!");
-            
-            //arm.Start();
 
+            //arm.Start();
             // arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
 
             Console.WriteLine(" ");
@@ -35,17 +37,17 @@ namespace TEST_StreamAPITests
             Console.ReadKey();
             VerticalSquare(arm);
 
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START THE SPIRAL...");
-            Console.ReadKey();
-            Spiral(arm, 5);
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START THE SPIRAL...");
+            //Console.ReadKey();
+            //Spiral(arm, 5);
 
-            int frame = 0;
-            while(frame < 20 * 1000/30.0)
-            {
-                Console.WriteLine("Frame: " + (frame++) + " " + arm.GetCurrentPosition());
-                Thread.Sleep(30);
-            }
+            //int frame = 0;
+            //while(frame < 20 * 1000/30.0)
+            //{
+            //    Console.WriteLine("Frame: " + (frame++) + " " + arm.GetCurrentPosition());
+            //    Thread.Sleep(30);
+            //}
 
             ////arm.DebugRobotCursors();
             ////arm.DebugBuffer();
@@ -86,7 +88,7 @@ namespace TEST_StreamAPITests
             bot.Wait(500);
 
             // Turn on "DO_15"
-            bot.SetIOName("DO_16", 1, true);
+            bot.SetIOName("DO_15", 1, true);
             bot.WriteDigital(1, true);
 
             // Slow MoveL a square with precision

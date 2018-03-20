@@ -70,8 +70,21 @@ namespace Machina.Drivers
             internal set { _port = value; }
         }
 
+        public abstract Dictionary<ConnectionType, bool> AvailableConnectionTypes { get; }
 
-        
+
+
+        /// <summary>
+        /// Create a new instance of a Driver object given a Controller.
+        /// </summary>
+        /// <param name="ctrl"></param>
+        public Driver(Control ctrl)
+        {
+            this.parentControl = ctrl;
+            //Reset();
+        }
+
+
 
 
         //  ┌─┐┬┌─┐┌┐┌┌─┐┌┬┐┬ ┬┬─┐┌─┐┌─┐
@@ -101,12 +114,12 @@ namespace Machina.Drivers
         public abstract bool Dispose();
 
 
-        ///// <summary>
-        ///// Sets the execution mode on the device to once or loop (useful for ControlMode.Execute)
-        ///// </summary>
-        ///// <param name="mode"></param>
-        ///// <returns></returns>
-        //public abstract bool SetRunMode(CycleType mode);
+        /// <summary>
+        /// Sets the execution mode on the device to once or loop (useful for ControlMode.Execute)
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public abstract bool SetRunMode(CycleType mode);
 
         ///// <summary>
         ///// Loads a program to the device from a file in the system.
@@ -165,16 +178,7 @@ namespace Machina.Drivers
         /// </summary>
         public abstract void DebugDump();
 
-
-        /// <summary>
-        /// Create a new instance of a Driver object given a Controller.
-        /// </summary>
-        /// <param name="ctrl"></param>
-        public Driver(Control ctrl)
-        {
-            this.parentControl = ctrl;
-            //Reset();
-        }
+        
 
         //public void LinkStreamQueue(StreamQueue q)
         //{
