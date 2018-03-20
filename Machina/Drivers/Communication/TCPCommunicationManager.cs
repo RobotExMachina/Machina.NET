@@ -107,10 +107,8 @@ namespace Machina.Drivers.Communication
             // Expire the thread on disconnection
             while (Status != TCPConnectionStatus.Disconnected)
             {
-                //while (this.WriteCursor.actionBuffer.AreActionsPending())
                 while (this.ShouldSend() && this._writeCursor.AreActionsPending())
                 {
-                    //if (SendActionAsMessage(true)) _sentMessages++;
                     var msgs = this._translator.GetMessagesForNextAction(this._writeCursor);
                     if (msgs != null)
                     {

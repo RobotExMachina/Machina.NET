@@ -58,6 +58,8 @@ namespace Machina
         /// </summary>
         private Control c;  // the main control object
 
+        public delegate void BufferEmptyHandler(object sender, EventArgs e);
+
         public event BufferEmptyHandler BufferEmpty;
 
         internal virtual void OnBufferEmpty(EventArgs e)

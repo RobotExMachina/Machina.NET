@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace Machina
 {
-    public delegate void BufferEmptyHandler(object sender, EventArgs e);
+    
 
 }
