@@ -20,13 +20,13 @@ namespace Machina.Controllers
 
         internal override void SetCommunicationObject()
         {
-            _control.Comm = new DriverOffline(_control);
+            _control.Driver = new DriverOffline(_control);
         }
 
         internal override void LinkWriteCursor()
         {
             // Pass the streamQueue object as a shared reference
-            _control.Comm.LinkWriteCursor(ref _control.writeCursor);
+            _control.Driver.LinkWriteCursor(ref _control.writeCursor);
         }
 
         internal override void SetStateCursor()

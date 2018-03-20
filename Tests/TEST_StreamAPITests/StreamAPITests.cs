@@ -18,30 +18,34 @@ namespace TEST_StreamAPITests
         static void Main(string[] args)
         {
 
-            Robot arm = new Robot("StreamTests", "ABB");
+            Robot arm = Robot.Create("StreamTests", "ABB");
             arm.ControlMode(ControlType.Stream);
-            arm.Connect();
-            arm.Start();
+            arm.Connect("127.0.0.1", 7000);
+
+            arm.Message("Hello Robot!");
+
+
+            //arm.Start();
 
             // arm.BufferEmpty += new BufferEmptyHandler(GenerateMovements);
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
             Console.ReadKey();
-            VerticalSqaure(arm);
+            VerticalSquare(arm);
 
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
-            //Console.ReadKey();
-            //VerticalSqaure(arm);
+            ////Console.WriteLine(" ");
+            ////Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
+            ////Console.ReadKey();
+            ////VerticalSqaure(arm);
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to START THE SPIRAL...");
             Console.ReadKey();
             Spiral(arm, 10);
 
-            //arm.DebugRobotCursors();
-            //arm.DebugBuffer();
+            ////arm.DebugRobotCursors();
+            ////arm.DebugBuffer();
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to DISCONNECT...");
@@ -54,7 +58,7 @@ namespace TEST_StreamAPITests
             Console.ReadKey();
         }
 
-        static public void VerticalSqaure(Robot bot)
+        static public void VerticalSquare(Robot bot)
         {
             
 

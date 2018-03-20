@@ -58,13 +58,13 @@ namespace Machina
         /// <summary>
         /// A reference to the Robot object this class is driving.
         /// </summary>
-        internal Robot parent;
+        internal Robot parentRobot;
 
         /// <summary>
         /// Instances of the main robot Controller and Task
         /// </summary>
-        private Driver _comm;
-        public Driver Comm { get { return _comm; } internal set { _comm = value; } }
+        private Driver _driver;
+        internal Driver Driver { get { return _driver; } set { _driver = value; } }
 
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Machina
         /// </summary>
         public Control(Robot parentBot)
         {
-            parent = parentBot;
+            parentRobot = parentBot;
 
             // Reset();
 
@@ -173,6 +173,9 @@ namespace Machina
             {
                 InitializeRobotCursors();
             }
+
+            if (!success)
+                throw new Exception("Couldn't SetControlMode()");
 
             return success;
         }
@@ -263,11 +266,16 @@ namespace Machina
         /// <returns></returns>
         public bool ConnectToDevice(int robotId)
         {
-            // Sanity
-            if (!_comm.ConnectToDevice(robotId))
+            if (connectionMode == ConnectionType.User)
             {
-                Console.WriteLine("Cannot connect to device");
-                return false;
+                throw new Exception("Cannot search for robots automatically, please use ConnectToDevice(ip, port) instead");
+            }
+
+
+            // Sanity
+            if (!_driver.ConnectToDevice(robotId))
+            {
+                throw new Exception("Cannot connect to device");
             }
             else
             {
@@ -287,13 +295,34 @@ namespace Machina
             return true;
         }
 
+        public bool ConnectToDevice(string ip, int port)
+        {
+            if (connectionMode == ConnectionType.Machina)
+            {
+                throw new Exception("Try ConnectToDevice() instead");
+            }
+
+            // Sanity
+            if (!_driver.ConnectToDevice(ip, port))
+            {
+                throw new Exception("Cannot connect to device");
+            }
+            else
+            {
+                InitializeRobotCursors();
+            }
+            return true;
+        }
+
+
+
         /// <summary>
         /// Requests the Communication object to disconnect from controller and reset.
         /// </summary>
         /// <returns></returns>
         public bool DisconnectFromDevice()
         {
-            return _comm.DisconnectFromDevice();
+            return _driver.DisconnectFromDevice();
         }
 
         /// <summary>
@@ -302,7 +331,7 @@ namespace Machina
         /// <returns></returns>
         public bool IsConnectedToDevice()
         {
-            return _comm.Connected;
+            return _driver.Connected;
         }
 
         /// <summary>
@@ -311,7 +340,7 @@ namespace Machina
         /// <returns></returns>
         public string GetControllerIP()
         {
-            return _comm.IP;
+            return _driver.IP;
         }
 
         ///// <summary>
@@ -825,20 +854,20 @@ namespace Machina
         private bool InitializeCommunication()
         {
             // If there is already some communication going on
-            if (_comm != null)
+            if (_driver != null)
             {
                 Console.WriteLine("Communication protocol might be active. Please CloseControllerCommunication() first.");
                 return false;
             }
 
             // @TODO: shim assignment of correct robot model/brand
-            _comm = new DriverABB(this);
+            _driver = new DriverABB(this);
 
             // Pass the streamQueue object as a shared reference
             //comm.LinkStreamQueue(streamQueue);
             if (_controlMode == ControlType.Stream)
             {
-                _comm.LinkWriteCursor(ref writeCursor);
+                _driver.LinkWriteCursor(ref writeCursor);
             }
 
             return true;
@@ -850,13 +879,13 @@ namespace Machina
         /// <returns></returns>
         private bool DropCommunication()
         {
-            if (_comm == null)
+            if (_driver == null)
             {
                 Console.WriteLine("Communication protocol not established.");
                 return false;
             }
-            bool success = _comm.DisconnectFromDevice();
-            _comm = null;
+            bool success = _driver.DisconnectFromDevice();
+            _driver = null;
             return success;
         }
 
@@ -866,7 +895,7 @@ namespace Machina
         /// <returns></returns>
         private bool ResetCommunication()
         {
-            if (_comm == null)
+            if (_driver == null)
             {
                 Console.WriteLine("Communication protocol not established, please initialize first.");
             }
@@ -899,15 +928,15 @@ namespace Machina
 
         internal bool InitializeRobotCursors()
         {
-            if (_comm == null)
+            if (_driver == null)
             {
                 throw new Exception("Cannot initialize Robotcursors without a _comm object");
             }
 
             // If successful, initialize robot cursors to mirror the state of the device
-            Vector currPos = _comm.GetCurrentPosition();
-            Rotation currRot = _comm.GetCurrentOrientation();
-            Joints currJnts = _comm.GetCurrentJoints();
+            Vector currPos = _driver.GetCurrentPosition();
+            Rotation currRot = _driver.GetCurrentOrientation();
+            Joints currJnts = _driver.GetCurrentJoints();
 
             return InitializeRobotCursors(currPos ?? null, currRot ?? null, currJnts ?? null);
         }
@@ -923,7 +952,7 @@ namespace Machina
         {
             try
             {
-                System.IO.File.WriteAllLines(filepath, lines, this.parent.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
+                System.IO.File.WriteAllLines(filepath, lines, this.parentRobot.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
                 return true;
             }
             catch (Exception ex)
@@ -1077,7 +1106,7 @@ namespace Machina
         public void DebugDump()
         {
             DebugBanner();
-            _comm.DebugDump();
+            _driver.DebugDump();
         }
 
         public void DebugBuffer()

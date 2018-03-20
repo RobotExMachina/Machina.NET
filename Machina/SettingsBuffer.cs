@@ -11,25 +11,34 @@ namespace Machina
     /// </summary>
     class SettingsBuffer
     {
-        private static int limit = 32;  // @todo: implement some kind of limit for too many pushes without pops?
+        private static int limit = 32;
         private List<Settings> buffer = new List<Settings>();
 
+        // Keep a copy of the last pop to check changes in RobotCursor state
+        private Settings _lastPoppped;
+        public Settings LastPopped => _lastPoppped;
+
+        private Settings _settingsBeforeLastPopped;
+        public Settings SettingsBeforeLastPop => _settingsBeforeLastPopped;
+
+        // Constructor
         public SettingsBuffer() { }
 
-        public bool Push(Settings set)
+        public bool Push(RobotCursor cursor)
         {
             if (buffer.Count >= limit) throw new Exception("TOO MANY PUSHES WITHOUT POPS?");
-            buffer.Add(set);
+            buffer.Add(cursor.GetSettings());
             return true;
         }
 
-        public Settings Pop()
+        public Settings Pop(RobotCursor cursor)
         {
             if (buffer.Count > 0)
             {
-                Settings s = buffer.Last();
+                _settingsBeforeLastPopped = cursor.GetSettings();
+                _lastPoppped = buffer.Last();
                 buffer.RemoveAt(buffer.Count - 1);
-                return s;
+                return _lastPoppped;
             }
             return null;
         }

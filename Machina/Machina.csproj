@@ -85,11 +85,15 @@
     <Compile Include="Controllers\StreamControlManager.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="Drivers\Communication\RobotStudioManager.cs" />
+    <Compile Include="Drivers\Communication\TCPCommunicationManager.cs" />
     <Compile Include="Drivers\Communication\ThreadedTCPClient.cs" />
     <Compile Include="Drivers\Communication\TCPWriter.cs" />
     <Compile Include="Drivers\Driver.cs" />
     <Compile Include="Drivers\DriverABB.cs" />
     <Compile Include="Drivers\DriverOffline.cs" />
+    <Compile Include="Drivers\Protocols\ABBServerProtocol.cs" />
+    <Compile Include="Drivers\Protocols\ProtocolFactory.cs" />
+    <Compile Include="Drivers\Protocols\ProtocolBase.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="IO\IO.cs" />
     <Compile Include="Types\AxisAngle.cs" />

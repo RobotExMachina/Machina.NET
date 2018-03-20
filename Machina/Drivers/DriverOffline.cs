@@ -55,6 +55,11 @@ namespace Machina.Drivers
         {
             Console.WriteLine("Cannot reset driver in offline mode");
         }
+
+        public override bool Dispose()
+        {
+            return true;
+        }
     }
 
 }

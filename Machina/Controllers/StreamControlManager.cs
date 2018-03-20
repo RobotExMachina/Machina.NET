@@ -24,13 +24,13 @@ namespace Machina.Controllers
         internal override void SetCommunicationObject()
         {
             // @TODO: shim assignment of correct robot model/brand
-            _control.Comm = new DriverABB(_control);
+            _control.Driver = new DriverABB(_control);
         }
 
         internal override void LinkWriteCursor()
         {
             // Pass the streamQueue object as a shared reference
-            _control.Comm.LinkWriteCursor(ref _control.writeCursor);
+            _control.Driver.LinkWriteCursor(ref _control.writeCursor);
         }
 
         internal override void SetStateCursor()

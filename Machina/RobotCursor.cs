@@ -68,7 +68,7 @@ namespace Machina
         /// <summary>
         /// A buffer that stores Push and PopSettings() states.
         /// </summary>
-        protected SettingsBuffer settingsBuffer;
+        internal SettingsBuffer settingsBuffer;
 
         /// <summary>
         /// Manages pending and released Actions, plus blocks. 
@@ -100,23 +100,23 @@ namespace Machina
             this.child = childCursor;
 
             // @TODO: make this programmatic
-            if (this.parentControl.parent.Brand == RobotType.HUMAN)
+            if (this.parentControl.parentRobot.Brand == RobotType.HUMAN)
             {
                 compiler = new CompilerHuman();
             }
-            else if (this.parentControl.parent.Brand == RobotType.ABB)
+            else if (this.parentControl.parentRobot.Brand == RobotType.ABB)
             {
                 compiler = new CompilerABB();
             }
-            else if (this.parentControl.parent.Brand == RobotType.UR)
+            else if (this.parentControl.parentRobot.Brand == RobotType.UR)
             {
                 compiler = new CompilerUR();
             }
-            else if (this.parentControl.parent.Brand == RobotType.KUKA)
+            else if (this.parentControl.parentRobot.Brand == RobotType.KUKA)
             {
                 compiler = new CompilerKUKA();
             } 
-            else if (this.parentControl.parent.Brand == RobotType.ZMORPH)
+            else if (this.parentControl.parentRobot.Brand == RobotType.ZMORPH)
             {
                 compiler = new CompilerZMORPH();
             }
@@ -218,6 +218,26 @@ namespace Machina
         }
 
         /// <summary>
+        /// Applies next single action pending in the buffer and outs that action.
+        /// </summary>
+        /// <param name="lastAction"></param>
+        /// <returns></returns>
+        public bool ApplyNextAction(out Action lastAction)
+        {
+            lock (actionBufferLock)
+            {
+                lastAction = actionBuffer.GetNext();
+                if (lastAction == null) return false;
+                bool success = Apply(lastAction);
+                if (success)
+                {
+                    child.Issue(lastAction);
+                }
+                return success;
+            }
+        }
+
+        /// <summary>
         /// Returns the last Action that was released by the buffer.
         /// </summary>
         /// <returns></returns>
@@ -264,7 +284,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, false, inlineTargets, humanComments);
+            return compiler.UNSAFEProgramFromBuffer(parentControl.parentRobot.Name + "_Program", this, false, inlineTargets, humanComments);
         }
 
         /// <summary>
@@ -275,7 +295,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(parentControl.parent.Name + "_Program", this, true, inlineTargets, humanComments);
+            return compiler.UNSAFEProgramFromBuffer(parentControl.parentRobot.Name + "_Program", this, true, inlineTargets, humanComments);
         }
 
         public void LogBufferedActions()
@@ -284,6 +304,15 @@ namespace Machina
             {
                 actionBuffer.LogBufferedActions();
             }
+        }
+
+        /// <summary>
+        /// Returns a Settings object representing the current state of this RobotCursor.
+        /// </summary>
+        /// <returns></returns>
+        public Settings GetSettings()
+        {
+            return new Settings(this.speed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
         }
 
 
@@ -420,12 +449,11 @@ namespace Machina
         {
             if (action.push)
             {
-                Settings s = new Settings(this.speed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
-                return this.settingsBuffer.Push(s);
+                return this.settingsBuffer.Push(this);
             }
             else
             {
-                Settings s = settingsBuffer.Pop();
+                Settings s = settingsBuffer.Pop(this);
                 if (s != null)
                 {
                     this.speed = s.Speed;

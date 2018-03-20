@@ -31,10 +31,9 @@ namespace Machina.Controllers
         /// <returns></returns>
         public bool Initialize()
         {
-            if (_control.Comm != null)
+            if (_control.Driver != null && !_control.Driver.Dispose())
             {
-                Console.WriteLine("Communication protocol might be active. Please terminate it first.");
-                return false;
+                throw new Exception("Couldn't dispose current Driver...");
             }
 
             // @TODO: shim assignment of correct robot model/brand

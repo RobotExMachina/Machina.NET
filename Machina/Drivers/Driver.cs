@@ -24,7 +24,7 @@ namespace Machina.Drivers
         /// <summary>
         /// A reference to parent Machina Control object commanding this Driver.
         /// </summary>
-        protected Control masterControl = null;
+        internal Control masterControl = null;
 
         //// ADDED A WRITE ROBOT CURSOR IN THE ABB OBJECT
         ///// <summary>
@@ -97,6 +97,9 @@ namespace Machina.Drivers
         /// </summary>
         /// <returns></returns>
         public abstract bool DisconnectFromDevice();
+
+        public abstract bool Dispose();
+
 
         ///// <summary>
         ///// Sets the execution mode on the device to once or loop (useful for ControlMode.Execute)

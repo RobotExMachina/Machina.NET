@@ -299,11 +299,22 @@ namespace Machina
         /// Scans the network for robotic devices, real or virtual, and performs all necessary 
         /// operations to connect to it. This is necessary for 'online' modes such as 'execute' and 'stream.'
         /// </summary>
-        /// <param name="mode">If multiple devices are connected, choose this id from the list.</param>
+        /// <param name="robotId">If multiple devices are connected, choose this id from the list.</param>
         /// <returns></returns>
         public bool Connect(int robotId = 0)
         {
             return c.ConnectToDevice(robotId);
+        }
+
+        /// <summary>
+        /// Tries to establish connection to a remote device for 'online' modes.
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public bool Connect(string ip, int port)
+        {
+            return c.ConnectToDevice(ip, port);
         }
 
         /// <summary>
