@@ -16,12 +16,22 @@
 ```
 
 
+## v0.6.0.1400
+This release focuses on reworking the Streaming mode to base it off TCP connection with the controller server. 
+- [x] New factory constructor: `new Robot(...)` is now `Robot.Create(...)`
+- [x] `Offline` mode working with new architecture
+- [x] Add `ConnectionManager()` with options `user` (they are in charge of setting up communication server/firmatas) or `machina` (the library will try to make its best to figure out connection).
+- [x] Created a lot of utility classes and managers of different kinds, trying to make the library [SOLID](https://en.wikipedia.org/wiki/SOLID_(object-oriented_design))
+- [x] So many other untracked changes...
+- [x] Fix C:/mod permissions for non-admins, use ENV system path
+- [x] Rework the ABB real-time connection
+- [x] Add an overload for TransformTo that takes single values as x, y, z, xvec0, xvec1, xvec2, yvec0, yvec1, yvec2. 
+
+
 ## BUILD 1308
 - [x] Remove Undefined from MotionMode
 - [ ] Add some kind of descriptive text for each MotionMode
 - [x] Add `ExtrusionRate` to `Settings`
-
-
 
 
 ## BUILD 0.5.0.1307 

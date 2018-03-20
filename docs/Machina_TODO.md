@@ -16,13 +16,23 @@
 ```
 
 
+## IMPROVEMENTS
+- [ ] Cleanup dead code
+- [ ] Add comments on all the new functions
+- [ ] Verbose refactoring
+- [ ] When the buffer is empty, raise an event.
+
+
+---
 ## FOR 0.6.0 RELEASE
 This release will focus on reworking the Streaming mode to base it off TCP connection with the controller server. 
 
 - [x] New factory constructor: `new Robot(...)` is now `Robot.Create(...)`
 - [x] `Offline` mode working with new architecture
-- [ ] 
-
+- [x] Add `ConnectionManager()` with options `user` (they are in charge of setting up communication server/firmatas) or `machina` (the library will try to make its best to figure out connection).
+- [x] Fix C:/mod permissions for non-admins, use ENV system path
+- [x] Rework the ABB real-time connection
+- [x] Add an overload for TransformTo that takes single values as x, y, z, xvec0, xvec1, xvec2, yvec0, yvec1, yvec2. 
 
 ### Machina_Driver.mod
 [x] Cleanup dead code
@@ -90,8 +100,6 @@ This release will focus on reworking the Streaming mode to base it off TCP conne
 ## LATER..
 - [ ] Add enhanced CoordSys selection and WObj use
 
-- [ ] Rework the ABB real-time connection
-
 - [ ] Verify program names and IOnames cannot start with a digit
 - [ ] Add Acceleration
 - [ ] Add Action constructors that take atomic primitives (x,y,z instead of a point object): they shallow copy it anyway... optimization
@@ -109,9 +117,8 @@ This release will focus on reworking the Streaming mode to base it off TCP conne
 
 - [ ] If on online mode, if connection is lost with the controller, the app throws an error. Implement softreset
 
-- [ ] Fix C:/mod permissions for non-admins, use ENV system path
 - [ ] Improve the AxesTo -> TransformTo message, make it understandable... 
-- [ ] Add an overload for TransformTo that takes single values as x, y, z, xvec0, xvec1, xvec2, yvec0, yvec1, yvec2. 
+
 - [ ] Add a .Home() function?
 
 

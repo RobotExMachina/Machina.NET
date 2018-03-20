@@ -164,22 +164,22 @@ namespace Machina
         /// <returns></returns>
         public bool SetControlMode(ControlType mode)
         {
+            if (mode == ControlType.Execute)
+            {
+                Console.WriteLine("Execute mode temporarily deactivated. Try 'stream' instead, it's cooler ;)");
+                Console.WriteLine($"ControlMode reverted to {_controlMode}");
+                return false;
+            }
+
             _controlMode = mode;
-            //_controlManager = ControlFactory.GetControlManager(this);
-
-            //bool success = _controlManager.Initialize();
-
-            //if (mode == ControlType.Offline)
-            //{
-            //    InitializeRobotCursors();
-            //}
-
-            //if (!success)
-            //    throw new Exception("Couldn't SetControlMode()");
 
             return ResetControl();
         }
 
+        /// <summary>
+        /// Resets control parameters using the appropriate ControlManager.
+        /// </summary>
+        /// <returns></returns>
         private bool ResetControl()
         {
             _controlManager = ControlFactory.GetControlManager(this);
