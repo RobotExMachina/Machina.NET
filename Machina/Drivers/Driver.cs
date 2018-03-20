@@ -24,7 +24,7 @@ namespace Machina.Drivers
         /// <summary>
         /// A reference to parent Machina Control object commanding this Driver.
         /// </summary>
-        internal Control masterControl = null;
+        internal Control parentControl = null;
 
         //// ADDED A WRITE ROBOT CURSOR IN THE ABB OBJECT
         ///// <summary>
@@ -46,7 +46,7 @@ namespace Machina.Drivers
             get { return _writeCursor; }
             set { _writeCursor = value; }
         }
-        
+                
         
 
         private bool _connected = false;
@@ -172,7 +172,7 @@ namespace Machina.Drivers
         /// <param name="ctrl"></param>
         public Driver(Control ctrl)
         {
-            this.masterControl = ctrl;
+            this.parentControl = ctrl;
             //Reset();
         }
 

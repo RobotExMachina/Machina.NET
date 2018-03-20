@@ -20,7 +20,8 @@ namespace Machina.Drivers.Communication
         internal TCPConnectionStatus Status { get; private set; }
 
         private RobotCursor _writeCursor;
-        private Driver _driver;
+        private RobotCursor _motionCursor;
+        private Driver _parentDriver;
 
         private TcpClient clientSocket = new TcpClient();
         private NetworkStream clientNetworkStream;
@@ -32,7 +33,11 @@ namespace Machina.Drivers.Communication
 
         private Protocols.ProtocolBase _translator;
         private List<string> _messageBuffer = new List<string>();
-        private byte[] _msgBytes;
+        private byte[] _sendMsgBytes;
+        private byte[] _receiveMsgBytes = new byte[1024];
+        private int _receiveByteCount;
+        private string _response;
+        private string[] _responseChunks;
 
         private int _sentMessages = 0;
         private int _receivedMessages = 0;
@@ -40,14 +45,15 @@ namespace Machina.Drivers.Communication
         private int _sendNewBatchOn = 2;
 
 
-        internal TCPCommunicationManager(Driver driver, RobotCursor writeCursor, string ip, int port)
+        internal TCPCommunicationManager(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string ip, int port)
         {
-            this._driver = driver;
+            this._parentDriver = driver;
             this._writeCursor = writeCursor;
+            this._motionCursor = motionCursor;
             this._ip = ip;
             this._port = port;
 
-            this._translator = ProtocolFactory.GetTranslator(this._driver);
+            this._translator = ProtocolFactory.GetTranslator(this._parentDriver);
         }
 
         internal bool Disconnect()
@@ -110,8 +116,8 @@ namespace Machina.Drivers.Communication
                     {
                         foreach (var msg in msgs)
                         {
-                            _msgBytes = Encoding.ASCII.GetBytes(msg);
-                            clientNetworkStream.Write(_msgBytes, 0, _msgBytes.Length);
+                            _sendMsgBytes = Encoding.ASCII.GetBytes(msg);
+                            clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
                             _sentMessages++;
                             Console.WriteLine("Sending mgs: " + msg);
                         }
@@ -122,36 +128,6 @@ namespace Machina.Drivers.Communication
             }
         }
 
-        //private boolpublic SendActionAsMessage(bool hasPriority)
-        //{
-        //    if (!WriteCursor.ApplyNextAction())
-        //    {
-        //        Console.WriteLine("Could not apply next action");
-        //        return false;
-        //    }
-
-        //    Action a = WriteCursor.GetLastAction();
-
-        //    if (a == null)
-        //        throw new Exception("Last action wasn't correctly stored...?");
-
-        //    string msg = GetActionMessage(a, WriteCursor);
-        //    if (msg == "")
-        //    {
-        //        Console.WriteLine("Applied action to cursor, but not necessary to stream to robot");
-        //        return false;
-        //    }
-
-        //    byte[] msgBytes = Encoding.ASCII.GetBytes(msg);
-
-        //    clientNetworkStream.Write(msgBytes, 0, msgBytes.Length);
-
-        //    Console.WriteLine("Sending mgs: " + msg);
-
-        //    return true;
-        //}
-
-
         private void ReceivingMethod(object obj)
         {
             // Expire the thread on disconnection
@@ -159,14 +135,14 @@ namespace Machina.Drivers.Communication
             {
                 if (clientSocket.Available > 0)
                 {
-                    var buffer = new byte[1024];
-                    var byteCount = clientSocket.GetStream().Read(buffer, 0, buffer.Length);
-                    var response = Encoding.UTF8.GetString(buffer, 0, byteCount);
+                    _receiveByteCount = clientSocket.GetStream().Read(_receiveMsgBytes, 0, _receiveMsgBytes.Length);
+                    _response = Encoding.UTF8.GetString(_receiveMsgBytes, 0, _receiveByteCount);
 
-                    var msgs = response.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var res in msgs)
+                    var msgs = _response.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var msg in msgs)
                     {
-                        Console.WriteLine($"  RES: Server response was {res};");
+                        Console.WriteLine($"  RES: Server response was {msg};");
+                        ParseResponse(msg);
                         _receivedMessages++;
                     }
                 }
@@ -203,6 +179,23 @@ namespace Machina.Drivers.Communication
             }
         }
 
+        /// <summary>
+        /// Parse the response and decide what to do with it.
+        /// </summary>
+        /// <param name="res"></param>
+        private void ParseResponse(string res)
+        {
+            // If first char is an id marker (otherwise, we can't know which action it is)
+            // @TODO: this is hardcoded for ABB, do this programmatically...
+            if (res[0] == '@')
+            {
+                _responseChunks = res.Split(' ');
+                string idStr = _responseChunks[0].Substring(1);
+                int id = Convert.ToInt32(idStr);
+                this._motionCursor.ApplyActionsUntilId(id);
+                Console.WriteLine(_motionCursor);
+            }
+        }
 
     }
 }

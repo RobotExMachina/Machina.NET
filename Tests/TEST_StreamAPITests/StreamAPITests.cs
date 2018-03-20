@@ -60,8 +60,6 @@ namespace TEST_StreamAPITests
 
         static public void VerticalSquare(Robot bot)
         {
-            
-
             // Message
             bot.Message("Starting vertical square");
 
@@ -137,6 +135,7 @@ namespace TEST_StreamAPITests
             bot.PopSettings();
             bot.Wait(500);
 
+            bot.SpeedTo(100);
             for (var i = 0; i < loops; i++)
             {
                 for (var j = 0; j < segments; j++)

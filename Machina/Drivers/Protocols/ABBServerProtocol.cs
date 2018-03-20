@@ -9,8 +9,8 @@ namespace Machina.Drivers.Protocols
     class ABBServerProtocol : ProtocolBase
     {
         // From the Machina_Server.mod file, must be consistent!
-        const string STR_MESSAGE_END_CHAR = ";";
-        const string STR_MESSAGE_ID_CHAR = "@";
+        internal const string STR_MESSAGE_END_CHAR = ";";
+        internal const string STR_MESSAGE_ID_CHAR = "@";
 
         // A RAPID-code oriented API:
         //                                     // INSTRUCTION P1 P2 P3 P4...

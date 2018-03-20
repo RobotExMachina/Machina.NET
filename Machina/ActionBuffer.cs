@@ -114,6 +114,42 @@ namespace Machina
         }
 
         /// <summary>
+        /// Returns all Actions in the pending buffer until the one with given id inclusive.
+        /// This assumes ids are correlative and ascending, will stop if it finds an
+        /// id larger than the given one. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public List<Action> GetAllUpToId(int id)
+        {
+            List<Action> search = new List<Action>();
+            int count = 0;
+            foreach (Action a in pending)
+            {
+                if (a.id <= id) count++;
+                else break;
+            }
+
+            if (count == 0)
+            {
+                return search;
+            }
+
+            // If the action wasn't found (is this even possible??)
+            if (count == pending.Count && pending[pending.Count - 1].id != id)
+            {
+                throw new Exception($"Couldn't find id {id} in the the action buffer");
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                search.Add(GetNext());
+            }
+
+            return search;
+        }
+
+        /// <summary>
         /// Wraps all pending actions outside release blocks into one.
         /// </summary>
         public void SetBlock()

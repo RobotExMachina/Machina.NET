@@ -10,7 +10,7 @@ namespace Machina.Drivers.Protocols
     {
         internal static ProtocolBase GetTranslator(Driver driver)
         {
-            switch (driver.masterControl.parentRobot.Brand)
+            switch (driver.parentControl.parentRobot.Brand)
             {
                 case RobotType.ABB:
                     return new ABBServerProtocol();

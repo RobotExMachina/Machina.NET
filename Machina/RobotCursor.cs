@@ -209,7 +209,7 @@ namespace Machina
                 lastAction = actionBuffer.GetNext();
                 if (lastAction == null) return false;
                 bool success = Apply(lastAction);
-                if (success)
+                if (success && child != null)
                 {
                     child.Issue(lastAction);
                 }
@@ -229,10 +229,38 @@ namespace Machina
                 lastAction = actionBuffer.GetNext();
                 if (lastAction == null) return false;
                 bool success = Apply(lastAction);
-                if (success)
+                if (success && child != null)
                 {
                     child.Issue(lastAction);
                 }
+                return success;
+            }
+        }
+
+        /// <summary>
+        /// Ascends the pending actions buffer searching for the given id, and applies
+        /// them all, inclusive of the one searched. 
+        /// This assumes ids are correlative and ascending, will stop if it finds an
+        /// id larger thatn the given one. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public bool ApplyActionsUntilId(int id)
+        {
+            lock (actionBufferLock)
+            {
+                var actions = actionBuffer.GetAllUpToId(id);
+                bool success = true;
+
+                foreach (Action a in actions)
+                {
+                    success &= Apply(a);
+                    if (success && child != null)
+                    {
+                        child.Issue(a);
+                    }
+                }
+
                 return success;
             }
         }
@@ -314,6 +342,7 @@ namespace Machina
         {
             return new Settings(this.speed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
         }
+
 
 
 
