@@ -47,6 +47,19 @@ namespace Machina
                 && Math.Abs(this.Z - other.Z) < EPSILON;
         }
 
+        /// <summary>
+        /// Test if this Vector is approximately equal to another.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <param name="epsilon"></param>
+        /// <returns></returns>
+        public bool IsSimilar(Vector other, double epsilon)
+        {
+            return Math.Abs(this.X - other.X) < epsilon
+                && Math.Abs(this.Y - other.Y) < epsilon
+                && Math.Abs(this.Z - other.Z) < epsilon;
+        }
+
         //public static bool operator ==(Vector p1, Vector p2)
         //{
         //    return Math.Abs(p1.X - p2.X) < EPSILON

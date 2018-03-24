@@ -174,12 +174,12 @@ namespace Machina
             // Initialize a module list
             List<string> module = new List<string>();
             
-            // Banner
-            module.AddRange(GenerateDisclaimerHeader(programName));
-            module.Add("");
-
             // MODULE HEADER
             module.Add("MODULE " + programName);
+            module.Add("");
+
+            // Banner (must go after MODULE, or will yield RAPID syntax errors)
+            module.AddRange(GenerateDisclaimerHeader(programName));
             module.Add("");
 
             // INTRO LINES
