@@ -361,13 +361,19 @@ namespace Machina
         }
 
         /// <summary>
+        /// Sets the creddentials for logging into the controller.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public bool SetUserCredentials(string name, string password) => 
+            Driver == null ? false : Driver.SetUser(name, password);
+
+        /// <summary>
         /// If connected to a device, return the IP address
         /// </summary>
         /// <returns></returns>
-        public string GetControllerIP()
-        {
-            return _driver.IP;
-        }
+        public string GetControllerIP() => _driver.IP;
 
         ///// <summary>
         ///// Loads a programm to the connected device and executes it. 
@@ -482,6 +488,13 @@ namespace Machina
         //    return comm.StopProgramExecution(immediate);
         //}
 
+
+        public Vector GetVirtualPosition() => virtualCursor.position;
+        public Rotation GetVirtualOrientation() => virtualCursor.rotation;
+        public Joints GetVirtualAxes() => virtualCursor.joints;
+        public Tool GetVirtualTool() => virtualCursor.tool;
+
+
         /// <summary>
         /// Returns a Vector object representing the current robot's TCP position.
         /// </summary>
@@ -498,7 +511,7 @@ namespace Machina
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public Joints getCurrentAxes() => stateCursor.joints;
+        public Joints GetCurrentAxes() => stateCursor.joints;
 
         /// <summary>
         /// Returns a Tool object representing the currently attached tool, null if none.

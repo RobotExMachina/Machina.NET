@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
+using Machina.Users;
 
 
 namespace Machina.Drivers
@@ -70,6 +70,17 @@ namespace Machina.Drivers
             internal set { _port = value; }
         }
 
+
+        /// <summary>
+        /// The User profile used to log into the controller
+        /// </summary>
+        public User User
+        {
+            get { return _user; }
+            set { _user = value; }
+        }
+        private User _user = new User();
+        
         public abstract Dictionary<ConnectionType, bool> AvailableConnectionTypes { get; }
 
 
@@ -179,6 +190,24 @@ namespace Machina.Drivers
         public abstract void DebugDump();
 
         
+
+
+
+
+        /// <summary>
+        /// Change the user profile usedfor logging operations.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        internal virtual bool SetUser(string name, string password)
+        {
+            this.User = new User(name, password);
+            return true;
+        }
+
+
+
 
         //public void LinkStreamQueue(StreamQueue q)
         //{

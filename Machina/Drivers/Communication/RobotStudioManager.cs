@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
 
+using Machina.Users;
+
 using ABB.Robotics;
 using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
@@ -23,7 +25,7 @@ namespace Machina.Drivers.Communication
     /// </summary>
     class RobotStudioManager
     {
-        private Driver _driver;  // the parent object
+        private Driver _parentDriver;  // the parent object
 
         // ABB stuff and flags
         private Controller controller;
@@ -57,7 +59,7 @@ namespace Machina.Drivers.Communication
 
         public RobotStudioManager(Driver parent)
         {
-            _driver = parent;
+            _parentDriver = parent;
         }
 
 
@@ -108,6 +110,13 @@ namespace Machina.Drivers.Communication
             if (!LogOn())
             {
                 Console.WriteLine("Could not log on to the controller");
+                Disconnect();
+                return false;
+            }
+
+            if (!LoadRobotWareOptions())
+            {
+                Console.WriteLine("Could not retrieve RobotWare options from the controller");
                 Disconnect();
                 return false;
             }
@@ -188,11 +197,22 @@ namespace Machina.Drivers.Communication
                     Console.WriteLine($"Found controller {controller.SystemName} on {controller.Name}");
                     success = true;
 
-                    this.robotWare = this.controller.RobotWare;
-                    this.robotWareOptions = this.robotWare.Options;
+                    Console.WriteLine(controller);
+                    //Console.WriteLine(controller.RobotWare);
+                    //Console.WriteLine(controller.RobotWareVersion);
 
-                    this._hasMultiTasking = HasMultiTaskOption(this.robotWareOptions);
-                    this._hasEGM = HasEGMOption(this.robotWareOptions);
+                    //try
+                    //{
+                    //    this.robotWare = this.controller.RobotWare;
+                    //    this.robotWareOptions = this.robotWare.Options;
+
+                    //    this._hasMultiTasking = HasMultiTaskOption(this.robotWareOptions);
+                    //    this._hasEGM = HasEGMOption(this.robotWareOptions);
+                    //}
+                    //catch
+                    //{
+                    //    Console.WriteLine("Could not access ROBOTWARE options");
+                    //}
                 }
                 else
                 {
@@ -254,7 +274,6 @@ namespace Machina.Drivers.Communication
             return true;
         }
 
-
         /// <summary>
         /// Logs on to the controller with a default user.
         /// </summary>
@@ -268,8 +287,13 @@ namespace Machina.Drivers.Communication
             {
                 try
                 {
-                    controller.Logon(UserInfo.DefaultUser);
-                    Console.WriteLine("Logged on as DefaultUser");
+                    User user = this._parentDriver.User;
+                    UserInfo robotStudioUser = user.Name == "" ?
+                        UserInfo.DefaultUser :
+                        new UserInfo(user.Name, user.Password);
+
+                    controller.Logon(robotStudioUser);
+                    Console.WriteLine($"Logged on as {robotStudioUser} user");
                     _isLogged = true;
                 }
                 catch (Exception ex)
@@ -521,7 +545,42 @@ namespace Machina.Drivers.Communication
             return false;
         }
 
+        /// <summary>
+        /// Try to fetch RW options from this robot.
+        /// </summary>
+        /// <returns></returns>
+        private bool LoadRobotWareOptions()
+        {
+            try
+            {
+                this.robotWare = this.controller.RobotWare;
+                this.robotWareOptions = this.robotWare.Options;
+                this._hasMultiTasking = HasMultiTaskOption(this.robotWareOptions);
+                this._hasEGM = HasEGMOption(this.robotWareOptions);
 
+                Console.WriteLine("RobotWare " + controller.RobotWare);
+                Console.WriteLine("RobotWareVersion " + controller.RobotWareVersion);
+                Console.WriteLine("hasMultiTasking? " + this._hasMultiTasking);
+                Console.WriteLine("hasEGM? " + this._hasEGM);
+                return true;
+
+            }
+            catch
+            {
+                this.robotWare = null;
+                this.robotWareOptions = null;
+                this._hasMultiTasking = false;
+                this._hasEGM = false;
+                Console.WriteLine("Could not access ROBOTWARE options");
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Does this robot have the MultiTask option?
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         private bool HasMultiTaskOption(RobotWareOptionCollection options)
         {
             var available = false;
@@ -536,6 +595,11 @@ namespace Machina.Drivers.Communication
             return available;
         }
 
+        /// <summary>
+        /// Does this robot have the Externally Guided Motion option?
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         private bool HasEGMOption(RobotWareOptionCollection options)
         {
             var available = false;

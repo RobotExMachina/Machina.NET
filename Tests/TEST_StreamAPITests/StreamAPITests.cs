@@ -16,6 +16,8 @@ namespace TEST_StreamAPITests
         //static int it = 0;
         //static int maxTargets = 36;
 
+        static bool PHYSICAL_ROBOT = false;
+
         static public void LogEvent(object sender, EventArgs args)
         {
             Console.WriteLine("EVENT RAISED");
@@ -31,6 +33,7 @@ namespace TEST_StreamAPITests
 
             arm.ConnectionManager("machina");
             arm.ControlMode("stream");
+            arm.SetUser("BUILD", "password");
             arm.Connect();
 
             //arm.ControlMode("stream");
@@ -78,30 +81,30 @@ namespace TEST_StreamAPITests
             bot.Message("Starting vertical square");
 
             // A 100 mm long tool with no TCP rotation
-            Tool rod = new Tool("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
+            Tool rod = new Tool("rod", new Point(0, 0, 175), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
             bot.Attach(rod);
 
             // Home
-            bot.SpeedTo(500);
+            bot.SpeedTo((int) (500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(10);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
 
             // Joint move and rotate to starting point
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
-            bot.SpeedTo(300);
+            bot.SpeedTo((int)(300 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(5);
             bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.Rotate(0, 1, 0, -90);
             bot.PopSettings();
             bot.Wait(500);
 
-            // Turn on "DO_15"
-            bot.SetIOName("DO_15", 1, true);
-            bot.WriteDigital(1, true);
+            //// Turn on "DO_15"
+            //bot.SetIOName("DO_15", 1, true);
+            //bot.WriteDigital(1, true);
 
             // Slow MoveL a square with precision
-            bot.SpeedTo(100);
+            bot.SpeedTo((int)(100 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(1);
             bot.Move(0, 50, 0);
             bot.Move(0, 0, 50);
@@ -109,12 +112,12 @@ namespace TEST_StreamAPITests
             bot.Move(0, 0, -50);
             bot.Wait(500);
 
-            // Turn off "DO_15"
-            bot.WriteDigital(1, false);
+            //// Turn off "DO_15"
+            //bot.WriteDigital(1, false);
 
             // No tool and back home
             bot.Detach();
-            bot.SpeedTo(500);
+            bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(5);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
 
@@ -136,20 +139,20 @@ namespace TEST_StreamAPITests
         static private void Spiral(Robot bot, int loops)
         {
             // Home
-            bot.SpeedTo(500);
+            bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(10);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
 
             // Joint move and rotate to starting point
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
-            bot.SpeedTo(300);
+            bot.SpeedTo((int)(300 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(5);
             bot.TransformTo(new Point(x, y, z), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.PopSettings();
             bot.Wait(500);
 
-            bot.SpeedTo(100);
+            bot.SpeedTo((int)(100 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             for (var i = 0; i < loops; i++)
             {
                 for (var j = 0; j < segments; j++)
@@ -161,7 +164,7 @@ namespace TEST_StreamAPITests
             }
 
             // Home
-            bot.SpeedTo(500);
+            bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(5);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
         }

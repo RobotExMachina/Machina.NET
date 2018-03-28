@@ -306,6 +306,17 @@ namespace Machina
         }
 
         /// <summary>
+        /// If the controller needs special user logging, set the credentials here. 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public bool SetUser(string name, string password)
+        {
+            return c.SetUserCredentials(name, password);
+        }
+
+        /// <summary>
         /// Scans the network for robotic devices, real or virtual, and performs all necessary 
         /// operations to connect to it. This is necessary for 'online' modes such as 'execute' and 'stream.'
         /// </summary>
@@ -1192,9 +1203,9 @@ namespace Machina
         /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
         /// </summary>
         /// <returns></returns>
-        public Point GetPosition()
+        public Point GetVirtualPosition()
         {
-            return c.GetCurrentPosition();
+            return c.GetVirtualPosition();
         }
 
         /// <summary>
@@ -1202,9 +1213,9 @@ namespace Machina
         /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
         /// </summary>
         /// <returns></returns>
-        public Rotation GetRotation()
+        public Rotation GetVirtualRotation()
         {
-            return c.GetCurrentOrientation();
+            return c.GetVirtualOrientation();
         }
 
         /// <summary>
@@ -1212,27 +1223,27 @@ namespace Machina
         /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
         /// </summary>
         /// <returns></returns>
-        public Orientation GetOrientation()
+        public Orientation GetVirtualOrientation()
         {
-            return (Orientation)c.GetCurrentOrientation();
+            return (Orientation)c.GetVirtualOrientation();
         }
 
         /// <summary>
         /// Returns a Joint object representing the rotations in the robot axes.
         /// </summary>
         /// <returns></returns>
-        public Joints GetAxes()
+        public Joints GetVirtualAxes()
         {
-            return c.getCurrentAxes();
+            return c.GetVirtualAxes();
         }
 
         /// <summary>
         /// Returns the Tool object currently attached to this Robot, null if none.
         /// </summary>
         /// <returns>The Tool object currently attached to this Robot, null if none.</returns>
-        public Tool GetTool()
+        public Tool GetVirtualTool()
         {
-            return c.GetCurrentTool();
+            return c.GetVirtualTool();
         }
 
 

@@ -26,8 +26,12 @@ This release focuses on reworking the Streaming mode to base it off TCP connecti
 - [x] Fix C:/mod permissions for non-admins, use ENV system path
 - [x] Rework the ABB real-time connection
 - [x] Add an overload for TransformTo that takes single values as x, y, z, xvec0, xvec1, xvec2, yvec0, yvec1, yvec2. 
-- [ ] Add BufferEmpty event
-- [ ] Add MotionCursorUpdated event 
+- [x] Add BufferEmpty event
+- [x] Add MotionCursorUpdated event 
+- [x] Add `GetCurrentPosition()` vs. `GetVirtualPsotion()`, drawing from state/virtual cursor.
+- [x] Same for orientation and axes. 
+- [x] Add `SetUser(name, password)` to specify special logging credentials.
+- [x] RobotWare options are now checked after log-on: for restricted accounts, `system.xml` is not accessible. 
 
 
 ## BUILD 1308
