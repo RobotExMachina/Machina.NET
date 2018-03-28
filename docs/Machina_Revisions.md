@@ -16,7 +16,9 @@
 ```
 
 
-## v0.6.0.1400
+# v0.6.0
+
+## BUILD 1400
 This release focuses on reworking the Streaming mode to base it off TCP connection with the controller server. 
 - [x] New factory constructor: `new Robot(...)` is now `Robot.Create(...)`
 - [x] `Offline` mode working with new architecture
