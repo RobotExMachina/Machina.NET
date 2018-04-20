@@ -507,22 +507,28 @@ namespace Machina
         /// Increase the default velocity new actions will be run at.
         /// </summary>
         /// <param name="speedInc"></param>
-        public void Speed(double speedInc)
+        public bool Speed(double speedInc)
         {
-            c.IssueSpeedRequest(speedInc, true);
+            return c.IssueSpeedRequest(speedInc, true);
         }
 
         /// <summary>
         /// Sets the default velocity new actions will be run at.
         /// </summary>
         /// <param name="speed"></param>
-        public void SpeedTo(double speed)
+        public bool SpeedTo(double speed)
         {
-            c.IssueSpeedRequest(speed, false);
+            return c.IssueSpeedRequest(speed, false);
         }
 
-        public void Acceleration(double acc)
+        public void Acceleration(double accInc)
         {
+
+        }
+
+        public void AccelerationTo(double acc)
+        {
+
         }
 
         /// <summary>
@@ -562,9 +568,9 @@ namespace Machina
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
         /// <param name="radiusInc">Smoothing radius increment in mm</param>
-        public void Precision(double radiusInc)
+        public bool Precision(double radiusInc)
         {
-            c.IssuePrecisionRequest(radiusInc, true);
+            return c.IssuePrecisionRequest(radiusInc, true);
         }
 
         /// <summary>
@@ -574,9 +580,9 @@ namespace Machina
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
         /// <param name="radius">Smoothing radius in mm</param>
-        public void PrecisionTo(double radius)
+        public bool PrecisionTo(double radius)
         {
-            c.IssuePrecisionRequest(radius, false);
+            return c.IssuePrecisionRequest(radius, false);
         }
 
         ///// <summary>

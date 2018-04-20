@@ -26,6 +26,7 @@ namespace Machina
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
         public Joints joints, prevJoints;
+        public double acceleration;
         public double speed;
         public double precision;
         public MotionType motionType;
@@ -156,7 +157,7 @@ namespace Machina
         /// <param name="joints"></param>
         /// <returns></returns>
         public bool Initialize(Vector position, Rotation rotation, Joints joints, 
-            double speed, double precision, MotionType mType, ReferenceCS refCS)
+            double acceleration, double speed, double precision, MotionType mType, ReferenceCS refCS)
         {
             if (position != null)
             {
@@ -173,6 +174,7 @@ namespace Machina
                 this.joints = new Joints(joints);
                 this.prevJoints = new Joints(joints);
             }
+            this.acceleration = acceleration;
             this.speed = speed;
             this.precision = precision;
             this.motionType = mType;
@@ -343,7 +345,7 @@ namespace Machina
         /// <returns></returns>
         public Settings GetSettings()
         {
-            return new Settings(this.speed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
+            return new Settings(this.acceleration, this.speed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
         }
 
 
@@ -366,6 +368,7 @@ namespace Machina
         /// </summary>
         Dictionary<Type, Func<Machina.Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
         {
+            { typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
             { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
             { typeof (ActionMotion),                    (act, robCur) => robCur.ApplyAction((ActionMotion) act) },
@@ -414,6 +417,23 @@ namespace Machina
         //  ╔═╗╔═╗╔╦╗╔╦╗╦╔╗╔╔═╗╔═╗  ╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
         //  ╚═╗║╣  ║  ║ ║║║║║ ╦╚═╗  ╠═╣║   ║ ║║ ║║║║╚═╗
         //  ╚═╝╚═╝ ╩  ╩ ╩╝╚╝╚═╝╚═╝  ╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
+        /// <summary>
+        /// Apply Acceleration Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionAcceleration action)
+        {
+            if (action.relative)
+                this.acceleration += action.acceleration;
+            else
+                this.acceleration = action.acceleration;
+
+            if (this.acceleration < 0) this.acceleration = 0;
+
+            return true;
+        }
+
         /// <summary>
         /// Apply Speed Action.
         /// </summary>
@@ -488,6 +508,7 @@ namespace Machina
                 Settings s = settingsBuffer.Pop(this);
                 if (s != null)
                 {
+                    this.acceleration = s.Acceleration;
                     this.speed = s.Speed;
                     this.precision = s.Precision;
                     this.motionType = s.MotionType;
@@ -998,20 +1019,7 @@ namespace Machina
             this.extrudedLength += this.extrusionRate * this.prevPosition.DistanceTo(this.position);
         }
 
-
-
-        public override string ToString()
-        {
-            return string.Format("{0}: {1} p{2} r{3} j{4} v{5} z{6} {7}", 
-                name, 
-                motionType, 
-                position, 
-                rotation, 
-                joints, 
-                speed, 
-                precision,
-                this.tool == null ? "" : "t" + this.tool);
-        }
+        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} a{acceleration} v{speed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
 
     }
 }

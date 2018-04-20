@@ -13,27 +13,28 @@ namespace Machina
     /// </summary>
     public enum ActionType
     {
-        Undefined = 0,
-        Translation = 1,
-        Rotation = 2,
-        Transformation = 3,
-        Axes = 4,
-        Message = 5,
-        Wait = 6,
-        Speed = 7,
-        Precision = 8,
-        Motion = 9,
-        Coordinates = 10,
-        PushPop = 11, 
-        Comment = 12,
-        Attach = 13,
-        Detach = 14,
-        IODigital = 15,
-        IOAnalog = 16, 
-        Temperature = 17,
-        Extrusion = 18,
-        ExtrusionRate = 19,
-        Initialization = 20
+        Undefined,
+        Translation,
+        Rotation,
+        Transformation,
+        Axes,
+        Message,
+        Wait,
+        Acceleration,
+        Speed,
+        Precision,
+        Motion,
+        Coordinates,
+        PushPop, 
+        Comment,
+        Attach,
+        Detach,
+        IODigital,
+        IOAnalog, 
+        Temperature,
+        Extrusion,
+        ExtrusionRate,
+        Initialization
     }
 
     
@@ -61,6 +62,16 @@ namespace Machina
         internal static int currentId = 1;  // a rolling id counter
 
         // Static constructors for APIs creating abstract actions (Dynamo ehem!)
+        public static ActionAcceleration Acceleration(double accInc)
+        {
+            return new ActionAcceleration(accInc, true);
+        }
+
+        public static ActionAcceleration AccelerationTo(double acc)
+        {
+            return new ActionAcceleration(acc, false);
+        }
+
         public static ActionSpeed Speed(double speedInc)
         {
             return new ActionSpeed(speedInc, true);
@@ -141,7 +152,6 @@ namespace Machina
             return new ActionMessage(msg);
         }
 
-        // Why were these not here...?
         public static ActionPushPop PushSettings()
         {
             return new ActionPushPop(true);
@@ -212,6 +222,36 @@ namespace Machina
 
 
 
+    //   █████╗  ██████╗ ██████╗███████╗██╗     ███████╗██████╗  █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+    //  ██╔══██╗██╔════╝██╔════╝██╔════╝██║     ██╔════╝██╔══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+    //  ███████║██║     ██║     █████╗  ██║     █████╗  ██████╔╝███████║   ██║   ██║██║   ██║██╔██╗ ██║
+    //  ██╔══██║██║     ██║     ██╔══╝  ██║     ██╔══╝  ██╔══██╗██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+    //  ██║  ██║╚██████╗╚██████╗███████╗███████╗███████╗██║  ██║██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+    //  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+    //                                                                                                 
+    public class ActionAcceleration : Action
+    {
+        public double acceleration;
+        public bool relative;
+
+        public ActionAcceleration(double acc, bool relative) : base()
+        {
+            this.type = ActionType.Acceleration;
+
+            this.acceleration = acc;
+            this.relative = relative;
+        }
+
+        public override string ToString()
+        {
+            return relative ?
+                string.Format("{0} acceleration by {1} mm/s^2", this.acceleration < 0 ? "Decrease" : "Increase", this.acceleration) :
+                string.Format("Set acceleration to {0} mm/s^2", this.acceleration);
+        }
+    }
+
+
+
     //  ███████╗██████╗ ███████╗███████╗██████╗ 
     //  ██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗
     //  ███████╗██████╔╝█████╗  █████╗  ██║  ██║
@@ -229,7 +269,7 @@ namespace Machina
 
         public ActionSpeed(double speed, bool relative) : base()
         {
-            type = ActionType.Speed;
+            this.type = ActionType.Speed;
 
             this.speed = speed;
             this.relative = relative;
@@ -292,7 +332,7 @@ namespace Machina
         
         public ActionMotion(MotionType motionType) : base()
         {
-            type = ActionType.Motion;
+            this.type = ActionType.Motion;
 
             this.motionType = motionType;
         }
@@ -319,7 +359,7 @@ namespace Machina
 
         public ActionCoordinates(ReferenceCS referenceCS) : base()
         {
-            type = ActionType.Coordinates;
+            this.type = ActionType.Coordinates;
 
             this.referenceCS = referenceCS;
         }
@@ -346,7 +386,7 @@ namespace Machina
 
         public ActionPushPop(bool push) : base()
         {
-            type = ActionType.PushPop;
+            this.type = ActionType.PushPop;
 
             this.push = push;
         }
@@ -387,7 +427,7 @@ namespace Machina
 
         public ActionTranslation(Vector trans, bool relTrans) : base()
         {
-            type = ActionType.Translation;
+            this.type = ActionType.Translation;
 
             translation = new Vector(trans);  // shallow copy
             relative = relTrans;
@@ -419,7 +459,7 @@ namespace Machina
             
         public ActionRotation(Rotation rot, bool relRot) : base()
         {
-            type = ActionType.Rotation;
+            this.type = ActionType.Rotation;
 
             rotation = new Rotation(rot);  // shallow copy
             relative = relRot;
@@ -455,7 +495,7 @@ namespace Machina
 
         public ActionTransformation(Vector translation, Rotation rotation, bool relative, bool translationFirst) : base()
         {
-            type = ActionType.Transformation;
+            this.type = ActionType.Transformation;
 
             this.translation = new Vector(translation);  // shallow copy
             this.rotation = new Rotation(rotation);  // shallow copy
@@ -503,7 +543,7 @@ namespace Machina
 
         //public ActionJoints(double j1, double j2, double j3, double j4, double j5, double j6, bool relative) : base()
         //{
-        //    type = ActionType.Joints;
+        //    this.type = ActionType.Joints;
 
         //    this.joints = new Joints(j1, j2, j3, j4, j5, j6);
         //    this.relative = relative;
@@ -514,7 +554,7 @@ namespace Machina
 
         public ActionAxes(Joints joints, bool relative)
         {
-            type = ActionType.Axes;
+            this.type = ActionType.Axes;
 
             this.joints = new Joints(joints);  // shallow copy
             this.relative = relative;
@@ -572,7 +612,7 @@ namespace Machina
 
         public ActionWait(long millis) : base()
         {
-            type = ActionType.Wait;
+            this.type = ActionType.Wait;
 
             this.millis = millis;
         }
@@ -601,7 +641,7 @@ namespace Machina
 
         public ActionComment(string comment) : base()
         {
-            type = ActionType.Comment;
+            this.type = ActionType.Comment;
 
             this.comment = comment;
         }
@@ -633,7 +673,7 @@ namespace Machina
 
         public ActionAttach(Tool tool) : base()
         {
-            type = ActionType.Attach;
+            this.type = ActionType.Attach;
 
             this.tool = tool;
             this.translationFirst = tool.translationFirst;

@@ -11,6 +11,7 @@ namespace Machina
     /// </summary>
     class Settings
     {
+        public double Acceleration;
         public double Speed;
         public double Precision;
         public MotionType MotionType;
@@ -18,20 +19,18 @@ namespace Machina
         public double ExtrusionRate;
 
 
-        public Settings(double speed, double precision, MotionType mType, ReferenceCS refcs, double extrusionRate)
+        public Settings(double acc, double speed, double precision, MotionType mType, ReferenceCS refcs, double extrusionRate)
         {
-            Speed = speed;
-            Precision = precision;
-            MotionType = mType;
-            RefCS = refcs;
+            this.Acceleration = acc;
+            this.Speed = speed;
+            this.Precision = precision;
+            this.MotionType = mType;
+            this.RefCS = refcs;
             this.ExtrusionRate = extrusionRate;
         }
 
-        public Settings Clone() => new Settings(Speed, Precision, MotionType, RefCS, ExtrusionRate);
+        public Settings Clone() => new Settings(Acceleration, Speed, Precision, MotionType, RefCS, ExtrusionRate);
 
-        public override string ToString() => $"{RefCS} {MotionType} {Speed}-{Precision} {ExtrusionRate}";
-        
+        public override string ToString() => $"{RefCS} {MotionType} {Acceleration}-{Speed}-{Precision} {ExtrusionRate}";
     }
-
-
 }

@@ -32,8 +32,9 @@ namespace Machina
         //public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
 
         // TODO: move to cursors, make it device specific
-        public const int DEFAULT_SPEED = 20;                                  // default speed for new actions
-        public const int DEFAULT_PRECISION = 5;                               // default precision for new actions
+        public const double DEFAULT_ACCELERATION = 1000;                      // default acc for new actions in mm/s^2  
+        public const double DEFAULT_SPEED = 20;                               // default speed for new actions
+        public const double DEFAULT_PRECISION = 5;                            // default precision for new actions
 
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
@@ -958,14 +959,14 @@ namespace Machina
         /// <param name="joints"></param>
         /// <returns></returns>
         internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
-            int speed = Control.DEFAULT_SPEED, int precision = Control.DEFAULT_PRECISION,
+            double acc = Control.DEFAULT_ACCELERATION, double speed = Control.DEFAULT_SPEED, double precision = Control.DEFAULT_PRECISION,
             MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
 
         {
             bool success = true;
-            success &= virtualCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
-            success &= writeCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
-            success &= motionCursor.Initialize(position, rotation, joints, speed, precision, mType, refCS);
+            success &= virtualCursor.Initialize(position, rotation, joints, acc, speed, precision, mType, refCS);
+            success &= writeCursor.Initialize(position, rotation, joints, acc, speed, precision, mType, refCS);
+            success &= motionCursor.Initialize(position, rotation, joints, acc, speed, precision, mType, refCS);
 
             _areCursorsInitialized = success;
 
