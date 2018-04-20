@@ -49,8 +49,18 @@ namespace Machina
         /// </summary>
         public static Orientation WorldYZ => new Orientation(0, 1, 0, 0, 0, 1);
 
+        /// <summary>
+        /// Implicit conversion to Quaternion object.
+        /// </summary>
+        /// <param name="ori"></param>
+        public static implicit operator Quaternion(Orientation ori) => ori.Q;
 
-
+        /// <summary>
+        /// Implicit conversion to RotationMatrix object.
+        /// </summary>
+        /// <param name="ori"></param>
+        public static implicit operator RotationMatrix(Orientation ori) => ori.RM;
+        
 
         internal Quaternion Q = null;
         internal RotationMatrix RM = null;  // useful for vector-to-quaternion conversions and as storage of orientation vectors
@@ -137,6 +147,10 @@ namespace Machina
         /// <param name="r"></param>
         internal Orientation(Rotation r)
             : this(r.Q) { }
+
+
+        public Quaternion ToQuaternion() => this.Q;
+        public RotationMatrix ToRotationMatrix() => this.RM;
 
 
         public override string ToString()

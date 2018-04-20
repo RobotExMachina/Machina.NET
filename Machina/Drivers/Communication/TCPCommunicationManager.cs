@@ -104,6 +104,14 @@ namespace Machina.Drivers.Communication
         }
 
 
+        internal bool ConfigureBuffer(int minActions, int maxActions)
+        {
+            this._maxStreamCount = maxActions;
+            this._sendNewBatchOn = minActions;
+            return true;
+        }
+
+
         private void SendingMethod(object obj)
         {
             // Expire the thread on disconnection
@@ -157,7 +165,7 @@ namespace Machina.Drivers.Communication
         {
             if (_isDeviceBufferFull)
             {
-                if (_sentMessages - _receivedMessages < _sendNewBatchOn)
+                if (_sentMessages - _receivedMessages <= _sendNewBatchOn)
                 {
                     _isDeviceBufferFull = false;
                     return true;
@@ -214,6 +222,11 @@ namespace Machina.Drivers.Communication
                 this._motionCursor.ApplyActionsUntilId(id);
                 //Console.WriteLine(_motionCursor);
                 this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
+
+                Action lastAction = this._motionCursor.lastAction;
+                int remaining = this._motionCursor.ActionsPending();
+                ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
+                this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
             }
         }
 

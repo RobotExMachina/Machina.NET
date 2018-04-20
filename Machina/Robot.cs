@@ -58,25 +58,40 @@ namespace Machina
         /// </summary>
         private Control c;  // the main control object
 
-        public delegate void BufferEmptyHandler(object sender, EventArgs e);
 
+
+
+        //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
+        //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
+        //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
+        //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
+        //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
+        //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+        //                                                      
+        /// <summary>
+        /// Will be raised when Machina has finished streaming all pending actions to the controller.
+        /// Note that the controller still needs to receive them and execute them. This gives Machina 
+        /// time to prepare the next batch.
+        /// </summary>
         public event BufferEmptyHandler BufferEmpty;
+        public delegate void BufferEmptyHandler(object sender, EventArgs e);
+        internal virtual void OnBufferEmpty(EventArgs e) => BufferEmpty?.Invoke(this, e);
 
-        internal virtual void OnBufferEmpty(EventArgs e)
-        {
-            //Console.WriteLine("Event raised, about to call handlers");
-
-            //if (BufferEmpty != null)
-            //    BufferEmpty(this, e);
-            BufferEmpty?.Invoke(this, e);  // same as above
-        }
-
-        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
+        /// <summary>
+        /// Will be raised when Machina received an update from the controller as has new motion
+        /// information available. Useful to keep track of the state of the controller.
+        /// </summary>
         public event MotionCursorUpdatedHandler MotionCursorUpdated;
-        internal virtual void OnMotionCursorUpdated(EventArgs e)
-        {
-            MotionCursorUpdated?.Invoke(this, e);
-        }
+        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
+        internal virtual void OnMotionCursorUpdated(EventArgs e) => MotionCursorUpdated?.Invoke(this, e);
+
+        /// <summary>
+        /// Raised whenever an action has been completed by the device. 
+        /// </summary>
+        public event ActionCompletedHandler ActionCompleted;
+        public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
+        internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
+        
 
 
 
@@ -145,11 +160,23 @@ namespace Machina
             c = new Control(this);
         }
 
+        /// <summary>
+        /// Create a new instance of a Robot.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="make"></param>
+        /// <returns></returns>
         static public Robot Create(string name, RobotType make)
         {
             return new Robot(name, make);
         }
 
+        /// <summary>
+        /// Create a new instance of a Robot.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="make"></param>
+        /// <returns></returns>
         static public Robot Create(string name, string make)
         {
             RobotType rt;
@@ -168,7 +195,6 @@ namespace Machina
                 {
                     Console.WriteLine(str.ToString());
                 }
-                return null;
             }
             //}
             //catch (Exception ex)
@@ -195,6 +221,16 @@ namespace Machina
             return brand == this.Brand;
         }
 
+        /// <summary>
+        /// Configure how actions are streamed to the controller.
+        /// </summary>
+        /// <param name="minActionOnController">When Machina detects that the controller has these many actions or less buffered, it will start streaming new actions.</param>
+        /// <param name="maxActionsOnController">When Maxhina detects that the controller has these many actions or more buffered, it will stop streaming and wait for them to reach minActionOnController to stream more.</param>
+        /// <returns></returns>
+        public bool StreamConfiguration(int minActionOnController, int maxActionsOnController)
+        {
+            return c.ConfigureBuffer(minActionOnController, maxActionsOnController);
+        }
 
         /// <summary>
         /// Sets the control mode the robot will operate under.
@@ -338,6 +374,12 @@ namespace Machina
             return c.ConnectToDevice(ip, port);
         }
 
+
+        public bool Connect(string ip, int port, string thisIP)
+        {
+
+        }
+
         /// <summary>
         /// Performs all necessary instructions to disconnect from and dispose a robot device, real or virtual. 
         /// This is necessary before leaving current execution thread.
@@ -398,24 +440,6 @@ namespace Machina
         }
 
         /// <summary>
-        /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
-        /// </summary>
-        /// <returns></returns>
-        public Point GetCurrentPosition()
-        {
-            return c.GetCurrentPosition();
-        }
-
-        /// <summary>
-        /// Returns a Rotation representation of the Robot's TCP orientation in quaternions.
-        /// </summary>
-        /// <returns></returns>
-        public Orientation GetCurrentOrientation()
-        {
-            return c.GetCurrentOrientation();
-        }
-
-        /// <summary>
         /// Create a program with all the buffered actions and return it as a string List.
         /// Note all buffered actions will be removed from the queue.
         /// </summary>
@@ -462,6 +486,7 @@ namespace Machina
         {
             return c.SetIOName(ioName, pinNumber, isDigital);
         }
+
 
 
 
@@ -1197,54 +1222,57 @@ namespace Machina
         //  ██║   ██║██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗╚════██║
         //  ╚██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║███████║
         //   ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
-        //                                                             
+        //               
+
+        /// <summary>
+        /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
+        /// </summary>
+        /// <returns></returns>
+        public Point GetCurrentPosition() => c.GetCurrentPosition();
+
+        /// <summary>
+        /// Returns a Rotation representation of the Robot's TCP orientation in quaternions.
+        /// </summary>
+        /// <returns></returns>
+        public Rotation GetCurrentRotation() => c.GetCurrentRotation();
+
+        /// <summary>
+        /// Returns a Joint object representing the rotations in the robot axes.
+        /// </summary>
+        /// <returns></returns>
+        public Joints GetCurrentAxes() => c.GetCurrentAxes();
+
+        /// <summary>
+        /// Returns the Tool object currently attached to this Robot, null if none.
+        /// </summary>
+        /// <returns>The Tool object currently attached to this Robot, null if none.</returns>
+        public Tool GetCurrentTool() => c.GetCurrentTool();
+
         /// <summary>
         /// Returns a Point represnting the current location of the Tool Center Point
         /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
         /// </summary>
         /// <returns></returns>
-        public Point GetVirtualPosition()
-        {
-            return c.GetVirtualPosition();
-        }
-
-        /// <summary>
-        /// Return a Rotation object representing the current rotation of the Tool Center Point
-        /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
-        /// </summary>
-        /// <returns></returns>
-        public Rotation GetVirtualRotation()
-        {
-            return c.GetVirtualOrientation();
-        }
+        public Point GetVirtualPosition() => c.GetVirtualPosition();
 
         /// <summary>
         /// Return a Orientation object representing the current orientation of the Tool Center Point
         /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
         /// </summary>
         /// <returns></returns>
-        public Orientation GetVirtualOrientation()
-        {
-            return (Orientation)c.GetVirtualOrientation();
-        }
+        public Orientation GetVirtualRotation() => c.GetVirtualRotation();
 
         /// <summary>
         /// Returns a Joint object representing the rotations in the robot axes.
         /// </summary>
         /// <returns></returns>
-        public Joints GetVirtualAxes()
-        {
-            return c.GetVirtualAxes();
-        }
+        public Joints GetVirtualAxes() => c.GetVirtualAxes();
 
         /// <summary>
         /// Returns the Tool object currently attached to this Robot, null if none.
         /// </summary>
         /// <returns>The Tool object currently attached to this Robot, null if none.</returns>
-        public Tool GetVirtualTool()
-        {
-            return c.GetVirtualTool();
-        }
+        public Tool GetVirtualTool() => c.GetVirtualTool();
 
 
 
@@ -1293,5 +1321,27 @@ namespace Machina
 
         public override string ToString() => $"Robot[\"{this.Name}\", {this.Brand}]";
 
+    }
+
+
+
+
+    //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗ █████╗ ██████╗  ██████╗ ███████╗
+    //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝
+    //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████║██████╔╝██║  ███╗███████╗
+    //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ██╔══██║██╔══██╗██║   ██║╚════██║
+    //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ██║  ██║██║  ██║╚██████╔╝███████║
+    //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+    //                                                                               
+    public class ActionCompletedArgs : EventArgs
+    {
+        public Action LastAction { get; set; }
+        public int RemainingActions { get; set; }
+
+        public ActionCompletedArgs(Action last, int remaining)
+        {
+            LastAction = last;
+            RemainingActions = remaining;
+        }
     }
 }

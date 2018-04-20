@@ -253,7 +253,10 @@ namespace Machina.Drivers
             throw new NotImplementedException();
         }
 
-
+        internal override bool ConfigureBuffer(int minActions, int maxActions)
+        {
+            return this._tcpManager.ConfigureBuffer(minActions, maxActions);
+        }
 
 
 

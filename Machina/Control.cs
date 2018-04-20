@@ -198,6 +198,7 @@ namespace Machina
         }
 
 
+
         //private bool InitializeMode(ControlType mode)
         //{
         //    switch (mode) {
@@ -259,6 +260,13 @@ namespace Machina
         //{
         //    return runMode;
         //}
+
+
+        internal bool ConfigureBuffer(int minActions, int maxActions)
+        {
+            return this.Driver.ConfigureBuffer(minActions, maxActions);
+        }
+
 
         /// <summary>
         /// Sets the current ConnectionManagerType.
@@ -490,7 +498,7 @@ namespace Machina
 
 
         public Vector GetVirtualPosition() => virtualCursor.position;
-        public Rotation GetVirtualOrientation() => virtualCursor.rotation;
+        public Rotation GetVirtualRotation() => virtualCursor.rotation;
         public Joints GetVirtualAxes() => virtualCursor.joints;
         public Tool GetVirtualTool() => virtualCursor.tool;
 
@@ -505,7 +513,7 @@ namespace Machina
         /// Returns a Rotation object representing the current robot's TCP orientation.
         /// </summary>
         /// <returns></returns>
-        public Rotation GetCurrentOrientation() => stateCursor.rotation;
+        public Rotation GetCurrentRotation() => stateCursor.rotation;
 
         /// <summary>
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.

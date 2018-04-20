@@ -190,6 +190,7 @@ namespace Machina.Drivers
         public abstract void DebugDump();
 
         
+        
 
 
 
@@ -204,6 +205,11 @@ namespace Machina.Drivers
         {
             this.User = new User(name, password);
             return true;
+        }
+
+        internal virtual bool ConfigureBuffer(int minActions, int maxActions)
+        {
+            return false;
         }
 
 

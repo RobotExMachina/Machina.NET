@@ -42,7 +42,10 @@ namespace Machina
         public Dictionary<RobotPartType, double> partTemperature = new Dictionary<RobotPartType, double>();
         public double extrudedLength, prevExtrudedLength;  // the length of filament that has been extruded, i.e. the "E" parameter
 
-        public Action lastAction = null;  // the last action that was applied to this cursor
+        /// <summary>
+        /// Last Action that was applied to this cursor
+        /// </summary>
+        public Action lastAction = null;
         protected bool initialized = false;
         private bool applyImmediately = false;  // when an action is issued to this cursor, apply it immediately?
 

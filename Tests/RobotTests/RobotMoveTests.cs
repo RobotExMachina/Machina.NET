@@ -82,20 +82,20 @@ namespace RobotTests
             Robot bot = new Robot("foo", "ABB");
             bot.MoveTo(300, 300, 300);
 
-            Rotation ror = bot.GetCurrentOrientation();
+            Rotation ror = bot.GetCurrentRotation();
             Trace.WriteLine("");
             Trace.WriteLine(ror);
             Trace.WriteLine(ror.Q);
 
             bot.Rotate(0, 1, 0, -90);
-            ror = bot.GetCurrentOrientation();
+            ror = bot.GetCurrentRotation();
             Trace.WriteLine(ror);
             Trace.WriteLine(ror.Q);
 
             Orientation ori = new Orientation(1, 1, 0, 1, -1, 0);
             Point pos = new Point(200, 200, 200);
             bot.TransformTo(ori, pos);
-            ror = bot.GetCurrentOrientation();
+            ror = bot.GetCurrentRotation();
             Trace.WriteLine(ror);
             Trace.WriteLine(ror.Q);
 
