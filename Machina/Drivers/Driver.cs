@@ -26,49 +26,47 @@ namespace Machina.Drivers
         /// </summary>
         internal Control parentControl = null;
 
-        //// ADDED A WRITE ROBOT CURSOR IN THE ABB OBJECT
-        ///// <summary>
-        ///// A reference to the shared streamQueue object
-        ///// </summary>
-        //protected StreamQueue streamQueue = null;
-        //public abstract RobotCursor writeCursor = null;
 
         /// <summary>
         /// A reference to the shared Write RobotCursor object
-        /// </summary>
-        private RobotCursor _writeCursor;
-
-        /// <summary>
-        /// A reference to the shared streamQueue object
         /// </summary>
         public RobotCursor WriteCursor
         {
             get { return _writeCursor; }
             set { _writeCursor = value; }
         }
+        private RobotCursor _writeCursor;
                 
         
-
-        private bool _connected = false;
+        /// <summary>
+        /// Is connected to device?
+        /// </summary>
         public bool Connected
         {
             get { return _connected; }
             internal set { _connected = value; }
         }
+        private bool _connected = false;
 
-        private string _ip = "";
+        /// <summary>
+        /// Device's IP
+        /// </summary>
         public string IP
         {
             get { return _ip; }
             internal set { _ip = value; }
         }
+        private string _ip = "";
 
-        private int _port = 0;  // @TODO: figure this out as an input somewhere
+        /// <summary>
+        /// Device's port
+        /// </summary>
         public int Port
         {
             get { return _port; }
             internal set { _port = value; }
         }
+        private int _port;
 
 
         /// <summary>

@@ -374,12 +374,6 @@ namespace Machina
             return c.ConnectToDevice(ip, port);
         }
 
-
-        public bool Connect(string ip, int port, string thisIP)
-        {
-
-        }
-
         /// <summary>
         /// Performs all necessary instructions to disconnect from and dispose a robot device, real or virtual. 
         /// This is necessary before leaving current execution thread.

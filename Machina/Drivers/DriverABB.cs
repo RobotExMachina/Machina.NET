@@ -131,9 +131,6 @@ namespace Machina.Drivers
         /// <returns></returns>
         public override bool DisconnectFromDevice()
         {
-            //Reset();
-            //_rsBridge.Disconnect();
-
             bool success = true;
 
             if (_tcpManager != null)
