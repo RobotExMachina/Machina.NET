@@ -32,7 +32,7 @@ namespace Machina
         //public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
 
         // TODO: move to cursors, make it device specific
-        public const double DEFAULT_ACCELERATION = 1000;                      // default acc for new actions in mm/s^2  
+        public const double DEFAULT_ACCELERATION = 0;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
         public const double DEFAULT_SPEED = 20;                               // default speed for new actions
         public const double DEFAULT_PRECISION = 5;                            // default precision for new actions
 

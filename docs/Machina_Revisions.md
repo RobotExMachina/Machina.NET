@@ -24,6 +24,7 @@
 - [x] Tweaks to ABB compiler to accept the above.
 - [x] Add `Acceleration` and `AccelerationTo` actions: add to Actions, Cursor, Settings
 - [x] Add acceleration params to UR compiler
+- [ ] 
 
 
 # v0.6.0

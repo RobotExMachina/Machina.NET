@@ -284,6 +284,24 @@ namespace Machina
             string dec = null;
             switch (action.type)
             {
+                case ActionType.Acceleration:
+                    bool zero = cursor.acceleration < Geometry.EPSILON2;
+                    dec = string.Format("    WorldAccLim {0};",
+                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                    break;
+
+                // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZA...
+                case ActionType.PushPop:
+                    // Find if there was a change in acceleration, and set the corresponsing instruction...
+                    ActionPushPop app = action as ActionPushPop;
+                    if (app.push) break;  // only necessary for pops
+                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON2) break;  // no change
+                    // If here, there was a change, so...
+                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON2;
+                    dec = string.Format("    WorldAccLim {0};",
+                        zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                    break;
+
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
@@ -406,6 +424,24 @@ namespace Machina
             string dec = null;
             switch (action.type)
             {
+                case ActionType.Acceleration:
+                    bool zero = cursor.acceleration < Geometry.EPSILON2;
+                    dec = string.Format("    WorldAccLim {0};",
+                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                    break;
+
+                // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZa...
+                case ActionType.PushPop:
+                    // Find if there was a change in acceleration, and set the corresponsing instruction...
+                    ActionPushPop app = action as ActionPushPop;
+                    if (app.push) break;  // only necessary for pops
+                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON2) break;  // no change
+                    // If here, there was a change, so...
+                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON2;
+                    dec = string.Format("    WorldAccLim {0};",
+                        zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                    break;
+
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:

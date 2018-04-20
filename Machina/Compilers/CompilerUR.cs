@@ -154,10 +154,10 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0}(target{1}, a={2}, v={3}, r={4})",
+                    dec = string.Format("  {0}(target{1}, {2}v={3}, r={4})",
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         id,
-                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
+                        cursor.acceleration > Geometry.EPSILON2 ? "a=" + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) + ", " : "",
                         Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
                         Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
@@ -286,10 +286,10 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0}({1}, a={2}, v={3}, r={4})",
+                    dec = string.Format("  {0}({1}, {2}v={3}, r={4})",
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         GetPoseTargetValue(cursor),
-                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
+                        cursor.acceleration > Geometry.EPSILON2 ? "a=" + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) + ", " : "",
                         Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
                         Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;

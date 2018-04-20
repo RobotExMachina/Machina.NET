@@ -524,7 +524,7 @@ namespace Machina
         /// <summary>
         /// Increase the default acceleration new Actions will be ran at.
         /// </summary>
-        /// <param name="accInc">Acceleration increment in mm/s^2.</param>
+        /// <param name="accInc">Acceleration increment in mm/s^2. Decreasing the acceleration value to zero will reset it back the robot's default.</param>
         /// <returns></returns>
         public bool Acceleration(double accInc)
         {
@@ -534,12 +534,25 @@ namespace Machina
         /// <summary>
         /// Set the default acceleration new Actions will be ran at. 
         /// </summary>
-        /// <param name="acceleration">Acceleration value in mm/s^2.</param>
+        /// <param name="acceleration">Acceleration value in mm/s^2. Setting this value to zero will reset acceleration to the robot's default.</param>
         /// <returns></returns>
         public bool AccelerationTo(double acceleration)
         {
             return c.IssueAccelerationRequest(acceleration, false);
         }
+
+        //public bool RotationalSpeed(double rotationalSpeedInc)
+        //{
+
+        //}
+
+        //public bool RotationalSpeedTo(double rotationalSpeed)
+        //{
+
+        //}
+
+
+
 
         /// <summary>
         /// Gets the current zone setting.

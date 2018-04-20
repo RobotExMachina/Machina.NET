@@ -82,7 +82,7 @@ namespace TEST_OfflineAPITests
             arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" :
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" :
                 arm.IsBrand("KUKA") ? @"C:\offlineTests.src" : 
-                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, false);
+                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
@@ -141,7 +141,6 @@ namespace TEST_OfflineAPITests
             bot.SpeedTo(500);
             bot.PrecisionTo(5);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
-
         }
 
 
