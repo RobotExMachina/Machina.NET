@@ -14,7 +14,7 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = Robot.Create("Offline_Tests", "ABB");
+            Robot arm = Robot.Create("Offline_Tests", "UR");
 
             VerticalSquare(arm);
 
@@ -112,6 +112,7 @@ namespace TEST_OfflineAPITests
             // Joint move and rotate to starting point
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
+            bot.AccelerationTo(1200);
             bot.SpeedTo(300.2);
             bot.PrecisionTo(5);
             bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));

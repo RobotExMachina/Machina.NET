@@ -23,7 +23,7 @@
 - [x] `Precision/To` can now be a `double`
 - [x] Tweaks to ABB compiler to accept the above.
 - [x] Add `Acceleration` and `AccelerationTo` actions: add to Actions, Cursor, Settings
-- [ ] Add acceleration params to UR compiler
+- [x] Add acceleration params to UR compiler
 
 
 # v0.6.0

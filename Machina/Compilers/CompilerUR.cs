@@ -154,25 +154,27 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0}(target{1}, a=1, v={2}, r={3})",
+                    dec = string.Format("  {0}(target{1}, a={2}, v={3}, r={4})",
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         id,
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
                 case ActionType.Axes:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
-                    dec = string.Format("  {0}(target{1}, a=1, v={2}, r={3})",
+                    dec = string.Format("  {0}(target{1}, a={2}, v={3}, r={4})",
                         "movej",
                         id,
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  popup(\"{0}\", title=\"{0}\", warning=False, error=False)",
+                    dec = string.Format("  popup(\"{0}\", title=\"Machina Message\", warning=False, error=False)",
                         am.message);
                     break;
 
@@ -284,25 +286,27 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})",
+                    dec = string.Format("  {0}({1}, a={2}, v={3}, r={4})",
                         cursor.motionType == MotionType.Joint ? "movej" : "movel",
                         GetPoseTargetValue(cursor),
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
                 case ActionType.Axes:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
-                    dec = string.Format("  {0}({1}, a=1, v={2}, r={3})",
+                    dec = string.Format("  {0}({1}, a={2}, v={3}, r={4})",
                         "movej",
                         GetJointTargetValue(cursor),
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(0.001 * cursor.precision, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
+                        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  popup(\"{0}\", title=\"{0}\", warning=False, error=False)",
+                    dec = string.Format("  popup(\"{0}\", title=\"Machina Message\", warning=False, error=False)",
                         am.message);
                     break;
 

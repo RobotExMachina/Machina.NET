@@ -88,7 +88,7 @@ namespace Machina
             header.Add($"{commChar}{commChar} consequence of using this software in any way whatsoever.");
             header.Add($"{commChar}{commChar} ");
             header.Add($"{commChar}{commChar} ");
-            header.Add($"{commChar}{commChar} Copyright(c) 2018 Jose Luis Garcia del Castillo y Lopez, {DateTime.Now.Year}");
+            header.Add($"{commChar}{commChar} Copyright(c) {DateTime.Now.Year} Jose Luis Garcia del Castillo y Lopez");
             header.Add($"{commChar}{commChar} https://github.com/RobotExMachina");
             header.Add($"{commChar}{commChar} ");
             header.Add($"{commChar}{commChar} MIT License");

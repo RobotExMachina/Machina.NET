@@ -728,6 +728,9 @@ namespace Machina
             return success;
         }
 
+
+        public bool IssueAccelerationRequest(double acc, bool relative) => IssueApplyActionRequest(new ActionAcceleration(acc, relative));
+
         /// <summary>
         /// Sets the speed parameter for future issued actions.
         /// </summary>

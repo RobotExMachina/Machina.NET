@@ -69,7 +69,7 @@ namespace Machina
         //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
         //                                                      
         /// <summary>
-        /// Will be raised when Machina has finished streaming all pending actions to the controller.
+        /// Will be raised when Machina has finished streaming all pending Actions to the controller.
         /// Note that the controller still needs to receive them and execute them. This gives Machina 
         /// time to prepare the next batch.
         /// </summary>
@@ -104,7 +104,7 @@ namespace Machina
         ///// <summary>
         ///// Base constructor.
         ///// </summary>                                                       
-        [System.Obsolete("Deprecated constructor, defaults to a human-readable interpretation of the actions. Please use Robot.Create(name, make) instead. Example: `Robot arm = Robot.Create(\"Machina\", \"ABB\");`")]
+        [System.Obsolete("Deprecated constructor, defaults to a human-readable interpretation of the Actions. Please use Robot.Create(name, make) instead. Example: `Robot arm = Robot.Create(\"Machina\", \"ABB\");`")]
         public Robot() : this("Machina", "HUMAN") { }
 
         [System.Obsolete("Deprecated constructor, use Robot.Create(name, make) instead")]
@@ -222,10 +222,10 @@ namespace Machina
         }
 
         /// <summary>
-        /// Configure how actions are streamed to the controller.
+        /// Configure how Actions are streamed to the controller.
         /// </summary>
-        /// <param name="minActionOnController">When Machina detects that the controller has these many actions or less buffered, it will start streaming new actions.</param>
-        /// <param name="maxActionsOnController">When Maxhina detects that the controller has these many actions or more buffered, it will stop streaming and wait for them to reach minActionOnController to stream more.</param>
+        /// <param name="minActionOnController">When Machina detects that the controller has these many Actions or less buffered, it will start streaming new Actions.</param>
+        /// <param name="maxActionsOnController">When Maxhina detects that the controller has these many Actions or more buffered, it will stop streaming and wait for them to reach minActionOnController to stream more.</param>
         /// <returns></returns>
         public bool StreamConfiguration(int minActionOnController, int maxActionsOnController)
         {
@@ -434,8 +434,8 @@ namespace Machina
         }
 
         /// <summary>
-        /// Create a program with all the buffered actions and return it as a string List.
-        /// Note all buffered actions will be removed from the queue.
+        /// Create a program with all the buffered Actions and return it as a string List.
+        /// Note all buffered Actions will be removed from the queue.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
@@ -446,8 +446,8 @@ namespace Machina
         }
 
         /// <summary>
-        /// Create a program with all the buffered actions and save it to a file. 
-        /// Note all buffered actions will be removed from the queue.
+        /// Create a program with all the buffered Actions and save it to a file. 
+        /// Note all buffered Actions will be removed from the queue.
         /// </summary>
         /// <param name="filepath"></param>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
@@ -460,7 +460,7 @@ namespace Machina
 
 
         /// <summary>
-        /// In 'execute' mode, flushes all pending actions, creates a program, 
+        /// In 'execute' mode, flushes all pending Actions, creates a program, 
         /// uploads it to the controller and runs it.
         /// </summary>
         /// <returns></returns>
@@ -504,31 +504,41 @@ namespace Machina
         }
 
         /// <summary>
-        /// Increase the default velocity new actions will be run at.
+        /// Increase the default velocity new Actions will be ran at.
         /// </summary>
-        /// <param name="speedInc"></param>
+        /// <param name="speedInc">Speed increment in mm/s.</param>
         public bool Speed(double speedInc)
         {
             return c.IssueSpeedRequest(speedInc, true);
         }
 
         /// <summary>
-        /// Sets the default velocity new actions will be run at.
+        /// Set the default velocity new Actions will be ran at.
         /// </summary>
-        /// <param name="speed"></param>
+        /// <param name="speed">Speed value in mm/s</param>
         public bool SpeedTo(double speed)
         {
             return c.IssueSpeedRequest(speed, false);
         }
 
-        public void Acceleration(double accInc)
+        /// <summary>
+        /// Increase the default acceleration new Actions will be ran at.
+        /// </summary>
+        /// <param name="accInc">Acceleration increment in mm/s^2.</param>
+        /// <returns></returns>
+        public bool Acceleration(double accInc)
         {
-
+            return c.IssueAccelerationRequest(accInc, true);
         }
 
-        public void AccelerationTo(double acc)
+        /// <summary>
+        /// Set the default acceleration new Actions will be ran at. 
+        /// </summary>
+        /// <param name="acceleration">Acceleration value in mm/s^2.</param>
+        /// <returns></returns>
+        public bool AccelerationTo(double acceleration)
         {
-
+            return c.IssueAccelerationRequest(acceleration, false);
         }
 
         /// <summary>
@@ -542,7 +552,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Increase the default zone value new actions will be given.
+        /// Increase the default zone value new Actions will be given.
         /// </summary>
         /// <param name="zoneInc"></param>
         [System.Obsolete("Deprecated method, use Precision(radiusInc) instead")]
@@ -552,7 +562,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Sets the default zone value new actions will be given.
+        /// Sets the default zone value new Actions will be given.
         /// </summary>
         /// <param name="zone"></param>
         [System.Obsolete("Deprecated method, use PrecisionTo(radius) instead")]
@@ -562,24 +572,24 @@ namespace Machina
         }
 
         /// <summary>
-        /// Increase the default precision value new actions will be given. 
+        /// Increase the default precision value new Actions will be given. 
         /// Precision is measured as the radius of the smooth interpolation
         /// between motion targets. This is refered to as "Zone", "Approximate
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
-        /// <param name="radiusInc">Smoothing radius increment in mm</param>
+        /// <param name="radiusInc">Smoothing radius increment in mm.</param>
         public bool Precision(double radiusInc)
         {
             return c.IssuePrecisionRequest(radiusInc, true);
         }
 
         /// <summary>
-        /// Set the default precision value new actions will be given. 
+        /// Set the default precision value new Actions will be given. 
         /// Precision is measured as the radius of the smooth interpolation
         /// between motion targets. This is refered to as "Zone", "Approximate
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
-        /// <param name="radius">Smoothing radius in mm</param>
+        /// <param name="radius">Smoothing radius in mm.</param>
         public bool PrecisionTo(double radius)
         {
             return c.IssuePrecisionRequest(radius, false);
@@ -595,7 +605,7 @@ namespace Machina
         //}
 
         /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued actions.
+        /// Sets the motion type (linear, joint...) for future issued Actions.
         /// </summary>
         /// <param name="motionType"></param>
         public bool MotionMode(MotionType motionType)
@@ -604,9 +614,9 @@ namespace Machina
         }
 
         /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued actions.
+        /// Sets the motion type (linear, joint...) for future issued Actions.
         /// </summary>
-        /// <param name="motionType">"linear", "joint", etc."</param>
+        /// <param name="motionType">"linear", "joint", etc.</param>
         public bool MotionMode(string motionType)
         {
             MotionType mt;
@@ -918,7 +928,7 @@ namespace Machina
         /// <summary>
         /// Issue a compound RELATIVE local Translation + Rotation request
         /// according to the current reference system.
-        /// Note that, if using local coordinates, order of actions will matter.  // TODO: wouldn't they matter too if the are in global coordinates?
+        /// Note that, if using local coordinates, order of Actions will matter.  // TODO: wouldn't they matter too if the are in global coordinates?
         /// </summary>
         /// <param name="direction"></param>
         /// <param name="rotation"></param>
@@ -934,7 +944,7 @@ namespace Machina
         /// <summary>
         /// Issue a compound RELATIVE local Rotation + Translation request
         /// according to the current reference system.
-        /// Note that, if using local coordinates, order of actions will matter. // TODO: wouldn't they matter too if the are in global coordinates?
+        /// Note that, if using local coordinates, order of Actions will matter. // TODO: wouldn't they matter too if the are in global coordinates?
         /// </summary>
         /// <param name="rotation"></param>
         /// <param name="direction"></param>
@@ -1300,7 +1310,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Dumps a list of the remaining buffered actions.
+        /// Dumps a list of the remaining buffered Actions.
         /// </summary>
         public void DebugBuffer()
         {
