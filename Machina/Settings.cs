@@ -11,14 +11,14 @@ namespace Machina
     /// </summary>
     class Settings
     {
-        public int Speed;
-        public int Precision;
+        public double Speed;
+        public double Precision;
         public MotionType MotionType;
         public ReferenceCS RefCS;
         public double ExtrusionRate;
 
 
-        public Settings(int speed, int precision, MotionType mType, ReferenceCS refcs, double extrusionRate)
+        public Settings(double speed, double precision, MotionType mType, ReferenceCS refcs, double extrusionRate)
         {
             Speed = speed;
             Precision = precision;

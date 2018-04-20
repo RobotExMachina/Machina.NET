@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina.Drivers.Protocols
+namespace Machina.Drivers.Communication.Protocols
 {
-    internal static class ProtocolFactory
+    internal static class Factory
     {
-        internal static ProtocolBase GetTranslator(Driver driver)
+        internal static Base GetTranslator(Driver driver)
         {
             switch (driver.parentControl.parentRobot.Brand)
             {
                 case RobotType.ABB:
-                    return new ABBServerProtocol();
+                    return new ABBCommunicationProtocol();
 
                 default:
                     throw new NotImplementedException();

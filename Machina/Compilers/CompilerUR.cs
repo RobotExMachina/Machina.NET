@@ -411,7 +411,7 @@ namespace Machina
         /// Returns an UR pose representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        internal string GetPoseTargetValue(RobotCursor cursor)
+        internal static string GetPoseTargetValue(RobotCursor cursor)
         {
             RotationVector axisAng = cursor.rotation.GetRotationVector(true);
             return string.Format("p[{0},{1},{2},{3},{4},{5}]",
@@ -427,7 +427,7 @@ namespace Machina
         /// Returns a UR joint representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
-        internal string GetJointTargetValue(RobotCursor cursor)
+        internal static string GetJointTargetValue(RobotCursor cursor)
         {
             Joints jrad = new Joints(cursor.joints);  // use a shallow copy
             Console.WriteLine(jrad);
@@ -447,7 +447,7 @@ namespace Machina
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        internal string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
+        internal static string GetToolValue(RobotCursor cursor)  //TODO: wouldn't it be just better to pass the Tool object? Inconsistent with the rest of the API...
         {
             if (cursor.tool == null)
             {

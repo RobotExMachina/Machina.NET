@@ -61,22 +61,22 @@ namespace Machina
         internal static int currentId = 1;  // a rolling id counter
 
         // Static constructors for APIs creating abstract actions (Dynamo ehem!)
-        public static ActionSpeed Speed(int speedInc)
+        public static ActionSpeed Speed(double speedInc)
         {
             return new ActionSpeed(speedInc, true);
         }
 
-        public static ActionSpeed SpeedTo(int speed)
+        public static ActionSpeed SpeedTo(double speed)
         {
             return new ActionSpeed(speed, false);
         }
 
-        public static ActionPrecision Precision(int precisionInc)
+        public static ActionPrecision Precision(double precisionInc)
         {
             return new ActionPrecision(precisionInc, true);
         }
 
-        public static ActionPrecision PrecisionTo(int precision)
+        public static ActionPrecision PrecisionTo(double precision)
         {
             return new ActionPrecision(precision, false);
         }
@@ -224,10 +224,10 @@ namespace Machina
     /// </summary>
     public class ActionSpeed : Action
     {
-        public int speed;
+        public double speed;
         public bool relative;
 
-        public ActionSpeed(int speed, bool relative) : base()
+        public ActionSpeed(double speed, bool relative) : base()
         {
             type = ActionType.Speed;
 
@@ -257,10 +257,10 @@ namespace Machina
     /// </summary>
     public class ActionPrecision : Action
     {
-        public int precision;
+        public double precision;
         public bool relative;
 
-        public ActionPrecision(int value, bool relative) : base()
+        public ActionPrecision(double value, bool relative) : base()
         {
             type = ActionType.Precision;
 

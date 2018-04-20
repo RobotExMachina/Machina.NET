@@ -34,12 +34,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1400;
+        public static readonly int Build = 1401;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.6.0." + Build;
+        public static readonly string Version = "0.6.1." + Build;
 
 
         /// <summary>
@@ -497,7 +497,8 @@ namespace Machina
         /// Gets the current speed setting.
         /// </summary>
         /// <returns></returns>
-        public int Speed()
+        [System.Obsolete("Deprecated method, use GetSpeed() instead")]
+        public double Speed()
         {
             return c.GetCurrentSpeedSetting();
         }
@@ -506,7 +507,7 @@ namespace Machina
         /// Increase the default velocity new actions will be run at.
         /// </summary>
         /// <param name="speedInc"></param>
-        public void Speed(int speedInc)
+        public void Speed(double speedInc)
         {
             c.IssueSpeedRequest(speedInc, true);
         }
@@ -515,17 +516,21 @@ namespace Machina
         /// Sets the default velocity new actions will be run at.
         /// </summary>
         /// <param name="speed"></param>
-        public void SpeedTo(int speed)
+        public void SpeedTo(double speed)
         {
             c.IssueSpeedRequest(speed, false);
+        }
+
+        public void Acceleration(double acc)
+        {
         }
 
         /// <summary>
         /// Gets the current zone setting.
         /// </summary>
         /// <returns></returns>
-        [System.Obsolete("Deprecated method, use Precision() instead")]
-        public int Zone()
+        [System.Obsolete("Deprecated method, use GetPrecision() instead")]
+        public double Zone()
         {
             return c.GetCurrentPrecisionSettings();
         }
@@ -535,7 +540,7 @@ namespace Machina
         /// </summary>
         /// <param name="zoneInc"></param>
         [System.Obsolete("Deprecated method, use Precision(radiusInc) instead")]
-        public void Zone(int zoneInc)
+        public void Zone(double zoneInc)
         {
             c.IssuePrecisionRequest(zoneInc, true);
         }
@@ -545,7 +550,7 @@ namespace Machina
         /// </summary>
         /// <param name="zone"></param>
         [System.Obsolete("Deprecated method, use PrecisionTo(radius) instead")]
-        public void ZoneTo(int zone)
+        public void ZoneTo(double zone)
         {
             c.IssuePrecisionRequest(zone, false);
         }
@@ -557,7 +562,7 @@ namespace Machina
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
         /// <param name="radiusInc">Smoothing radius increment in mm</param>
-        public void Precision(int radiusInc)
+        public void Precision(double radiusInc)
         {
             c.IssuePrecisionRequest(radiusInc, true);
         }
@@ -569,7 +574,7 @@ namespace Machina
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
         /// <param name="radius">Smoothing radius in mm</param>
-        public void PrecisionTo(int radius)
+        public void PrecisionTo(double radius)
         {
             c.IssuePrecisionRequest(radius, false);
         }

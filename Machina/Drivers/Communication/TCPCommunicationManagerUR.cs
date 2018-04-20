@@ -1,4 +1,4 @@
-﻿using Machina.Drivers.Protocols;
+﻿using Machina.Drivers.Communication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace Machina.Drivers.Communication
 {
     /// <summary>
-    /// A class that manages TCP communication with devices, including sending/receiving messages, 
-    /// queuing them, releasing them to the TCP server when appropriate, and raining events on 
+    /// A class that manages TCP communication with ABB devices, including sending/receiving messages, 
+    /// queuing them, releasing them to the TCP server when appropriate, and raising events on 
     /// buffer empty.
     /// </summary>
-    internal class TCPCommunicationManager
+    internal class TCPCommunicationManagerUR
     {
         internal TCPConnectionStatus Status { get; private set; }
 
@@ -31,7 +31,7 @@ namespace Machina.Drivers.Communication
         private int _port = 0;
         private bool _isDeviceBufferFull = false;
 
-        private Protocols.ProtocolBase _translator;
+        private Protocols.Base _translator;
         private List<string> _messageBuffer = new List<string>();
         private byte[] _sendMsgBytes;
         private byte[] _receiveMsgBytes = new byte[1024];
@@ -47,7 +47,7 @@ namespace Machina.Drivers.Communication
         private bool _bufferEmptyEventIsRaiseable = true;
 
 
-        internal TCPCommunicationManager(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string ip, int port)
+        internal TCPCommunicationManagerUR(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string ip, int port)
         {
             this._parentDriver = driver;
             this._writeCursor = writeCursor;
@@ -55,7 +55,7 @@ namespace Machina.Drivers.Communication
             this._ip = ip;
             this._port = port;
 
-            this._translator = ProtocolFactory.GetTranslator(this._parentDriver);
+            this._translator = Protocols.Factory.GetTranslator(this._parentDriver);
         }
 
         internal bool Disconnect()

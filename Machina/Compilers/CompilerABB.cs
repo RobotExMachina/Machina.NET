@@ -56,11 +56,11 @@ namespace Machina
             // CODE LINES GENERATION
             // VELOCITY & ZONE DECLARATIONS
             // Amount of different VZ types
-            Dictionary<int, string> velNames = new Dictionary<int, string>();
-            Dictionary<int, string> velDecs = new Dictionary<int, string>();
-            Dictionary<int, string> zoneNames = new Dictionary<int, string>();
-            Dictionary<int, string> zoneDecs = new Dictionary<int, string>();
-            Dictionary<int, bool> zonePredef = new Dictionary<int, bool>();
+            var velNames = new Dictionary<double, string>();
+            var velDecs = new Dictionary<double, string>();
+            var zoneNames = new Dictionary<double, string>();
+            var zoneDecs = new Dictionary<double, string>();
+            var zonePredef = new Dictionary<double, bool>();
 
             // TOOL DECLARATIONS
             Dictionary<Tool, string> toolNames = new Dictionary<Tool, string>();
@@ -97,15 +97,21 @@ namespace Machina
                 // Check velocity + zone and generate data accordingly
                 if (!velNames.ContainsKey(writer.speed))
                 {
-                    velNames.Add(writer.speed, "vel" + writer.speed);
+                    velNames.Add(writer.speed, "vel" + SafeDoubleName(writer.speed));
                     velDecs.Add(writer.speed, GetSpeedValue(writer));
                 }
 
                 if (!zoneNames.ContainsKey(writer.precision))
                 {
-                    bool predef = PredefinedZones.Contains(writer.precision);
+                    // If precision is very close to an integer, make it integer and/or use predefined zones
+                    bool predef = false;
+                    int roundZone = 0;
+                    if (Math.Abs(writer.precision - Math.Round(writer.precision)) < Geometry.EPSILON2) {
+                        roundZone = (int) Math.Round(writer.precision);
+                        predef = PredefinedZones.Contains(roundZone);
+                    }
                     zonePredef.Add(writer.precision, predef);
-                    zoneNames.Add(writer.precision, (predef ? "z" : "zone") + writer.precision);  // use predef syntax or clean new one
+                    zoneNames.Add(writer.precision, predef ? "z" + roundZone : "zone" + SafeDoubleName(writer.precision));  // use predef syntax or clean new one
                     zoneDecs.Add(writer.precision, predef ? "" : GetZoneValue(writer));
                 }
 
@@ -147,13 +153,13 @@ namespace Machina
             // Generate V+Z+T
             foreach (Tool t in toolNames.Keys)
             {
-                zoneLines.Add(string.Format("  PERS tooldata {0} := {1};", toolNames[t], toolDecs[t]));
+                toolLines.Add(string.Format("  PERS tooldata {0} := {1};", toolNames[t], toolDecs[t]));
             }
-            foreach (int v in velNames.Keys)
+            foreach (var v in velNames.Keys)
             {
                 velocityLines.Add(string.Format("  CONST speeddata {0} := {1};", velNames[v], velDecs[v]));
             }
-            foreach (int z in zoneNames.Keys)
+            foreach (var z in zoneNames.Keys)
             {
                 if (!zonePredef[z])  // no need to add declarations for predefined zones
                 {
@@ -190,6 +196,13 @@ namespace Machina
             }
 
             // VARIABLE DECLARATIONS
+            // Tools
+            if (toolLines.Count != 0)
+            {
+                module.AddRange(toolLines);
+                module.Add("");
+            }
+
             // Velocities
             if (velocityLines.Count != 0)
             {
@@ -263,8 +276,8 @@ namespace Machina
             Action action,
             RobotCursor cursor,
             int id,
-            Dictionary<int, string> velNames,
-            Dictionary<int, string> zoneNames,
+            Dictionary<double, string> velNames,
+            Dictionary<double, string> zoneNames,
             Dictionary<Tool, string> toolNames,
             out string declaration)
         {
@@ -385,8 +398,8 @@ namespace Machina
         internal bool GenerateInstructionDeclaration(
             Action action,
             RobotCursor cursor,
-            Dictionary<int, string> velNames,
-            Dictionary<int, string> zoneNames,
+            Dictionary<double, string> velNames,
+            Dictionary<double, string> zoneNames,
             Dictionary<Tool, string> toolNames,
             out string declaration)
         {
@@ -578,6 +591,8 @@ namespace Machina
                 cursor.tool.centerOfGravity,
                 "[1,0,0,0]");  // no internial axes by default
         }
+
+        static internal string SafeDoubleName(double value) => Math.Round(value, Geometry.STRING_ROUND_DECIMALS_MM).ToString().Replace('.', '_');
 
     }
 }

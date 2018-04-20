@@ -602,7 +602,7 @@ namespace Machina
         /// Gets current speed setting.
         /// </summary>
         /// <returns></returns>
-        public int GetCurrentSpeedSetting()
+        public double GetCurrentSpeedSetting()
         {
             // @TODO: will need to decide if this returns the current virtual, write or motion speed
             return virtualCursor.speed;
@@ -612,7 +612,7 @@ namespace Machina
         /// Gets current precision setting.
         /// </summary>
         /// <returns></returns>
-        public int GetCurrentPrecisionSettings()
+        public double GetCurrentPrecisionSettings()
         {
             return virtualCursor.precision;
         }
@@ -731,11 +731,11 @@ namespace Machina
         /// Sets the speed parameter for future issued actions.
         /// </summary>
         /// <param name="speed">In mm/s</param>
-        public bool IssueSpeedRequest(int speed, bool relative) => 
+        public bool IssueSpeedRequest(double speed, bool relative) => 
                 IssueApplyActionRequest(new ActionSpeed(speed, relative));
 
 
-        public bool IssuePrecisionRequest(int precision, bool relative) =>
+        public bool IssuePrecisionRequest(double precision, bool relative) =>
                 IssueApplyActionRequest(new ActionPrecision(precision, relative));
 
 

@@ -26,8 +26,8 @@ namespace Machina
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
         public Joints joints, prevJoints;
-        public int speed;
-        public int precision;
+        public double speed;
+        public double precision;
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
@@ -156,7 +156,7 @@ namespace Machina
         /// <param name="joints"></param>
         /// <returns></returns>
         public bool Initialize(Vector position, Rotation rotation, Joints joints, 
-            int speed, int zone, MotionType mType, ReferenceCS refCS)
+            double speed, double precision, MotionType mType, ReferenceCS refCS)
         {
             if (position != null)
             {
@@ -174,7 +174,7 @@ namespace Machina
                 this.prevJoints = new Joints(joints);
             }
             this.speed = speed;
-            this.precision = zone;
+            this.precision = precision;
             this.motionType = mType;
             this.referenceCS = refCS; 
 

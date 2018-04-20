@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina.Drivers.Protocols
+namespace Machina.Drivers.Communication.Protocols
 {
     /// <summary>
     /// A base class representing a translator from abstract Machina Actions + Cursors
     /// to messages in the communication protocol used by the device's server/firmata.
     /// </summary>
-    abstract class ProtocolBase
+    abstract class Base
     {
         /// <summary>
         /// Given a (write) cursor, apply next Action in the buffer and return a List of messages

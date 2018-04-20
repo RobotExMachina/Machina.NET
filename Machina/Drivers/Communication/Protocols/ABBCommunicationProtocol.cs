@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina.Drivers.Protocols
+namespace Machina.Drivers.Communication.Protocols
 {
-    class ABBServerProtocol : ProtocolBase
+    class ABBCommunicationProtocol : Base
     {
         // From the Machina_Server.mod file, must be consistent!
         internal const string STR_MESSAGE_END_CHAR = ";";
