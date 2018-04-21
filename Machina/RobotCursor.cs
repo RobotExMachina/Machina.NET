@@ -28,6 +28,9 @@ namespace Machina
         public Joints joints, prevJoints;
         public double acceleration;
         public double speed;
+        public double rotationSpeed;
+        public double jointAcceleration;
+        public double jointSpeed;
         public double precision;
         public MotionType motionType;
         public ReferenceCS referenceCS;
@@ -157,7 +160,8 @@ namespace Machina
         /// <param name="joints"></param>
         /// <returns></returns>
         public bool Initialize(Vector position, Rotation rotation, Joints joints, 
-            double acceleration, double speed, double precision, MotionType mType, ReferenceCS refCS)
+            double acceleration, double speed, double rotationSpeed, 
+            double precision, MotionType mType, ReferenceCS refCS)
         {
             if (position != null)
             {
@@ -176,6 +180,7 @@ namespace Machina
             }
             this.acceleration = acceleration;
             this.speed = speed;
+            this.rotationSpeed = rotationSpeed;
             this.precision = precision;
             this.motionType = mType;
             this.referenceCS = refCS; 
@@ -345,7 +350,7 @@ namespace Machina
         /// <returns></returns>
         public Settings GetSettings()
         {
-            return new Settings(this.acceleration, this.speed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
+            return new Settings(this.acceleration, this.speed, this.rotationSpeed, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
         }
 
 
@@ -370,6 +375,7 @@ namespace Machina
         {
             { typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
+            { typeof (ActionRotationSpeed),             (act, robCur) => robCur.ApplyAction((ActionRotationSpeed) act) },
             { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
             { typeof (ActionMotion),                    (act, robCur) => robCur.ApplyAction((ActionMotion) act) },
             { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
@@ -446,7 +452,24 @@ namespace Machina
             else
                 this.speed = action.speed;
 
-            if (this.speed < 0) speed = 0;
+            if (this.speed < 0) this.speed = 0;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply RotationSpeed Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionRotationSpeed action)
+        {
+            if (action.relative)
+                this.rotationSpeed += action.rotationSpeed;
+            else
+                this.rotationSpeed = action.rotationSpeed;
+
+            if (this.rotationSpeed < 0) this.rotationSpeed = 0;
 
             return true;
         }
@@ -510,6 +533,7 @@ namespace Machina
                 {
                     this.acceleration = s.Acceleration;
                     this.speed = s.Speed;
+                    this.rotationSpeed = s.RotationSpeed;
                     this.precision = s.Precision;
                     this.motionType = s.MotionType;
                     this.referenceCS = s.RefCS;
@@ -1019,7 +1043,7 @@ namespace Machina
             this.extrudedLength += this.extrusionRate * this.prevPosition.DistanceTo(this.position);
         }
 
-        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} a{acceleration} v{speed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
+        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} a{acceleration} v{speed} rv{rotationSpeed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
 
     }
 }

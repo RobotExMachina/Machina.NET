@@ -23,8 +23,11 @@
 - [x] `Precision/To` can now be a `double`
 - [x] Tweaks to ABB compiler to accept the above.
 - [x] Add `Acceleration` and `AccelerationTo` actions: add to Actions, Cursor, Settings
-- [x] Add acceleration params to UR compiler
-- [ ] 
+  - [x] Add acceleration params to UR compiler
+  - [x] Acceleration values of zero or less reset it back to the robot's default.
+- [x] Add `RotationSpeed/To()` option
+  - [x] Add ABB correct compilation with defaults
+  - [ ] Add UR warning compilation message
 
 
 # v0.6.0

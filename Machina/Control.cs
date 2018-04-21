@@ -32,6 +32,7 @@ namespace Machina
         //public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
 
         // TODO: move to cursors, make it device specific
+        public const double DEFAULT_ROTATIONSPEED = 0;                          // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
         public const double DEFAULT_ACCELERATION = 0;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
         public const double DEFAULT_SPEED = 20;                               // default speed for new actions
         public const double DEFAULT_PRECISION = 5;                            // default precision for new actions
@@ -729,15 +730,14 @@ namespace Machina
         }
 
 
+
         public bool IssueAccelerationRequest(double acc, bool relative) => IssueApplyActionRequest(new ActionAcceleration(acc, relative));
 
-        /// <summary>
-        /// Sets the speed parameter for future issued actions.
-        /// </summary>
-        /// <param name="speed">In mm/s</param>
+
         public bool IssueSpeedRequest(double speed, bool relative) => 
                 IssueApplyActionRequest(new ActionSpeed(speed, relative));
 
+        public bool IssueRotationSpeedRequest(double rotSpeed, bool rel) => IssueApplyActionRequest(new ActionRotationSpeed(rotSpeed, rel));
 
         public bool IssuePrecisionRequest(double precision, bool relative) =>
                 IssueApplyActionRequest(new ActionPrecision(precision, relative));
@@ -962,14 +962,15 @@ namespace Machina
         /// <param name="joints"></param>
         /// <returns></returns>
         internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
-            double acc = Control.DEFAULT_ACCELERATION, double speed = Control.DEFAULT_SPEED, double precision = Control.DEFAULT_PRECISION,
+            double acc = Control.DEFAULT_ACCELERATION, double speed = Control.DEFAULT_SPEED, double rotationSpeed = Control.DEFAULT_ROTATIONSPEED,
+            double precision = Control.DEFAULT_PRECISION,
             MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
 
         {
             bool success = true;
-            success &= virtualCursor.Initialize(position, rotation, joints, acc, speed, precision, mType, refCS);
-            success &= writeCursor.Initialize(position, rotation, joints, acc, speed, precision, mType, refCS);
-            success &= motionCursor.Initialize(position, rotation, joints, acc, speed, precision, mType, refCS);
+            success &= virtualCursor.Initialize(position, rotation, joints, acc, speed, rotationSpeed, precision, mType, refCS);
+            success &= writeCursor.Initialize(position, rotation, joints, acc, speed, rotationSpeed, precision, mType, refCS);
+            success &= motionCursor.Initialize(position, rotation, joints, acc, speed, rotationSpeed, precision, mType, refCS);
 
             _areCursorsInitialized = success;
 

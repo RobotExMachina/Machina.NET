@@ -162,6 +162,10 @@ namespace Machina
                         Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
+                case ActionType.RotationSpeed:
+                    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", commChar);
+                    break;
+
                 case ActionType.Axes:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
                     dec = string.Format("  {0}(target{1}, a={2}, v={3}, r={4})",
@@ -292,6 +296,10 @@ namespace Machina
                         cursor.acceleration > Geometry.EPSILON2 ? "a=" + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) + ", " : "",
                         Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
                         Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    break;
+
+                case ActionType.RotationSpeed:
+                    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", commChar);
                     break;
 
                 case ActionType.Axes:

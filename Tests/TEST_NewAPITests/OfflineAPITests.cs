@@ -113,6 +113,7 @@ namespace TEST_OfflineAPITests
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
             bot.AccelerationTo(1200);
+            bot.RotationSpeedTo(400);
             bot.SpeedTo(300.2);
             bot.PrecisionTo(5);
             bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));

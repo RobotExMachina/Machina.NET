@@ -22,6 +22,7 @@ namespace Machina
         Wait,
         Acceleration,
         Speed,
+        RotationSpeed,
         Precision,
         Motion,
         Coordinates,
@@ -55,7 +56,6 @@ namespace Machina
     /// </summary>
     public class Action
     {
-
         //  ╔═╗╔╦╗╔═╗╔╦╗╦╔═╗  ╔═╗╔╦╗╦ ╦╔═╗╔═╗
         //  ╚═╗ ║ ╠═╣ ║ ║║    ╚═╗ ║ ║ ║╠╣ ╠╣ 
         //  ╚═╝ ╩ ╩ ╩ ╩ ╩╚═╝  ╚═╝ ╩ ╚═╝╚  ╚  
@@ -80,6 +80,16 @@ namespace Machina
         public static ActionSpeed SpeedTo(double speed)
         {
             return new ActionSpeed(speed, false);
+        }
+
+        public static ActionRotationSpeed RotationSpeed(double rotSpeedInc) 
+        {
+            return new ActionRotationSpeed(rotSpeedInc, true);
+        }
+
+        public static ActionRotationSpeed RotationSpeedTo(double rotSpeed)
+        {
+            return new ActionRotationSpeed(rotSpeed, false);
         }
 
         public static ActionPrecision Precision(double precisionInc)
@@ -245,8 +255,8 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                string.Format("{0} acceleration by {1} mm/s^2", this.acceleration < 0 ? "Decrease" : "Increase", this.acceleration) :
-                string.Format("Set acceleration to {0} mm/s^2", this.acceleration);
+                string.Format("{0} TCP acceleration by {1} mm/s^2", this.acceleration < 0 ? "Decrease" : "Increase", this.acceleration) :
+                string.Format("Set TCP acceleration to {0} mm/s^2", this.acceleration);
         }
     }
 
@@ -278,8 +288,40 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                string.Format("{0} speed by {1} mm/s", this.speed < 0 ? "Decrease" : "Increase", speed) :
-                string.Format("Set speed to {0} mm/s", speed);
+                string.Format("{0} TCP speed by {1} mm/s", this.speed < 0 ? "Decrease" : "Increase", speed) :
+                string.Format("Set TCP speed to {0} mm/s", speed);
+        }
+    }
+
+
+
+
+
+    //  ██████╗  ██████╗ ████████╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗    ███████╗██████╗ ███████╗███████╗██████╗ 
+    //  ██╔══██╗██╔═══██╗╚══██╔══╝██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║    ██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗
+    //  ██████╔╝██║   ██║   ██║   ███████║   ██║   ██║██║   ██║██╔██╗ ██║    ███████╗██████╔╝█████╗  █████╗  ██║  ██║
+    //  ██╔══██╗██║   ██║   ██║   ██╔══██║   ██║   ██║██║   ██║██║╚██╗██║    ╚════██║██╔═══╝ ██╔══╝  ██╔══╝  ██║  ██║
+    //  ██║  ██║╚██████╔╝   ██║   ██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║    ███████║██║     ███████╗███████╗██████╔╝
+    //  ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝    ╚══════╝╚═╝     ╚══════╝╚══════╝╚═════╝ 
+    //                                                                                                               
+    public class ActionRotationSpeed : Action
+    {
+        public double rotationSpeed;
+        public bool relative;
+
+        public ActionRotationSpeed(double rotSpeed, bool rel) : base()
+        {
+            this.type = ActionType.RotationSpeed;
+
+            this.rotationSpeed = rotSpeed;
+            this.relative = rel;
+        }
+
+        public override string ToString()
+        {
+            return relative ?
+                string.Format("{0} TCP rotation speed by {1} mm/s", this.rotationSpeed < 0 ? "Decrease" : "Increase", this.rotationSpeed) :
+                string.Format("Set TCP rotation speed to {0} mm/s", this.rotationSpeed);
         }
     }
 
@@ -311,8 +353,8 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                string.Format("{0} precision by {1} mm", this.precision < 0 ? "Decrease" : "Increase", this.precision) :
-                string.Format("Set precision to {0} mm", this.precision);
+                string.Format("{0} precision radius by {1} mm", this.precision < 0 ? "Decrease" : "Increase", this.precision) :
+                string.Format("Set precision radius to {0} mm", this.precision);
         }
     }
 
