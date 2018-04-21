@@ -16,6 +16,9 @@
 ```
 
 
+- [ ] Improved Logging system
+- [ ] UR streaming
+
 # v0.6.1
 
 ## BUILD 1401
@@ -27,7 +30,10 @@
   - [x] Acceleration values of zero or less reset it back to the robot's default.
 - [x] Add `RotationSpeed/To()` option
   - [x] Add ABB correct compilation with defaults
-  - [ ] Add UR warning compilation message
+  - [x] Add UR warning compilation message
+- [x] Add `JointSpeed/To()` and `JointAcceleration/To()` for UR robots
+  - [ ] Add UR compilation
+  - [ ] Add ABB compilation warnings
 
 
 # v0.6.0

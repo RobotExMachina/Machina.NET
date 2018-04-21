@@ -566,41 +566,28 @@ namespace Machina
         /// </summary>
         /// <param name="jointSpeedInc">Maximum joint angular rotation speed increment in deg/s. Decreasing the total to zero or less will reset it back to the robot's default.</param>
         /// <returns></returns>
-        public bool JointSpeed(double jointSpeedInc)
-        {
-            throw new NotImplementedException();
-        }
+        public bool JointSpeed(double jointSpeedInc) => c.IssueJointSpeedRequest(jointSpeedInc, true);
 
         /// <summary>
         /// Set the maximum joint angular rotation speed value. Movement will be constrained so that the fastest joint rotates below this threshold. 
         /// </summary>
         /// <param name="jointSpeed">Maximum joint angular rotation speed value in deg/s. Setting this value to zero or less will reset it back to the robot's default.</param>
         /// <returns></returns>
-        public bool JointSpeedTo(double jointSpeed)
-        {
-            throw new NotImplementedException();
-        }
+        public bool JointSpeedTo(double jointSpeed) => c.IssueJointSpeedRequest(jointSpeed, false);
 
         /// <summary>
         /// Increase the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
         /// </summary>
         /// <param name="jointAccelerationInc">Maximum joint angular rotation acceleration increment in deg/s^2. Decreasing the total to zero or less will reset it back to the robot's default.</param>
         /// <returns></returns>
-        public bool JointAcceleration(double jointAccelerationInc)
-        {
-            throw new NotImplementedException();
-        }
+        public bool JointAcceleration(double jointAccelerationInc) => c.IssueJointAccelerationRequest(jointAccelerationInc, true);
 
         /// <summary>
         /// Set the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
         /// </summary>
         /// <param name="jointAcceleration">Maximum joint angular rotation acceleration value in deg/s^2. Setting this value to zero or less will reset it back to the robot's default.</param>
         /// <returns></returns>
-        public bool JointAccelerationTo(double jointAcceleration)
-        {
-            throw new NotImplementedException();
-        }
-
+        public bool JointAccelerationTo(double jointAcceleration) => c.IssueJointAccelerationRequest(jointAcceleration, false);
 
         /// <summary>
         /// Gets the current zone setting.

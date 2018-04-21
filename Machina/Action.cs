@@ -20,9 +20,11 @@ namespace Machina
         Axes,
         Message,
         Wait,
-        Acceleration,
         Speed,
+        Acceleration,
         RotationSpeed,
+        JointSpeed, 
+        JointAcceleration,
         Precision,
         Motion,
         Coordinates,
@@ -90,6 +92,26 @@ namespace Machina
         public static ActionRotationSpeed RotationSpeedTo(double rotSpeed)
         {
             return new ActionRotationSpeed(rotSpeed, false);
+        }
+
+        public static ActionJointSpeed JointSpeed(double jointSpeedInc)
+        {
+            return new ActionJointSpeed(jointSpeedInc, true);
+        }
+
+        public static ActionJointSpeed JointSpeedTo(double jointSpeed)
+        {
+            return new ActionJointSpeed(jointSpeed, false);
+        }
+
+        public static ActionJointAcceleration JointAcceleration(double jointAccelerationInc)
+        {
+            return new ActionJointAcceleration(jointAccelerationInc, true);
+        }
+
+        public static ActionJointAcceleration JointAccelerationTo(double jointAcceleration)
+        {
+            return new ActionJointAcceleration(jointAcceleration, false);
         }
 
         public static ActionPrecision Precision(double precisionInc)
@@ -322,6 +344,57 @@ namespace Machina
             return relative ?
                 string.Format("{0} TCP rotation speed by {1} mm/s", this.rotationSpeed < 0 ? "Decrease" : "Increase", this.rotationSpeed) :
                 string.Format("Set TCP rotation speed to {0} mm/s", this.rotationSpeed);
+        }
+    }
+
+
+
+    //       ██╗ ██████╗ ██╗███╗   ██╗████████╗    ███████╗██████╗   ██╗ █████╗  ██████╗ ██████╗
+    //       ██║██╔═══██╗██║████╗  ██║╚══██╔══╝    ██╔════╝██╔══██╗ ██╔╝██╔══██╗██╔════╝██╔════╝
+    //       ██║██║   ██║██║██╔██╗ ██║   ██║       ███████╗██████╔╝██╔╝ ███████║██║     ██║     
+    //  ██   ██║██║   ██║██║██║╚██╗██║   ██║       ╚════██║██╔═══╝██╔╝  ██╔══██║██║     ██║     
+    //  ╚█████╔╝╚██████╔╝██║██║ ╚████║   ██║       ███████║██║   ██╔╝   ██║  ██║╚██████╗╚██████╗
+    //   ╚════╝  ╚═════╝ ╚═╝╚═╝  ╚═══╝   ╚═╝       ╚══════╝╚═╝   ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
+    //                                                                                          
+    public class ActionJointSpeed : Action
+    {
+        public double jointSpeed;
+        public bool relative;
+
+        public ActionJointSpeed(double jointSpeed, bool rel) : base()
+        {
+            this.type = ActionType.JointSpeed;
+
+            this.jointSpeed = jointSpeed;
+            this.relative = rel;
+        }
+
+        public override string ToString()
+        {
+            return relative ?
+                string.Format("{0} joint speed by {1} deg/s", this.jointSpeed < 0 ? "Decrease" : "Increase", this.jointSpeed) :
+                string.Format("Set joint speed to {0} mm/s", this.jointSpeed);
+        }
+    }
+
+    public class ActionJointAcceleration : Action
+    {
+        public double jointAcceleration;
+        public bool relative;
+
+        public ActionJointAcceleration(double jointAcceleration, bool rel) : base()
+        {
+            this.type = ActionType.JointAcceleration;
+
+            this.jointAcceleration = jointAcceleration;
+            this.relative = rel;
+        }
+
+        public override string ToString()
+        {
+            return relative ?
+                string.Format("{0} joint acceleration by {1} deg/s", this.jointAcceleration < 0 ? "Decrease" : "Increase", this.jointAcceleration) :
+                string.Format("Set joint acceleration to {0} mm/s", this.jointAcceleration);
         }
     }
 
