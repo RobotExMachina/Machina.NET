@@ -290,6 +290,13 @@ namespace Machina
                         zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
+                case ActionType.JointSpeed:
+                case ActionType.JointAcceleration:
+                    dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.", 
+                        commChar,
+                        action.type);
+                    break;
+
                 // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZA...
                 case ActionType.PushPop:
                     // Find if there was a change in acceleration, and set the corresponsing instruction...
@@ -428,6 +435,13 @@ namespace Machina
                     bool zero = cursor.acceleration < Geometry.EPSILON2;
                     dec = string.Format("    WorldAccLim {0};",
                         zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                    break;
+
+                case ActionType.JointSpeed:
+                case ActionType.JointAcceleration:
+                    dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.",
+                        commChar,
+                        action.type);
                     break;
 
                 // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZa...

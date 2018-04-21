@@ -22,6 +22,12 @@ namespace Machina
     /// </summary>
     internal class CompilerUR : Compiler
     {
+        // From the URScript manual
+        private const double DEFAULT_JOINT_ACCELERATION = 1.4;
+        private const double DEFAULT_JOINT_SPEED = 1.05;
+        private const double DEFAULT_TOOL_ACCELERATION = 1.2;
+        private const double DEFAULT_TOOL_SPEED = 0.25;
+        
         internal CompilerUR() : base("#") { }
 
         /// <summary>
@@ -154,12 +160,24 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0}(target{1}, {2}v={3}, r={4})",
-                        cursor.motionType == MotionType.Joint ? "movej" : "movel",
-                        id,
-                        cursor.acceleration > Geometry.EPSILON2 ? "a=" + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) + ", " : "",
-                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
-                        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    // Accelerations and velocoties have different meaning for moveJ and moveL instructions.
+                    // Joint motion is essentially the same as Axes motion, just the input is a pose instead of a joints vector.
+                    if (cursor.motionType == MotionType.Joint)
+                    {
+                        dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
+                            id,
+                            cursor.jointAcceleration > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                            cursor.jointSpeed > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
+                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    }
+                    else
+                    {
+                        dec = string.Format("  movel(target{0}, a={1}, v={2}, r={3})",
+                            id,
+                            cursor.acceleration > Geometry.EPSILON2 ? Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_ACCELERATION,
+                            cursor.speed > Geometry.EPSILON2 ? Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_SPEED,
+                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    }
                     break;
 
                 case ActionType.RotationSpeed:
@@ -168,11 +186,10 @@ namespace Machina
 
                 case ActionType.Axes:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
-                    dec = string.Format("  {0}(target{1}, a={2}, v={3}, r={4})",
-                        "movej",
+                    dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
                         id,
-                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
-                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
+                        cursor.jointAcceleration > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                        cursor.jointSpeed > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
                         Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
@@ -290,12 +307,25 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0}({1}, {2}v={3}, r={4})",
-                        cursor.motionType == MotionType.Joint ? "movej" : "movel",
-                        GetPoseTargetValue(cursor),
-                        cursor.acceleration > Geometry.EPSILON2 ? "a=" + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) + ", " : "",
-                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
-                        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    // Accelerations and velocoties have different meaning for moveJ and moveL instructions.
+                    // Joint motion is essentially the same as Axes motion, just the input is a pose instead of a joints vector.
+                    if (cursor.motionType == MotionType.Joint)
+                    {
+                        dec = string.Format("  movej({0}, a={1}, v={2}, r={3})",
+                            GetPoseTargetValue(cursor),
+                            cursor.jointAcceleration > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                            cursor.jointSpeed > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
+                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    }
+                    else
+                    {
+                        dec = string.Format("  movel({0}, a={1}, v={2}, r={3})",
+                            GetPoseTargetValue(cursor),
+                            cursor.acceleration > Geometry.EPSILON2 ? Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_ACCELERATION,
+                            cursor.speed > Geometry.EPSILON2 ? Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_SPEED,
+                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    }
+                    break;
                     break;
 
                 case ActionType.RotationSpeed:
@@ -304,11 +334,10 @@ namespace Machina
 
                 case ActionType.Axes:
                     // HAL generates a "set_tcp(p[0,0,0,0,0,0])" call here which I find confusing... 
-                    dec = string.Format("  {0}({1}, a={2}, v={3}, r={4})",
-                        "movej",
+                    dec = string.Format("  movej({0}, a={1}, v={2}, r={3})",
                         GetJointTargetValue(cursor),
-                        Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
-                        Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
+                        cursor.jointAcceleration > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                        cursor.jointSpeed > Geometry.EPSILON2 ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
                         Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 

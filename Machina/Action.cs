@@ -373,7 +373,7 @@ namespace Machina
         {
             return relative ?
                 string.Format("{0} joint speed by {1} deg/s", this.jointSpeed < 0 ? "Decrease" : "Increase", this.jointSpeed) :
-                string.Format("Set joint speed to {0} mm/s", this.jointSpeed);
+                string.Format("Set joint speed to {0} deg/s", this.jointSpeed);
         }
     }
 
@@ -393,8 +393,8 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                string.Format("{0} joint acceleration by {1} deg/s", this.jointAcceleration < 0 ? "Decrease" : "Increase", this.jointAcceleration) :
-                string.Format("Set joint acceleration to {0} mm/s", this.jointAcceleration);
+                string.Format("{0} joint acceleration by {1} deg/s^2", this.jointAcceleration < 0 ? "Decrease" : "Increase", this.jointAcceleration) :
+                string.Format("Set joint acceleration to {0} deg/s^2", this.jointAcceleration);
         }
     }
 

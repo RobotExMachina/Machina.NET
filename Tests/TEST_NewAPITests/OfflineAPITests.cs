@@ -14,7 +14,7 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = Robot.Create("Offline_Tests", "UR");
+            Robot arm = Robot.Create("Offline_Tests", "ABB");
 
             VerticalSquare(arm);
 
@@ -112,9 +112,11 @@ namespace TEST_OfflineAPITests
             // Joint move and rotate to starting point
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
-            bot.AccelerationTo(1200);
-            bot.RotationSpeedTo(400);
+            bot.AccelerationTo(2000);
+            bot.RotationSpeedTo(45);
             bot.SpeedTo(300.2);
+            bot.JointSpeedTo(45);
+            bot.JointAccelerationTo(90);
             bot.PrecisionTo(5);
             bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.Rotate(0, 1, 0, -90);
@@ -128,6 +130,7 @@ namespace TEST_OfflineAPITests
             // Slow MoveL a square with precision
             bot.SpeedTo(100.3);
             bot.PrecisionTo(0.1);
+            bot.AccelerationTo(2000);
             bot.Move(0, 50, 0);
             bot.Move(0, 0, 50);
             bot.Move(0, -50, 0);
