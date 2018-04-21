@@ -32,8 +32,8 @@
   - [x] Add ABB correct compilation with defaults
   - [x] Add UR warning compilation message
 - [x] Add `JointSpeed/To()` and `JointAcceleration/To()` for UR robots
-  - [ ] Add UR compilation
-  - [ ] Add ABB compilation warnings
+  - [x] Add UR compilation
+  - [x] Add ABB compilation warnings
 
 
 # v0.6.0
