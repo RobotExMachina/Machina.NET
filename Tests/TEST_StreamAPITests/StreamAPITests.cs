@@ -16,7 +16,10 @@ namespace TEST_StreamAPITests
         //static int it = 0;
         //static int maxTargets = 36;
 
-        static bool PHYSICAL_ROBOT = false;
+        static bool PHYSICAL_ROBOT = true;
+
+        //static Joints homeJoints = new Joints(0, 0, 0, 0, 90, 0);           // ABB
+        static Joints homeJoints = new Joints(0, -90, -90, -90, 90, 90);    // UR
 
         static public void LogEvent(object sender, EventArgs args)
         {
@@ -27,14 +30,14 @@ namespace TEST_StreamAPITests
 
         static void Main(string[] args)
         {
-            Robot arm = Robot.Create("StreamTests", "ABB");
+            Robot arm = Robot.Create("StreamTests", "UR");
 
             arm.BufferEmpty += LogEvent;
 
-            arm.ConnectionManager("machina");
+            //arm.ConnectionManager("machina");
             arm.ControlMode("stream");
-            arm.SetUser("BUILD", "password");
-            arm.Connect();
+            //arm.SetUser("BUILD", "password");
+            arm.Connect("192.168.0.101", 6969);
 
             //arm.ControlMode("stream");
             //arm.Connect("127.0.0.1", 7000);
@@ -81,18 +84,18 @@ namespace TEST_StreamAPITests
             bot.Message("Starting vertical square");
 
             // A 100 mm long tool with no TCP rotation
-            Tool rod = new Tool("rod", new Point(0, 0, 175), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
-            bot.Attach(rod);
+            //Tool rod = new Tool("rod", new Point(0, 0, 100), Orientation.WorldXY, 1, new Point(0, 0, 50));
+            //bot.Attach(rod);
 
             // Home
-            bot.SpeedTo((int) (500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            bot.SpeedTo(500 * (PHYSICAL_ROBOT ? 0.2 : 1));
             bot.PrecisionTo(10);
-            bot.AxesTo(0, 0, 0, 0, 90, 0);
+            bot.AxesTo(homeJoints);
 
             // Joint move and rotate to starting point
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
-            bot.SpeedTo((int)(300 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            bot.SpeedTo(300 * (PHYSICAL_ROBOT ? 0.2 : 1));
             bot.PrecisionTo(5);
             bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.Rotate(0, 1, 0, -90);
@@ -104,7 +107,7 @@ namespace TEST_StreamAPITests
             //bot.WriteDigital(1, true);
 
             // Slow MoveL a square with precision
-            bot.SpeedTo((int)(100 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            bot.SpeedTo(100 * (PHYSICAL_ROBOT ? 0.2 : 1));
             bot.PrecisionTo(1);
             bot.Move(0, 50, 0);
             bot.Move(0, 0, 50);
@@ -116,10 +119,10 @@ namespace TEST_StreamAPITests
             //bot.WriteDigital(1, false);
 
             // No tool and back home
-            bot.Detach();
-            bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            //bot.Detach();
+            bot.SpeedTo(500 * (PHYSICAL_ROBOT ? 0.2 : 1));
             bot.PrecisionTo(5);
-            bot.AxesTo(0, 0, 0, 0, 90, 0);
+            bot.AxesTo(homeJoints);
 
         }
 

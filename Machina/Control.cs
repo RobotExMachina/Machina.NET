@@ -36,7 +36,7 @@ namespace Machina
         public const double DEFAULT_ACCELERATION = 0;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
         public const double DEFAULT_ROTATION_SPEED = 0;                       // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
         public const double DEFAULT_JOINT_SPEED = 0;
-        public const double DEFAULT_JOINT_ACCELERATION = 0;             
+        public const double DEFAULT_JOINT_ACCELERATION = 0;
         public const double DEFAULT_PRECISION = 5;                            // default precision for new actions
 
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
@@ -268,7 +268,7 @@ namespace Machina
 
         internal bool ConfigureBuffer(int minActions, int maxActions)
         {
-            return this.Driver.ConfigureBuffer(minActions, maxActions);
+            return this._driver.ConfigureBuffer(minActions, maxActions);
         }
 
 
@@ -378,7 +378,7 @@ namespace Machina
         /// <param name="name"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public bool SetUserCredentials(string name, string password) => 
+        public bool SetUserCredentials(string name, string password) =>
             Driver == null ? false : Driver.SetUser(name, password);
 
         /// <summary>
@@ -735,7 +735,7 @@ namespace Machina
 
 
 
-        public bool IssueSpeedRequest(double speed, bool relative) =>  IssueApplyActionRequest(new ActionSpeed(speed, relative));
+        public bool IssueSpeedRequest(double speed, bool relative) => IssueApplyActionRequest(new ActionSpeed(speed, relative));
 
         public bool IssueAccelerationRequest(double acc, bool relative) => IssueApplyActionRequest(new ActionAcceleration(acc, relative));
 
@@ -904,31 +904,46 @@ namespace Machina
         //██║     ██║  ██║██║ ╚████╔╝ ██║  ██║   ██║   ███████╗
         //╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ╚══════╝
 
+        // THIS IS NOW A TASK FOR THE ControlManager.SetCommunicationObject()
         /// <summary>
         /// Initializes the Communication object.
         /// </summary>
         /// <returns></returns>
-        private bool InitializeCommunication()
-        {
-            // If there is already some communication going on
-            if (_driver != null)
-            {
-                Console.WriteLine("Communication protocol might be active. Please CloseControllerCommunication() first.");
-                return false;
-            }
+        //private bool InitializeCommunication()
+        //{
+        //    Console.WriteLine("InitializeCommunication");
 
-            // @TODO: shim assignment of correct robot model/brand
-            _driver = new DriverABB(this);
+        //    // If there is already some communication going on
+        //    if (_driver != null)
+        //    {
+        //        Console.WriteLine("Communication protocol might be active. Please CloseControllerCommunication() first.");
+        //        return false;
+        //    }
 
-            // Pass the streamQueue object as a shared reference
-            //comm.LinkStreamQueue(streamQueue);
-            if (_controlMode == ControlType.Stream)
-            {
-                _driver.LinkWriteCursor(ref writeCursor);
-            }
+        //    // @TODO: shim assignment of correct robot model/brand
+        //    //_driver = new DriverABB(this);
+        //    if (this.parentRobot.Brand == RobotType.ABB)
+        //    {
+        //        _driver = new DriverABB(this);
+        //    }
+        //    else if (this.parentRobot.Brand == RobotType.UR)
+        //    {
+        //        _driver = new DriverUR(this);
+        //    }
+        //    else
+        //    {
+        //        throw new NotImplementedException();
+        //    }
 
-            return true;
-        }
+        //    // Pass the streamQueue object as a shared reference
+        //    //comm.LinkStreamQueue(streamQueue);
+        //    if (_controlMode == ControlType.Stream)
+        //    {
+        //        _driver.LinkWriteCursor(ref writeCursor);
+        //    }
+
+        //    return true;
+        //}
 
         /// <summary>
         /// Disconnects and resets the Communication object.
@@ -946,19 +961,19 @@ namespace Machina
             return success;
         }
 
-        /// <summary>
-        /// If there was a running Communication protocol, drop it and restart it again.
-        /// </summary>
-        /// <returns></returns>
-        private bool ResetCommunication()
-        {
-            if (_driver == null)
-            {
-                Console.WriteLine("Communication protocol not established, please initialize first.");
-            }
-            DropCommunication();
-            return InitializeCommunication();
-        }
+        ///// <summary>
+        ///// If there was a running Communication protocol, drop it and restart it again.
+        ///// </summary>
+        ///// <returns></returns>
+        //private bool ResetCommunication()
+        //{
+        //    if (_driver == null)
+        //    {
+        //        Console.WriteLine("Communication protocol not established, please initialize first.");
+        //    }
+        //    DropCommunication();
+        //    return InitializeCommunication();
+        //}
 
         /// <summary>
         /// Initializes all instances of robotCursors with base information

@@ -28,7 +28,9 @@ namespace Machina.Drivers.Communication
         private Thread receivingThread;
         private Thread sendingThread;
         private string _ip = "";
+        public string IP => _ip;
         private int _port = 0;
+        public int Port => _port;
         private bool _isDeviceBufferFull = false;
 
         private Protocols.Base _translator;

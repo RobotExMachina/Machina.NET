@@ -21,6 +21,15 @@ namespace Machina
     /// </summary>
     internal class CompilerABB : Compiler
     {
+        // @TODO: deprecate all instantiation shit, and make compilers be mostly static, like CompilerUR
+        /*
+         * // From the URScript manual
+        public static readonly char COMMENT_CHAR = '#';
+        public static readonly double DEFAULT_JOINT_ACCELERATION = 1.4;
+        public static readonly double DEFAULT_JOINT_SPEED = 1.05;
+        public static readonly double DEFAULT_TOOL_ACCELERATION = 1.2;
+        public static readonly double DEFAULT_TOOL_SPEED = 0.25;
+        */
 
         internal CompilerABB() : base("!") { }
 

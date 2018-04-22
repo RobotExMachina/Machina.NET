@@ -57,8 +57,8 @@ namespace Machina.Drivers
 
             if (_tcpManager.Connect())
             {
-                this.IP = ip;
-                this.Port = port;
+                this.IP = _tcpManager.IP;
+                this.Port = _tcpManager.Port;
                 return true;
             }
 
@@ -100,17 +100,20 @@ namespace Machina.Drivers
 
         public override Joints GetCurrentJoints()
         {
-            throw new NotImplementedException();
+            // @TODO: fetch from the robot...
+            return null;
         }
 
         public override Rotation GetCurrentOrientation()
         {
-            throw new NotImplementedException();
+            // @TODO: fetch from the robot...
+            return null;
         }
 
         public override Vector GetCurrentPosition()
         {
-            throw new NotImplementedException();
+            // @TODO: fetch from the robot...
+            return null;
         }
 
         public override void DebugDump()

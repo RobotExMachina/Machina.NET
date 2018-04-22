@@ -23,10 +23,11 @@ namespace Machina
     internal class CompilerUR : Compiler
     {
         // From the URScript manual
-        private const double DEFAULT_JOINT_ACCELERATION = 1.4;
-        private const double DEFAULT_JOINT_SPEED = 1.05;
-        private const double DEFAULT_TOOL_ACCELERATION = 1.2;
-        private const double DEFAULT_TOOL_SPEED = 0.25;
+        public static readonly char COMMENT_CHAR = '#';
+        public static readonly double DEFAULT_JOINT_ACCELERATION = 1.4;
+        public static readonly double DEFAULT_JOINT_SPEED = 1.05;
+        public static readonly double DEFAULT_TOOL_ACCELERATION = 1.2;
+        public static readonly double DEFAULT_TOOL_SPEED = 0.25;
         
         internal CompilerUR() : base("#") { }
 
@@ -39,7 +40,8 @@ namespace Machina
         /// <returns></returns>
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
-            ADD_ACTION_STRING = humanComments;
+            // @TODO: deprecate all instantiation shit, and make compilers be mostly static 
+            //ADD_ACTION_STRING = humanComments;
 
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -64,7 +66,7 @@ namespace Machina
 
                 if (inlineTargets)
                 {
-                    if (GenerateInstructionDeclaration(a, writer, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    if (GenerateInstructionDeclaration(a, writer, humanComments, out line))  // there will be a number jump on target-less instructions, but oh well...
                     {
                         instructionLines.Add(line);
                     }
@@ -77,7 +79,7 @@ namespace Machina
                         variableLines.Add(line);
                     }
 
-                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, humanComments, out line))  // there will be a number jump on target-less instructions, but oh well...
                     {
                         instructionLines.Add(line);
                     }
@@ -130,7 +132,7 @@ namespace Machina
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        internal static bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.type)
@@ -150,8 +152,8 @@ namespace Machina
             return dec != null;
         }
 
-        internal bool GenerateInstructionDeclarationFromVariable(
-            Action action, RobotCursor cursor, int id,
+        internal static bool GenerateInstructionDeclarationFromVariable(
+            Action action, RobotCursor cursor, int id, bool humanComments,
             out string declaration)
         {
             string dec = null;
@@ -181,7 +183,7 @@ namespace Machina
                     break;
 
                 case ActionType.RotationSpeed:
-                    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", commChar);
+                    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", COMMENT_CHAR);
                     break;
 
                 case ActionType.Axes:
@@ -208,7 +210,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        commChar,
+                        COMMENT_CHAR,
                         ac.comment);
                     break;
 
@@ -228,13 +230,13 @@ namespace Machina
                     if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
+                            COMMENT_CHAR,
                             aiod.ToString());
                     }
                     else if (aiod.pin > 7)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
-                            commChar,
+                            COMMENT_CHAR,
                             aiod.ToString());
                     }
                     else
@@ -250,19 +252,19 @@ namespace Machina
                     if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
+                            COMMENT_CHAR,
                             aioa.ToString());
                     }
                     else if (aioa.pin > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
-                            commChar,
+                            COMMENT_CHAR,
                             aioa.ToString());
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
-                            commChar,
+                            COMMENT_CHAR,
                             aioa.ToString());
                     }
                     else
@@ -278,27 +280,27 @@ namespace Machina
                     //    break;
             }
 
-            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
+            if (humanComments && action.type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    COMMENT_CHAR,
                     action.ToString());
             }
-            else if (ADD_ACTION_ID)
-            {
-                dec = string.Format("{0}  {1} [{2}]",
-                    dec,
-                    commChar,
-                    action.id);
-            }
+            //else if (ADD_ACTION_ID)
+            //{
+            //    dec = string.Format("{0}  {1} [{2}]",
+            //        dec,
+            //        commChar,
+            //        action.id);
+            //}
 
             declaration = dec;
             return dec != null;
         }
 
-        internal bool GenerateInstructionDeclaration(
-            Action action, RobotCursor cursor,
+        internal static bool GenerateInstructionDeclaration(
+            Action action, RobotCursor cursor, bool humanComments,
             out string declaration)
         {
             string dec = null;
@@ -326,10 +328,9 @@ namespace Machina
                             Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
                     }
                     break;
-                    break;
 
                 case ActionType.RotationSpeed:
-                    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", commChar);
+                    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", COMMENT_CHAR);
                     break;
 
                 case ActionType.Axes:
@@ -356,7 +357,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        commChar,
+                        COMMENT_CHAR,
                         ac.comment);
                     break;
 
@@ -376,13 +377,13 @@ namespace Machina
                     if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
+                            COMMENT_CHAR,
                             aiod.ToString());
                     }
                     else if (aiod.pin > 7)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
-                            commChar,
+                            COMMENT_CHAR,
                             aiod.ToString());
                     }
                     else
@@ -398,19 +399,19 @@ namespace Machina
                     if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
                     {
                         dec = string.Format("   {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
+                            COMMENT_CHAR,
                             aioa.ToString());
                     }
                     else if (aioa.pin > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
-                            commChar,
+                            COMMENT_CHAR,
                             aioa.ToString());
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
                         dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
-                            commChar,
+                            COMMENT_CHAR,
                             aioa.ToString());
                     }
                     else
@@ -426,20 +427,20 @@ namespace Machina
                     //    break;
             }
 
-            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
+            if (humanComments && action.type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    COMMENT_CHAR,
                     action.ToString());
             }
-            else if (ADD_ACTION_ID)
-            {
-                dec = string.Format("{0}  {1} [{2}]",
-                    dec,
-                    commChar,
-                    action.id);
-            }
+            //else if (ADD_ACTION_ID)
+            //{
+            //    dec = string.Format("{0}  {1} [{2}]",
+            //        dec,
+            //        COMMENT_CHAR,
+            //        action.id);
+            //}
 
             declaration = dec;
             return dec != null;

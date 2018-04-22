@@ -15,6 +15,9 @@ namespace Machina.Drivers.Communication.Protocols
                 case RobotType.ABB:
                     return new ABBCommunicationProtocol();
 
+                case RobotType.UR:
+                    return new URCommunicationProtocol();
+
                 default:
                     throw new NotImplementedException();
             }

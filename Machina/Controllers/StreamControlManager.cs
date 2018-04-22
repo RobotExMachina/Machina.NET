@@ -24,7 +24,18 @@ namespace Machina.Controllers
         internal override void SetCommunicationObject()
         {
             // @TODO: shim assignment of correct robot model/brand
-            _control.Driver = new DriverABB(_control);
+            if (_control.parentRobot.Brand == RobotType.ABB)
+            {
+                _control.Driver = new DriverABB(_control);
+            }
+            else if (_control.parentRobot.Brand == RobotType.UR)
+            {
+                _control.Driver = new DriverUR(_control);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         internal override void LinkWriteCursor()
