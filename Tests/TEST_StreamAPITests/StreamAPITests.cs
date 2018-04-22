@@ -45,10 +45,10 @@ namespace TEST_StreamAPITests
 
             //arm.Start();
 
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
-            Console.ReadKey();
-            VerticalSquare(arm);
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
+            //Console.ReadKey();
+            //VerticalSquare(arm);
 
             //Console.WriteLine(" ");
             //Console.WriteLine("Press any key to START THE SPIRAL...");
@@ -62,8 +62,13 @@ namespace TEST_StreamAPITests
             //    Thread.Sleep(30);
             //}
 
-            ////arm.DebugRobotCursors();
-            ////arm.DebugBuffer();
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to START THE SQUARE LOOP...");
+            Console.ReadKey();
+            SquareSpiralUR(arm, 400, -400, 200, 100, 50, 5, 20);
+
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffer();
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to DISCONNECT...");
@@ -171,6 +176,43 @@ namespace TEST_StreamAPITests
             bot.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
+        static private void SquareSpiralUR(Robot bot, double sx, double sy, double sz, double side, double h, int loopCount, double linearSpeed)
+        {
+            bot.PushSettings();
+
+            // Home
+            bot.JointSpeedTo(45);
+            bot.JointAccelerationTo(90);
+            bot.PrecisionTo(10);
+            bot.AxesTo(0, -90, -90, -90, 90, 90);
+
+            // Approach first point
+            bot.MotionMode(MotionType.Linear);
+            bot.SpeedTo(3 * linearSpeed);
+            bot.PrecisionTo(5);
+            bot.TransformTo(sx, sy, sz, -1, 0, 0, 0, 1, 0);
+
+            // Start looping
+            bot.SpeedTo(linearSpeed);
+            bot.PrecisionTo(1);
+
+            for (int i = 0; i < loopCount; i++)
+            {
+                bot.Move(side, 0);
+                bot.Move(0, side);
+                bot.Move(-side, 0);
+                bot.Move(0, -side);
+                bot.Move(0, 0, h);
+            }
+
+            // Home
+            bot.JointSpeedTo(45);
+            bot.JointAccelerationTo(90);
+            bot.PrecisionTo(10);
+            bot.AxesTo(0, -90, -90, -90, 90, 90);
+
+            bot.PopSettings();
+        }
 
 
 

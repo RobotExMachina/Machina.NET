@@ -80,8 +80,8 @@ namespace Machina.Drivers.Communication
 
         private int _sentMessages = 0;
         private int _receivedMessages = 0;
-        private int _maxStreamCount = 10;
-        private int _sendNewBatchOn = 1;
+        private int _maxStreamCount = 5;
+        private int _sendNewBatchOn = 3;
 
         private bool _bufferEmptyEventIsRaiseable = true;
 
@@ -189,6 +189,7 @@ namespace Machina.Drivers.Communication
 
                     _sb.Clear();
                     _sb.AppendLine(_streamProgramHeader);
+                    int sentPrev = _sentMessages;
                     while (this.ShouldSend() && this._writeCursor.AreActionsPending())
                     {
                         _msgs = this._translator.GetMessagesForNextAction(this._writeCursor);
@@ -203,11 +204,18 @@ namespace Machina.Drivers.Communication
                     }
                     _sb.AppendLine(_streamProgramFooter);
 
-                    Console.WriteLine("STREAMING PROGRAM: ");
-                    Console.WriteLine(_sb.ToString());
+                    if (sentPrev < _sentMessages)
+                    {
+                        Console.WriteLine("STREAMING PROGRAM: ");
+                        Console.WriteLine(_sb.ToString());
 
-                    _sendMsgBytes = Encoding.ASCII.GetBytes(_sb.ToString());
-                    _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+                        _sendMsgBytes = Encoding.ASCII.GetBytes(_sb.ToString());
+                        _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+                    }
+                    else
+                    {
+                        Console.WriteLine("--> Pending action have no instruction representation");
+                    }
                 }
                                 
                 RaiseBufferEmptyEventCheck();
@@ -271,8 +279,8 @@ namespace Machina.Drivers.Communication
                             Console.WriteLine($"  Server received {msg};");
                             if (ProcessResponse(msg))
                             {
-                                Console.WriteLine("  Moving the queue on");
                                 _receivedMessages++;
+                                Console.WriteLine("  Sent:" + _sentMessages + " received:"+_receivedMessages);
                             }
                         }
 
@@ -371,9 +379,6 @@ namespace Machina.Drivers.Communication
 
             _streamProgramHeader = _streamProgramHeader.Replace("{{HOST_IP}}", _serverIP);
             _streamProgramHeader = _streamProgramHeader.Replace("{{HOST_PORT}}", _serverPort.ToString());
-
-            //Console.WriteLine(_streamProgramHeader);
-            //Console.WriteLine(_streamProgramFooter);
 
             return true;
         }
