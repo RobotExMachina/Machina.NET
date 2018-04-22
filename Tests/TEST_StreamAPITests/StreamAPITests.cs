@@ -41,7 +41,6 @@ namespace TEST_StreamAPITests
 
             //arm.ControlMode("stream");
             //arm.Connect("127.0.0.1", 7000);
-
             arm.Message("Hello Robot!");
 
             //arm.Start();

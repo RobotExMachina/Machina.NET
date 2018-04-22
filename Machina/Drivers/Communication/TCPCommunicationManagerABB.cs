@@ -1,5 +1,4 @@
-﻿using Machina.Drivers.Communication;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -7,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Machina.Drivers.Communication;
+using Machina.Drivers.Communication.Protocols;
 
 namespace Machina.Drivers.Communication
 {
@@ -215,7 +216,7 @@ namespace Machina.Drivers.Communication
         {
             // If first char is an id marker (otherwise, we can't know which action it is)
             // @TODO: this is hardcoded for ABB, do this programmatically...
-            if (res[0] == '@')
+            if (res[0] == ABBCommunicationProtocol.STR_MESSAGE_ID_CHAR)
             {
                 // @TODO: dd some sanity here for incorrectly formatted messages
                 _responseChunks = res.Split(' ');

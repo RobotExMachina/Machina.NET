@@ -1,0 +1,13 @@
+def machina_program():
+  is_socket_open = False
+  connection_attempt = 0
+  while is_socket_open == False:
+    is_socket_open = socket_open("{{HOST_IP}}", {{HOST_PORT}})
+    connection_attempt = connection_attempt + 1
+    if connection_attempt > 5:
+      break
+    end
+  end
+  if is_socket_open == False:
+    popup("Could not connect to Machina")
+  end

@@ -13,9 +13,9 @@ namespace Machina.Drivers.Communication.Protocols
         // Not ideal, but SG is around the freaking corner! 
 
         // From the Machina_Server.mod file, must be consistent!
-        internal const string STR_MESSAGE_END_CHAR = ";";
-        internal const string STR_MESSAGE_ID_CHAR = "@";
-        internal const string STR_MESSAGE_RESPONSE_CHAR = ">";
+        internal static readonly char STR_MESSAGE_END_CHAR = ';';
+        internal static readonly char STR_MESSAGE_ID_CHAR = '@';
+        internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
 
 
         /// <summary>
@@ -34,10 +34,10 @@ namespace Machina.Drivers.Communication.Protocols
                 return null;
 
             // The message type in the response is currently ignored by Machina, but let's send a zero anyway to not break string splitting and other checks... 
-            //string res = $"  socket_send_string(\"{STR_MESSAGE_ID_CHAR}{action.id} 0{STR_MESSAGE_END_CHAR}\")";
+            string res = $"  socket_send_string(\"{STR_MESSAGE_ID_CHAR}{action.id} 0{STR_MESSAGE_END_CHAR}\")";
 
             msgs.Add(dec);
-            //msgs.Add(res);
+            msgs.Add(res);
             return msgs;
         }
 

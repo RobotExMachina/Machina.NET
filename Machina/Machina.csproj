@@ -97,6 +97,7 @@
     <Compile Include="Drivers\Communication\Protocols\Base.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="IO\IO.cs" />
+    <Compile Include="Net\Net.cs" />
     <Compile Include="Types\AxisAngle.cs" />
     <Compile Include="Types\Orientation.cs" />
     <Compile Include="Types\Geometry.cs" />
@@ -129,7 +130,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Modules\Machina_ABB_Server_SingleTask.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Modules\Machina_UR_Stream_Program_Header.script" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Modules\Machina_UR_Stream_Program_Footer.script" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM JL: for the time being, only copy ddlls manually to avoid breaking the dependent projects

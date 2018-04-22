@@ -9,9 +9,9 @@ namespace Machina.Drivers.Communication.Protocols
     class ABBCommunicationProtocol : Base
     {
         // From the Machina_Server.mod file, must be consistent!
-        internal const string STR_MESSAGE_END_CHAR = ";";
-        internal const string STR_MESSAGE_ID_CHAR = "@";
-        internal const string STR_MESSAGE_RESPONSE_CHAR = ">";
+        internal static readonly char STR_MESSAGE_END_CHAR = ';';
+        internal static readonly char STR_MESSAGE_ID_CHAR = '@';
+        internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
 
         // A RAPID-code oriented API:
         //                                     // INSTRUCTION P1 P2 P3 P4...

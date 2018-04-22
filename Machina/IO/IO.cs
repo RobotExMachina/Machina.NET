@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Machina
 {
-    static class IO
+    public static class IO
     {
         /// <summary>
         /// Reads a text resource file and returns it as a string.
