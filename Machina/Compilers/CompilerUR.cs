@@ -472,9 +472,7 @@ namespace Machina
         internal static string GetJointTargetValue(RobotCursor cursor)
         {
             Joints jrad = new Joints(cursor.joints);  // use a shallow copy
-            Console.WriteLine(jrad);
-            jrad.Scale(Math.PI / 180);  // convert to radians
-            Console.WriteLine(jrad);
+            jrad.Scale(Geometry.TO_RADS);  // convert to radians
             return string.Format("[{0},{1},{2},{3},{4},{5}]",
                 Math.Round(jrad.J1, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(jrad.J2, Geometry.STRING_ROUND_DECIMALS_RADS),

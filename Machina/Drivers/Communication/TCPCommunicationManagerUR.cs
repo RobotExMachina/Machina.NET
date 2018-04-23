@@ -71,7 +71,9 @@ namespace Machina.Drivers.Communication
         private Protocols.Base _translator;
         private StringBuilder _sb = new StringBuilder();
         private List<string> _msgs;
-        private List<string> _messageBuffer = new List<string>();
+        private List<List<string>> _messageBuffer = new List<List<string>>();
+        private List<int> _sentIDs = new List<int>();
+        private List<int> _receivedIDs = new List<int>();
         private byte[] _sendMsgBytes;
         private byte[] _receiveMsgBytes = new byte[2048];
         private int _receiveByteCount;
@@ -80,8 +82,8 @@ namespace Machina.Drivers.Communication
 
         private int _sentMessages = 0;
         private int _receivedMessages = 0;
-        private int _maxStreamCount = 5;
-        private int _sendNewBatchOn = 3;
+        private int _maxStreamCount = 10;
+        private int _sendNewBatchOn = 2;
 
         private bool _bufferEmptyEventIsRaiseable = true;
 
@@ -177,34 +179,45 @@ namespace Machina.Drivers.Communication
             {
                 while (this.ShouldSend() && this._writeCursor.AreActionsPending())
                 {
-                    /** PSEUDO:
-                     *      - Start a program
-                     *      - Add header
-                     *      - Add as many actions as bufferzise
-                     *      - Add footer
-                     *      - Send
-                     *      
-                     *      - Extend to add sending acknowledgements to a TCP server
-                     */
-
+                    // Add header
                     _sb.Clear();
                     _sb.AppendLine(_streamProgramHeader);
-                    int sentPrev = _sentMessages;
+
+                    int streamed = 0;
+
+                    // Add Instructions that were pending on the robot when this triggered
+                    int remaining = CalculateRemaining();
+                    for (int i = _messageBuffer.Count - remaining; i < _messageBuffer.Count; i++)
+                    {
+                        foreach (var msg in _messageBuffer[i])
+                        {
+                            _sb.AppendLine(msg);
+                        }
+                        streamed++;
+                    }
+
+                    //int sentPrev = _sentMessages;
+
                     while (this.ShouldSend() && this._writeCursor.AreActionsPending())
                     {
                         _msgs = this._translator.GetMessagesForNextAction(this._writeCursor);
+
+                        // If the action had instruction represenation
                         if (_msgs != null)
                         {
+                            _messageBuffer.Add(_msgs);  // keep a copy of the instruction blocks sent
                             foreach (var msg in _msgs)
                             {
                                 _sb.AppendLine(msg);
                             }
+                            streamed++;
+                            _sentIDs.Add(this._writeCursor.GetLastAction().id);
                             _sentMessages++;
                         }
                     }
                     _sb.AppendLine(_streamProgramFooter);
 
-                    if (sentPrev < _sentMessages)
+                    if (streamed > 0)
                     {
                         Console.WriteLine("STREAMING PROGRAM: ");
                         Console.WriteLine(_sb.ToString());
@@ -252,12 +265,12 @@ namespace Machina.Drivers.Communication
             // Do not kill threads by aborting them... https://stackoverflow.com/questions/1559255/whats-wrong-with-using-thread-abort/1560567#1560567
             while (_isServerListeningRunning)
             {
-                Console.Write("Waiting for a connection... ");
+                //Console.Write("Waiting for a connection... ");
 
                 // Perform a blocking call to accept requests.
                 // You could also user server.AcceptSocket() here.
                 TcpClient client = _serverSocket.AcceptTcpClient();
-                Console.WriteLine("Connected client: " + client);
+                //Console.WriteLine("Connected client: " + client);
 
                 _serverListeningMsg = null;
 
@@ -280,7 +293,9 @@ namespace Machina.Drivers.Communication
                             if (ProcessResponse(msg))
                             {
                                 _receivedMessages++;
-                                Console.WriteLine("  Sent:" + _sentMessages + " received:"+_receivedMessages);
+                                //Console.WriteLine("  Sent:" + _sentMessages + " received:"+_receivedMessages);
+                                //DebugLists();
+                                Console.WriteLine("  REMAINING:" + CalculateRemaining());
                             }
                         }
 
@@ -292,7 +307,7 @@ namespace Machina.Drivers.Communication
                     Console.WriteLine(e);
                 }
                 
-                Console.WriteLine("Closing client");
+                //Console.WriteLine("Closing client");
                 client.Close();
 
                 Thread.Sleep(30);
@@ -301,9 +316,11 @@ namespace Machina.Drivers.Communication
 
         private bool ShouldSend()
         {
+            int remaining = CalculateRemaining();
+
             if (_isDeviceBufferFull)
             {
-                if (_sentMessages - _receivedMessages <= _sendNewBatchOn)
+                if (remaining <= _sendNewBatchOn)
                 {
                     _isDeviceBufferFull = false;
                     return true;
@@ -315,7 +332,7 @@ namespace Machina.Drivers.Communication
             }
             else
             {
-                if (_sentMessages - _receivedMessages < _maxStreamCount)
+                if (remaining < _maxStreamCount)
                 {
                     return true;
                 }
@@ -357,6 +374,7 @@ namespace Machina.Drivers.Communication
                 _responseChunks = res.Split(' ');
                 string idStr = _responseChunks[0].Substring(1);
                 int id = Convert.ToInt32(idStr);
+                _receivedIDs.Add(id);
                 this._motionCursor.ApplyActionsUntilId(id);
                 //Console.WriteLine(_motionCursor);
                 this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
@@ -383,7 +401,35 @@ namespace Machina.Drivers.Communication
             return true;
         }
 
+        private int CalculateRemaining()
+        {
+            int slen = _sentIDs.Count;
+            int rlen = _receivedIDs.Count;
+            if (rlen == 0) return slen;
 
-        
+            int lastReceivedID = _receivedIDs.Last();
+            int remaining = 0;
+            for (int i = slen - 1; i >= 0; i--)
+            {
+                if (_sentIDs[i] == lastReceivedID)
+                {
+                    remaining = slen - 1 - i;
+                    break;
+                }
+            }
+            return remaining;
+        }
+
+        private void DebugLists()
+        {
+            Console.Write("SENT IDS: ");
+            foreach (var id in _sentIDs) Console.Write(id + ", ");
+            Console.WriteLine("");
+
+            Console.Write("RCVD IDS: ");
+            foreach (var id in _receivedIDs) Console.Write(id + ", ");
+            Console.WriteLine("");
+        }
+
     }
 }
