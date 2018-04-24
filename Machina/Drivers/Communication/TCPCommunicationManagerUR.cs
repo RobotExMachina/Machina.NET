@@ -65,8 +65,9 @@ namespace Machina.Drivers.Communication
         public int ServerPort => _serverPort;
         private int _serverPort = 7003;
 
-        private string _streamProgramHeader;
-        private string _streamProgramFooter;
+        //private string _streamProgramHeader;
+        //private string _streamProgramFooter;
+        private string _driverScript;
 
         private Protocols.Base _translator;
         private StringBuilder _sb = new StringBuilder();
@@ -128,9 +129,10 @@ namespace Machina.Drivers.Communication
                 _clientSocket.ReceiveBufferSize = 2048;
                 _clientSocket.SendBufferSize = 1024;
 
-                _clientSendingThread = new Thread(ClientSendingMethod);
-                _clientSendingThread.IsBackground = true;
-                _clientSendingThread.Start();
+                //// We don't need a sending thread to the client anymore, since the driver script will only be uplaoded once.
+                //_clientSendingThread = new Thread(ClientSendingMethod);
+                //_clientSendingThread.IsBackground = true;
+                //_clientSendingThread.Start();
 
                 _clientReceivingThread = new Thread(ClientReceivingMethod);
                 _clientReceivingThread.IsBackground = true;
@@ -149,7 +151,9 @@ namespace Machina.Drivers.Communication
                 _serverListeningThread.IsBackground = true;
                 _serverListeningThread.Start();
 
-                LoadStreamProgramParts();
+                //LoadStreamProgramParts();
+                LoadDriverScript();
+                UploadScriptToDevice(_driverScript, true);
 
                 return _clientSocket.Connected;
             }
@@ -174,71 +178,79 @@ namespace Machina.Drivers.Communication
 
         private void ClientSendingMethod(object obj)
         {
-            // Expire the thread on disconnection
             while (ClientSocketStatus != TCPConnectionStatus.Disconnected)
             {
-                while (this.ShouldSend() && this._writeCursor.AreActionsPending())
-                {
-                    // Add header
-                    _sb.Clear();
-                    _sb.AppendLine(_streamProgramHeader);
-
-                    int streamed = 0;
-
-                    // Add Instructions that were pending on the robot when this triggered
-                    int remaining = CalculateRemaining();
-                    for (int i = _messageBuffer.Count - remaining; i < _messageBuffer.Count; i++)
-                    {
-                        foreach (var msg in _messageBuffer[i])
-                        {
-                            _sb.AppendLine(msg);
-                        }
-                        streamed++;
-                    }
-
-                    //int sentPrev = _sentMessages;
-
-                    while (this.ShouldSend() && this._writeCursor.AreActionsPending())
-                    {
-                        _msgs = this._translator.GetMessagesForNextAction(this._writeCursor);
-
-                        // If the action had instruction represenation
-                        if (_msgs != null)
-                        {
-                            _messageBuffer.Add(_msgs);  // keep a copy of the instruction blocks sent
-                            foreach (var msg in _msgs)
-                            {
-                                _sb.AppendLine(msg);
-                            }
-                            streamed++;
-                            _sentIDs.Add(this._writeCursor.GetLastAction().id);
-                            _sentMessages++;
-                        }
-                    }
-                    _sb.AppendLine(_streamProgramFooter);
-
-                    if (streamed > 0)
-                    {
-                        Console.WriteLine("STREAMING PROGRAM: ");
-                        Console.WriteLine(_sb.ToString());
-
-                        _sendMsgBytes = Encoding.ASCII.GetBytes(_sb.ToString());
-                        _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
-                    }
-                    else
-                    {
-                        Console.WriteLine("--> Pending action have no instruction representation");
-                    }
-                }
-                                
-                RaiseBufferEmptyEventCheck();
 
                 Thread.Sleep(30);
             }
+
+
+            //// Expire the thread on disconnection
+            //while (ClientSocketStatus != TCPConnectionStatus.Disconnected)
+            //{
+            //    while (this.ShouldSend() && this._writeCursor.AreActionsPending())
+            //    {
+            //        // Add header
+            //        _sb.Clear();
+            //        _sb.AppendLine(_streamProgramHeader);
+
+            //        int streamed = 0;
+
+            //        // Add Instructions that were pending on the robot when this triggered
+            //        int remaining = CalculateRemaining();
+            //        for (int i = _messageBuffer.Count - remaining; i < _messageBuffer.Count; i++)
+            //        {
+            //            foreach (var msg in _messageBuffer[i])
+            //            {
+            //                _sb.AppendLine(msg);
+            //            }
+            //            streamed++;
+            //        }
+
+            //        //int sentPrev = _sentMessages;
+
+            //        while (this.ShouldSend() && this._writeCursor.AreActionsPending())
+            //        {
+            //            _msgs = this._translator.GetMessagesForNextAction(this._writeCursor);
+
+            //            // If the action had instruction represenation
+            //            if (_msgs != null)
+            //            {
+            //                _messageBuffer.Add(_msgs);  // keep a copy of the instruction blocks sent
+            //                foreach (var msg in _msgs)
+            //                {
+            //                    _sb.AppendLine(msg);
+            //                }
+            //                streamed++;
+            //                _sentIDs.Add(this._writeCursor.GetLastAction().id);
+            //                _sentMessages++;
+            //            }
+            //        }
+            //        _sb.AppendLine(_streamProgramFooter);
+
+            //        if (streamed > 0)
+            //        {
+            //            Console.WriteLine("STREAMING PROGRAM: ");
+            //            Console.WriteLine(_sb.ToString());
+
+            //            _sendMsgBytes = Encoding.ASCII.GetBytes(_sb.ToString());
+            //            _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+            //        }
+            //        else
+            //        {
+            //            Console.WriteLine("--> Pending action have no instruction representation");
+            //        }
+            //    }
+
+            //    RaiseBufferEmptyEventCheck();
+
+            //    Thread.Sleep(30);
+            //}
         }
 
         private void ClientReceivingMethod(object obj)
         {
+            //// @TODO: Parse the 30002 buffer to get information about the robot state
             // Expire the thread on disconnection
             while (ClientSocketStatus != TCPConnectionStatus.Disconnected)
             {
@@ -265,12 +277,12 @@ namespace Machina.Drivers.Communication
             // Do not kill threads by aborting them... https://stackoverflow.com/questions/1559255/whats-wrong-with-using-thread-abort/1560567#1560567
             while (_isServerListeningRunning)
             {
-                //Console.Write("Waiting for a connection... ");
+                Console.WriteLine("Waiting for a connection... ");
 
                 // Perform a blocking call to accept requests.
                 // You could also user server.AcceptSocket() here.
                 TcpClient client = _serverSocket.AcceptTcpClient();
-                //Console.WriteLine("Connected client: " + client);
+                Console.WriteLine("Connected client: " + _robotIP);
 
                 _serverListeningMsg = null;
 
@@ -306,7 +318,7 @@ namespace Machina.Drivers.Communication
                     Console.WriteLine("Something went wrong with the client... ");
                     Console.WriteLine(e);
                 }
-                
+
                 //Console.WriteLine("Closing client");
                 client.Close();
 
@@ -390,16 +402,33 @@ namespace Machina.Drivers.Communication
             return false;
         }
 
-        private bool LoadStreamProgramParts()
-        {
-            _streamProgramHeader = Machina.IO.ReadTextResource("Machina.Resources.Modules.Machina_UR_Stream_Program_Header.script");
-            _streamProgramFooter = Machina.IO.ReadTextResource("Machina.Resources.Modules.Machina_UR_Stream_Program_Footer.script");
 
-            _streamProgramHeader = _streamProgramHeader.Replace("{{HOST_IP}}", _serverIP);
-            _streamProgramHeader = _streamProgramHeader.Replace("{{HOST_PORT}}", _serverPort.ToString());
+        private bool LoadDriverScript()
+        {
+            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.Modules.machina_ur_driver.script");
+
+            // @TODO: remove comments, trailing spaces and empty lines from script
+            _driverScript = _driverScript.Replace("{{HOSTNAME}}", _serverIP);
+            _driverScript = _driverScript.Replace("{{PORT}}", _serverPort.ToString());
 
             return true;
         }
+
+
+        private bool UploadScriptToDevice(string script, bool consoleDump)
+        {
+            if (consoleDump)
+            {
+                Console.WriteLine("UPLOADING SCRIPT: ");
+                Console.WriteLine(script);
+            }
+
+            _sendMsgBytes = Encoding.ASCII.GetBytes(script);
+            _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+
+            return true;
+        }
+
 
         private int CalculateRemaining()
         {

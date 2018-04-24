@@ -131,10 +131,7 @@
     <EmbeddedResource Include="Resources\Modules\Machina_ABB_Server_SingleTask.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Modules\Machina_UR_Stream_Program_Header.script" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Modules\Machina_UR_Stream_Program_Footer.script" />
+    <EmbeddedResource Include="Resources\Modules\machina_ur_driver.script" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

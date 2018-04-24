@@ -1,0 +1,148 @@
+# A Universal Robot driver script to allow control from TCP socket.
+# Works with SW3.0 and above (?)
+# https://github.com/RobotExMachina
+
+def machina_ur_driver():
+  # Useful for handshakes and version compatibility checks...
+  MACHINA_DRIVER_VERSION = "1.0.0"
+  
+  # Data of the TCP socket for communication
+  HOSTNAME = "{{HOSTNAME}}"         # to be replaced with the driving device's IP (probably your computer) prior to uploading to controller
+  PORT = {{PORT}}                   # idem
+
+  # Instruction data will be sent to the socket in the form of 32 signed integers.
+  # To allow for float precision, the original values must be 'puffed' by these factors.
+  # This works de facto as the maximum precision for unit value types. 
+  FACTOR_M = 10000.0
+  FACTOR_RAD = 10000.0
+  FACTOR_SEC = 1000.0
+  FACTOR_KG = 1000.0
+  FACTOR_VOLT = 1000000.0
+
+  # Instruction codes. 
+  # Instruction buffers start with an ID that will be sent back on the acknowledgement response (use -1 if not interested),
+  # then a numeric code which determines the instruction to perform, and variable number of parameters for the instruction.
+  # Please note that, with the exception of strings (WIP), all parameters must be integers that have been premultiplied by
+  # their corresponding unit factor (see above).
+                                    # INCOMING BUFFER:
+  INST_MOVEL = 1                    # [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
+  INST_MOVEJ_P = 2                  # [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
+  INST_MOVEJ_Q = 3                  # [ID, CODE, J1, J2, J3, J4, J5, J6] (in (int) RAD * FACTOR_RAD)
+  INST_TCP_SPEED = 4                # [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
+  INST_TCP_ACC = 5                  # [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
+  INST_Q_SPEED = 6                  # [ID, CODE, VEL] (in (int) RAD/S * FACTOR_RAD)
+  INST_Q_ACC = 7                    # [ID, CODE, ACC] (in (int) RAD/S^2 * FACTOR_RAD)
+  INST_BLEND = 8                    # [ID, CODE, RADIUS] (in (int) M * FACTOR_M)
+  INST_SLEEP = 9                    # [ID, CODE, TIME] (in (int) S * FACTOR_SEC)
+#   INST_TEXTMSG = 10                 # [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
+#   INST_POPUP = 11                   # [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
+  INST_SET_TOOL = 12                # [ID, CODE, X, Y, Z, RX, RY, RZ, KG] (in (int) M * FACTOR_M, RAD * FACTOR_RAD, KG * FACTOR_KG)
+  INST_SET_DIGITAL_OUT = 13         # [ID, CODE, PIN, ON] (in (int)) 
+  INST_SET_ANALOG_OUT = 14          # [ID, CODE, PIN, VOLTAGE] (in (int) VOLTAGE * FACTOR_VOLT)
+
+  # Some conventions for string parsing (NOT IMPLEMENTED, trying to figure out a solution compatible with SW3.0)
+#   STR_MESSAGE_END_CHAR = ";"
+#   STR_MESSAGE_ID_CHAR = "@"         # response acknowledgements include this symbol with the action id
+#   STR_MESSAGE_RESPONSE_CHAR := ">"  # this will be added to infomation request responses (acknowledgments do not include it)
+
+  # ------------------------------------------------------------
+
+  # Other constants
+  TAU = 6.2831853                   # = 2 * PI :)
+  TO_DEG = 360 / TAU
+  TO_RAD = TAU / 360
+  
+  # State variables
+  state_speed = 0.05
+  state_acceleration = 0.2
+  state_joint_speed = 0.35
+  state_joint_acceleration = 0.7
+  state_blend_radius = 0
+
+
+  # Let's go! 
+  socket_open(HOSTNAME, PORT)
+  textmsg("Started Machina driver")
+
+  # Main buffer reading and instructing loop (TODO: implement theaded buffer reading, if only URScript had some array management options... :()
+  while True:
+    header = socket_read_binary_integer(2)
+    textmsg("Received action request: ", header)
+
+    if header[0] == 0:
+      # timeout, do nothing
+    
+    elif header[0] != 2:
+      textmsg("Incorrectly formatted buffer:", header)
+    
+    else:
+      action_id = header[1]
+      action_code = header[2]
+      # textmsg("Action ", action_code)
+      
+      if action_code == INST_MOVEL:
+        params6 = socket_read_binary_integer(6)
+        pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
+        movel(pose, state_acceleration, state_speed, 0, state_blend_radius)
+      
+      elif action_code == INST_MOVEJ_P:
+        params6 = socket_read_binary_integer(6)
+        pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
+        movej(pose, state_joint_acceleration, state_joint_speed, 0, state_blend_radius)
+      
+      elif action_code == INST_MOVEJ_Q:
+        params6 = socket_read_binary_integer(6)
+        joints = [params6[1] / FACTOR_RAD, params6[2] / FACTOR_RAD, params6[3] / FACTOR_RAD, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
+        movej(joints, state_joint_acceleration, state_joint_speed, 0, state_blend_radius)
+      
+      elif action_code == INST_TCP_SPEED:
+        params1 = socket_read_binary_integer(1)
+        state_speed = params1[1] / FACTOR_M
+      
+      elif action_code == INST_TCP_ACC:
+        params1 = socket_read_binary_integer(1)
+        state_acceleration = params1[1] / FACTOR_M
+
+      elif action_code == INST_Q_SPEED:
+        params1 = socket_read_binary_integer(1)
+        state_joint_speed = params1[1] / FACTOR_RAD
+      
+      elif action_code == INST_Q_ACC:
+        params1 = socket_read_binary_integer(1)
+        state_joint_acceleration = params1[1] / FACTOR_RAD
+      
+      elif action_code == INST_BLEND:
+        params1 = socket_read_binary_integer(1)
+        state_blend_radius = params1[1] / FACTOR_M
+
+      elif action_code == INST_SLEEP:
+        params1 = socket_read_binary_integer(1)
+        sleep(params1[1] / FACTOR_SEC)
+
+      # Not implemented yet due to SW3.0 limitations in capping string reading  
+    #   elif action_code == INST_TEXTMSG:
+    #   elif action_code == INST_POPUP:
+
+      elif action_code == INST_SET_TOOL:
+        params7 = socket_read_binary_integer(7)
+        pose = p[params7[1] / FACTOR_M, params7[2] / FACTOR_M, params7[3] / FACTOR_M, params7[4] / FACTOR_RAD, params7[5] / FACTOR_RAD, params7[6] / FACTOR_RAD]
+        set_tcp(pose)
+        set_payload(params7[7] / FACTOR_KG)
+      
+      elif action_code == INST_SET_DIGITAL_OUT:
+        params2 = socket_read_binary_integer(2)
+        set_standard_digital_out(params2[1], params2[2] != 0)
+      
+      elif action_code == INST_SET_ANALOG_OUT:
+        params2 = socket_read_binary_integer(2)
+        set_standard_analog_out(params2[1], params2[2] / FACTOR_VOLT)
+
+      end
+
+      # Send completion message with action ID
+      socket_send_int(action_id)
+
+    end
+
+  end
+end

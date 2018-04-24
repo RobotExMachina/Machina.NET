@@ -12,7 +12,7 @@ namespace Machina.Drivers.Communication.Protocols
         // and attaches an immediate socket response with the id to it, to keep track of runtime.
         // Not ideal, but SG is around the freaking corner! 
 
-        // From the Machina_Server.mod file, must be consistent!
+        //// Not implemented yet
         internal static readonly char STR_MESSAGE_END_CHAR = ';';
         internal static readonly char STR_MESSAGE_ID_CHAR = '@';
         internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
