@@ -112,7 +112,7 @@ namespace Machina.Drivers.Communication.Protocols
                         Math.Round(t.TCPOrientation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         Math.Round(t.TCPOrientation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         Math.Round(t.TCPOrientation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(t.weight, Geometry.STRING_ROUND_DECIMALS_KG),
+                        Math.Round(t.Weight, Geometry.STRING_ROUND_DECIMALS_KG),
                         Math.Round(t.centerOfGravity.X, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(t.centerOfGravity.Y, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(t.centerOfGravity.Z, Geometry.STRING_ROUND_DECIMALS_MM),

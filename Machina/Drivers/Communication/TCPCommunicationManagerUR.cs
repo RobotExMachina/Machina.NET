@@ -238,7 +238,9 @@ namespace Machina.Drivers.Communication
                         _sentIDs.Add(this._writeCursor.GetLastAction().id);
                         _sentMessages++;
 
-                        Console.WriteLine("Sending: [" + string.Join(",", (Util.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
+                        Console.WriteLine("Sending:");
+                        Console.WriteLine("  " + this._writeCursor.GetLastAction());
+                        Console.WriteLine("  [" + string.Join(",", (Util.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
                     }
                 }
 
@@ -277,21 +279,17 @@ namespace Machina.Drivers.Communication
                 {
                     while ((i = _robotNetworkStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
                     {
-                        // Debug sanity
-                        if (i != 4)
-                        {
-                            Console.WriteLine("Received " + i + " bytes?!");
-                        }
-
                         _serverListeningInts = Util.ByteArrayToInt32Array(_serverListeningBytes, i, false);
 
                         Console.WriteLine("Received (id): [" + string.Join(",", _serverListeningInts) + "]");
-                        if (ProcessResponse(_serverListeningInts))
+                        foreach(var id in _serverListeningInts)
                         {
-                            _receivedMessages++;
-                            Console.WriteLine("  REMAINING:" + CalculateRemaining());
+                            if (ProcessResponse(id))
+                            {
+                                _receivedMessages++;
+                                Console.WriteLine("  REMAINING:" + CalculateRemaining());
+                            }
                         }
-
                     }
                 }
                 catch (Exception e)
@@ -384,9 +382,13 @@ namespace Machina.Drivers.Communication
         //    return false;
         //}
 
-        private bool ProcessResponse(int[] response)
+        private bool ProcessResponse(int id)
         {
-            int id = response[0];
+            // Some messages actually contain several instructions (like a pop call may). 
+            // In this case, ids are -1 except for the last instruction, that contains the right id.
+            // If an id is below 1, just ignore it. 
+            if (id < 1) return false;
+            
             _receivedIDs.Add(id);
             this._motionCursor.ApplyActionsUntilId(id);
             //Console.WriteLine(_motionCursor);

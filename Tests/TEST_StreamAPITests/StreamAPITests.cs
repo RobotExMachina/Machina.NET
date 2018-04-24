@@ -38,25 +38,22 @@ namespace TEST_StreamAPITests
             arm.ControlMode("stream");
             //arm.SetUser("BUILD", "password");
             arm.Connect("192.168.0.101", 6969);
-            //arm.Connect("127.0.0.1", 7000);
 
-            //arm.Message("Hello Robot!");
+            //arm.StreamConfiguration(3, 10);
 
-            arm.SpeedTo(50);
-
-            arm.TransformTo(300, 300, 300, -1, 0, 0, 0, 1, 0);
-            arm.Move(50, 0);
-            arm.Move(0, 50);
-            arm.Move(-50, 0);
-            arm.Move(0, -50);
-            arm.Move(0, 0, 200);
+            arm.Message("Hello Robot!");
 
             //arm.Start();
 
             //Console.WriteLine(" ");
             //Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
             //Console.ReadKey();
-            //VerticalSquare(arm);
+            //VerticalSquareUR(arm);
+
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to START THE VERTICAL CIRCLE...");
+            Console.ReadKey();
+            VerticalCircleUR(arm);
 
             //Console.WriteLine(" ");
             //Console.WriteLine("Press any key to START THE SPIRAL...");
@@ -107,7 +104,7 @@ namespace TEST_StreamAPITests
             //bot.Attach(rod);
 
             // Home
-            bot.SpeedTo(500 * (PHYSICAL_ROBOT ? 0.2 : 1));
+            bot.SpeedTo(200 * (PHYSICAL_ROBOT ? 0.2 : 1));
             bot.PrecisionTo(10);
             bot.AxesTo(homeJoints);
 
@@ -142,6 +139,114 @@ namespace TEST_StreamAPITests
             bot.SpeedTo(500 * (PHYSICAL_ROBOT ? 0.2 : 1));
             bot.PrecisionTo(5);
             bot.AxesTo(homeJoints);
+
+        }
+
+        static public void VerticalSquareUR(Robot bot)
+        {
+            // Message
+            bot.Message("Starting vertical square");
+
+            ////A 100 mm long tool with no TCP rotation
+            //Tool rod = new Tool("rod", new Point(0, 0, 100), Orientation.WorldXY, 1, new Point(0, 0, 50));
+            //bot.Attach(rod);
+
+            // UR is giving me problems with stupid linear mode...
+            bot.MotionMode(MotionType.Joint); 
+
+            // Home
+            bot.JointSpeedTo(20);
+            bot.JointAccelerationTo(4);
+            bot.PrecisionTo(10);
+            bot.AxesTo(homeJoints);
+            
+            // Joint move and rotate to starting point
+            bot.PushSettings();
+            //bot.SpeedTo(100);
+            //bot.AccelerationTo(50);
+            bot.PrecisionTo(1);
+            bot.TransformTo(new Point(300, 300, 300), new Orientation(1, 0, 0, 0, -1, 0));
+            bot.Rotate(0, 1, 0, 90);
+            bot.PopSettings();
+            bot.Wait(1000);
+
+            //// Turn on "DO_15"
+            //bot.SetIOName("DO_15", 1, true);
+            bot.WriteDigital(1, true);
+
+            bot.PrecisionTo(1);
+            bot.Move(0, 100, 0);
+            bot.Move(0, 0, 100);
+            bot.Move(0, -100, 0);
+            bot.Move(0, 0, -100);
+            bot.Wait(1000);
+
+            //// Turn off "DO_15"
+            bot.WriteDigital(1, false);
+
+            // No tool and back home
+            //bot.Detach();
+            //bot.JointSpeedTo(45);
+            //bot.JointAccelerationTo(90);
+            bot.PrecisionTo(5);
+            bot.AxesTo(homeJoints);
+
+
+        }
+
+        static public void VerticalCircleUR(Robot bot)
+        {
+            // Message
+            bot.Message("Starting vertical square");
+
+            ////A 100 mm long tool with no TCP rotation
+            //Tool rod = new Tool("rod", new Point(0, 0, 100), Orientation.WorldXY, 1, new Point(0, 0, 50));
+            //bot.Attach(rod);
+
+            // UR is giving me problems with stupid linear mode...
+            bot.MotionMode(MotionType.Joint);
+
+            // Home
+            bot.JointSpeedTo(60);
+            bot.JointAccelerationTo(10);
+            bot.PrecisionTo(10);
+            bot.AxesTo(homeJoints);
+
+            double x = 300,
+                   y = 300,
+                   z = 300,
+                   r = 50,
+                   angle = Math.PI / 2;
+            int steps = 32;
+
+            // Joint move and rotate to starting point
+            bot.PushSettings();
+            //bot.SpeedTo(100);
+            //bot.AccelerationTo(50);
+            bot.PrecisionTo(1);
+            bot.TransformTo(new Point(x, y, z), new Orientation(1, 0, 0, 0, -1, 0));
+            bot.Rotate(0, 1, 0, 90);
+            bot.PopSettings();
+            //bot.Wait(1000);
+
+            bot.WriteDigital(1, true);
+
+            for (int i = 0; i < steps; i++)
+            {
+                bot.MoveTo(x, y + r * Math.Cos(angle), z + r * Math.Sin(angle));
+                angle += 2 * Math.PI / steps;
+            }
+            //bot.Wait(1000);
+
+            bot.WriteDigital(1, false);
+
+            // No tool and back home
+            //bot.Detach();
+            //bot.JointSpeedTo(45);
+            //bot.JointAccelerationTo(90);
+            bot.PrecisionTo(5);
+            bot.AxesTo(homeJoints);
+
 
         }
 

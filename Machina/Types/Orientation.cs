@@ -151,6 +151,7 @@ namespace Machina
 
         public Quaternion ToQuaternion() => this.Q;
         public RotationMatrix ToRotationMatrix() => this.RM;
+        public RotationVector ToRotationVector() => this.Q.ToAxisAngle().ToRotationVector();  // @TODO: this is grose... 
 
 
         public override string ToString()

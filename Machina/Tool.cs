@@ -28,10 +28,27 @@ namespace Machina
         public static Tool Unset => new Tool("noTool", Point.Origin, Orientation.WorldXY, 0, Point.Origin);
 
         public string name { get; internal set; }
+
+        /// <summary>
+        /// Position of the Tool Center Point (TCP) relative to the Tool's base coordinate system. 
+        /// In other words, if the Tool gets attached to the robot flange in XYZ [0, 0, 0], where is the tooltip relative to this?
+        /// </summary>
         public Point TCPPosition { get; internal set; }
+
+        /// <summary>
+        /// Orientation of the Tool Center Point (TCP) relative to the Tool's base coordinate system. 
+        /// In other words, if the Tool gets attached to the robot flange in XYZ [0, 0, 0], what is the relative rotation?
+        /// </summary>
         public Orientation TCPOrientation { get; internal set; }
 
-        public double weight { get; internal set; }
+        /// <summary>
+        /// Weight of the tool in Kg.
+        /// </summary>
+        public double Weight { get; internal set; }
+
+        /// <summary>
+        /// Position of the Tool's CoG relative to the flange.
+        /// </summary>
         public Vector centerOfGravity { get; internal set; }   
 
         // For the time being, tools will be defined through position (first) and orientation
@@ -50,7 +67,7 @@ namespace Machina
             this.name = name;
             this.TCPPosition = TCPPosition;
             this.TCPOrientation = TCPOrientation;
-            this.weight = 1;
+            this.Weight = 1;
             this.centerOfGravity = new Vector(TCPPosition);
             this.centerOfGravity.Scale(0.5);  // quick estimation
         }
@@ -69,7 +86,7 @@ namespace Machina
             this.name = name;
             this.TCPPosition = TCPPosition;
             this.TCPOrientation = TCPOrientation;
-            this.weight = weightKg;
+            this.Weight = weightKg;
             this.centerOfGravity = centerOfGravity;
         }
 
@@ -80,7 +97,7 @@ namespace Machina
                 this.name,
                 this.TCPPosition,
                 this.TCPOrientation,
-                this.weight); 
+                this.Weight); 
                 //this.centerOfGravity);
         }
 

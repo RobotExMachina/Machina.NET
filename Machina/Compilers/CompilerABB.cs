@@ -650,7 +650,7 @@ namespace Machina
             return string.Format("[TRUE, [{0},{1}], [{2},{3},{4},0,0,0]]",
                 cursor.tool.TCPPosition,
                 cursor.tool.TCPOrientation.Q.ToString(false),
-                cursor.tool.weight,
+                cursor.tool.Weight,
                 cursor.tool.centerOfGravity,
                 "[1,0,0,0]");  // no internial axes by default
         }

@@ -32,15 +32,15 @@ namespace Machina
         //public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
 
         // @TODO: move to cursors, make it device specific
-        public const double DEFAULT_SPEED = 20;                               // default speed for new actions
-        public const double DEFAULT_ACCELERATION = 0;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
-        public const double DEFAULT_ROTATION_SPEED = 0;                       // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
-        public const double DEFAULT_JOINT_SPEED = 0;
-        public const double DEFAULT_JOINT_ACCELERATION = 0;
-        public const double DEFAULT_PRECISION = 5;                            // default precision for new actions
+        public const double DEFAULT_SPEED = 20;                                 // default speed for new actions
+        public const double DEFAULT_ACCELERATION = 200;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
+        public const double DEFAULT_ROTATION_SPEED = 500;                       // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
+        public const double DEFAULT_JOINT_SPEED = 20;                           // deg/s
+        public const double DEFAULT_JOINT_ACCELERATION = 40;                    // deg/s^2
+        public const double DEFAULT_PRECISION = 5;                              // default precision for new actions
 
-        public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;      // default motion type for new actions
-        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;           // default reference coordinate system for relative transform actions
+        public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;        // default motion type for new actions
+        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;             // default reference coordinate system for relative transform actions
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
         public const CycleType DEFAULT_RUNMODE = CycleType.Once;
         public const ConnectionType DEFAULT_CONNECTIONMODE = ConnectionType.User;

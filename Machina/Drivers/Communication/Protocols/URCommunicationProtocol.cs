@@ -80,6 +80,8 @@ namespace Machina.Drivers.Communication.Protocols
         {
             if (!cursor.ApplyNextAction(out _action)) return null;  // cursor buffer is empty
 
+            _params = null;
+
             switch (_action.type)
             {
                 case ActionType.Translation:
@@ -90,27 +92,195 @@ namespace Machina.Drivers.Communication.Protocols
                     {
                         _action.id,
                         cursor.motionType == MotionType.Joint ? INST_MOVEJ_P : INST_MOVEL,
-                        (int) (cursor.position.X * 0.001 * FACTOR_M),
-                        (int) (cursor.position.Y * 0.001 * FACTOR_M),
-                        (int) (cursor.position.Z * 0.001 * FACTOR_M),
-                        (int) (rv.X * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) (rv.Y * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) (rv.Z * Geometry.TO_RADS * FACTOR_RAD)
+                        (int) Math.Round(cursor.position.X * 0.001 * FACTOR_M),
+                        (int) Math.Round(cursor.position.Y * 0.001 * FACTOR_M),
+                        (int) Math.Round(cursor.position.Z * 0.001 * FACTOR_M),
+                        (int) Math.Round(rv.X * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(rv.Y * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(rv.Z * Geometry.TO_RADS * FACTOR_RAD)
                     };
                     break;
 
+                case ActionType.Axes:
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_MOVEJ_Q,
+                        (int) Math.Round(cursor.joints.J1 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.joints.J2 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.joints.J3 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.joints.J4 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.joints.J5 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.joints.J6 * Geometry.TO_RADS * FACTOR_RAD),
+                    };
+                    break;
+
+                case ActionType.Wait:
+                    ActionWait aa = _action as ActionWait;
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_SLEEP,
+                        (int) Math.Round(aa.millis * 0.001 * FACTOR_SEC)
+                    };
+                    break;
+
+                // Not implemented yet
+                //case ActionType.Message:
+                //    ActionMessage am = (ActionMessage)action;
+                //    dec = string.Format("  popup(\"{0}\", title=\"Machina Message\", warning=False, error=False)",
+                //        am.message);
+                //    break;
+
+                case ActionType.Attach:
+                    ActionAttach aatt = _action as ActionAttach;
+                    Tool t = aatt.tool;
+                    RotationVector trv = t.TCPOrientation.ToRotationVector();
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_SET_TOOL,
+                        (int) Math.Round(t.TCPPosition.X * 0.001 * FACTOR_M),
+                        (int) Math.Round(t.TCPPosition.Y * 0.001 * FACTOR_M),
+                        (int) Math.Round(t.TCPPosition.Z * 0.001 * FACTOR_M),
+                        (int) Math.Round(trv.X * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(trv.Y * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(trv.Z * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(t.Weight * FACTOR_M)
+                    };
+                    break;
+
+                case ActionType.Detach:
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_SET_TOOL,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    };
+                    break;
+
+                case ActionType.IODigital:
+                    ActionIODigital aiod = _action as ActionIODigital;
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_SET_DIGITAL_OUT,
+                        aiod.pin,
+                        aiod.on ? 1 : 0
+                    };
+                    break;
+
+                case ActionType.IOAnalog:
+                    ActionIOAnalog aioa = _action as ActionIOAnalog;
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_SET_DIGITAL_OUT,
+                        aioa.pin,
+                        (int) Math.Round(aioa.value * FACTOR_VOLT)
+                    };
+                    break;
+
+
+                //  ╔═╗╔═╗╔╦╗╔╦╗╦╔╗╔╔═╗╔═╗
+                //  ╚═╗║╣  ║  ║ ║║║║║ ╦╚═╗
+                //  ╚═╝╚═╝ ╩  ╩ ╩╝╚╝╚═╝╚═╝
                 case ActionType.Speed:
                     _params = new int[]
                     {
                         _action.id,
                         INST_TCP_SPEED,
-                        (int) (cursor.speed * 0.001 * FACTOR_M)
+                        (int) Math.Round(cursor.speed * 0.001 * FACTOR_M)
                     };
                     break;
+
+                case ActionType.Acceleration:
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_TCP_ACC,
+                        (int) Math.Round(cursor.acceleration * 0.001 * FACTOR_M)
+                    };
+                    break;
+
+                case ActionType.JointSpeed:
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_Q_SPEED,
+                        (int) Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD)
+                    };
+                    break;
+
+                case ActionType.JointAcceleration:
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_Q_ACC,
+                        (int) Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD)
+                    };
+                    break;
+
+                case ActionType.Precision:
+                    _params = new int[]
+                    {
+                        _action.id,
+                        INST_BLEND,
+                        (int) Math.Round(cursor.precision * 0.001 * FACTOR_M)
+                    };
+                    break;
+
+                case ActionType.PushPop:
+                    ActionPushPop app = _action as ActionPushPop;
+                    if (app.push) break;
+
+                    Settings beforePop = cursor.settingsBuffer.SettingsBeforeLastPop;
+                    Dictionary<int, int> poppedSettings = new Dictionary<int, int>();
+
+                    // These are the states kept in the controller as of v1.0 of the driver
+                    if (beforePop.Speed != cursor.speed)
+                        poppedSettings.Add(INST_TCP_SPEED, (int)Math.Round(cursor.speed * 0.001 * FACTOR_M));
+
+                    if (beforePop.Acceleration != cursor.acceleration)
+                        poppedSettings.Add(INST_TCP_ACC, (int)Math.Round(cursor.acceleration * 0.001 * FACTOR_M));
+
+                    if (beforePop.JointSpeed != cursor.jointSpeed)
+                        poppedSettings.Add(INST_Q_SPEED, (int)Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD));
+
+                    if (beforePop.JointAcceleration != cursor.jointAcceleration)
+                        poppedSettings.Add(INST_Q_ACC, (int)Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD));
+
+                    if (beforePop.Precision != cursor.precision)
+                        poppedSettings.Add(INST_BLEND, (int)Math.Round(cursor.precision * 0.001 * FACTOR_M));
+
+                    // Generate a buffer with all instructions, ids of -1 except for the last one.
+                    _params = new int[3 * poppedSettings.Count];
+                    int it = 0;
+                    foreach (var setting in poppedSettings)
+                    {
+                        _params[3 * it] = it == poppedSettings.Count - 1 ? app.id : -1;  // only attach the real id to the last instruction
+                        _params[3 * it + 1] = setting.Key;
+                        _params[3 * it + 2] = setting.Value;
+                        it++;
+                    }
+
+                    break;
+
+                case ActionType.Coordinates:
+                    throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
+
             }
 
-            _buffer = Util.Int32ArrayToByteArray(_params, false); 
-            
+            if (_params == null) return null;
+
+            _buffer = Util.Int32ArrayToByteArray(_params, false);
+
             return _buffer;
         }
 
