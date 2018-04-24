@@ -28,17 +28,17 @@ namespace Machina
     public class RotationVector : Geometry
     {
         /// <summary>
-        /// X coordinate of the Rotation Vector
+        /// X coordinate of the Rotation Vector in degrees.
         /// </summary>
         public double X { get; internal set; }
 
         /// <summary>
-        /// Y coordinate of the Rotation Vector
+        /// Y coordinate of the Rotation Vector in degrees.
         /// </summary>
         public double Y { get; internal set; }
 
         /// <summary>
-        /// Z coordinate of the Rotation Vector
+        /// Z coordinate of the Rotation Vector in degrees.
         /// </summary>
         public double Z { get; internal set; }
 

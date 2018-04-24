@@ -32,7 +32,7 @@ namespace TEST_StreamAPITests
         {
             Robot arm = Robot.Create("StreamTests", "UR");
 
-            arm.BufferEmpty += LogEvent;
+            //arm.BufferEmpty += LogEvent;
 
             //arm.ConnectionManager("machina");
             arm.ControlMode("stream");
@@ -40,7 +40,16 @@ namespace TEST_StreamAPITests
             arm.Connect("192.168.0.101", 6969);
             //arm.Connect("127.0.0.1", 7000);
 
-            arm.Message("Hello Robot!");
+            //arm.Message("Hello Robot!");
+
+            arm.SpeedTo(50);
+
+            arm.TransformTo(300, 300, 300, -1, 0, 0, 0, 1, 0);
+            arm.Move(50, 0);
+            arm.Move(0, 50);
+            arm.Move(-50, 0);
+            arm.Move(0, -50);
+            arm.Move(0, 0, 200);
 
             //arm.Start();
 
@@ -61,15 +70,15 @@ namespace TEST_StreamAPITests
             //    Thread.Sleep(30);
             //}
 
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START THE SQUARE LOOP...");
-            Console.ReadKey();
-            arm.StreamConfiguration(2, 10);
-            SquareSpiralUR(arm, 400, -400, 100, 25, 10, 10, 50);
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START THE SQUARE LOOP...");
+            //Console.ReadKey();
+            //arm.StreamConfiguration(2, 10);
+            //SquareSpiralUR(arm, 400, -400, 100, 25, 10, 10, 50);
 
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START THE LOOP...");
-            Console.ReadKey();
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START THE LOOP...");
+            //Console.ReadKey();
             //SpiralUR(arm, 400, -400, 200, 50, 10, 1, );
 
             //arm.DebugRobotCursors();

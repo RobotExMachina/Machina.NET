@@ -59,20 +59,23 @@ namespace Machina.Drivers.Communication
         private Thread _serverListeningThread;
         private byte[] _serverListeningBytes = new byte[2048];
         private string _serverListeningMsg;
+        private int[] _serverListeningInts;
         private bool _isServerListeningRunning = false;
+        private Thread _serverSendingThread;
+        private byte[] _ServerSendingBytes;
         public string ServerIP => _serverIP;
         private string _serverIP;
         public int ServerPort => _serverPort;
         private int _serverPort = 7003;
+        private TcpClient _robotSocket;
+        private NetworkStream _robotNetworkStream;
 
-        //private string _streamProgramHeader;
-        //private string _streamProgramFooter;
         private string _driverScript;
 
         private Protocols.Base _translator;
-        private StringBuilder _sb = new StringBuilder();
-        private List<string> _msgs;
-        private List<List<string>> _messageBuffer = new List<List<string>>();
+        //private StringBuilder _sb = new StringBuilder();
+        //private List<string> _msgs;
+        //private List<List<string>> _messageBuffer = new List<List<string>>();
         private List<int> _sentIDs = new List<int>();
         private List<int> _receivedIDs = new List<int>();
         private byte[] _sendMsgBytes;
@@ -153,7 +156,7 @@ namespace Machina.Drivers.Communication
 
                 //LoadStreamProgramParts();
                 LoadDriverScript();
-                UploadScriptToDevice(_driverScript, true);
+                UploadScriptToDevice(_driverScript, false);
 
                 return _clientSocket.Connected;
             }
@@ -176,81 +179,24 @@ namespace Machina.Drivers.Communication
         }
 
 
-        private void ClientSendingMethod(object obj)
-        {
-            while (ClientSocketStatus != TCPConnectionStatus.Disconnected)
-            {
+        //private void ClientSendingMethod(object obj)
+        //{
+        //    while (ClientSocketStatus != TCPConnectionStatus.Disconnected)
+        //    {
 
-                Thread.Sleep(30);
-            }
+        //        Thread.Sleep(30);
 
+        //    }
+        //}
 
-            //// Expire the thread on disconnection
-            //while (ClientSocketStatus != TCPConnectionStatus.Disconnected)
-            //{
-            //    while (this.ShouldSend() && this._writeCursor.AreActionsPending())
-            //    {
-            //        // Add header
-            //        _sb.Clear();
-            //        _sb.AppendLine(_streamProgramHeader);
-
-            //        int streamed = 0;
-
-            //        // Add Instructions that were pending on the robot when this triggered
-            //        int remaining = CalculateRemaining();
-            //        for (int i = _messageBuffer.Count - remaining; i < _messageBuffer.Count; i++)
-            //        {
-            //            foreach (var msg in _messageBuffer[i])
-            //            {
-            //                _sb.AppendLine(msg);
-            //            }
-            //            streamed++;
-            //        }
-
-            //        //int sentPrev = _sentMessages;
-
-            //        while (this.ShouldSend() && this._writeCursor.AreActionsPending())
-            //        {
-            //            _msgs = this._translator.GetMessagesForNextAction(this._writeCursor);
-
-            //            // If the action had instruction represenation
-            //            if (_msgs != null)
-            //            {
-            //                _messageBuffer.Add(_msgs);  // keep a copy of the instruction blocks sent
-            //                foreach (var msg in _msgs)
-            //                {
-            //                    _sb.AppendLine(msg);
-            //                }
-            //                streamed++;
-            //                _sentIDs.Add(this._writeCursor.GetLastAction().id);
-            //                _sentMessages++;
-            //            }
-            //        }
-            //        _sb.AppendLine(_streamProgramFooter);
-
-            //        if (streamed > 0)
-            //        {
-            //            Console.WriteLine("STREAMING PROGRAM: ");
-            //            Console.WriteLine(_sb.ToString());
-
-            //            _sendMsgBytes = Encoding.ASCII.GetBytes(_sb.ToString());
-            //            _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
-            //        }
-            //        else
-            //        {
-            //            Console.WriteLine("--> Pending action have no instruction representation");
-            //        }
-            //    }
-
-            //    RaiseBufferEmptyEventCheck();
-
-            //    Thread.Sleep(30);
-            //}
-        }
-
+        /// <summary>
+        /// This method reads the buffer coming from the robot socket server and parses it into state info.
+        /// </summary>
+        /// <param name="obj"></param>
         private void ClientReceivingMethod(object obj)
         {
             //// @TODO: Parse the 30002 buffer to get information about the robot state
+
             // Expire the thread on disconnection
             while (ClientSocketStatus != TCPConnectionStatus.Disconnected)
             {
@@ -272,6 +218,41 @@ namespace Machina.Drivers.Communication
             }
         }
 
+        /// <summary>
+        /// This method sends buffered instructions to the client socket on the robot whenever necessary
+        /// </summary>
+        /// <param name="obj"></param>
+        private void ServerSendingMethod(object obj)
+        {
+            // Expire thread if no socket
+            while (_robotSocket != null)
+            {
+                while (this.ShouldSend() && this._writeCursor.AreActionsPending())
+                {
+                    _sendMsgBytes = this._translator.GetBytesForNextAction(this._writeCursor);
+
+                    // If the action had instruction represenation
+                    if (_sendMsgBytes != null)
+                    {
+                        _robotNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+                        _sentIDs.Add(this._writeCursor.GetLastAction().id);
+                        _sentMessages++;
+
+                        Console.WriteLine("Sending: [" + string.Join(",", (Util.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
+                    }
+                }
+
+                RaiseBufferEmptyEventCheck();
+
+                Thread.Sleep(30);
+            }
+        }
+
+        /// <summary>
+        /// This method listens to int messages from the client socket on the robots, and parses them as ids
+        /// of completed actions.
+        /// </summary>
+        /// <param name="obj"></param>
         private void ServerReceivingMethod(object obj)
         {
             // Do not kill threads by aborting them... https://stackoverflow.com/questions/1559255/whats-wrong-with-using-thread-abort/1560567#1560567
@@ -281,34 +262,34 @@ namespace Machina.Drivers.Communication
 
                 // Perform a blocking call to accept requests.
                 // You could also user server.AcceptSocket() here.
-                TcpClient client = _serverSocket.AcceptTcpClient();
+                _robotSocket = _serverSocket.AcceptTcpClient();
                 Console.WriteLine("Connected client: " + _robotIP);
 
-                _serverListeningMsg = null;
+                _serverSendingThread = new Thread(ServerSendingMethod);
+                _serverSendingThread.IsBackground = true;
+                _serverSendingThread.Start();
 
-                NetworkStream clientStream = client.GetStream();
+                _robotNetworkStream = _robotSocket.GetStream();
 
                 // Loop to receive all the data sent by the client.
                 int i;
                 try
                 {
-                    while ((i = clientStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
+                    while ((i = _robotNetworkStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
                     {
-                        // Translate data bytes to a ASCII string.
-                        _serverListeningMsg = Encoding.ASCII.GetString(_serverListeningBytes, 0, i);
-                        //Console.WriteLine("Received: {0}", _serverListeningMsg);
-
-                        var msgs = _serverListeningMsg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (var msg in msgs)
+                        // Debug sanity
+                        if (i != 4)
                         {
-                            Console.WriteLine($"  Server received {msg};");
-                            if (ProcessResponse(msg))
-                            {
-                                _receivedMessages++;
-                                //Console.WriteLine("  Sent:" + _sentMessages + " received:"+_receivedMessages);
-                                //DebugLists();
-                                Console.WriteLine("  REMAINING:" + CalculateRemaining());
-                            }
+                            Console.WriteLine("Received " + i + " bytes?!");
+                        }
+
+                        _serverListeningInts = Util.ByteArrayToInt32Array(_serverListeningBytes, i, false);
+
+                        Console.WriteLine("Received (id): [" + string.Join(",", _serverListeningInts) + "]");
+                        if (ProcessResponse(_serverListeningInts))
+                        {
+                            _receivedMessages++;
+                            Console.WriteLine("  REMAINING:" + CalculateRemaining());
                         }
 
                     }
@@ -320,7 +301,8 @@ namespace Machina.Drivers.Communication
                 }
 
                 //Console.WriteLine("Closing client");
-                client.Close();
+                _robotSocket.Close();
+                _robotSocket = null;
 
                 Thread.Sleep(30);
             }
@@ -372,34 +354,50 @@ namespace Machina.Drivers.Communication
 
 
 
-        /// <summary>
-        /// Parse the response and decide what to do with it. Returns true if the message was understood.
-        /// </summary>
-        /// <param name="res"></param>
-        private bool ProcessResponse(string res)
+        ///// <summary>
+        ///// Parse the response and decide what to do with it. Returns true if the message was understood.
+        ///// </summary>
+        ///// <param name="res"></param>
+        //private bool ProcessResponse(string res)
+        //{
+        //    // If first char is an id marker (otherwise, we can't know which action it is)
+        //    // @TODO: this is hardcoded for ABB, do this programmatically...
+        //    if (res[0] == URCommunicationProtocol.STR_MESSAGE_ID_CHAR)
+        //    {
+        //        // @TODO: dd some sanity here for incorrectly formatted messages
+        //        _responseChunks = res.Split(' ');
+        //        string idStr = _responseChunks[0].Substring(1);
+        //        int id = Convert.ToInt32(idStr);
+        //        _receivedIDs.Add(id);
+        //        this._motionCursor.ApplyActionsUntilId(id);
+        //        //Console.WriteLine(_motionCursor);
+        //        this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
+
+        //        Action lastAction = this._motionCursor.lastAction;
+        //        int remaining = this._motionCursor.ActionsPending();
+        //        ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
+        //        this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
+
+        //        return true;
+        //    }
+
+        //    return false;
+        //}
+
+        private bool ProcessResponse(int[] response)
         {
-            // If first char is an id marker (otherwise, we can't know which action it is)
-            // @TODO: this is hardcoded for ABB, do this programmatically...
-            if (res[0] == URCommunicationProtocol.STR_MESSAGE_ID_CHAR)
-            {
-                // @TODO: dd some sanity here for incorrectly formatted messages
-                _responseChunks = res.Split(' ');
-                string idStr = _responseChunks[0].Substring(1);
-                int id = Convert.ToInt32(idStr);
-                _receivedIDs.Add(id);
-                this._motionCursor.ApplyActionsUntilId(id);
-                //Console.WriteLine(_motionCursor);
-                this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
+            int id = response[0];
+            _receivedIDs.Add(id);
+            this._motionCursor.ApplyActionsUntilId(id);
+            //Console.WriteLine(_motionCursor);
+            this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
 
-                Action lastAction = this._motionCursor.lastAction;
-                int remaining = this._motionCursor.ActionsPending();
-                ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
-                this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
+            Action lastAction = this._motionCursor.lastAction;
+            int remaining = this._motionCursor.ActionsPending();
+            ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
+            this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
 
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
 
@@ -417,11 +415,9 @@ namespace Machina.Drivers.Communication
 
         private bool UploadScriptToDevice(string script, bool consoleDump)
         {
+            Console.WriteLine("Uploading Machina UR Driver to devvice...");
             if (consoleDump)
-            {
-                Console.WriteLine("UPLOADING SCRIPT: ");
                 Console.WriteLine(script);
-            }
 
             _sendMsgBytes = Encoding.ASCII.GetBytes(script);
             _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);

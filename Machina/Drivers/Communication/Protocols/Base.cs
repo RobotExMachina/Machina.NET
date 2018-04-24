@@ -14,7 +14,7 @@ namespace Machina.Drivers.Communication.Protocols
     {
         /// <summary>
         /// Given a (write) cursor, apply next Action in the buffer and return a List of messages
-        /// for the device's server/firmata.
+        /// for the device's driver/firmata.
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
@@ -28,6 +28,14 @@ namespace Machina.Drivers.Communication.Protocols
         }
 
         /// <summary>
+        /// Given a (write cursor, apply next Action in the buffer and return a byte[] representation
+        /// of the message for the device's driver/firmata.
+        /// </summary>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        public virtual byte[] GetBytesForNextAction(RobotCursor cursor) => null;
+
+        /// <summary>
         /// Given an Action and a RobotCursor representing the state of the robot after application, 
         /// return a List of strings with the messages necessary to perform this Action adhering to 
         /// the device's communication protocol.
@@ -35,7 +43,7 @@ namespace Machina.Drivers.Communication.Protocols
         /// <param name="action"></param>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        internal abstract List<string> GetActionMessages(Action action, RobotCursor cursor);
+        internal virtual List<string> GetActionMessages(Action action, RobotCursor cursor) => null;
     }
     
 }
