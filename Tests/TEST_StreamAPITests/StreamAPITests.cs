@@ -34,10 +34,10 @@ namespace TEST_StreamAPITests
 
             //arm.BufferEmpty += LogEvent;
 
-            //arm.ConnectionManager("machina");
+            arm.ConnectionManager("machina");
             arm.ControlMode("stream");
             //arm.SetUser("BUILD", "password");
-            arm.Connect("192.168.0.101", 6969);
+            //arm.Connect("192.168.0.101", 6969);
 
             //arm.StreamConfiguration(3, 10);
 

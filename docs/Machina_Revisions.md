@@ -17,7 +17,12 @@
 
 
 - [ ] Improved Logging system
-- [ ] UR streaming
+
+# v0.6.1
+
+## BUILD 1402
+
+
 
 # v0.6.1
 
@@ -34,6 +39,7 @@
 - [x] Add `JointSpeed/To()` and `JointAcceleration/To()` for UR robots
   - [x] Add UR compilation
   - [x] Add ABB compilation warnings
+- [x] UR streaming
 
 
 # v0.6.0
