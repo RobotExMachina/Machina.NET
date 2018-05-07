@@ -171,7 +171,7 @@ namespace Machina
             if (mode == ControlType.Execute)
             {
                 Console.WriteLine("Execute mode temporarily deactivated. Try 'stream' instead, it's cooler ;)");
-                Console.WriteLine($"ControlMode reverted to {_controlMode}");
+ //               Console.WriteLine($"ControlMode reverted to {_ControlMode}"); //MDJ_TODO
                 return false;
             }
 

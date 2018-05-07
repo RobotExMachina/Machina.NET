@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BRobot;
+using Machina;
 
 namespace EXAMPLE_KeyboardControl
 {
@@ -23,7 +23,7 @@ namespace EXAMPLE_KeyboardControl
             Robot arm = new Robot();
 
             // Set connection properties
-            arm.Mode("stream");
+            arm.MotionMode("stream");
             arm.Connect();
 
             arm.DebugDump();

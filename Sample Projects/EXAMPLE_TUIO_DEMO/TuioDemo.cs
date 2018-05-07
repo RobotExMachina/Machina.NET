@@ -1,6 +1,6 @@
 ﻿/*
  * ROBOTCONTROL - TUIO_DEMO
- * A quick implementation of the BRobot library using ReacTIVision.
+ * A quick implementation of the Machina library using ReacTIVision.
  * This example reads Tuio packages sent from a running instance of ReacTIVision,
  * generates 2D paths for each fiducial and uploads them to a Robot Controller
  * in real time to be immediate executed.
@@ -41,7 +41,7 @@ using System.Collections;
 using System.Threading;
 using TUIO;
 
-using BRobot;
+using Machina;
 using System.Text;
 
 public class TuioDemo : Form , TuioListener
@@ -173,12 +173,12 @@ public class TuioDemo : Form , TuioListener
         if (verbose) Console.WriteLine("add obj "+o.SymbolID+" ("+o.SessionID+") "+o.X+" "+o.Y+" "+o.Angle);
 
         // ROBOT
-        if (cMode == ControlMode.Execute)
+        if (cMode == ControlType.Execute)
         {
             InitializePath(o);
             AddTargetToPath(o, 0);
         }
-        else if (cMode == ControlMode.Stream)
+        else if (cMode == ControlType.Execute)
         {     
             if (UseThisTUIOObject(o))
             {
@@ -199,11 +199,11 @@ public class TuioDemo : Form , TuioListener
 		if (verbose) Console.WriteLine("set obj "+o.SymbolID+" "+o.SessionID+" "+o.X+" "+o.Y+" "+o.Angle+" "+o.MotionSpeed+" "+o.RotationSpeed+" "+o.MotionAccel+" "+o.RotationAccel);
 
         // ROBOT
-        if (cMode == ControlMode.Execute)
+        if (cMode == ControlType.Execute)
         {
             AddTargetToPath(o, 0);
         }
-        else if (cMode == ControlMode.Stream && UseThisTUIOObject(o))
+        else if (cMode == ControlType.Stream && UseThisTUIOObject(o))
         {
             if (UseThisTUIOObject(o))
             {
@@ -222,11 +222,11 @@ public class TuioDemo : Form , TuioListener
         // ROBOT
         // Sending the path to the robot or flagging current ID as inactive
         // is taken care of by TimeTick()
-        if (cMode == ControlMode.Execute)
+        if (cMode == ControlType.Execute)
         {
             AddTargetToPath(o, 0);
         }
-        else if (cMode == ControlMode.Stream && UseThisTUIOObject(o))
+        else if (cMode == ControlType.Stream && UseThisTUIOObject(o))
         {
             if (UseThisTUIOObject(o))
             {
@@ -382,7 +382,7 @@ public class TuioDemo : Form , TuioListener
     // In "stream" mode, marker movement will be replicated by the robot in near real-time.
     // In "instruct" mode, the whole stroke will be sent as a path to the robot.
     //private string onlineMode = "instruct";
-    private ControlMode cMode = ControlMode.Execute;
+    private ControlType cMode = ControlType.Execute;
 
     // In "stream" mode, which fiducial ID the app is reading 
     // (to avoid jumping between multiple simultaneous fiducials
@@ -418,7 +418,7 @@ public class TuioDemo : Form , TuioListener
     {
         // ROBOT
         arm = new Robot();
-        arm.Mode(cMode);
+        arm.ControlMode(cMode);
 
         arm.Connect();
         arm.DebugDump();
@@ -430,12 +430,12 @@ public class TuioDemo : Form , TuioListener
         arm.Speed(velocity);
         arm.Zone(zone);
 
-        if (cMode == ControlMode.Execute)
+        if (cMode == ControlType.Execute)
         {
             fiduPaths = new Dictionary<int, Path>();
             fiduTimes = new Dictionary<int, long>();
         }
-        else if (cMode == ControlMode.Stream)
+        else if (cMode == ControlType.Stream)
         {
             arm.Start();
 
@@ -476,7 +476,7 @@ public class TuioDemo : Form , TuioListener
     {
         long timeInc = frameTime.TotalMilliseconds - lastTimeTick;
 
-        if (cMode == ControlMode.Execute)
+        if (cMode == ControlType.Execute)
         {
             var keys = new List<int>(fiduTimes.Keys);       // http://stackoverflow.com/a/2260472
             foreach (var key in keys)
@@ -488,7 +488,7 @@ public class TuioDemo : Form , TuioListener
                 }
             }
         }
-        else if (cMode == ControlMode.Stream)
+        else if (cMode == ControlType.Stream)
         {
             //idleTime += timeInc;
             //if (awake && idleTime > maxTimeInc)

@@ -92,7 +92,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ABB.Robotics.Controllers.PC">
-      <HintPath>C:\Program Files (x86)\ABB Industrial IT\Robotics IT\SDK\PCSDK 6.03\ABB.Robotics.Controllers.PC.dll</HintPath>
+      <HintPath>..\..\Machina\bin\Debug\ABB.Robotics.Controllers.PC.dll</HintPath>
+    </Reference>
+    <Reference Include="Machina">
+      <HintPath>..\..\Machina\bin\Debug\Machina.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

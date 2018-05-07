@@ -21,10 +21,10 @@ using System.Windows.Shapes;
 /// PM> Install-Package SharpDX.XInput -Version 2.6.2"
 /// </summary>
 using SharpDX.XInput;
-using Vec = BRobot.Point;
-using Rot = BRobot.Rotation;
+using Vec = Machina.Point;
+using Rot = Machina.Rotation;
 
-using BRobot;
+using Machina;
 
 namespace EXAMPLE_XBOX1Control
 {
@@ -76,7 +76,7 @@ namespace EXAMPLE_XBOX1Control
             arm.Start();
             arm.Speed(relSpeed);
             arm.Zone(2);
-            //arm.RotateTo(BRobot.Rotation.FlippedAroundY);
+            //arm.RotateTo(Machina.Rotation.FlippedAroundY);
             //arm.MoveTo(200, 200, 200);
 
             // initial quick to the stream queue
@@ -100,7 +100,7 @@ namespace EXAMPLE_XBOX1Control
             //Console.WriteLine("BUTTONS: " + state.Gamepad.Buttons);
 
             // Can't really test this right now, my controller's thumb is broken... XD
-            //BRobot.Point dir = new BRobot.Point(
+            //Machina.Point dir = new Machina.Point(
             //    RemapThumb(state.Gamepad.LeftThumbX, 10000, 32767),
             //    RemapThumb(state.Gamepad.LeftThumbY, 10000, 32767),
             //    RemapThumb(state.Gamepad.RightThumbY, 10000, 32767)
