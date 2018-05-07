@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BRobot;
+using Machina;
 
 namespace TEST_Workbench
 {
@@ -15,7 +15,7 @@ namespace TEST_Workbench
             //int inc = 50;
             Robot arm = new Robot();
             //arm.Mode("offline");
-            arm.Mode("stream");
+            arm.MotionMode("stream");
             arm.Connect();
             arm.Start();
 
@@ -40,7 +40,7 @@ namespace TEST_Workbench
             arm.PushSettings();
             arm.Speed(-50);
             arm.Zone(-2);
-            arm.Motion("joint");
+            arm.MotionMode("joint");
             arm.Coordinates("local");
             arm.Move(0, 0, 50);
 
@@ -54,10 +54,10 @@ namespace TEST_Workbench
 
         static void TestStaticActions(Robot arm)
         {
-            BRobot.Action start = BRobot.Action.MoveTo(new Point(302, 0, 558));
-            BRobot.Action x10 = BRobot.Action.Move(new Point(25, 0, 0));
-            BRobot.Action y10 = BRobot.Action.Move(new Point(0, 25, 0));
-            BRobot.Action z10 = BRobot.Action.Move(new Point(0, 0, 25));
+            Machina.Action start = Machina.Action.MoveTo(new Point(302, 0, 558));
+            Machina.Action x10 = Machina.Action.Move(new Point(25, 0, 0));
+            Machina.Action y10 = Machina.Action.Move(new Point(0, 25, 0));
+            Machina.Action z10 = Machina.Action.Move(new Point(0, 0, 25));
 
 
             arm.Do(start);
@@ -80,7 +80,7 @@ namespace TEST_Workbench
             arm.ZoneTo(2);
             arm.Move(100, 0);
 
-            arm.Motion("joint");
+            arm.MotionMode("joint");
             arm.Move(0, -100);
             arm.Rotate(0, 1, 0, -90);
 

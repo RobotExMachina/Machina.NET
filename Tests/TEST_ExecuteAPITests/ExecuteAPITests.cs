@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BRobot;
+using Machina;
 
 namespace TEST_ExecuteAPITests
 {
@@ -15,7 +15,7 @@ namespace TEST_ExecuteAPITests
             Robot arm = new Robot();   
 
             // Set control mode
-            arm.Mode("execute");     
+            arm.MotionMode("execute");     
 
             // Connect to a controller
             arm.Connect();
