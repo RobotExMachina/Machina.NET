@@ -509,7 +509,7 @@ namespace Machina
 
         public override string ToInstruction()
         {
-            return $"MotionMode(\"{this.motionType}\");";
+            return $"MotionMode(\"{(Enum.GetName(typeof(MotionType), this.motionType))}\");";
         }
     }
 
@@ -843,7 +843,7 @@ namespace Machina
 
         public override string ToInstruction()
         {
-            return $"Wait(\"{this.millis}\");";
+            return $"Wait({this.millis});";
         }
     }
 
