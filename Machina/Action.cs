@@ -249,6 +249,14 @@ namespace Machina
         {
             this.id = currentId++;
         }
+
+        /// <summary>
+        /// Generates a string representing a "serialized" instruction representing the 
+        /// Machina-API command that would have generated this action. 
+        /// Useful for generating actions to send to the Bridge.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string ToInstruction() => "";        
     }
 
 
@@ -279,6 +287,13 @@ namespace Machina
             return relative ?
                 string.Format("{0} TCP acceleration by {1} mm/s^2", this.acceleration < 0 ? "Decrease" : "Increase", this.acceleration) :
                 string.Format("Set TCP acceleration to {0} mm/s^2", this.acceleration);
+        }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"Acceleration({this.acceleration});" :
+                $"AccelerationTo({this.acceleration});";
         }
     }
 
@@ -313,6 +328,13 @@ namespace Machina
                 string.Format("{0} TCP speed by {1} mm/s", this.speed < 0 ? "Decrease" : "Increase", speed) :
                 string.Format("Set TCP speed to {0} mm/s", speed);
         }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"Speed({this.speed});" :
+                $"SpeedTo({this.speed});";
+        }
     }
 
 
@@ -345,6 +367,13 @@ namespace Machina
                 string.Format("{0} TCP rotation speed by {1} mm/s", this.rotationSpeed < 0 ? "Decrease" : "Increase", this.rotationSpeed) :
                 string.Format("Set TCP rotation speed to {0} mm/s", this.rotationSpeed);
         }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"RotationSpeed({this.rotationSpeed});" :
+                $"RotationSpeedTo({this.rotationSpeed});";
+        }
     }
 
 
@@ -375,6 +404,13 @@ namespace Machina
                 string.Format("{0} joint speed by {1} deg/s", this.jointSpeed < 0 ? "Decrease" : "Increase", this.jointSpeed) :
                 string.Format("Set joint speed to {0} deg/s", this.jointSpeed);
         }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"JointSpeed({this.jointSpeed});" :
+                $"JointSpeedTo({this.jointSpeed});";
+        }
     }
 
     public class ActionJointAcceleration : Action
@@ -395,6 +431,13 @@ namespace Machina
             return relative ?
                 string.Format("{0} joint acceleration by {1} deg/s^2", this.jointAcceleration < 0 ? "Decrease" : "Increase", this.jointAcceleration) :
                 string.Format("Set joint acceleration to {0} deg/s^2", this.jointAcceleration);
+        }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"JointAcceleration({this.jointAcceleration});" :
+                $"JointAccelerationTo({this.jointAcceleration});";
         }
     }
 
@@ -417,7 +460,7 @@ namespace Machina
 
         public ActionPrecision(double value, bool relative) : base()
         {
-            type = ActionType.Precision;
+            this.type = ActionType.Precision;
 
             this.precision = value;
             this.relative = relative;
@@ -428,6 +471,13 @@ namespace Machina
             return relative ?
                 string.Format("{0} precision radius by {1} mm", this.precision < 0 ? "Decrease" : "Increase", this.precision) :
                 string.Format("Set precision radius to {0} mm", this.precision);
+        }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"Precision({this.precision});" :
+                $"PrecisionTo({this.precision});";
         }
     }
 
@@ -456,6 +506,11 @@ namespace Machina
         {
             return string.Format("Set motion type to '{0}'", motionType);
         }
+
+        public override string ToInstruction()
+        {
+            return $"MotionMode(\"{this.motionType}\");";
+        }
     }
 
     //   ██████╗ ██████╗  ██████╗ ██████╗ ██████╗ ██╗███╗   ██╗ █████╗ ████████╗███████╗███████╗
@@ -482,6 +537,11 @@ namespace Machina
         public override string ToString()
         {
             return string.Format("Set reference coordinate system to '{0}'", referenceCS);
+        }
+
+        public override string ToInstruction()
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -511,6 +571,13 @@ namespace Machina
             return push ?
                 "Push settings to buffer" :
                 "Pop settings";
+        }
+
+        public override string ToInstruction()
+        {
+            return this.push ?
+                "PushSettings()" :
+                "PopSettings()";
         }
     }
 
@@ -544,8 +611,8 @@ namespace Machina
         {
             this.type = ActionType.Translation;
 
-            translation = new Vector(trans);  // shallow copy
-            relative = relTrans;
+            this.translation = new Vector(trans);  // shallow copy
+            this.relative = relTrans;
         }
 
         public override string ToString()
@@ -553,6 +620,13 @@ namespace Machina
             return relative ?
                 string.Format("Move {0} mm", translation) :
                 string.Format("Move to {0} mm", translation);
+        }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"Move({this.translation.X},{this.translation.Y},{this.translation.Z});" :
+                $"MoveTo({this.translation.X},{this.translation.Y},{this.translation.Z});";
         }
     }
 
@@ -576,9 +650,8 @@ namespace Machina
         {
             this.type = ActionType.Rotation;
 
-            rotation = new Rotation(rot);  // shallow copy
-            relative = relRot;
-
+            this.rotation = new Rotation(rot);  // shallow copy
+            this.relative = relRot;
         }
 
         public override string ToString()
@@ -588,6 +661,17 @@ namespace Machina
                 string.Format("Rotate to {0}", new Orientation(rotation));
         }
 
+        public override string ToInstruction()
+        {
+            if (this.relative)
+            {
+                return $"Rotate({this.rotation.AA.X},{this.rotation.AA.Y},{this.rotation.AA.Z},{this.rotation.AA.Angle});";
+            }
+
+            // @TODO: improve this! 
+            Orientation ori = new Orientation(this.rotation);
+            return $"RotateTo({ori.XAxis.X},{ori.XAxis.Y},{ori.XAxis.Z},{ori.YAxis.X},{ori.YAxis.Y},{ori.YAxis.Z});";
+        }
     }
 
 
@@ -635,6 +719,17 @@ namespace Machina
             }
             return str;
         }
+
+        public override string ToInstruction()
+        {
+            if (this.relative)
+            {
+                throw new NotImplementedException();
+            }
+
+            Orientation ori = new Orientation(this.rotation);
+            return $"TransformTo({this.translation.X},{this.translation.Y},{this.translation.Z},{ori.XAxis.X},{ori.XAxis.Y},{ori.XAxis.Z},{ori.YAxis.X},{ori.YAxis.Y},{ori.YAxis.Z});";
+        }
     }
 
 
@@ -681,6 +776,13 @@ namespace Machina
                 string.Format("Increase joint rotations by {0} deg", joints) :
                 string.Format("Set joint rotations to {0} deg", joints);
         }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"Axes({this.joints.J1},{this.joints.J2},{this.joints.J3},{this.joints.J4},{this.joints.J5},{this.joints.J6});" :
+                $"AxesTo({this.joints.J1},{this.joints.J2},{this.joints.J3},{this.joints.J4},{this.joints.J5},{this.joints.J6});";
+        }
     }
 
     //  ███╗   ███╗███████╗███████╗███████╗ █████╗  ██████╗ ███████╗
@@ -707,6 +809,11 @@ namespace Machina
         public override string ToString()
         {
             return string.Format("Display message \"{0}\"", message);
+        }
+
+        public override string ToInstruction()
+        {
+            return $"Message(\"{this.message}\");";
         }
     }
 
@@ -736,6 +843,11 @@ namespace Machina
         {
             return string.Format("Wait {0} ms", millis);
         }
+
+        public override string ToInstruction()
+        {
+            return $"Wait(\"{this.millis}\");";
+        }
     }
 
 
@@ -764,6 +876,11 @@ namespace Machina
         public override string ToString()
         {
             return string.Format("Comment: \"{0}\"", comment);
+        }
+
+        public override string ToInstruction()
+        {
+            return null;
         }
     }
 
@@ -798,6 +915,11 @@ namespace Machina
         {
             return string.Format("Attach tool \"{0}\"", this.tool.name);
         }
+
+        public override string ToInstruction()
+        {
+            return $"Attach(\"{this.tool.name}\");";
+        }
     }
 
     /// <summary>
@@ -813,6 +935,11 @@ namespace Machina
         public override string ToString()
         {
             return "Detach all tools";
+        }
+
+        public override string ToInstruction()
+        {
+            return $"Deatch();";
         }
     }
 
@@ -849,6 +976,11 @@ namespace Machina
                 this.pin,
                 this.on ? "ON" : "OFF");
         }
+
+        public override string ToInstruction()
+        {
+            return $"WriteDigital({this.pin},{this.on});";
+        }
     }
 
     /// <summary>
@@ -872,6 +1004,11 @@ namespace Machina
             return string.Format("Set analog IO {0} to {1}",
                 this.pin,
                 this.value);
+        }
+
+        public override string ToInstruction()
+        {
+            return $"WriteAnalog({this.pin},{this.value});";
         }
     }
 
@@ -922,6 +1059,11 @@ namespace Machina
                     this.wait ? " and wait" : "");
             }
         }
+
+        public override string ToInstruction()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     
@@ -951,6 +1093,11 @@ namespace Machina
         {
             return $"Turn extrusion {(this.extrude ? "on" : "off")}";
         }
+
+        public override string ToInstruction()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     /// <summary>
@@ -974,6 +1121,11 @@ namespace Machina
             return this.relative ? 
                 $"{(this.rate < 0 ? "Decrease" : "Increase")} feed rate by {this.rate} mm/s" :
                 $"Set feed rate to {this.rate} mm/s";
+        }
+
+        public override string ToInstruction()
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -1000,6 +1152,11 @@ namespace Machina
         public override string ToString()
         {
             return $"{(this.initialize ? "Initialize" : "Terminate")} this device.";
+        }
+
+        public override string ToInstruction()
+        {
+            throw new NotImplementedException();
         }
     }
 
