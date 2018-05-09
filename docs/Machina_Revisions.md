@@ -18,13 +18,17 @@
 
 - [ ] Improved Logging system
 
+---
 # v0.6.2
+
+## BUILD 1403
+
 
 ## BUILD 1402
 - [x] Add `ToInstruction()` override to Action:
     Generates a string representing a "serialized" instruction representing the Machina-API command that would have generated this action. Useful for generating actions to send to the Bridge.
 
-
+---
 # v0.6.1
 
 ## BUILD 1401

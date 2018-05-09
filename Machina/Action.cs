@@ -256,7 +256,7 @@ namespace Machina
         /// Useful for generating actions to send to the Bridge.
         /// </summary>
         /// <returns></returns>
-        public virtual string ToInstruction() => "";        
+        public virtual string ToInstruction() => null;
     }
 
 
@@ -539,10 +539,7 @@ namespace Machina
             return string.Format("Set reference coordinate system to '{0}'", referenceCS);
         }
 
-        public override string ToInstruction()
-        {
-            throw new NotImplementedException();
-        }
+        public override string ToInstruction() => null;
     }
 
     //  ██████╗ ██╗   ██╗███████╗██╗  ██╗      ██████╗  ██████╗ ██████╗ 
@@ -724,7 +721,7 @@ namespace Machina
         {
             if (this.relative)
             {
-                throw new NotImplementedException();
+                return null;  // @TODO
             }
 
             Orientation ori = new Orientation(this.rotation);
@@ -1060,10 +1057,7 @@ namespace Machina
             }
         }
 
-        public override string ToInstruction()
-        {
-            throw new NotImplementedException();
-        }
+        public override string ToInstruction() => null;
     }
 
     
@@ -1094,10 +1088,7 @@ namespace Machina
             return $"Turn extrusion {(this.extrude ? "on" : "off")}";
         }
 
-        public override string ToInstruction()
-        {
-            throw new NotImplementedException();
-        }
+        public override string ToInstruction() => null;
     }
 
     /// <summary>
@@ -1123,10 +1114,7 @@ namespace Machina
                 $"Set feed rate to {this.rate} mm/s";
         }
 
-        public override string ToInstruction()
-        {
-            throw new NotImplementedException();
-        }
+        public override string ToInstruction() => null;
     }
 
 
@@ -1154,10 +1142,7 @@ namespace Machina
             return $"{(this.initialize ? "Initialize" : "Terminate")} this device.";
         }
 
-        public override string ToInstruction()
-        {
-            throw new NotImplementedException();
-        }
+        public override string ToInstruction() => null;
     }
 
 
