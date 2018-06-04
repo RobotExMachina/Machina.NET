@@ -17,6 +17,8 @@
 
 
 - [ ] Improved Logging system
+- [ ] Update Bridge with 1403 changes
+- [ ] Update GH with changes
 
 
 ---

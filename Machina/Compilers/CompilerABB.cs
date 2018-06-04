@@ -179,7 +179,7 @@ namespace Machina
             // Generate IO warning
             if (usesIO)
             {
-                introLines.Add(string.Format("  {0} NOTE: your program is interfacing with the robot's IOs. Make sure to properly configure their names/properties through system preferences in the ABB controller. See Machina's `SetIOName()` for more information.",
+                introLines.Add(string.Format("  {0} NOTE: your program is interfacing with the robot's IOs. Make sure to properly configure their names/properties through system preferences in the ABB robot controller.",
                     commChar));
             }
 
