@@ -39,7 +39,7 @@ namespace Machina
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.6.2." + Build;
+        public static readonly string Version = "0.6.3." + Build;
 
 
         /// <summary>

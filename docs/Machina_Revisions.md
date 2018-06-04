@@ -24,6 +24,9 @@
 
 ## BUILD 1403
 - [x] Add safe program name check to avoid
+- [x] IOs can now be named with `string`
+- [x] Remove `Robot.SetIOName()`
+- [x] Add `toolPin` option for IOs (UR robots)
 
 
 ---
