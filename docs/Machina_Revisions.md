@@ -18,10 +18,16 @@
 
 - [ ] Improved Logging system
 
+
 ---
-# v0.6.2
+# v0.6.3
 
 ## BUILD 1403
+- [x] Add safe program name check to avoid
+
+
+---
+# v0.6.2
 
 ## BUILD 1402
 - [x] Add `ToInstruction()` override to Action:

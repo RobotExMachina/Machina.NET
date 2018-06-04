@@ -270,6 +270,7 @@ namespace Machina
                     if (success && child != null)
                     {
                         child.Issue(a);
+                        lastAction = a;
                     }
                 }
 
@@ -324,7 +325,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(parentControl.parentRobot.Name + "_Program", this, false, inlineTargets, humanComments);
+            return compiler.UNSAFEProgramFromBuffer(Util.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
         }
 
         /// <summary>
@@ -335,7 +336,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(parentControl.parentRobot.Name + "_Program", this, true, inlineTargets, humanComments);
+            return compiler.UNSAFEProgramFromBuffer(Util.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
         }
 
         public void LogBufferedActions()

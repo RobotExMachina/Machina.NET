@@ -132,6 +132,7 @@ namespace Machina
 
             if (count == 0)
             {
+                released.AddRange(search);
                 return search;
             }
 
@@ -146,6 +147,7 @@ namespace Machina
                 search.Add(GetNext());
             }
 
+            released.AddRange(search);
             return search;
         }
 

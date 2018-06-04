@@ -226,7 +226,7 @@ namespace Machina.Drivers.Communication
                 //Console.WriteLine(_motionCursor);
                 this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
 
-                Action lastAction = this._motionCursor.lastAction;
+                Action lastAction = this._motionCursor.GetLastAction();
                 int remaining = this._motionCursor.ActionsPending();
                 ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
                 this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);

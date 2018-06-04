@@ -34,7 +34,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1402;
+        public static readonly int Build = 1403;
 
         /// <summary>
         /// Version number.
@@ -476,6 +476,7 @@ namespace Machina
         /// <param name="ioName"></param>
         /// <param name="pinNumber"></param>
         /// <param name="isDigital"></param>
+        [System.Obsolete("Deprecated method, use string inputs on Robot.WriteDigital() instead")]
         public bool SetIOName(string ioName, int pinNumber, bool isDigital)
         {
             return c.SetIOName(ioName, pinNumber, isDigital);

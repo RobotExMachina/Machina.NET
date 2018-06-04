@@ -108,6 +108,10 @@ namespace Machina.Drivers.Communication
         {
             if (_clientSocket != null)
             {
+                // Upload an empty script to stop the running program
+                LoadEmptyScript();
+                UploadScriptToDevice(_driverScript, false);
+
                 ClientSocketStatus = TCPConnectionStatus.Disconnected;
                 _clientSocket.Client.Disconnect(false);
                 _clientSocket.Close();
@@ -146,6 +150,7 @@ namespace Machina.Drivers.Communication
                     throw new Exception("ERROR: Could not figure out local IP");
                 }
                 Console.WriteLine("Machina local IP: " + _serverIP);
+
                 _serverSocket = new TcpListener(IPAddress.Parse(_serverIP), _serverPort);
                 _serverSocket.Start();
 
@@ -394,7 +399,8 @@ namespace Machina.Drivers.Communication
             //Console.WriteLine(_motionCursor);
             this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
 
-            Action lastAction = this._motionCursor.lastAction;
+            //Action lastAction = this._motionCursor.lastAction;
+            Action lastAction = this._motionCursor.GetLastAction();
             int remaining = this._motionCursor.ActionsPending();
             ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
             this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
@@ -402,6 +408,11 @@ namespace Machina.Drivers.Communication
             return true;
         }
 
+        private bool LoadEmptyScript()
+        {
+            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.Modules.empty.script");
+            return true;
+        }
 
         private bool LoadDriverScript()
         {

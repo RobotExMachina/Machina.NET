@@ -113,6 +113,25 @@ namespace Machina
             return ints;
         }
 
+        /// <summary>
+        /// Returns a string with safe ASCII characters to be used as a robot program name. 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string SafeProgramName(string name)
+        {
+            string safe = "";
+            if (name.Length == 0) safe = "Machina"; 
+
+            // Replace whitespaces with underscores
+            safe = name.Replace(' ', '_');
+
+            // Check if the name starts with a digit
+            if (char.IsDigit(safe[0])) safe = "_" + safe;
+
+            return safe;
+        }
+
     }
 
 
