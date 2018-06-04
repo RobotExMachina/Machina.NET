@@ -469,18 +469,18 @@ namespace Machina
             c.Execute();
         }
 
-        /// <summary>
-        /// ABB IOs must have a name corresponding to their definition in the controller. This function is useful to give them
-        /// a custom name that matches the controller's, and is used in code generation.
-        /// </summary>
-        /// <param name="ioName"></param>
-        /// <param name="pinNumber"></param>
-        /// <param name="isDigital"></param>
-        [System.Obsolete("Deprecated method, use string inputs on Robot.WriteDigital() instead")]
-        public bool SetIOName(string ioName, int pinNumber, bool isDigital)
-        {
-            return c.SetIOName(ioName, pinNumber, isDigital);
-        }
+        ///// <summary>
+        ///// ABB IOs must have a name corresponding to their definition in the controller. This function is useful to give them
+        ///// a custom name that matches the controller's, and is used in code generation.
+        ///// </summary>
+        ///// <param name="ioName"></param>
+        ///// <param name="pinNumber"></param>
+        ///// <param name="isDigital"></param>
+        //[System.Obsolete("Deprecated method, use string inputs on Robot.WriteDigital() instead")]
+        //public bool SetIOName(string ioName, int pinNumber, bool isDigital)
+        //{
+        //    return c.SetIOName(ioName, pinNumber, isDigital);
+        //}
 
 
 
@@ -1189,9 +1189,21 @@ namespace Machina
         /// </summary>
         /// <param name="pinNumber"></param>
         /// <param name="isOn"></param>
-        public bool WriteDigital(int pinNumber, bool isOn)
+        /// <param name="toolPin">Is this pin on the tool?</param>
+        public bool WriteDigital(int pinNumber, bool isOn, bool toolPin = false)
         {
-            return c.IssueWriteToDigitalIORequest(pinNumber, isOn);
+            return c.IssueWriteToDigitalIORequest(pinNumber.ToString(), isOn, toolPin);
+        }
+
+        /// <summary>
+        /// Writes to the digital IO pin.
+        /// </summary>
+        /// <param name="pinId">Pin name.</param>
+        /// <param name="isOn"></param>
+        /// <param name="toolPin">Is this pin on the tool?</param>
+        public bool WriteDigital(string pinId, bool isOn, bool toolPin = false)
+        {
+            return c.IssueWriteToDigitalIORequest(pinId, isOn, toolPin);
         }
 
         /// <summary>
@@ -1199,9 +1211,21 @@ namespace Machina
         /// </summary>
         /// <param name="pinNumber"></param>
         /// <param name="value"></param>
-        public bool WriteAnalog(int pinNumber, double value)
+        /// <param name="toolPin">Is this pin on the tool?</param>
+        public bool WriteAnalog(int pinNumber, double value, bool toolPin = false)
         {
-            return c.IssueWriteToAnalogIORequest(pinNumber, value);
+            return c.IssueWriteToAnalogIORequest(pinNumber.ToString(), value, toolPin);
+        }
+
+        /// <summary>
+        /// Writes to the analog IO pin.
+        /// </summary>
+        /// <param name="pinId">Pin name.</param>
+        /// <param name="value"></param>
+        /// <param name="toolPin">Is this pin on the tool?</param>
+        public bool WriteAnalog(string pinId, double value, bool toolPin = false)
+        {
+            return c.IssueWriteToAnalogIORequest(pinId.ToString(), value, toolPin);
         }
 
         /// <summary>
@@ -1226,23 +1250,23 @@ namespace Machina
             return 0.0;
         }
 
-        /// <summary>
-        /// Turn digital IO on. Is alias for `WriteDigital(pinNumber, true)`
-        /// </summary>
-        /// <param name="pinNumber"></param>
-        public bool TurnOn(int pinNumber)
-        {
-            return this.WriteDigital(pinNumber, true);
-        }
+        ///// <summary>
+        ///// Turn digital IO on. Is alias for `WriteDigital(pinNumber, true)`
+        ///// </summary>
+        ///// <param name="pinNumber"></param>
+        //public bool TurnOn(int pinNumber)
+        //{
+        //    return this.WriteDigital(pinNumber, true);
+        //}
 
-        /// <summary>
-        /// Turn digital IO off. Is alias for `WriteDigital(pinNumber, false)`
-        /// </summary>
-        /// <param name="pinNumber"></param>
-        public bool TurnOff(int pinNumber)
-        {
-            return this.WriteDigital(pinNumber, false);
-        }
+        ///// <summary>
+        ///// Turn digital IO off. Is alias for `WriteDigital(pinNumber, false)`
+        ///// </summary>
+        ///// <param name="pinNumber"></param>
+        //public bool TurnOff(int pinNumber)
+        //{
+        //    return this.WriteDigital(pinNumber, false);
+        //}
 
         /// <summary>
         /// Turns extrusion in 3D printers on/off.

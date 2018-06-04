@@ -124,8 +124,8 @@ namespace TEST_OfflineAPITests
             bot.Wait(500);
 
             // Turn on "DO_15"
-            bot.SetIOName("DO_15", 1, true);
-            bot.WriteDigital(1, true);
+            //bot.SetIOName("DO_15", 1, true);
+            bot.WriteDigital("DO_15", true);
 
             // Slow MoveL a square with precision
             bot.SpeedTo(100.3);
@@ -154,7 +154,7 @@ namespace TEST_OfflineAPITests
             // Add inline comment in code
             arm.Comment("GENERAL MACHINA CODE COMPILATION TEST! :)");
 
-            Console.WriteLine(arm.SetIOName("custom_DO_name_1", 1, true));
+            //Console.WriteLine(arm.SetIOName("custom_DO_name_1", 1, true));
 
             // Move to 'home' position
             arm.MotionMode("joint");
@@ -208,7 +208,7 @@ namespace TEST_OfflineAPITests
             // Draw half an arc up
             arm.Message("Drawing arc");
             arm.Coordinates("local");
-            arm.TurnOn(1);
+            arm.WriteDigital(1, true);
             for (var i = 0; i < 18; i++)
             {
                 arm.Move(0, 0.2 * size, 0);
@@ -216,7 +216,7 @@ namespace TEST_OfflineAPITests
             }
             arm.PopSettings();
 
-            arm.TurnOff(1);
+            arm.WriteDigital(1, false);
             arm.Wait(2000);
 
             arm.Message("Back home");

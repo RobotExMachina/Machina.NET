@@ -227,51 +227,37 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
+                    if (!aiod.isDigit)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            COMMENT_CHAR,
-                            aiod.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": only integer pin names are possible";
                     }
-                    else if (aiod.pin > 7)
+                    else if (aiod.pinNum < 0 || aiod.pinNum > 7)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
-                            COMMENT_CHAR,
-                            aiod.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
-                        dec = string.Format("  set_standard_digital_out({0}, {1})",
-                            aiod.pin,
-                            aiod.on ? "True" : "False");
+                        dec = $"  set_{(aiod.isToolPin ? "tool" : "standard")}_digital_out({aiod.pinNum}, {(aiod.on ? "True" : "False")})";
                     }
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
+                    if (!aioa.isDigit)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            COMMENT_CHAR,
-                            aioa.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": only integer pin names are possible";
                     }
-                    else if (aioa.pin > 1)
+                    else if (aioa.pinNum < 0 || aioa.pinNum > 1)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
-                            COMMENT_CHAR,
-                            aioa.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
-                            COMMENT_CHAR,
-                            aioa.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": value out of range [0.0, 1.0]";
                     }
                     else
                     {
-                        dec = string.Format("  set_standard_analog_out({0}, {1})",
-                            aioa.pin,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                        dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
                     }
                     break;
 
@@ -374,51 +360,37 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
+                    if (!aiod.isDigit)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            COMMENT_CHAR,
-                            aiod.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": only integer pin names are possible";
                     }
-                    else if (aiod.pin > 7)
+                    else if (aiod.pinNum < 0 || aiod.pinNum > 7)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": digital IO pin not available in UR robot",
-                            COMMENT_CHAR,
-                            aiod.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
-                        dec = string.Format("  set_standard_digital_out({0}, {1})",
-                            aiod.pin,
-                            aiod.on ? "True" : "False");
+                        dec = $"  set_{(aiod.isToolPin ? "tool" : "standard")}_digital_out({aiod.pinNum}, {(aiod.on ? "True" : "False")})";
                     }
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
+                    if (!aioa.isDigit)
                     {
-                        dec = string.Format("   {0} ERROR on \"{1}\": IO number not available",
-                            COMMENT_CHAR,
-                            aioa.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": only integer pin names are possible";
                     }
-                    else if (aioa.pin > 1)
+                    else if (aioa.pinNum < 0 || aioa.pinNum > 1)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": analog IO pin not available in UR robot",
-                            COMMENT_CHAR,
-                            aioa.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [0.0, 1.0]",
-                            COMMENT_CHAR,
-                            aioa.ToString());
+                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": value out of range [0.0, 1.0]";
                     }
                     else
                     {
-                        dec = string.Format("  set_standard_analog_out({0}, {1})",
-                            aioa.pin,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                        dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
                     }
                     break;
 

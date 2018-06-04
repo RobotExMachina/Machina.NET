@@ -215,15 +215,31 @@ namespace Machina
                 // http://reprap.org/wiki/G-code#M42:_Switch_I.2FO_pin
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    dec = $"M42 P{aiod.pin} S{(cursor.digitalOutputs[aiod.pin] ? "1" : "0")}";
+                    if (!aiod.isDigit)
+                    {
+                        dec = $"{commChar} ERROR on \"{aiod}\": only integer pin names allowed";
+                    }
+                    else
+                    {
+                        dec = $"M42 P{aiod.pinNum} S{(aiod.on ? "1" : "0")}";
+                    }
                     break;
+
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    if (aioa.value < 0 || aioa.value > 255)
+                    if (!aioa.isDigit)
+                    {
+                        dec = $"{commChar} ERROR on \"{aioa}\": only integer pin names allowed";
+                    }
+                    else if (aioa.value < 0 || aioa.value > 255)
+                    {
                         dec = $"{commChar} ERROR on \"{aioa.ToString()}\": value out of range [0..255]";
+                    }
                     else
-                        dec = $"M42 P{aioa.pin} S{Math.Round(cursor.analogOutputs[aioa.pin], 0)}";
+                    {
+                        dec = $"M42 P{aioa.pinNum} S{Math.Round(aioa.value, 0)}";
+                    }
                     break;
 
                 case ActionType.Temperature:

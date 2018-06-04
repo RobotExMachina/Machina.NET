@@ -35,10 +35,18 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
-        public bool[] digitalOutputs = new bool[14];
-        public double[] analogOutputs = new double[14];
-        public string[] digitalOutputNames = new string[14];  // ABB robots can have io ports named, UR + KUKA use standard names
-        public string[] analogOutputNames = new string[14];
+
+        // REPLACED BY DICT
+        //public bool[] digitalOutputs = new bool[14];
+        //public double[] analogOutputs = new double[14];
+        //public string[] digitalOutputNames = new string[14];  // ABB robots can have io ports named, UR + KUKA use standard names
+        //public string[] analogOutputNames = new string[14];
+        
+        // Some robots use ints as pin identifiers (UR, KUKA), while others use strings (ABB). 
+        // All pin ids are stored as strings, and are parsed to ints internally if possible. 
+        Dictionary<string, bool> digitalOutputs = new Dictionary<string, bool>();
+        Dictionary<string, double> analogOutputs = new Dictionary<string, double>();
+
 
         // 3D printing
         public bool isExtruding;
@@ -132,15 +140,15 @@ namespace Machina
             actionBuffer = new ActionBuffer();
             settingsBuffer = new SettingsBuffer();
 
-            // Basics io names
-            for (int i = 0; i < digitalOutputNames.Length;  i++)
-            {
-                digitalOutputNames[i] = "do" + i;
-            }
-            for (int i = 0; i < digitalOutputNames.Length; i++)
-            {
-                analogOutputNames[i] = "ao" + i;
-            }
+            //// Basics io names
+            //for (int i = 0; i < digitalOutputNames.Length;  i++)
+            //{
+            //    digitalOutputNames[i] = "do" + i;
+            //}
+            //for (int i = 0; i < digitalOutputNames.Length; i++)
+            //{
+            //    analogOutputNames[i] = "ao" + i;
+            //}
 
             // Initialize temps to zero
             foreach (RobotPartType part in Enum.GetValues(typeof(RobotPartType)))
@@ -975,13 +983,24 @@ namespace Machina
         /// <returns></returns>
         public bool ApplyAction(ActionIODigital action)
         {
-            if (action.pin < 0 || action.pin >= digitalOutputs.Length)
+            //if (action.pinName < 0 || action.pinName >= digitalOutputs.Length)
+            //{
+            //    Console.WriteLine("Cannot write to digital IO: robot has no pin #" + action.pinName);
+            //    return false;
+            //}
+
+            //this.digitalOutputs[action.pinName] = action.on;
+            //return true;
+
+            if (digitalOutputs.ContainsKey(action.pinName))
             {
-                Console.WriteLine("Cannot write to digital IO: robot has no pin #" + action.pin);
-                return false;
+                digitalOutputs[action.pinName] = action.on;
+            }
+            else
+            {
+                digitalOutputs.Add(action.pinName, action.on);
             }
 
-            this.digitalOutputs[action.pin] = action.on;
             return true;
         }
 
@@ -992,13 +1011,24 @@ namespace Machina
         /// <returns></returns>
         public bool ApplyAction(ActionIOAnalog action)
         {
-            if (action.pin < 0 || action.pin >= analogOutputs.Length)
+            //if (action.pinName < 0 || action.pinName >= analogOutputs.Length)
+            //{
+            //    Console.WriteLine("Cannot write to analog IO: robot has no analog pin #" + action.pinName);
+            //    return false;
+            //}
+
+            //this.analogOutputs[action.pinName] = action.value;
+            //return true;
+
+            if (analogOutputs.ContainsKey(action.pinName))
             {
-                Console.WriteLine("Cannot write to analog IO: robot has no analog pin #" + action.pin);
-                return false;
+                analogOutputs[action.pinName] = action.value;
+            }
+            else
+            {
+                analogOutputs.Add(action.pinName, action.value);
             }
 
-            this.analogOutputs[action.pin] = action.value;
             return true;
         }
 

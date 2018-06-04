@@ -127,13 +127,13 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.IODigital:
                     // !SetDO "NAME" ON
                     ActionIODigital aiod = (ActionIODigital)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETDO} \"{cursor.digitalOutputNames[aiod.pin]}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETDO} \"{aiod.pinName}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}");
                     break;
 
                 case ActionType.IOAnalog:
                     // !SetAO "NAME" V
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETAO} \"{cursor.digitalOutputNames[aioa.pin]}\" {aioa.value}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETAO} \"{aioa.pinName}\" {aioa.value}{STR_MESSAGE_END_CHAR}");
                     break;
 
                 case ActionType.PushPop:

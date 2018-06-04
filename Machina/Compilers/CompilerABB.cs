@@ -375,34 +375,36 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
-                    {
-                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aiod.ToString());
-                    }
-                    else
-                    {
-                        dec = string.Format("    SetDO {0}, {1};",
-                        cursor.digitalOutputNames[aiod.pin],
-                        aiod.on ? "1" : "0");
-                    }
+                    //if (aiod.pinName < 0 || aiod.pinName >= cursor.digitalOutputs.Length)
+                    //{
+                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                    //        commChar,
+                    //        aiod.ToString());
+                    //}
+                    //else
+                    //{
+                    //    dec = string.Format("    SetDO {0}, {1};",
+                    //    cursor.digitalOutputNames[aiod.pinName],
+                    //    aiod.on ? "1" : "0");
+                    //}
+                    dec = $"    SetDO {aiod.pinName}, {(aiod.on ? "1" : "0")};";
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
-                    {
-                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aioa.ToString());
-                    }
-                    else
-                    {
-                        dec = string.Format("    SetAO {0}, {1};",
-                        cursor.analogOutputNames[aioa.pin],
-                        aioa.value);
-                    }
+                    //if (aioa.pinName < 0 || aioa.pinName >= cursor.analogOutputs.Length)
+                    //{
+                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                    //        commChar,
+                    //        aioa.ToString());
+                    //}
+                    //else
+                    //{
+                    //    dec = string.Format("    SetAO {0}, {1};",
+                    //    cursor.analogOutputNames[aioa.pinName],
+                    //    aioa.value);
+                    //}
+                    dec = $"    SetAO {aioa.pinName}, {aioa.value};";
                     break;
 
                     //default:
@@ -522,34 +524,36 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    if (aiod.pin < 0 || aiod.pin >= cursor.digitalOutputs.Length)
-                    {
-                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aiod.ToString());
-                    }
-                    else
-                    {
-                        dec = string.Format("    SetDO {0}, {1};",
-                        cursor.digitalOutputNames[aiod.pin],
-                        aiod.on ? "1" : "0");
-                    }
+                    //if (aiod.pinName < 0 || aiod.pinName >= cursor.digitalOutputs.Length)
+                    //{
+                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                    //        commChar,
+                    //        aiod.ToString());
+                    //}
+                    //else
+                    //{
+                    //    dec = string.Format("    SetDO {0}, {1};",
+                    //    cursor.digitalOutputNames[aiod.pinName],
+                    //    aiod.on ? "1" : "0");
+                    //}
+                    dec = $"    SetDO {aiod.pinName}, {(aiod.on ? "1" : "0")};";
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    if (aioa.pin < 0 || aioa.pin >= cursor.analogOutputs.Length)
-                    {
-                        dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aioa.ToString());
-                    }
-                    else
-                    {
-                        dec = string.Format("    SetAO {0}, {1};",
-                        cursor.analogOutputNames[aioa.pin],
-                        aioa.value);
-                    }
+                    //if (aioa.pinName < 0 || aioa.pinName >= cursor.analogOutputs.Length)
+                    //{
+                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
+                    //        commChar,
+                    //        aioa.ToString());
+                    //}
+                    //else
+                    //{
+                    //    dec = string.Format("    SetAO {0}, {1};",
+                    //    cursor.analogOutputNames[aioa.pinName],
+                    //    aioa.value);
+                    //}
+                    dec = $"    SetAO {aioa.pinName}, {aioa.value};";
                     break;
 
                     //default:

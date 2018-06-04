@@ -204,14 +204,14 @@ namespace Machina
             return new ActionAttach(tool);
         }
 
-        public static ActionIODigital WriteDigital(int pinNum, bool isOn)
+        public static ActionIODigital WriteDigital(string pinName, bool isOn, bool toolPin)
         {
-            return new ActionIODigital(pinNum, isOn);
+            return new ActionIODigital(pinName, isOn, toolPin);
         }
 
-        public static ActionIOAnalog WriteAnalog(int pinNum, double value)
+        public static ActionIOAnalog WriteAnalog(string pinName, double value, bool toolPin)
         {
-            return new ActionIOAnalog(pinNum, value);
+            return new ActionIOAnalog(pinName, value, toolPin);
         }
 
         public static ActionTemperature Temperature(double temp, RobotPartType devicePart, bool wait, bool relative)
@@ -956,27 +956,30 @@ namespace Machina
     /// </summary>
     public class ActionIODigital : Action
     {
-        public int pin;
+        // See RobotCursor for string/int32 naming
+        public string pinName;
         public bool on;
+        public bool isDigit = false;
+        public int pinNum = 0;
+        public bool isToolPin = false;
 
-        public ActionIODigital(int pinNum, bool isOn) : base()
+        public ActionIODigital(string pin, bool isOn, bool toolPin) : base()
         {
             this.type = ActionType.IODigital;
-
-            this.pin = pinNum;
-            this.on = isOn; 
+            this.pinName = pin;
+            this.on = isOn;
+            this.isDigit = Int32.TryParse(this.pinName, out this.pinNum);
+            this.isToolPin = toolPin;
         }
 
         public override string ToString()
         {
-            return string.Format("Turn digital IO {0} {1}",
-                this.pin,
-                this.on ? "ON" : "OFF");
+            return $"Turn {(this.isToolPin ? "tool " : "")}digital IO {(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")} {(this.on ? "ON" : "OFF")}";
         }
 
         public override string ToInstruction()
         {
-            return $"WriteDigital({this.pin},{this.on});";
+            return $"WriteDigital({(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")},{this.on},{this.isToolPin});";
         }
     }
 
@@ -985,27 +988,32 @@ namespace Machina
     /// </summary>
     public class ActionIOAnalog : Action
     {
-        public int pin;
+        public string pinName;
         public double value;
+        public bool isDigit = false;
+        public int pinNum = 0;
+        public bool isToolPin = false;
 
-        public ActionIOAnalog(int pinNum, double value) : base()
+        public ActionIOAnalog(string pin, double value, bool toolPin) : base()
         {
             this.type = ActionType.IOAnalog;
-
-            this.pin = pinNum;
+            this.pinName = pin;
             this.value = value;
+            this.isDigit = Int32.TryParse(this.pinName, out this.pinNum);
+            this.isToolPin = toolPin;
         }
 
         public override string ToString()
         {
-            return string.Format("Set analog IO {0} to {1}",
-                this.pin,
-                this.value);
+            //return string.Format("Set analog IO {0} to {1}",
+            //    this.pinName,
+            //    this.value);
+            return $"Set {(this.isToolPin ? "tool " : "")}analog IO {(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")} to {this.value}";
         }
 
         public override string ToInstruction()
         {
-            return $"WriteAnalog({this.pin},{this.value});";
+            return $"WriteAnalog({(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")},{this.value},{this.isToolPin});";
         }
     }
 

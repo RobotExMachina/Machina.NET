@@ -270,39 +270,37 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    if (aiod.pin < 1 || aiod.pin >= cursor.digitalOutputs.Length)  // KUKA starts counting pins by 1
+                    if (!aiod.isDigit)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aiod.ToString());
+                        dec = $"  {commChar} ERROR on \"{aiod}\": only integer pin names are possible";
+                    }
+                    else if (aiod.pinNum < 1 || aiod.pinNum > 32)  // KUKA starts counting pins by 1
+                    {
+                        dec = $"  {commChar} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
-                        dec = string.Format("  $OUT[{0}] = {1}",
-                            aiod.pin,
-                            aiod.on ? "TRUE" : "FALSE");
+                        dec = $"  $OUT[{aiod.pinNum}] = {(aiod.on ? "TRUE" : "FALSE")}";
                     }
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    if (aioa.pin < 1 || aioa.pin >= cursor.analogOutputNames.Length || aioa.pin > 16)    // KUKA: analog pins [1 to 16]
+                    if (!aioa.isDigit)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aioa.ToString());
+                        dec = $"  {commChar} ERROR on \"{aioa}\": only integer pin names are possible";
+                    }
+                    else if (aioa.pinNum < 1 || aioa.pinNum > 16)    // KUKA: analog pins [1 to 16]
+                    {
+                        dec = $"  {commChar} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < -1 || aioa.value > 1)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [-1.0, 1.0]",
-                            commChar,
-                            aioa.ToString());
+                        dec = $"  {commChar} ERROR on \"{aioa}\": value out of range [-1.0, 1.0]";
                     }
                     else
                     {
-                        dec = string.Format("  $ANOUT[{0}] = {1}",
-                            aioa.pin,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                        dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
                     }
                     break;
 
@@ -401,39 +399,37 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    if (aiod.pin < 1 || aiod.pin >= cursor.digitalOutputs.Length)  // KUKA starts counting pins by 1
+                    if (!aiod.isDigit)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aiod.ToString());
+                        dec = $"  {commChar} ERROR on \"{aiod}\": only integer pin names are possible";
+                    }
+                    else if (aiod.pinNum < 1 || aiod.pinNum > 32)  // KUKA starts counting pins by 1
+                    {
+                        dec = $"  {commChar} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
-                        dec = string.Format("  $OUT[{0}] = {1}",
-                            aiod.pin,
-                            aiod.on ? "TRUE" : "FALSE");
+                        dec = $"  $OUT[{aiod.pinNum}] = {(aiod.on ? "TRUE" : "FALSE")}";
                     }
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    if (aioa.pin < 1 || aioa.pin >= cursor.analogOutputNames.Length || aioa.pin > 16)    // KUKA: analog pins [1 to 16]
+                    if (!aioa.isDigit)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": IO number not available",
-                            commChar,
-                            aioa.ToString());
+                        dec = $"  {commChar} ERROR on \"{aioa}\": only integer pin names are possible";
+                    }
+                    else if (aioa.pinNum < 1 || aioa.pinNum > 16)    // KUKA: analog pins [1 to 16]
+                    {
+                        dec = $"  {commChar} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < -1 || aioa.value > 1)
                     {
-                        dec = string.Format("  {0} ERROR on \"{1}\": value out of range [-1.0, 1.0]",
-                            commChar,
-                            aioa.ToString());
+                        dec = $"  {commChar} ERROR on \"{aioa}\": value out of range [-1.0, 1.0]";
                     }
                     else
                     {
-                        dec = string.Format("  $ANOUT[{0}] = {1}",
-                            aioa.pin,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                        dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
                     }
                     break;
 

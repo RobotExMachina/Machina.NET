@@ -662,39 +662,39 @@ namespace Machina
 
 
 
-        // TODO: take another look at this, it was quick and dirty...
-        public bool SetIOName(string ioName, int pinNumber, bool isDigital)
-        {
+        //// TODO: take another look at this, it was quick and dirty...
+        //public bool SetIOName(string ioName, int pinNumber, bool isDigital)
+        //{
 
-            if (isDigital)
-            {
-                if (pinNumber < 0 || pinNumber >= virtualCursor.digitalOutputs.Length)
-                {
-                    Console.WriteLine("ERROR: pin # out of range");
-                    return false;
-                }
-                else
-                {
-                    virtualCursor.digitalOutputNames[pinNumber] = ioName;
-                    writeCursor.digitalOutputNames[pinNumber] = ioName;
-                }
-                return true;
-            }
-            else
-            {
-                if (pinNumber < 0 || pinNumber >= virtualCursor.analogOutputs.Length)
-                {
-                    Console.WriteLine("ERROR: pin # out of range");
-                    return false;
-                }
-                else
-                {
-                    virtualCursor.analogOutputNames[pinNumber] = ioName;
-                    writeCursor.analogOutputNames[pinNumber] = ioName;
-                }
-                return true;
-            }
-        }
+        //    if (isDigital)
+        //    {
+        //        if (pinNumber < 0 || pinNumber >= virtualCursor.digitalOutputs.Length)
+        //        {
+        //            Console.WriteLine("ERROR: pin # out of range");
+        //            return false;
+        //        }
+        //        else
+        //        {
+        //            virtualCursor.digitalOutputNames[pinNumber] = ioName;
+        //            writeCursor.digitalOutputNames[pinNumber] = ioName;
+        //        }
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        if (pinNumber < 0 || pinNumber >= virtualCursor.analogOutputs.Length)
+        //        {
+        //            Console.WriteLine("ERROR: pin # out of range");
+        //            return false;
+        //        }
+        //        else
+        //        {
+        //            virtualCursor.analogOutputNames[pinNumber] = ioName;
+        //            writeCursor.analogOutputNames[pinNumber] = ioName;
+        //        }
+        //        return true;
+        //    }
+        //}
 
 
 
@@ -863,21 +863,21 @@ namespace Machina
         /// <summary>
         /// Issue a request to turn digital IO on/off.
         /// </summary>
-        /// <param name="pinNum"></param>
+        /// <param name="pinId"></param>
         /// <param name="isOn"></param>
         /// <returns></returns>
-        public bool IssueWriteToDigitalIORequest(int pinNum, bool isOn) =>
-                IssueApplyActionRequest(new ActionIODigital(pinNum, isOn));
+        public bool IssueWriteToDigitalIORequest(string pinId, bool isOn, bool toolPin) =>
+                IssueApplyActionRequest(new ActionIODigital(pinId, isOn, toolPin));
 
 
         /// <summary>
         /// Issue a request to write to analog pin.
         /// </summary>
-        /// <param name="pinNum"></param>
+        /// <param name="pinId"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool IssueWriteToAnalogIORequest(int pinNum, double value) =>
-                IssueApplyActionRequest(new ActionIOAnalog(pinNum, value));
+        public bool IssueWriteToAnalogIORequest(string pinId, double value, bool toolPin) =>
+                IssueApplyActionRequest(new ActionIOAnalog(pinId, value, toolPin));
 
 
         /// <summary>

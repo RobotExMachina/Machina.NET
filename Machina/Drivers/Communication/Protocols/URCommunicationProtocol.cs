@@ -171,7 +171,7 @@ namespace Machina.Drivers.Communication.Protocols
                     {
                         _action.id,
                         INST_SET_DIGITAL_OUT,
-                        aiod.pin,
+                        aiod.pinNum,
                         aiod.on ? 1 : 0
                     };
                     break;
@@ -182,7 +182,7 @@ namespace Machina.Drivers.Communication.Protocols
                     {
                         _action.id,
                         INST_SET_DIGITAL_OUT,
-                        aioa.pin,
+                        aioa.pinNum,
                         (int) Math.Round(aioa.value * FACTOR_VOLT)
                     };
                     break;
