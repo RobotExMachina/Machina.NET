@@ -936,7 +936,7 @@ namespace Machina
 
         public override string ToInstruction()
         {
-            return $"Deatch();";
+            return $"Detach();";
         }
     }
 

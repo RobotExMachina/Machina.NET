@@ -17,12 +17,17 @@
 
 
 - [ ] Improved Logging system
-- [ ] Update Bridge with 1403 changes
-- [ ] Update GH with changes
+
 
 
 ---
 # v0.6.3
+
+## BUILD 1404
+- [ ] Deprecate direct `Tool` constructors, substituted with static `Tool.Create(...)`
+- [ ] Add a private `Tool` constructor with all parameters as primitives.
+- [ ] Add `Tool.ToInstruction()` method to produce _streamable_ message
+- [ ] Fix typos in `Actions`
 
 ## BUILD 1403
 - [x] Add safe program name check to avoid
