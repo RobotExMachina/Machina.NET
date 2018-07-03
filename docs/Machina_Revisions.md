@@ -23,6 +23,9 @@
 ---
 # v0.6.3
 
+## BUILD 1405
+- [ ] Remove EOL chars and add double quotes to name in `Tool.ToInstruction()`
+
 ## BUILD 1404
 - [ ] Deprecate direct `Tool` constructors, substituted with static `Tool.Create(...)`
 - [ ] Add a private `Tool` constructor with all parameters as primitives.
