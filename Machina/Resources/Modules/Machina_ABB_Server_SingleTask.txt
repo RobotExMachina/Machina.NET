@@ -1,18 +1,16 @@
 ﻿MODULE Machina_Server
 
-    ! ##     ##    ###     ######  ##     ## #### ##    ##    ###
-    ! ###   ###   ## ##   ##    ## ##     ##  ##  ###   ##   ## ##
-    ! #### ####  ##   ##  ##       ##     ##  ##  ####  ##  ##   ##
-    ! ## ### ## ##     ## ##       #########  ##  ## ## ## ##     ##
-    ! ##     ## ######### ##       ##     ##  ##  ##  #### #########
-    ! ##     ## ##     ## ##    ## ##     ##  ##  ##   ### ##     ##
-    ! ##     ## ##     ##  ######  ##     ## #### ##    ## ##     ##
+    ! ###\   ###\ #####\  ######\##\  ##\##\###\   ##\ #####\
+    ! ####\ ####\##\\\##\##\\\\\\##\  ##\##\####\  ##\##\\\##\
+    ! ##\####\##\#######\##\     #######\##\##\##\ ##\#######\
+    ! ##\\##\\##\##\\\##\##\     ##\\\##\##\##\\##\##\##\\\##\
+    ! ##\ \\\ ##\##\  ##\\######\##\  ##\##\##\ \####\##\  ##\
+    ! \\\     \\\\\\  \\\ \\\\\\\\\\  \\\\\\\\\  \\\\\\\\  \\\
     !
     !
-    !
-    ! This file starts a server on a virtual/real ABB robot,
-    ! waits for a TCP client, and listens to a stream of formatted
-    ! string messages.
+    ! This file starts a synchronous, single-threaded server on a virtual/real ABB robot,
+    ! waits for a TCP client, listens to a stream of formatted string messages,
+    ! buffers them parsed into an 'action' struct, and runs a loop to execute them. .
     !
     ! IMPORTANT: make sure to adjust SERVER_IP to your current setup
     !
@@ -22,7 +20,7 @@
     !
     ! MIT License
     !
-    ! Copyright (c) 2018 Jose Luis García del Castillo y López
+    ! Copyright (c) 2018 Jose Luis Garcia del Castillo y Lopez
     !
     ! Permission is hereby granted, free of charge, to any person obtaining a copy
     ! of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +63,7 @@
     CONST num SERVER_PORT := 7000;
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_DRIVER_VERSION := "1.0.0";
+    CONST string MACHINA_SERVER_VERSION := "1.0.1";
 
     ! Should program exit on any kind of error?
     VAR bool USE_STRICT := TRUE;
@@ -96,7 +94,7 @@
     ! Characters used for buffer parsing
     CONST string STR_MESSAGE_END_CHAR := ";";
     CONST string STR_MESSAGE_ID_CHAR := "@";
-    CONST string STR_MESSAGE_RESPONSE_CHAR := ">";  ! this will be added to infomation request responses (acknowledgments do not include it)
+    CONST string STR_MESSAGE_RESPONSE_CHAR := ">";  ! this will be added to information request responses (acknowledgments do not include it)
 
     ! RobotWare 5.x shim
     CONST num WAIT_MAX := 8388608;
@@ -144,8 +142,8 @@
     PROC Main()
         TPErase;
 
-        ! Avoid signularities
-        SingArea \Wrist;
+        ! Avoid singularities.
+        ! SingArea \Wrist;  ! Uncomment this line if you are often running into singularity problems. Beware that this will make linear motion slightly deviate from its linear trajectory.
 
         CursorsInitialize;
         ServerInitialize;
@@ -236,7 +234,7 @@
 
         ERROR
             IF ERRNO = ERR_SYM_ACCESS THEN
-                TPWrite "Could not find signal """ + currentAction.s1 + """";
+                TPWrite "MACHINA ERROR: Could not find signal """ + currentAction.s1 + """";
                 TPWrite "Errors will follow";
                 IF USE_STRICT THEN EXIT; ENDIF
                 STOP;
@@ -275,6 +273,7 @@
 
         ERROR
             IF ERRNO = ERR_SOCK_TIMEOUT THEN
+                TPWrite "Machina error: ServerRecover timeout. Retrying...";
                 RETRY;
             ELSEIF ERRNO = ERR_SOCK_CLOSED THEN
                 RETURN;
@@ -300,6 +299,9 @@
         ERROR
         IF ERRNO = ERR_SOCK_CLOSED THEN
             ServerRecover;
+            RETRY;
+        ELSEIF ERRNO = ERR_SOCK_TIMEOUT THEN
+            TPWrite "Machina: ReadStream() timeout. Retrying.";
             RETRY;
         ENDIF
     ENDPROC
@@ -330,15 +332,15 @@
 
         TEST a.p1
 
-        CASE 1:  ! Driver version
-            response := response + STR_DOUBLE_QUOTES + MACHINA_DRIVER_VERSION + STR_DOUBLE_QUOTES;
+        CASE 1:  ! Module version
+            response := response + STR_DOUBLE_QUOTES + MACHINA_SERVER_VERSION + STR_DOUBLE_QUOTES;
 
         CASE 2:  ! IP and PORT
             response := response + STR_DOUBLE_QUOTES + SERVER_IP + STR_DOUBLE_QUOTES + STR_WHITE + NumToStr(SERVER_PORT, 0);
 
         ENDTEST
 
-		response := response + STR_MESSAGE_END_CHAR;
+        response := response + STR_MESSAGE_END_CHAR;
 
         SocketSend clientSocket \Str:=response;
     ENDPROC
@@ -600,7 +602,7 @@
         cursorTool := tool0;
         cursorWObj := wobj0;
         cursorJoints := CJointT();
-        cursorTarget := CRobT();
+        cursorTarget := CRobT(\Tool:=tool0, \WObj:=wobj0);
         cursorSpeed := v20;
         cursorZone := z5;
     ENDPROC
