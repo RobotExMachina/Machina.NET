@@ -145,6 +145,10 @@
         ! Avoid singularities.
         ! SingArea \Wrist;  ! Uncomment this line if you are often running into singularity problems. Beware that this will make linear motion slightly deviate from its linear trajectory.
 
+        ! Allow the controller to choose the best configuraation for motion
+        ConfJ \Off;
+        ConfL \Off;
+
         CursorsInitialize;
         ServerInitialize;
 
