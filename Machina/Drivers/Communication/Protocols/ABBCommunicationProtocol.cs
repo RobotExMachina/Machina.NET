@@ -165,7 +165,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.ExternalAxes:
                     ActionExternalAxes aea = action as ActionExternalAxes;
 
-                    string msg = $"{STR_MESSAGE_ID_CHAR}{aea.id} ";
+                    string msg = $"{STR_MESSAGE_ID_CHAR}{aea.id} {INST_EXT_JOINTS} ";
 
                     for (int i = 0; i < aea.externalAxes.Length; i++)
                     {

@@ -37,6 +37,7 @@ namespace TEST_StreamAPITests
             arm.ConnectionManager("machina");
             arm.ControlMode("stream");
             arm.Connect();
+            //arm.Connect("127.0.0.1", 7000);
 
             //arm.SetUser("BUILD", "password");
             //arm.Connect("192.168.0.101", 6969);
@@ -110,7 +111,7 @@ namespace TEST_StreamAPITests
             bot.ExternalAxesTo(1800);
 
             // Home
-            bot.SpeedTo(100);
+            bot.SpeedTo(500);
             bot.TransformTo(1800, -1445, 1327.65, 0, 1, 0, 1, 0, 0);
 
             bot.Wait(2000);
