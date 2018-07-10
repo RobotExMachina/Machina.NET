@@ -1190,15 +1190,6 @@ namespace Machina
 
         public override string ToString()
         {
-            string extAx = string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]",
-                    this.externalAxes[0] == null ? "null" : this.externalAxes[0].ToString(),
-                    this.externalAxes[1] == null ? "null" : this.externalAxes[1].ToString(),
-                    this.externalAxes[2] == null ? "null" : this.externalAxes[2].ToString(),
-                    this.externalAxes[3] == null ? "null" : this.externalAxes[3].ToString(),
-                    this.externalAxes[4] == null ? "null" : this.externalAxes[4].ToString(),
-                    this.externalAxes[5] == null ? "null" : this.externalAxes[5].ToString()
-                    );
-
             return relative ?
                 $"Increase external axes by [{this.Serialize()}]" :
                 $"Set external axes to [{this.Serialize()}]"; 
@@ -1213,14 +1204,15 @@ namespace Machina
 
         private string Serialize()
         {
-            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}",
-                this.externalAxes[0] == null ? "null" : this.externalAxes[0].ToString(),
-                this.externalAxes[1] == null ? "null" : this.externalAxes[1].ToString(),
-                this.externalAxes[2] == null ? "null" : this.externalAxes[2].ToString(),
-                this.externalAxes[3] == null ? "null" : this.externalAxes[3].ToString(),
-                this.externalAxes[4] == null ? "null" : this.externalAxes[4].ToString(),
-                this.externalAxes[5] == null ? "null" : this.externalAxes[5].ToString()
-                );
+            string ser = "";
+            for (int i = 0; i < this.externalAxes.Length; i++)
+            {
+                ser += this.externalAxes[i] == null ? "null" : this.externalAxes[i].ToString();
+                if (i < this.externalAxes.Length - 1)
+                    ser += ", ";
+            }
+
+            return ser;
         }
             
     }
