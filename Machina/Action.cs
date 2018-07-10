@@ -37,7 +37,8 @@ namespace Machina
         Temperature,
         Extrusion,
         ExtrusionRate,
-        Initialization
+        Initialization, 
+        ExternalAxes
     }
 
     
@@ -232,6 +233,11 @@ namespace Machina
         public static ActionInitialization Initialize(bool init)
         {
             return new ActionInitialization(init);
+        }
+
+        public static ActionExternalAxes ExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative)
+        {
+            return new ActionExternalAxes(a1, a2, a3, a4, a5, a6, relative);
         }
 
 
@@ -1151,6 +1157,52 @@ namespace Machina
         }
 
         public override string ToInstruction() => null;
+    }
+
+
+
+    //  ███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗      █████╗ ██╗  ██╗███████╗███████╗
+    //  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔══██╗╚██╗██╔╝██╔════╝██╔════╝
+    //  █████╗   ╚███╔╝    ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████║ ╚███╔╝ █████╗  ███████╗
+    //  ██╔══╝   ██╔██╗    ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     ██╔══██║ ██╔██╗ ██╔══╝  ╚════██║
+    //  ███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗██║  ██║██╔╝ ██╗███████╗███████║
+    //  ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝
+    //                                                                                                     
+
+    public class ActionExternalAxes : Action
+    {
+        public double? eax1, eax2, eax3, eax4, eax5, eax6;
+        public bool relative;
+
+        public ActionExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative) : base()
+        {
+            this.type = ActionType.ExternalAxes;
+
+            this.eax1 = a1;
+            this.eax2 = a2;
+            this.eax3 = a3;
+            this.eax4 = a4;
+            this.eax5 = a5;
+            this.eax6 = a6;
+
+            this.relative = relative;
+        }
+
+        public override string ToString()
+        {
+            return relative ?
+                $"Increase external axes by [{this.eax1}, {this.eax2}, {this.eax3}, {this.eax4}, {this.eax5}, {this.eax6}]" :
+                $"Set external axes to [{this.eax1}, {this.eax2}, {this.eax3}, {this.eax4}, {this.eax5}, {this.eax6}]";
+
+        }
+
+        public override string ToInstruction()
+        {
+            return relative ?
+                $"ExternalAxes({this.eax1},{this.eax2},{this.eax3},{this.eax4},{this.eax5},{this.eax6});" :
+                $"ExternalAxesTo({this.eax1},{this.eax2},{this.eax3},{this.eax4},{this.eax5},{this.eax6});";
+
+        }
     }
 
 

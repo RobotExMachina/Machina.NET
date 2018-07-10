@@ -17,20 +17,30 @@
 
 
 - [ ] Improved Logging system
++ [ ] Console dump levels: DEBUG (4), INFO (3), WARNING (2), ERROR (1) and NONE (0).
++ [ ]
 
+- [ ] Custom code (non-streamable)
 
 
 ---
 # v0.6.3
 
+## BUILD 1406
+- [x] Add `ExternalAxes` Action
+- [x] Add `eternalAxes` as cursor state
+- [x] Add `ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null)`
+- [ ]
+
 ## BUILD 1405
-- [ ] Remove EOL chars and add double quotes to name in `Tool.ToInstruction()`
+- [x] Remove EOL chars and add double quotes to name in `Tool.ToInstruction()`
+- [x] Update ABB driver
 
 ## BUILD 1404
-- [ ] Deprecate direct `Tool` constructors, substituted with static `Tool.Create(...)`
-- [ ] Add a private `Tool` constructor with all parameters as primitives.
-- [ ] Add `Tool.ToInstruction()` method to produce _streamable_ message
-- [ ] Fix typos in `Actions`
+- [x] Deprecate direct `Tool` constructors, substituted with static `Tool.Create(...)`
+- [x] Add a private `Tool` constructor with all parameters as primitives.
+- [x] Add `Tool.ToInstruction()` method to produce _streamable_ message
+- [x] Fix typos in `Actions`
 
 ## BUILD 1403
 - [x] Add safe program name check to avoid

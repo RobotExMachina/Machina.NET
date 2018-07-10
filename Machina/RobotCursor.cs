@@ -35,6 +35,7 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
+        public double?[] externalAxes;
 
         // REPLACED BY DICT
         //public bool[] digitalOutputs = new bool[14];
@@ -193,7 +194,9 @@ namespace Machina
             this.jointAcceleration = jointAcceleration;
             this.precision = precision;
             this.motionType = mType;
-            this.referenceCS = refCS; 
+            this.referenceCS = refCS;
+
+            this.externalAxes = new double?[] { null, null, null, null, null, null };  // @TODO: should this be passed as an argument?
 
             this.initialized = true;
             return this.initialized;
@@ -407,7 +410,8 @@ namespace Machina
             { typeof (ActionTemperature),               (act, robCur) => robCur.ApplyAction((ActionTemperature) act) },
             { typeof (ActionExtrusion),                 (act, robCur) => robCur.ApplyAction((ActionExtrusion) act) },
             { typeof (ActionExtrusionRate),             (act, robCur) => robCur.ApplyAction((ActionExtrusionRate) act) },
-            { typeof (ActionInitialization),            (act, robCur) => robCur.ApplyAction((ActionInitialization) act) }
+            { typeof (ActionInitialization),            (act, robCur) => robCur.ApplyAction((ActionInitialization) act) },
+            { typeof (ActionExternalAxes),              (act, robCur) => robCur.ApplyAction((ActionExternalAxes) act) },
         };
 
         /// <summary>
@@ -1088,6 +1092,44 @@ namespace Machina
             // nothing to do here really... 
             return true;
         }
+
+
+
+
+        //  ╔═╗═╗ ╦╔╦╗╔═╗╦═╗╔╗╔╔═╗╦      ╔═╗═╗ ╦╔═╗╔═╗
+        //  ║╣ ╔╩╦╝ ║ ║╣ ╠╦╝║║║╠═╣║      ╠═╣╔╩╦╝║╣ ╚═╗
+        //  ╚═╝╩ ╚═ ╩ ╚═╝╩╚═╝╚╝╩ ╩╩═╝────╩ ╩╩ ╚═╚═╝╚═╝
+        /// <summary>
+        /// Apply an Action to set/increase external axes values for this robot.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionExternalAxes action)
+        {
+            if (action.relative)
+            {
+                if (this.externalAxes[0] != null && action.eax1 != null) this.externalAxes[0] += action.eax1;
+                if (this.externalAxes[1] != null && action.eax2 != null) this.externalAxes[1] += action.eax2;
+                if (this.externalAxes[2] != null && action.eax3 != null) this.externalAxes[2] += action.eax3;
+                if (this.externalAxes[3] != null && action.eax4 != null) this.externalAxes[3] += action.eax4;
+                if (this.externalAxes[4] != null && action.eax5 != null) this.externalAxes[4] += action.eax5;
+                if (this.externalAxes[5] != null && action.eax6 != null) this.externalAxes[5] += action.eax6;
+            }
+            else
+            {
+                this.externalAxes[0] = action.eax1;
+                this.externalAxes[1] = action.eax2;
+                this.externalAxes[2] = action.eax3;
+                this.externalAxes[3] = action.eax4;
+                this.externalAxes[4] = action.eax5;
+                this.externalAxes[5] = action.eax6;
+            }
+            return true;
+        }
+
+
+
+
 
 
 

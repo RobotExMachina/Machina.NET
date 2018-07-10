@@ -17,6 +17,23 @@ using System.Threading.Tasks;
 namespace Machina
 {
 
+    //public static class Log
+    //{
+    //    static bool _consoleDump = true;
+    //    static int _debugLevel = 3;
+
+    //    internal static void Debug(string msg)
+    //    {
+
+    //        if (_consoleDump && -_debugLevel >= 4)
+    //        {
+    //            Console.WriteLine("MACHINA DEBUG: " + msg);
+    //        }
+    //    }
+
+
+    //}
+
 
     //  ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
     //  ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
@@ -34,13 +51,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1405;
+        public static readonly int Build = 1406;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.6.3." + Build;
-
+        public static readonly string Version = "0.6.4." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
@@ -61,37 +77,10 @@ namespace Machina
 
 
 
-        //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
-        //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
-        //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
-        //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
-        //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
-        //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
-        //                                                      
-        /// <summary>
-        /// Will be raised when Machina has finished streaming all pending Actions to the controller.
-        /// Note that the controller still needs to receive them and execute them. This gives Machina 
-        /// time to prepare the next batch.
-        /// </summary>
-        public event BufferEmptyHandler BufferEmpty;
-        public delegate void BufferEmptyHandler(object sender, EventArgs e);
-        internal virtual void OnBufferEmpty(EventArgs e) => BufferEmpty?.Invoke(this, e);
 
-        /// <summary>
-        /// Will be raised when Machina received an update from the controller as has new motion
-        /// information available. Useful to keep track of the state of the controller.
-        /// </summary>
-        public event MotionCursorUpdatedHandler MotionCursorUpdated;
-        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
-        internal virtual void OnMotionCursorUpdated(EventArgs e) => MotionCursorUpdated?.Invoke(this, e);
 
-        /// <summary>
-        /// Raised whenever an action has been completed by the device. 
-        /// </summary>
-        public event ActionCompletedHandler ActionCompleted;
-        public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
-        internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
-        
+
+
 
 
 
@@ -1300,6 +1289,37 @@ namespace Machina
             return c.IssueInitializationRequest(false);
         }
 
+        /// <summary>
+        /// Increase the values of the robot's external axes. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Use null for inactive axes.
+        /// </summary>
+        /// <param name="ext1"></param>
+        /// <param name="ext2"></param>
+        /// <param name="ext3"></param>
+        /// <param name="ext4"></param>
+        /// <param name="ext5"></param>
+        /// <param name="ext6"></param>
+        /// <returns></returns>
+        public bool ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
+            c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, true);
+
+        /// <summary>
+        /// Set the values of the robot's external axes.
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Use null for inactive axes.
+        /// </summary>
+        /// <param name="ext1"></param>
+        /// <param name="ext2"></param>
+        /// <param name="ext3"></param>
+        /// <param name="ext4"></param>
+        /// <param name="ext5"></param>
+        /// <param name="ext6"></param>
+        /// <returns></returns>
+        public bool ExternalAxesTo(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
+            c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, false);
+
+        
 
 
 
@@ -1363,7 +1383,49 @@ namespace Machina
         public Tool GetVirtualTool() => c.GetVirtualTool();
 
 
+        public override string ToString() => $"Robot[\"{this.Name}\", {this.Brand}]";
 
+
+
+
+
+        //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
+        //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
+        //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
+        //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
+        //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
+        //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+        //                                                      
+        /// <summary>
+        /// Will be raised when Machina has finished streaming all pending Actions to the controller.
+        /// Note that the controller still needs to receive them and execute them. This gives Machina 
+        /// time to prepare the next batch.
+        /// </summary>
+        public event BufferEmptyHandler BufferEmpty;
+        public delegate void BufferEmptyHandler(object sender, EventArgs e);
+        internal virtual void OnBufferEmpty(EventArgs e) => BufferEmpty?.Invoke(this, e);
+
+        /// <summary>
+        /// Will be raised when Machina received an update from the controller as has new motion
+        /// information available. Useful to keep track of the state of the controller.
+        /// </summary>
+        public event MotionCursorUpdatedHandler MotionCursorUpdated;
+        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
+        internal virtual void OnMotionCursorUpdated(EventArgs e) => MotionCursorUpdated?.Invoke(this, e);
+
+        /// <summary>
+        /// Raised whenever an action has been completed by the device. 
+        /// </summary>
+        public event ActionCompletedHandler ActionCompleted;
+        public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
+        internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
+
+        ///// <summary>
+        ///// Raised when Machina wants to log something. Suscribe to this event to receive string logs with prioroty level.
+        ///// </summary>
+        //public event LogHandler Log;
+        //public delegate void LogHandler(object sender, LogArgs e);
+        //internal virtual void OnLog(LogArgs e) => Log?.Invoke(this, e);
 
 
 
@@ -1407,7 +1469,6 @@ namespace Machina
         }
 
 
-        public override string ToString() => $"Robot[\"{this.Name}\", {this.Brand}]";
 
     }
 
@@ -1432,4 +1493,20 @@ namespace Machina
             RemainingActions = remaining;
         }
     }
+
+    //public class LogArgs : EventArgs
+    //{
+    //    public string Message { get; set; }
+    //    public int Level { get; set; }
+
+    //    public LogArgs(string message, int level)
+    //    {
+    //        Message = message;
+    //        Level = level;
+    //    }
+    //}
+
+
+
+
 }
