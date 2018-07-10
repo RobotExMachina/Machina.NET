@@ -1209,7 +1209,7 @@ namespace Machina
             {
                 ser += this.externalAxes[i] == null ? "null" : this.externalAxes[i].ToString();
                 if (i < this.externalAxes.Length - 1)
-                    ser += ", ";
+                    ser += ",";
             }
 
             return ser;

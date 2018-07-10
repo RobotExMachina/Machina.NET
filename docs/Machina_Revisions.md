@@ -22,9 +22,7 @@
 
 - [ ] Custom code (non-streamable)
 
-
----
-# v0.6.3
+# v0.6.4
 
 ## BUILD 1406
 - [x] Add `ExternalAxes` Action
@@ -32,7 +30,11 @@
 - [x] Add `ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null)`
 - [x] Update ABB driver to 1.0.2
 - [x] Update ABB compiler
-- [x] Update `ABBCommunicationProtocol`;
+- [x] Update `ABBCommunicationProtocol`
+
+
+---
+# v0.6.3
 
 ## BUILD 1405
 - [x] Remove EOL chars and add double quotes to name in `Tool.ToInstruction()`

@@ -167,11 +167,11 @@ namespace Machina.Drivers.Communication.Protocols
 
                     string msg = $"{STR_MESSAGE_ID_CHAR}{aea.id} {INST_EXT_JOINTS} ";
 
-                    for (int i = 0; i < aea.externalAxes.Length; i++)
+                    for (int i = 0; i < cursor.externalAxes.Length; i++)
                     {
                         // RAPID's StrToVal() will parse 9E9 into a 9E+9 num value, and ignore that axis on motions
-                        msg += aea.externalAxes[i] == null ? "9E9" : aea.externalAxes[i].ToString();
-                        if (i < aea.externalAxes.Length - 1)
+                        msg += cursor.externalAxes[i] == null ? "9E9" : cursor.externalAxes[i].ToString();
+                        if (i < cursor.externalAxes.Length - 1)
                         {
                             msg += " ";
                         }
