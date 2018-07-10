@@ -30,6 +30,7 @@
 - [x] Add `ExternalAxes` Action
 - [x] Add `eternalAxes` as cursor state
 - [x] Add `ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null)`
+- [x] Update ABB driver to 1.0.2
 - [ ]
 
 ## BUILD 1405

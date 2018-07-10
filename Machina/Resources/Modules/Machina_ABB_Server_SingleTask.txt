@@ -63,7 +63,7 @@
     CONST num SERVER_PORT := 7000;
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.0.1";
+    CONST string MACHINA_SERVER_VERSION := "1.0.2";
 
     ! Should program exit on any kind of error?
     VAR bool USE_STRICT := TRUE;
@@ -86,6 +86,7 @@
     CONST num INST_NOTOOL := 9;             ! (settool tool0)
     CONST num INST_SETDO := 10;             ! SetDO "NAME" ON
     CONST num INST_SETAO := 11;             ! SetAO "NAME" V
+    CONST num INST_EXT_JOINTS := 12;        ! (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
 
     CONST num INST_STOP_EXECUTION := 100;       ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;             ! A way to retreive state information from the server (not implemented)
@@ -103,6 +104,7 @@
     PERS tooldata cursorTool;
     PERS wobjdata cursorWObj;
     VAR robtarget cursorTarget;
+    VAR extjoint cursorExtJointsTarget;
     VAR jointtarget cursorJoints;
     VAR speeddata cursorSpeed;
     VAR zonedata cursorZone;
@@ -209,10 +211,12 @@
                     GetDataVal currentAction.s1, cursorDO;
                     SetDO cursorDO, currentAction.p1;
 
-                CASE INST_SETDO:
+                CASE INST_SETAO:
                     GetDataVal currentAction.s1, cursorAO;
                     SetAO cursorAO, currentAction.p1;
 
+                CASE INST_EXT_JOINTS:
+                    cursorExtJointsTarget := GetExternalJointsData(currentAction);
 
                 CASE INST_STOP_EXECUTION:
                     stopExecution := TRUE;
@@ -613,14 +617,15 @@
 
     ! Return the jointtarget represented by an Action
     FUNC jointtarget GetJointTarget(action a)
-        RETURN [[a.p1, a.p2, a.p3, a.p4, a.p5, a.p6], [9E9,9E9,9E9,9E9,9E9,9E9]];
+        RETURN [[a.p1, a.p2, a.p3, a.p4, a.p5, a.p6], cursorExtJointsTarget];
     ENDFUNC
 
     ! Return the robottarget represented by an Action
     FUNC robtarget GetRobTarget(action a)
-        RETURN [[a.p1, a.p2, a.p3], [a.p4, a.p5, a.p6, a.p7], [0,0,0,0], [9E9,9E9,9E9,9E9,9E9,9E9]];
+        RETURN [[a.p1, a.p2, a.p3], [a.p4, a.p5, a.p6, a.p7], [0, 0, 0, 0], cursorExtJointsTarget];
     ENDFUNC
 
+    ! Return the speeddata represented by an Action
     FUNC speeddata GetSpeedData(action a)
         ! Fill in the gaps
         IF a.p2 = 0 THEN
@@ -682,6 +687,11 @@
 
         RETURN [TRUE, [[a.p1, a.p2, a.p3], [a.p4, a.p5, a.p6, a.p7]],
             [a.p8, [a.p9, a.p10, a.p11], [1, 0, 0, 0], 0, 0, 0]];
+    ENDFUNC
+
+    ! Return the external joints represented by an Action
+    FUNC extjoint GetExternalJointsData(action a)
+      RETURN [a.p1, a.p2, a.p3, a.p4, a.p5, a.p6];
     ENDFUNC
 
     ! TPWrite a string representation of an Action
