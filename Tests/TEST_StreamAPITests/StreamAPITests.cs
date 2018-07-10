@@ -30,12 +30,14 @@ namespace TEST_StreamAPITests
 
         static void Main(string[] args)
         {
-            Robot arm = Robot.Create("StreamTests", "UR");
+            Robot arm = Robot.Create("StreamTests", "ABB");
 
             //arm.BufferEmpty += LogEvent;
 
             arm.ConnectionManager("machina");
             arm.ControlMode("stream");
+            arm.Connect();
+
             //arm.SetUser("BUILD", "password");
             //arm.Connect("192.168.0.101", 6969);
 
@@ -45,15 +47,21 @@ namespace TEST_StreamAPITests
 
             //arm.Start();
 
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to START EXTERNAL AXIS TEST...");
+            Console.ReadKey();
+            ExternalAxes(arm);
+
             //Console.WriteLine(" ");
             //Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
             //Console.ReadKey();
             //VerticalSquareUR(arm);
 
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START THE VERTICAL CIRCLE...");
-            Console.ReadKey();
-            VerticalCircleUR(arm);
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START THE VERTICAL CIRCLE...");
+            //Console.ReadKey();
+            //VerticalCircleUR(arm);
+
 
             //Console.WriteLine(" ");
             //Console.WriteLine("Press any key to START THE SPIRAL...");
@@ -91,6 +99,24 @@ namespace TEST_StreamAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static public void ExternalAxes(Robot bot)
+        {
+            // Message
+            bot.Message("Testing external axes");
+
+            // setup
+            bot.ExternalAxesTo(1800);
+
+            // Home
+            bot.SpeedTo(100);
+            bot.TransformTo(1800, -1445, 1327.65, 0, 1, 0, 1, 0, 0);
+
+            bot.Wait(2000);
+
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+
         }
 
 

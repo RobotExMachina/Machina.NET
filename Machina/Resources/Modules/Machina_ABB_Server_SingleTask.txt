@@ -611,6 +611,7 @@
         cursorWObj := wobj0;
         cursorJoints := CJointT();
         cursorTarget := CRobT(\Tool:=tool0, \WObj:=wobj0);
+        cursorExtJointsTarget := cursorTarget.extax;
         cursorSpeed := v20;
         cursorZone := z5;
     ENDPROC

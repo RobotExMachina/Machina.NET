@@ -26,6 +26,8 @@ namespace Machina.Drivers.Communication.Protocols
         const int INST_NOTOOL = 9;             // (settool tool0)
         const int INST_SETDO = 10;             // SetDO "NAME" ON
         const int INST_SETAO = 11;             // SetAO "NAME" V
+        const int INST_EXT_JOINTS = 12;        // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+
 
         /// <summary>
         /// Given an Action and a RobotCursor representing the state of the robot after application, 
@@ -159,6 +161,27 @@ namespace Machina.Drivers.Communication.Protocols
 
                 case ActionType.Coordinates:
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
+
+                case ActionType.ExternalAxes:
+                    ActionExternalAxes aea = action as ActionExternalAxes;
+
+                    string msg = $"{STR_MESSAGE_ID_CHAR}{aea.id} ";
+
+                    for (int i = 0; i < aea.externalAxes.Length; i++)
+                    {
+                        // RAPID's StrToVal() will parse 9E9 into a 9E+9 num value, and ignore that axis on motions
+                        msg += aea.externalAxes[i] == null ? "9E9" : aea.externalAxes[i].ToString();
+                        if (i < aea.externalAxes.Length - 1)
+                        {
+                            msg += " ";
+                        }
+                    }
+
+                    msg += STR_MESSAGE_END_CHAR;
+
+                    msgs.Add(msg);
+
+                    break;
 
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:

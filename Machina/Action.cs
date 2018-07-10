@@ -1171,19 +1171,19 @@ namespace Machina
 
     public class ActionExternalAxes : Action
     {
-        public double? eax1, eax2, eax3, eax4, eax5, eax6;
+        public double?[] externalAxes = new double?[6];
         public bool relative;
 
         public ActionExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative) : base()
         {
             this.type = ActionType.ExternalAxes;
 
-            this.eax1 = a1;
-            this.eax2 = a2;
-            this.eax3 = a3;
-            this.eax4 = a4;
-            this.eax5 = a5;
-            this.eax6 = a6;
+            this.externalAxes[0] = a1;
+            this.externalAxes[1] = a2;
+            this.externalAxes[2] = a3;
+            this.externalAxes[3] = a4;
+            this.externalAxes[4] = a5;
+            this.externalAxes[5] = a6;
 
             this.relative = relative;
         }
@@ -1191,16 +1191,16 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                $"Increase external axes by [{this.eax1}, {this.eax2}, {this.eax3}, {this.eax4}, {this.eax5}, {this.eax6}]" :
-                $"Set external axes to [{this.eax1}, {this.eax2}, {this.eax3}, {this.eax4}, {this.eax5}, {this.eax6}]";
+                $"Increase external axes by [{this.externalAxes[0]}, {this.externalAxes[1]}, {this.externalAxes[2]}, {this.externalAxes[3]}, {this.externalAxes[4]}, {this.externalAxes[5]}]" :
+                $"Set external axes to [{this.externalAxes[0]}, {this.externalAxes[1]}, {this.externalAxes[2]}, {this.externalAxes[3]}, {this.externalAxes[4]}, {this.externalAxes[5]}]";
 
         }
 
         public override string ToInstruction()
         {
             return relative ?
-                $"ExternalAxes({this.eax1},{this.eax2},{this.eax3},{this.eax4},{this.eax5},{this.eax6});" :
-                $"ExternalAxesTo({this.eax1},{this.eax2},{this.eax3},{this.eax4},{this.eax5},{this.eax6});";
+                $"ExternalAxes({this.externalAxes[0]},{this.externalAxes[1]},{this.externalAxes[2]},{this.externalAxes[3]},{this.externalAxes[4]},{this.externalAxes[5]});" :
+                $"ExternalAxesTo({this.externalAxes[0]},{this.externalAxes[1]},{this.externalAxes[2]},{this.externalAxes[3]},{this.externalAxes[4]},{this.externalAxes[5]});";
 
         }
     }

@@ -1108,21 +1108,17 @@ namespace Machina
         {
             if (action.relative)
             {
-                if (this.externalAxes[0] != null && action.eax1 != null) this.externalAxes[0] += action.eax1;
-                if (this.externalAxes[1] != null && action.eax2 != null) this.externalAxes[1] += action.eax2;
-                if (this.externalAxes[2] != null && action.eax3 != null) this.externalAxes[2] += action.eax3;
-                if (this.externalAxes[3] != null && action.eax4 != null) this.externalAxes[3] += action.eax4;
-                if (this.externalAxes[4] != null && action.eax5 != null) this.externalAxes[4] += action.eax5;
-                if (this.externalAxes[5] != null && action.eax6 != null) this.externalAxes[5] += action.eax6;
+                for (int i = 0; i < this.externalAxes.Length; i++)
+                {
+                    if (this.externalAxes[i] != null && action.externalAxes[i] != null) this.externalAxes[i] += action.externalAxes[i];
+                }
             }
             else
             {
-                this.externalAxes[0] = action.eax1;
-                this.externalAxes[1] = action.eax2;
-                this.externalAxes[2] = action.eax3;
-                this.externalAxes[3] = action.eax4;
-                this.externalAxes[4] = action.eax5;
-                this.externalAxes[5] = action.eax6;
+                for (int i = 0; i < this.externalAxes.Length; i++)
+                {
+                    this.externalAxes[i] = action.externalAxes[i];
+                }
             }
             return true;
         }
