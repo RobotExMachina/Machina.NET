@@ -16,7 +16,9 @@ namespace TEST_OfflineAPITests
 
             Robot arm = Robot.Create("Offline_Tests", "ABB");
 
-            VerticalSquare(arm);
+            ExternalAxes(arm);
+
+            //VerticalSquare(arm);
 
             //Robot arm = new Robot("3dprinter", "ZMorph");
             //ZMorphSimpleMovementTest(arm);
@@ -79,7 +81,7 @@ namespace TEST_OfflineAPITests
             arm.DebugBuffer();  // read all pending buffered actions
             arm.DebugRobotCursors();
 
-            arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.mod" :
+            arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.prg" :
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" :
                 arm.IsBrand("KUKA") ? @"C:\offlineTests.src" : 
                 arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
@@ -93,6 +95,24 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static public void ExternalAxes(Robot bot)
+        {
+            // Message
+            bot.Message("Testing external axes");
+
+            // setup
+            bot.ExternalAxesTo(1800);
+
+            // Home
+            bot.SpeedTo(100);
+            bot.TransformTo(1800, -1445, 1327.65, 0, 1, 0, 1, 0, 0);
+
+            bot.Wait(2000);
+
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+            
         }
 
         static public void VerticalSquare(Robot bot)

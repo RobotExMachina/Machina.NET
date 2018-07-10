@@ -31,7 +31,7 @@
 - [x] Add `eternalAxes` as cursor state
 - [x] Add `ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null)`
 - [x] Update ABB driver to 1.0.2
-- [ ]
+- [x] Update ABB compiler
 
 ## BUILD 1405
 - [x] Remove EOL chars and add double quotes to name in `Tool.ToInstruction()`

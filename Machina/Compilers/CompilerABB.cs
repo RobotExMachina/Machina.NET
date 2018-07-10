@@ -595,7 +595,7 @@ namespace Machina
                 cursor.position.ToString(false),
                 cursor.rotation.Q.ToString(false),
                 "[0,0,0,0]",  // no IK at this moment
-                "[0,9E9,9E9,9E9,9E9,9E9]");  // no external axes at this moment
+                GetExternalJointsValue(cursor)); 
         }
 
         /// <summary>
@@ -604,7 +604,7 @@ namespace Machina
         /// <returns></returns>
         static internal string GetJointTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0}, [0,9E9,9E9,9E9,9E9,9E9]]", cursor.joints);
+            return string.Format("[{0}, {1}]", cursor.joints, GetExternalJointsValue(cursor));
         }
 
         /// <summary>
@@ -657,6 +657,26 @@ namespace Machina
                 cursor.tool.Weight,
                 cursor.tool.centerOfGravity,
                 "[1,0,0,0]");  // no internial axes by default
+        }
+
+        /// <summary>
+        /// Returns a RAPID representation of an extjoints object
+        /// </summary>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        static internal string GetExternalJointsValue(RobotCursor cursor)
+        {
+            string extj = "[";
+            double? val;
+            for (int i = 0; i < cursor.externalAxes.Length; i++)
+            {
+                val = cursor.externalAxes[i];
+                extj += (val == null) ? "9E9" : val.ToString();
+                if (i < cursor.externalAxes.Length - 1)
+                    extj += ",";
+            }
+            extj += "]";
+            return extj;
         }
 
         static internal string SafeDoubleName(double value) => Math.Round(value, Geometry.STRING_ROUND_DECIMALS_MM).ToString().Replace('.', '_');
