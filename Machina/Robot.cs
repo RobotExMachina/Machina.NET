@@ -1293,6 +1293,7 @@ namespace Machina
         /// Increase the values of the robot's external axes. 
         /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
         /// Use null for inactive axes.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
         /// </summary>
         /// <param name="ext1"></param>
         /// <param name="ext2"></param>
@@ -1308,6 +1309,7 @@ namespace Machina
         /// Set the values of the robot's external axes.
         /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
         /// Use null for inactive axes.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
         /// </summary>
         /// <param name="ext1"></param>
         /// <param name="ext2"></param>
