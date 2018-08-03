@@ -162,15 +162,17 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Coordinates:
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
 
-                case ActionType.ExternalAxes:
-                    ActionExternalAxes aea = action as ActionExternalAxes;
+                case ActionType.ExternalAxis:
+                    //ActionExternalAxes aea = action as ActionExternalAxes;
+                    //ActionExternalAxis aea = action as ActionExternalAxis;
 
-                    string msg = $"{STR_MESSAGE_ID_CHAR}{aea.id} {INST_EXT_JOINTS} ";
+                    string msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_EXT_JOINTS} ";
 
                     for (int i = 0; i < cursor.externalAxes.Length; i++)
                     {
                         // RAPID's StrToVal() will parse 9E9 into a 9E+9 num value, and ignore that axis on motions
-                        msg += cursor.externalAxes[i] == null ? "9E9" : cursor.externalAxes[i].ToString();
+                        //msg += cursor.externalAxes[i] == null ? "9E9" : cursor.externalAxes[i].ToString();
+                        msg += cursor.externalAxes[i]?.ToString() ?? "9E9";
                         if (i < cursor.externalAxes.Length - 1)
                         {
                             msg += " ";

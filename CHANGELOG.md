@@ -16,7 +16,6 @@
 # TODO:
 - [ ] Improved Logging system
 - [ ] Console dump levels: DEBUG (4), INFO (3), WARNING (2), ERROR (1) and NONE (0).
-- [ ] Custom code (non-streamable)
 - [ ] Hopefully turn this changelog into something more [orthodox](http://keepachangelog.com/en/1.0.0/)
 
 
@@ -33,6 +32,10 @@
 - [x] Add `ExternalAxes` data type to replace `double?[]`
 - [x] Add `.ToArrayString()` method to a bunch of data types, to generate array-like string representations: `Vector(500, 200, 300)` --> `"[500,200,300]"`
 - [x] Fix a lot of rounding for String representation.
+- [x] Change `ExternalAxes(double? a1...a6)` to `ExternalAxis(axisNumber, value)`
+
+
+
 
 
 ---
