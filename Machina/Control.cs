@@ -526,6 +526,12 @@ namespace Machina
         public Joints GetCurrentAxes() => stateCursor.joints;
 
         /// <summary>
+        /// Returns a double?[] array representing the values for the external axes.
+        /// </summary>
+        /// <returns></returns>
+        public ExternalAxes GetCurrentExternalAxes() => stateCursor.externalAxes;
+
+        /// <summary>
         /// Returns a Tool object representing the currently attached tool, null if none.
         /// </summary>
         /// <returns></returns>

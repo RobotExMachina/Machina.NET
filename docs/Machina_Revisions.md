@@ -31,7 +31,9 @@
 - [x] Update ABB driver to 1.0.2
 - [x] Update ABB compiler
 - [x] Update `ABBCommunicationProtocol`
-
+- [x] Add `ExternalAxes` data type to replace `double?[]`
+- [x] Add `.ToArrayString()` method to a bunch of data types, to generate array-like string representations: `Vector(500, 200, 300)` --> `"[500,200,300]"`
+- [x] Fix a lot of rounding for String representaiton. 
 
 
 ---

@@ -666,6 +666,11 @@ namespace Machina
         /// <returns></returns>
         static internal string GetExternalJointsValue(RobotCursor cursor)
         {
+            if (cursor.externalAxes == null)
+            {
+                return "[9E9,9E9,9E9,9E9,9E9,9E9]";
+            }
+
             string extj = "[";
             double? val;
             for (int i = 0; i < cursor.externalAxes.Length; i++)

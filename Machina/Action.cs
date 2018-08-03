@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Machina.Types;
+
 namespace Machina
 {
 
@@ -627,9 +629,12 @@ namespace Machina
 
         public override string ToInstruction()
         {
-            return relative ?
-                $"Move({this.translation.X},{this.translation.Y},{this.translation.Z});" :
-                $"MoveTo({this.translation.X},{this.translation.Y},{this.translation.Z});";
+            return string.Format("{0}({1},{2},{3});",
+                (this.relative ? "Move" : "MoveTo"),
+                Math.Round(this.translation.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.translation.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.translation.Z, Geometry.STRING_ROUND_DECIMALS_MM)
+            );
         }
     }
 
@@ -668,12 +673,24 @@ namespace Machina
         {
             if (this.relative)
             {
-                return $"Rotate({this.rotation.AA.X},{this.rotation.AA.Y},{this.rotation.AA.Z},{this.rotation.AA.Angle});";
+                return string.Format("Rotate({0},{1},{2},{3});",
+                    Math.Round(this.rotation.AA.X, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                    Math.Round(this.rotation.AA.Y, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                    Math.Round(this.rotation.AA.Z, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                    Math.Round(this.rotation.AA.Angle, Geometry.STRING_ROUND_DECIMALS_DEGS)
+                );
             }
 
             // @TODO: improve this! 
             Orientation ori = new Orientation(this.rotation);
-            return $"RotateTo({ori.XAxis.X},{ori.XAxis.Y},{ori.XAxis.Z},{ori.YAxis.X},{ori.YAxis.Y},{ori.YAxis.Z});";
+            return string.Format("RotateTo({0},{1},{2},{3},{4},{5});",
+                Math.Round(ori.XAxis.X, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.XAxis.Y, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.XAxis.Z, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.YAxis.X, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.YAxis.Y, Geometry.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.YAxis.Z, Geometry.STRING_ROUND_DECIMALS_VECTOR)
+            );
         }
     }
 
@@ -731,7 +748,18 @@ namespace Machina
             }
 
             Orientation ori = new Orientation(this.rotation);
-            return $"TransformTo({this.translation.X},{this.translation.Y},{this.translation.Z},{ori.XAxis.X},{ori.XAxis.Y},{ori.XAxis.Z},{ori.YAxis.X},{ori.YAxis.Y},{ori.YAxis.Z});";
+
+            return string.Format("TransformTo({0},{1},{2},{3},{4},{5},{6},{7},{8});",
+                    Math.Round(this.translation.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.translation.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.translation.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.XAxis.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.XAxis.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.XAxis.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.YAxis.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.YAxis.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.YAxis.Z, Geometry.STRING_ROUND_DECIMALS_MM)
+                );
         }
     }
 
@@ -782,9 +810,15 @@ namespace Machina
 
         public override string ToInstruction()
         {
-            return relative ?
-                $"Axes({this.joints.J1},{this.joints.J2},{this.joints.J3},{this.joints.J4},{this.joints.J5},{this.joints.J6});" :
-                $"AxesTo({this.joints.J1},{this.joints.J2},{this.joints.J3},{this.joints.J4},{this.joints.J5},{this.joints.J6});";
+            return string.Format("{0}({1},{2},{3},{4},{5},{6});",
+                (this.relative ? "Axes" : "AxesTo"),
+                Math.Round(this.joints.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.J6, Geometry.STRING_ROUND_DECIMALS_DEGS)
+            );
         }
     }
 
@@ -1056,17 +1090,17 @@ namespace Machina
         {
             if (relative)
             {
-                return string.Format("{0} {1} temperature by {2} °C{3}",
+                return string.Format("{0} {1} temperature by {2} C{3}",
                     this.temperature < 0 ? "Decrease" : "Increase",
                     Enum.GetName(typeof(RobotPartType), this.robotPart),
-                    this.temperature,
+                    Math.Round(this.temperature, Geometry.STRING_ROUND_DECIMALS_TEMPERATURE),
                     this.wait ? " and wait" : "");
             }
             else
             {
-                return string.Format("Set {0} temperature to {1} °C{2}",
+                return string.Format("Set {0} temperature to {1} C{2}",
                     Enum.GetName(typeof(RobotPartType), this.robotPart),
-                    this.temperature,
+                    Math.Round(this.temperature, Geometry.STRING_ROUND_DECIMALS_TEMPERATURE),
                     this.wait ? " and wait" : "");
             }
         }
@@ -1171,19 +1205,14 @@ namespace Machina
 
     public class ActionExternalAxes : Action
     {
-        public double?[] externalAxes = new double?[6];
+        public ExternalAxes externalAxes;
         public bool relative;
 
         public ActionExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative) : base()
         {
             this.type = ActionType.ExternalAxes;
 
-            this.externalAxes[0] = a1;
-            this.externalAxes[1] = a2;
-            this.externalAxes[2] = a3;
-            this.externalAxes[3] = a4;
-            this.externalAxes[4] = a5;
-            this.externalAxes[5] = a6;
+            this.externalAxes = new ExternalAxes(a1, a2, a3, a4, a5, a6);
 
             this.relative = relative;
         }
@@ -1191,29 +1220,20 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                $"Increase external axes by [{this.Serialize()}]" :
-                $"Set external axes to [{this.Serialize()}]"; 
+                $"Increase external axes by {this.externalAxes.ToArrayString()}" :
+                $"Set external axes to {this.externalAxes.ToArrayString()}"; 
         }
 
         public override string ToInstruction()
         {
+            string arr = this.externalAxes.ToArrayString();
+            arr = arr.Substring(1, arr.Length - 2);
             return relative ?
-                $"ExternalAxes({this.Serialize()});" :
-                $"ExternalAxesTo({this.Serialize()});";
+                $"ExternalAxes({arr});" :
+                $"ExternalAxesTo({arr});";
         }
 
-        private string Serialize()
-        {
-            string ser = "";
-            for (int i = 0; i < this.externalAxes.Length; i++)
-            {
-                ser += this.externalAxes[i] == null ? "null" : this.externalAxes[i].ToString();
-                if (i < this.externalAxes.Length - 1)
-                    ser += ",";
-            }
 
-            return ser;
-        }
             
     }
 }

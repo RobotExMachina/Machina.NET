@@ -850,13 +850,22 @@ namespace Machina
             return string.Format("{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}]",
                 labels ? "Quaternion" : "",
                 labels ? "W:" : "",
-                Math.Round(W, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(W, STRING_ROUND_DECIMALS_QUAT),
                 labels ? "X:" : "",
-                Math.Round(X, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(X, STRING_ROUND_DECIMALS_QUAT),
                 labels ? "Y:" : "",
-                Math.Round(Y, STRING_ROUND_DECIMALS_RADS),
+                Math.Round(Y, STRING_ROUND_DECIMALS_QUAT),
                 labels ? "Z:" : "",
-                Math.Round(Z, STRING_ROUND_DECIMALS_RADS));
+                Math.Round(Z, STRING_ROUND_DECIMALS_QUAT));
+        }
+
+        public string ToArrayString()
+        {
+            return string.Format("[{0},{1},{2},{3}]",
+                Math.Round(W, STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(X, STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(Y, STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(Z, STRING_ROUND_DECIMALS_QUAT));
         }
 
 

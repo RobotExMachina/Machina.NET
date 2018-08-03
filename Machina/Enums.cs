@@ -144,4 +144,14 @@ namespace Machina
         Write, 
         Motion
     }
+
+    /// <summary>
+    /// Defines the types of External Axes
+    /// </summary>
+    public enum ExternalAxisType
+    {
+        Undefined, 
+        Linear, 
+        Angular
+    }
 }

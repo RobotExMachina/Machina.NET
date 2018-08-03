@@ -837,5 +837,13 @@ namespace Machina
                 labels ? "Z:" : "",
                 Math.Round(Z, STRING_ROUND_DECIMALS_MM));
         }
+
+        public string ToArrayString()
+        {
+            return string.Format("[{0},{1},{2}]",
+                Math.Round(X, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
+                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
+        }
     }
 }

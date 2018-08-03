@@ -166,5 +166,16 @@ namespace Machina
                 Math.Round(J6, STRING_ROUND_DECIMALS_DEGS));
         }
 
+        public string ToArrayString()
+        {
+            return string.Format("[{0},{1},{2},{3},{4},{5}]",
+                Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J4, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J5, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(J6, STRING_ROUND_DECIMALS_DEGS));
+        }
+
     }
 }

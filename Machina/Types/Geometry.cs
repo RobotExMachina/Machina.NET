@@ -22,41 +22,42 @@ namespace Machina
         /// <summary>
         /// Precision for floating-point comparisons.
         /// </summary>
-        internal static readonly double EPSILON = 0.000001;
+        public static readonly double EPSILON = 0.000001;
 
         /// <summary>
         /// A more permissive precision factor.
         /// </summary>
-        internal static readonly double EPSILON2 = 0.001;
+        public static readonly double EPSILON2 = 0.001;
 
         /// <summary>
         /// A more restrictive precision factor.
         /// </summary>
-        internal static readonly double EPSILON3 = 0.000000001;
+        public static readonly double EPSILON3 = 0.000000001;
 
         /// <summary>
         /// Amount of digits for floating-point comparisons precision.
         /// </summary>
-        internal static readonly int EPSILON_DECIMALS = 10;
+        public static readonly int EPSILON_DECIMALS = 10;
 
         /// <summary>
         /// Amount of decimals for rounding on ToString() operations.
         /// </summary>
-        internal static readonly int STRING_ROUND_DECIMALS_M = 6;
-        internal static readonly int STRING_ROUND_DECIMALS_MM = 3;
-        internal static readonly int STRING_ROUND_DECIMALS_DEGS = 3;
-        internal static readonly int STRING_ROUND_DECIMALS_QUAT = 4;
-        internal static readonly int STRING_ROUND_DECIMALS_RADS = 6;
-        internal static readonly int STRING_ROUND_DECIMALS_VOLTAGE = 3;
-        internal static readonly int STRING_ROUND_DECIMALS_TEMPERATURE = 0;
-        internal static readonly int STRING_ROUND_DECIMALS_KG = 3;
+        public static readonly int STRING_ROUND_DECIMALS_M = 6;
+        public static readonly int STRING_ROUND_DECIMALS_MM = 3;
+        public static readonly int STRING_ROUND_DECIMALS_DEGS = 3;
+        public static readonly int STRING_ROUND_DECIMALS_QUAT = 4;
+        public static readonly int STRING_ROUND_DECIMALS_RADS = 6;
+        public static readonly int STRING_ROUND_DECIMALS_VOLTAGE = 3;
+        public static readonly int STRING_ROUND_DECIMALS_TEMPERATURE = 0;
+        public static readonly int STRING_ROUND_DECIMALS_KG = 3;
+        public static readonly int STRING_ROUND_DECIMALS_VECTOR = 5;              // Hopefully for unit vectors and stuff
 
         // Angle conversion
-        internal static readonly double TO_DEGS = 180.0 / Math.PI;
-        internal static readonly double TO_RADS = Math.PI / 180.0;
+        public static readonly double TO_DEGS = 180.0 / Math.PI;
+        public static readonly double TO_RADS = Math.PI / 180.0;
 
         // TAU ;)
-        internal static readonly double TAU = 2 * Math.PI;
+        public static readonly double TAU = 2 * Math.PI;
 
 
 

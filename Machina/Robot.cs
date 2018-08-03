@@ -1322,6 +1322,9 @@ namespace Machina
             c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, false);
 
         
+        // @TODO: this would probably be better and more practical...
+        //public bool ExternalAxis(int index, double increment) => c.IssueExternalAxisRquest(index, increment, true);
+        //public bool ExternalAxisTo(int index, double value) => c.IssueExternalAxisRequest(index, value, false);
 
 
 
@@ -1351,6 +1354,12 @@ namespace Machina
         /// </summary>
         /// <returns></returns>
         public Joints GetCurrentAxes() => c.GetCurrentAxes();
+
+        /// <summary>
+        /// Retuns an ExternalAxes object representing the values of the external axes. If a value is null, that axis is not valid.
+        /// </summary>
+        /// <returns></returns>
+        public ExternalAxes GetCurrentExternalAxes() => c.GetCurrentExternalAxes();
 
         /// <summary>
         /// Returns the Tool object currently attached to this Robot, null if none.

@@ -35,7 +35,8 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
-        public double?[] externalAxes;
+        //public double?[] externalAxes;
+        public ExternalAxes externalAxes;
 
         // REPLACED BY DICT
         //public bool[] digitalOutputs = new bool[14];
@@ -196,7 +197,8 @@ namespace Machina
             this.motionType = mType;
             this.referenceCS = refCS;
 
-            this.externalAxes = new double?[] { null, null, null, null, null, null };  // @TODO: should this be passed as an argument?
+            // Keep this null until initialized
+            //this.externalAxes = new ExternalAxes();  // @TODO: should this be passed as an argument?
 
             this.initialized = true;
             return this.initialized;
@@ -1106,11 +1108,19 @@ namespace Machina
         /// <returns></returns>
         public bool ApplyAction(ActionExternalAxes action)
         {
+            if (externalAxes == null)
+            {
+                externalAxes = new ExternalAxes();
+            }
+
             if (action.relative)
             {
                 for (int i = 0; i < this.externalAxes.Length; i++)
                 {
-                    if (this.externalAxes[i] != null && action.externalAxes[i] != null) this.externalAxes[i] += action.externalAxes[i];
+                    if (this.externalAxes[i] != null && action.externalAxes[i] != null)
+                    {
+                        this.externalAxes[i] += action.externalAxes[i];
+                    }
                 }
             }
             else
@@ -1120,6 +1130,7 @@ namespace Machina
                     this.externalAxes[i] = action.externalAxes[i];
                 }
             }
+
             return true;
         }
 
