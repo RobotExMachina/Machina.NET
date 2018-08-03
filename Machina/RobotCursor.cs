@@ -413,7 +413,8 @@ namespace Machina
             { typeof (ActionExtrusion),                 (act, robCur) => robCur.ApplyAction((ActionExtrusion) act) },
             { typeof (ActionExtrusionRate),             (act, robCur) => robCur.ApplyAction((ActionExtrusionRate) act) },
             { typeof (ActionInitialization),            (act, robCur) => robCur.ApplyAction((ActionInitialization) act) },
-            { typeof (ActionExternalAxis),              (act, robCur) => robCur.ApplyAction((ActionExternalAxis) act) }
+            { typeof (ActionExternalAxis),              (act, robCur) => robCur.ApplyAction((ActionExternalAxis) act) },
+            { typeof (ActionCustomCode),                (act, robCur) => robCur.ApplyAction((ActionCustomCode) act) }
         };
 
         /// <summary>
@@ -1126,6 +1127,16 @@ namespace Machina
         }
 
 
+
+        //  ╔═╗╦ ╦╔═╗╔╦╗╔═╗╔╦╗    ╔═╗╔═╗╔╦╗╔═╗
+        //  ║  ║ ║╚═╗ ║ ║ ║║║║    ║  ║ ║ ║║║╣ 
+        //  ╚═╝╚═╝╚═╝ ╩ ╚═╝╩ ╩────╚═╝╚═╝═╩╝╚═╝
+        /// <summary>
+        /// This action doesn't change the state of the cursor... 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionCustomCode action) => true;
 
 
 

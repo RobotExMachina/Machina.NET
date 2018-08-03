@@ -41,7 +41,8 @@ namespace Machina
         ExtrusionRate,
         Initialization, 
         //ExternalAxes
-        ExternalAxis
+        ExternalAxis,
+        CustomCode
     }
 
     
@@ -238,12 +239,9 @@ namespace Machina
             return new ActionInitialization(init);
         }
 
-        //public static ActionExternalAxes ExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative)
-        //{
-        //    return new ActionExternalAxes(a1, a2, a3, a4, a5, a6, relative);
-        //}
-
         public static ActionExternalAxis ExternalAxis(int axisNumber, double value, bool relative) => new ActionExternalAxis(axisNumber, value, relative);
+
+        public static ActionCustomCode CustomCode(string statementLine, bool isDeclaration) => new ActionCustomCode(statementLine, isDeclaration);
 
 
 
@@ -1198,47 +1196,6 @@ namespace Machina
 
 
 
-    ////  ███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗      █████╗ ██╗  ██╗███████╗███████╗
-    ////  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔══██╗╚██╗██╔╝██╔════╝██╔════╝
-    ////  █████╗   ╚███╔╝    ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████║ ╚███╔╝ █████╗  ███████╗
-    ////  ██╔══╝   ██╔██╗    ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     ██╔══██║ ██╔██╗ ██╔══╝  ╚════██║
-    ////  ███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗██║  ██║██╔╝ ██╗███████╗███████║
-    ////  ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝
-    ////                                                                                                     
-
-    //public class ActionExternalAxes : Action
-    //{
-    //    public ExternalAxes externalAxes;
-    //    public bool relative;
-
-    //    public ActionExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative) : base()
-    //    {
-    //        this.type = ActionType.ExternalAxes;
-
-    //        this.externalAxes = new ExternalAxes(a1, a2, a3, a4, a5, a6);
-
-    //        this.relative = relative;
-    //    }
-
-    //    public override string ToString()
-    //    {
-    //        return relative ?
-    //            $"Increase external axes by {this.externalAxes.ToArrayString()}" :
-    //            $"Set external axes to {this.externalAxes.ToArrayString()}"; 
-    //    }
-
-    //    public override string ToInstruction()
-    //    {
-    //        string arr = this.externalAxes.ToArrayString();
-    //        arr = arr.Substring(1, arr.Length - 2);
-    //        return relative ?
-    //            $"ExternalAxes({arr});" :
-    //            $"ExternalAxesTo({arr});";
-    //    }
-    //}
-
-
-
     //  ███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗      █████╗ ██╗  ██╗██╗███████╗
     //  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔══██╗╚██╗██╔╝██║██╔════╝
     //  █████╗   ╚███╔╝    ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████║ ╚███╔╝ ██║███████╗
@@ -1274,5 +1231,38 @@ namespace Machina
                 $"ExternalAxisTo({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)});";
         }
     }
+
+
+
+    //   ██████╗██╗   ██╗███████╗████████╗ ██████╗ ███╗   ███╗ ██████╗ ██████╗ ██████╗ ███████╗
+    //  ██╔════╝██║   ██║██╔════╝╚══██╔══╝██╔═══██╗████╗ ████║██╔════╝██╔═══██╗██╔══██╗██╔════╝
+    //  ██║     ██║   ██║███████╗   ██║   ██║   ██║██╔████╔██║██║     ██║   ██║██║  ██║█████╗  
+    //  ██║     ██║   ██║╚════██║   ██║   ██║   ██║██║╚██╔╝██║██║     ██║   ██║██║  ██║██╔══╝  
+    //  ╚██████╗╚██████╔╝███████║   ██║   ╚██████╔╝██║ ╚═╝ ██║╚██████╗╚██████╔╝██████╔╝███████╗
+    //   ╚═════╝ ╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝
+    //                                                                                         
+    public class ActionCustomCode : Action
+    {
+        public string statement;
+        public bool isDeclaration;
+        
+        public ActionCustomCode(string statement, bool isDeclaration)
+        {
+            this.type = ActionType.CustomCode;
+            this.statement = statement;
+            this.isDeclaration = isDeclaration;
+        }
+
+        public override string ToString()
+        {
+            return this.isDeclaration ?
+                $"Add custom declaration: \"{this.statement}\"" :
+                $"Add custom instruction: \"{this.statement}\"";
+        }
+
+        public override string ToInstruction() => 
+                $"CustomCode(\"{this.statement}\",{this.isDeclaration});";
+    }
+
 
 }

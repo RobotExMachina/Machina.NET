@@ -108,7 +108,6 @@ namespace TEST_StreamAPITests
             bot.Message("Testing external axes");
 
             // setup
-            //bot.ExternalAxesTo(1800);
             bot.ExternalAxisTo(1, 1800);
 
             // Home

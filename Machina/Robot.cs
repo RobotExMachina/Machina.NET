@@ -1289,41 +1289,6 @@ namespace Machina
             return c.IssueInitializationRequest(false);
         }
 
-        ///// <summary>
-        ///// Increase the values of the robot's external axes. 
-        ///// Values expressed in degrees or milimeters, depending on the nature of the external axis.
-        ///// Use null for inactive axes.
-        ///// Note that the effect of this change of external axis will go in effect on the next motion Action.
-        ///// </summary>
-        ///// <param name="ext1"></param>
-        ///// <param name="ext2"></param>
-        ///// <param name="ext3"></param>
-        ///// <param name="ext4"></param>
-        ///// <param name="ext5"></param>
-        ///// <param name="ext6"></param>
-        ///// <returns></returns>
-        //[System.Obsolete("Deprecated method, use Robot.ExternalAxis(axisIndex, increment) instead")]
-        //public bool ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
-        //    c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, true);
-
-        ///// <summary>
-        ///// Set the values of the robot's external axes.
-        ///// Values expressed in degrees or milimeters, depending on the nature of the external axis.
-        ///// Use null for inactive axes.
-        ///// Note that the effect of this change of external axis will go in effect on the next motion Action.
-        ///// </summary>
-        ///// <param name="ext1"></param>
-        ///// <param name="ext2"></param>
-        ///// <param name="ext3"></param>
-        ///// <param name="ext4"></param>
-        ///// <param name="ext5"></param>
-        ///// <param name="ext6"></param>
-        ///// <returns></returns>
-        //[System.Obsolete("Deprecated method, use Robot.ExternalAxisTo(axisIndex, increment) instead")]
-        //public bool ExternalAxesTo(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
-        //    c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, false);
-
-
         /// <summary>
         /// Increase the value of one of the robot's external axis. 
         /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
@@ -1357,6 +1322,19 @@ namespace Machina
             }
             return c.IssueExternalAxisRequest(axisNumber, value, false);
         }
+
+
+        /// <summary>
+        /// Insert a line of custom code directly into a compiled program. 
+        /// This is useful for obscure instructions that are not covered by Machina's API. 
+        /// Not that this Action cannot be checked for validity by Machina, and you are responsible for correct syntax.
+        /// This Action is non-streamable. 
+        /// </summary>
+        /// <param name="statement">Code in the machine's native language.</param>
+        /// <param name="isDeclaration">Is this a declaration, like a variable or a workobject? If so, it will be placed at the beginning of the program.</param>
+        /// <returns></returns>
+        public bool CustomCode(string statement, bool isDeclaration = false) =>
+                c.IssueCustomCodeRequest(statement, isDeclaration);
 
 
 

@@ -21,8 +21,9 @@ namespace Machina
     /// </summary>
     internal class CompilerKUKA : Compiler
     {
+        public static readonly char COMMENT_CHAR = ';';
 
-        internal CompilerKUKA() : base(";") { }
+        internal CompilerKUKA() : base(COMMENT_CHAR) { }
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
@@ -45,6 +46,7 @@ namespace Machina
             // CODE LINES GENERATION
             // TARGETS AND INSTRUCTIONS
             List<string> declarationLines = new List<string>();
+            List<string> customDeclarationLines = new List<string>();
             List<string> initializationLines = new List<string>();
             List<string> instructionLines = new List<string>();
 
@@ -68,6 +70,11 @@ namespace Machina
             {
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them
+
+                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                {
+                    customDeclarationLines.Add("  " + (a as ActionCustomCode).statement);
+                }
 
                 if (inlineTargets)
                 {
@@ -124,6 +131,13 @@ namespace Machina
             if (declarationLines.Count != 0)
             {
                 module.AddRange(declarationLines);
+                module.Add("");
+            }
+
+            // Custom declarations
+            if (customDeclarationLines.Count != 0)
+            {
+                module.AddRange(customDeclarationLines);
                 module.Add("");
             }
 
@@ -240,7 +254,8 @@ namespace Machina
                 // Will figure this out later.
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
-                    dec = string.Format("  ; MESSAGE: \"{0}\" (messages in KRL currently not supported in Machina)",
+                    dec = string.Format("  {0} MESSAGE: \"{1}\" (messages in KRL currently not supported in Machina)",
+                        COMMENT_CHAR,
                         am.message);
                     break;
 
@@ -301,6 +316,14 @@ namespace Machina
                     else
                     {
                         dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                    }
+                    break;
+
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    if (!acc.isDeclaration)
+                    {
+                        dec = $"  {acc.statement}";
                     }
                     break;
 
@@ -430,6 +453,14 @@ namespace Machina
                     else
                     {
                         dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                    }
+                    break;
+
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    if (!acc.isDeclaration)
+                    {
+                        dec = $"  {acc.statement}";
                     }
                     break;
 

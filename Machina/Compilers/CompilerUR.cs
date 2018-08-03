@@ -29,7 +29,7 @@ namespace Machina
         public static readonly double DEFAULT_TOOL_ACCELERATION = 1.2;
         public static readonly double DEFAULT_TOOL_SPEED = 0.25;
         
-        internal CompilerUR() : base("#") { }
+        internal CompilerUR() : base(COMMENT_CHAR) { }
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native UR Script.
@@ -52,6 +52,7 @@ namespace Machina
 
             // CODE LINES GENERATION
             // TARGETS AND INSTRUCTIONS
+            List<string> customDeclarationLines = new List<string>();
             List<string> variableLines = new List<string>();
             List<string> instructionLines = new List<string>();
 
@@ -63,6 +64,11 @@ namespace Machina
             {
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them 
+
+                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                {
+                    customDeclarationLines.Add("  " + (a as ActionCustomCode).statement);
+                }
 
                 if (inlineTargets)
                 {
@@ -101,6 +107,13 @@ namespace Machina
             // MODULE HEADER
             module.Add("def " + programName + "():");
             module.Add("");
+
+            // Custom declarations
+            if (customDeclarationLines.Count != 0)
+            {
+                module.AddRange(customDeclarationLines);
+                module.Add("");
+            }
 
             // Targets
             if (variableLines.Count != 0)
@@ -261,6 +274,15 @@ namespace Machina
                     }
                     break;
 
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    if (!acc.isDeclaration)
+                    {
+                        dec = $"  {acc.statement}";
+                    }
+                    break;
+
+
                     //default:
                     //    dec = string.Format("  # ACTION \"{0}\" NOT IMPLEMENTED", action);
                     //    break;
@@ -391,6 +413,14 @@ namespace Machina
                     else
                     {
                         dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
+                    }
+                    break;
+
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    if (!acc.isDeclaration)
+                    {
+                        dec = $"  {acc.statement}";
                     }
                     break;
 

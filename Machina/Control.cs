@@ -907,6 +907,14 @@ namespace Machina
         public bool IssueExternalAxisRequest(int axisNumber, double value, bool relative) => 
                 IssueApplyActionRequest(new ActionExternalAxis(axisNumber, value, relative));
 
+        /// <summary>
+        /// Issue a request to add custom code to a compiled program.
+        /// </summary>
+        /// <param name="statement"></param>
+        /// <param name="isDeclaration"></param>
+        /// <returns></returns>
+        public bool IssueCustomCodeRequest(string statement, bool isDeclaration) =>
+                IssueApplyActionRequest(new ActionCustomCode(statement, isDeclaration));
 
 
 

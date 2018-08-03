@@ -32,13 +32,13 @@ namespace Machina
         /// <summary>
         /// Character used for comments by the compiler
         /// </summary>
-        internal string commChar = "";
+        internal char commChar;
 
         /// <summary>
         /// A constructor that takes several parameters particular to each compiler type
         /// </summary>
         /// <param name="commentCharacter"></param>
-        protected Compiler(string commentCharacter)
+        protected Compiler(char commentCharacter)
         {
             this.commChar = commentCharacter;
         }

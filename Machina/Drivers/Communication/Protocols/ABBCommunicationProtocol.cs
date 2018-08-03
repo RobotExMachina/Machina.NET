@@ -163,15 +163,11 @@ namespace Machina.Drivers.Communication.Protocols
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
 
                 case ActionType.ExternalAxis:
-                    //ActionExternalAxes aea = action as ActionExternalAxes;
-                    //ActionExternalAxis aea = action as ActionExternalAxis;
-
                     string msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_EXT_JOINTS} ";
 
                     for (int i = 0; i < cursor.externalAxes.Length; i++)
                     {
                         // RAPID's StrToVal() will parse 9E9 into a 9E+9 num value, and ignore that axis on motions
-                        //msg += cursor.externalAxes[i] == null ? "9E9" : cursor.externalAxes[i].ToString();
                         msg += cursor.externalAxes[i]?.ToString() ?? "9E9";
                         if (i < cursor.externalAxes.Length - 1)
                         {
@@ -184,6 +180,8 @@ namespace Machina.Drivers.Communication.Protocols
                     msgs.Add(msg);
 
                     break;
+
+                // CustomCode --> is non-streamable
 
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:

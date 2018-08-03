@@ -21,7 +21,7 @@ namespace Machina
     /// </summary>
     internal class CompilerABB : Compiler
     {
-        // @TODO: deprecate all instantiation shit, and make compilers be mostly static, like CompilerUR
+        // @TODO: deprecate all instantiation shit, and make compilers be mostly static, like CompilerUR:
         /*
          * // From the URScript manual
         public static readonly char COMMENT_CHAR = '#';
@@ -30,8 +30,10 @@ namespace Machina
         public static readonly double DEFAULT_TOOL_ACCELERATION = 1.2;
         public static readonly double DEFAULT_TOOL_SPEED = 0.25;
         */
+        
+        public static readonly char COMMENT_CHAR = '!';
 
-        internal CompilerABB() : base("!") { }
+        internal CompilerABB() : base(COMMENT_CHAR) { }
 
         /// <summary>
         /// A Set of RAPID's predefined zone values. 
@@ -82,6 +84,7 @@ namespace Machina
             List<string> velocityLines = new List<string>();
             List<string> zoneLines = new List<string>();
             List<string> toolLines = new List<string>();
+            List<string> customLines = new List<string>();
 
             // TARGETS AND INSTRUCTIONS
             List<string> variableLines = new List<string>();
@@ -129,6 +132,12 @@ namespace Machina
                     toolNames.Add(writer.tool, writer.tool.name);
                     toolDecs.Add(writer.tool, GetToolValue(writer));
                 }
+
+                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                {
+                    customLines.Add($"  {(a as ActionCustomCode).statement}");
+                }
+
 
 
                 // Generate program
@@ -223,6 +232,13 @@ namespace Machina
             if (zoneLines.Count != 0)
             {
                 module.AddRange(zoneLines);
+                module.Add("");
+            }
+
+            // Custom code
+            if (customLines.Count != 0)
+            {
+                module.AddRange(customLines);
                 module.Add("");
             }
 
@@ -407,9 +423,19 @@ namespace Machina
                     dec = $"    SetAO {aioa.pinName}, {aioa.value};";
                     break;
 
-                    //default:
-                    //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
-                    //    break;
+
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    if (!acc.isDeclaration)
+                    {
+                        dec = "    " + acc.statement;
+                    }
+                    break;
+
+                //default:
+                //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
+
             }
 
             if (ADD_ACTION_STRING && action.type != ActionType.Comment)
@@ -556,9 +582,17 @@ namespace Machina
                     dec = $"    SetAO {aioa.pinName}, {aioa.value};";
                     break;
 
-                    //default:
-                    //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
-                    //    break;
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    if (!acc.isDeclaration)
+                    {
+                        dec = "    " + acc.statement;
+                    }
+                    break;
+
+                //default:
+                //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                //    break;
 
             }
 

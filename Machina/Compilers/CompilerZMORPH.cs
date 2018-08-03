@@ -22,6 +22,8 @@ namespace Machina
     /// </summary>
     internal class CompilerZMORPH : Compiler
     {
+        public static readonly char COMMENT_CHAR = ';';
+
         // A 'multidimensional' Dict to store permutations of (part, wait) to their corresponding GCode command
         // https://stackoverflow.com/a/15826532/1934487
         Dictionary<Tuple<RobotPartType, bool>, String> tempToGCode = new Dictionary<Tuple<RobotPartType, bool>, String>()
@@ -40,14 +42,15 @@ namespace Machina
         // Every n mm of extrusion, reset "E" to zero: "G92 E0"
         double extrusionLengthResetEvery = 10;
 
-        // Made this class members to be able to insert more thatn one line of code per Action
+        // Made this class members to be able to insert more than one line of code per Action
         // @TODO: make adding several lines of code per Action more programmatic
         List<string> initializationLines,
+                     customDeclarationLines,
                      instructionLines,
                      closingLines;
 
         // Base constructor
-        internal CompilerZMORPH() : base(";") { }
+        internal CompilerZMORPH() : base(COMMENT_CHAR) { }
     
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
@@ -72,6 +75,7 @@ namespace Machina
             // CODE LINES GENERATION
             // TARGETS AND INSTRUCTIONS
             this.initializationLines = new List<string>();
+            this.customDeclarationLines = new List<string>();
             this.instructionLines = new List<string>();
             this.closingLines = new List<string>();
 
@@ -105,6 +109,11 @@ namespace Machina
             {
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them
+
+                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                {
+                    customDeclarationLines.Add((a as ActionCustomCode).statement);
+                }
 
                 // GCode is super straightforward, so no need to pre-declare anything
                 if (GenerateInstructionDeclaration(a, writer, out line))
@@ -144,6 +153,13 @@ namespace Machina
             if (this.initializationLines.Count != 0)
             {
                 module.AddRange(this.initializationLines);
+                module.Add("");
+            }
+
+            // Custom declarations
+            if (this.customDeclarationLines.Count != 0)
+            {
+                module.AddRange(this.customDeclarationLines);
                 module.Add("");
             }
 
@@ -259,6 +275,14 @@ namespace Machina
                     else
                         EndCodeBoilerplate(cursor);
 
+                    break;
+
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    if (!acc.isDeclaration)
+                    {
+                        dec = $"{acc.statement}";
+                    }
                     break;
 
                 // If action wasn't implemented before, then it doesn't apply to this device

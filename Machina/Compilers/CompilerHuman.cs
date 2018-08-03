@@ -21,7 +21,9 @@ namespace Machina
     /// </summary>
     internal class CompilerHuman : Compiler
     {
-        internal CompilerHuman() : base("//") { }
+        public static readonly char COMMENT_CHAR = '/';
+
+        internal CompilerHuman() : base(COMMENT_CHAR) { }
 
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
