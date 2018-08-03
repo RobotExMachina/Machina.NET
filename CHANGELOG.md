@@ -22,7 +22,7 @@
 ---
 # v0.6.4
 
-## BUILD 1406
+## BUILD 1407
 - [x] Add `ExternalAxes` Action
 - [x] Add `eternalAxes` as cursor state
 - [x] Add `ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null)`
@@ -33,7 +33,7 @@
 - [x] Add `.ToArrayString()` method to a bunch of data types, to generate array-like string representations: `Vector(500, 200, 300)` --> `"[500,200,300]"`
 - [x] Fix a lot of rounding for String representation.
 - [x] Change `ExternalAxes(double? a1...a6)` to `ExternalAxis(axisNumber, value)`
-
+- [x] Add `CustomCode(string statement, bool isDeclaration)` Action
 
 
 

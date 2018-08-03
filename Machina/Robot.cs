@@ -1294,8 +1294,8 @@ namespace Machina
         /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
         /// Note that the effect of this change of external axis will go in effect on the next motion Action.
         /// </summary>
-        /// <param name="axisNumber">One-based axis number.</param>
-        /// <param name="increment">Increment value.</param>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="increment">Increment value in mm or degrees.</param>
         public bool ExternalAxis(int axisNumber, double increment)
         {
             if (axisNumber == 0)
@@ -1311,8 +1311,8 @@ namespace Machina
         /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
         /// Note that the effect of this change of external axis will go in effect on the next motion Action.
         /// </summary>
-        /// <param name="axisNumber">One-based axis number</param>
-        /// <param name="value">Axis value.</param>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="value">Axis value in mm or degrees.</param>
         public bool ExternalAxisTo(int axisNumber, double value)
         {
             if (axisNumber == 0)
@@ -1327,11 +1327,11 @@ namespace Machina
         /// <summary>
         /// Insert a line of custom code directly into a compiled program. 
         /// This is useful for obscure instructions that are not covered by Machina's API. 
-        /// Not that this Action cannot be checked for validity by Machina, and you are responsible for correct syntax.
+        /// Note that this Action cannot be checked for validity by Machina, and you are responsible for correct syntax.
         /// This Action is non-streamable. 
         /// </summary>
         /// <param name="statement">Code in the machine's native language.</param>
-        /// <param name="isDeclaration">Is this a declaration, like a variable or a workobject? If so, it will be placed at the beginning of the program.</param>
+        /// <param name="isDeclaration">Is this a declaration, like a variable or a workobject? If so, this statement will be placed at the beginning of the program.</param>
         /// <returns></returns>
         public bool CustomCode(string statement, bool isDeclaration = false) =>
                 c.IssueCustomCodeRequest(statement, isDeclaration);
