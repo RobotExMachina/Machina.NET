@@ -14,14 +14,13 @@
 //  ╚═════╝ ╚══════╝  ╚═══╝  ╚══════╝ ╚═════╝  ╚═════╝
 //
 ```
-
-
+# TODO:
 - [ ] Improved Logging system
 + [ ] Console dump levels: DEBUG (4), INFO (3), WARNING (2), ERROR (1) and NONE (0).
-+ [ ]
-
 - [ ] Custom code (non-streamable)
+- [ ] Hopefully turn this changelog into comething more [orthodox](http://keepachangelog.com/en/1.0.0/)
 
+---
 # v0.6.4
 
 ## BUILD 1406
@@ -33,7 +32,7 @@
 - [x] Update `ABBCommunicationProtocol`
 - [x] Add `ExternalAxes` data type to replace `double?[]`
 - [x] Add `.ToArrayString()` method to a bunch of data types, to generate array-like string representations: `Vector(500, 200, 300)` --> `"[500,200,300]"`
-- [x] Fix a lot of rounding for String representaiton. 
+- [x] Fix a lot of rounding for String representation.
 
 
 ---
