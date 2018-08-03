@@ -1097,46 +1097,6 @@ namespace Machina
 
 
 
-
-        ////  ╔═╗═╗ ╦╔╦╗╔═╗╦═╗╔╗╔╔═╗╦      ╔═╗═╗ ╦╔═╗╔═╗
-        ////  ║╣ ╔╩╦╝ ║ ║╣ ╠╦╝║║║╠═╣║      ╠═╣╔╩╦╝║╣ ╚═╗
-        ////  ╚═╝╩ ╚═ ╩ ╚═╝╩╚═╝╚╝╩ ╩╩═╝────╩ ╩╩ ╚═╚═╝╚═╝
-        ///// <summary>
-        ///// Apply an Action to set/increase external axes values for this robot.
-        ///// </summary>
-        ///// <param name="action"></param>
-        ///// <returns></returns>
-        //public bool ApplyAction(ActionExternalAxes action)
-        //{
-        //    if (externalAxes == null)
-        //    {
-        //        externalAxes = new ExternalAxes();
-        //    }
-
-        //    if (action.relative)
-        //    {
-        //        for (int i = 0; i < this.externalAxes.Length; i++)
-        //        {
-        //            if (this.externalAxes[i] != null && action.externalAxes[i] != null)
-        //            {
-        //                this.externalAxes[i] += action.externalAxes[i];
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        for (int i = 0; i < this.externalAxes.Length; i++)
-        //        {
-        //            this.externalAxes[i] = action.externalAxes[i];
-        //        }
-        //    }
-
-        //    return true;
-        //}
-
-
-
-
         //  ╔═╗═╗ ╦╔╦╗╔═╗╦═╗╔╗╔╔═╗╦      ╔═╗═╗ ╦╦╔═╗
         //  ║╣ ╔╩╦╝ ║ ║╣ ╠╦╝║║║╠═╣║      ╠═╣╔╩╦╝║╚═╗
         //  ╚═╝╩ ╚═ ╩ ╚═╝╩╚═╝╚╝╩ ╩╩═╝────╩ ╩╩ ╚═╩╚═╝
@@ -1149,17 +1109,17 @@ namespace Machina
 
             if (action.relative)
             {
-                if (this.externalAxes[action.axisNumber] == null)
+                if (this.externalAxes[action.axisNumber - 1] == null)
                 {
                     Console.WriteLine($"Sorry, must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones... Action: " + action.ToInstruction());
                     return false;
                 }
 
-                this.externalAxes[action.axisNumber] += action.value;
+                this.externalAxes[action.axisNumber - 1] += action.value;
             }
             else
             {
-                this.externalAxes[action.axisNumber] = action.value;
+                this.externalAxes[action.axisNumber - 1] = action.value;
             }
 
             return true;

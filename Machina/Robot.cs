@@ -1331,7 +1331,15 @@ namespace Machina
         /// </summary>
         /// <param name="axisNumber">One-based axis number.</param>
         /// <param name="increment">Increment value.</param>
-        public bool ExternalAxis(int axisNumber, double increment) => c.IssueExternalAxisRequest(axisNumber, increment, true);
+        public bool ExternalAxis(int axisNumber, double increment)
+        {
+            if (axisNumber == 0)
+            {
+                Console.WriteLine("Please enter an axis number between 1-6");
+                return false;
+            }
+            return c.IssueExternalAxisRequest(axisNumber, increment, true);
+        }
 
         /// <summary>
         /// Set the value of one of the robot's external axis. 
@@ -1340,8 +1348,15 @@ namespace Machina
         /// </summary>
         /// <param name="axisNumber">One-based axis number</param>
         /// <param name="value">Axis value.</param>
-        public bool ExternalAxisTo(int axisNumber, double value) => c.IssueExternalAxisRequest(axisNumber, value, false);
-
+        public bool ExternalAxisTo(int axisNumber, double value)
+        {
+            if (axisNumber == 0)
+            {
+                Console.WriteLine("Please enter an axis number between 1-6");
+                return false;
+            }
+            return c.IssueExternalAxisRequest(axisNumber, value, false);
+        }
 
 
 
@@ -1353,10 +1368,10 @@ namespace Machina
         //   ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
         //               
 
-        /// <summary>
-        /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
-        /// </summary>
-        /// <returns></returns>
+            /// <summary>
+            /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
+            /// </summary>
+            /// <returns></returns>
         public Point GetCurrentPosition() => c.GetCurrentPosition();
 
         /// <summary>

@@ -895,28 +895,17 @@ namespace Machina
         public bool IssueInitializationRequest(bool initiate) =>
                 IssueApplyActionRequest(new ActionInitialization(initiate));
 
-        ///// <summary>
-        ///// Issue a request to modify the external axes of this robot.
-        ///// </summary>
-        ///// <param name="a1"></param>
-        ///// <param name="a2"></param>
-        ///// <param name="a3"></param>
-        ///// <param name="a4"></param>
-        ///// <param name="a5"></param>
-        ///// <param name="a6"></param>
-        ///// <param name="relative"></param>
-        ///// <returns></returns>
-        //public bool IssueExternalAxesRequest(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative) =>
-        //        IssueApplyActionRequest(new ActionExternalAxes(a1, a2, a3, a4, a5, a6, relative));
 
         /// <summary>
         /// Issue a request to modify a external axis in this robot.
+        /// Note axisNumber is one-based, i.e. axisNumber 1 is _externalAxes[0]
         /// </summary>
         /// <param name="axisNumber"></param>
         /// <param name="value"></param>
         /// <param name="relative"></param>
         /// <returns></returns>
-        public bool IssueExternalAxisRequest(int axisNumber, double value, bool relative) => IssueApplyActionRequest(new ActionExternalAxis(axisNumber, value, relative));
+        public bool IssueExternalAxisRequest(int axisNumber, double value, bool relative) => 
+                IssueApplyActionRequest(new ActionExternalAxis(axisNumber, value, relative));
 
 
 
