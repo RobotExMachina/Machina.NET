@@ -413,7 +413,7 @@ namespace Machina
             { typeof (ActionExtrusion),                 (act, robCur) => robCur.ApplyAction((ActionExtrusion) act) },
             { typeof (ActionExtrusionRate),             (act, robCur) => robCur.ApplyAction((ActionExtrusionRate) act) },
             { typeof (ActionInitialization),            (act, robCur) => robCur.ApplyAction((ActionInitialization) act) },
-            { typeof (ActionExternalAxes),              (act, robCur) => robCur.ApplyAction((ActionExternalAxes) act) },
+            { typeof (ActionExternalAxis),              (act, robCur) => robCur.ApplyAction((ActionExternalAxis) act) }
         };
 
         /// <summary>
@@ -1098,37 +1098,68 @@ namespace Machina
 
 
 
-        //  ╔═╗═╗ ╦╔╦╗╔═╗╦═╗╔╗╔╔═╗╦      ╔═╗═╗ ╦╔═╗╔═╗
-        //  ║╣ ╔╩╦╝ ║ ║╣ ╠╦╝║║║╠═╣║      ╠═╣╔╩╦╝║╣ ╚═╗
-        //  ╚═╝╩ ╚═ ╩ ╚═╝╩╚═╝╚╝╩ ╩╩═╝────╩ ╩╩ ╚═╚═╝╚═╝
-        /// <summary>
-        /// Apply an Action to set/increase external axes values for this robot.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionExternalAxes action)
+        ////  ╔═╗═╗ ╦╔╦╗╔═╗╦═╗╔╗╔╔═╗╦      ╔═╗═╗ ╦╔═╗╔═╗
+        ////  ║╣ ╔╩╦╝ ║ ║╣ ╠╦╝║║║╠═╣║      ╠═╣╔╩╦╝║╣ ╚═╗
+        ////  ╚═╝╩ ╚═ ╩ ╚═╝╩╚═╝╚╝╩ ╩╩═╝────╩ ╩╩ ╚═╚═╝╚═╝
+        ///// <summary>
+        ///// Apply an Action to set/increase external axes values for this robot.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionExternalAxes action)
+        //{
+        //    if (externalAxes == null)
+        //    {
+        //        externalAxes = new ExternalAxes();
+        //    }
+
+        //    if (action.relative)
+        //    {
+        //        for (int i = 0; i < this.externalAxes.Length; i++)
+        //        {
+        //            if (this.externalAxes[i] != null && action.externalAxes[i] != null)
+        //            {
+        //                this.externalAxes[i] += action.externalAxes[i];
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        for (int i = 0; i < this.externalAxes.Length; i++)
+        //        {
+        //            this.externalAxes[i] = action.externalAxes[i];
+        //        }
+        //    }
+
+        //    return true;
+        //}
+
+
+
+
+        //  ╔═╗═╗ ╦╔╦╗╔═╗╦═╗╔╗╔╔═╗╦      ╔═╗═╗ ╦╦╔═╗
+        //  ║╣ ╔╩╦╝ ║ ║╣ ╠╦╝║║║╠═╣║      ╠═╣╔╩╦╝║╚═╗
+        //  ╚═╝╩ ╚═ ╩ ╚═╝╩╚═╝╚╝╩ ╩╩═╝────╩ ╩╩ ╚═╩╚═╝
+        public bool ApplyAction(ActionExternalAxis action)
         {
-            if (externalAxes == null)
+            if (this.externalAxes == null)
             {
-                externalAxes = new ExternalAxes();
+                this.externalAxes = new ExternalAxes();
             }
 
             if (action.relative)
             {
-                for (int i = 0; i < this.externalAxes.Length; i++)
+                if (this.externalAxes[action.axisNumber] == null)
                 {
-                    if (this.externalAxes[i] != null && action.externalAxes[i] != null)
-                    {
-                        this.externalAxes[i] += action.externalAxes[i];
-                    }
+                    Console.WriteLine($"Sorry, must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones... Action: " + action.ToInstruction());
+                    return false;
                 }
+
+                this.externalAxes[action.axisNumber] += action.value;
             }
             else
             {
-                for (int i = 0; i < this.externalAxes.Length; i++)
-                {
-                    this.externalAxes[i] = action.externalAxes[i];
-                }
+                this.externalAxes[action.axisNumber] = action.value;
             }
 
             return true;

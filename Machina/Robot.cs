@@ -1289,42 +1289,58 @@ namespace Machina
             return c.IssueInitializationRequest(false);
         }
 
-        /// <summary>
-        /// Increase the values of the robot's external axes. 
-        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
-        /// Use null for inactive axes.
-        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
-        /// </summary>
-        /// <param name="ext1"></param>
-        /// <param name="ext2"></param>
-        /// <param name="ext3"></param>
-        /// <param name="ext4"></param>
-        /// <param name="ext5"></param>
-        /// <param name="ext6"></param>
-        /// <returns></returns>
-        public bool ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
-            c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, true);
+        ///// <summary>
+        ///// Increase the values of the robot's external axes. 
+        ///// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        ///// Use null for inactive axes.
+        ///// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        ///// </summary>
+        ///// <param name="ext1"></param>
+        ///// <param name="ext2"></param>
+        ///// <param name="ext3"></param>
+        ///// <param name="ext4"></param>
+        ///// <param name="ext5"></param>
+        ///// <param name="ext6"></param>
+        ///// <returns></returns>
+        //[System.Obsolete("Deprecated method, use Robot.ExternalAxis(axisIndex, increment) instead")]
+        //public bool ExternalAxes(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
+        //    c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, true);
+
+        ///// <summary>
+        ///// Set the values of the robot's external axes.
+        ///// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        ///// Use null for inactive axes.
+        ///// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        ///// </summary>
+        ///// <param name="ext1"></param>
+        ///// <param name="ext2"></param>
+        ///// <param name="ext3"></param>
+        ///// <param name="ext4"></param>
+        ///// <param name="ext5"></param>
+        ///// <param name="ext6"></param>
+        ///// <returns></returns>
+        //[System.Obsolete("Deprecated method, use Robot.ExternalAxisTo(axisIndex, increment) instead")]
+        //public bool ExternalAxesTo(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
+        //    c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, false);
+
 
         /// <summary>
-        /// Set the values of the robot's external axes.
+        /// Increase the value of one of the robot's external axis. 
         /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
-        /// Use null for inactive axes.
         /// Note that the effect of this change of external axis will go in effect on the next motion Action.
         /// </summary>
-        /// <param name="ext1"></param>
-        /// <param name="ext2"></param>
-        /// <param name="ext3"></param>
-        /// <param name="ext4"></param>
-        /// <param name="ext5"></param>
-        /// <param name="ext6"></param>
-        /// <returns></returns>
-        public bool ExternalAxesTo(double? ext1 = null, double? ext2 = null, double? ext3 = null, double? ext4 = null, double? ext5 = null, double? ext6 = null) =>
-            c.IssueExternalAxesRequest(ext1, ext2, ext3, ext4, ext5, ext6, false);
+        /// <param name="axisNumber">One-based axis number.</param>
+        /// <param name="increment">Increment value.</param>
+        public bool ExternalAxis(int axisNumber, double increment) => c.IssueExternalAxisRequest(axisNumber, increment, true);
 
-        
-        // @TODO: this would probably be better and more practical...
-        //public bool ExternalAxis(int index, double increment) => c.IssueExternalAxisRquest(index, increment, true);
-        //public bool ExternalAxisTo(int index, double value) => c.IssueExternalAxisRequest(index, value, false);
+        /// <summary>
+        /// Set the value of one of the robot's external axis. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// </summary>
+        /// <param name="axisNumber">One-based axis number</param>
+        /// <param name="value">Axis value.</param>
+        public bool ExternalAxisTo(int axisNumber, double value) => c.IssueExternalAxisRequest(axisNumber, value, false);
 
 
 

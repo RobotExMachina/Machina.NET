@@ -40,7 +40,8 @@ namespace Machina
         Extrusion,
         ExtrusionRate,
         Initialization, 
-        ExternalAxes
+        //ExternalAxes
+        ExternalAxis
     }
 
     
@@ -237,10 +238,12 @@ namespace Machina
             return new ActionInitialization(init);
         }
 
-        public static ActionExternalAxes ExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative)
-        {
-            return new ActionExternalAxes(a1, a2, a3, a4, a5, a6, relative);
-        }
+        //public static ActionExternalAxes ExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative)
+        //{
+        //    return new ActionExternalAxes(a1, a2, a3, a4, a5, a6, relative);
+        //}
+
+        public static ActionExternalAxis ExternalAxis(int axisNumber, double value, bool relative) => new ActionExternalAxis(axisNumber, value, relative);
 
 
 
@@ -1195,45 +1198,81 @@ namespace Machina
 
 
 
-    //  ███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗      █████╗ ██╗  ██╗███████╗███████╗
-    //  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔══██╗╚██╗██╔╝██╔════╝██╔════╝
-    //  █████╗   ╚███╔╝    ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████║ ╚███╔╝ █████╗  ███████╗
-    //  ██╔══╝   ██╔██╗    ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     ██╔══██║ ██╔██╗ ██╔══╝  ╚════██║
-    //  ███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗██║  ██║██╔╝ ██╗███████╗███████║
-    //  ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝
-    //                                                                                                     
+    ////  ███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗      █████╗ ██╗  ██╗███████╗███████╗
+    ////  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔══██╗╚██╗██╔╝██╔════╝██╔════╝
+    ////  █████╗   ╚███╔╝    ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████║ ╚███╔╝ █████╗  ███████╗
+    ////  ██╔══╝   ██╔██╗    ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     ██╔══██║ ██╔██╗ ██╔══╝  ╚════██║
+    ////  ███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗██║  ██║██╔╝ ██╗███████╗███████║
+    ////  ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝
+    ////                                                                                                     
 
-    public class ActionExternalAxes : Action
+    //public class ActionExternalAxes : Action
+    //{
+    //    public ExternalAxes externalAxes;
+    //    public bool relative;
+
+    //    public ActionExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative) : base()
+    //    {
+    //        this.type = ActionType.ExternalAxes;
+
+    //        this.externalAxes = new ExternalAxes(a1, a2, a3, a4, a5, a6);
+
+    //        this.relative = relative;
+    //    }
+
+    //    public override string ToString()
+    //    {
+    //        return relative ?
+    //            $"Increase external axes by {this.externalAxes.ToArrayString()}" :
+    //            $"Set external axes to {this.externalAxes.ToArrayString()}"; 
+    //    }
+
+    //    public override string ToInstruction()
+    //    {
+    //        string arr = this.externalAxes.ToArrayString();
+    //        arr = arr.Substring(1, arr.Length - 2);
+    //        return relative ?
+    //            $"ExternalAxes({arr});" :
+    //            $"ExternalAxesTo({arr});";
+    //    }
+    //}
+
+
+
+    //  ███████╗██╗  ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗      █████╗ ██╗  ██╗██╗███████╗
+    //  ██╔════╝╚██╗██╔╝╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     ██╔══██╗╚██╗██╔╝██║██╔════╝
+    //  █████╗   ╚███╔╝    ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     ███████║ ╚███╔╝ ██║███████╗
+    //  ██╔══╝   ██╔██╗    ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     ██╔══██║ ██╔██╗ ██║╚════██║
+    //  ███████╗██╔╝ ██╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗██║  ██║██╔╝ ██╗██║███████║
+    //  ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝
+    //                                                                                                
+    public class ActionExternalAxis : Action
     {
-        public ExternalAxes externalAxes;
+        public int axisNumber;
+        public double value;
         public bool relative;
 
-        public ActionExternalAxes(double? a1, double? a2, double? a3, double? a4, double? a5, double? a6, bool relative) : base()
+        public ActionExternalAxis(int axisNumber, double value, bool relative)
         {
-            this.type = ActionType.ExternalAxes;
-
-            this.externalAxes = new ExternalAxes(a1, a2, a3, a4, a5, a6);
-
+            this.type = ActionType.ExternalAxis;
+            this.axisNumber = axisNumber;
+            this.value = value;
             this.relative = relative;
         }
 
         public override string ToString()
         {
-            return relative ?
-                $"Increase external axes by {this.externalAxes.ToArrayString()}" :
-                $"Set external axes to {this.externalAxes.ToArrayString()}"; 
+            return this.relative ?
+                $"Increase external axis {this.axisNumber} by {this.value}" :
+                $"Set external axis {this.axisNumber} to {this.value}";
         }
 
         public override string ToInstruction()
         {
-            string arr = this.externalAxes.ToArrayString();
-            arr = arr.Substring(1, arr.Length - 2);
             return relative ?
-                $"ExternalAxes({arr});" :
-                $"ExternalAxesTo({arr});";
+                $"ExternalAxis({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)});" :
+                $"ExternalAxisTo({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)});";
         }
-
-
-            
     }
+
 }
