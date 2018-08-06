@@ -1260,5 +1260,28 @@ namespace Machina
         }
 
 
+
+
+
+
+        //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
+        //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
+        //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
+        //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
+        //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
+        //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+        //    
+        internal void RaiseActionCompletedEvent()
+        {
+            Action lastAction = this.motionCursor.GetLastAction();
+            int pedingWrite = this.writeCursor.ActionsPendingCount();
+            int pendingBuffer = this.motionCursor.ActionsPendingCount();
+            ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
+
+            this.parentRobot.OnActionCompleted(e);
+        }
+
+        
+
     }
 }

@@ -233,22 +233,22 @@ namespace Machina.Drivers.Communication
                 string idStr = _responseChunks[0].Substring(1);
                 int id = Convert.ToInt32(idStr);
                 this._motionCursor.ApplyActionsUntilId(id);
-                //Console.WriteLine(_motionCursor);
+
+
+
                 this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
 
-                Action lastAction = this._motionCursor.GetLastAction();
-                //int remaining = this._motionCursor.ActionsPendingCount();
-                int pedingWrite = this._writeCursor.ActionsPendingCount();
-                int pendingBuffer = this._motionCursor.ActionsPendingCount();
-                ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
                 
-                //Console.WriteLine(this._motionCursor.actionBuffer);
-                //this._motionCursor.actionBuffer.LogBufferedActions();
-
-                //Console.WriteLine(this._writeCursor.actionBuffer);
-                //this._writeCursor.actionBuffer.LogBufferedActions();
-
-                this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
+                
+                
+                //Action lastAction = this._motionCursor.GetLastAction();
+                //int pedingWrite = this._writeCursor.ActionsPendingCount();
+                //int pendingBuffer = this._motionCursor.ActionsPendingCount();
+                //ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
+                //this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
+                
+                // All the above moved to Control so that it isn't necessary to handle the event in each CommunicationMnager...
+                this._parentDriver.parentControl.RaiseActionCompletedEvent();
             }
         }
 

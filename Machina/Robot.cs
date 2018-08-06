@@ -1407,47 +1407,7 @@ namespace Machina
 
 
 
-
-
-        //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
-        //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
-        //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
-        //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
-        //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
-        //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
-        //                                                      
-        /// <summary>
-        /// Will be raised when Machina has finished streaming all pending Actions to the controller.
-        /// Note that the controller still needs to receive them and execute them. This gives Machina 
-        /// time to prepare the next batch.
-        /// </summary>
-        public event BufferEmptyHandler BufferEmpty;
-        public delegate void BufferEmptyHandler(object sender, EventArgs e);
-        internal virtual void OnBufferEmpty(EventArgs e) => BufferEmpty?.Invoke(this, e);
-
-        /// <summary>
-        /// Will be raised when Machina received an update from the controller as has new motion
-        /// information available. Useful to keep track of the state of the controller.
-        /// </summary>
-        public event MotionCursorUpdatedHandler MotionCursorUpdated;
-        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
-        internal virtual void OnMotionCursorUpdated(EventArgs e) => MotionCursorUpdated?.Invoke(this, e);
-
-        /// <summary>
-        /// Raised whenever an action has been completed by the device. 
-        /// </summary>
-        public event ActionCompletedHandler ActionCompleted;
-        public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
-        internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
-
-        ///// <summary>
-        ///// Raised when Machina wants to log something. Suscribe to this event to receive string logs with prioroty level.
-        ///// </summary>
-        //public event LogHandler Log;
-        //public delegate void LogHandler(object sender, LogArgs e);
-        //internal virtual void OnLog(LogArgs e) => Log?.Invoke(this, e);
-
-
+        
 
         //  ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
         //  ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
@@ -1490,6 +1450,48 @@ namespace Machina
 
 
 
+
+
+        //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗
+        //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
+        //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗
+        //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
+        //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
+        //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
+        //                                                      
+        /// <summary>
+        /// Will be raised when Machina has finished streaming all pending Actions to the controller.
+        /// Note that the controller still needs to receive them and execute them. This gives Machina 
+        /// time to prepare the next batch.
+        /// </summary>
+        public event BufferEmptyHandler BufferEmpty;
+        public delegate void BufferEmptyHandler(object sender, EventArgs e);
+        internal virtual void OnBufferEmpty(EventArgs e) => BufferEmpty?.Invoke(this, e);
+
+        /// <summary>
+        /// Will be raised when Machina received an update from the controller as has new motion
+        /// information available. Useful to keep track of the state of the controller.
+        /// </summary>
+        public event MotionCursorUpdatedHandler MotionCursorUpdated;
+        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
+        internal virtual void OnMotionCursorUpdated(EventArgs e) => MotionCursorUpdated?.Invoke(this, e);
+
+        /// <summary>
+        /// Raised whenever an action has been completed by the device. 
+        /// </summary>
+        public event ActionCompletedHandler ActionCompleted;
+        public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
+        internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
+
+        ///// <summary>
+        ///// Raised when Machina wants to log something. Suscribe to this event to receive string logs with prioroty level.
+        ///// </summary>
+        //public event LogHandler Log;
+        //public delegate void LogHandler(object sender, LogArgs e);
+        //internal virtual void OnLog(LogArgs e) => Log?.Invoke(this, e);
+
+
+
     }
 
 
@@ -1519,6 +1521,11 @@ namespace Machina
             LastAction = last;
             RemainingActions = pendingWrite;
             RemainingInBuffer = pendingBuffer;
+        }
+
+        public override string ToString()
+        {
+            return $"ActionCompletedArgs: rem:{RemainingActions} robBuf:{RemainingInBuffer} last:\"{LastAction}\"";
         }
     }
 

@@ -399,12 +399,14 @@ namespace Machina.Drivers.Communication
             this._motionCursor.ApplyActionsUntilId(id);
             this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
 
-            Action lastAction = this._motionCursor.GetLastAction();
-            int pendingWrite = this._writeCursor.ActionsPendingCount();
-            int pendingBuffer = this._motionCursor.ActionsPendingCount();
-            ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pendingWrite + pendingBuffer, pendingBuffer);
+            //Action lastAction = this._motionCursor.GetLastAction();
+            //int pendingWrite = this._writeCursor.ActionsPendingCount();
+            //int pendingBuffer = this._motionCursor.ActionsPendingCount();
+            //ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pendingWrite + pendingBuffer, pendingBuffer);
+            //this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
 
-            this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
+            // All the above moved to Control so that it isn't necessary to handle the event in each CommunicationMnager...
+            this._parentDriver.parentControl.RaiseActionCompletedEvent();
 
             return true;
         }

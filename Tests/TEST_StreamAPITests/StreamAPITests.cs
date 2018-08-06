@@ -32,7 +32,9 @@ namespace TEST_StreamAPITests
         {
             Robot arm = Robot.Create("StreamTests", "ABB");
 
-            //arm.BufferEmpty += LogEvent;
+            arm.BufferEmpty += LogEvent;
+            arm.ActionCompleted += LogEvent;
+            arm.MotionCursorUpdated += LogEvent;
 
             arm.ConnectionManager("machina");
             arm.ControlMode("stream");
