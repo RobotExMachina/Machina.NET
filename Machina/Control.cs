@@ -1281,10 +1281,15 @@ namespace Machina
             this.parentRobot.OnActionCompleted(e);
         }
 
-        internal void RaiseMotionCursorUpdated()
+        internal void RaiseMotionCursorUpdatedEvent()
         {
             MotionCursorUpdatedArgs e = new MotionCursorUpdatedArgs(this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
             this.parentRobot.OnMotionCursorUpdated(e);
+        }
+
+        internal void RaiseBufferEmptyEvent()
+        {
+            this.parentRobot.OnBufferEmpty(new BufferEmptyArgs());
         }
 
     }

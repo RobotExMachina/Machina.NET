@@ -23,8 +23,6 @@ namespace TEST_StreamAPITests
 
         static public void LogEvent(object sender, MachinaEventArgs args)
         {
-            Console.WriteLine("EVENT RAISED");
-            Console.WriteLine(sender);
             Console.WriteLine(args.ToJSONString());
         }
 

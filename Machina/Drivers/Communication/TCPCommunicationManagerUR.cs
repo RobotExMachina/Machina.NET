@@ -349,8 +349,7 @@ namespace Machina.Drivers.Communication
             }
             else if (_bufferEmptyEventIsRaiseable)
             {
-                //Console.WriteLine("Raising OnBufferEmpty event");
-                this._parentDriver.parentControl.parentRobot.OnBufferEmpty(EventArgs.Empty);
+                this._parentDriver.parentControl.RaiseBufferEmptyEvent();
                 _bufferEmptyEventIsRaiseable = false;
             }
         }
@@ -399,7 +398,7 @@ namespace Machina.Drivers.Communication
             this._motionCursor.ApplyActionsUntilId(id);
 
             // Raise appropriate events
-            this._parentDriver.parentControl.RaiseMotionCursorUpdated();
+            this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
             this._parentDriver.parentControl.RaiseActionCompletedEvent();
 
             return true;

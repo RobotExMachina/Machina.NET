@@ -1465,8 +1465,8 @@ namespace Machina
         /// time to prepare the next batch.
         /// </summary>
         public event BufferEmptyHandler BufferEmpty;
-        public delegate void BufferEmptyHandler(object sender, EventArgs e);
-        internal virtual void OnBufferEmpty(EventArgs e) => BufferEmpty?.Invoke(this, e);
+        public delegate void BufferEmptyHandler(object sender, BufferEmptyArgs e);
+        internal virtual void OnBufferEmpty(BufferEmptyArgs e) => BufferEmpty?.Invoke(this, e);
 
         /// <summary>
         /// Will be raised when Machina received an update from the controller as has new motion
@@ -1474,7 +1474,7 @@ namespace Machina
         /// </summary>
         public event MotionCursorUpdatedHandler MotionCursorUpdated;
         public delegate void MotionCursorUpdatedHandler(object sender, MotionCursorUpdatedArgs e);
-        internal virtual void OnMotionCursorUpdated(EventArgs e) => MotionCursorUpdated?.Invoke(this, e);
+        internal virtual void OnMotionCursorUpdated(MotionCursorUpdatedArgs e) => MotionCursorUpdated?.Invoke(this, e);
 
         /// <summary>
         /// Raised whenever an action has been completed by the device. 
@@ -1572,11 +1572,11 @@ namespace Machina
         public override string ToJSONString()
         {
             return string.Format("{{\"event\":\"execution-update\",\"pos\":{0},\"ori\":{1},\"quat\":{2},\"axes\":{3},\"extax\":{4},\"conf\":{5}}}",
-                this.Position.ToArrayString(),
-                this.Rotation.ToOrientation().ToArrayString(),
-                this.Rotation.Q.ToArrayString(),
-                this.Axes.ToArrayString(),
-                this.ExternalAxes.ToArrayString(),
+                this.Position?.ToArrayString() ?? "null",
+                this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
+                this.Rotation?.Q.ToArrayString() ?? "null",
+                this.Axes?.ToArrayString() ?? "null",
+                this.ExternalAxes?.ToArrayString() ?? "null",
                 "null");  // placeholder for whenever IK are introduced...
         }
     }
