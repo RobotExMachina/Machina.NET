@@ -21,11 +21,11 @@ namespace TEST_StreamAPITests
         //static Joints homeJoints = new Joints(0, 0, 0, 0, 90, 0);           // ABB
         static Joints homeJoints = new Joints(0, -90, -90, -90, 90, 90);    // UR
 
-        static public void LogEvent(object sender, EventArgs args)
+        static public void LogEvent(object sender, MachinaEventArgs args)
         {
             Console.WriteLine("EVENT RAISED");
             Console.WriteLine(sender);
-            Console.WriteLine(args);
+            Console.WriteLine(args.ToJSONString());
         }
 
         static void Main(string[] args)

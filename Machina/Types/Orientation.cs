@@ -162,5 +162,16 @@ namespace Machina
                 Math.Round(this.RM.m02, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m22, STRING_ROUND_DECIMALS_MM));
         }
 
+        public string ToArrayString()
+        {
+            return string.Format("[{0},{1},{2},{3},{4},{5}]",
+                Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM));
+        }
+
     }
 }

@@ -23,8 +23,11 @@
 # v0.7.0
 
 ## BUILD 1408
+- Create `MachinaEventArgs` abstract class and derivates per `Event`
+- Each evenArgs now serializes itself into a `JSON` object
 - Improve `OnActionCompleted`:
-  - It now returns the correct remaining action count, plus the buffer
+  - It now returns the correct remaining action count, plus the buffer.
+  - Raising of the event is now handled in `Control`
 
 
 

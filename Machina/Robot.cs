@@ -1473,7 +1473,7 @@ namespace Machina
         /// information available. Useful to keep track of the state of the controller.
         /// </summary>
         public event MotionCursorUpdatedHandler MotionCursorUpdated;
-        public delegate void MotionCursorUpdatedHandler(object sender, EventArgs e);
+        public delegate void MotionCursorUpdatedHandler(object sender, MotionCursorUpdatedArgs e);
         internal virtual void OnMotionCursorUpdated(EventArgs e) => MotionCursorUpdated?.Invoke(this, e);
 
         /// <summary>
@@ -1490,9 +1490,11 @@ namespace Machina
         //public delegate void LogHandler(object sender, LogArgs e);
         //internal virtual void OnLog(LogArgs e) => Log?.Invoke(this, e);
 
-
-
     }
+
+
+
+
 
 
 
@@ -1504,7 +1506,26 @@ namespace Machina
     //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ██║  ██║██║  ██║╚██████╔╝███████║
     //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
     //                                                                               
-    public class ActionCompletedArgs : EventArgs
+    public abstract class MachinaEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The arguments on this event must be serializable to a JSON object
+        /// </summary>
+        /// <returns></returns>
+        public abstract string ToJSONString();
+
+    }
+
+
+    public class BufferEmptyArgs : MachinaEventArgs
+    {
+        // There is nothing really worthy on this event...
+
+        public override string ToJSONString() => $"{{\"event\":\"buffer-empty\"}}";
+    }
+
+
+    public class ActionCompletedArgs : MachinaEventArgs
     {
         public Action LastAction { get; set; }
         public int RemainingActions { get; set; }
@@ -1523,9 +1544,40 @@ namespace Machina
             RemainingInBuffer = pendingBuffer;
         }
 
-        public override string ToString()
+        public override string ToJSONString()
         {
-            return $"ActionCompletedArgs: rem:{RemainingActions} robBuf:{RemainingInBuffer} last:\"{LastAction}\"";
+            return string.Format("{{\"event\":\"action-completed\",\"rem\":{0},\"robBuf\":{1},\"last\":\"{2}\"}}",
+                this.RemainingActions,
+                this.RemainingInBuffer,
+                this.LastAction.ToInstruction());
+        }
+    }
+
+
+    public class MotionCursorUpdatedArgs : MachinaEventArgs
+    {
+        public Vector Position;
+        public Rotation Rotation;
+        public Joints Axes;
+        public ExternalAxes ExternalAxes;
+
+        public MotionCursorUpdatedArgs(Vector pos, Rotation rot, Joints axes, ExternalAxes extAxes)
+        {
+            this.Position = pos;
+            this.Rotation = rot;
+            this.Axes = axes;
+            this.ExternalAxes = extAxes;
+        }
+
+        public override string ToJSONString()
+        {
+            return string.Format("{{\"event\":\"execution-update\",\"pos\":{0},\"ori\":{1},\"quat\":{2},\"axes\":{3},\"extax\":{4},\"conf\":{5}}}",
+                this.Position.ToArrayString(),
+                this.Rotation.ToOrientation().ToArrayString(),
+                this.Rotation.Q.ToArrayString(),
+                this.Axes.ToArrayString(),
+                this.ExternalAxes.ToArrayString(),
+                "null");  // placeholder for whenever IK are introduced...
         }
     }
 

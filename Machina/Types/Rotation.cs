@@ -304,12 +304,33 @@ namespace Machina
             return this.AA.ToRotationVector(radians);
         }
 
+        /// <summary>
+        /// Returns an Orientation representation of this Rotation. 
+        /// </summary>
+        /// <returns></returns>
+        public Orientation ToOrientation()
+        {
+            return new Orientation(this);
+        }
+
+
+
+
         public override string ToString()
         {
             return string.Format("Rotation[X:{0}, Y:{1}, Z:{2}, A:{3}]",
-                Math.Round(AA.X, STRING_ROUND_DECIMALS_MM),
-                Math.Round(AA.Y, STRING_ROUND_DECIMALS_MM),
-                Math.Round(AA.Z, STRING_ROUND_DECIMALS_MM),
+                Math.Round(AA.X, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Y, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Z, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
+        }
+
+        public string ToArrayString()
+        {
+            return string.Format("[{0},{1},{2},{3}]",
+                Math.Round(AA.X, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Y, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Z, STRING_ROUND_DECIMALS_VECTOR),
                 Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
         }
 
