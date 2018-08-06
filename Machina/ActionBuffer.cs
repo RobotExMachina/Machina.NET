@@ -27,18 +27,20 @@ namespace Machina
         /// like in Execute mode. 
         /// </summary>
         private List<int> blockCounts;
-        
 
+        private RobotCursor _parent;
 
 
         /// <summary>
         /// Main constructor.
         /// </summary>
-        public ActionBuffer()
+        public ActionBuffer(RobotCursor parent)
         {
-            released = new List<Action>();
-            pending = new List<Action>();
-            blockCounts = new List<int>();
+            this._parent = parent;
+
+            this.released = new List<Action>();
+            this.pending = new List<Action>();
+            this.blockCounts = new List<int>();
         }
 
         /// <summary>
@@ -201,7 +203,7 @@ namespace Machina
         /// How many Actions are pending in the buffer?
         /// </summary>
         /// <returns></returns>
-        public int ActionsPending()
+        public int ActionsPendingCount()
         {
             return pending.Count;
         }
@@ -273,7 +275,7 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("ACTION BUFFER: {0} issued, {1} remaining", released.Count, pending.Count);
+            return string.Format("ACTION BUFFER FROM {2}: {0} issued, {1} remaining", released.Count, pending.Count, this._parent.name);
         }
     }
 }

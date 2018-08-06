@@ -20,6 +20,16 @@
 
 
 ---
+# v0.7.0
+
+## BUILD 1408
+- Improve `OnActionCompleted`:
+  - It now returns the correct remaining action count, plus the buffer
+
+
+
+
+---
 # v0.6.4
 
 ## BUILD 1407

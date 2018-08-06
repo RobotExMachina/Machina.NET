@@ -139,7 +139,7 @@ namespace Machina
             }
 
             // Initialize buffers
-            actionBuffer = new ActionBuffer();
+            actionBuffer = new ActionBuffer(this);
             settingsBuffer = new SettingsBuffer();
 
             //// Basics io names
@@ -325,9 +325,9 @@ namespace Machina
         /// Returns the number of actions pending in this cursor's buffer.
         /// </summary>
         /// <returns></returns>
-        public int ActionsPending()
+        public int ActionsPendingCount()
         {
-            return actionBuffer.ActionsPending();
+            return actionBuffer.ActionsPendingCount();
         }
 
         /// <summary>

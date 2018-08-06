@@ -46,12 +46,16 @@ namespace TEST_StreamAPITests
 
             arm.Message("Hello Robot!");
 
+            //Console.WriteLine("DUMPING BUFFERS");
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffers();
+
             //arm.Start();
 
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START EXTERNAL AXIS TEST...");
-            Console.ReadKey();
-            ExternalAxes(arm);
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START EXTERNAL AXIS TEST...");
+            //Console.ReadKey();
+            //ExternalAxes(arm);
 
             //Console.WriteLine(" ");
             //Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
@@ -64,10 +68,10 @@ namespace TEST_StreamAPITests
             //VerticalCircleUR(arm);
 
 
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START THE SPIRAL...");
-            //Console.ReadKey();
-            //Spiral(arm, 5);
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to START THE SPIRAL...");
+            Console.ReadKey();
+            Spiral(arm, 1);
 
             //int frame = 0;
             //while(frame < 20 * 1000/30.0)
@@ -179,14 +183,14 @@ namespace TEST_StreamAPITests
             //bot.Attach(rod);
 
             // UR is giving me problems with stupid linear mode...
-            bot.MotionMode(MotionType.Joint); 
+            bot.MotionMode(MotionType.Joint);
 
             // Home
             bot.JointSpeedTo(20);
             bot.JointAccelerationTo(4);
             bot.PrecisionTo(10);
             bot.AxesTo(homeJoints);
-            
+
             // Joint move and rotate to starting point
             bot.PushSettings();
             //bot.SpeedTo(100);
@@ -277,51 +281,53 @@ namespace TEST_StreamAPITests
 
         }
 
-        //static double x = 400,
-        //    y = 400,
-        //    z = 400;
-
-        //static double dx = 50,
-        //    dy = 50,
-        //    dz = 1;
-
-        //static int segments = 72;
-        //static double angle = 0;
-        //static double da = 2 * Math.PI / segments;
 
 
-        //static private void Spiral(Robot bot, int loops)
-        //{
-        //    // Home
-        //    bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
-        //    bot.PrecisionTo(10);
-        //    bot.AxesTo(0, 0, 0, 0, 90, 0);
 
-        //    // Joint move and rotate to starting point
-        //    bot.PushSettings();
-        //    bot.MotionMode(MotionType.Joint);
-        //    bot.SpeedTo((int)(300 * (PHYSICAL_ROBOT ? 0.2 : 1)));
-        //    bot.PrecisionTo(5);
-        //    bot.TransformTo(new Point(x, y, z), new Orientation(-1, 0, 0, 0, 1, 0));
-        //    bot.PopSettings();
-        //    bot.Wait(500);
+        static private void Spiral(Robot bot, int loops)
+        {
+            double x = 400,
+                   y = 400,
+                   z = 400;
 
-        //    bot.SpeedTo((int)(100 * (PHYSICAL_ROBOT ? 0.2 : 1)));
-        //    for (var i = 0; i < loops; i++)
-        //    {
-        //        for (var j = 0; j < segments; j++)
-        //        {
-        //            bot.MoveTo(x + dx * Math.Cos(angle), y + dy * Math.Sin(angle), z + j * dz / segments);
-        //            angle += da;
-        //        }
-        //        z += dz;
-        //    }
+            double dx = 50,
+                dy = 50,
+                dz = 1;
 
-        //    // Home
-        //    bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
-        //    bot.PrecisionTo(5);
-        //    bot.AxesTo(0, 0, 0, 0, 90, 0);
-        //}
+            int segments = 16;
+            double angle = 0;
+            double da = 2 * Math.PI / segments;
+
+            // Home
+            bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            bot.PrecisionTo(10);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+
+            // Joint move and rotate to starting point
+            bot.PushSettings();
+            bot.MotionMode(MotionType.Joint);
+            bot.SpeedTo((int)(300 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            bot.PrecisionTo(5);
+            bot.TransformTo(new Point(x, y, z), new Orientation(-1, 0, 0, 0, 1, 0));
+            bot.PopSettings();
+            bot.Wait(500);
+
+            bot.SpeedTo((int)(100 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            for (var i = 0; i < loops; i++)
+            {
+                for (var j = 0; j < segments; j++)
+                {
+                    bot.MoveTo(x + dx * Math.Cos(angle), y + dy * Math.Sin(angle), z + j * dz / segments);
+                    angle += da;
+                }
+                z += dz;
+            }
+
+            // Home
+            bot.SpeedTo((int)(500 * (PHYSICAL_ROBOT ? 0.2 : 1)));
+            bot.PrecisionTo(5);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+        }
 
         static private void SpiralUR(Robot bot, double sx, double sy, double sz, double radius, double loopHeight, int loopCount, double linearSpeed)
         {

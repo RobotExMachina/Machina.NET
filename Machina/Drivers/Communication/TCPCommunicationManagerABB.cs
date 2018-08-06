@@ -117,6 +117,11 @@ namespace Machina.Drivers.Communication
 
         private void SendingMethod(object obj)
         {
+            if (Thread.CurrentThread.Name == null)
+            {
+                Thread.CurrentThread.Name = "MachinaTCPSendingThread";
+            }
+
             // Expire the thread on disconnection
             while (Status != TCPConnectionStatus.Disconnected)
             {
@@ -143,6 +148,11 @@ namespace Machina.Drivers.Communication
 
         private void ReceivingMethod(object obj)
         {
+            if (Thread.CurrentThread.Name == null)
+            {
+                Thread.CurrentThread.Name = "MachinaTCPListeningThread";
+            }
+
             // Expire the thread on disconnection
             while (Status != TCPConnectionStatus.Disconnected)
             {
@@ -218,7 +228,7 @@ namespace Machina.Drivers.Communication
             // @TODO: this is hardcoded for ABB, do this programmatically...
             if (res[0] == ABBCommunicationProtocol.STR_MESSAGE_ID_CHAR)
             {
-                // @TODO: dd some sanity here for incorrectly formatted messages
+                // @TODO: Add some sanity here for incorrectly formatted messages
                 _responseChunks = res.Split(' ');
                 string idStr = _responseChunks[0].Substring(1);
                 int id = Convert.ToInt32(idStr);
@@ -227,8 +237,17 @@ namespace Machina.Drivers.Communication
                 this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
 
                 Action lastAction = this._motionCursor.GetLastAction();
-                int remaining = this._motionCursor.ActionsPending();
-                ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
+                //int remaining = this._motionCursor.ActionsPendingCount();
+                int pedingWrite = this._writeCursor.ActionsPendingCount();
+                int pendingBuffer = this._motionCursor.ActionsPendingCount();
+                ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
+                
+                //Console.WriteLine(this._motionCursor.actionBuffer);
+                //this._motionCursor.actionBuffer.LogBufferedActions();
+
+                //Console.WriteLine(this._writeCursor.actionBuffer);
+                //this._writeCursor.actionBuffer.LogBufferedActions();
+
                 this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
             }
         }

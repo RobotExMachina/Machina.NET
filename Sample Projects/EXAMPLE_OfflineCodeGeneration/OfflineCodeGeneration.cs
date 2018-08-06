@@ -39,7 +39,7 @@ namespace EXAMPLE_OfflineCodeGeneration
             arm.MoveTo(300, 0, 500);
 
             // Check all pending Actions in the buffer
-            arm.DebugBuffer();
+            arm.DebugBuffers();
 
             // Export buffered program to local file
             arm.Export(@"C:\square.script");

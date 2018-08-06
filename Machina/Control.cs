@@ -95,8 +95,8 @@ namespace Machina
         private bool _areCursorsInitialized = false;
 
         /// <summary>
-        /// An mutable alias for the cursor that will be used to return the current state for the robot,
-        /// aka which cursor to use for sync GetJoints(), GetPose()-kind of functions...
+        /// A mutable alias for the cursor that will be used to return the current state for the robot,
+        /// a.k.a. which cursor to use for sync GetJoints(), GetPose()-kind of functions...
         /// Mainly the virtualCursor for Offline modes, motionCursor for Stream, etc.
         /// </summary>
         internal RobotCursor stateCursor;
@@ -104,7 +104,7 @@ namespace Machina
         /// <summary>
         /// A shared instance of a Thread to manage sending and executing actions
         /// in the controller, which typically takes a lot of resources
-        /// and halts program execution
+        /// and halts program execution.
         /// </summary>
         private Thread actionsExecuter;
 
@@ -1208,13 +1208,16 @@ namespace Machina
             _driver.DebugDump();
         }
 
-        public void DebugBuffer()
+        public void DebugBuffers()
         {
             Console.WriteLine("VIRTUAL BUFFER:");
             virtualCursor.LogBufferedActions();
 
             Console.WriteLine("WRITE BUFFER:");
             writeCursor.LogBufferedActions();
+
+            Console.WriteLine("MOTION BUFFER");
+            motionCursor.LogBufferedActions();
         }
 
         public void DebugRobotCursors()

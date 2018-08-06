@@ -78,7 +78,7 @@ namespace TEST_OfflineAPITests
             //// Wait and Message
             //TestWaitAndMessage(arm);
 
-            arm.DebugBuffer();  // read all pending buffered actions
+            arm.DebugBuffers();  // read all pending buffered actions
             arm.DebugRobotCursors();
 
             arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.prg" :
@@ -90,7 +90,7 @@ namespace TEST_OfflineAPITests
             //foreach (string s in code) Console.WriteLine(s);
 
             arm.DebugRobotCursors();
-            arm.DebugBuffer();  // at this point, the buffer should be empty and nothing should show up
+            arm.DebugBuffers();  // at this point, the buffer should be empty and nothing should show up
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");

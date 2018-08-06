@@ -392,17 +392,18 @@ namespace Machina.Drivers.Communication
             // Some messages actually contain several instructions (like a pop call may). 
             // In this case, ids are -1 except for the last instruction, that contains the right id.
             // If an id is below 1, just ignore it. 
-            if (id < 1) return false;
+            if (id < 1)
+                return false;
             
             _receivedIDs.Add(id);
             this._motionCursor.ApplyActionsUntilId(id);
-            //Console.WriteLine(_motionCursor);
             this._parentDriver.parentControl.parentRobot.OnMotionCursorUpdated(EventArgs.Empty);
 
-            //Action lastAction = this._motionCursor.lastAction;
             Action lastAction = this._motionCursor.GetLastAction();
-            int remaining = this._motionCursor.ActionsPending();
-            ActionCompletedArgs e = new ActionCompletedArgs(lastAction, remaining);
+            int pendingWrite = this._writeCursor.ActionsPendingCount();
+            int pendingBuffer = this._motionCursor.ActionsPendingCount();
+            ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pendingWrite + pendingBuffer, pendingBuffer);
+
             this._parentDriver.parentControl.parentRobot.OnActionCompleted(e);
 
             return true;

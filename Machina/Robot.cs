@@ -51,12 +51,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1407;
+        public static readonly int Build = 1408;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.6.4." + Build;
+        public static readonly string Version = "0.7.0." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
@@ -1467,9 +1467,9 @@ namespace Machina
         /// <summary>
         /// Dumps a list of the remaining buffered Actions.
         /// </summary>
-        public void DebugBuffer()
+        public void DebugBuffers()
         {
-            c.DebugBuffer();
+            c.DebugBuffers();
         }
 
         /// <summary>
@@ -1506,11 +1506,19 @@ namespace Machina
     {
         public Action LastAction { get; set; }
         public int RemainingActions { get; set; }
+        public int RemainingInBuffer { get; set; }
 
-        public ActionCompletedArgs(Action last, int remaining)
+        /// <summary>
+        /// Arguments for onActionCompleted
+        /// </summary>
+        /// <param name="last">The last Action recently executed by the Robot.</param>
+        /// <param name="pendingWrite">How many Actions are left to be executed by the Robot?</param>
+        /// <param name="pendingBuffer">How many Actions are currently loaded in the Robot's buffer to be executed?</param>
+        public ActionCompletedArgs(Action last, int pendingWrite, int pendingBuffer)
         {
             LastAction = last;
-            RemainingActions = remaining;
+            RemainingActions = pendingWrite;
+            RemainingInBuffer = pendingBuffer;
         }
     }
 
