@@ -63,7 +63,7 @@
     CONST num SERVER_PORT := 7000;
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.0.2";
+    CONST string MACHINA_SERVER_VERSION := "1.1.0";
 
     ! Should program exit on any kind of error?
     VAR bool USE_STRICT := TRUE;
@@ -92,10 +92,26 @@
     CONST num INST_GET_INFO := 101;             ! A way to retreive state information from the server (not implemented)
     CONST num INST_SET_CONFIGURATION := 102;    ! A way to make some changes to the configuration of the server
 
+    ! (these could be straight strings since they are never used for checks...?)
+    CONST num RES_POSE := 21;               ! ">21 400 300 500 0 0 1 0;
+    CONST num RES_JOINTS := 22;             ! ">22 0 0 0 0 90 0;
+    ! CONST num RES_EXTAX := 23;
+
     ! Characters used for buffer parsing
     CONST string STR_MESSAGE_END_CHAR := ";";
     CONST string STR_MESSAGE_ID_CHAR := "@";
     CONST string STR_MESSAGE_RESPONSE_CHAR := ">";  ! this will be added to information request responses (acknowledgments do not include it)
+
+    ! Rounding parameters for string representation of values (consistent with current Machina standards...)
+    CONST num STR_RND_M := 6;
+    CONST num STR_RND_MM := 3;
+    CONST num STR_RND_DEGS := 3;
+    CONST num STR_RND_QUAT := 4;
+    CONST num STR_RND_RADS := 6;
+    CONST num STR_RND_VOLT := 3;
+    CONST num STR_RND_TEMP := 0;
+    CONST num STR_RND_KG := 3;
+    CONST num STR_RND_VEC := 5;
 
     ! RobotWare 5.x shim
     CONST num WAIT_MAX := 8388608;
@@ -110,6 +126,10 @@
     VAR zonedata cursorZone;
     VAR signaldo cursorDO;
     VAR signalao cursorAO;
+
+    ! State variables for real-time motion tracking
+    VAR robtarget nowrt;
+    VAR jointtarget nowjt;
 
     ! Buffer of incoming messages
     CONST num msgBufferSize := 1000;
@@ -229,6 +249,10 @@
                 ! Send acknowledgement message
                 SendAcknowledgement(currentAction);
 
+                !! Update the client with real-time motion data
+                !SendPose;
+                !SendJoints;
+
                 actionPosExecute := actionPosExecute + 1;
                 IF actionPosExecute > actionsBufferSize THEN
                     actionPosExecute := 1;
@@ -279,6 +303,10 @@
         TPWrite "Connected to client: " + clientIp;
         TPWrite "Listening to TCP/IP commands...";
 
+        ! Update the client with some data
+        SendPose;
+        SendJoints;
+
         ERROR
             IF ERRNO = ERR_SOCK_TIMEOUT THEN
                 TPWrite "Machina error: ServerRecover timeout. Retrying...";
@@ -326,6 +354,15 @@
         response := response + NumToStr(a.code, 0) + STR_MESSAGE_END_CHAR;
 
         SocketSend clientSocket \Str:=response;
+
+        ERROR
+            IF ERRNO = ERR_SOCK_CLOSED THEN
+                TPWrite "Machina error: client disconnected.";
+                RETURN;
+            ELSE
+                ! No error recovery handling
+                TPWrite "Machina error: unknown error";
+            ENDIF
     ENDPROC
 
     ! Responds to an information request by sending a formatted message
@@ -353,6 +390,39 @@
         SocketSend clientSocket \Str:=response;
     ENDPROC
 
+    !VAR robtarget currentRobotTarget;
+    !VAR jointtarget currentJointTarget;
+    PROC SendPose()
+        nowrt := CRobT(\Tool:=tool0, \WObj:=wobj0);
+
+        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_POSE, 0);
+        response := response + STR_WHITE
+            + NumToStr(nowrt.trans.x, STR_RND_MM) + STR_WHITE
+            + NumToStr(nowrt.trans.y, STR_RND_MM) + STR_WHITE
+            + NumToStr(nowrt.trans.z, STR_RND_MM);
+        response := response + STR_WHITE
+            + NumToStr(nowrt.rot.q1, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(nowrt.rot.q2, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(nowrt.rot.q3, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(nowrt.rot.q4, STR_RND_QUAT) + STR_MESSAGE_END_CHAR;
+
+        SocketSend clientSocket \Str:=response;
+    ENDPROC
+
+    PROC SendJoints()
+        nowjt := CJointT();
+
+        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_JOINTS, 0);
+        response := response + STR_WHITE
+            + NumToStr(nowjt.robax.rax_1, STR_RND_DEGS) + STR_WHITE
+            + NumToStr(nowjt.robax.rax_2, STR_RND_DEGS) + STR_WHITE
+            + NumToStr(nowjt.robax.rax_3, STR_RND_DEGS) + STR_WHITE
+            + NumToStr(nowjt.robax.rax_4, STR_RND_DEGS) + STR_WHITE
+            + NumToStr(nowjt.robax.rax_5, STR_RND_DEGS) + STR_WHITE
+            + NumToStr(nowjt.robax.rax_6, STR_RND_DEGS) + STR_MESSAGE_END_CHAR;
+
+        SocketSend clientSocket \Str:=response;
+    ENDPROC
 
 
 
