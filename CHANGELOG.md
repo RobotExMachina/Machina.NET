@@ -22,12 +22,18 @@
 ---
 # v0.7.0
 
+## BUILD 1409
+- `TCPCommunicationManagerABB` now listens to incoming messages from the driver
+- `TCPCommunicationManagerABB` now is initialized with pose + joint data from the controller, which means being able to start with any relative/abs motion.
+- `TCPCommunicationManagerABB` now waits for initialization data from the driver before successfully connecting, and fails to do so on timeout.
+
+
 ## BUILD 1408
 - Create `MachinaEventArgs` abstract class and derivates per `Event`
 - Each evenArgs now serializes itself into a `JSON` object
-- Improve `OnActionCompleted`:
-  - It now returns the correct remaining action count, plus the buffer.
-  - Raising of the event is now handled in `Control`
+- Raising all events is now handled by `Control`
+- Improve `OnActionCompleted`: it now returns the correct remaining action count, plus the buffer.
+
 
 
 

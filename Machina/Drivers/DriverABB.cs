@@ -66,6 +66,7 @@ namespace Machina.Drivers
             {
                 this.IP = ip;
                 this.Port = port;
+                
                 return true;
             }
 
@@ -160,8 +161,7 @@ namespace Machina.Drivers
                 return jnt;
             }
 
-            // @TODO: if on TCP without bridge, make a sync request to the server and fetch state from it!
-            return null;
+            return this._tcpManager.initAx;
         }
 
         public override Rotation GetCurrentOrientation()
@@ -172,9 +172,9 @@ namespace Machina.Drivers
                 Console.WriteLine($"GetCurrentOrientation: {ori}");
                 return ori;
             }
+            
 
-            // @TODO: if on TCP without bridge, make a sync request to the server and fetch state from it!
-            return null;
+            return this._tcpManager.initRot;
         }
 
         public override Vector GetCurrentPosition()
@@ -186,8 +186,7 @@ namespace Machina.Drivers
                 return pos;
             }
 
-            // @TODO: if on TCP without bridge, make a sync request to the server and fetch state from it!
-            return null;
+            return this._tcpManager.initPos;  // will be null if not initialized...
         }
 
         public override void DebugDump()

@@ -24,6 +24,11 @@ namespace Machina.Drivers.Communication
         private RobotCursor _motionCursor;
         private Driver _parentDriver;
 
+        private const int INIT_TIMEOUT = 10000;  // in millis
+        internal Vector initPos;
+        internal Rotation initRot;
+        internal Joints initAx;
+
         private TcpClient clientSocket = new TcpClient();
         private NetworkStream clientNetworkStream;
         private Thread receivingThread;
@@ -95,6 +100,12 @@ namespace Machina.Drivers.Communication
                 receivingThread.IsBackground = true;
                 receivingThread.Start();
 
+                if (!WaitForInitialization())
+                {
+                    Console.WriteLine("Machina error: timeout when waiting for initialization data from the controller");
+                    return false;
+                }
+
                 return clientSocket.Connected;
             }
             catch (Exception ex)
@@ -104,6 +115,21 @@ namespace Machina.Drivers.Communication
             }
 
             //return false;
+        }
+
+        private bool WaitForInitialization()
+        {
+            int time = 0;
+            Console.WriteLine("Waiting for intialization data from controller...");
+
+            // @TODO: this is awful, come on...
+            while ((initAx == null || initPos == null || initRot == null) && time < INIT_TIMEOUT)
+            {
+                time += 33;
+                Thread.Sleep(33);
+            }
+
+            return initAx != null && initPos != null && initRot != null;
         }
 
 
@@ -135,7 +161,7 @@ namespace Machina.Drivers.Communication
                             _sendMsgBytes = Encoding.ASCII.GetBytes(msg);
                             clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
                             _sentMessages++;
-                            //Console.WriteLine("Sending mgs: " + msg);
+                           //Console.WriteLine("Sending mgs: " + msg);
                         }
                     }
                 }
@@ -227,16 +253,55 @@ namespace Machina.Drivers.Communication
             // @TODO: this is hardcoded for ABB, do this programmatically...
             if (res[0] == ABBCommunicationProtocol.STR_MESSAGE_ID_CHAR)
             {
-                // @TODO: Add some sanity here for incorrectly formatted messages
-                _responseChunks = res.Split(' ');
-                string idStr = _responseChunks[0].Substring(1);
-                int id = Convert.ToInt32(idStr);
-                this._motionCursor.ApplyActionsUntilId(id);
-
-                // Raise appropriate events
-                this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
-                this._parentDriver.parentControl.RaiseActionCompletedEvent();
+                AcknowledgmentReceived(res);
             }
+            else if (res[0] == ABBCommunicationProtocol.STR_MESSAGE_RESPONSE_CHAR)
+            {
+                //Console.WriteLine("RECEIVED: " + res);
+                DataReceived(res);
+            }
+        }
+
+        private void AcknowledgmentReceived(string res)
+        {
+            // @TODO: Add some sanity here for incorrectly formatted messages
+            _responseChunks = res.Split(' ');
+            string idStr = _responseChunks[0].Substring(1);
+            int id = Convert.ToInt32(idStr);
+            this._motionCursor.ApplyActionsUntilId(id);
+
+            // Raise appropriate events
+            this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
+            this._parentDriver.parentControl.RaiseActionCompletedEvent();
+        }
+
+        private void DataReceived(string res)
+        {
+            _responseChunks = res.Split(' ');
+            int resType = Convert.ToInt32(_responseChunks[0].Substring(1));
+
+            double[] data = new double[_responseChunks.Length - 1];
+            for (int i = 0; i < data.Length; i++)
+            {
+                // @TODO: add sanity like Double.TryParse(...)
+                data[i] = Double.Parse(_responseChunks[i + 1]);
+            }
+
+            switch (resType)
+            {
+                // ">21 400 300 500 0 0 1 0;"
+                case ABBCommunicationProtocol.RES_POSE:
+                    this.initPos = new Vector(data[0], data[1], data[2]);
+                    this.initRot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
+                    break;
+
+
+                // ">22 0 0 0 0 90 0;"
+                case ABBCommunicationProtocol.RES_JOINTS:
+                    this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
+                    break;
+            }
+
         }
 
     }

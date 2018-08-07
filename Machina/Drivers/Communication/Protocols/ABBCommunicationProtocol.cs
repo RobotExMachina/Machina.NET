@@ -15,18 +15,22 @@ namespace Machina.Drivers.Communication.Protocols
 
         // A RAPID-code oriented API:
         //                                     // INSTRUCTION P1 P2 P3 P4...
-        const int INST_MOVEL = 1;              // MoveL X Y Z QW QX QY QZ
-        const int INST_MOVEJ = 2;              // MoveJ X Y Z QW QX QY QZ
-        const int INST_MOVEABSJ = 3;           // MoveAbsJ J1 J2 J3 J4 J5 J6
-        const int INST_SPEED = 4;              // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
-        const int INST_ZONE = 5;               // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
-        const int INST_WAITTIME = 6;           // WaitTime T
-        const int INST_TPWRITE = 7;            // TPWrite "MSG"
-        const int INST_TOOL = 8;               // (settool X Y Z QW QX QY QZ KG CX CY CZ)
-        const int INST_NOTOOL = 9;             // (settool tool0)
-        const int INST_SETDO = 10;             // SetDO "NAME" ON
-        const int INST_SETAO = 11;             // SetAO "NAME" V
-        const int INST_EXT_JOINTS = 12;        // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+        internal const int INST_MOVEL = 1;              // MoveL X Y Z QW QX QY QZ
+        internal const int INST_MOVEJ = 2;              // MoveJ X Y Z QW QX QY QZ
+        internal const int INST_MOVEABSJ = 3;           // MoveAbsJ J1 J2 J3 J4 J5 J6
+        internal const int INST_SPEED = 4;              // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
+        internal const int INST_ZONE = 5;               // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
+        internal const int INST_WAITTIME = 6;           // WaitTime T
+        internal const int INST_TPWRITE = 7;            // TPWrite "MSG"
+        internal const int INST_TOOL = 8;               // (settool X Y Z QW QX QY QZ KG CX CY CZ)
+        internal const int INST_NOTOOL = 9;             // (settool tool0)
+        internal const int INST_SETDO = 10;             // SetDO "NAME" ON
+        internal const int INST_SETAO = 11;             // SetAO "NAME" V
+        internal const int INST_EXT_JOINTS = 12;        // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+
+        internal const int RES_POSE = 21;               // ">21 400 300 500 0 0 1 0;"
+        internal const int RES_JOINTS = 22;             // ">22 0 0 0 0 90 0;"
+        // const int RES_EXTAX = 23;
 
 
         /// <summary>
