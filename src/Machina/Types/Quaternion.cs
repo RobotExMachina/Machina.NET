@@ -868,6 +868,5 @@ namespace Machina
                 Math.Round(Z, STRING_ROUND_DECIMALS_QUAT));
         }
 
-
     }
 }

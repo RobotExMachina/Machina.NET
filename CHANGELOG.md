@@ -17,6 +17,9 @@
 - [ ] Improved Logging system
 - [ ] Console dump levels: DEBUG (4), INFO (3), WARNING (2), ERROR (1) and NONE (0).
 - [ ] Hopefully turn this changelog into something more [orthodox](http://keepachangelog.com/en/1.0.0/)
+- [ ] Make `Machina` types JSON-de/serializable via `DataContract`s
+
+
 
 
 ---

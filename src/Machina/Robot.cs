@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using System.Runtime.Serialization;
+using System.IO;
+using System.Runtime.Serialization.Json;
+
 
 //  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ 
 //  ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗
@@ -1346,10 +1350,10 @@ namespace Machina
         //   ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝
         //               
 
-            /// <summary>
-            /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
-            /// </summary>
-            /// <returns></returns>
+        /// <summary>
+        /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
+        /// </summary>
+        /// <returns></returns>
         public Point GetCurrentPosition() => c.GetCurrentPosition();
 
         /// <summary>
@@ -1407,7 +1411,7 @@ namespace Machina
 
 
 
-        
+
 
         //  ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
         //  ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
@@ -1505,7 +1509,7 @@ namespace Machina
     //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ██╔══██║██╔══██╗██║   ██║╚════██║
     //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ██║  ██║██║  ██║╚██████╔╝███████║
     //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-    //                                                                               
+    //                                                                              
     public abstract class MachinaEventArgs : EventArgs
     {
         /// <summary>
@@ -1513,13 +1517,34 @@ namespace Machina
         /// </summary>
         /// <returns></returns>
         public abstract string ToJSONString();
+        
 
+        //public string SerializeToJSON()
+        //{
+        //    MemoryStream ms = new MemoryStream();
+        //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MachinaEventArgs));
+        //    ser.WriteObject(ms, this);
+        //    byte[] json = ms.ToArray();
+        //    ms.Close();
+        //    return Encoding.UTF8.GetString(json, 0, json.Length);
+        //}
+
+        //public MachinaEventArgs DeserializeFromJSON(string json)
+        //{
+        //    MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MachinaEventArgs));
+        //    MachinaEventArgs e = ser.ReadObject(ms) as MachinaEventArgs;
+        //    ms.Close();
+        //    return e;
+        //}
+        
     }
 
 
     public class BufferEmptyArgs : MachinaEventArgs
     {
         // There is nothing really worthy on this event...
+        public string eventType = "buffer-empty";
 
         public override string ToJSONString() => $"{{\"event\":\"buffer-empty\"}}";
     }
@@ -1552,7 +1577,6 @@ namespace Machina
                 this.LastAction.ToInstruction());
         }
     }
-
 
     public class MotionCursorUpdatedArgs : MachinaEventArgs
     {
@@ -1593,6 +1617,39 @@ namespace Machina
     //    }
     //}
 
+    //[DataContract]
+    //public class FooBar
+    //{
+    //    [DataMember(Name = "myName")]
+    //    public string name;
+
+    //    [DataMember]
+    //    public int age;
+
+    //    [DataMember]
+    //    public Vector v;
+
+    //    public FooBar(string name, int age, Vector v)
+    //    {
+    //        this.name = name;
+    //        this.age = age;
+    //        this.v = v;
+    //    }
+
+    //    public string SelfSerializeToJSON()
+    //    {
+    //        //Create a stream to serialize the object to.  
+    //        MemoryStream ms = new MemoryStream();
+
+    //        // Serializer the User object to the stream.  
+    //        DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(FooBar));
+    //        ser.WriteObject(ms, this);
+    //        byte[] json = ms.ToArray();
+    //        ms.Close();
+    //        return Encoding.UTF8.GetString(json, 0, json.Length);
+    //    }
+        
+    //}
 
 
 
