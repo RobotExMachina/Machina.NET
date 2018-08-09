@@ -23,9 +23,7 @@ namespace TEST_StreamAPITests
 
         static public void LogEvent(object sender, MachinaEventArgs args)
         {
-            Console.WriteLine(args.SerializeToJSON());
-            
-
+            Console.WriteLine(args.ToJSONString());
         }
 
         static void Main(string[] args)

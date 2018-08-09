@@ -18,15 +18,15 @@
 - [ ] Console dump levels: DEBUG (4), INFO (3), WARNING (2), ERROR (1) and NONE (0).
 - [ ] Hopefully turn this changelog into something more [orthodox](http://keepachangelog.com/en/1.0.0/)
 - [ ] Make `Machina` types JSON-de/serializable via `DataContract`s
-
-
+- [ ] Implement a `Machina` compiler that outputs all Actions as simple Instructions...
+- [ ] Implement event listeners in Grasshopper
 
 
 ---
 # v0.7.0
 
 ## BUILD 1410
-
+- Create `ToolCreated` event (intern request ;)
 
 ## BUILD 1409
 - `TCPCommunicationManagerABB` now listens to incoming messages from the driver

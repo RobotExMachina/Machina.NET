@@ -132,6 +132,16 @@ namespace Machina
             return safe;
         }
 
+        /// <summary>
+        /// Finds double quotes on a string and scapes them adding a backlash in front.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string EscapeDoubleQuotes(string str)
+        {
+            return str.Replace("\"", "\\\"");
+        }
+
     }
 
 

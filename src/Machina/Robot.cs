@@ -1487,6 +1487,10 @@ namespace Machina
         public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
         internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
 
+        public event ToolCreatedHandler ToolCreated;
+        public delegate void ToolCreatedHandler(object sender, ToolCreatedArgs e);
+        internal virtual void OnToolCreated(ToolCreatedArgs e) => ToolCreated?.Invoke(this, e);
+
         ///// <summary>
         ///// Raised when Machina wants to log something. Suscribe to this event to receive string logs with prioroty level.
         ///// </summary>
@@ -1602,6 +1606,26 @@ namespace Machina
                 this.Axes?.ToArrayString() ?? "null",
                 this.ExternalAxes?.ToArrayString() ?? "null",
                 "null");  // placeholder for whenever IK are introduced...
+        }
+    }
+
+    /// <summary>
+    /// A quick tool-created event because the interns need it for their awesome project! :)
+    /// </summary>
+    public class ToolCreatedArgs : MachinaEventArgs
+    {
+        public Tool tool;
+
+        public ToolCreatedArgs(Tool tool)
+        {
+            this.tool = tool;
+        }
+
+        public override string ToJSONString()
+        {
+            return string.Format("{{\"event\":\"tool-created\",\"tool\":\"{0}\"}}",
+                Util.EscapeDoubleQuotes(tool.ToInstruction())
+            );
         }
     }
 
