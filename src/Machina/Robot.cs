@@ -1342,6 +1342,9 @@ namespace Machina
 
 
 
+
+
+
         //   ██████╗ ███████╗████████╗████████╗███████╗██████╗ ███████╗
         //  ██╔════╝ ██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗██╔════╝
         //  ██║  ███╗█████╗     ██║      ██║   █████╗  ██████╔╝███████╗
@@ -1487,9 +1490,9 @@ namespace Machina
         public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
         internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
 
-        public event ToolCreatedHandler ToolCreated;
-        public delegate void ToolCreatedHandler(object sender, ToolCreatedArgs e);
-        internal virtual void OnToolCreated(ToolCreatedArgs e) => ToolCreated?.Invoke(this, e);
+        //public event ToolCreatedHandler ToolCreated;
+        //public delegate void ToolCreatedHandler(object sender, ToolCreatedArgs e);
+        //internal virtual void OnToolCreated(ToolCreatedArgs e) => ToolCreated?.Invoke(this, e);
 
         ///// <summary>
         ///// Raised when Machina wants to log something. Suscribe to this event to receive string logs with prioroty level.
@@ -1578,7 +1581,8 @@ namespace Machina
             return string.Format("{{\"event\":\"action-completed\",\"rem\":{0},\"robBuf\":{1},\"last\":\"{2}\"}}",
                 this.RemainingActions,
                 this.RemainingInBuffer,
-                this.LastAction.ToInstruction());
+                Util.EscapeDoubleQuotes(this.LastAction.ToInstruction())
+            );
         }
     }
 

@@ -195,7 +195,7 @@ namespace Machina
         /// <returns></returns>
         public string ToInstruction()
         {
-            return $"Tool.Create(\\\"{this.name}\\\", {this.TCPPosition.X}, {this.TCPPosition.Y}, {this.TCPPosition.Z}, {this.TCPOrientation.XAxis.X}, {this.TCPOrientation.XAxis.Y}, {this.TCPOrientation.XAxis.Z}, {this.TCPOrientation.YAxis.X}, {this.TCPOrientation.YAxis.Y}, {this.TCPOrientation.YAxis.Z}, {this.Weight}, {this.centerOfGravity.X}, {this.centerOfGravity.Y}, {this.centerOfGravity.Z});";
+            return $"Tool.Create(\"{this.name}\", {this.TCPPosition.X}, {this.TCPPosition.Y}, {this.TCPPosition.Z}, {this.TCPOrientation.XAxis.X}, {this.TCPOrientation.XAxis.Y}, {this.TCPOrientation.XAxis.Z}, {this.TCPOrientation.YAxis.X}, {this.TCPOrientation.YAxis.Y}, {this.TCPOrientation.YAxis.Z}, {this.Weight}, {this.centerOfGravity.X}, {this.centerOfGravity.Y}, {this.centerOfGravity.Z});";
         }
 
     }

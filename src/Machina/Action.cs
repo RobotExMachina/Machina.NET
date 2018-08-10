@@ -1220,8 +1220,8 @@ namespace Machina
         public override string ToString()
         {
             return this.relative ?
-                $"Increase external axis {this.axisNumber} by {this.value}" :
-                $"Set external axis {this.axisNumber} to {this.value}";
+                $"Increase external axis #{this.axisNumber} by {this.value}" :
+                $"Set external axis #{this.axisNumber} to {this.value}";
         }
 
         public override string ToInstruction()
