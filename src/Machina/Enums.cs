@@ -88,6 +88,7 @@ namespace Machina
     public enum RobotType
     {
         HUMAN,
+        MACHINA,
         ABB,
         UR,
         KUKA,

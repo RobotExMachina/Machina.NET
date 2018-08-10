@@ -121,6 +121,10 @@ namespace Machina
             {
                 compiler = new CompilerHuman();
             }
+            else if (this.parentControl.parentRobot.Brand == RobotType.MACHINA)
+            {
+                compiler = new CompilerMACHINA();
+            }
             else if (this.parentControl.parentRobot.Brand == RobotType.ABB)
             {
                 compiler = new CompilerABB();

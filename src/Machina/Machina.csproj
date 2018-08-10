@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ActionBuffer.cs" />
+    <Compile Include="Compilers\CompilerMACHINA.cs" />
     <Compile Include="Compilers\CompilerZMORPH.cs" />
     <Compile Include="Compilers\CompilerKUKA.cs" />
     <Compile Include="Compilers\CompilerUR.cs" />

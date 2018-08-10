@@ -16,7 +16,6 @@ namespace Machina
     /// platform-specific programs. 
     /// </summary>
     /// 
-
     internal abstract class Compiler
     {
         /// <summary>

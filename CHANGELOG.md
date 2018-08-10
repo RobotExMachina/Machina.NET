@@ -27,6 +27,8 @@
 
 ## BUILD 1410
 - Create `ToolCreated` event (intern request ;)
+- Add `MACHINA` compiler: it serializes each Action into its `ToInstruction` form.
+- 
 
 ## BUILD 1409
 - `TCPCommunicationManagerABB` now listens to incoming messages from the driver
