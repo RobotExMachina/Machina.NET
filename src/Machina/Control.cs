@@ -192,7 +192,7 @@ namespace Machina
 
             if (ControlMode == ControlType.Offline)
             {
-                InitializeRobotCursors();
+                InitializeRobotCursors(null, Rotation.FlippedAroundY, null);    // @TODO: this should depend on the Robot brand, model, cursor and so many other things... Added this quick fix to allow programs to start with MoveTo() instructions.
             }
 
             if (!success)

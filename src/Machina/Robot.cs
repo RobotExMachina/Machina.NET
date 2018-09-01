@@ -21,24 +21,6 @@ using System.Runtime.Serialization.Json;
 namespace Machina
 {
 
-    //public static class Log
-    //{
-    //    static bool _consoleDump = true;
-    //    static int _debugLevel = 3;
-
-    //    internal static void Debug(string msg)
-    //    {
-
-    //        if (_consoleDump && -_debugLevel >= 4)
-    //        {
-    //            Console.WriteLine("MACHINA DEBUG: " + msg);
-    //        }
-    //    }
-
-
-    //}
-
-
     //  ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
     //  ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
     //  ██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
@@ -55,12 +37,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1410;
+        public static readonly int Build = 1411;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.7.0." + Build;
+        public static readonly string Version = "0.8.0." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
@@ -77,8 +59,6 @@ namespace Machina
         /// manage robot control.
         /// </summary>
         private Control c;  // the main control object
-
-
 
 
 
@@ -226,7 +206,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Sets the control mode the robot will operate under.
+        /// Sets the control type the robot will operate under, like "offline", "execute" or "stream".
         /// </summary>
         /// <param name="controlType"></param>
         /// <returns></returns>
@@ -299,7 +279,7 @@ namespace Machina
 
         /// <summary>
         /// Sets who will be in charge of managing the connection to the device,
-        /// i.e. having "Machina" try to load a server/firmata modules to the controller or 
+        /// i.e. having "Machina" try to load driver modules to the controller or 
         /// leave that task to the "User" (default).
         /// </summary>
         /// <param name="connectionManager">"User" or "Machina"</param>
@@ -324,7 +304,7 @@ namespace Machina
 
         /// <summary>
         /// Sets who will be in charge of managing the connection to the device,
-        /// i.e. having "Machina" try to load a server/firmata modules to the controller or 
+        /// i.e. having "Machina" try to load driver modules to the controller or 
         /// leave that task to the "User" (default).
         /// </summary>
         /// <param name="connectionManager">"User" or "Machina"</param>
@@ -427,12 +407,39 @@ namespace Machina
         }
 
         /// <summary>
+        /// Create a program in the device's native language with all the buffered Actions and return it as a string List.
+        /// Note all buffered Actions will be removed from the queue.
+        /// </summary>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        /// <returns></returns>
+        public List<string> Compile(bool inlineTargets = true, bool humanComments = true)
+        {
+            return c.Export(inlineTargets, humanComments);
+        }
+
+        /// <summary>
+        /// Create a program in the device's native language with all the buffered Actions and save it to a file. 
+        /// Note all buffered Actions will be removed from the queue.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        /// <returns></returns>
+        public bool Compile(string filepath, bool inlineTargets = true, bool humanComments = true)
+        {
+            return c.Export(filepath, inlineTargets, humanComments);
+        }
+
+
+        /// <summary>
         /// Create a program with all the buffered Actions and return it as a string List.
         /// Note all buffered Actions will be removed from the queue.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
+        [System.Obsolete("Deprecated method, use Compile() instead")]
         public List<string> Export(bool inlineTargets = true, bool humanComments = true)
         {
             return c.Export(inlineTargets, humanComments);
@@ -446,6 +453,7 @@ namespace Machina
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
+        [System.Obsolete("Deprecated method, use Compile() instead")]
         public bool Export(string filepath, bool inlineTargets = true, bool humanComments = true)
         {
             return c.Export(filepath, inlineTargets, humanComments);
@@ -487,15 +495,51 @@ namespace Machina
         //  ╚════██║██╔══╝     ██║      ██║   ██║██║╚██╗██║██║   ██║╚════██║
         //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
         //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
+
         /// <summary>
-        /// Gets the current speed setting.
+        /// Sets the motion type (linear, joint...) for future issued Actions.
         /// </summary>
-        /// <returns></returns>
-        [System.Obsolete("Deprecated method, use GetSpeed() instead")]
-        public double Speed()
+        /// <param name="motionType"></param>
+        public bool MotionMode(MotionType motionType)
         {
-            return c.GetCurrentSpeedSetting();
+            return c.IssueMotionRequest(motionType);
         }
+
+        /// <summary>
+        /// Sets the motion type (linear, joint...) for future issued Actions.
+        /// </summary>
+        /// <param name="motionType">"linear", "joint", etc.</param>
+        public bool MotionMode(string motionType)
+        {
+            MotionType mt;
+            try
+            {
+                mt = (MotionType)Enum.Parse(typeof(MotionType), motionType, true);
+                if (Enum.IsDefined(typeof(MotionType), mt))
+                {
+                    return c.IssueMotionRequest(mt);
+                }
+            }
+            catch
+            {
+                Console.WriteLine($"{motionType} is not a valid target part for motion type changes, please specify one of the following: ");
+                foreach (string str in Enum.GetNames(typeof(MotionType)))
+                {
+                    Console.WriteLine(str);
+                }
+            }
+            return false;
+        }
+
+        ///// <summary>
+        ///// Gets the current speed setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //[System.Obsolete("Deprecated method, use GetSpeed() instead")]
+        //public double Speed()
+        //{
+        //    return c.GetCurrentSpeedSetting();
+        //}
 
         /// <summary>
         /// Increase the TCP velocity value new Actions will be ran at.
@@ -646,40 +690,6 @@ namespace Machina
         //    return c.GetCurrentMotionTypeSetting();
         //}
 
-        /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued Actions.
-        /// </summary>
-        /// <param name="motionType"></param>
-        public bool MotionMode(MotionType motionType)
-        {
-            return c.IssueMotionRequest(motionType);
-        }
-
-        /// <summary>
-        /// Sets the motion type (linear, joint...) for future issued Actions.
-        /// </summary>
-        /// <param name="motionType">"linear", "joint", etc.</param>
-        public bool MotionMode(string motionType)
-        {
-            MotionType mt;
-            try
-            {
-                mt = (MotionType)Enum.Parse(typeof(MotionType), motionType, true);
-                if (Enum.IsDefined(typeof(MotionType), mt))
-                {
-                    return c.IssueMotionRequest(mt);
-                }
-            }
-            catch
-            {
-                Console.WriteLine($"{motionType} is not a valid target part for motion type changes, please specify one of the following: ");
-                foreach (string str in Enum.GetNames(typeof(MotionType)))
-                {
-                    Console.WriteLine(str);
-                }
-            }
-            return false;
-        }
 
         /// <summary>
         /// Gets current ReferenceCS setting.
@@ -723,25 +733,7 @@ namespace Machina
 
             Coordinates(refcs);
         }
-
-        /// <summary>
-        /// Buffers current state settings (speed, precision, motion type...), and opens up for 
-        /// temporary settings changes to be reverted by PopSettings().
-        /// </summary>
-        public void PushSettings()
-        {
-            c.IssuePushPopRequest(true);
-        }
-
-        /// <summary>
-        /// Reverts the state settings (speed, precision, motion type...) to the previously buffered
-        /// state by PushSettings().
-        /// </summary>
-        public void PopSettings()
-        {
-            c.IssuePushPopRequest(false);
-        }
-
+        
         /// <summary>
         /// Increments the working temperature of one of the device's parts. Useful for 3D printing operations. 
         /// </summary>
@@ -800,8 +792,6 @@ namespace Machina
             return false;
         }
 
-
-
         /// <summary>
         /// Increases the extrusion rate of filament for 3D printers.
         /// </summary>
@@ -823,6 +813,25 @@ namespace Machina
         }
 
 
+        /// <summary>
+        /// Buffers current state settings (speed, precision, motion type...), and opens up for 
+        /// temporary settings changes to be reverted by PopSettings().
+        /// </summary>
+        public void PushSettings()
+        {
+            c.IssuePushPopRequest(true);
+        }
+
+        /// <summary>
+        /// Reverts the state settings (speed, precision, motion type...) to the previously buffered
+        /// state by PushSettings().
+        /// </summary>
+        public void PopSettings()
+        {
+            c.IssuePushPopRequest(false);
+        }
+
+
 
 
         //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
@@ -832,16 +841,6 @@ namespace Machina
         //  ██║  ██║╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
         //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
         //                                                         
-
-        /// <summary>
-        /// Applies an Action object to this robot. 
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool Do(Action action)
-        {
-            return c.IssueApplyActionRequest(action);
-        }
 
         /// <summary>
         /// Issue a relative movement action request on current coordinate system.
@@ -1123,6 +1122,41 @@ namespace Machina
         }
 
         /// <summary>
+        /// Increase the value of one of the robot's external axis. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// </summary>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="increment">Increment value in mm or degrees.</param>
+        public bool ExternalAxis(int axisNumber, double increment)
+        {
+            if (axisNumber == 0)
+            {
+                Console.WriteLine("Please enter an axis number between 1-6");
+                return false;
+            }
+            return c.IssueExternalAxisRequest(axisNumber, increment, true);
+        }
+
+        /// <summary>
+        /// Set the value of one of the robot's external axis. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// </summary>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="value">Axis value in mm or degrees.</param>
+        public bool ExternalAxisTo(int axisNumber, double value)
+        {
+            if (axisNumber == 0)
+            {
+                Console.WriteLine("Please enter an axis number between 1-6");
+                return false;
+            }
+            return c.IssueExternalAxisRequest(axisNumber, value, false);
+        }
+
+
+        /// <summary>
         /// Issue a request to wait idle before moving to next action. 
         /// </summary>
         /// <param name="timeMillis">Time expressed in milliseconds</param>
@@ -1152,6 +1186,18 @@ namespace Machina
         {
             return c.IssueCommentRequest(comment);
         }
+
+        /// <summary>
+        /// Insert a line of custom code directly into a compiled program. 
+        /// This is useful for obscure instructions that are not covered by Machina's API. 
+        /// Note that this Action cannot be checked for validity by Machina, and you are responsible for correct syntax.
+        /// This Action is non-streamable. 
+        /// </summary>
+        /// <param name="statement">Code in the machine's native language.</param>
+        /// <param name="isDeclaration">Is this a declaration, like a variable or a workobject? If so, this statement will be placed at the beginning of the program.</param>
+        /// <returns></returns>
+        public bool CustomCode(string statement, bool isDeclaration = false) =>
+                c.IssueCustomCodeRequest(statement, isDeclaration);
 
         /// <summary>
         /// Attach a Tool to the flange of this Robot.
@@ -1294,51 +1340,15 @@ namespace Machina
         }
 
         /// <summary>
-        /// Increase the value of one of the robot's external axis. 
-        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
-        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// Applies an Action object to this robot. 
         /// </summary>
-        /// <param name="axisNumber">Axis number from 1 to 6.</param>
-        /// <param name="increment">Increment value in mm or degrees.</param>
-        public bool ExternalAxis(int axisNumber, double increment)
-        {
-            if (axisNumber == 0)
-            {
-                Console.WriteLine("Please enter an axis number between 1-6");
-                return false;
-            }
-            return c.IssueExternalAxisRequest(axisNumber, increment, true);
-        }
-
-        /// <summary>
-        /// Set the value of one of the robot's external axis. 
-        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
-        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
-        /// </summary>
-        /// <param name="axisNumber">Axis number from 1 to 6.</param>
-        /// <param name="value">Axis value in mm or degrees.</param>
-        public bool ExternalAxisTo(int axisNumber, double value)
-        {
-            if (axisNumber == 0)
-            {
-                Console.WriteLine("Please enter an axis number between 1-6");
-                return false;
-            }
-            return c.IssueExternalAxisRequest(axisNumber, value, false);
-        }
-
-
-        /// <summary>
-        /// Insert a line of custom code directly into a compiled program. 
-        /// This is useful for obscure instructions that are not covered by Machina's API. 
-        /// Note that this Action cannot be checked for validity by Machina, and you are responsible for correct syntax.
-        /// This Action is non-streamable. 
-        /// </summary>
-        /// <param name="statement">Code in the machine's native language.</param>
-        /// <param name="isDeclaration">Is this a declaration, like a variable or a workobject? If so, this statement will be placed at the beginning of the program.</param>
+        /// <param name="action"></param>
         /// <returns></returns>
-        public bool CustomCode(string statement, bool isDeclaration = false) =>
-                c.IssueCustomCodeRequest(statement, isDeclaration);
+        public bool Do(Action action)
+        {
+            return c.IssueApplyActionRequest(action);
+        }
+
 
 
 

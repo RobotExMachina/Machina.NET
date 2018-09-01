@@ -35,15 +35,8 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
-        //public double?[] externalAxes;
         public ExternalAxes externalAxes;
 
-        // REPLACED BY DICT
-        //public bool[] digitalOutputs = new bool[14];
-        //public double[] analogOutputs = new double[14];
-        //public string[] digitalOutputNames = new string[14];  // ABB robots can have io ports named, UR + KUKA use standard names
-        //public string[] analogOutputNames = new string[14];
-        
         // Some robots use ints as pin identifiers (UR, KUKA), while others use strings (ABB). 
         // All pin ids are stored as strings, and are parsed to ints internally if possible. 
         Dictionary<string, bool> digitalOutputs = new Dictionary<string, bool>();
@@ -145,25 +138,6 @@ namespace Machina
             // Initialize buffers
             actionBuffer = new ActionBuffer(this);
             settingsBuffer = new SettingsBuffer();
-
-            //// Basics io names
-            //for (int i = 0; i < digitalOutputNames.Length;  i++)
-            //{
-            //    digitalOutputNames[i] = "do" + i;
-            //}
-            //for (int i = 0; i < digitalOutputNames.Length; i++)
-            //{
-            //    analogOutputNames[i] = "ao" + i;
-            //}
-
-            // Initialize temps to zero
-            foreach (RobotPartType part in Enum.GetValues(typeof(RobotPartType)))
-            {
-                partTemperature[part] = 0;
-            }
-            isExtruding = false;  // should these go into Initilize()?
-            extrusionRate = 0;
-            extrudedLength = 0;
         }
 
         /// <summary>
@@ -200,6 +174,15 @@ namespace Machina
             this.precision = precision;
             this.motionType = mType;
             this.referenceCS = refCS;
+
+            // Initialize temps to zero
+            foreach (RobotPartType part in Enum.GetValues(typeof(RobotPartType)))
+            {
+                partTemperature[part] = 0;
+            }
+            isExtruding = false;
+            extrusionRate = 0;
+            extrudedLength = 0;
 
             // Keep this null until initialized
             //this.externalAxes = new ExternalAxes();  // @TODO: should this be passed as an argument?
@@ -1170,6 +1153,7 @@ namespace Machina
         }
 
         public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} a{acceleration} v{speed} rv{rotationSpeed} jv{jointSpeed} ja{jointAcceleration} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
+
 
     }
 }
