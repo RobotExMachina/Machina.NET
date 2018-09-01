@@ -110,7 +110,7 @@ namespace Machina
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them
 
-                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                if (a.Type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
                 {
                     customDeclarationLines.Add((a as ActionCustomCode).statement);
                 }
@@ -192,7 +192,7 @@ namespace Machina
             out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Speed:
                     dec = string.Format("G1 F{0}",
@@ -300,7 +300,7 @@ namespace Machina
             }
 
             // Add trailing comments or ids if speficied
-            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
+            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,

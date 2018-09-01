@@ -45,7 +45,7 @@ namespace Machina.Drivers.Communication.Protocols
         {
             List<string> msgs = new List<string>();
 
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:

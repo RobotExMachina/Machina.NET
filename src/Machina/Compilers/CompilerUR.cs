@@ -65,7 +65,7 @@ namespace Machina
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them 
 
-                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                if (a.Type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
                 {
                     customDeclarationLines.Add("  " + (a as ActionCustomCode).statement);
                 }
@@ -148,7 +148,7 @@ namespace Machina
         internal static bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
@@ -170,7 +170,7 @@ namespace Machina
             out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
@@ -288,7 +288,7 @@ namespace Machina
                     //    break;
             }
 
-            if (humanComments && action.type != ActionType.Comment)
+            if (humanComments && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
@@ -312,7 +312,7 @@ namespace Machina
             out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
@@ -429,7 +429,7 @@ namespace Machina
                     //    break;
             }
 
-            if (humanComments && action.type != ActionType.Comment)
+            if (humanComments && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,

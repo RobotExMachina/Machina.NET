@@ -101,7 +101,7 @@ namespace Machina
                 writer.ApplyNextAction();  // for the buffer to correctly manage them 
 
                 // For ABB robots, check if any IO command is issued, and display a warning about configuring their names in the controller.
-                if (!usesIO && (writer.lastAction.type == ActionType.IODigital || writer.lastAction.type == ActionType.IOAnalog))
+                if (!usesIO && (writer.lastAction.Type == ActionType.IODigital || writer.lastAction.Type == ActionType.IOAnalog))
                 {
                     usesIO = true;
                 }
@@ -133,7 +133,7 @@ namespace Machina
                     toolDecs.Add(writer.tool, GetToolValue(writer));
                 }
 
-                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                if (a.Type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
                 {
                     customLines.Add($"  {(a as ActionCustomCode).statement}");
                 }
@@ -280,7 +280,7 @@ namespace Machina
         internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
@@ -307,7 +307,7 @@ namespace Machina
             out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Acceleration:
                     bool zero = cursor.acceleration < Geometry.EPSILON2;
@@ -319,7 +319,7 @@ namespace Machina
                 case ActionType.JointAcceleration:
                     dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.", 
                         commChar,
-                        action.type);
+                        action.Type);
                     break;
 
                 // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZA...
@@ -438,7 +438,7 @@ namespace Machina
 
             }
 
-            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
+            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
@@ -466,7 +466,7 @@ namespace Machina
             out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Acceleration:
                     bool zero = cursor.acceleration < Geometry.EPSILON2;
@@ -478,7 +478,7 @@ namespace Machina
                 case ActionType.JointAcceleration:
                     dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.",
                         commChar,
-                        action.type);
+                        action.Type);
                     break;
 
                 // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZa...
@@ -596,7 +596,7 @@ namespace Machina
 
             }
 
-            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
+            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}{1}  {2} [{3}]",
                     dec,

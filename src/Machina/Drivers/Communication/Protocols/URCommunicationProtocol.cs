@@ -82,7 +82,7 @@ namespace Machina.Drivers.Communication.Protocols
 
             _params = null;
 
-            switch (_action.type)
+            switch (_action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:

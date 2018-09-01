@@ -71,7 +71,7 @@ namespace Machina
                 // Move writerCursor to this action state
                 writer.ApplyNextAction();  // for the buffer to correctly manage them
 
-                if (a.type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                if (a.Type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
                 {
                     customDeclarationLines.Add("  " + (a as ActionCustomCode).statement);
                 }
@@ -174,7 +174,7 @@ namespace Machina
         internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
@@ -196,7 +196,7 @@ namespace Machina
         internal bool GenerateVariableInitialization(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
@@ -221,7 +221,7 @@ namespace Machina
             out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
@@ -332,7 +332,7 @@ namespace Machina
                     //    break;
             }
 
-            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
+            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
@@ -357,7 +357,7 @@ namespace Machina
             out string declaration)
         {
             string dec = null;
-            switch (action.type)
+            switch (action.Type)
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
@@ -469,7 +469,7 @@ namespace Machina
                     //    break;
             }
 
-            if (ADD_ACTION_STRING && action.type != ActionType.Comment)
+            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
