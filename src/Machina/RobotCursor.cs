@@ -63,6 +63,11 @@ namespace Machina
         public Control parentControl;
 
         /// <summary>
+        /// A reference to this parent's Robot Logger.
+        /// </summary>
+        internal RobotLogger logger;
+
+        /// <summary>
         /// Specified RobotCursor instance will be issued all Actions 
         /// released from this one. 
         /// </summary>
@@ -105,6 +110,7 @@ namespace Machina
         public RobotCursor(Control parentControl, string name,  bool applyImmediately, RobotCursor childCursor)
         {
             this.parentControl = parentControl;
+            this.logger = parentControl.Logger;
             this.name = name;
             this.applyImmediately = applyImmediately;
             this.child = childCursor;
@@ -343,7 +349,7 @@ namespace Machina
         {
             lock(actionBufferLock)
             {
-                actionBuffer.LogBufferedActions();
+                actionBuffer.DebugBufferedActions();
             }
         }
 
@@ -422,7 +428,7 @@ namespace Machina
                 return ActionsMap[t](action, this);
             }
 
-            Console.WriteLine("Found no suitable method for this Action " + action);
+            logger.Verbose($"Found no suitable method for Action \"{action}\"");
             return false;
         }
 
@@ -606,7 +612,7 @@ namespace Machina
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute position values first before applying relative ones... " + this);
+                    logger.Info($"Cannot apply \"{action}\", must provide absolute position values first before applying relative ones... ");
                     return false;
                 }
 
@@ -626,7 +632,7 @@ namespace Machina
                 // Fail if issued abs movement without prior rotation info. (This limitation is due to current lack of FK/IK solvers)
                 if (rotation == null)
                 {
-                    Console.WriteLine("Sorry, currently missing TCP orientation to work with... " + this);
+                    logger.Info($"Cannot apply \"{action}\", currently missing TCP orientation to work with... ");
                     return false;
                 }
 
@@ -677,7 +683,7 @@ namespace Machina
                 // If user issued a relative action, make sure there are absolute values to work with (this limitation is due to current lack of FK/IK solvers).
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute rotation values first before applying relative ones... " + this);
+                    logger.Info($"Cannot apply \"{action}\", must provide absolute rotation values first before applying relative ones... ");
                     return false;
                 }
 
@@ -698,7 +704,7 @@ namespace Machina
                 // Fail if issued abs rotation without prior position info (this limitation is due to current lack of FK/IK solvers).
                 if (position == null)
                 {
-                    Console.WriteLine("Sorry, currently missing TCP position to work with... " + this);
+                    logger.Info($"Cannot apply \"{action}\", currently missing TCP position to work with... ");
                     return false;
                 }
 
@@ -733,7 +739,7 @@ namespace Machina
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    Console.WriteLine("Sorry, must provide absolute transform values first before applying relative ones..." + this);
+                    logger.Info($"Cannot apply \"{action}\", must provide absolute transform values first before applying relative ones...");
                     return false;
                 }
 
@@ -831,7 +837,7 @@ namespace Machina
                 // (This limitation is due to current lack of FK/IK solvers)
                 if (joints == null)  // could also check for motionType == MotionType.Joints ?
                 {
-                    Console.WriteLine("Sorry, must provide absolute Joints values first before applying relative ones..." + this);
+                    logger.Info($"Cannot apply \"{action}\", must provide absolute Joints values first before applying relative ones...");
                     return false;
                 }
 
@@ -909,7 +915,7 @@ namespace Machina
             // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
             if (this.position == null || this.rotation == null)
             {
-                Console.WriteLine("Sorry, must provide absolute transform values before attaching a tool... " + this);
+                logger.Info($"Cannot apply \"{action}\", must provide absolute transform values before attaching a tool... ");
             }
             else
             {
@@ -939,7 +945,7 @@ namespace Machina
         {
             if (this.tool == null)
             {
-                Console.WriteLine("Robot had no tool attached");
+                logger.Verbose("Robot had no tool attached");
                 return false;
             }
 
@@ -947,7 +953,7 @@ namespace Machina
             // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
             if (this.position == null || this.rotation == null)
             {
-                Console.WriteLine("Sorry, must provide absolute transform values before detaching a tool... " + this);
+                logger.Info($"Cannot apply \"{action}\", must provide absolute transform values before detaching a tool... " + this);
                 return false;
             }
 
@@ -1099,7 +1105,7 @@ namespace Machina
             {
                 if (this.externalAxes[action.axisNumber - 1] == null)
                 {
-                    Console.WriteLine($"Sorry, must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones... Action: " + action.ToInstruction());
+                    logger.Info($"Cannot apply \"{action}\", must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones...");
                     return false;
                 }
 
@@ -1144,7 +1150,7 @@ namespace Machina
         {
             if (this.prevPosition == null || this.position == null)
             {
-                Console.WriteLine("Cannot compute new extrusion length: cursor position missing");
+                logger.Info($"Cannot compute new extrusion length: cursor position missing");
                 return;
             }
 

@@ -33,6 +33,8 @@ namespace Machina.Drivers
         };
         public override Dictionary<ConnectionType, bool> AvailableConnectionTypes { get { return _availableConnectionTypes; } }
 
+        private RobotLogger logger;
+
 
         //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
         //  ██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
@@ -50,6 +52,8 @@ namespace Machina.Drivers
             {
                 _rsBridge = new RobotStudioManager(this);
             }
+
+            logger = this.parentControl.Logger;
         }
 
         /// <summary>
@@ -157,7 +161,7 @@ namespace Machina.Drivers
             if (_rsBridge != null && _rsBridge.Connected)
             {
                 var jnt = _rsBridge.GetCurrentJoints();
-                Console.WriteLine($"CurrentJoints: {jnt}");
+                logger.Debug($"CurrentJoints: {jnt}");
                 return jnt;
             }
 
@@ -169,7 +173,7 @@ namespace Machina.Drivers
             if (_rsBridge != null && _rsBridge.Connected)
             {
                 var ori = _rsBridge.GetCurrentOrientation();
-                Console.WriteLine($"GetCurrentOrientation: {ori}");
+                logger.Debug($"GetCurrentOrientation: {ori}");
                 return ori;
             }
             
@@ -182,7 +186,7 @@ namespace Machina.Drivers
             if (_rsBridge != null && _rsBridge.Connected)
             {
                 var pos = _rsBridge.GetCurrentPosition();
-                Console.WriteLine($"GetCurrentPosition: {pos}");
+                logger.Debug($"GetCurrentPosition: {pos}");
                 return pos;
             }
 

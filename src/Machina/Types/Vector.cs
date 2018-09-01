@@ -615,7 +615,7 @@ namespace Machina
             int dir = Vector.CompareDirections(X, Y);
             if (dir == 1 || dir == 3)
             {
-                Console.WriteLine("Cannot orthogonalize vectors with the same direction");
+                Logger.Verbose("Cannot orthogonalize vectors with the same direction");
                 nX = null;
                 nY = null;
                 nZ = null;
@@ -648,7 +648,7 @@ namespace Machina
         {
             if (points.Count < 1)
             {
-                Console.WriteLine("List contains no points.");
+                Logger.Verbose("List contains no points.");
             }
 
             int prev = points.Count;
@@ -666,7 +666,7 @@ namespace Machina
                 simplified = SimplifyDouglasPeucker(points, sqTolerance);
             }
 
-            Console.WriteLine("Vector list simplified from " + prev + " to " + simplified.Count + " Points.");
+            Logger.Verbose("Vector list simplified from " + prev + " to " + simplified.Count + " Points.");
 
             return simplified;
         }

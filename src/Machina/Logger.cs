@@ -38,7 +38,7 @@ namespace Machina
         /// Define the level of logging desired for the WriteLine logger: 0 None, 1 Error, 2 Warning, 3 Info (default), 4 Verbose or 5 Debug.
         /// </summary>
         /// <param name="level"></param>
-        public static void SetLevel(int level)
+        public static void SetLogLevel(int level)
         {
             _logLevel = (LogLevel)level;
         }
@@ -86,7 +86,7 @@ namespace Machina
 
 
 
-        private static void OnCustomLogging(LoggerArgs e)
+        internal static void OnCustomLogging(LoggerArgs e)
         {
             CustomLogging?.Invoke(e);
 
@@ -94,30 +94,85 @@ namespace Machina
             OnWriteLine(e);
         }
 
-        private static void OnWriteLine(LoggerArgs e)
+        internal static void OnWriteLine(LoggerArgs e)
         {
             if (WriteLine != null && e.Level <= _logLevel)
             { 
-                WriteLine.Invoke(StringifyArgs(e));
+                WriteLine.Invoke(e.ToString());
             }
-        }
-
-        private static string StringifyArgs(LoggerArgs args)
-        {
-            string sender = "Machina";
-
-            if (args.Sender is Robot)
-            {
-                Robot b = args.Sender as Robot;
-                sender = b.Name;
-            }
-
-            return string.Format("{0} {1}: {2}",
-                sender,
-                args.Level,
-                args.Message);
         }
     }
+
+
+    /// <summary>
+    /// A "Console" class that can be attached to objects to track their log messages.
+    /// </summary>
+    internal class RobotLogger
+    {
+        internal object _sender;
+
+        internal RobotLogger(object sender)
+        {
+            _sender = sender;
+        }
+
+        // STRINGS
+        internal void Error(string msg)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, msg));
+        }
+
+        internal void Warning(string msg)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, msg));
+        }
+
+        internal void Info(string msg)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, msg));
+        }
+
+        internal void Verbose(string msg)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, msg));
+        }
+
+        internal void Debug(string msg)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, msg));
+        }
+
+
+        // OBJECTS
+        internal void Error(object obj)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, obj.ToString()));
+        }
+
+        internal void Warning(object obj)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, obj.ToString()));
+        }
+
+        internal void Info(object obj)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, obj.ToString()));
+        }
+
+        internal void Verbose(object obj)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, obj.ToString()));
+        }
+
+        internal void Debug(object obj)
+        {
+            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, obj.ToString()));
+        }
+
+    }
+
+
+
 
     /// <summary>
     /// Custom logging arguments
@@ -142,6 +197,26 @@ namespace Machina
             Sender = sender;
             Level = level;
             Message = msg;
+        }
+
+        /// <summary>
+        /// Formatted representation of this object.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            string sender = "Machina";
+
+            if (Sender is Robot)
+            {
+                Robot b = Sender as Robot;
+                sender = b.Name;
+            }
+
+            return string.Format("{0} {1}: {2}",
+                sender,
+                Level,
+                Message);
         }
     }
 }

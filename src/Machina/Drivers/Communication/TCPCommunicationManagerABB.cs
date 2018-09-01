@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Machina.Drivers.Communication;
 using Machina.Drivers.Communication.Protocols;
 
 namespace Machina.Drivers.Communication
@@ -23,6 +22,7 @@ namespace Machina.Drivers.Communication
         private RobotCursor _writeCursor;
         private RobotCursor _motionCursor;
         private Driver _parentDriver;
+        internal RobotLogger logger;
 
         private const int INIT_TIMEOUT = 10000;  // in millis
         internal Vector initPos;
@@ -58,6 +58,7 @@ namespace Machina.Drivers.Communication
         internal TCPCommunicationManagerABB(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string ip, int port)
         {
             this._parentDriver = driver;
+            this.logger = driver.parentControl.Logger;
             this._writeCursor = writeCursor;
             this._motionCursor = motionCursor;
             this._ip = ip;
@@ -102,7 +103,7 @@ namespace Machina.Drivers.Communication
 
                 if (!WaitForInitialization())
                 {
-                    Console.WriteLine("Machina error: timeout when waiting for initialization data from the controller");
+                    logger.Error("Timeout when waiting for initialization data from the controller");
                     return false;
                 }
 
@@ -110,7 +111,7 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                logger.Debug(ex);
                 throw new Exception("ERROR: could not establish TCP connection");
             }
 
@@ -120,7 +121,7 @@ namespace Machina.Drivers.Communication
         private bool WaitForInitialization()
         {
             int time = 0;
-            Console.WriteLine("Waiting for intialization data from controller...");
+            logger.Debug("Waiting for intialization data from controller...");
 
             // @TODO: this is awful, come on...
             while ((initAx == null || initPos == null || initRot == null) && time < INIT_TIMEOUT)

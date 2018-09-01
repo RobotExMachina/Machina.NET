@@ -26,7 +26,11 @@ namespace Machina
 
         public bool Push(RobotCursor cursor)
         {
-            if (buffer.Count >= limit) throw new Exception("TOO MANY PUSHES WITHOUT POPS?");
+            if (buffer.Count >= limit)
+            {
+                cursor.logger.Error("Too many Pushes without Pops?");
+                throw new Exception("TOO MANY PUSHES WITHOUT POPS?");
+            }
             buffer.Add(cursor.GetSettings());
             return true;
         }
@@ -43,10 +47,10 @@ namespace Machina
             return null;
         }
 
-        public void LogBuffer()
+        public void DebugBuffer()
         {
             int it = 0;
-            foreach (Settings s in buffer) Console.WriteLine(it++ + ": " + s);
+            foreach (Settings s in buffer) Logger.Debug(it++ + ": " + s);
         }
 
     }

@@ -11,6 +11,8 @@ namespace Machina.Drivers
     /// </summary>
     class DriverOffline : Driver
     {
+        private RobotLogger logger;
+
         private Dictionary<ConnectionType, bool> _availableConnectionTypes = new Dictionary<ConnectionType, bool>()
         {
             { ConnectionType.User, true },
@@ -19,28 +21,30 @@ namespace Machina.Drivers
         public override Dictionary<ConnectionType, bool> AvailableConnectionTypes { get { return _availableConnectionTypes; } }
 
 
-        public DriverOffline(Control ctrl) : base(ctrl) { }
+        public DriverOffline(Control ctrl) : base(ctrl) {
+            logger = ctrl.Logger;
+        }
 
         public override bool ConnectToDevice(int deviceId)
         {
-            Console.WriteLine("Cannot connect to a device in Offline mode");
+            logger.Info("Cannot connect to a device in Offline mode");
             return false;
         }
 
         public override bool ConnectToDevice(string ip, int port)
         {
-            Console.WriteLine("Cannot connect to a device in Offline mode");
+            logger.Info("Cannot connect to a device in Offline mode");
             return false;
         }
 
         public override void DebugDump()
         {
-            Console.WriteLine("Nothing to debug for a Driver in Offline mode");
+            logger.Debug("Nothing to debug for a Driver in Offline mode");
         }
 
         public override bool DisconnectFromDevice()
         {
-            Console.WriteLine("Cannot disconnect to a device in Offline mode");
+            logger.Info("Cannot disconnect to a device in Offline mode");
             return false;
         }
 
@@ -61,7 +65,7 @@ namespace Machina.Drivers
 
         public override void Reset()
         {
-            Console.WriteLine("Cannot reset driver in offline mode");
+            logger.Info("Cannot reset driver in offline mode");
         }
 
         public override bool Dispose()

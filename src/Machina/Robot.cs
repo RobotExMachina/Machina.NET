@@ -61,6 +61,10 @@ namespace Machina
         private Control c;  // the main control object
 
 
+        /// <summary>
+        /// An internal logging class to be used by children objects to log messages from this Robot.
+        /// </summary>
+        internal RobotLogger logger;
 
 
 
@@ -99,16 +103,15 @@ namespace Machina
                 rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
                 if (Enum.IsDefined(typeof(RobotType), rt))
                 {
-                    //Console.WriteLine("Converted '{0}' to {1}", make, rt.ToString());
                     this.Brand = rt;
                     c = new Control(this);
                 }
                 else
                 {
-                    Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
+                    logger.Error($"{make} is not a RobotType, please specify one of the following: ");
                     foreach (string str in Enum.GetNames(typeof(RobotType)))
                     {
-                        Console.WriteLine(str.ToString());
+                        logger.Error(str);
                     }
                     this.Brand = RobotType.HUMAN;
                     c = new Control(this);
@@ -116,20 +119,26 @@ namespace Machina
             }
             catch
             {
-                Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
+                logger.Error($"{make} is not a RobotType, please specify one of the following: ");
                 foreach (string str in Enum.GetNames(typeof(RobotType)))
                 {
-                    Console.WriteLine(str.ToString());
+                    logger.Error(str);
                 }
                 this.Brand = RobotType.HUMAN;
                 c = new Control(this);
             }
         }
 
+        /// <summary>
+        /// Internal constructor.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="make"></param>
         internal Robot(string name, RobotType make)
         {
             this.Name = name;
             this.Brand = make;
+            this.logger = new RobotLogger(this);
             c = new Control(this);
         }
 
@@ -153,32 +162,23 @@ namespace Machina
         static public Robot Create(string name, string make)
         {
             RobotType rt;
-
-            //try
-            //{
-            rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
-            if (Enum.IsDefined(typeof(RobotType), rt))
+            try
             {
-                return new Robot(name, rt);
-            }
-            else
-            {
-                Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
-                foreach (string str in Enum.GetNames(typeof(RobotType)))
+                rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
+                if (Enum.IsDefined(typeof(RobotType), rt))
                 {
-                    Console.WriteLine(str.ToString());
+                    return new Robot(name, rt);
                 }
             }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex);
-            //    Console.WriteLine("{0} is not a RobotType, please specify one of the following: ", make);
-            //    foreach (string str in Enum.GetNames(typeof(RobotType)))
-            //    {
-            //        Console.WriteLine(str.ToString());
-            //    }
-            //}
+            catch
+            {
+                Machina.Logger.Error($"{make} is not a RobotType, please specify one of the following: ");
+                foreach (string str in Enum.GetNames(typeof(RobotType)))
+                {
+                    Machina.Logger.Error(str);
+                }
+            }
+
             return null;
         }
 
@@ -233,49 +233,49 @@ namespace Machina
             }
             catch
             {
-                Console.WriteLine($"{controlType} is not a valid ControlMode type, please specify one of the following:");
+                logger.Error($"{controlType} is not a valid ControlMode type, please specify one of the following:");
                 foreach (string str in Enum.GetNames(typeof(ControlType)))
                 {
-                    Console.WriteLine(str);
+                    logger.Error(str);
                 }
             }
             return false;
         }
 
-        /// <summary>
-        /// Sets the cycle the robot will run program in (Once or Loop).
-        /// </summary>
-        /// <param name="cycleType"></param>
-        /// <returns></returns>
-        public bool CycleMode(CycleType cycleType)
-        {
-            //return c.SetRunMode(cycleType);
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// Sets the cycle the robot will run program in (Once or Loop).
+        ///// </summary>
+        ///// <param name="cycleType"></param>
+        ///// <returns></returns>
+        //public bool CycleMode(CycleType cycleType)
+        //{
+        //    //return c.SetRunMode(cycleType);
+        //    throw new NotImplementedException();
+        //}
 
-        /// <summary>
-        /// Sets the cycle the robot will run program in (Once or Loop).
-        /// </summary>
-        /// <param name="cycleType"></param>
-        public bool CycleMode(string cycleType)
-        {
-            //CycleType ct;
-            //try
-            //{
-            //    ct = (CycleType)Enum.Parse(typeof(CycleType), cycleType, true);
-            //    if (Enum.IsDefined(typeof(CycleType), ct))
-            //        return c.SetRunMode(ct);
-            //}
-            //catch
-            //{
-            //    Console.WriteLine($"{cycleType} is not a valid CycleMode type, please specify one of the following:");
-            //    foreach (string str in Enum.GetNames(typeof(CycleType)))
-            //        Console.WriteLine(str);
-            //}
-            //return false;
+        ///// <summary>
+        ///// Sets the cycle the robot will run program in (Once or Loop).
+        ///// </summary>
+        ///// <param name="cycleType"></param>
+        //public bool CycleMode(string cycleType)
+        //{
+        //    //CycleType ct;
+        //    //try
+        //    //{
+        //    //    ct = (CycleType)Enum.Parse(typeof(CycleType), cycleType, true);
+        //    //    if (Enum.IsDefined(typeof(CycleType), ct))
+        //    //        return c.SetRunMode(ct);
+        //    //}
+        //    //catch
+        //    //{
+        //    //    Console.WriteLine($"{cycleType} is not a valid CycleMode type, please specify one of the following:");
+        //    //    foreach (string str in Enum.GetNames(typeof(CycleType)))
+        //    //        Console.WriteLine(str);
+        //    //}
+        //    //return false;
 
-            throw new NotImplementedException();
-        }
+        //    throw new NotImplementedException();
+        //}
 
         /// <summary>
         /// Sets who will be in charge of managing the connection to the device,
@@ -295,9 +295,9 @@ namespace Machina
             }
             catch
             {
-                Console.WriteLine($"{connectionManager} is not a valid ConnectionManagerType type, please specify one of the following:");
+                logger.Error($"{connectionManager} is not a valid ConnectionManagerType type, please specify one of the following:");
                 foreach (string str in Enum.GetNames(typeof(ConnectionType)))
-                    Console.WriteLine(str);
+                    logger.Error(str);
             }
             return false;
         }
@@ -365,46 +365,46 @@ namespace Machina
             return c.GetControllerIP();
         }
 
-        /// <summary>
-        /// Loads a program to the robot from a local file.
-        /// </summary>
-        /// <param name="filepath">Full absolute filepath including root, directory structure, filename and extension.</param>
-        /// <returns></returns>
-        public bool LoadProgram(string filepath)
-        {
-            //return c.LoadProgramToDevice(filepath, true);
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// Loads a program to the robot from a local file.
+        ///// </summary>
+        ///// <param name="filepath">Full absolute filepath including root, directory structure, filename and extension.</param>
+        ///// <returns></returns>
+        //public bool LoadProgram(string filepath)
+        //{
+        //    //return c.LoadProgramToDevice(filepath, true);
+        //    throw new NotImplementedException();
+        //}
 
-        /// <summary>
-        /// Loads a program to the robot from a string list of code.
-        /// </summary>
-        /// <param name="code"></param>
-        /// <returns></returns>
-        public bool LoadProgram(List<string> code)
-        {
-            //return c.LoadProgramToDevice(code);
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// Loads a program to the robot from a string list of code.
+        ///// </summary>
+        ///// <param name="code"></param>
+        ///// <returns></returns>
+        //public bool LoadProgram(List<string> code)
+        //{
+        //    //return c.LoadProgramToDevice(code);
+        //    throw new NotImplementedException();
+        //}
 
-        /// <summary>
-        /// Starts execution of the current module/s in the controller.
-        /// @TODO: The behavior of this method will change depending based on Off/Online mode
-        /// </summary>
-        public bool Start()
-        {
-            //return c.StartProgramOnDevice();
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// Starts execution of the current module/s in the controller.
+        ///// @TODO: The behavior of this method will change depending based on Off/Online mode
+        ///// </summary>
+        //public bool Start()
+        //{
+        //    //return c.StartProgramOnDevice();
+        //    throw new NotImplementedException();
+        //}
 
-        /// <summary>
-        /// Immediately stops execution of the current program/s in the connected robot. 
-        /// </summary>
-        public bool Stop()
-        {
-            //return c.StopProgramOnDevice(true);
-            throw new NotImplementedException();
-        }
+        ///// <summary>
+        ///// Immediately stops execution of the current program/s in the connected robot. 
+        ///// </summary>
+        //public bool Stop()
+        //{
+        //    //return c.StopProgramOnDevice(true);
+        //    throw new NotImplementedException();
+        //}
 
         /// <summary>
         /// Create a program in the device's native language with all the buffered Actions and return it as a string List.
@@ -469,22 +469,7 @@ namespace Machina
         {
             c.Execute();
         }
-
-        ///// <summary>
-        ///// ABB IOs must have a name corresponding to their definition in the controller. This function is useful to give them
-        ///// a custom name that matches the controller's, and is used in code generation.
-        ///// </summary>
-        ///// <param name="ioName"></param>
-        ///// <param name="pinNumber"></param>
-        ///// <param name="isDigital"></param>
-        //[System.Obsolete("Deprecated method, use string inputs on Robot.WriteDigital() instead")]
-        //public bool SetIOName(string ioName, int pinNumber, bool isDigital)
-        //{
-        //    return c.SetIOName(ioName, pinNumber, isDigital);
-        //}
-
-
-
+        
 
 
 
@@ -522,10 +507,10 @@ namespace Machina
             }
             catch
             {
-                Console.WriteLine($"{motionType} is not a valid target part for motion type changes, please specify one of the following: ");
+                logger.Error($"{motionType} is not a valid target part for motion type changes, please specify one of the following: ");
                 foreach (string str in Enum.GetNames(typeof(MotionType)))
                 {
-                    Console.WriteLine(str);
+                    logger.Error(str);
                 }
             }
             return false;
@@ -704,35 +689,40 @@ namespace Machina
         /// Sets the reference system used for relative transformations.
         /// </summary>
         /// <param name="refcs"></param>
-        public void Coordinates(ReferenceCS refcs)
+        public bool Coordinates(ReferenceCS refcs)
         {
-            c.IssueCoordinatesRequest(refcs);
+            return c.IssueCoordinatesRequest(refcs);
         }
 
         /// <summary>
         /// Sets the reference system used for relative transformations ("local", "global", etc.)
         /// </summary>
         /// <param name="type"></param>
-        public void Coordinates(string type)
+        public bool Coordinates(string type)
         {
             ReferenceCS refcs;
-            type = type.ToLower();
-            if (type.Equals("global") || type.Equals("world"))
+            try
             {
-                refcs = ReferenceCS.World;
+                refcs = (ReferenceCS)Enum.Parse(typeof(ReferenceCS), type, true);
+                if (Enum.IsDefined(typeof(ReferenceCS), refcs))
+                {
+                    return Coordinates(refcs);
+                }
             }
-            else if (type.Equals("local"))
+            catch
             {
-                refcs = ReferenceCS.Local;
-            }
-            else
-            {
-                Console.WriteLine("Invalid reference coordinate system");
-                return;
+               logger.Error($"{type} is not a Coordinate System, please specify one of the following: ");
+                foreach (string str in Enum.GetNames(typeof(ReferenceCS)))
+                {
+                    logger.Error(str);
+                }
             }
 
-            Coordinates(refcs);
+            return false;
         }
+
+        
+
         
         /// <summary>
         /// Increments the working temperature of one of the device's parts. Useful for 3D printing operations. 
@@ -754,10 +744,10 @@ namespace Machina
             }
             catch
             {
-                Console.WriteLine("{0} is not a valid target part for temperature changes, please specify one of the following: ", devicePart);
+                logger.Error($"{devicePart} is not a valid target part for temperature changes, please specify one of the following: ");
                 foreach (string str in Enum.GetNames(typeof(RobotPartType)))
                 {
-                    Console.WriteLine(str);
+                    logger.Error(str);
                 }
             }
             return false;
@@ -783,10 +773,10 @@ namespace Machina
             }
             catch
             {
-                Console.WriteLine("{0} is not a valid target part for temperature changes, please specify one of the following: ", devicePart);
+                logger.Error($"{devicePart} is not a valid target part for temperature changes, please specify one of the following: ");
                 foreach (string str in Enum.GetNames(typeof(RobotPartType)))
                 {
-                    Console.WriteLine(str);
+                    logger.Error(str);
                 }
             }
             return false;
@@ -811,7 +801,6 @@ namespace Machina
         {
             return c.IssueExtrusionRateRequest(rate, false);
         }
-
 
         /// <summary>
         /// Buffers current state settings (speed, precision, motion type...), and opens up for 
@@ -1132,7 +1121,7 @@ namespace Machina
         {
             if (axisNumber == 0)
             {
-                Console.WriteLine("Please enter an axis number between 1-6");
+                logger.Error("Please enter an axis number between 1-6");
                 return false;
             }
             return c.IssueExternalAxisRequest(axisNumber, increment, true);
@@ -1149,7 +1138,7 @@ namespace Machina
         {
             if (axisNumber == 0)
             {
-                Console.WriteLine("Please enter an axis number between 1-6");
+                logger.Error("Please enter an axis number between 1-6");
                 return false;
             }
             return c.IssueExternalAxisRequest(axisNumber, value, false);
@@ -1267,45 +1256,28 @@ namespace Machina
             return c.IssueWriteToAnalogIORequest(pinId.ToString(), value, toolPin);
         }
 
-        /// <summary>
-        /// Reads from the digital IO pin.
-        /// </summary>
-        /// <param name="pinNumber"></param>
-        /// <returns></returns>
-        private bool ReadDigital(int pinNumber)
-        {
-            Console.WriteLine("ReadDigital not implemented yet!");
-            return false;
-        }
-
-        /// <summary>
-        /// Reads from the analog IO pin.
-        /// </summary>
-        /// <param name="pinNumber"></param>
-        /// <returns></returns>
-        private double ReadAnalog(int pinNumber)
-        {
-            Console.WriteLine("ReadAnalog not implemented yet!");
-            return 0.0;
-        }
-
         ///// <summary>
-        ///// Turn digital IO on. Is alias for `WriteDigital(pinNumber, true)`
+        ///// Reads from the digital IO pin.
         ///// </summary>
         ///// <param name="pinNumber"></param>
-        //public bool TurnOn(int pinNumber)
+        ///// <returns></returns>
+        //private bool ReadDigital(int pinNumber)
         //{
-        //    return this.WriteDigital(pinNumber, true);
+        //    System.Console.WriteLine("ReadDigital not implemented yet!");
+        //    return false;
         //}
 
         ///// <summary>
-        ///// Turn digital IO off. Is alias for `WriteDigital(pinNumber, false)`
+        ///// Reads from the analog IO pin.
         ///// </summary>
         ///// <param name="pinNumber"></param>
-        //public bool TurnOff(int pinNumber)
+        ///// <returns></returns>
+        //private double ReadAnalog(int pinNumber)
         //{
-        //    return this.WriteDigital(pinNumber, false);
+        //    System.Console.WriteLine("ReadAnalog not implemented yet!");
+        //    return 0.0;
         //}
+        
 
         /// <summary>
         /// Turns extrusion in 3D printers on/off.
@@ -1464,6 +1436,10 @@ namespace Machina
         {
             //c.DebugSettingsBuffer();
         }
+
+
+
+
 
 
 

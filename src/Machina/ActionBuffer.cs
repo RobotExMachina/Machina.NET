@@ -229,14 +229,16 @@ namespace Machina
         /// <summary>
         /// Writes a description of each pending Action to the Console.
         /// </summary>
-        public void LogBufferedActions()
+        public void DebugBufferedActions()
         {
-            Console.WriteLine("--> RELEASED:" );
-            foreach (Action a in released) Console.WriteLine("    " + a);
+            Logger.Debug("--> RELEASED:" );
+            foreach (Action a in released) Logger.Debug("    " + a);
 
-            Console.Write("--> PENDING: ");
-            foreach (var i in blockCounts) Console.Write(i + ",");
-            Console.WriteLine("");
+            Logger.Debug("--> PENDING: ");
+            string blocks = "";
+            foreach (var i in blockCounts) blocks += i + ",";
+            Logger.Debug(blocks);
+            Logger.Debug("");
             int it = -1;
             int b = 0;
             foreach (Action a in pending)
@@ -259,16 +261,16 @@ namespace Machina
 
                 if (it == 0)
                 {
-                    Console.WriteLine("    Block " + b + ":");
+                    Logger.Debug("    Block " + b + ":");
                 }
                 
                 if (it >= 0)
                 {
-                    Console.WriteLine("        " + a);
+                    Logger.Debug("        " + a);
                 }
                 else
                 {
-                    Console.WriteLine("    " + a);
+                    Logger.Debug("    " + a);
                 }
             }
         }

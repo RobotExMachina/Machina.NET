@@ -26,6 +26,7 @@ namespace Machina.Drivers.Communication
     class RobotStudioManager
     {
         private Driver _parentDriver;  // the parent object
+        private RobotLogger logger;
 
         // ABB stuff and flags
         private Controller controller;
@@ -60,6 +61,7 @@ namespace Machina.Drivers.Communication
         public RobotStudioManager(Driver parent)
         {
             _parentDriver = parent;
+            logger = _parentDriver.parentControl.Logger;
         }
 
 
@@ -93,7 +95,7 @@ namespace Machina.Drivers.Communication
             // Connect to the ABB real/virtual controller
             if (!LoadController(deviceId))
             {
-                Console.WriteLine("Could not connect to controller");
+                logger.Warning("Could not connect to controller, found no device on the network");
                 Disconnect();
                 return false;
             }
@@ -101,7 +103,7 @@ namespace Machina.Drivers.Communication
             // Load the controller's IP
             if (!LoadIP())
             {
-                Console.WriteLine("Could not find the controller's IP");
+                logger.Warning("Could not connect to controller, failed to find the controller's IP");
                 Disconnect();
                 return false;
             }
@@ -109,14 +111,14 @@ namespace Machina.Drivers.Communication
             // Log on to the controller
             if (!LogOn())
             {
-                Console.WriteLine("Could not log on to the controller");
+                logger.Warning("Could not connect to controller, failed to log on to the controller");
                 Disconnect();
                 return false;
             }
 
             if (!LoadRobotWareOptions())
             {
-                Console.WriteLine("Could not retrieve RobotWare options from the controller");
+                logger.Warning("Could not connect to controller, failed to retrieve RobotWare options from the controller");
                 Disconnect();
                 return false;
             }
@@ -124,14 +126,14 @@ namespace Machina.Drivers.Communication
             // Is controller in Automatic mode with motors on?
             if (!IsControllerInAutoMode())
             {
-                Console.WriteLine("Please set up controller to AUTOMATIC MODE and try again.");
+                logger.Warning("Could not connect to controller, please set up controller to AUTOMATIC MODE and try again.");
                 Disconnect();
                 return false;
             }
 
             if (!IsControllerMotorsOn())
             {
-                Console.WriteLine("Please set up Motors On mode in controller");
+                logger.Warning("Could not connect to controller, please set up Motors On mode in controller");
                 Disconnect();
                 return false;
             }
@@ -139,7 +141,7 @@ namespace Machina.Drivers.Communication
             // Test if Rapid Mastership is available
             if (!TestMastershipRapid())
             {
-                Console.WriteLine("Mastership not available");
+                logger.Warning("Could not connect to controller, mastership not available");
                 Disconnect();
                 return false;
             }
@@ -147,14 +149,14 @@ namespace Machina.Drivers.Communication
             // Load main task from the controller
             if (!LoadMainTask())
             {
-                Console.WriteLine("Could not load main task");
+                logger.Warning("Could not connect to controller, failed to load main task");
                 Disconnect();
                 return false;
             }
 
             if (!SetRunMode(CycleType.Once))
             {
-                Console.WriteLine("Could not set runmode to once");
+                logger.Warning("Could not connect to controller, failed to set runmode to once");
                 Disconnect();
                 return false;
             }
@@ -162,7 +164,7 @@ namespace Machina.Drivers.Communication
             // Subscribe to relevant events to keep track of robot execution
             if (!SubscribeToEvents())
             {
-                Console.WriteLine("Could not subscribe to robot controller events");
+                logger.Warning("Could not connect to controller, failed to subscribe to robot controller events");
                 Disconnect();
                 return false;
             }
@@ -183,7 +185,7 @@ namespace Machina.Drivers.Communication
             bool success = false;
 
             // This is specific to ABB, should become abstracted at some point...
-            Console.WriteLine("Scanning the network for controllers...");
+            logger.Verbose("Scanning the network for controllers...");
             NetworkScanner scanner = new NetworkScanner();
             ControllerInfo[] controllers = scanner.GetControllers();
             if (controllers.Length > 0)
@@ -194,10 +196,10 @@ namespace Machina.Drivers.Communication
                 if (controller != null)
                 {
                     //isConnected = true;
-                    Console.WriteLine($"Found controller {controller.SystemName} on {controller.Name}");
+                    logger.Verbose($"Found controller {controller.SystemName} on {controller.Name}");
                     success = true;
 
-                    Console.WriteLine(controller);
+                    logger.Debug(controller);
                     //Console.WriteLine(controller.RobotWare);
                     //Console.WriteLine(controller.RobotWareVersion);
 
@@ -216,19 +218,19 @@ namespace Machina.Drivers.Communication
                 }
                 else
                 {
-                    Console.WriteLine("Could not connect to controller...");
+                    logger.Debug("Could not connect to controller...");
                 }
             }
             else
             {
-                Console.WriteLine("No controllers found on the network");
+                logger.Debug("No controllers found on the network");
             }
 
-            if (!success)
-            {
-                Disconnect();
-                throw new Exception("ERROR: could not LoadController()");
-            }
+            //if (!success)
+            //{
+            //    Disconnect();
+            //    //throw new Exception("ERROR: could not LoadController()");
+            //}
 
             return success;
         }
@@ -258,7 +260,7 @@ namespace Machina.Drivers.Communication
             if (controller != null && controller.IPAddress != null)
             {
                 this._ip = controller.IPAddress.ToString();
-                Console.WriteLine($"Loaded IP {this._ip}");
+                logger.Debug($"Loaded IP {this._ip}");
                 return true;
             }
             return false;
@@ -293,13 +295,13 @@ namespace Machina.Drivers.Communication
                         new UserInfo(user.Name, user.Password);
 
                     controller.Logon(robotStudioUser);
-                    Console.WriteLine($"Logged on as {robotStudioUser} user");
+                    logger.Debug($"Logged on as {robotStudioUser} user");
                     _isLogged = true;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Could not log on to the controller");
-                    Console.WriteLine(ex);
+                    logger.Debug("Could not log on to the controller");
+                    logger.Debug(ex);
                     _isLogged = false;
                 }
             }
@@ -357,7 +359,7 @@ namespace Machina.Drivers.Communication
         {
             if (controller == null)
             {
-                Console.WriteLine("Cannot retreive main task: no controller available");
+                logger.Debug("Cannot retreive main task: no controller available");
                 return false;
             }
 
@@ -367,21 +369,20 @@ namespace Machina.Drivers.Communication
                 if (tasks.Length > 0)
                 {
                     tRob1Task = tasks[0];
-                    Console.WriteLine("Retrieved task " + tRob1Task.Name);
+                    logger.Debug("Retrieved task " + tRob1Task.Name);
                     return true;
                 }
                 else
                 {
                     tRob1Task = null;
-                    Console.WriteLine("Could not retrieve any task from the controller");
+                    logger.Debug("Could not retrieve any task from the controller");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Could not retrieve main task from controller");
-                Console.WriteLine(ex);
+                logger.Debug("Could not retrieve main task from controller");
+                logger.Debug(ex);
             }
-
 
             return false;
         }
@@ -418,19 +419,19 @@ namespace Machina.Drivers.Communication
                         // Gets the current execution cycle from the RAPID module and sets it back to the same value (just a stupid test)
                         ExecutionCycle mode = controller.Rapid.Cycle;
                         controller.Rapid.Cycle = mode;
-                        Console.WriteLine("Mastership test OK");
+                        logger.Debug("Mastership test OK");
                         return true;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Rapid Mastership not available");
-                    Console.WriteLine(ex);
+                    logger.Debug("Rapid Mastership not available");
+                    logger.Debug(ex);
                 }
             }
             else
             {
-                Console.WriteLine("Cannot test Rapid Mastership, no controller available");
+                logger.Debug("Cannot test Rapid Mastership, no controller available");
             }
             return false;
         }
@@ -442,7 +443,7 @@ namespace Machina.Drivers.Communication
         {
             if (controller == null)
             {
-                Console.WriteLine("Cannot subscribe to controller events: not connected to controller.");
+                logger.Debug("Cannot subscribe to controller events: not connected to controller.");
             }
             else
             {
@@ -475,13 +476,13 @@ namespace Machina.Drivers.Communication
         {
             if (controller == null)
             {
-                Console.WriteLine("Cannot clear modules: not connected to controller");
+                logger.Debug("Cannot clear modules: not connected to controller");
                 return -1;
             }
 
             if (tRob1Task == null)
             {
-                Console.WriteLine("Cannot clear modules: main task not retrieved");
+                logger.Debug("Cannot clear modules: main task not retrieved");
                 return -1;
             }
 
@@ -493,7 +494,7 @@ namespace Machina.Drivers.Communication
                     ABB.Robotics.Controllers.RapidDomain.Module[] modules = tRob1Task.GetModules();
                     foreach (ABB.Robotics.Controllers.RapidDomain.Module m in modules)
                     {
-                        Console.WriteLine("Deleting module: {0}", m.Name);
+                        logger.Verbose($"Deleting module: {m.Name}");
                         m.Delete();
                         count++;
                     }
@@ -501,10 +502,10 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine("CLEAR MODULES ERROR: {0}", ex);
+                logger.Debug($"CLEAR MODULES ERROR: {ex}");
             }
 
-            Console.WriteLine("Cleared {0} modules from main task", count);
+            logger.Debug($"Cleared {count} modules from main task");
             return count;
         }
 
@@ -517,13 +518,13 @@ namespace Machina.Drivers.Communication
         {
             if (controller == null)
             {
-                Console.WriteLine("Cannot reset pointer: not connected to controller");
+                logger.Debug("Cannot reset pointer: not connected to controller");
                 return false;
             }
 
             if (tRob1Task == null)
             {
-                Console.WriteLine("Cannot reset pointer: mainTask not present");
+                logger.Debug("Cannot reset pointer: mainTask not present");
                 return false;
             }
 
@@ -538,8 +539,8 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Cannot reset pointer...");
-                Console.WriteLine(ex);
+                logger.Debug("Cannot reset pointer...");
+                logger.Debug(ex);
             }
 
             return false;
@@ -558,10 +559,10 @@ namespace Machina.Drivers.Communication
                 this._hasMultiTasking = HasMultiTaskOption(this.robotWareOptions);
                 this._hasEGM = HasEGMOption(this.robotWareOptions);
 
-                Console.WriteLine("RobotWare " + controller.RobotWare);
-                Console.WriteLine("RobotWareVersion " + controller.RobotWareVersion);
-                Console.WriteLine("hasMultiTasking? " + this._hasMultiTasking);
-                Console.WriteLine("hasEGM? " + this._hasEGM);
+                logger.Debug("RobotWare " + controller.RobotWare);
+                logger.Debug("RobotWareVersion " + controller.RobotWareVersion);
+                logger.Debug("hasMultiTasking? " + this._hasMultiTasking);
+                logger.Debug("hasEGM? " + this._hasEGM);
                 return true;
 
             }
@@ -571,7 +572,7 @@ namespace Machina.Drivers.Communication
                 this.robotWareOptions = null;
                 this._hasMultiTasking = false;
                 this._hasEGM = false;
-                Console.WriteLine("Could not access ROBOTWARE options");
+                logger.Debug("Could not access ROBOTWARE options");
             }
             return false;
         }
@@ -622,19 +623,19 @@ namespace Machina.Drivers.Communication
         {
             if (!_isConnected)
             {
-                Console.WriteLine("Cannot start program: not connected to controller");
+                logger.Debug("Cannot start program: not connected to controller");
                 return false;
             }
 
             if (_isRunning)
             {
-                Console.WriteLine("Program is already running...");
+                logger.Debug("Program is already running...");
                 return false;
             }
 
             if (!ResetProgramPointer())
             {
-                Console.WriteLine("Cannot start program: cannot reset program pointer");
+                logger.Debug("Cannot start program: cannot reset program pointer");
                 return false;
             }
 
@@ -652,7 +653,7 @@ namespace Machina.Drivers.Communication
                     StartResult res = controller.Rapid.Start(true);
                     if (res != StartResult.Ok)
                     {
-                        Console.WriteLine($"Cannot start program: {res}");
+                        logger.Debug($"Cannot start program: {res}");
                     }
                     else
                     {
@@ -663,7 +664,7 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine("PROGRAM START ERROR: " + ex);
+                logger.Debug("PROGRAM START ERROR: " + ex);
             }
 
             return false;
@@ -681,13 +682,13 @@ namespace Machina.Drivers.Communication
 
             if (!_isConnected)
             {
-                Console.WriteLine("Cannot stop program: not connected to controller");
+                logger.Debug("Cannot stop program: not connected to controller");
                 return false;
             }
 
             if (!_isRunning)
             {
-                Console.WriteLine("Cannot stop program: execution is already stopped");
+                logger.Debug("Cannot stop program: execution is already stopped");
                 return false;
             }
 
@@ -702,8 +703,8 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Could not stop program...");
-                Console.WriteLine(ex);
+                logger.Debug("Could not stop program...");
+                logger.Debug(ex);
             }
 
             return false;
@@ -718,7 +719,7 @@ namespace Machina.Drivers.Communication
         {
             if (controller == null)
             {
-                Console.WriteLine("Cannot set RunMode, not connected to any controller");
+                logger.Debug("Cannot set RunMode, not connected to any controller");
                 return false;
             }
 
@@ -732,8 +733,8 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error setting RunMode in controller...");
-                Console.WriteLine(ex);
+                logger.Debug("Error setting RunMode in controller...");
+                logger.Debug(ex);
             }
 
             return false;
@@ -745,25 +746,25 @@ namespace Machina.Drivers.Communication
         {
             if (!SetupStreamingModules())
             {
-                Console.WriteLine("Could not setup streaming modules");
+                logger.Debug("Could not setup streaming modules");
                 return false;
             }
 
             if (!UploadStreamingModules())
             {
-                Console.WriteLine("Could not upload streaming modules");
+                logger.Debug("Could not upload streaming modules");
                 return false;
             }
 
             if (!ResetProgramPointer())
             {
-                Console.WriteLine("Could not reset the program pointer");
+                logger.Debug("Could not reset the program pointer");
                 return false;
             }
 
             if (!StartProgramExecution())
             {
-                Console.WriteLine("Could not load start the streaming module");
+                logger.Debug("Could not load start the streaming module");
                 return false;
             }
 
@@ -792,7 +793,7 @@ namespace Machina.Drivers.Communication
             string portStr = _streamingModule.Substring(portPos, 4);
             _writePort = Convert.ToInt32(portStr);
 
-            Console.WriteLine($"_writePort set to {_writePort}");
+            logger.Debug($"_writePort set to {_writePort}");
 
             // Replace the IP in the module with the one found by this manager: "CONST string SERVER_IP := "127.0.0.1";"
             _streamingModule = _streamingModule.Replace("127.0.0.1", IP);
@@ -836,7 +837,7 @@ namespace Machina.Drivers.Communication
             }
             else
             {
-                Console.WriteLine("Saved module to " + path);
+                logger.Debug("Saved module to " + path);
             }
 
             if (!LoadFileToDevice(path))
@@ -928,7 +929,7 @@ namespace Machina.Drivers.Communication
                     bool dirExists = fs.DirectoryExists(REMOTE_BUFFER_DIR);
                     if (!dirExists)
                     {
-                        Console.WriteLine("Creating {0} on remote controller", remotePath);
+                        logger.Debug($"Creating {remotePath} on remote controller");
                         fs.CreateDirectory(REMOTE_BUFFER_DIR);
                     }
 
@@ -936,7 +937,7 @@ namespace Machina.Drivers.Communication
 
                     // Copy the file to the remote controller
                     controller.FileSystem.PutFile(fullPath, $"{REMOTE_BUFFER_DIR}/{filename}", wipeout);
-                    Console.WriteLine($"Copied {filename} to {REMOTE_BUFFER_DIR}");
+                    logger.Debug($"Copied {filename} to {REMOTE_BUFFER_DIR}");
 
                     // Loads a Rapid module to the task in the robot controller
                     success = tRob1Task.LoadModuleFromFile($"{remotePath}/{filename}", RapidLoadMode.Replace);
@@ -945,7 +946,7 @@ namespace Machina.Drivers.Communication
             catch (Exception ex)
             {
                 //Console.WriteLine("ERROR: Could not load module");
-                Console.WriteLine(ex);
+                logger.Debug(ex);
                 throw new Exception("ERROR: Could not load module");
             }
 
@@ -971,7 +972,7 @@ namespace Machina.Drivers.Communication
             }
             else
             {
-                Console.WriteLine("Sucessfully loaded {0}", fullPath);
+                logger.Debug($"Sucessfully loaded {fullPath}");
             }
 
             return success;
@@ -986,7 +987,7 @@ namespace Machina.Drivers.Communication
         {
             if (!_isConnected)
             {
-                Console.WriteLine("Cannot GetCurrentPosition: not connected to controller");
+                logger.Debug("Cannot GetCurrentPosition: not connected to controller");
                 return null;
             }
 
@@ -1003,7 +1004,7 @@ namespace Machina.Drivers.Communication
         {
             if (!_isConnected)
             {
-                Console.WriteLine("Cannot GetCurrentRotation, not connected to controller");
+                logger.Debug("Cannot GetCurrentRotation, not connected to controller");
                 return null;
             }
 
@@ -1022,7 +1023,7 @@ namespace Machina.Drivers.Communication
         {
             if (!_isConnected)
             {
-                Console.WriteLine("Cannot GetCurrentJoints, not connected to controller");
+                logger.Debug("Cannot GetCurrentJoints, not connected to controller");
                 return null;
             }
 
@@ -1033,8 +1034,8 @@ namespace Machina.Drivers.Communication
             }
             catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
             {
-                Console.WriteLine("CANNOT RETRIEVE JOINTS FROM CONTROLLER");
-                Console.WriteLine(e);
+                logger.Debug("CANNOT RETRIEVE JOINTS FROM CONTROLLER");
+                logger.Debug(e);
                 return null;
             }
         }
@@ -1046,68 +1047,68 @@ namespace Machina.Drivers.Communication
         {
             if (_isConnected)
             {
-                Console.WriteLine("");
-                Console.WriteLine("DEBUG CONTROLLER DUMP:");
-                Console.WriteLine("     AuthenticationSystem: " + controller.AuthenticationSystem.Name);
-                Console.WriteLine("     BackupInProgress: " + controller.BackupInProgress);
-                Console.WriteLine("     Configuration: " + controller.Configuration);
-                Console.WriteLine("     Connected: " + controller.Connected);
-                Console.WriteLine("     CurrentUser: " + controller.CurrentUser);
-                Console.WriteLine("     DateTime: " + controller.DateTime);
-                Console.WriteLine("     EventLog: " + controller.EventLog);
-                Console.WriteLine("     FileSystem: " + controller.FileSystem);
-                Console.WriteLine("     IOSystem: " + controller.IOSystem);
-                Console.WriteLine("     IPAddress: " + controller.IPAddress);
-                Console.WriteLine("     Ipc: " + controller.Ipc);
-                Console.WriteLine("     IsMaster: " + controller.IsMaster);
-                Console.WriteLine("     IsVirtual: " + controller.IsVirtual);
-                Console.WriteLine("     MacAddress: " + controller.MacAddress);
+                logger.Debug("");
+                logger.Debug("DEBUG CONTROLLER DUMP:");
+                logger.Debug("     AuthenticationSystem: " + controller.AuthenticationSystem.Name);
+                logger.Debug("     BackupInProgress: " + controller.BackupInProgress);
+                logger.Debug("     Configuration: " + controller.Configuration);
+                logger.Debug("     Connected: " + controller.Connected);
+                logger.Debug("     CurrentUser: " + controller.CurrentUser);
+                logger.Debug("     DateTime: " + controller.DateTime);
+                logger.Debug("     EventLog: " + controller.EventLog);
+                logger.Debug("     FileSystem: " + controller.FileSystem);
+                logger.Debug("     IOSystem: " + controller.IOSystem);
+                logger.Debug("     IPAddress: " + controller.IPAddress);
+                logger.Debug("     Ipc: " + controller.Ipc);
+                logger.Debug("     IsMaster: " + controller.IsMaster);
+                logger.Debug("     IsVirtual: " + controller.IsVirtual);
+                logger.Debug("     MacAddress: " + controller.MacAddress);
                 //Console.WriteLine("     MainComputerServiceInfo: ");
                 //Console.WriteLine("         BoardType: " + controller.MainComputerServiceInfo.BoardType);
                 //Console.WriteLine("         CpuInfo: " + controller.MainComputerServiceInfo.CpuInfo);
                 //Console.WriteLine("         RamSize: " + controller.MainComputerServiceInfo.RamSize);
                 //Console.WriteLine("         Temperature: " + controller.MainComputerServiceInfo.Temperature);
-                Console.WriteLine("     MastershipPolicy: " + controller.MastershipPolicy);
-                Console.WriteLine("     MotionSystem: " + controller.MotionSystem);
-                Console.WriteLine("     Name: " + controller.Name);
+                logger.Debug("     MastershipPolicy: " + controller.MastershipPolicy);
+                logger.Debug("     MotionSystem: " + controller.MotionSystem);
+                logger.Debug("     Name: " + controller.Name);
                 //Console.WriteLine("     NetworkSettings: " + controller.NetworkSettings);
-                Console.WriteLine("     OperatingMode: " + controller.OperatingMode);
-                Console.WriteLine("     Rapid: " + controller.Rapid);
-                Console.WriteLine("     RobotWare: " + controller.RobotWare);
-                Console.WriteLine("     RobotWareVersion: " + controller.RobotWareVersion);
-                Console.WriteLine("     RunLevel: " + controller.RunLevel);
-                Console.WriteLine("     State: " + controller.State);
-                Console.WriteLine("     SystemId: " + controller.SystemId);
-                Console.WriteLine("     SystemName: " + controller.SystemName);
+                logger.Debug("     OperatingMode: " + controller.OperatingMode);
+                logger.Debug("     Rapid: " + controller.Rapid);
+                logger.Debug("     RobotWare: " + controller.RobotWare);
+                logger.Debug("     RobotWareVersion: " + controller.RobotWareVersion);
+                logger.Debug("     RunLevel: " + controller.RunLevel);
+                logger.Debug("     State: " + controller.State);
+                logger.Debug("     SystemId: " + controller.SystemId);
+                logger.Debug("     SystemName: " + controller.SystemName);
                 //Console.WriteLine("     TimeServer: " + controller.TimeServer);
                 //Console.WriteLine("     TimeZone: " + controller.TimeZone);
                 //Console.WriteLine("     UICulture: " + controller.UICulture);
 
-                Console.WriteLine("");
-                Console.WriteLine("DEBUG TASK DUMP:");
-                Console.WriteLine("    Cycle: " + tRob1Task.Cycle);
-                Console.WriteLine("    Enabled: " + tRob1Task.Enabled);
-                Console.WriteLine("    ExecutionStatus: " + tRob1Task.ExecutionStatus);
+                logger.Debug("");
+                logger.Debug("DEBUG TASK DUMP:");
+                logger.Debug("    Cycle: " + tRob1Task.Cycle);
+                logger.Debug("    Enabled: " + tRob1Task.Enabled);
+                logger.Debug("    ExecutionStatus: " + tRob1Task.ExecutionStatus);
                 try
                 {
-                    Console.WriteLine("    ExecutionType: " + tRob1Task.ExecutionType);
+                    logger.Debug("    ExecutionType: " + tRob1Task.ExecutionType);
                 }
                 catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
                 {
-                    Console.WriteLine("    ExecutionType: UNSUPPORTED BY CONTROLLER");
-                    Console.WriteLine(e);
+                    logger.Debug("    ExecutionType: UNSUPPORTED BY CONTROLLER");
+                    logger.Debug(e);
                 }
-                Console.WriteLine("    Motion: " + tRob1Task.Motion);
-                Console.WriteLine("    MotionPointer: " + tRob1Task.MotionPointer.Module);
-                Console.WriteLine("    Name: " + tRob1Task.Name);
-                Console.WriteLine("    ProgramPointer: " + tRob1Task.ProgramPointer.Module);
-                Console.WriteLine("    RemainingCycles: " + tRob1Task.RemainingCycles);
-                Console.WriteLine("    TaskType: " + tRob1Task.TaskType);
-                Console.WriteLine("    Type: " + tRob1Task.Type);
-                Console.WriteLine("");
+                logger.Debug("    Motion: " + tRob1Task.Motion);
+                logger.Debug("    MotionPointer: " + tRob1Task.MotionPointer.Module);
+                logger.Debug("    Name: " + tRob1Task.Name);
+                logger.Debug("    ProgramPointer: " + tRob1Task.ProgramPointer.Module);
+                logger.Debug("    RemainingCycles: " + tRob1Task.RemainingCycles);
+                logger.Debug("    TaskType: " + tRob1Task.TaskType);
+                logger.Debug("    Type: " + tRob1Task.Type);
+                logger.Debug("");
 
-                Console.WriteLine("HAS MULTITASKING: " + this._hasMultiTasking);
-                Console.WriteLine("HAS EGM: " + this._hasEGM);
+                logger.Debug("HAS MULTITASKING: " + this._hasMultiTasking);
+                logger.Debug("HAS EGM: " + this._hasEGM);
 
             }
         }
@@ -1132,7 +1133,7 @@ namespace Machina.Drivers.Communication
         /// <param name="e"></param>
         private void OnRapidExecutionStatusChanged(object sender, ExecutionStatusChangedEventArgs e)
         {
-            Console.WriteLine("EXECUTION STATUS CHANGED: " + e.Status);
+            logger.Debug("EXECUTION STATUS CHANGED: " + e.Status);
 
             if (e.Status == ExecutionStatus.Running)
             {
@@ -1160,7 +1161,7 @@ namespace Machina.Drivers.Communication
         /// <param name="e"></param>
         private void OnRapidMastershipChanged(object sender, MastershipChangedEventArgs e)
         {
-            Console.WriteLine("RAPID MASTERSHIP STATUS CHANGED: {0}", e.Status);
+            logger.Debug($"RAPID MASTERSHIP STATUS CHANGED: {e.Status}");
 
             // @TODO: what to do when mastership changes
         }
@@ -1172,7 +1173,7 @@ namespace Machina.Drivers.Communication
         /// <param name="e"></param>
         private void OnRapidTaskEnabledChanged(object sender, TaskEnabledChangedEventArgs e)
         {
-            Console.WriteLine("TASK ENABLED CHANGED: {0}", e.Enabled);
+            logger.Debug($"TASK ENABLED CHANGED: {e.Enabled}");
 
             // @TODO: add behaviors
         }
@@ -1184,23 +1185,23 @@ namespace Machina.Drivers.Communication
         /// <param name="e"></param>
         private void OnOperatingModeChanged(object sender, OperatingModeChangeEventArgs e)
         {
-            Console.WriteLine("OPERATING MODE CHANGED: {0}", e.NewMode);
+            logger.Debug($"OPERATING MODE CHANGED: {e.NewMode}");
         }
 
 
         private void OnStateChanged(object sender, StateChangedEventArgs e)
         {
-            Console.WriteLine("CONTROLLER STATECHANGED: {0}", e.NewState);
+            logger.Debug($"CONTROLLER STATECHANGED: {e.NewState}");
         }
 
         private void OnMastershipChanged(object sender, MastershipChangedEventArgs e)
         {
-            Console.WriteLine("CONTROLLER MASTERSHIP CHANGED: {0}", e.Status);
+            logger.Debug($"CONTROLLER MASTERSHIP CHANGED: {e.Status}");
         }
 
         private void OnConnectionChanged(object sender, ConnectionChangedEventArgs e)
         {
-            Console.WriteLine("CONTROLLER CONNECTION CHANGED: {0}", e.Connected);
+            logger.Debug($"CONTROLLER CONNECTION CHANGED: {e.Connected}");
         }
 
 

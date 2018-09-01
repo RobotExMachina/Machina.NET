@@ -41,6 +41,7 @@ namespace Machina.Drivers.Communication
         private RobotCursor _writeCursor;
         private RobotCursor _motionCursor;
         private Driver _parentDriver;
+        internal RobotLogger logger;
 
         /// <summary>
         ///  The client socket that connects to the robot's secondary client.
@@ -95,6 +96,7 @@ namespace Machina.Drivers.Communication
         internal TCPCommunicationManagerUR(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string robotIP, int robotPort)
         {
             this._parentDriver = driver;
+            this.logger = driver.parentControl.Logger;
             this._writeCursor = writeCursor;
             this._motionCursor = motionCursor;
             this._robotIP = robotIP;
@@ -149,7 +151,7 @@ namespace Machina.Drivers.Communication
                 {
                     throw new Exception("ERROR: Could not figure out local IP");
                 }
-                Console.WriteLine("Machina local IP: " + _serverIP);
+                logger.Debug("Machina local IP: " + _serverIP);
 
                 _serverSocket = new TcpListener(IPAddress.Parse(_serverIP), _serverPort);
                 _serverSocket.Start();
@@ -167,8 +169,8 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR: something went wrong trying to connect to robot...");
-                Console.WriteLine(ex);
+                logger.Error("Something went wrong trying to connect to robot...");
+                logger.Debug(ex);
                 throw new Exception();
             }
 
@@ -243,9 +245,9 @@ namespace Machina.Drivers.Communication
                         _sentIDs.Add(this._writeCursor.GetLastAction().id);
                         _sentMessages++;
 
-                        Console.WriteLine("Sending:");
-                        Console.WriteLine("  " + this._writeCursor.GetLastAction());
-                        Console.WriteLine("  [" + string.Join(",", (Util.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
+                        logger.Debug("Sending:");
+                        logger.Debug("  " + this._writeCursor.GetLastAction());
+                        logger.Debug("  [" + string.Join(",", (Util.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
                     }
                 }
 
@@ -265,12 +267,12 @@ namespace Machina.Drivers.Communication
             // Do not kill threads by aborting them... https://stackoverflow.com/questions/1559255/whats-wrong-with-using-thread-abort/1560567#1560567
             while (_isServerListeningRunning)
             {
-                Console.WriteLine("Waiting for a connection... ");
+                logger.Verbose("Waiting for a connection... ");
 
                 // Perform a blocking call to accept requests.
                 // You could also user server.AcceptSocket() here.
                 _robotSocket = _serverSocket.AcceptTcpClient();
-                Console.WriteLine("Connected client: " + _robotIP);
+                logger.Verbose("Connected client: " + _robotIP);
 
                 _serverSendingThread = new Thread(ServerSendingMethod);
                 _serverSendingThread.IsBackground = true;
@@ -286,21 +288,21 @@ namespace Machina.Drivers.Communication
                     {
                         _serverListeningInts = Util.ByteArrayToInt32Array(_serverListeningBytes, i, false);
 
-                        Console.WriteLine("Received (id): [" + string.Join(",", _serverListeningInts) + "]");
+                        logger.Debug("Received (id): [" + string.Join(",", _serverListeningInts) + "]");
                         foreach(var id in _serverListeningInts)
                         {
                             if (ProcessResponse(id))
                             {
                                 _receivedMessages++;
-                                Console.WriteLine("  REMAINING:" + CalculateRemaining());
+                                logger.Debug("  REMAINING:" + CalculateRemaining());
                             }
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Something went wrong with the client... ");
-                    Console.WriteLine(e);
+                    logger.Error("Something went wrong with the client... ");
+                    logger.Error(e);
                 }
 
                 //Console.WriteLine("Closing client");
@@ -422,11 +424,10 @@ namespace Machina.Drivers.Communication
         }
 
 
-        private bool UploadScriptToDevice(string script, bool consoleDump)
+        private bool UploadScriptToDevice(string script, bool consoleDump = false)
         {
-            Console.WriteLine("Uploading Machina UR Driver to devvice...");
-            if (consoleDump)
-                Console.WriteLine(script);
+            logger.Verbose("Uploading Machina UR Driver to device...");
+            if (consoleDump) logger.Debug(script);
 
             _sendMsgBytes = Encoding.ASCII.GetBytes(script);
             _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
@@ -456,13 +457,17 @@ namespace Machina.Drivers.Communication
 
         private void DebugLists()
         {
-            Console.Write("SENT IDS: ");
-            foreach (var id in _sentIDs) Console.Write(id + ", ");
-            Console.WriteLine("");
+            logger.Debug("SENT IDS: ");
+            string ids = "";
+            foreach (var id in _sentIDs) ids += id + ", ";
+            logger.Debug(ids);
+            logger.Debug("");
 
-            Console.Write("RCVD IDS: ");
-            foreach (var id in _receivedIDs) Console.Write(id + ", ");
-            Console.WriteLine("");
+            logger.Debug("RCVD IDS: ");
+            ids = "";
+            foreach (var id in _receivedIDs) ids += id + ", ";
+            logger.Debug(ids);
+            logger.Debug("");
         }
 
     }

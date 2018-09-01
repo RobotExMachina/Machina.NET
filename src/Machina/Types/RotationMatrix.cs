@@ -317,7 +317,7 @@ namespace Machina
 
             if (Vector.Orthogonalize(vecX, vecY, out vecX, out vecY, out vecZ) == false)
             {
-                Console.WriteLine("Cannot orthogonalize a Matrix with X & Y parallel vectors");
+                Logger.Verbose("Cannot orthogonalize a Matrix with X & Y parallel vectors");
                 this.Identity();
                 return false;
             }

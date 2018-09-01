@@ -65,6 +65,11 @@ namespace Machina
         internal Robot parentRobot;
 
         /// <summary>
+        /// A reference to the parent Robot's Logger object.
+        /// </summary>
+        internal RobotLogger Logger;
+
+        /// <summary>
         /// Instances of the main robot Controller and Task
         /// </summary>
         private Driver _driver;
@@ -130,6 +135,7 @@ namespace Machina
         public Control(Robot parentBot)
         {
             parentRobot = parentBot;
+            Logger = parentRobot.logger;
 
             // Reset();
 
@@ -170,8 +176,7 @@ namespace Machina
         {
             if (mode == ControlType.Execute)
             {
-                Console.WriteLine("Execute mode temporarily deactivated. Try 'stream' instead, it's cooler ;)");
-                Console.WriteLine($"ControlMode reverted to {_controlMode}");
+                Logger.Warning($"Execute mode temporarily deactivated. Try 'stream' instead, it's cooler ;) ControlMode reverted to {_controlMode}");
                 return false;
             }
 
@@ -196,7 +201,10 @@ namespace Machina
             }
 
             if (!success)
+            {
+                Logger.Error("Couldn't SetControlMode()");
                 throw new Exception("Couldn't SetControlMode()");
+            }
 
             return success;
         }
@@ -286,8 +294,7 @@ namespace Machina
 
             if (!_driver.AvailableConnectionTypes[mode])
             {
-                Console.WriteLine($"WARNING: this device's driver does not accept ConnectionType {mode}");
-                Console.WriteLine($"ConnectionMode remains {this.connectionMode}");
+                Logger.Warning($"This device's driver does not accept ConnectionType {mode}, ConnectionMode remains {this.connectionMode}");
                 return false;
             }
 
@@ -553,7 +560,7 @@ namespace Machina
         {
             if (_controlMode != ControlType.Offline)
             {
-                Console.WriteLine("Export() only works in Offline mode");
+                Logger.Warning("Export() only works in Offline mode");
                 return null;
             }
 
@@ -728,7 +735,7 @@ namespace Machina
         {
             if (!_areCursorsInitialized)
             {
-                Console.WriteLine("ERROR: cursors not initialized. Did you .Connect()?");
+                Logger.Error("Cursors not initialized. Did you .Connect()?");
                 return false;
             }
 
@@ -978,7 +985,7 @@ namespace Machina
         {
             if (_driver == null)
             {
-                Console.WriteLine("Communication protocol not established.");
+                Logger.Debug("Communication protocol not established, no DropCommunication() performed.");
                 return false;
             }
             bool success = _driver.DisconnectFromDevice();
@@ -1056,8 +1063,8 @@ namespace Machina
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Could not save program to file...");
-                Console.WriteLine(ex);
+                Logger.Error("Could not save program to file...");
+                Logger.Error(ex);
             }
             return false;
         }
@@ -1210,32 +1217,32 @@ namespace Machina
 
         public void DebugBuffers()
         {
-            Console.WriteLine("VIRTUAL BUFFER:");
+            Logger.Debug("VIRTUAL BUFFER:");
             virtualCursor.LogBufferedActions();
 
-            Console.WriteLine("WRITE BUFFER:");
+            Logger.Debug("WRITE BUFFER:");
             writeCursor.LogBufferedActions();
 
-            Console.WriteLine("MOTION BUFFER");
+            Logger.Debug("MOTION BUFFER");
             motionCursor.LogBufferedActions();
         }
 
         public void DebugRobotCursors()
         {
             if (virtualCursor == null)
-                Console.WriteLine("Virtual cursor not initialized");
+                Logger.Debug("Virtual cursor not initialized");
             else
-                Console.WriteLine(virtualCursor);
+                Logger.Debug(virtualCursor);
 
             if (writeCursor == null)
-                Console.WriteLine("Write cursor not initialized");
+                Logger.Debug("Write cursor not initialized");
             else
-                Console.WriteLine(writeCursor);
+                Logger.Debug(writeCursor);
 
             if (motionCursor == null)
-                Console.WriteLine("Motion cursor not initialized");
+                Logger.Debug("Motion cursor not initialized");
             else
-                Console.WriteLine(writeCursor);
+                Logger.Debug(writeCursor);
         }
 
         //public void DebugSettingsBuffer()
@@ -1249,14 +1256,14 @@ namespace Machina
         /// </summary>
         private void DebugBanner()
         {
-            Console.WriteLine("");
-            Console.WriteLine("██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ ");
-            Console.WriteLine("██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ ");
-            Console.WriteLine("██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗");
-            Console.WriteLine("██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║");
-            Console.WriteLine("██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝");
-            Console.WriteLine("╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ ");
-            Console.WriteLine("");
+            Logger.Debug("");
+            Logger.Debug("██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ ");
+            Logger.Debug("██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ ");
+            Logger.Debug("██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗");
+            Logger.Debug("██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║");
+            Logger.Debug("██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝");
+            Logger.Debug("╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ ");
+            Logger.Debug("");
         }
 
 
