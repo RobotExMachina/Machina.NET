@@ -110,7 +110,7 @@ namespace Machina
         public RobotCursor(Control parentControl, string name,  bool applyImmediately, RobotCursor childCursor)
         {
             this.parentControl = parentControl;
-            this.logger = parentControl.Logger;
+            this.logger = parentControl.logger;
             this.name = name;
             this.applyImmediately = applyImmediately;
             this.child = childCursor;

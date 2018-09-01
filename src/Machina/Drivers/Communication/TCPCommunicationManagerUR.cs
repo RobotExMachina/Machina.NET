@@ -96,7 +96,7 @@ namespace Machina.Drivers.Communication
         internal TCPCommunicationManagerUR(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string robotIP, int robotPort)
         {
             this._parentDriver = driver;
-            this.logger = driver.parentControl.Logger;
+            this.logger = driver.parentControl.logger;
             this._writeCursor = writeCursor;
             this._motionCursor = motionCursor;
             this._robotIP = robotIP;
