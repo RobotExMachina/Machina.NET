@@ -61,7 +61,7 @@ namespace Machina.Drivers.Communication
         public RobotStudioManager(Driver parent)
         {
             _parentDriver = parent;
-            logger = _parentDriver.parentControl.Logger;
+            logger = _parentDriver.parentControl.logger;
         }
 
 

@@ -544,6 +544,42 @@ namespace Machina
             return c.IssueSpeedRequest(speed, false);
         }
 
+
+
+        public bool SpeedPlusTo(double value)
+        {
+            return c.IssueSpeedPlusRequest(value, SpeedType.Global, false);
+        }
+
+        public bool SpeedPlusTo(double value, string speedType)
+        {
+            SpeedType st;
+            try
+            {
+                st = (SpeedType)Enum.Parse(typeof(SpeedType), speedType, true);
+                if (Enum.IsDefined(typeof(MotionType), st))
+                {
+                    return c.IssueSpeedPlusRequest(value, st, false);
+                }
+            }
+            catch
+            {
+                logger.Error($"\"{speedType}\" is not a valid speed type, please specify one of the following: ");
+                foreach (string str in Enum.GetNames(typeof(SpeedType)))
+                {
+                    logger.Error(str);
+                }
+            }
+            return false;
+        }
+
+        public bool SpeedPlusTo(double value, SpeedType speedType)
+        {
+            return c.IssueSpeedPlusRequest(value, speedType, false);
+        }
+
+
+
         /// <summary>
         /// Increase the TCP acceleration value new Actions will be ran at.
         /// </summary>

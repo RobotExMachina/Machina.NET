@@ -53,7 +53,7 @@ namespace Machina.Drivers
                 _rsBridge = new RobotStudioManager(this);
             }
 
-            logger = this.parentControl.Logger;
+            logger = this.parentControl.logger;
         }
 
         /// <summary>

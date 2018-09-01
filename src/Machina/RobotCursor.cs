@@ -21,6 +21,30 @@ namespace Machina
     /// </summary>
     internal class RobotCursor
     {
+        // DEFAULTS
+        public const double DEFAULT_SPEED = 20;                                 // default speed for new actions
+        public const double DEFAULT_ROTATION_SPEED = 500;                       // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
+        public const double DEFAULT_JOINT_SPEED = 20;                           // deg/s
+        public const double DEFAULT_ACCELERATION = 200;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
+        public const double DEFAULT_JOINT_ACCELERATION = 40;                    // deg/s^2
+
+        public const double DEFAULT_PRECISION = 5;                              // default precision for new actions
+        public readonly Dictionary<SpeedType, double> DEFAULT_SPEED_VALUES = new Dictionary<SpeedType, double>()
+        {
+            {SpeedType.Global, 20 },                                            // A "generic" speed in mm/s, used for linear TCP speed and as the base to compute proportional speed values for other speed types. Makes things easier for entry level users. 
+            {SpeedType.Linear, 20 },                                            // TCP linear speed in mm/s
+            {SpeedType.Rotational, 30 },                                        // TCP reorientation speed in deg/s
+            {SpeedType.Axes, 30 },                                              // Axes max rotation speed in deg/s
+            {SpeedType.ExternalAxesLinear, 20 },                                // External linear axes speed in mm/s
+            {SpeedType.ExternalAxesRotational, 30 }                             // External rotational axes speed in deg/s
+        };
+
+        public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;        // default motion type for new actions
+        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;             // default reference coordinate system for relative transform actions
+
+
+
+
         // Public props
         public string name;
         public Vector position, prevPosition;
@@ -41,6 +65,11 @@ namespace Machina
         // All pin ids are stored as strings, and are parsed to ints internally if possible. 
         Dictionary<string, bool> digitalOutputs = new Dictionary<string, bool>();
         Dictionary<string, double> analogOutputs = new Dictionary<string, double>();
+
+        /// <summary>
+        /// Values for all possible speed types.
+        /// </summary>
+        Dictionary<SpeedType, double> speedValues = new Dictionary<SpeedType, double>();
 
 
         // 3D printing
@@ -110,7 +139,7 @@ namespace Machina
         public RobotCursor(Control parentControl, string name,  bool applyImmediately, RobotCursor childCursor)
         {
             this.parentControl = parentControl;
-            this.logger = parentControl.Logger;
+            this.logger = parentControl.logger;
             this.name = name;
             this.applyImmediately = applyImmediately;
             this.child = childCursor;
@@ -146,55 +175,99 @@ namespace Machina
             settingsBuffer = new SettingsBuffer();
         }
 
+        ///// <summary>
+        ///// Minimum information necessary to initialize a robot object.
+        ///// </summary>
+        ///// <param name="position"></param>
+        ///// <param name="rotation"></param>
+        ///// <param name="joints"></param>
+        ///// <returns></returns>
+        //public bool Initialize(Vector position, Rotation rotation, Joints joints,
+        //    double speed, double acceleration, double rotationSpeed, double jointSpeed, double jointAcceleration,
+        //    double precision, MotionType mType, ReferenceCS refCS, Dictionary<SpeedType, double> speedValues)
+        //{
+        //    if (position != null)
+        //    {
+        //        this.position = new Vector(position);
+        //        this.prevPosition = new Vector(position);
+        //    }
+        //    if (rotation != null)
+        //    {
+        //        this.rotation = new Rotation(rotation);
+        //        this.prevRotation = new Rotation(rotation);
+        //    }
+        //    if (joints != null)
+        //    {
+        //        this.joints = new Joints(joints);
+        //        this.prevJoints = new Joints(joints);
+        //    }
+        //    this.acceleration = acceleration;
+        //    this.speed = speed;
+        //    this.rotationSpeed = rotationSpeed;
+        //    this.jointSpeed = jointSpeed;
+        //    this.jointAcceleration = jointAcceleration;
+        //    this.precision = precision;
+        //    this.motionType = mType;
+        //    this.referenceCS = refCS;
+
+        //    //this.speedValues = Util.CopyGenericDictionary<SpeedType, double>(speedValues);
+
+        //    // Initialize temps to zero
+        //    foreach (RobotPartType part in Enum.GetValues(typeof(RobotPartType)))
+        //    {
+        //        partTemperature[part] = 0;
+        //    }
+        //    isExtruding = false;
+        //    extrusionRate = 0;
+        //    extrudedLength = 0;
+
+        //    // Keep this null until initialized
+        //    //this.externalAxes = new ExternalAxes();  // @TODO: should this be passed as an argument?
+
+        //    this.initialized = true;
+        //    return this.initialized;
+        //}
+
         /// <summary>
-        /// Minimum information necessary to initialize a robot object.
+        /// Initialize this Cursor to its default values.
         /// </summary>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <param name="joints"></param>
         /// <returns></returns>
-        public bool Initialize(Vector position, Rotation rotation, Joints joints,
-            double speed, double acceleration, double rotationSpeed, double jointSpeed, double jointAcceleration,
-            double precision, MotionType mType, ReferenceCS refCS)
+        public bool InitializeToDefaults()
         {
-            if (position != null)
-            {
-                this.position = new Vector(position);
-                this.prevPosition = new Vector(position);
-            }
-            if (rotation != null)
-            {
-                this.rotation = new Rotation(rotation);
-                this.prevRotation = new Rotation(rotation);
-            }
-            if (joints != null)
-            {
-                this.joints = new Joints(joints);
-                this.prevJoints = new Joints(joints);
-            }
-            this.acceleration = acceleration;
-            this.speed = speed;
-            this.rotationSpeed = rotationSpeed;
-            this.jointSpeed = jointSpeed;
-            this.jointAcceleration = jointAcceleration;
-            this.precision = precision;
-            this.motionType = mType;
-            this.referenceCS = refCS;
+            // Unknown default pose, to override with absolute actions
+            this.position = null;
+            this.rotation = null;
+            this.joints = null;
+
+            // Settings 
+            this.speedValues = Util.CopyGenericDictionary<SpeedType, double>(DEFAULT_SPEED_VALUES);
+            // --> new accelerations here
+            this.precision = DEFAULT_PRECISION;
+            this.motionType = DEFAULT_MOTION_TYPE;
+            this.referenceCS = DEFAULT_REFCS;
+            
 
             // Initialize temps to zero
             foreach (RobotPartType part in Enum.GetValues(typeof(RobotPartType)))
             {
                 partTemperature[part] = 0;
             }
-            isExtruding = false;
-            extrusionRate = 0;
-            extrudedLength = 0;
-
-            // Keep this null until initialized
-            //this.externalAxes = new ExternalAxes();  // @TODO: should this be passed as an argument?
+            this.isExtruding = false;
+            this.extrusionRate = 0;
+            this.extrudedLength = 0;
 
             this.initialized = true;
-            return this.initialized;
+            return true;
+        }
+
+
+        public bool SetPose(Vector pos, Rotation ori, Joints axes)
+        {
+            this.position = pos;
+            this.rotation = ori;
+            this.joints = axes;
+
+            return true;
         }
         
         
@@ -383,12 +456,13 @@ namespace Machina
         Dictionary<Type, Func<Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
         {
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
+            { typeof (ActionSpeedPlus),                 (act, robCur) => robCur.ApplyAction((ActionSpeedPlus) act) },
             { typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
             { typeof (ActionRotationSpeed),             (act, robCur) => robCur.ApplyAction((ActionRotationSpeed) act) },
             { typeof (ActionJointSpeed),                (act, robCur) => robCur.ApplyAction((ActionJointSpeed) act) },
             { typeof (ActionJointAcceleration),         (act, robCur) => robCur.ApplyAction((ActionJointAcceleration) act) },
             { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
-            { typeof (ActionMotionMode),                    (act, robCur) => robCur.ApplyAction((ActionMotionMode) act) },
+            { typeof (ActionMotionMode),                (act, robCur) => robCur.ApplyAction((ActionMotionMode) act) },
             { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
             { typeof (ActionPushPop),                   (act, robCur) => robCur.ApplyAction((ActionPushPop) act) },
             { typeof (ActionTranslation),               (act, robCur) => robCur.ApplyAction((ActionTranslation) act) },
@@ -469,6 +543,15 @@ namespace Machina
 
             return true;
         }
+
+
+        public bool ApplyAction(ActionSpeedPlus action)
+        {
+            logger.Info("Applied ActionSpeedPlus");
+            return true;
+        }
+
+
 
         /// <summary>
         /// Apply RotationSpeed Action.

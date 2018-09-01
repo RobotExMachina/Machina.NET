@@ -22,7 +22,7 @@ namespace Machina.Drivers
 
 
         public DriverOffline(Control ctrl) : base(ctrl) {
-            logger = ctrl.Logger;
+            logger = ctrl.logger;
         }
 
         public override bool ConnectToDevice(int deviceId)

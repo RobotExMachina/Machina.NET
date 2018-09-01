@@ -25,26 +25,9 @@ namespace Machina
     /// </summary>
     class Control
     {
-        // Some 'environment variables' to define check states and behavior
-        public const bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
-        //public const bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
-        //public const bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
-        //public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
-
-        // @TODO: move to cursors, make it device specific
-        public const double DEFAULT_SPEED = 20;                                 // default speed for new actions
-        public const double DEFAULT_ACCELERATION = 200;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
-        public const double DEFAULT_ROTATION_SPEED = 500;                       // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
-        public const double DEFAULT_JOINT_SPEED = 20;                           // deg/s
-        public const double DEFAULT_JOINT_ACCELERATION = 40;                    // deg/s^2
-        public const double DEFAULT_PRECISION = 5;                              // default precision for new actions
-
-        public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;        // default motion type for new actions
-        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;             // default reference coordinate system for relative transform actions
+        // Some defaults
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
-        public const CycleType DEFAULT_RUNMODE = CycleType.Once;
         public const ConnectionType DEFAULT_CONNECTIONMODE = ConnectionType.User;
-
 
 
         /// <summary>
@@ -53,9 +36,6 @@ namespace Machina
         internal ControlType _controlMode;
         public ControlType ControlMode { get { return _controlMode; } internal set { _controlMode = value; } }
         internal ControlManager _controlManager;
-
-
-        internal CycleType runMode = DEFAULT_RUNMODE;
         internal ConnectionType connectionMode;
 
 
@@ -67,7 +47,7 @@ namespace Machina
         /// <summary>
         /// A reference to the parent Robot's Logger object.
         /// </summary>
-        internal RobotLogger Logger;
+        internal RobotLogger logger;
 
         /// <summary>
         /// Instances of the main robot Controller and Task
@@ -135,7 +115,7 @@ namespace Machina
         public Control(Robot parentBot)
         {
             parentRobot = parentBot;
-            Logger = parentRobot.logger;
+            logger = parentRobot.logger;
 
             // Reset();
 
@@ -176,7 +156,7 @@ namespace Machina
         {
             if (mode == ControlType.Execute)
             {
-                Logger.Warning($"Execute mode temporarily deactivated. Try 'stream' instead, it's cooler ;) ControlMode reverted to {_controlMode}");
+                logger.Warning($"Execute mode temporarily deactivated. Try 'stream' instead, it's cooler ;) ControlMode reverted to {_controlMode}");
                 return false;
             }
 
@@ -202,7 +182,7 @@ namespace Machina
 
             if (!success)
             {
-                Logger.Error("Couldn't SetControlMode()");
+                logger.Error("Couldn't SetControlMode()");
                 throw new Exception("Couldn't SetControlMode()");
             }
 
@@ -294,7 +274,7 @@ namespace Machina
 
             if (!_driver.AvailableConnectionTypes[mode])
             {
-                Logger.Warning($"This device's driver does not accept ConnectionType {mode}, ConnectionMode remains {this.connectionMode}");
+                logger.Warning($"This device's driver does not accept ConnectionType {mode}, ConnectionMode remains {this.connectionMode}");
                 return false;
             }
 
@@ -334,7 +314,7 @@ namespace Machina
 
                 // If successful, initialize robot cursors to mirror the state of the device.
                 // The function will initialize them based on the _comm object.
-                InitializeRobotCursors();
+                InitializeRobotCursorsFromDriver();
             }
 
             return true;
@@ -354,7 +334,7 @@ namespace Machina
             }
             else
             {
-                InitializeRobotCursors();
+                InitializeRobotCursorsFromDriver();
             }
             return true;
         }
@@ -560,7 +540,7 @@ namespace Machina
         {
             if (_controlMode != ControlType.Offline)
             {
-                Logger.Warning("Export() only works in Offline mode");
+                logger.Warning("Export() only works in Offline mode");
                 return null;
             }
 
@@ -735,7 +715,7 @@ namespace Machina
         {
             if (!_areCursorsInitialized)
             {
-                Logger.Error("Cursors not initialized. Did you .Connect()?");
+                logger.Error("Cursors not initialized. Did you .Connect()?");
                 return false;
             }
 
@@ -749,6 +729,8 @@ namespace Machina
 
 
         public bool IssueSpeedRequest(double speed, bool relative) => IssueApplyActionRequest(new ActionSpeed(speed, relative));
+
+        public bool IssueSpeedPlusRequest(double value, SpeedType speedType, bool relative) => IssueApplyActionRequest(new ActionSpeedPlus(value, speedType, relative));
 
         public bool IssueAccelerationRequest(double acc, bool relative) => IssueApplyActionRequest(new ActionAcceleration(acc, relative));
 
@@ -985,7 +967,7 @@ namespace Machina
         {
             if (_driver == null)
             {
-                Logger.Debug("Communication protocol not established, no DropCommunication() performed.");
+                logger.Debug("Communication protocol not established, no DropCommunication() performed.");
                 return false;
             }
             bool success = _driver.DisconnectFromDevice();
@@ -1007,32 +989,58 @@ namespace Machina
         //    return InitializeCommunication();
         //}
 
-        /// <summary>
-        /// Initializes all instances of robotCursors with base information
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <param name="joints"></param>
-        /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
-            double speed = Control.DEFAULT_SPEED, double acc = Control.DEFAULT_ACCELERATION, double rotationSpeed = Control.DEFAULT_ROTATION_SPEED,
-            double jointSpeed = Control.DEFAULT_JOINT_SPEED, double jointAcceleration = Control.DEFAULT_JOINT_ACCELERATION,
-            double precision = Control.DEFAULT_PRECISION,
-            MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
+        ///// <summary>
+        ///// Initializes all instances of robotCursors with base state
+        ///// </summary>
+        ///// <param name="position"></param>
+        ///// <param name="rotation"></param>
+        ///// <param name="joints"></param>
+        ///// <returns></returns>
+        //internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
+        //    double speed = Control.DEFAULT_SPEED, double acc = Control.DEFAULT_ACCELERATION, double rotationSpeed = Control.DEFAULT_ROTATION_SPEED,
+        //    double jointSpeed = Control.DEFAULT_JOINT_SPEED, double jointAcceleration = Control.DEFAULT_JOINT_ACCELERATION,
+        //    double precision = Control.DEFAULT_PRECISION,
+        //    MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
 
+        //{
+        //    bool success = true;
+        //    success &= virtualCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+        //    success &= writeCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+        //    success &= motionCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+
+        //    _areCursorsInitialized = success;
+
+        //    return success;
+        //}
+
+        /// <summary>
+        /// Initializes all instances of robotCursors with their internal default state
+        /// </summary>
+        /// <returns></returns>
+        internal bool InitializeRobotCursors()
         {
             bool success = true;
-            success &= virtualCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
-            success &= writeCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
-            success &= motionCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+            success &= virtualCursor.InitializeToDefaults();
+            success &= writeCursor.InitializeToDefaults();
+            success &= motionCursor.InitializeToDefaults();
 
             _areCursorsInitialized = success;
 
             return success;
         }
 
+        internal bool InitializeRobotCursors(Vector pos, Rotation ori, Joints axes)
+        {
+            bool success = InitializeRobotCursors();
+            success &= virtualCursor.SetPose(pos, ori, axes);
+            success &= writeCursor.SetPose(pos, ori, axes);
+            success &= motionCursor.SetPose(pos, ori, axes);
 
-        internal bool InitializeRobotCursors()
+            return success;
+        }
+
+
+        internal bool InitializeRobotCursorsFromDriver()
         {
             if (_driver == null)
             {
@@ -1063,8 +1071,8 @@ namespace Machina
             }
             catch (Exception ex)
             {
-                Logger.Error("Could not save program to file...");
-                Logger.Error(ex);
+                logger.Error("Could not save program to file...");
+                logger.Error(ex);
             }
             return false;
         }
@@ -1217,32 +1225,32 @@ namespace Machina
 
         public void DebugBuffers()
         {
-            Logger.Debug("VIRTUAL BUFFER:");
+            logger.Debug("VIRTUAL BUFFER:");
             virtualCursor.LogBufferedActions();
 
-            Logger.Debug("WRITE BUFFER:");
+            logger.Debug("WRITE BUFFER:");
             writeCursor.LogBufferedActions();
 
-            Logger.Debug("MOTION BUFFER");
+            logger.Debug("MOTION BUFFER");
             motionCursor.LogBufferedActions();
         }
 
         public void DebugRobotCursors()
         {
             if (virtualCursor == null)
-                Logger.Debug("Virtual cursor not initialized");
+                logger.Debug("Virtual cursor not initialized");
             else
-                Logger.Debug(virtualCursor);
+                logger.Debug(virtualCursor);
 
             if (writeCursor == null)
-                Logger.Debug("Write cursor not initialized");
+                logger.Debug("Write cursor not initialized");
             else
-                Logger.Debug(writeCursor);
+                logger.Debug(writeCursor);
 
             if (motionCursor == null)
-                Logger.Debug("Motion cursor not initialized");
+                logger.Debug("Motion cursor not initialized");
             else
-                Logger.Debug(writeCursor);
+                logger.Debug(writeCursor);
         }
 
         //public void DebugSettingsBuffer()
@@ -1256,14 +1264,14 @@ namespace Machina
         /// </summary>
         private void DebugBanner()
         {
-            Logger.Debug("");
-            Logger.Debug("██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ ");
-            Logger.Debug("██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ ");
-            Logger.Debug("██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗");
-            Logger.Debug("██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║");
-            Logger.Debug("██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝");
-            Logger.Debug("╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ ");
-            Logger.Debug("");
+            logger.Debug("");
+            logger.Debug("██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ ");
+            logger.Debug("██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ ");
+            logger.Debug("██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗");
+            logger.Debug("██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║");
+            logger.Debug("██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝");
+            logger.Debug("╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ ");
+            logger.Debug("");
         }
 
 

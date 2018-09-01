@@ -96,6 +96,7 @@
     <Compile Include="Actions\ActionRotation.cs" />
     <Compile Include="Actions\ActionRotationSpeed.cs" />
     <Compile Include="Actions\ActionSpeed.cs" />
+    <Compile Include="Actions\ActionSpeedPlus.cs" />
     <Compile Include="Actions\ActionTemperature.cs" />
     <Compile Include="Actions\ActionTransformation.cs" />
     <Compile Include="Actions\ActionTranslation.cs" />
