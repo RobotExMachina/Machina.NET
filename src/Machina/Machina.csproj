@@ -73,8 +73,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Action.cs" />
+    <Compile Include="Actions\Action.cs" />
     <Compile Include="ActionBuffer.cs" />
+    <Compile Include="Actions\ActionAcceleration.cs" />
+    <Compile Include="Actions\ActionAttach.cs" />
+    <Compile Include="Actions\ActionAxes.cs" />
+    <Compile Include="Actions\ActionComment.cs" />
+    <Compile Include="Actions\ActionCoordinates.cs" />
+    <Compile Include="Actions\ActionCustomCode.cs" />
+    <Compile Include="Actions\ActionDetach.cs" />
+    <Compile Include="Actions\ActionExtrusion.cs" />
+    <Compile Include="Actions\ActionExtrusionRate.cs" />
+    <Compile Include="Actions\ActionInitialization.cs" />
+    <Compile Include="Actions\ActionIOAnalog.cs" />
+    <Compile Include="Actions\ActionIODigital.cs" />
+    <Compile Include="Actions\ActionJointAcceleration.cs" />
+    <Compile Include="Actions\ActionJointSpeed.cs" />
+    <Compile Include="Actions\ActionMessage.cs" />
+    <Compile Include="Actions\ActionMotion.cs" />
+    <Compile Include="Actions\ActionPrecision.cs" />
+    <Compile Include="Actions\ActionPushPop.cs" />
+    <Compile Include="Actions\ActionRotation.cs" />
+    <Compile Include="Actions\ActionRotationSpeed.cs" />
+    <Compile Include="Actions\ActionSpeed.cs" />
+    <Compile Include="Actions\ActionTemperature.cs" />
+    <Compile Include="Actions\ActionTransformation.cs" />
+    <Compile Include="Actions\ActionTranslation.cs" />
+    <Compile Include="Actions\ActionWait.cs" />
+    <Compile Include="Actions\ActionExternalAxis.cs" />
     <Compile Include="Compilers\CompilerMACHINA.cs" />
     <Compile Include="Compilers\CompilerZMORPH.cs" />
     <Compile Include="Compilers\CompilerKUKA.cs" />

@@ -380,7 +380,7 @@ namespace Machina
         /// A dict that maps Action types to the cursor's applicable method.
         /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
         /// </summary>
-        Dictionary<Type, Func<Machina.Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
+        Dictionary<Type, Func<Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
         {
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
             { typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
