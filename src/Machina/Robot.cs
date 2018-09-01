@@ -37,7 +37,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1412;
+        public static readonly int Build = 1413;
 
         /// <summary>
         /// Version number.
@@ -81,66 +81,67 @@ namespace Machina
         ///// <summary>
         ///// Base constructor.
         ///// </summary>                                                       
-        [System.Obsolete("Deprecated constructor, defaults to a human-readable interpretation of the Actions. Please use Robot.Create(name, make) instead. Example: `Robot arm = Robot.Create(\"Machina\", \"ABB\");`")]
-        public Robot() : this("Machina", "HUMAN") { }
+        //private Robot() : this("Machina", RobotType.HUMAN) { }
 
-        [System.Obsolete("Deprecated constructor, use Robot.Create(name, make) instead")]
-        public Robot(string make) : this("Machina", make) { }
+        //private Robot(string make) : this("Machina", make) { }
 
-        /// <summary>
-        /// Base constructor.
-        /// </summary>
-        /// <param name="name">A name for this Robot</param>
-        /// <param name="make">The robot make. This will determine which drivers/compilers are used to manage it.</param>
-        [System.Obsolete("Deprecated constructor, use Robot.Create(name, make) instead")]
-        public Robot(string name, string make)
-        {
-            this.Name = name;
-            RobotType rt;
+        ///// <summary>
+        ///// Base constructor.
+        ///// </summary>
+        ///// <param name="name">A name for this Robot</param>
+        ///// <param name="make">The robot make. This will determine which drivers/compilers are used to manage it.</param>
+        //private Robot(string name, string make)
+        //{
+        //    this.Name = name;
+        //    RobotType rt;
 
-            try
-            {
-                rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
-                if (Enum.IsDefined(typeof(RobotType), rt))
-                {
-                    this.Brand = rt;
-                    c = new Control(this);
-                }
-                else
-                {
-                    logger.Error($"{make} is not a RobotType, please specify one of the following: ");
-                    foreach (string str in Enum.GetNames(typeof(RobotType)))
-                    {
-                        logger.Error(str);
-                    }
-                    this.Brand = RobotType.HUMAN;
-                    c = new Control(this);
-                }
-            }
-            catch
-            {
-                logger.Error($"{make} is not a RobotType, please specify one of the following: ");
-                foreach (string str in Enum.GetNames(typeof(RobotType)))
-                {
-                    logger.Error(str);
-                }
-                this.Brand = RobotType.HUMAN;
-                c = new Control(this);
-            }
-        }
+        //    try
+        //    {
+        //        rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
+        //        if (Enum.IsDefined(typeof(RobotType), rt))
+        //        {
+        //            this.Brand = rt;
+        //            c = new Control(this);
+        //        }
+        //        else
+        //        {
+        //            logger.Error($"{make} is not a RobotType, please specify one of the following: ");
+        //            foreach (string str in Enum.GetNames(typeof(RobotType)))
+        //            {
+        //                logger.Error(str);
+        //            }
+        //            this.Brand = RobotType.HUMAN;
+        //            c = new Control(this);
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        logger.Error($"{make} is not a RobotType, please specify one of the following: ");
+        //        foreach (string str in Enum.GetNames(typeof(RobotType)))
+        //        {
+        //            logger.Error(str);
+        //        }
+        //        this.Brand = RobotType.HUMAN;
+        //        c = new Control(this);
+        //    }
+        //}
 
         /// <summary>
         /// Internal constructor.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="make"></param>
-        internal Robot(string name, RobotType make)
+        private Robot(string name, RobotType make)
         {
             this.Name = name;
             this.Brand = make;
             this.logger = new RobotLogger(this);
             c = new Control(this);
         }
+
+
+
+
 
         /// <summary>
         /// Create a new instance of a Robot.
@@ -152,6 +153,12 @@ namespace Machina
         {
             return new Robot(name, make);
         }
+
+        /// <summary>
+        /// Create a new instance of a Robot.
+        /// </summary>
+        /// <returns></returns>
+        static public Robot Create() => Robot.Create("Machina", "HUMAN");
 
         /// <summary>
         /// Create a new instance of a Robot.
@@ -181,6 +188,10 @@ namespace Machina
 
             return null;
         }
+
+
+
+
 
 
         /// What was this even for? Exports checks?
@@ -432,32 +443,32 @@ namespace Machina
         }
 
 
-        /// <summary>
-        /// Create a program with all the buffered Actions and return it as a string List.
-        /// Note all buffered Actions will be removed from the queue.
-        /// </summary>
-        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
-        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
-        /// <returns></returns>
-        [System.Obsolete("Deprecated method, use Compile() instead")]
-        public List<string> Export(bool inlineTargets = true, bool humanComments = true)
-        {
-            return c.Export(inlineTargets, humanComments);
-        }
+        ///// <summary>
+        ///// Create a program with all the buffered Actions and return it as a string List.
+        ///// Note all buffered Actions will be removed from the queue.
+        ///// </summary>
+        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        ///// <returns></returns>
+        //[System.Obsolete("Deprecated method, use Compile() instead")]
+        //public List<string> Export(bool inlineTargets = true, bool humanComments = true)
+        //{
+        //    return c.Export(inlineTargets, humanComments);
+        //}
 
-        /// <summary>
-        /// Create a program with all the buffered Actions and save it to a file. 
-        /// Note all buffered Actions will be removed from the queue.
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
-        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
-        /// <returns></returns>
-        [System.Obsolete("Deprecated method, use Compile() instead")]
-        public bool Export(string filepath, bool inlineTargets = true, bool humanComments = true)
-        {
-            return c.Export(filepath, inlineTargets, humanComments);
-        }
+        ///// <summary>
+        ///// Create a program with all the buffered Actions and save it to a file. 
+        ///// Note all buffered Actions will be removed from the queue.
+        ///// </summary>
+        ///// <param name="filepath"></param>
+        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        ///// <returns></returns>
+        //[System.Obsolete("Deprecated method, use Compile() instead")]
+        //public bool Export(string filepath, bool inlineTargets = true, bool humanComments = true)
+        //{
+        //    return c.Export(filepath, inlineTargets, humanComments);
+        //}
 
 
         /// <summary>
@@ -612,35 +623,35 @@ namespace Machina
         /// <returns></returns>
         public bool JointAccelerationTo(double jointAcceleration) => c.IssueJointAccelerationRequest(jointAcceleration, false);
 
-        /// <summary>
-        /// Gets the current zone setting.
-        /// </summary>
-        /// <returns></returns>
-        [System.Obsolete("Deprecated method, use GetPrecision() instead")]
-        public double Zone()
-        {
-            return c.GetCurrentPrecisionSettings();
-        }
+        ///// <summary>
+        ///// Gets the current zone setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //[System.Obsolete("Deprecated method, use GetPrecision() instead")]
+        //public double Zone()
+        //{
+        //    return c.GetCurrentPrecisionSettings();
+        //}
 
-        /// <summary>
-        /// Increase the default zone value new Actions will be given.
-        /// </summary>
-        /// <param name="zoneInc"></param>
-        [System.Obsolete("Deprecated method, use Precision(radiusInc) instead")]
-        public void Zone(double zoneInc)
-        {
-            c.IssuePrecisionRequest(zoneInc, true);
-        }
+        ///// <summary>
+        ///// Increase the default zone value new Actions will be given.
+        ///// </summary>
+        ///// <param name="zoneInc"></param>
+        //[System.Obsolete("Deprecated method, use Precision(radiusInc) instead")]
+        //public void Zone(double zoneInc)
+        //{
+        //    c.IssuePrecisionRequest(zoneInc, true);
+        //}
 
-        /// <summary>
-        /// Sets the default zone value new Actions will be given.
-        /// </summary>
-        /// <param name="zone"></param>
-        [System.Obsolete("Deprecated method, use PrecisionTo(radius) instead")]
-        public void ZoneTo(double zone)
-        {
-            c.IssuePrecisionRequest(zone, false);
-        }
+        ///// <summary>
+        ///// Sets the default zone value new Actions will be given.
+        ///// </summary>
+        ///// <param name="zone"></param>
+        //[System.Obsolete("Deprecated method, use PrecisionTo(radius) instead")]
+        //public void ZoneTo(double zone)
+        //{
+        //    c.IssuePrecisionRequest(zone, false);
+        //}
 
         /// <summary>
         /// Increase the default precision value new Actions will be given. 
@@ -1045,11 +1056,12 @@ namespace Machina
         {
             return c.IssueJointsRequest(incJoints, true);
         }
-        [System.Obsolete("Deprecated, use Axes() instead")]
-        public bool Joints(Joints incJoints)
-        {
-            return c.IssueJointsRequest(incJoints, true);
-        }
+
+        //[System.Obsolete("Deprecated, use Axes() instead")]
+        //public bool Joints(Joints incJoints)
+        //{
+        //    return c.IssueJointsRequest(incJoints, true);
+        //}
 
         /// <summary>
         /// Issue a request to increment the angular values of the robot joint axes rotations.
@@ -1066,11 +1078,12 @@ namespace Machina
         {
             return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
         }
-        [System.Obsolete("Deprecated, use Axes() instead")]
-        public bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
-        {
-            return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
-        }
+
+        //[System.Obsolete("Deprecated, use Axes() instead")]
+        //public bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
+        //{
+        //    return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
+        //}
 
         /// <summary>
         /// Issue a request to set the angular values of the robot joint axes rotations.
@@ -1083,11 +1096,12 @@ namespace Machina
         {
             return c.IssueJointsRequest(joints, false);
         }
-        [System.Obsolete("Deprecated, use AxesTo() instead")]
-        public bool JointsTo(Joints joints)
-        {
-            return c.IssueJointsRequest(joints, false);
-        }
+
+        //[System.Obsolete("Deprecated, use AxesTo() instead")]
+        //public bool JointsTo(Joints joints)
+        //{
+        //    return c.IssueJointsRequest(joints, false);
+        //}
 
         /// <summary>
         /// Issue a request to set the angular values of the robot joint axes rotations.
@@ -1104,11 +1118,12 @@ namespace Machina
         {
             return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
         }
-        [System.Obsolete("Deprecated, use AxesTo() instead")]
-        public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
-        {
-            return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
-        }
+
+        //[System.Obsolete("Deprecated, use AxesTo() instead")]
+        //public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
+        //{
+        //    return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
+        //}
 
         /// <summary>
         /// Increase the value of one of the robot's external axis. 

@@ -17,7 +17,7 @@ namespace RobotTests
         public void Robot_Move_Simple()
         {
             // Movement should be platform-agnostic.
-            Robot bot = new Robot();
+            Robot bot = Robot.Create();
 
             List<SysVec> sysvecs = new List<System.Numerics.Vector3>();
 
@@ -48,7 +48,7 @@ namespace RobotTests
             }
 
             // Reset the robot
-            bot = new Robot();
+            bot = Robot.Create();
             botpos = bot.GetCurrentPosition();
             syspos = new SysVec((float)botpos.X, (float)botpos.Y, (float)botpos.Z);
 
@@ -79,7 +79,7 @@ namespace RobotTests
         [TestMethod]
         public void Robot_Rotate_Simple()
         {
-            Robot bot = new Robot("foo", "ABB");
+            Robot bot = Robot.Create("foo", "ABB");
             bot.MoveTo(300, 300, 300);
 
             Rotation ror = bot.GetCurrentRotation();
