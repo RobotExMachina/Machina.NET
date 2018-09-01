@@ -23,7 +23,8 @@
 ---
 # v0.8.0
 ## BUILD 1412
-
+- Split `Action` classes
+- Removed static `Action` constructors.
 
 ## BUILD 1411
 - Add `Machina.Logger` for global message logging.

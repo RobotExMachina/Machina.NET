@@ -37,8 +37,8 @@ namespace Machina
         public override string ToInstruction()
         {
             return this.push ?
-                "PushSettings()" :
-                "PopSettings()";
+                "PushSettings();" :
+                "PopSettings();";
         }
     }
 }
