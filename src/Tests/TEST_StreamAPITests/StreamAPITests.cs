@@ -211,8 +211,8 @@ namespace TEST_StreamAPITests
             bot.MotionMode(MotionType.Joint);
 
             // Home
-            bot.JointSpeedTo(20);
-            bot.JointAccelerationTo(4);
+            //bot.JointSpeedTo(20);
+            //bot.JointAccelerationTo(4);
             bot.PrecisionTo(10);
             bot.AxesTo(homeJoints);
 
@@ -263,8 +263,8 @@ namespace TEST_StreamAPITests
             bot.MotionMode(MotionType.Joint);
 
             // Home
-            bot.JointSpeedTo(60);
-            bot.JointAccelerationTo(10);
+            //bot.JointSpeedTo(60);
+            //bot.JointAccelerationTo(10);
             bot.PrecisionTo(10);
             bot.AxesTo(homeJoints);
 
@@ -363,8 +363,8 @@ namespace TEST_StreamAPITests
             bot.PushSettings();
 
             // Home
-            bot.JointSpeedTo(20);
-            bot.JointAccelerationTo(90);
+            //bot.JointSpeedTo(20);
+            //bot.JointAccelerationTo(90);
             bot.PrecisionTo(10);
             bot.AxesTo(0, -90, -90, -90, 90, 90);
 
@@ -389,8 +389,8 @@ namespace TEST_StreamAPITests
             }
 
             // Home
-            bot.JointSpeedTo(20);
-            bot.JointAccelerationTo(90);
+            //bot.JointSpeedTo(20);
+            //bot.JointAccelerationTo(90);
             bot.PrecisionTo(10);
             bot.AxesTo(0, -90, -90, -90, 90, 90);
 
@@ -402,8 +402,8 @@ namespace TEST_StreamAPITests
             bot.PushSettings();
 
             // Home
-            bot.JointSpeedTo(20);
-            bot.JointAccelerationTo(90);
+            //bot.JointSpeedTo(20);
+            //bot.JointAccelerationTo(90);
             bot.PrecisionTo(10);
             bot.AxesTo(0, -90, -90, -90, 90, 90);
 
@@ -427,8 +427,8 @@ namespace TEST_StreamAPITests
             }
 
             // Home
-            bot.JointSpeedTo(20);
-            bot.JointAccelerationTo(90);
+            //bot.JointSpeedTo(20);
+            //bot.JointAccelerationTo(90);
             bot.PrecisionTo(10);
             bot.AxesTo(0, -90, -90, -90, 90, 90);
 

@@ -22,8 +22,11 @@
 
 ---
 # v0.8.0
-## BUILD 1413
+## BUILD 1414
+- Removal of all `JointAcceleration`, `JointSpeed` and `RotationSpeed` actions.
 
+## BUILD 1413
+- Massive API deprecation.
 
 ## BUILD 1412
 - Split `Action` classes

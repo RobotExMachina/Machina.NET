@@ -752,11 +752,11 @@ namespace Machina
 
         public bool IssueAccelerationRequest(double acc, bool relative) => IssueApplyActionRequest(new ActionAcceleration(acc, relative));
 
-        public bool IssueRotationSpeedRequest(double rotSpeed, bool rel) => IssueApplyActionRequest(new ActionRotationSpeed(rotSpeed, rel));
+        //public bool IssueRotationSpeedRequest(double rotSpeed, bool rel) => IssueApplyActionRequest(new ActionRotationSpeed(rotSpeed, rel));
 
-        public bool IssueJointSpeedRequest(double jointSpeed, bool relative) => IssueApplyActionRequest(new ActionJointSpeed(jointSpeed, relative));
+        //public bool IssueJointSpeedRequest(double jointSpeed, bool relative) => IssueApplyActionRequest(new ActionJointSpeed(jointSpeed, relative));
 
-        public bool IssueJointAccelerationRequest(double jointAcceleration, bool relative) => IssueApplyActionRequest(new ActionJointAcceleration(jointAcceleration, relative));
+        //public bool IssueJointAccelerationRequest(double jointAcceleration, bool relative) => IssueApplyActionRequest(new ActionJointAcceleration(jointAcceleration, relative));
 
         public bool IssuePrecisionRequest(double precision, bool relative) =>
                 IssueApplyActionRequest(new ActionPrecision(precision, relative));

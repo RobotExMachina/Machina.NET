@@ -83,7 +83,7 @@ namespace TEST_OfflineAPITests
             //arm.DebugBuffers();  // read all pending buffered actions
             //arm.DebugRobotCursors();
 
-            arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.prg" :
+            arm.Compile(arm.IsBrand("ABB") ? @"C:\offlineTests.prg" :
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" :
                 arm.IsBrand("KUKA") ? @"C:\offlineTests.src" :
                 arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
@@ -151,10 +151,10 @@ namespace TEST_OfflineAPITests
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
             bot.AccelerationTo(2000);
-            bot.RotationSpeedTo(45);
+            //bot.RotationSpeedTo(45);
             bot.SpeedTo(300.2);
-            bot.JointSpeedTo(45);
-            bot.JointAccelerationTo(90);
+            //bot.JointSpeedTo(45);
+            //bot.JointAccelerationTo(90);
             bot.PrecisionTo(5);
             bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.Rotate(0, 1, 0, -90);

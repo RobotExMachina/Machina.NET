@@ -26,8 +26,8 @@ namespace Machina
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
         public Joints joints, prevJoints;
-        public double acceleration;
         public double speed;
+        public double acceleration;
         public double rotationSpeed;
         public double jointAcceleration;
         public double jointSpeed;
@@ -384,9 +384,9 @@ namespace Machina
         {
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
             { typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
-            { typeof (ActionRotationSpeed),             (act, robCur) => robCur.ApplyAction((ActionRotationSpeed) act) },
-            { typeof (ActionJointSpeed),                (act, robCur) => robCur.ApplyAction((ActionJointSpeed) act) },
-            { typeof (ActionJointAcceleration),         (act, robCur) => robCur.ApplyAction((ActionJointAcceleration) act) },
+            //{ typeof (ActionRotationSpeed),             (act, robCur) => robCur.ApplyAction((ActionRotationSpeed) act) },
+            //{ typeof (ActionJointSpeed),                (act, robCur) => robCur.ApplyAction((ActionJointSpeed) act) },
+            //{ typeof (ActionJointAcceleration),         (act, robCur) => robCur.ApplyAction((ActionJointAcceleration) act) },
             { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
             { typeof (ActionMotionMode),                    (act, robCur) => robCur.ApplyAction((ActionMotionMode) act) },
             { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
@@ -470,56 +470,56 @@ namespace Machina
             return true;
         }
 
-        /// <summary>
-        /// Apply RotationSpeed Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionRotationSpeed action)
-        {
-            if (action.relative)
-                this.rotationSpeed += action.rotationSpeed;
-            else
-                this.rotationSpeed = action.rotationSpeed;
+        ///// <summary>
+        ///// Apply RotationSpeed Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionRotationSpeed action)
+        //{
+        //    if (action.relative)
+        //        this.rotationSpeed += action.rotationSpeed;
+        //    else
+        //        this.rotationSpeed = action.rotationSpeed;
 
-            if (this.rotationSpeed < 0) this.rotationSpeed = 0;
+        //    if (this.rotationSpeed < 0) this.rotationSpeed = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        /// <summary>
-        /// Apply JointSpeed Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionJointSpeed action)
-        {
-            if (action.relative)
-                this.jointSpeed += action.jointSpeed;
-            else
-                this.jointSpeed = action.jointSpeed;
+        ///// <summary>
+        ///// Apply JointSpeed Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionJointSpeed action)
+        //{
+        //    if (action.relative)
+        //        this.jointSpeed += action.jointSpeed;
+        //    else
+        //        this.jointSpeed = action.jointSpeed;
 
-            if (this.jointSpeed < 0) this.jointSpeed = 0;
+        //    if (this.jointSpeed < 0) this.jointSpeed = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        /// <summary>
-        /// Apply JointAcceleration Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionJointAcceleration action)
-        {
-            if (action.relative)
-                this.jointAcceleration += action.jointAcceleration;
-            else
-                this.jointAcceleration = action.jointAcceleration;
+        ///// <summary>
+        ///// Apply JointAcceleration Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionJointAcceleration action)
+        //{
+        //    if (action.relative)
+        //        this.jointAcceleration += action.jointAcceleration;
+        //    else
+        //        this.jointAcceleration = action.jointAcceleration;
 
-            if (this.jointAcceleration < 0) this.jointAcceleration = 0;
+        //    if (this.jointAcceleration < 0) this.jointAcceleration = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
         /// <summary>
         /// Apply Zone Action.

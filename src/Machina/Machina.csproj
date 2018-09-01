@@ -87,14 +87,11 @@
     <Compile Include="Actions\ActionInitialization.cs" />
     <Compile Include="Actions\ActionIOAnalog.cs" />
     <Compile Include="Actions\ActionIODigital.cs" />
-    <Compile Include="Actions\ActionJointAcceleration.cs" />
-    <Compile Include="Actions\ActionJointSpeed.cs" />
     <Compile Include="Actions\ActionMessage.cs" />
     <Compile Include="Actions\ActionMotion.cs" />
     <Compile Include="Actions\ActionPrecision.cs" />
     <Compile Include="Actions\ActionPushPop.cs" />
     <Compile Include="Actions\ActionRotation.cs" />
-    <Compile Include="Actions\ActionRotationSpeed.cs" />
     <Compile Include="Actions\ActionSpeed.cs" />
     <Compile Include="Actions\ActionTemperature.cs" />
     <Compile Include="Actions\ActionTransformation.cs" />
