@@ -602,7 +602,7 @@ namespace Machina
         public double GetCurrentSpeedSetting()
         {
             // @TODO: will need to decide if this returns the current virtual, write or motion speed
-            return virtualCursor.speed;
+            return virtualCursor.speedValues[SpeedType.Linear];
         }
 
         /// <summary>

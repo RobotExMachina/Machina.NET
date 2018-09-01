@@ -526,23 +526,23 @@ namespace Machina
         //    return c.GetCurrentSpeedSetting();
         //}
 
-        /// <summary>
-        /// Increase the TCP velocity value new Actions will be ran at.
-        /// </summary>
-        /// <param name="speedInc">TCP speed increment in mm/s.</param>
-        public bool Speed(double speedInc)
-        {
-            return c.IssueSpeedRequest(speedInc, true);
-        }
+        ///// <summary>
+        ///// Increase the TCP velocity value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="speedInc">TCP speed increment in mm/s.</param>
+        //public bool Speed(double speedInc)
+        //{
+        //    return c.IssueSpeedRequest(speedInc, true);
+        //}
 
-        /// <summary>
-        /// Set the TCP velocity value new Actions will be ran at.
-        /// </summary>
-        /// <param name="speed">TCP speed value in mm/s</param>
-        public bool SpeedTo(double speed)
-        {
-            return c.IssueSpeedRequest(speed, false);
-        }
+        ///// <summary>
+        ///// Set the TCP velocity value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="speed">TCP speed value in mm/s</param>
+        //public bool SpeedTo(double speed)
+        //{
+        //    return c.IssueSpeedRequest(speed, false);
+        //}
 
 
 
@@ -580,73 +580,73 @@ namespace Machina
 
 
 
-        /// <summary>
-        /// Increase the TCP acceleration value new Actions will be ran at.
-        /// </summary>
-        /// <param name="accInc">TCP acceleration increment in mm/s^2. Decreasing the total to zero or less will reset it back the robot's default.</param>
-        /// <returns></returns>
-        public bool Acceleration(double accInc)
-        {
-            return c.IssueAccelerationRequest(accInc, true);
-        }
+        ///// <summary>
+        ///// Increase the TCP acceleration value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="accInc">TCP acceleration increment in mm/s^2. Decreasing the total to zero or less will reset it back the robot's default.</param>
+        ///// <returns></returns>
+        //public bool Acceleration(double accInc)
+        //{
+        //    return c.IssueAccelerationRequest(accInc, true);
+        //}
+
+        ///// <summary>
+        ///// Set the TCP acceleration value new Actions will be ran at. 
+        ///// </summary>
+        ///// <param name="acceleration">TCP acceleration value in mm/s^2. Setting this value to zero or less will reset acceleration to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool AccelerationTo(double acceleration)
+        //{
+        //    return c.IssueAccelerationRequest(acceleration, false);
+        //}
+
+        ///// <summary>
+        ///// Increase the TCP angular rotation speed value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="rotationSpeedInc">TCP angular rotation speed increment in deg/s. Decreasing the total to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool RotationSpeed(double rotationSpeedInc)
+        //{
+        //    return c.IssueRotationSpeedRequest(rotationSpeedInc, true);
+        //}
+
+        ///// <summary>
+        ///// Set the TCP angular rotation speed value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="rotationSpeed">TCP angular rotation speed value in deg/s. Setting this value to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool RotationSpeedTo(double rotationSpeed)
+        //{
+        //    return c.IssueRotationSpeedRequest(rotationSpeed, true);
+        //}
 
         /// <summary>
-        /// Set the TCP acceleration value new Actions will be ran at. 
-        /// </summary>
-        /// <param name="acceleration">TCP acceleration value in mm/s^2. Setting this value to zero or less will reset acceleration to the robot's default.</param>
-        /// <returns></returns>
-        public bool AccelerationTo(double acceleration)
-        {
-            return c.IssueAccelerationRequest(acceleration, false);
-        }
+        ///// Increase the maximum joint angular rotation speed value. Movement will be constrained so that the fastest joint rotates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointSpeedInc">Maximum joint angular rotation speed increment in deg/s. Decreasing the total to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointSpeed(double jointSpeedInc) => c.IssueJointSpeedRequest(jointSpeedInc, true);
 
-        /// <summary>
-        /// Increase the TCP angular rotation speed value new Actions will be ran at.
-        /// </summary>
-        /// <param name="rotationSpeedInc">TCP angular rotation speed increment in deg/s. Decreasing the total to zero or less will reset it back to the robot's default.</param>
-        /// <returns></returns>
-        public bool RotationSpeed(double rotationSpeedInc)
-        {
-            return c.IssueRotationSpeedRequest(rotationSpeedInc, true);
-        }
+        ///// <summary>
+        ///// Set the maximum joint angular rotation speed value. Movement will be constrained so that the fastest joint rotates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointSpeed">Maximum joint angular rotation speed value in deg/s. Setting this value to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointSpeedTo(double jointSpeed) => c.IssueJointSpeedRequest(jointSpeed, false);
 
-        /// <summary>
-        /// Set the TCP angular rotation speed value new Actions will be ran at.
-        /// </summary>
-        /// <param name="rotationSpeed">TCP angular rotation speed value in deg/s. Setting this value to zero or less will reset it back to the robot's default.</param>
-        /// <returns></returns>
-        public bool RotationSpeedTo(double rotationSpeed)
-        {
-            return c.IssueRotationSpeedRequest(rotationSpeed, true);
-        }
+        ///// <summary>
+        ///// Increase the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointAccelerationInc">Maximum joint angular rotation acceleration increment in deg/s^2. Decreasing the total to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointAcceleration(double jointAccelerationInc) => c.IssueJointAccelerationRequest(jointAccelerationInc, true);
 
-        /// <summary>
-        /// Increase the maximum joint angular rotation speed value. Movement will be constrained so that the fastest joint rotates below this threshold. 
-        /// </summary>
-        /// <param name="jointSpeedInc">Maximum joint angular rotation speed increment in deg/s. Decreasing the total to zero or less will reset it back to the robot's default.</param>
-        /// <returns></returns>
-        public bool JointSpeed(double jointSpeedInc) => c.IssueJointSpeedRequest(jointSpeedInc, true);
-
-        /// <summary>
-        /// Set the maximum joint angular rotation speed value. Movement will be constrained so that the fastest joint rotates below this threshold. 
-        /// </summary>
-        /// <param name="jointSpeed">Maximum joint angular rotation speed value in deg/s. Setting this value to zero or less will reset it back to the robot's default.</param>
-        /// <returns></returns>
-        public bool JointSpeedTo(double jointSpeed) => c.IssueJointSpeedRequest(jointSpeed, false);
-
-        /// <summary>
-        /// Increase the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
-        /// </summary>
-        /// <param name="jointAccelerationInc">Maximum joint angular rotation acceleration increment in deg/s^2. Decreasing the total to zero or less will reset it back to the robot's default.</param>
-        /// <returns></returns>
-        public bool JointAcceleration(double jointAccelerationInc) => c.IssueJointAccelerationRequest(jointAccelerationInc, true);
-
-        /// <summary>
-        /// Set the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
-        /// </summary>
-        /// <param name="jointAcceleration">Maximum joint angular rotation acceleration value in deg/s^2. Setting this value to zero or less will reset it back to the robot's default.</param>
-        /// <returns></returns>
-        public bool JointAccelerationTo(double jointAcceleration) => c.IssueJointAccelerationRequest(jointAcceleration, false);
+        ///// <summary>
+        ///// Set the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointAcceleration">Maximum joint angular rotation acceleration value in deg/s^2. Setting this value to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointAccelerationTo(double jointAcceleration) => c.IssueJointAccelerationRequest(jointAcceleration, false);
 
         /// <summary>
         /// Gets the current zone setting.

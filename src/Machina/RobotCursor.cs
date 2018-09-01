@@ -22,14 +22,14 @@ namespace Machina
     internal class RobotCursor
     {
         // DEFAULTS
-        public const double DEFAULT_SPEED = 20;                                 // default speed for new actions
-        public const double DEFAULT_ROTATION_SPEED = 500;                       // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
-        public const double DEFAULT_JOINT_SPEED = 20;                           // deg/s
-        public const double DEFAULT_ACCELERATION = 200;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
-        public const double DEFAULT_JOINT_ACCELERATION = 40;                    // deg/s^2
+        //public const double DEFAULT_SPEED = 20;                                 // default speed for new actions
+        //public const double DEFAULT_ROTATION_SPEED = 500;                       // default rotation speed for new actions in deg/s; under zero values let the controller figure out defaults
+        //public const double DEFAULT_JOINT_SPEED = 20;                           // deg/s
+        //public const double DEFAULT_ACCELERATION = 200;                         // default acc for new actions in mm/s^2; zero values let the controller figure out accelerations
+        //public const double DEFAULT_JOINT_ACCELERATION = 40;                    // deg/s^2
 
-        public const double DEFAULT_PRECISION = 5;                              // default precision for new actions
-        public readonly Dictionary<SpeedType, double> DEFAULT_SPEED_VALUES = new Dictionary<SpeedType, double>()
+        private const double DEFAULT_PRECISION = 5;                              // default precision for new actions
+        private readonly Dictionary<SpeedType, double> DEFAULT_SPEED_VALUES = new Dictionary<SpeedType, double>()
         {
             {SpeedType.Global, 20 },                                            // A "generic" speed in mm/s, used for linear TCP speed and as the base to compute proportional speed values for other speed types. Makes things easier for entry level users. 
             {SpeedType.Linear, 20 },                                            // TCP linear speed in mm/s
@@ -39,8 +39,8 @@ namespace Machina
             {SpeedType.ExternalAxesRotational, 30 }                             // External rotational axes speed in deg/s
         };
 
-        public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;        // default motion type for new actions
-        public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;             // default reference coordinate system for relative transform actions
+        private const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;        // default motion type for new actions
+        private const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;             // default reference coordinate system for relative transform actions
 
 
 
@@ -50,31 +50,34 @@ namespace Machina
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
         public Joints joints, prevJoints;
-        public double acceleration;
-        public double speed;
-        public double rotationSpeed;
-        public double jointAcceleration;
-        public double jointSpeed;
+        public Tool tool;
+        public ExternalAxes externalAxes;
+
+
+        // Settings
+        /// <summary>
+        /// Values for all possible speed types.
+        /// </summary>
+        internal Dictionary<SpeedType, double> speedValues = new Dictionary<SpeedType, double>();
+        //public double acceleration;
+        //public double speed;
+        //public double rotationSpeed;
+        //public double jointAcceleration;
+        //public double jointSpeed;
         public double precision;
         public MotionType motionType;
         public ReferenceCS referenceCS;
-        public Tool tool;
-        public ExternalAxes externalAxes;
+        public double extrusionRate;
+
 
         // Some robots use ints as pin identifiers (UR, KUKA), while others use strings (ABB). 
         // All pin ids are stored as strings, and are parsed to ints internally if possible. 
         Dictionary<string, bool> digitalOutputs = new Dictionary<string, bool>();
         Dictionary<string, double> analogOutputs = new Dictionary<string, double>();
-
-        /// <summary>
-        /// Values for all possible speed types.
-        /// </summary>
-        Dictionary<SpeedType, double> speedValues = new Dictionary<SpeedType, double>();
-
+        
 
         // 3D printing
         public bool isExtruding;
-        public double extrusionRate;
         public Dictionary<RobotPartType, double> partTemperature = new Dictionary<RobotPartType, double>();
         public double extrudedLength, prevExtrudedLength;  // the length of filament that has been extruded, i.e. the "E" parameter
 
@@ -432,8 +435,11 @@ namespace Machina
         /// <returns></returns>
         public Settings GetSettings()
         {
-            return new Settings(this.speed, this.acceleration, this.rotationSpeed, this.jointSpeed, this.jointAcceleration, 
-                this.precision, this.motionType, this.referenceCS, this.extrusionRate);
+            return new Settings(this.speedValues, this.precision, this.motionType, this.referenceCS, this.extrusionRate); 
+
+
+            //return new Settings(this.speed, this.acceleration, this.rotationSpeed, this.jointSpeed, this.jointAcceleration, 
+            //    this.precision, this.motionType, this.referenceCS, this.extrusionRate);
         }
 
 
@@ -455,12 +461,12 @@ namespace Machina
         /// </summary>
         Dictionary<Type, Func<Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
         {
-            { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
+            //{ typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
             { typeof (ActionSpeedPlus),                 (act, robCur) => robCur.ApplyAction((ActionSpeedPlus) act) },
-            { typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
-            { typeof (ActionRotationSpeed),             (act, robCur) => robCur.ApplyAction((ActionRotationSpeed) act) },
-            { typeof (ActionJointSpeed),                (act, robCur) => robCur.ApplyAction((ActionJointSpeed) act) },
-            { typeof (ActionJointAcceleration),         (act, robCur) => robCur.ApplyAction((ActionJointAcceleration) act) },
+            //{ typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
+            //{ typeof (ActionRotationSpeed),             (act, robCur) => robCur.ApplyAction((ActionRotationSpeed) act) },
+            //{ typeof (ActionJointSpeed),                (act, robCur) => robCur.ApplyAction((ActionJointSpeed) act) },
+            //{ typeof (ActionJointAcceleration),         (act, robCur) => robCur.ApplyAction((ActionJointAcceleration) act) },
             { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
             { typeof (ActionMotionMode),                (act, robCur) => robCur.ApplyAction((ActionMotionMode) act) },
             { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
@@ -507,42 +513,42 @@ namespace Machina
         }
 
 
-        //  ╔═╗╔═╗╔╦╗╔╦╗╦╔╗╔╔═╗╔═╗  ╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
-        //  ╚═╗║╣  ║  ║ ║║║║║ ╦╚═╗  ╠═╣║   ║ ║║ ║║║║╚═╗
-        //  ╚═╝╚═╝ ╩  ╩ ╩╝╚╝╚═╝╚═╝  ╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
-        /// <summary>
-        /// Apply Acceleration Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionAcceleration action)
-        {
-            if (action.relative)
-                this.acceleration += action.acceleration;
-            else
-                this.acceleration = action.acceleration;
+        ////  ╔═╗╔═╗╔╦╗╔╦╗╦╔╗╔╔═╗╔═╗  ╔═╗╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
+        ////  ╚═╗║╣  ║  ║ ║║║║║ ╦╚═╗  ╠═╣║   ║ ║║ ║║║║╚═╗
+        ////  ╚═╝╚═╝ ╩  ╩ ╩╝╚╝╚═╝╚═╝  ╩ ╩╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
+        ///// <summary>
+        ///// Apply Acceleration Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionAcceleration action)
+        //{
+        //    if (action.relative)
+        //        this.acceleration += action.acceleration;
+        //    else
+        //        this.acceleration = action.acceleration;
 
-            if (this.acceleration < 0) this.acceleration = 0;
+        //    if (this.acceleration < 0) this.acceleration = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        /// <summary>
-        /// Apply Speed Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionSpeed action)
-        {
-            if (action.relative)
-                this.speed += action.speed;
-            else
-                this.speed = action.speed;
+        ///// <summary>
+        ///// Apply Speed Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionSpeed action)
+        //{
+        //    if (action.relative)
+        //        this.speed += action.speed;
+        //    else
+        //        this.speed = action.speed;
 
-            if (this.speed < 0) this.speed = 0;
+        //    if (this.speed < 0) this.speed = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
 
         public bool ApplyAction(ActionSpeedPlus action)
@@ -553,56 +559,56 @@ namespace Machina
 
 
 
-        /// <summary>
-        /// Apply RotationSpeed Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionRotationSpeed action)
-        {
-            if (action.relative)
-                this.rotationSpeed += action.rotationSpeed;
-            else
-                this.rotationSpeed = action.rotationSpeed;
+        ///// <summary>
+        ///// Apply RotationSpeed Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionRotationSpeed action)
+        //{
+        //    if (action.relative)
+        //        this.rotationSpeed += action.rotationSpeed;
+        //    else
+        //        this.rotationSpeed = action.rotationSpeed;
 
-            if (this.rotationSpeed < 0) this.rotationSpeed = 0;
+        //    if (this.rotationSpeed < 0) this.rotationSpeed = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        /// <summary>
-        /// Apply JointSpeed Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionJointSpeed action)
-        {
-            if (action.relative)
-                this.jointSpeed += action.jointSpeed;
-            else
-                this.jointSpeed = action.jointSpeed;
+        ///// <summary>
+        ///// Apply JointSpeed Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionJointSpeed action)
+        //{
+        //    if (action.relative)
+        //        this.jointSpeed += action.jointSpeed;
+        //    else
+        //        this.jointSpeed = action.jointSpeed;
 
-            if (this.jointSpeed < 0) this.jointSpeed = 0;
+        //    if (this.jointSpeed < 0) this.jointSpeed = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        /// <summary>
-        /// Apply JointAcceleration Action.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public bool ApplyAction(ActionJointAcceleration action)
-        {
-            if (action.relative)
-                this.jointAcceleration += action.jointAcceleration;
-            else
-                this.jointAcceleration = action.jointAcceleration;
+        ///// <summary>
+        ///// Apply JointAcceleration Action.
+        ///// </summary>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public bool ApplyAction(ActionJointAcceleration action)
+        //{
+        //    if (action.relative)
+        //        this.jointAcceleration += action.jointAcceleration;
+        //    else
+        //        this.jointAcceleration = action.jointAcceleration;
 
-            if (this.jointAcceleration < 0) this.jointAcceleration = 0;
+        //    if (this.jointAcceleration < 0) this.jointAcceleration = 0;
 
-            return true;
-        }
+        //    return true;
+        //}
 
         /// <summary>
         /// Apply Zone Action.
@@ -661,19 +667,29 @@ namespace Machina
                 Settings s = settingsBuffer.Pop(this);
                 if (s != null)
                 {
-                    this.acceleration = s.Acceleration;
-                    this.speed = s.Speed;
-                    this.rotationSpeed = s.RotationSpeed;
-                    this.jointSpeed = s.JointSpeed;
-                    this.jointAcceleration = s.JointAcceleration;
-                    this.precision = s.Precision;
-                    this.motionType = s.MotionType;
-                    this.referenceCS = s.RefCS;
-                    this.extrusionRate = s.ExtrusionRate;
+                    //this.acceleration = s.Acceleration;
+                    //this.speed = s.Speed;
+                    //this.rotationSpeed = s.RotationSpeed;
+                    //this.jointSpeed = s.JointSpeed;
+                    //this.jointAcceleration = s.JointAcceleration;
+                    //this.precision = s.Precision;
+                    //this.motionType = s.MotionType;
+                    //this.referenceCS = s.RefCS;
+                    //this.extrusionRate = s.ExtrusionRate;
+                    ApplySettings(s);
                     return true;
                 }
             }
             return false;
+        }
+
+        public void ApplySettings(Settings s)
+        {
+            this.speedValues = s.SpeedValues;
+            this.precision = s.Precision;
+            this.motionType = s.MotionType;
+            this.referenceCS = s.ReferenceCS;
+            this.extrusionRate = s.ExtrusionRate;
         }
 
 
@@ -1241,7 +1257,9 @@ namespace Machina
             this.extrudedLength += this.extrusionRate * this.prevPosition.DistanceTo(this.position);
         }
 
-        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} a{acceleration} v{speed} rv{rotationSpeed} jv{jointSpeed} ja{jointAcceleration} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
+        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} v{speedValues[SpeedType.Linear]} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
+
+        //public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} a{acceleration} v{speed} rv{rotationSpeed} jv{jointSpeed} ja{jointAcceleration} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
 
 
     }
