@@ -14,9 +14,11 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = Robot.Create("Offline_Tests", "ABB");
+            Robot arm = Robot.Create("HelloRobot", "UR");
 
-            ExternalAxes(arm);
+            HelloRobot(arm);
+
+            //ExternalAxes(arm);
 
             //VerticalSquare(arm);
 
@@ -78,23 +80,39 @@ namespace TEST_OfflineAPITests
             //// Wait and Message
             //TestWaitAndMessage(arm);
 
-            arm.DebugBuffers();  // read all pending buffered actions
-            arm.DebugRobotCursors();
+            //arm.DebugBuffers();  // read all pending buffered actions
+            //arm.DebugRobotCursors();
 
             arm.Export(arm.IsBrand("ABB") ? @"C:\offlineTests.prg" :
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" :
-                arm.IsBrand("KUKA") ? @"C:\offlineTests.src" : 
+                arm.IsBrand("KUKA") ? @"C:\offlineTests.src" :
                 arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
 
-            arm.DebugRobotCursors();
-            arm.DebugBuffers();  // at this point, the buffer should be empty and nothing should show up
+            //arm.DebugRobotCursors();
+            //arm.DebugBuffers();  // at this point, the buffer should be empty and nothing should show up
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static public void HelloRobot(Robot arm)
+        {
+            arm.ControlMode("offline");
+
+            arm.Message("Hello Robot!");
+            arm.SpeedTo(100);
+            arm.MoveTo(400, 300, 500);
+            arm.Rotate(0, 1, 0, -90);
+            arm.Move(0, 0, 250);
+            arm.Wait(2000);
+            arm.AxesTo(0, 0, 0, 0, 90, 0);
+
+            //List<string> program = arm.Compile();
+            //Console.WriteLine(program);
         }
 
         static public void ExternalAxes(Robot bot)

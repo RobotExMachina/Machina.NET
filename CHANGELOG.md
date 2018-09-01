@@ -15,20 +15,26 @@
 ```
 # TODO:
 - [ ] Improved Logging system
-- [ ] Console dump levels: DEBUG (4), INFO (3), WARNING (2), ERROR (1) and NONE (0).
+- [ ] Console dump levels: DEBUG (5), VERBOSE (4), INFO (3), WARNING (2), ERROR (1) and NONE (0).
 - [ ] Hopefully turn this changelog into something more [orthodox](http://keepachangelog.com/en/1.0.0/)
 - [ ] Make `Machina` types JSON-de/serializable via `DataContract`s
-- [ ] Implement a `Machina` compiler that outputs all Actions as simple Instructions...
-- [ ] Implement event listeners in Grasshopper
+- [ ] Add `ExternalAxis` init msg from the ABB driver
+- [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
+- [ ] Add semicolon to Push/Pop ToInstruction
+
+---
+# v0.8.0
+## BUILD 1411
+- Add `Machina.Logger` for global message logging.
+- Subscription to `Machina.Logger.WriteLine` broadcasts formatted messages below the set `Machina.Logger.SetLevel(int)`.
 
 
 ---
 # v0.7.0
-
 ## BUILD 1410
 - Create `ToolCreated` event (intern request ;)
 - Add `MACHINA` compiler: it serializes each Action into its `ToInstruction` form.
-- 
+
 
 ## BUILD 1409
 - `TCPCommunicationManagerABB` now listens to incoming messages from the driver

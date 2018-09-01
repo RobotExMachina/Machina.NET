@@ -30,24 +30,32 @@ namespace TEST_StreamAPITests
         {
             Robot arm = Robot.Create("StreamTests", "ABB");
 
+            Machina.Logger.WriteLine += Console.WriteLine;
+            Machina.Logger.CustomLogging += Logger_CustomLogging;
+
             arm.BufferEmpty += LogEvent;
             arm.ActionCompleted += LogEvent;
             arm.MotionCursorUpdated += LogEvent;
 
+            arm.ActionCompleted += (sender, eventArgs) =>
+            {
+                if (eventArgs.RemainingActions == 0) LoopUp(sender as Robot);
+            };
+
             arm.ControlMode("stream");
-
-            arm.ConnectionManager("user");
-            arm.Connect("127.0.0.1", 7000);
-
-            //arm.ConnectionMode("machina");
-            //arm.Connect();
+            arm.ConnectionManager("machina");
+            arm.Connect();
+            //arm.ConnectionManager("user");
+            //arm.Connect("127.0.0.1", 7000);
 
             //arm.SetUser("BUILD", "password");
             //arm.Connect("192.168.0.101", 6969);
 
             //arm.StreamConfiguration(3, 10);
 
-            //arm.Message("Hello Robot!");
+            arm.Message("Hello Robot!");
+
+            LoopUp(arm);
 
             //Console.WriteLine("DUMPING BUFFERS");
             //arm.DebugRobotCursors();
@@ -71,10 +79,10 @@ namespace TEST_StreamAPITests
             //VerticalCircleUR(arm);
 
 
-            Console.WriteLine(" ");
-            Console.WriteLine("Press any key to START THE SPIRAL...");
-            Console.ReadKey();
-            Spiral(arm, 1);
+            //Console.WriteLine(" ");
+            //Console.WriteLine("Press any key to START THE SPIRAL...");
+            //Console.ReadKey();
+            //Spiral(arm, 1);
 
             //int frame = 0;
             //while(frame < 20 * 1000/30.0)
@@ -107,6 +115,20 @@ namespace TEST_StreamAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        private static void Logger_CustomLogging(LoggerArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        static void LoopUp(Robot bot)
+        {
+            bot.Move(50, 0, 0);
+            bot.Move(0, 50, 0);
+            bot.Move(-50, 0, 0);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, 10);
         }
 
         static public void ExternalAxes(Robot bot)

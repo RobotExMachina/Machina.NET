@@ -155,4 +155,17 @@ namespace Machina
         Linear, 
         Angular
     }
+
+    /// <summary>
+    /// Defines how verbose should internal logging be
+    /// </summary>
+    public enum LogLevel
+    {
+        NONE = 0,
+        ERROR = 1,
+        WARNING = 2,
+        INFO = 3,
+        VERBOSE = 4,
+        DEBUG = 5
+    }
 }
