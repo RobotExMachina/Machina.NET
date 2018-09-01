@@ -23,10 +23,10 @@ namespace Machina
         public bool wait;
         public bool relative;
 
+        public override ActionType Type => ActionType.Temperature;
+
         public ActionTemperature(double temperature, RobotPartType robotPart, bool wait, bool relative) : base()
         {
-            this.type = ActionType.Temperature;
-
             this.temperature = temperature;
             this.robotPart = robotPart;
             this.wait = wait;

@@ -19,11 +19,10 @@ namespace Machina
     public class ActionCoordinates : Action
     {
         public ReferenceCS referenceCS;
+        public override ActionType Type => ActionType.Coordinates;
 
         public ActionCoordinates(ReferenceCS referenceCS) : base()
         {
-            this.type = ActionType.Coordinates;
-
             this.referenceCS = referenceCS;
         }
 

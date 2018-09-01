@@ -20,10 +20,10 @@ namespace Machina
     {
         public bool extrude;
 
-        public ActionExtrusion(bool extrude)
-        {
-            this.type = ActionType.Extrusion;
+        public override ActionType Type => ActionType.Extrusion;
 
+        public ActionExtrusion(bool extrude) : base()
+        {
             this.extrude = extrude;
         }
 

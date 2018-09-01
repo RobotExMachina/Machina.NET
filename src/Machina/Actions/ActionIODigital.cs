@@ -25,9 +25,10 @@ namespace Machina
         public int pinNum = 0;
         public bool isToolPin = false;
 
+        public override ActionType Type => ActionType.IODigital;
+
         public ActionIODigital(string pin, bool isOn, bool toolPin) : base()
         {
-            this.type = ActionType.IODigital;
             this.pinName = pin;
             this.on = isOn;
             this.isDigit = Int32.TryParse(this.pinName, out this.pinNum);

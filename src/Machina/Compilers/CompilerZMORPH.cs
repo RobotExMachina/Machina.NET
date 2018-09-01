@@ -312,7 +312,7 @@ namespace Machina
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
                     commChar,
-                    action.id);
+                    action.Id);
             }
 
             declaration = dec;

@@ -6,24 +6,23 @@ using System.Threading.Tasks;
 
 namespace Machina
 {
-    //  ███╗   ███╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗
-    //  ████╗ ████║██╔═══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
-    //  ██╔████╔██║██║   ██║   ██║   ██║██║   ██║██╔██╗ ██║
-    //  ██║╚██╔╝██║██║   ██║   ██║   ██║██║   ██║██║╚██╗██║
-    //  ██║ ╚═╝ ██║╚██████╔╝   ██║   ██║╚██████╔╝██║ ╚████║
-    //  ╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-    //                                                     
+    //  ███╗   ███╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗███╗   ███╗ ██████╗ ██████╗ ███████╗
+    //  ████╗ ████║██╔═══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║████╗ ████║██╔═══██╗██╔══██╗██╔════╝
+    //  ██╔████╔██║██║   ██║   ██║   ██║██║   ██║██╔██╗ ██║██╔████╔██║██║   ██║██║  ██║█████╗  
+    //  ██║╚██╔╝██║██║   ██║   ██║   ██║██║   ██║██║╚██╗██║██║╚██╔╝██║██║   ██║██║  ██║██╔══╝  
+    //  ██║ ╚═╝ ██║╚██████╔╝   ██║   ██║╚██████╔╝██║ ╚████║██║ ╚═╝ ██║╚██████╔╝██████╔╝███████╗
+    //  ╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+    //                                                                                         
     /// <summary>
     /// An Action to change current MotionType.
     /// </summary>
-    public class ActionMotion : Action
+    public class ActionMotionMode : Action
     {
         public MotionType motionType;
+        public override ActionType Type => ActionType.MotionMode;
 
-        public ActionMotion(MotionType motionType) : base()
+        public ActionMotionMode(MotionType motionType) : base()
         {
-            this.type = ActionType.Motion;
-
             this.motionType = motionType;
         }
 

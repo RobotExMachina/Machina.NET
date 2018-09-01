@@ -20,10 +20,10 @@ namespace Machina
     {
         public long millis;
 
+        public override ActionType Type => ActionType.Wait;
+
         public ActionWait(long millis) : base()
         {
-            this.type = ActionType.Wait;
-
             this.millis = millis;
         }
 

@@ -18,10 +18,10 @@ namespace Machina
         public double jointSpeed;
         public bool relative;
 
+        public override ActionType Type => ActionType.JointSpeed;
+
         public ActionJointSpeed(double jointSpeed, bool rel) : base()
         {
-            this.type = ActionType.JointSpeed;
-
             this.jointSpeed = jointSpeed;
             this.relative = rel;
         }

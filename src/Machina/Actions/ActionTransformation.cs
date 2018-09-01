@@ -23,10 +23,10 @@ namespace Machina
         public bool relative;
         public bool translationFirst;  // for relative transforms, translate or rotate first?
 
+        public override ActionType Type => ActionType.Transformation;
+
         public ActionTransformation(Vector translation, Rotation rotation, bool relative, bool translationFirst) : base()
         {
-            this.type = ActionType.Transformation;
-
             this.translation = new Vector(translation);  // shallow copy
             this.rotation = new Rotation(rotation);  // shallow copy
             this.relative = relative;

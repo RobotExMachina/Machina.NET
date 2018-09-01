@@ -18,14 +18,13 @@ namespace Machina
     /// </summary>
     public class ActionTranslation : Action
     {
-
         public Vector translation;
         public bool relative;
 
+        public override ActionType Type => ActionType.Translation;
+
         public ActionTranslation(Vector trans, bool relTrans) : base()
         {
-            this.type = ActionType.Translation;
-
             this.translation = new Vector(trans);  // shallow copy
             this.relative = relTrans;
         }

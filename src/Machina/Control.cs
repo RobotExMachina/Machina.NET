@@ -763,7 +763,7 @@ namespace Machina
 
 
         public bool IssueMotionRequest(MotionType motionType) =>
-                IssueApplyActionRequest(new ActionMotion(motionType));
+                IssueApplyActionRequest(new ActionMotionMode(motionType));
 
 
         public bool IssueCoordinatesRequest(ReferenceCS referenceCS) =>

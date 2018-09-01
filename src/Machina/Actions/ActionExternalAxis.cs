@@ -22,9 +22,10 @@ namespace Machina
         public double value;
         public bool relative;
 
-        public ActionExternalAxis(int axisNumber, double value, bool relative)
+        public override ActionType Type => ActionType.ExternalAxis;
+
+        public ActionExternalAxis(int axisNumber, double value, bool relative) : base()
         {
-            this.type = ActionType.ExternalAxis;
             this.axisNumber = axisNumber;
             this.value = value;
             this.relative = relative;

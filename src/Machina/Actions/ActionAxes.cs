@@ -21,10 +21,10 @@ namespace Machina
         public Joints joints;
         public bool relative;
 
-        public ActionAxes(Joints joints, bool relative)
-        {
-            this.type = ActionType.Axes;
+        public override ActionType Type => ActionType.Axes;
 
+        public ActionAxes(Joints joints, bool relative) : base()
+        {
             this.joints = new Joints(joints);  // shallow copy
             this.relative = relative;
         }

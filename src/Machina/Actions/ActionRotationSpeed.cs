@@ -19,10 +19,10 @@ namespace Machina
         public double rotationSpeed;
         public bool relative;
 
+        public override ActionType Type => ActionType.RotationSpeed;
+
         public ActionRotationSpeed(double rotSpeed, bool rel) : base()
         {
-            this.type = ActionType.RotationSpeed;
-
             this.rotationSpeed = rotSpeed;
             this.relative = rel;
         }

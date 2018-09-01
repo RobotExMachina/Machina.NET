@@ -22,10 +22,10 @@ namespace Machina
         public Tool tool;
         internal bool translationFirst;
 
+        public override ActionType Type => ActionType.Attach;
+
         public ActionAttach(Tool tool) : base()
         {
-            this.type = ActionType.Attach;
-
             this.tool = tool;
             this.translationFirst = tool.translationFirst;
         }

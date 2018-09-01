@@ -21,10 +21,10 @@ namespace Machina
         public double precision;
         public bool relative;
 
+        public override ActionType Type => ActionType.Precision;
+
         public ActionPrecision(double value, bool relative) : base()
         {
-            this.type = ActionType.Precision;
-
             this.precision = value;
             this.relative = relative;
         }

@@ -22,10 +22,10 @@ namespace Machina
         public double speed;
         public bool relative;
 
+        public override ActionType Type => ActionType.Speed;
+
         public ActionSpeed(double speed, bool relative) : base()
         {
-            this.type = ActionType.Speed;
-
             this.speed = speed;
             this.relative = relative;
         }

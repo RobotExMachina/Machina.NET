@@ -242,7 +242,7 @@ namespace Machina.Drivers.Communication
                     if (_sendMsgBytes != null)
                     {
                         _robotNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
-                        _sentIDs.Add(this._writeCursor.GetLastAction().id);
+                        _sentIDs.Add(this._writeCursor.GetLastAction().Id);
                         _sentMessages++;
 
                         logger.Debug("Sending:");

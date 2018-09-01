@@ -28,7 +28,7 @@ namespace Machina
         JointSpeed, 
         JointAcceleration,
         Precision,
-        Motion,
+        MotionMode,
         Coordinates,
         PushPop, 
         Comment,
@@ -60,26 +60,30 @@ namespace Machina
     /// They are independent from the device's properties, and their translation into
     /// actual robotic instructions depends on the robot's properties and state. 
     /// </summary>
-    public class Action
+    public abstract class Action
     {
         //  ╔═╗╔╦╗╔═╗╔╦╗╦╔═╗  ╔═╗╔╦╗╦ ╦╔═╗╔═╗
         //  ╚═╗ ║ ╠═╣ ║ ║║    ╚═╗ ║ ║ ║╠╣ ╠╣ 
         //  ╚═╝ ╩ ╩ ╩ ╩ ╩╚═╝  ╚═╝ ╩ ╚═╝╚  ╚  
         internal static int currentId = 1;  // a rolling id counter
 
+        /// <summary>
+        /// Unique id for this Action.
+        /// </summary>
+        public int Id { get; }
 
-        //  ╦╔╗╔╔═╗╔╦╗╔═╗╔╗╔╔═╗╔═╗  ╔═╗╔╦╗╦ ╦╔═╗╔═╗
-        //  ║║║║╚═╗ ║ ╠═╣║║║║  ║╣   ╚═╗ ║ ║ ║╠╣ ╠╣ 
-        //  ╩╝╚╝╚═╝ ╩ ╩ ╩╝╚╝╚═╝╚═╝  ╚═╝ ╩ ╚═╝╚  ╚  
-        public ActionType type = ActionType.Undefined;
-        public int id;
+        /// <summary>
+        /// The type of Action this object is representing.
+        /// </summary>
+        public abstract ActionType Type { get; }
+
 
         /// <summary>
         /// A base constructor to take care of common setup for all actionss
         /// </summary>
         public Action()
         {
-            this.id = currentId++;
+            this.Id = currentId++;
         }
 
         /// <summary>
@@ -88,7 +92,7 @@ namespace Machina
         /// Useful for generating actions to send to the Bridge.
         /// </summary>
         /// <returns></returns>
-        public virtual string ToInstruction() => null;
+        public abstract string ToInstruction();
 
     }
 

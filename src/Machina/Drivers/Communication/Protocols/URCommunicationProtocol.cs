@@ -90,7 +90,7 @@ namespace Machina.Drivers.Communication.Protocols
                     RotationVector rv = cursor.rotation.AA.ToRotationVector();
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         cursor.motionType == MotionType.Joint ? INST_MOVEJ_P : INST_MOVEL,
                         (int) Math.Round(cursor.position.X * 0.001 * FACTOR_M),
                         (int) Math.Round(cursor.position.Y * 0.001 * FACTOR_M),
@@ -104,7 +104,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Axes:
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_MOVEJ_Q,
                         (int) Math.Round(cursor.joints.J1 * Geometry.TO_RADS * FACTOR_RAD),
                         (int) Math.Round(cursor.joints.J2 * Geometry.TO_RADS * FACTOR_RAD),
@@ -119,7 +119,7 @@ namespace Machina.Drivers.Communication.Protocols
                     ActionWait aa = _action as ActionWait;
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_SLEEP,
                         (int) Math.Round(aa.millis * 0.001 * FACTOR_SEC)
                     };
@@ -138,7 +138,7 @@ namespace Machina.Drivers.Communication.Protocols
                     RotationVector trv = t.TCPOrientation.ToRotationVector();
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_SET_TOOL,
                         (int) Math.Round(t.TCPPosition.X * 0.001 * FACTOR_M),
                         (int) Math.Round(t.TCPPosition.Y * 0.001 * FACTOR_M),
@@ -153,7 +153,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Detach:
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_SET_TOOL,
                         0,
                         0,
@@ -169,7 +169,7 @@ namespace Machina.Drivers.Communication.Protocols
                     ActionIODigital aiod = _action as ActionIODigital;
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_SET_DIGITAL_OUT,
                         aiod.pinNum,
                         aiod.on ? 1 : 0
@@ -180,7 +180,7 @@ namespace Machina.Drivers.Communication.Protocols
                     ActionIOAnalog aioa = _action as ActionIOAnalog;
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_SET_DIGITAL_OUT,
                         aioa.pinNum,
                         (int) Math.Round(aioa.value * FACTOR_VOLT)
@@ -194,7 +194,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Speed:
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_TCP_SPEED,
                         (int) Math.Round(cursor.speed * 0.001 * FACTOR_M)
                     };
@@ -203,7 +203,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Acceleration:
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_TCP_ACC,
                         (int) Math.Round(cursor.acceleration * 0.001 * FACTOR_M)
                     };
@@ -212,7 +212,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.JointSpeed:
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_Q_SPEED,
                         (int) Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD)
                     };
@@ -221,7 +221,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.JointAcceleration:
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_Q_ACC,
                         (int) Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD)
                     };
@@ -230,7 +230,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Precision:
                     _params = new int[]
                     {
-                        _action.id,
+                        _action.Id,
                         INST_BLEND,
                         (int) Math.Round(cursor.precision * 0.001 * FACTOR_M)
                     };
@@ -264,7 +264,7 @@ namespace Machina.Drivers.Communication.Protocols
                     int it = 0;
                     foreach (var setting in poppedSettings)
                     {
-                        _params[3 * it] = it == poppedSettings.Count - 1 ? app.id : -1;  // only attach the real id to the last instruction
+                        _params[3 * it] = it == poppedSettings.Count - 1 ? app.Id : -1;  // only attach the real id to the last instruction
                         _params[3 * it + 1] = setting.Key;
                         _params[3 * it + 2] = setting.Value;
                         it++;

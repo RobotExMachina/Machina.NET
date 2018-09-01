@@ -128,7 +128,7 @@ namespace Machina
             int count = 0;
             foreach (Action a in pending)
             {
-                if (a.id <= id) count++;
+                if (a.Id <= id) count++;
                 else break;
             }
 
@@ -139,7 +139,7 @@ namespace Machina
             }
 
             // If the action wasn't found (is this even possible??)
-            if (count == pending.Count && pending[pending.Count - 1].id != id)
+            if (count == pending.Count && pending[pending.Count - 1].Id != id)
             {
                 throw new Exception($"Couldn't find id {id} in the the action buffer");
             }

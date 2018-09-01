@@ -21,10 +21,10 @@ namespace Machina
         public Rotation rotation;
         public bool relative;
 
+        public override ActionType Type => ActionType.Rotation;
+
         public ActionRotation(Rotation rot, bool relRot) : base()
         {
-            this.type = ActionType.Rotation;
-
             this.rotation = new Rotation(rot);  // shallow copy
             this.relative = relRot;
         }

@@ -53,7 +53,7 @@ namespace Machina.Drivers.Communication.Protocols
                     //// MoveL/J X Y Z QW QX QY QZ
                     msgs.Add(string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9}{10}",
                         STR_MESSAGE_ID_CHAR,
-                        action.id,
+                        action.Id,
                         cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ,
                         Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
@@ -69,7 +69,7 @@ namespace Machina.Drivers.Communication.Protocols
                     // MoveAbsJ J1 J2 J3 J4 J5 J6
                     msgs.Add(string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8}{9}",
                         STR_MESSAGE_ID_CHAR,
-                        action.id,
+                        action.Id,
                         INST_MOVEABSJ,
                         Math.Round(cursor.joints.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
                         Math.Round(cursor.joints.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
@@ -82,24 +82,24 @@ namespace Machina.Drivers.Communication.Protocols
 
                 case ActionType.Speed:
                     // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");  // this accepts more velocity params, but those are still not implemented in Machina... 
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");  // this accepts more velocity params, but those are still not implemented in Machina... 
                     break;
 
                 case ActionType.Precision:
                     // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}");  // this accepts more zone params, but those are still not implemented in Machina... 
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}");  // this accepts more zone params, but those are still not implemented in Machina... 
                     break;
 
                 case ActionType.Wait:
                     // !WaitTime T
                     ActionWait aw = (ActionWait)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_WAITTIME} {0.001 * aw.millis}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_WAITTIME} {0.001 * aw.millis}{STR_MESSAGE_END_CHAR}");
                     break;
 
                 case ActionType.Message:
                     // !TPWrite "MSG"
                     ActionMessage am = (ActionMessage)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_TPWRITE} \"{am.message}\"{STR_MESSAGE_END_CHAR}");
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_TPWRITE} \"{am.message}\"{STR_MESSAGE_END_CHAR}");
                     break;
 
                 case ActionType.Attach:
@@ -109,7 +109,7 @@ namespace Machina.Drivers.Communication.Protocols
 
                     msgs.Add(string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}{14}",
                         STR_MESSAGE_ID_CHAR,
-                        action.id,
+                        action.Id,
                         INST_TOOL,
                         Math.Round(t.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(t.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
@@ -127,19 +127,19 @@ namespace Machina.Drivers.Communication.Protocols
 
                 case ActionType.Detach:
                     // !(settool0)
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_NOTOOL}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_NOTOOL}{STR_MESSAGE_END_CHAR}");
                     break;
 
                 case ActionType.IODigital:
                     // !SetDO "NAME" ON
                     ActionIODigital aiod = (ActionIODigital)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETDO} \"{aiod.pinName}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SETDO} \"{aiod.pinName}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}");
                     break;
 
                 case ActionType.IOAnalog:
                     // !SetAO "NAME" V
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SETAO} \"{aioa.pinName}\" {aioa.value}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SETAO} \"{aioa.pinName}\" {aioa.value}{STR_MESSAGE_END_CHAR}");
                     break;
 
                 case ActionType.PushPop:
@@ -154,11 +154,11 @@ namespace Machina.Drivers.Communication.Protocols
                         Settings beforePop = cursor.settingsBuffer.SettingsBeforeLastPop;
                         if (beforePop.Speed != cursor.speed)
                         {
-                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");
+                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");
                         }
                         if (beforePop.Precision != cursor.precision)
                         {
-                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}");
+                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}");
                         }
                     }
                     break;
@@ -167,7 +167,7 @@ namespace Machina.Drivers.Communication.Protocols
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
 
                 case ActionType.ExternalAxis:
-                    string msg = $"{STR_MESSAGE_ID_CHAR}{action.id} {INST_EXT_JOINTS} ";
+                    string msg = $"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_EXT_JOINTS} ";
 
                     for (int i = 0; i < cursor.externalAxes.Length; i++)
                     {

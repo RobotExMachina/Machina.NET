@@ -19,11 +19,10 @@ namespace Machina
     public class ActionMessage : Action
     {
         public string message;
+        public override ActionType Type => ActionType.Message;
 
         public ActionMessage(string message) : base()
         {
-            this.type = ActionType.Message;
-
             this.message = message;
         }
 

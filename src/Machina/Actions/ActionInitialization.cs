@@ -20,11 +20,10 @@ namespace Machina
     public class ActionInitialization : Action
     {
         public bool initialize;
+        public override ActionType Type => ActionType.Initialization;
 
         public ActionInitialization(bool initialize) : base()
         {
-            this.type = ActionType.Initialization;
-
             this.initialize = initialize;
         }
 

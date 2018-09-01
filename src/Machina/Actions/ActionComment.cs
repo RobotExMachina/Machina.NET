@@ -20,10 +20,10 @@ namespace Machina
     {
         public string comment;
 
+        public override ActionType Type => ActionType.Comment;
+
         public ActionComment(string comment) : base()
         {
-            this.type = ActionType.Comment;
-
             this.comment = comment;
         }
 

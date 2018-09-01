@@ -25,6 +25,8 @@
 ## BUILD 1412
 - Split `Action` classes
 - Removed static `Action` constructors.
+- Add `:base()` to several children `Action` classes
+- `ActionType` is not an abstract property of `Action`
 
 ## BUILD 1411
 - Add `Machina.Logger` for global message logging.

@@ -21,10 +21,10 @@ namespace Machina
         public double rate;
         public bool relative;
 
+        public override ActionType Type => ActionType.ExtrusionRate;
+
         public ActionExtrusionRate(double rate, bool relative) : base()
         {
-            this.type = ActionType.ExtrusionRate;
-
             this.rate = rate;
             this.relative = relative;
         }

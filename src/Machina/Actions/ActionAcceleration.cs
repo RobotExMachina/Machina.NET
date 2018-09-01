@@ -18,10 +18,10 @@ namespace Machina
         public double acceleration;
         public bool relative;
 
+        public override ActionType Type => ActionType.Acceleration;
+
         public ActionAcceleration(double acc, bool relative) : base()
         {
-            this.type = ActionType.Acceleration;
-
             this.acceleration = acc;
             this.relative = relative;
         }

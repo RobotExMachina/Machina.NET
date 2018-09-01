@@ -388,7 +388,7 @@ namespace Machina
             { typeof (ActionJointSpeed),                (act, robCur) => robCur.ApplyAction((ActionJointSpeed) act) },
             { typeof (ActionJointAcceleration),         (act, robCur) => robCur.ApplyAction((ActionJointAcceleration) act) },
             { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
-            { typeof (ActionMotion),                    (act, robCur) => robCur.ApplyAction((ActionMotion) act) },
+            { typeof (ActionMotionMode),                    (act, robCur) => robCur.ApplyAction((ActionMotionMode) act) },
             { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
             { typeof (ActionPushPop),                   (act, robCur) => robCur.ApplyAction((ActionPushPop) act) },
             { typeof (ActionTranslation),               (act, robCur) => robCur.ApplyAction((ActionTranslation) act) },
@@ -543,7 +543,7 @@ namespace Machina
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public bool ApplyAction(ActionMotion action)
+        public bool ApplyAction(ActionMotionMode action)
         {
             this.motionType = action.motionType;
 

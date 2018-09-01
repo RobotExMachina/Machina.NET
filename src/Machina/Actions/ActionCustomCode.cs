@@ -21,9 +21,10 @@ namespace Machina
         public string statement;
         public bool isDeclaration;
 
-        public ActionCustomCode(string statement, bool isDeclaration)
+        public override ActionType Type => ActionType.CustomCode;
+
+        public ActionCustomCode(string statement, bool isDeclaration) : base()
         {
-            this.type = ActionType.CustomCode;
             this.statement = statement;
             this.isDeclaration = isDeclaration;
         }

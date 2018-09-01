@@ -11,10 +11,10 @@ namespace Machina
         public double jointAcceleration;
         public bool relative;
 
+        public override ActionType Type => ActionType.JointAcceleration;
+
         public ActionJointAcceleration(double jointAcceleration, bool rel) : base()
         {
-            this.type = ActionType.JointAcceleration;
-
             this.jointAcceleration = jointAcceleration;
             this.relative = rel;
         }

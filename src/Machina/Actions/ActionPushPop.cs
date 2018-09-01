@@ -20,10 +20,10 @@ namespace Machina
     {
         public bool push;  // is this push or pop?
 
+        public override ActionType Type => ActionType.PushPop;
+
         public ActionPushPop(bool push) : base()
         {
-            this.type = ActionType.PushPop;
-
             this.push = push;
         }
 
