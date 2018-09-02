@@ -13,6 +13,8 @@ namespace Machina.Drivers.Communication.Protocols
         internal static readonly char STR_MESSAGE_ID_CHAR = '@';
         internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
 
+        internal static readonly string MACHINA_SERVER_VERSION = "1.2.1";
+
         // A RAPID-code oriented API:
         //                                     // INSTRUCTION P1 P2 P3 P4...
         internal const int INST_MOVEL = 1;              // MoveL X Y Z QW QX QY QZ
@@ -27,10 +29,13 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int INST_SETDO = 10;             // SetDO "NAME" ON
         internal const int INST_SETAO = 11;             // SetAO "NAME" V
         internal const int INST_EXT_JOINTS = 12;        // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+        internal const int INST_ACCELERATION = 13;      // (setacceleration values, TBD)
+        internal const int INST_SING_AREA = 14;         // SingArea bool (sets Wrist or Off)
 
+        internal const int RES_VERSION = 20;            // ">20 1 2 1;" Sends version numbers
         internal const int RES_POSE = 21;               // ">21 400 300 500 0 0 1 0;"
         internal const int RES_JOINTS = 22;             // ">22 0 0 0 0 90 0;"
-        // const int RES_EXTAX = 23;
+        internal const int RES_EXTAX = 23;
 
 
         /// <summary>

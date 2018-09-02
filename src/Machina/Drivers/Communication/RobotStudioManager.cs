@@ -43,20 +43,19 @@ namespace Machina.Drivers.Communication
 
         private string _ip = "";
         public string IP => _ip;
+        private int _port = 7000;
+        public int Port => _port;
 
-        private int _writePort;
-        public int WritePort => _writePort;
-        private int _readPort;
-        public int ReadPort => _readPort;
+        //private int _writePort;
+        //public int WritePort => _writePort;
+        //private int _readPort;
+        //public int ReadPort => _readPort;
         
         private string _streamingModule;
             
         private const string REMOTE_BUFFER_DIR = "Machina";
 
-
-
-
-
+        
 
         public RobotStudioManager(Driver parent)
         {
@@ -744,7 +743,7 @@ namespace Machina.Drivers.Communication
 
         public bool SetupStreamingMode()
         {
-            if (!SetupStreamingModules())
+            if (!LoadDriverScript())
             {
                 logger.Debug("Could not setup streaming modules");
                 return false;
@@ -772,31 +771,53 @@ namespace Machina.Drivers.Communication
         }
 
 
-        /// <summary>
-        /// Read
-        /// </summary>
-        /// <returns></returns>
-        private bool SetupStreamingModules()
+        ///// <summary>
+        ///// Read
+        ///// </summary>
+        ///// <returns></returns>
+        //private bool SetupStreamingModules()
+        //{
+        //    //if (hasMultiTasking)
+        //    //{
+        //    //    // TODO: depending on availability of multitasking, upload different modules... 
+        //    //}
+
+
+        //    // Read the resource as a string
+        //    _streamingModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.SingleTask.Machina_ABB_Server_SingleTask.mod");
+
+        //    // Get the port number/s from the file's "CONST num SERVER_PORT := 7000;"
+        //    // @TODO: this is super flimsy, use regex here...
+        //    int portPos = _streamingModule.IndexOf("SERVER_PORT") + 15;
+        //    string portStr = _streamingModule.Substring(portPos, 4);
+        //    _writePort = Convert.ToInt32(portStr);
+
+        //    _driverScript = _driverScript.Replace("{{HOSTNAME}}", _serverIP);
+        //    _driverScript = _driverScript.Replace("{{PORT}}", _serverPort.ToString());
+
+        //    logger.Debug($"_writePort set to {_writePort}");
+
+        //    // Replace the IP in the module with the one found by this manager: "CONST string SERVER_IP := "127.0.0.1";"
+        //    _streamingModule = _streamingModule.Replace("127.0.0.1", IP);
+
+        //    return true;
+        //}
+
+        private bool LoadDriverScript()
         {
             //if (hasMultiTasking)
             //{
             //    // TODO: depending on availability of multitasking, upload different modules... 
             //}
 
-
             // Read the resource as a string
             _streamingModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.SingleTask.Machina_ABB_Server_SingleTask.mod");
 
-            // Get the port number/s from the file's "CONST num SERVER_PORT := 7000;"
-            // @TODO: this is super flimsy, use regex here...
-            int portPos = _streamingModule.IndexOf("SERVER_PORT") + 15;
-            string portStr = _streamingModule.Substring(portPos, 4);
-            _writePort = Convert.ToInt32(portStr);
+            // @TODO: remove comments, trailing spaces and empty lines from script
+            _streamingModule = _streamingModule.Replace("{{HOSTNAME}}", IP);
+            _streamingModule = _streamingModule.Replace("{{PORT}}", Port.ToString());
 
-            logger.Debug($"_writePort set to {_writePort}");
-
-            // Replace the IP in the module with the one found by this manager: "CONST string SERVER_IP := "127.0.0.1";"
-            _streamingModule = _streamingModule.Replace("127.0.0.1", IP);
+            logger.Debug($"Loaded ABB Driver module and cofigured to {IP}:{Port}");
 
             return true;
         }

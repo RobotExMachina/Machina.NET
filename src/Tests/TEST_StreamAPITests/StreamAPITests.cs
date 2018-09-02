@@ -30,8 +30,7 @@ namespace TEST_StreamAPITests
         {
             Robot arm = Robot.Create("StreamTests", "ABB");
 
-            Machina.Logger.WriteLine += Console.WriteLine;
-            Machina.Logger.CustomLogging += Logger_CustomLogging;
+            arm.DebugMode(true);
 
             arm.BufferEmpty += LogEvent;
             arm.ActionCompleted += LogEvent;
@@ -41,6 +40,7 @@ namespace TEST_StreamAPITests
             {
                 if (eventArgs.RemainingActions == 0) LoopUp(sender as Robot);
             };
+
 
             arm.ControlMode("stream");
             arm.ConnectionManager("machina");
@@ -55,7 +55,7 @@ namespace TEST_StreamAPITests
 
             arm.Message("Hello Robot!");
 
-            LoopUp(arm);
+            //LoopUp(arm);
 
             //Console.WriteLine("DUMPING BUFFERS");
             //arm.DebugRobotCursors();

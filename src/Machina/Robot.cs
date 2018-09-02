@@ -1452,6 +1452,23 @@ namespace Machina
             //c.DebugSettingsBuffer();
         }
 
+        /// <summary>
+        /// Sets Machina to dump all log messages to the Console.
+        /// </summary>
+        public void DebugMode(bool on)
+        {
+            if (on)
+            {
+                Machina.Logger.WriteLine += Console.WriteLine;
+                Machina.Logger.SetLogLevel(LogLevel.DEBUG);
+            } 
+            else
+            {
+                Machina.Logger.WriteLine -= Console.WriteLine;
+                Machina.Logger.SetLogLevel(LogLevel.INFO);
+            }
+        }
+
 
 
 

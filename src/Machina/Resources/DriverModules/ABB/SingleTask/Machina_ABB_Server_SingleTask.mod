@@ -63,7 +63,7 @@ MODULE Machina_Server
     CONST num SERVER_PORT := {{PORT}};           ! Change to custom port number, typically 7000.
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.2.0";
+    CONST string MACHINA_SERVER_VERSION := "1.2.1";
 
     ! Should program exit on any kind of error?
     VAR bool USE_STRICT := TRUE;
@@ -88,15 +88,17 @@ MODULE Machina_Server
     CONST num INST_SETAO := 11;             ! SetAO "NAME" V
     CONST num INST_EXT_JOINTS := 12;        ! (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
     CONST num INST_ACCELERATION := 13;      ! (setacceleration values, TBD)
+    CONST num INST_SING_AREA := 14;         ! SingArea bool (sets Wrist or Off)
 
     CONST num INST_STOP_EXECUTION := 100;       ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;             ! A way to retreive state information from the server (not implemented)
     CONST num INST_SET_CONFIGURATION := 102;    ! A way to make some changes to the configuration of the server
 
     ! (these could be straight strings since they are never used for checks...?)
-    CONST num RES_POSE := 21;               ! ">21 400 300 500 0 0 1 0;
-    CONST num RES_JOINTS := 22;             ! ">22 0 0 0 0 90 0;
-    ! CONST num RES_EXTAX := 23;
+    CONST num RES_VERSION := 20;            ! ">20 1 2 1;" Sends version numbers
+    CONST num RES_POSE := 21;               ! ">21 400 300 500 0 0 1 0;" Sends pose
+    CONST num RES_JOINTS := 22;             ! ">22 0 0 0 0 90 0;" Sends joints
+    CONST num RES_EXTAX := 23;              ! ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
 
     ! Characters used for buffer parsing
     CONST string STR_MESSAGE_END_CHAR := ";";
@@ -131,6 +133,7 @@ MODULE Machina_Server
     ! State variables for real-time motion tracking
     VAR robtarget nowrt;
     VAR jointtarget nowjt;
+    VAR extjoint nowej;
 
     ! Buffer of incoming messages
     CONST num msgBufferSize := 1000;
@@ -238,6 +241,18 @@ MODULE Machina_Server
 
                 CASE INST_EXT_JOINTS:
                     cursorExtJointsTarget := GetExternalJointsData(currentAction);
+
+                CASE INST_ACCELERATION:
+                    TPWrite("Acceleration still not implemented");
+
+                CASE INST_SING_AREA:
+                    IF currentAction.p1 = 1 THEN
+                        SingArea \Wrist;
+                    ELSE
+                        SingArea \Off;
+                    ENDIF
+
+
 
                 CASE INST_STOP_EXECUTION:
                     stopExecution := TRUE;
@@ -391,8 +406,14 @@ MODULE Machina_Server
         SocketSend clientSocket \Str:=response;
     ENDPROC
 
-    !VAR robtarget currentRobotTarget;
-    !VAR jointtarget currentJointTarget;
+
+    ! Send the version of this module to the socket
+    PROC SendVersion()
+
+    ENDPROC
+
+
+    ! Send the value of the current pose to the socket
     PROC SendPose()
         nowrt := CRobT(\Tool:=tool0, \WObj:=wobj0);
 
@@ -410,6 +431,7 @@ MODULE Machina_Server
         SocketSend clientSocket \Str:=response;
     ENDPROC
 
+    ! Send the value of the current joints to the socket
     PROC SendJoints()
         nowjt := CJointT();
 
@@ -425,6 +447,11 @@ MODULE Machina_Server
         SocketSend clientSocket \Str:=response;
     ENDPROC
 
+    ! Send the value of the current external axes to the socket
+    PROC SendExtAx()
+
+
+    ENDPROC
 
 
     !   __      __  __      __

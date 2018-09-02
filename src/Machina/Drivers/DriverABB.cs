@@ -116,7 +116,7 @@ namespace Machina.Drivers
             }
 
             this.IP = _rsBridge.IP;
-            this.Port = _rsBridge.WritePort;
+            this.Port = _rsBridge.Port;
 
             if (!this.ConnectToDevice(this.IP, this.Port))
             {
