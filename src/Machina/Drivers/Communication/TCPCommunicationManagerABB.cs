@@ -192,6 +192,7 @@ namespace Machina.Drivers.Communication
                     foreach (var msg in msgs)
                     {
                         //Console.WriteLine($"  RES: Server response was {msg};");
+                        logger.Debug("Received message from driver: " + msg);
                         ParseResponse(msg);
                         _receivedMessages++;
                     }
@@ -290,6 +291,11 @@ namespace Machina.Drivers.Communication
 
             switch (resType)
             {
+                // ">20 1 2 1;" Sends version numbers
+                case ABBCommunicationProtocol.RES_VERSION:
+                    CompareDriverVersions(data);
+                    break;
+
                 // ">21 400 300 500 0 0 1 0;"
                 case ABBCommunicationProtocol.RES_POSE:
                     this.initPos = new Vector(data[0], data[1], data[2]);
@@ -301,6 +307,32 @@ namespace Machina.Drivers.Communication
                 case ABBCommunicationProtocol.RES_JOINTS:
                     this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
                     break;
+            }
+
+        }
+
+        private void CompareDriverVersions(double[] version)
+        {
+            string[] currentV = ABBCommunicationProtocol.MACHINA_SERVER_VERSION.Split('.');
+            string driverV = "";
+            bool cool = true;
+            int v;
+            for (int i = 0; i < version.Length; i++)
+            {
+                v = Convert.ToInt32(version[i]);
+                driverV += v;
+                if (i < version.Length - 1) driverV += ".";
+                cool &= Convert.ToDouble(currentV[i]) <= v;
+            }
+
+            if (cool)
+            {
+                logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {driverV}.");
+
+            }
+            else
+            {
+                logger.Warning($"Found driver version {driverV}, expected at least {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}. Please update driver module or unexpected behavior may arise.");
             }
 
         }

@@ -59,11 +59,11 @@ MODULE Machina_Server
     ENDRECORD
 
     ! SERVER DATA --> to modify by user
-    CONST string SERVER_IP := "{{HOSTNAME}}";    ! Change to server IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
-    CONST num SERVER_PORT := {{PORT}};           ! Change to custom port number, typically 7000.
+    CONST string SERVER_IP := "{{HOSTNAME}}";    ! Replace "{{HOSTNAME}}" with device IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
+    CONST num SERVER_PORT := {{PORT}};           ! Replace {{PORT}} with custom port number, like for example 7000.
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.2.1";
+    CONST string MACHINA_SERVER_VERSION := "1.2.3";
 
     ! Should program exit on any kind of error?
     VAR bool USE_STRICT := TRUE;
@@ -88,7 +88,7 @@ MODULE Machina_Server
     CONST num INST_SETAO := 11;             ! SetAO "NAME" V
     CONST num INST_EXT_JOINTS := 12;        ! (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
     CONST num INST_ACCELERATION := 13;      ! (setacceleration values, TBD)
-    CONST num INST_SING_AREA := 14;         ! SingArea bool (sets Wrist or Off)
+    CONST num INST_SING_AREA := 14;         ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
 
     CONST num INST_STOP_EXECUTION := 100;       ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;             ! A way to retreive state information from the server (not implemented)
@@ -116,6 +116,9 @@ MODULE Machina_Server
     CONST num STR_RND_KG := 3;
     CONST num STR_RND_VEC := 5;
 
+    ! Other stuff for parsing
+    CONST string STR_DOT := ".";
+
     ! RobotWare 5.x shim
     CONST num WAIT_MAX := 8388608;
 
@@ -129,6 +132,7 @@ MODULE Machina_Server
     VAR zonedata cursorZone;
     VAR signaldo cursorDO;
     VAR signalao cursorAO;
+    VAR num maxAcceleration;
 
     ! State variables for real-time motion tracking
     VAR robtarget nowrt;
@@ -167,9 +171,6 @@ MODULE Machina_Server
     ! Main entry point
     PROC Main()
         TPErase;
-
-        ! Avoid singularities.
-        ! SingArea \Wrist;  ! Uncomment this line if you are often running into singularity problems. Beware that this will make linear motion slightly deviate from its linear trajectory.
 
         ! Allow the controller to choose the best configuraation for motion
         ConfJ \Off;
@@ -243,16 +244,19 @@ MODULE Machina_Server
                     cursorExtJointsTarget := GetExternalJointsData(currentAction);
 
                 CASE INST_ACCELERATION:
-                    TPWrite("Acceleration still not implemented");
-
-                CASE INST_SING_AREA:
-                    IF currentAction.p1 = 1 THEN
-                        SingArea \Wrist;
+                    maxAcceleration := currentAction.p1;
+                    IF maxAcceleration > 0 THEN
+                        WorldAccLim \On:=maxAcceleration;
                     ELSE
-                        SingArea \Off;
+                        WorldAccLim \Off;
                     ENDIF
 
-
+                CASE INST_SING_AREA:
+                    IF currentAction.p1 = 0 THEN
+                        SingArea \Off;
+                    ELSE
+                        SingArea \Wrist;
+                    ENDIF
 
                 CASE INST_STOP_EXECUTION:
                     stopExecution := TRUE;
@@ -300,7 +304,7 @@ MODULE Machina_Server
 
     ! Start the TCP server
     PROC ServerInitialize()
-        TPWrite "Initializing Machina Server...";
+        TPWrite "Initializing Machina Driver...";
         ServerRecover;
     ENDPROC
 
@@ -317,15 +321,16 @@ MODULE Machina_Server
         SocketAccept serverSocket, clientSocket \ClientAddress:=clientIp \Time:=WAIT_MAX;
 
         TPWrite "Connected to client: " + clientIp;
-        TPWrite "Listening to TCP/IP commands...";
+        TPWrite "Listening to remote instructions...";
 
         ! Update the client with some data
+        SendVersion;
         SendPose;
         SendJoints;
 
         ERROR
             IF ERRNO = ERR_SOCK_TIMEOUT THEN
-                TPWrite "Machina error: ServerRecover timeout. Retrying...";
+                TPWrite "MACHINA ERROR: ServerRecover timeout. Retrying...";
                 RETRY;
             ELSEIF ERRNO = ERR_SOCK_CLOSED THEN
                 RETURN;
@@ -353,7 +358,7 @@ MODULE Machina_Server
             ServerRecover;
             RETRY;
         ELSEIF ERRNO = ERR_SOCK_TIMEOUT THEN
-            TPWrite "Machina: ReadStream() timeout. Retrying.";
+            TPWrite "MACHINA ERROR: ReadStream() timeout. Retrying.";
             RETRY;
         ENDIF
     ENDPROC
@@ -373,11 +378,11 @@ MODULE Machina_Server
 
         ERROR
             IF ERRNO = ERR_SOCK_CLOSED THEN
-                TPWrite "Machina error: client disconnected.";
+                TPWrite "MACHINA ERROR: client disconnected.";
                 RETURN;
             ELSE
                 ! No error recovery handling
-                TPWrite "Machina error: unknown error";
+                TPWrite "MACHINA ERROR: unknown error";
             ENDIF
     ENDPROC
 
@@ -409,7 +414,32 @@ MODULE Machina_Server
 
     ! Send the version of this module to the socket
     PROC SendVersion()
+        VAR bool ok;
+        VAR string major;
+        VAR string minor;
+        VAR string patch;
+        VAR num it := 1;
+        VAR num itn;
+        VAR num len;
 
+        len := StrLen(MACHINA_SERVER_VERSION);
+
+        itn := StrFind(MACHINA_SERVER_VERSION, it, STR_DOT);
+        major := StrPart(MACHINA_SERVER_VERSION, it, itn - it);
+
+        it := itn + 1;
+        itn := StrFind(MACHINA_SERVER_VERSION, it, STR_DOT);
+        minor := StrPart(MACHINA_SERVER_VERSION, it, itn - it);
+
+        it := itn + 1;
+        patch := StrPart(MACHINA_SERVER_VERSION, it, len - it + 1);
+
+        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_VERSION, 0) + STR_WHITE
+            + major + STR_WHITE
+            + minor + STR_WHITE
+            + patch + STR_MESSAGE_END_CHAR;
+
+        SocketSend clientSocket \Str:=response;
     ENDPROC
 
 
@@ -476,7 +506,7 @@ MODULE Machina_Server
 
         ! Corrupt buffer
         IF endings = 0 THEN
-            TPWrite "Received corrupt buffer";
+            TPWrite "MACHINA ERROR: Received corrupt buffer";
             TPWrite sb;
             IF USE_STRICT THEN EXIT; ENDIF
         ENDIF
@@ -617,7 +647,7 @@ MODULE Machina_Server
                     end := TRUE;
                 ENDIF
             ELSE
-                TPWrite "MACHINA ERROR: corrupt message, missing closing double quotes";
+                TPWrite "MACHINA ERROR: corrupt message, missing closing double quotes.";
                 TPWrite st;
                 IF USE_STRICT THEN EXIT; ENDIF
                 RETURN;
@@ -712,6 +742,7 @@ MODULE Machina_Server
         cursorExtJointsTarget := cursorTarget.extax;
         cursorSpeed := v20;
         cursorZone := z5;
+        maxAcceleration := -1;
     ENDPROC
 
     ! Return the jointtarget represented by an Action

@@ -13,7 +13,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal static readonly char STR_MESSAGE_ID_CHAR = '@';
         internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
 
-        internal static readonly string MACHINA_SERVER_VERSION = "1.2.1";
+        internal static readonly string MACHINA_SERVER_VERSION = "1.2.2";
 
         // A RAPID-code oriented API:
         //                                     // INSTRUCTION P1 P2 P3 P4...
