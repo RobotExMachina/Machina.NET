@@ -159,11 +159,15 @@ namespace Machina.Drivers.Communication.Protocols
                     }
                     else
                     {
-                        // Only precision and speed are states kept on the controller
+                        // Only precision, speed and acceleration are states kept on the controller
                         Settings beforePop = cursor.settingsBuffer.SettingsBeforeLastPop;
                         if (beforePop.Speed != cursor.speed)
                         {
                             msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");
+                        }
+                        if (beforePop.Acceleration != cursor.acceleration)
+                        {
+                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_ACCELERATION} {cursor.acceleration}{STR_MESSAGE_END_CHAR}");
                         }
                         if (beforePop.Precision != cursor.precision)
                         {

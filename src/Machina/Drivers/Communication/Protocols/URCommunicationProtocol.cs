@@ -193,43 +193,6 @@ namespace Machina.Drivers.Communication.Protocols
                 //  ╔═╗╔═╗╔╦╗╔╦╗╦╔╗╔╔═╗╔═╗
                 //  ╚═╗║╣  ║  ║ ║║║║║ ╦╚═╗
                 //  ╚═╝╚═╝ ╩  ╩ ╩╝╚╝╚═╝╚═╝
-                // Removed support for different types of speed/acceleration
-                //case ActionType.Speed:
-                //    _params = new int[]
-                //    {
-                //        _action.Id,
-                //        INST_TCP_SPEED,
-                //        (int) Math.Round(cursor.speed * 0.001 * FACTOR_M)
-                //    };
-                //    break;
-
-                //case ActionType.Acceleration:
-                //    _params = new int[]
-                //    {
-                //        _action.Id,
-                //        INST_TCP_ACC,
-                //        (int) Math.Round(cursor.acceleration * 0.001 * FACTOR_M)
-                //    };
-                //    break;
-
-                //case ActionType.JointSpeed:
-                //    _params = new int[]
-                //    {
-                //        _action.Id,
-                //        INST_Q_SPEED,
-                //        (int) Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD)
-                //    };
-                //    break;
-
-                //case ActionType.JointAcceleration:
-                //    _params = new int[]
-                //    {
-                //        _action.Id,
-                //        INST_Q_ACC,
-                //        (int) Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD)
-                //    };
-                //    break;
-
                 // Speed is now set globally, and the driver takes care of translating that internally
                 case ActionType.Speed:
                     _params = new int[]
@@ -267,17 +230,24 @@ namespace Machina.Drivers.Communication.Protocols
                     Dictionary<int, int> poppedSettings = new Dictionary<int, int>();
 
                     // These are the states kept in the controller as of v1.0 of the driver
+                    //if (beforePop.Speed != cursor.speed)
+                    //    poppedSettings.Add(INST_TCP_SPEED, (int)Math.Round(cursor.speed * 0.001 * FACTOR_M));
+
+                    //if (beforePop.Acceleration != cursor.acceleration)
+                    //    poppedSettings.Add(INST_TCP_ACC, (int)Math.Round(cursor.acceleration * 0.001 * FACTOR_M));
+
+                    //if (beforePop.JointSpeed != cursor.jointSpeed)
+                    //    poppedSettings.Add(INST_Q_SPEED, (int)Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD));
+
+                    //if (beforePop.JointAcceleration != cursor.jointAcceleration)
+                    //    poppedSettings.Add(INST_Q_ACC, (int)Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD));
+
+                    // These are the states kept in the controller as of v1.0 of the driver
                     if (beforePop.Speed != cursor.speed)
-                        poppedSettings.Add(INST_TCP_SPEED, (int)Math.Round(cursor.speed * 0.001 * FACTOR_M));
+                        poppedSettings.Add(INST_ALL_SPEED, (int)Math.Round(cursor.speed * 0.001 * FACTOR_M));
 
                     if (beforePop.Acceleration != cursor.acceleration)
-                        poppedSettings.Add(INST_TCP_ACC, (int)Math.Round(cursor.acceleration * 0.001 * FACTOR_M));
-
-                    if (beforePop.JointSpeed != cursor.jointSpeed)
-                        poppedSettings.Add(INST_Q_SPEED, (int)Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD));
-
-                    if (beforePop.JointAcceleration != cursor.jointAcceleration)
-                        poppedSettings.Add(INST_Q_ACC, (int)Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD));
+                        poppedSettings.Add(INST_ALL_ACC, (int)Math.Round(cursor.acceleration * 0.001 * FACTOR_M));
 
                     if (beforePop.Precision != cursor.precision)
                         poppedSettings.Add(INST_BLEND, (int)Math.Round(cursor.precision * 0.001 * FACTOR_M));
