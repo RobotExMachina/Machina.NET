@@ -54,6 +54,8 @@ namespace Machina.Drivers.Communication
 
         private bool _bufferEmptyEventIsRaiseable = true;
 
+        private string _deviceDriverVersion = null;
+
 
         internal TCPCommunicationManagerABB(Driver driver, RobotCursor writeCursor, RobotCursor motionCursor, string ip, int port)
         {
@@ -293,7 +295,16 @@ namespace Machina.Drivers.Communication
             {
                 // ">20 1 2 1;" Sends version numbers
                 case ABBCommunicationProtocol.RES_VERSION:
-                    CompareDriverVersions(data);
+                    this._deviceDriverVersion = Convert.ToInt32(data[0]) + "." + Convert.ToInt32(data[1]) + "." + Convert.ToInt32(data[2]);
+                    int comp = Util.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
+                    if (comp > -1)
+                    {
+                        logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {_deviceDriverVersion}.");
+                    }
+                    else
+                    {
+                        logger.Warning($"Found driver version {_deviceDriverVersion}, expected at least {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}. Please update driver module or unexpected behavior may arise.");
+                    }
                     break;
 
                 // ">21 400 300 500 0 0 1 0;"
@@ -307,32 +318,6 @@ namespace Machina.Drivers.Communication
                 case ABBCommunicationProtocol.RES_JOINTS:
                     this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
                     break;
-            }
-
-        }
-
-        private void CompareDriverVersions(double[] version)
-        {
-            string[] currentV = ABBCommunicationProtocol.MACHINA_SERVER_VERSION.Split('.');
-            string driverV = "";
-            bool cool = true;
-            int v;
-            for (int i = 0; i < version.Length; i++)
-            {
-                v = Convert.ToInt32(version[i]);
-                driverV += v;
-                if (i < version.Length - 1) driverV += ".";
-                cool &= Convert.ToDouble(currentV[i]) <= v;
-            }
-
-            if (cool)
-            {
-                logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {driverV}.");
-
-            }
-            else
-            {
-                logger.Warning($"Found driver version {driverV}, expected at least {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}. Please update driver module or unexpected behavior may arise.");
             }
 
         }

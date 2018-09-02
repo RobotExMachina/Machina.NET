@@ -142,6 +142,36 @@ namespace Machina
             return str.Replace("\"", "\\\"");
         }
 
+        /// <summary>
+        /// Compares strings representing semantic versioning versions, like "1.3.2".
+        /// Returns 1 if A is newer than B, -1 if B is newer than A, and 0 if same version. 
+        /// </summary>
+        /// <param name="versionA"></param>
+        /// <param name="versionB"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
+        public static int CompareVersions(string versionA, string versionB, char delimiter = '.')
+        {
+            string[] A = versionA.Split(delimiter);
+            string[] B = versionB.Split(delimiter);
+
+            if (A.Length != B.Length)
+            {
+                throw new Exception("Incorrectly formatted version numbers, lengths must be equal");
+            }
+
+            int a, b;
+            for (int i = 0; i < A.Length; i++)
+            {
+                a = Convert.ToInt32(A[i]);
+                b = Convert.ToInt32(B[i]);
+                if (a > b) return 1;
+                if (a < b) return -1;
+            }
+
+            return 0;
+        }
+
     }
 
 
