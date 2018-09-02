@@ -43,19 +43,13 @@ namespace Machina.Drivers.Communication
 
         private string _ip = "";
         public string IP => _ip;
-        private int _port = 7000;
+        private int _port = 7000;   // @TODO: have a static counter keep track of used port for multi-robot
         public int Port => _port;
-
-        //private int _writePort;
-        //public int WritePort => _writePort;
-        //private int _readPort;
-        //public int ReadPort => _readPort;
-        
+                
         private string _streamingModule;
             
         private const string REMOTE_BUFFER_DIR = "Machina";
-
-        
+                
 
         public RobotStudioManager(Driver parent)
         {
@@ -869,41 +863,6 @@ namespace Machina.Drivers.Communication
             return true;
         }
 
-        ///// <summary>
-        ///// Loads a module to the ABB controller given as a string list of Rapid code lines.
-        ///// </summary>
-        ///// <param name="module"></param>
-        ///// <param name="programName"></param>
-        ///// <returns></returns>
-        //public bool LoadProgramToController(List<string> module, string programName)
-        //{
-        //    if (!isConnected)
-        //    {
-        //        Console.WriteLine("Cannot load program, not connected to controller");
-        //        return false;
-        //    }
-
-        //    string path = Path.Combine(Path.GetTempPath(), $"Machina_{programName}.mod");
-
-        //    // Modules can only be uploaded to ABB controllers using a file
-        //    if (!Machina.IO.SaveStringListToFile(path, module, Encoding.ASCII))  // 
-        //    {
-        //        Console.WriteLine("Could not save module to temp file");
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine($"Saved {programName} to {path}");
-        //    }
-
-        //    if (!LoadFileToDevice(path))
-        //    {
-        //        Console.WriteLine("Could not load module to controller");
-        //        return false;
-        //    }
-
-        //    return true;
-        //}
 
         /// <summary>
         /// Loads a module into de controller from a local file. 
