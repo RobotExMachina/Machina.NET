@@ -20,17 +20,17 @@ namespace Machina
     public abstract class Geometry
     {
         /// <summary>
+        /// A more permissive precision factor for floating-point comparisons.
+        /// </summary>
+        public static readonly double EPSILON = 0.001;
+
+        /// <summary>
         /// Precision for floating-point comparisons.
         /// </summary>
-        public static readonly double EPSILON = 0.000001;
+        public static readonly double EPSILON2 = 0.000001;
 
         /// <summary>
-        /// A more permissive precision factor.
-        /// </summary>
-        public static readonly double EPSILON2 = 0.001;
-
-        /// <summary>
-        /// A more restrictive precision factor.
+        /// A more restrictive precision factor for floating-point comparisons.
         /// </summary>
         public static readonly double EPSILON3 = 0.000000001;
 

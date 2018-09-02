@@ -78,15 +78,15 @@ namespace Machina
         /// <returns></returns>
         public bool IsSimilar(RotationMatrix other)
         {
-            return Math.Abs(this.R[0] - other.R[0]) < EPSILON
-                && Math.Abs(this.R[1] - other.R[1]) < EPSILON
-                && Math.Abs(this.R[2] - other.R[2]) < EPSILON
-                && Math.Abs(this.R[3] - other.R[3]) < EPSILON
-                && Math.Abs(this.R[4] - other.R[4]) < EPSILON
-                && Math.Abs(this.R[5] - other.R[5]) < EPSILON
-                && Math.Abs(this.R[6] - other.R[6]) < EPSILON
-                && Math.Abs(this.R[7] - other.R[7]) < EPSILON
-                && Math.Abs(this.R[8] - other.R[8]) < EPSILON;
+            return Math.Abs(this.R[0] - other.R[0]) < EPSILON2
+                && Math.Abs(this.R[1] - other.R[1]) < EPSILON2
+                && Math.Abs(this.R[2] - other.R[2]) < EPSILON2
+                && Math.Abs(this.R[3] - other.R[3]) < EPSILON2
+                && Math.Abs(this.R[4] - other.R[4]) < EPSILON2
+                && Math.Abs(this.R[5] - other.R[5]) < EPSILON2
+                && Math.Abs(this.R[6] - other.R[6]) < EPSILON2
+                && Math.Abs(this.R[7] - other.R[7]) < EPSILON2
+                && Math.Abs(this.R[8] - other.R[8]) < EPSILON2;
         }
 
         //public static bool operator ==(RotationMatrix m1, RotationMatrix m2)
@@ -280,9 +280,9 @@ namespace Machina
         /// <returns></returns>
         public bool IsIdentity()
         {
-            return Math.Abs(R[0] - 1) < EPSILON && Math.Abs(R[1]) < EPSILON && Math.Abs(R[2]) < EPSILON
-                && Math.Abs(R[3]) < EPSILON && Math.Abs(R[4] - 1) < EPSILON && Math.Abs(R[5]) < EPSILON
-                && Math.Abs(R[6]) < EPSILON && Math.Abs(R[7]) < EPSILON && Math.Abs(R[8] - 1) < EPSILON;
+            return Math.Abs(R[0] - 1) < EPSILON2 && Math.Abs(R[1]) < EPSILON2 && Math.Abs(R[2]) < EPSILON2
+                && Math.Abs(R[3]) < EPSILON2 && Math.Abs(R[4] - 1) < EPSILON2 && Math.Abs(R[5]) < EPSILON2
+                && Math.Abs(R[6]) < EPSILON2 && Math.Abs(R[7]) < EPSILON2 && Math.Abs(R[8] - 1) < EPSILON2;
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace Machina
             RotationMatrix t = new RotationMatrix(this);
             t.Transpose();
             RotationMatrix ident = RotationMatrix.Multiply(this, t);
-            return ident.IsIdentity() && Math.Abs(this.Determinant() - 1) < EPSILON;
+            return ident.IsIdentity() && Math.Abs(this.Determinant() - 1) < EPSILON2;
         }
 
         /// <summary>
@@ -389,7 +389,7 @@ namespace Machina
             // Calculate the determinant
             double det = a00 * b01 + a01 * b11 + a02 * b21;
 
-            if (det < EPSILON)
+            if (det < EPSILON2)
             {
                 return false;
             }
@@ -528,9 +528,9 @@ namespace Machina
             double sinv = 1 / Math.Sqrt(2);  // 0.7071...
 
             // Check for singularities
-            if (Math.Abs(m01 - m10) < EPSILON
-                && Math.Abs(m02 - m20) < EPSILON
-                && Math.Abs(m12 - m21) < EPSILON)
+            if (Math.Abs(m01 - m10) < EPSILON2
+                && Math.Abs(m02 - m20) < EPSILON2
+                && Math.Abs(m12 - m21) < EPSILON2)
             {
                 // If identity matrix (angle = 0), return a non rotation AxisAngle
                 if (this.IsIdentity())
@@ -549,7 +549,7 @@ namespace Machina
                 // If m00 is the largest diagonal
                 if (xx > yy && xx > zz)
                 {
-                    if (xx < EPSILON)
+                    if (xx < EPSILON2)
                     {
                         x = 0;
                         y = sinv;
@@ -565,7 +565,7 @@ namespace Machina
                 // If m11 is the largest diagonal
                 else if (yy > zz)
                 {
-                    if (yy < EPSILON)
+                    if (yy < EPSILON2)
                     {
                         x = sinv;
                         y = 0;
@@ -581,7 +581,7 @@ namespace Machina
                 // m22 is the largest diagonal
                 else
                 {
-                    if (zz < EPSILON)
+                    if (zz < EPSILON2)
                     {
                         x = sinv;
                         y = sinv;
@@ -602,7 +602,7 @@ namespace Machina
             double s = Math.Sqrt((m21 - m12) * (m21 - m12)
                     + (m02 - m20) * (m02 - m20)
                     + (m10 - m01) * (m10 - m01));  // for normalization (is this necessary here?)
-            if (Math.Abs(s) < EPSILON) s = 1;  // "prevent divide by zero, should not happen if matrix is orthogonal and should be caught by singularity test above, but I've left it in just in case"
+            if (Math.Abs(s) < EPSILON2) s = 1;  // "prevent divide by zero, should not happen if matrix is orthogonal and should be caught by singularity test above, but I've left it in just in case"
             angle = TO_DEGS * Math.Acos(0.5 * (m00 + m11 + m22 - 1));
             x = (m21 - m12) / s;
             y = (m02 - m20) / s;

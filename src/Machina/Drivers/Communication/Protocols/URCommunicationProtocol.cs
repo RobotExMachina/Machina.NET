@@ -209,23 +209,23 @@ namespace Machina.Drivers.Communication.Protocols
                     };
                     break;
 
-                case ActionType.JointSpeed:
-                    _params = new int[]
-                    {
-                        _action.Id,
-                        INST_Q_SPEED,
-                        (int) Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD)
-                    };
-                    break;
+                //case ActionType.JointSpeed:
+                //    _params = new int[]
+                //    {
+                //        _action.Id,
+                //        INST_Q_SPEED,
+                //        (int) Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD)
+                //    };
+                //    break;
 
-                case ActionType.JointAcceleration:
-                    _params = new int[]
-                    {
-                        _action.Id,
-                        INST_Q_ACC,
-                        (int) Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD)
-                    };
-                    break;
+                //case ActionType.JointAcceleration:
+                //    _params = new int[]
+                //    {
+                //        _action.Id,
+                //        INST_Q_ACC,
+                //        (int) Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD)
+                //    };
+                //    break;
 
                 case ActionType.Precision:
                     _params = new int[]

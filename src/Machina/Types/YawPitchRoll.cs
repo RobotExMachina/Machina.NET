@@ -73,9 +73,9 @@ namespace Machina
         /// <returns></returns>
         public bool IsSimilar(YawPitchRoll other)
         {
-            return Math.Abs(this.XAngle - other.XAngle) < EPSILON
-                && Math.Abs(this.YAngle - other.YAngle) < EPSILON
-                && Math.Abs(this.ZAngle - other.ZAngle) < EPSILON;
+            return Math.Abs(this.XAngle - other.XAngle) < EPSILON2
+                && Math.Abs(this.YAngle - other.YAngle) < EPSILON2
+                && Math.Abs(this.ZAngle - other.ZAngle) < EPSILON2;
         }
 
         ///// <summary>
@@ -193,7 +193,7 @@ namespace Machina
 
             angle = 2 * Math.Acos(cX * cY * cZ + sX * sY * sZ);
             s = Math.Sin(0.5 * angle);
-            if (s < EPSILON)
+            if (s < EPSILON2)
             {
                 // This AxisAngle represents no rotation (full turn).
                 x = y = z = 0;

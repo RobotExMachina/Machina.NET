@@ -42,9 +42,9 @@ namespace Machina
         /// <returns></returns>
         public bool IsSimilar(Vector other)
         {
-            return Math.Abs(this.X - other.X) < EPSILON
-                && Math.Abs(this.Y - other.Y) < EPSILON
-                && Math.Abs(this.Z - other.Z) < EPSILON;
+            return Math.Abs(this.X - other.X) < EPSILON2
+                && Math.Abs(this.Y - other.Y) < EPSILON2
+                && Math.Abs(this.Z - other.Z) < EPSILON2;
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Machina
         public bool Normalize()
         {
             double len = this.Length();
-            if (len < EPSILON) return false;
+            if (len < EPSILON2) return false;
             this.X /= len;
             this.Y /= len;
             this.Z /= len;
@@ -196,12 +196,12 @@ namespace Machina
         /// <returns></returns>
         public bool IsUnit()
         {
-            return Math.Abs(this.SqLength() - 1) < EPSILON;
+            return Math.Abs(this.SqLength() - 1) < EPSILON2;
         }
 
         public bool IsZero()
         {
-            return Math.Abs(this.SqLength()) < EPSILON;
+            return Math.Abs(this.SqLength()) < EPSILON2;
         }
 
         /// <summary>
@@ -387,7 +387,7 @@ namespace Machina
             //if (lens < EPSILON)
             //    return 0.5 * Math.PI;
 
-            if (lens < EPSILON)
+            if (lens < EPSILON2)
                 return 0;  // should convert to nullable "double?" ? 
 
             double div = DotProduct(p1, p2) / lens;
@@ -468,7 +468,7 @@ namespace Machina
         public static bool AreParallel(Vector vec1, Vector vec2)
         {
             double alpha = AngleBetween(vec1, vec2);
-            return alpha < EPSILON || (alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON);
+            return alpha < EPSILON2 || (alpha < Math.PI + EPSILON2 && alpha > Math.PI - EPSILON2);
         }
 
         /// <summary>
@@ -480,7 +480,7 @@ namespace Machina
         public static bool AreOrthogonal(Vector vec1, Vector vec2)
         {
             double alpha = AngleBetween(vec1, vec2);
-            return alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON;
+            return alpha < 0.5 * Math.PI + EPSILON2 && alpha > 0.5 * Math.PI - EPSILON2;
         }
 
         /// <summary>
@@ -492,7 +492,7 @@ namespace Machina
         public static bool AreOpposite(Vector vec1, Vector vec2)
         {
             double alpha = AngleBetween(vec1, vec2);
-            return alpha < Math.PI + EPSILON && alpha > Math.PI - EPSILON;
+            return alpha < Math.PI + EPSILON2 && alpha > Math.PI - EPSILON2;
         }
 
         /// <summary>
@@ -508,15 +508,15 @@ namespace Machina
         {
             double alpha = AngleBetween(vec1, vec2);
 
-            if (alpha < EPSILON)
+            if (alpha < EPSILON2)
             {
                 return 1;
             }
-            else if (alpha < 0.5 * Math.PI + EPSILON && alpha > 0.5 * Math.PI - EPSILON)
+            else if (alpha < 0.5 * Math.PI + EPSILON2 && alpha > 0.5 * Math.PI - EPSILON2)
             {
                 return 2;
             }
-            else if (Math.Abs(alpha - Math.PI) < EPSILON)
+            else if (Math.Abs(alpha - Math.PI) < EPSILON2)
             {
                 return 3;
             }
@@ -816,9 +816,9 @@ namespace Machina
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             //return other.X.Equals(X) && other.Y.Equals(Y) && other.Z.Equals(Z);
-            return Math.Abs(X - other.X) < EPSILON &&
-                   Math.Abs(Y - other.Y) < EPSILON &&
-                   Math.Abs(Z - other.Z) < EPSILON;
+            return Math.Abs(X - other.X) < EPSILON2 &&
+                   Math.Abs(Y - other.Y) < EPSILON2 &&
+                   Math.Abs(Z - other.Z) < EPSILON2;
         }
 
         public override string ToString()

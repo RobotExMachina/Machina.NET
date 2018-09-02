@@ -85,6 +85,10 @@ namespace Machina.Drivers.Communication.Protocols
                     msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");  // this accepts more velocity params, but those are still not implemented in Machina... 
                     break;
 
+                case ActionType.Acceleration:
+                    Logger.Debug("Acceleration not implemented in ABBCommunicationProtocol");
+                    break;
+
                 case ActionType.Precision:
                     // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
                     msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}");  // this accepts more zone params, but those are still not implemented in Machina... 

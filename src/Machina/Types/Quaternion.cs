@@ -46,10 +46,10 @@ namespace Machina
         /// <returns></returns>
         public bool IsSimilar(Quaternion other)
         {
-            return Math.Abs(this.W - other.W) < EPSILON
-                && Math.Abs(this.X - other.X) < EPSILON
-                && Math.Abs(this.Y - other.Y) < EPSILON
-                && Math.Abs(this.Z - other.Z) < EPSILON;
+            return Math.Abs(this.W - other.W) < EPSILON2
+                && Math.Abs(this.X - other.X) < EPSILON2
+                && Math.Abs(this.Y - other.Y) < EPSILON2
+                && Math.Abs(this.Z - other.Z) < EPSILON2;
         }
 
 
@@ -305,7 +305,7 @@ namespace Machina
         {
             double len = this.Length();
 
-            if (Math.Abs(len) < EPSILON)
+            if (Math.Abs(len) < EPSILON2)
             {
                 this.Identity();
                 return false;  // check for zero quaternion
@@ -335,7 +335,7 @@ namespace Machina
             }
 
             // Can't deal with zero-length quaternions or axis vectors
-            if (this.Length() < EPSILON || Geometry.Length(this.X, this.Y, this.Z) < EPSILON)
+            if (this.Length() < EPSILON2 || Geometry.Length(this.X, this.Y, this.Z) < EPSILON2)
             {
                 this.Identity(this.W >= 0);
                 return false;
@@ -346,7 +346,7 @@ namespace Machina
             bool pos;
 
             // Avoid divisions by zero
-            if (Math.Abs(this.X) > EPSILON)
+            if (Math.Abs(this.X) > EPSILON2)
             {
                 double yx, zx;
 
@@ -361,7 +361,7 @@ namespace Machina
 
                 return true;
             }
-            else if (Math.Abs(this.Y) > EPSILON)
+            else if (Math.Abs(this.Y) > EPSILON2)
             {
                 double xy, zy;
 
@@ -376,7 +376,7 @@ namespace Machina
 
                 return true;
             }
-            else if (Math.Abs(this.Z) > EPSILON)
+            else if (Math.Abs(this.Z) > EPSILON2)
             {
                 double xz, yz;
 
@@ -463,7 +463,7 @@ namespace Machina
         /// <returns></returns>
         public bool IsUnit()
         {
-            return Math.Abs(this.SqLength() - 1) < EPSILON;
+            return Math.Abs(this.SqLength() - 1) < EPSILON2;
         }
 
         /// <summary>
@@ -472,7 +472,7 @@ namespace Machina
         /// <returns></returns>
         public bool IsZero()
         {
-            return Math.Abs(this.SqLength()) < EPSILON;
+            return Math.Abs(this.SqLength()) < EPSILON2;
         }
 
         /// <summary>
@@ -482,10 +482,10 @@ namespace Machina
         /// <returns></returns>
         public bool IsIdentity()
         {
-            return (Math.Abs(this.W - 1) < EPSILON || Math.Abs(this.W + 1) < EPSILON)  // check for (1,0,0,0) or (-1,0,0,0)
-                && Math.Abs(this.X) < EPSILON
-                && Math.Abs(this.Y) < EPSILON
-                && Math.Abs(this.Z) < EPSILON;
+            return (Math.Abs(this.W - 1) < EPSILON2 || Math.Abs(this.W + 1) < EPSILON2)  // check for (1,0,0,0) or (-1,0,0,0)
+                && Math.Abs(this.X) < EPSILON2
+                && Math.Abs(this.Y) < EPSILON2
+                && Math.Abs(this.Z) < EPSILON2;
         }
 
         /// <summary>
@@ -507,7 +507,7 @@ namespace Machina
             //      q = -q;
             double sumQ = this.Sum();
             double sumQn = qn.Sum();
-            return (Math.Abs(sumQ + sumQn) < EPSILON || Math.Abs(sumQn - sumQ) < EPSILON);
+            return (Math.Abs(sumQ + sumQn) < EPSILON2 || Math.Abs(sumQn - sumQ) < EPSILON2);
         }
 
         /// <summary>
@@ -720,7 +720,7 @@ namespace Machina
             double theta2 = 2 * Math.Acos(this.W);
 
             // If angle == 0, no rotation is performed and this Quat is identity
-            if (theta2 < EPSILON)
+            if (theta2 < EPSILON2)
             {
                 return new AxisAngle(0, 0, 0, 0);
             }

@@ -118,7 +118,7 @@ namespace Machina
                     // If precision is very close to an integer, make it integer and/or use predefined zones
                     bool predef = false;
                     int roundZone = 0;
-                    if (Math.Abs(writer.precision - Math.Round(writer.precision)) < Geometry.EPSILON2) {
+                    if (Math.Abs(writer.precision - Math.Round(writer.precision)) < Geometry.EPSILON) {
                         roundZone = (int) Math.Round(writer.precision);
                         predef = PredefinedZones.Contains(roundZone);
                     }
@@ -310,26 +310,26 @@ namespace Machina
             switch (action.Type)
             {
                 case ActionType.Acceleration:
-                    bool zero = cursor.acceleration < Geometry.EPSILON2;
+                    bool zero = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
                         zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
-                case ActionType.JointSpeed:
-                case ActionType.JointAcceleration:
-                    dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.", 
-                        commChar,
-                        action.Type);
-                    break;
+                //case ActionType.JointSpeed:
+                //case ActionType.JointAcceleration:
+                //    dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.", 
+                //        commChar,
+                //        action.Type);
+                //    break;
 
                 // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZA...
                 case ActionType.PushPop:
                     // Find if there was a change in acceleration, and set the corresponsing instruction...
                     ActionPushPop app = action as ActionPushPop;
                     if (app.push) break;  // only necessary for pops
-                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON2) break;  // no change
+                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON) break;  // no change
                     // If here, there was a change, so...
-                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON2;
+                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
                         zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
@@ -469,26 +469,26 @@ namespace Machina
             switch (action.Type)
             {
                 case ActionType.Acceleration:
-                    bool zero = cursor.acceleration < Geometry.EPSILON2;
+                    bool zero = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
                         zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
 
-                case ActionType.JointSpeed:
-                case ActionType.JointAcceleration:
-                    dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.",
-                        commChar,
-                        action.Type);
-                    break;
+                //case ActionType.JointSpeed:
+                //case ActionType.JointAcceleration:
+                //    dec = string.Format("    {0} WARNING: {1}() has no effect in ABB robots.",
+                //        commChar,
+                //        action.Type);
+                //    break;
 
                 // @TODO: push/pop management should be done PROGRAMMATICALLY, not this CHAPUZa...
                 case ActionType.PushPop:
                     // Find if there was a change in acceleration, and set the corresponsing instruction...
                     ActionPushPop app = action as ActionPushPop;
                     if (app.push) break;  // only necessary for pops
-                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON2) break;  // no change
+                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON) break;  // no change
                     // If here, there was a change, so...
-                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON2;
+                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
                         zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
                     break;
@@ -648,13 +648,21 @@ namespace Machina
         /// <returns></returns>
         static internal string GetSpeedValue(RobotCursor cursor)
         {
-            // Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
-            // Using either rotationSpeed value or the same value as lin motion here.
-            return string.Format("[{0},{1},{2},{3}]", 
-                cursor.speed, 
-                cursor.rotationSpeed > Geometry.EPSILON2 ? cursor.rotationSpeed : cursor.speed, 
-                5000, 
-                1000);
+            // ABB format: [TCP linear speed in mm/s, TCP reorientation speed in deg/s, linear external axis speed in mm/s, rotational external axis speed in deg/s]
+            // Default linear speeddata are [vel, 500, 5000, 1000], which feels like a lot. 
+            // Just use the speed data as linear or rotational value, and stay safe. 
+            string vel = Math.Round(cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM).ToString();
+
+            return string.Format("[{0},{1},{2},{3}]", vel, vel, vel, vel);
+            
+            //// Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
+            //// Using either rotationSpeed value or the same value as lin motion here.
+            //return string.Format("[{0},{1},{2},{3}]", 
+            //    cursor.speed, 
+            //    cursor.rotationSpeed > Geometry.EPSILON2 ? cursor.rotationSpeed : cursor.speed, 
+            //    5000, 
+            //    1000);
+
         }
 
         /// <summary>
@@ -664,7 +672,7 @@ namespace Machina
         /// <returns></returns>
         static internal string GetZoneValue(RobotCursor cursor)
         {
-            if (cursor.precision < Geometry.EPSILON2)
+            if (cursor.precision < Geometry.EPSILON)
                 return "fine";
 
             // Following conventions for default RAPID zones.

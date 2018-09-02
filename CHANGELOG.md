@@ -24,6 +24,7 @@
 # v0.8.0
 ## BUILD 1414
 - Removal of all `JointAcceleration`, `JointSpeed` and `RotationSpeed` actions.
+- [ ] Make sure correct speed values are being sent and parsed by the drivers...
 
 ## BUILD 1413
 - Massive API deprecation.

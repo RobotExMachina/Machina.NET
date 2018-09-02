@@ -52,10 +52,10 @@ namespace Machina
         /// <returns></returns>
         public bool IsSimilar(AxisAngle other)
         {
-            return Math.Abs(this.Axis.X - other.Axis.X) < EPSILON
-                && Math.Abs(this.Axis.Y - other.Axis.Y) < EPSILON
-                && Math.Abs(this.Axis.Z - other.Axis.Z) < EPSILON
-                && Math.Abs(this.Angle - other.Angle) < EPSILON;
+            return Math.Abs(this.Axis.X - other.Axis.X) < EPSILON2
+                && Math.Abs(this.Axis.Y - other.Axis.Y) < EPSILON2
+                && Math.Abs(this.Axis.Z - other.Axis.Z) < EPSILON2
+                && Math.Abs(this.Angle - other.Angle) < EPSILON2;
         }
 
         ///// <summary>
@@ -166,7 +166,7 @@ namespace Machina
         {
             double len = Axis.Length();
 
-            if (len < EPSILON)
+            if (len < EPSILON2)
             {
                 this.Axis.X = 0;
                 this.Axis.Y = 0;
@@ -193,7 +193,7 @@ namespace Machina
             //        && Math.Abs(this.Y) < EPSILON
             //        && Math.Abs(this.Z) < EPSILON);
 
-            return Math.Abs(this.Angle % 360) < EPSILON
+            return Math.Abs(this.Angle % 360) < EPSILON2
                 || this.Axis.IsZero();
         }
 
@@ -250,11 +250,11 @@ namespace Machina
             // Sanity checks
             if (this.IsZero())
             {
-                return Math.Abs(other.Angle % 360) < EPSILON;
+                return Math.Abs(other.Angle % 360) < EPSILON2;
             } 
             else if (other.IsZero())
             {
-                return Math.Abs(this.Angle % 360) < EPSILON;
+                return Math.Abs(this.Angle % 360) < EPSILON2;
             }
 
             //Vector v1 = new Vector(this.X, this.Y, this.Z),
@@ -275,7 +275,7 @@ namespace Machina
                 a1 += 360;
             }
             a1 %= 360;
-            if (Math.Abs(a1 - 360) < EPSILON) a1 = 0;
+            if (Math.Abs(a1 - 360) < EPSILON2) a1 = 0;
 
             double a2 = other.Angle;
             while (a2 < 0)
@@ -283,18 +283,18 @@ namespace Machina
                 a2 += 360;
             }
             a2 %= 360;
-            if (Math.Abs(a2 - 360) < EPSILON) a2 = 0;
+            if (Math.Abs(a2 - 360) < EPSILON2) a2 = 0;
 
             // If the vectors have the same direction, angles should be module of each other.
             if (directions == 1)
             {
-                return Math.Abs(a1 - a2) < EPSILON;
+                return Math.Abs(a1 - a2) < EPSILON2;
             }
 
             // If opposite directions, they should add up to 360 degs.
             if (directions == 3)
             {
-                return Math.Abs(a1 + a2 - 360) < EPSILON;
+                return Math.Abs(a1 + a2 - 360) < EPSILON2;
             }
 
             return false;  // if here, something went wrong

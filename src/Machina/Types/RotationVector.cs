@@ -49,9 +49,9 @@ namespace Machina
         /// <returns></returns>
         public bool IsSimilar(RotationVector other)
         {
-            return Math.Abs(this.X - other.X) < EPSILON
-                && Math.Abs(this.Y - other.Y) < EPSILON
-                && Math.Abs(this.Z - other.Z) < EPSILON;
+            return Math.Abs(this.X - other.X) < EPSILON2
+                && Math.Abs(this.Y - other.Y) < EPSILON2
+                && Math.Abs(this.Z - other.Z) < EPSILON2;
         }
 
         ///// <summary>
@@ -116,7 +116,7 @@ namespace Machina
             {
                 double len = Vector.Length(x, y, z);
 
-                if (len < EPSILON)
+                if (len < EPSILON2)
                 {
                     this.X = 0;
                     this.Y = 0;
@@ -164,7 +164,7 @@ namespace Machina
         public bool IsZero()
         {
             double sqlen = this.SqLength();
-            return sqlen < EPSILON;
+            return sqlen < EPSILON2;
         }
 
 
@@ -209,7 +209,7 @@ namespace Machina
         public AxisAngle ToAxisAngle()
         {
             double angle = this.GetAngle();
-            if (angle < EPSILON) return new AxisAngle(0, 0, 0, 0, false);
+            if (angle < EPSILON2) return new AxisAngle(0, 0, 0, 0, false);
 
             double x = this.X / angle,
                 y = this.Y / angle,
