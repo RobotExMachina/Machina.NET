@@ -196,12 +196,14 @@ namespace Machina.Drivers
 
         public override ExternalAxes GetCurrentExternalAxes()
         {
-            if (_rsBridge != null && _rsBridge.Connected)
-            {
-                var extax = _rsBridge.GetCurrentExternalAxes();
-                logger.Debug($"GetCurrentExternlAxes: {extax}");
-                return extax;
-            }
+            // For some reason, extAx from RobotStudio is not giving me good results. 
+            // Use the manager or nothing!
+            //if (_rsBridge != null && _rsBridge.Connected)
+            //{
+            //    var extax = _rsBridge.GetCurrentExternalAxes();
+            //    logger.Debug($"GetCurrentExternalAxes: {extax}");
+            //    return extax;
+            //}
 
             return this._tcpManager.initExtAx;  // will be null if not initialized...
         }
