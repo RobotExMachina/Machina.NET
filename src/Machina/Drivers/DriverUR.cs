@@ -117,6 +117,12 @@ namespace Machina.Drivers
             return null;
         }
 
+        public override ExternalAxes GetCurrentExternalAxes()
+        {
+            // Do URs have the capacity to do external axes...?
+            return null;
+        }
+
         public override void DebugDump()
         {
             throw new NotImplementedException();

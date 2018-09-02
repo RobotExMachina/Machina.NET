@@ -16,16 +16,17 @@
 # TODO:
 - [ ] Hopefully turn this changelog into something more [orthodox](http://keepachangelog.com/en/1.0.0/)
 - [ ] Make `Machina` types JSON-de/serializable via `DataContract`s
-- [ ] Add `ExternalAxis` init msg from the ABB driver
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
-- [ ] Add semicolon to Push/Pop ToInstruction
 
 ---
 # v0.8.0
 ## BUILD 1414
 - Removal of all `JointAcceleration`, `JointSpeed` and `RotationSpeed` actions.
 - Add version check for ABB robots
-- [ ] Make sure correct speed values are being sent and parsed by the drivers...
+- Add `ExternalAxis` init msg from the ABB driver
+- Make sure correct speed values are being sent and parsed by the drivers...
+  - [x] ABB
+  - [ ] UR
 
 ## BUILD 1413
 - Massive API deprecation.

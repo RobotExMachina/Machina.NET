@@ -176,6 +176,12 @@ namespace Machina.Drivers
         /// <returns></returns>
         public abstract Joints GetCurrentJoints();
 
+        /// <summary>
+        /// Returns a ExternalAxes object representing the rotations/translations of the 6 external axes of this robot.
+        /// </summary>
+        /// <returns></returns>
+        public abstract ExternalAxes GetCurrentExternalAxes();
+
         ///// <summary>
         ///// Ticks the queue manager and potentially triggers streaming of targets to the controller.
         ///// </summary>

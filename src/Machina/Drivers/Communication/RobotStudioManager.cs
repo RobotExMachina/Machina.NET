@@ -1020,6 +1020,19 @@ namespace Machina.Drivers.Communication
             }
         }
 
+        public ExternalAxes GetCurrentExternalAxes()
+        {
+            if (!_isConnected)
+            {
+                logger.Debug("Cannot GetCurrentExternalAxes: not connected to controller");
+                return null;
+            }
+
+            RobTarget rt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition(ABB.Robotics.Controllers.MotionDomain.CoordinateSystemType.World);
+
+            return new ExternalAxes(rt.Extax.Eax_a, rt.Extax.Eax_b, rt.Extax.Eax_c, rt.Extax.Eax_d, rt.Extax.Eax_e, rt.Extax.Eax_f);
+        }
+
         /// <summary>
         /// Dumps a bunch of controller info to the console.
         /// </summary>

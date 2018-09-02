@@ -193,6 +193,20 @@ namespace Machina.Drivers
             return this._tcpManager.initPos;  // will be null if not initialized...
         }
 
+
+        public override ExternalAxes GetCurrentExternalAxes()
+        {
+            if (_rsBridge != null && _rsBridge.Connected)
+            {
+                var extax = _rsBridge.GetCurrentExternalAxes();
+                logger.Debug($"GetCurrentExternlAxes: {extax}");
+                return extax;
+            }
+
+            return this._tcpManager.initExtAx;  // will be null if not initialized...
+        }
+
+
         public override void DebugDump()
         {
             

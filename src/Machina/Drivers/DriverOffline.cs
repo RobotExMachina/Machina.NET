@@ -63,6 +63,11 @@ namespace Machina.Drivers
             return null;
         }
 
+        public override ExternalAxes GetCurrentExternalAxes()
+        {
+            return null;
+        }
+
         public override void Reset()
         {
             logger.Info("Cannot reset driver in offline mode");
