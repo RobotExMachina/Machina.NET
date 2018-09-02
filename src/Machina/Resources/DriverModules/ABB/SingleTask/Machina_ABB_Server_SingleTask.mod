@@ -63,7 +63,7 @@ MODULE Machina_Server
     CONST num SERVER_PORT := {{PORT}};           ! Replace {{PORT}} with custom port number, like for example 7000.
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.2.3";
+    CONST string MACHINA_SERVER_VERSION := "1.2.4";
 
     ! Should program exit on any kind of error?
     VAR bool USE_STRICT := TRUE;
@@ -137,7 +137,7 @@ MODULE Machina_Server
     ! State variables for real-time motion tracking
     VAR robtarget nowrt;
     VAR jointtarget nowjt;
-    VAR extjoint nowej;
+    VAR extjoint nowexj;
 
     ! Buffer of incoming messages
     CONST num msgBufferSize := 1000;
@@ -327,6 +327,7 @@ MODULE Machina_Server
         SendVersion;
         SendPose;
         SendJoints;
+        SendExtAx;
 
         ERROR
             IF ERRNO = ERR_SOCK_TIMEOUT THEN
@@ -451,8 +452,7 @@ MODULE Machina_Server
         response := response + STR_WHITE
             + NumToStr(nowrt.trans.x, STR_RND_MM) + STR_WHITE
             + NumToStr(nowrt.trans.y, STR_RND_MM) + STR_WHITE
-            + NumToStr(nowrt.trans.z, STR_RND_MM);
-        response := response + STR_WHITE
+            + NumToStr(nowrt.trans.z, STR_RND_MM) + STR_WHITE
             + NumToStr(nowrt.rot.q1, STR_RND_QUAT) + STR_WHITE
             + NumToStr(nowrt.rot.q2, STR_RND_QUAT) + STR_WHITE
             + NumToStr(nowrt.rot.q3, STR_RND_QUAT) + STR_WHITE
@@ -479,8 +479,19 @@ MODULE Machina_Server
 
     ! Send the value of the current external axes to the socket
     PROC SendExtAx()
+        nowrt := CRobT(\Tool:=tool0, \WObj:=wobj0);
+        nowexj := nowrt.extax;
 
+        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_EXTAX, 0);
+        response := response + STR_WHITE
+            + NumToStr(nowexj.eax_a, STR_RND_MM \Exp) + STR_WHITE
+            + NumToStr(nowexj.eax_b, STR_RND_MM \Exp) + STR_WHITE
+            + NumToStr(nowexj.eax_c, STR_RND_MM \Exp) + STR_WHITE
+            + NumToStr(nowexj.eax_d, STR_RND_MM \Exp) + STR_WHITE
+            + NumToStr(nowexj.eax_e, STR_RND_MM \Exp) + STR_WHITE
+            + NumToStr(nowexj.eax_f, STR_RND_MM \Exp) + STR_MESSAGE_END_CHAR;
 
+        SocketSend clientSocket \Str:=response;
     ENDPROC
 
 

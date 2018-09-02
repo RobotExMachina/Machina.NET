@@ -13,7 +13,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal static readonly char STR_MESSAGE_ID_CHAR = '@';
         internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
 
-        internal static readonly string MACHINA_SERVER_VERSION = "1.2.2";
+        internal static readonly string MACHINA_SERVER_VERSION = "1.2.4";
 
         // A RAPID-code oriented API:
         //                                     // INSTRUCTION P1 P2 P3 P4...
@@ -35,7 +35,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int RES_VERSION = 20;            // ">20 1 2 1;" Sends version numbers
         internal const int RES_POSE = 21;               // ">21 400 300 500 0 0 1 0;"
         internal const int RES_JOINTS = 22;             // ">22 0 0 0 0 90 0;"
-        internal const int RES_EXTAX = 23;
+        internal const int RES_EXTAX = 23;              // ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
 
 
         /// <summary>

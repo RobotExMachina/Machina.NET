@@ -36,10 +36,10 @@ namespace TEST_StreamAPITests
             arm.ActionCompleted += LogEvent;
             arm.MotionCursorUpdated += LogEvent;
 
-            arm.ActionCompleted += (sender, eventArgs) =>
-            {
-                if (eventArgs.RemainingActions == 0) LoopUp(sender as Robot);
-            };
+            //arm.ActionCompleted += (sender, eventArgs) =>
+            //{
+            //    if (eventArgs.RemainingActions == 0) LoopUp(sender as Robot);
+            //};
 
 
             arm.ControlMode("stream");
@@ -302,8 +302,6 @@ namespace TEST_StreamAPITests
             //bot.JointAccelerationTo(90);
             bot.PrecisionTo(5);
             bot.AxesTo(homeJoints);
-
-
         }
 
 

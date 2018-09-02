@@ -28,6 +28,7 @@ namespace Machina.Drivers.Communication
         internal Vector initPos;
         internal Rotation initRot;
         internal Joints initAx;
+        internal ExternalAxes initExtAx;
 
         private TcpClient clientSocket = new TcpClient();
         private NetworkStream clientNetworkStream;
@@ -126,13 +127,13 @@ namespace Machina.Drivers.Communication
             logger.Debug("Waiting for intialization data from controller...");
 
             // @TODO: this is awful, come on...
-            while ((initAx == null || initPos == null || initRot == null) && time < INIT_TIMEOUT)
+            while ((_deviceDriverVersion == null || initAx == null || initPos == null || initRot == null || initExtAx == null) && time < INIT_TIMEOUT)
             {
                 time += 33;
                 Thread.Sleep(33);
             }
 
-            return initAx != null && initPos != null && initRot != null;
+            return _deviceDriverVersion != null || initAx != null && initPos != null && initRot != null && initExtAx == null;
         }
 
 
@@ -318,6 +319,11 @@ namespace Machina.Drivers.Communication
                 case ABBCommunicationProtocol.RES_JOINTS:
                     this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
                     break;
+
+                case ABBCommunicationProtocol.RES_EXTAX:
+                    this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
+                    break;
+
             }
 
         }
