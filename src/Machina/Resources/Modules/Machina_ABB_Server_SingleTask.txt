@@ -63,7 +63,7 @@
     CONST num SERVER_PORT := 7000;
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.1.0";
+    CONST string MACHINA_SERVER_VERSION := "1.2.0";
 
     ! Should program exit on any kind of error?
     VAR bool USE_STRICT := TRUE;
@@ -87,6 +87,7 @@
     CONST num INST_SETDO := 10;             ! SetDO "NAME" ON
     CONST num INST_SETAO := 11;             ! SetAO "NAME" V
     CONST num INST_EXT_JOINTS := 12;        ! (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+    CONST num INST_ACCELERATION := 13;      ! (setacceleration values, TBD)
 
     CONST num INST_STOP_EXECUTION := 100;       ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;             ! A way to retreive state information from the server (not implemented)
@@ -703,10 +704,10 @@
             a.p2 := a.p1;
         ENDIF
         IF a.p3 = 0 THEN
-            a.p3 := 5000;
+            a.p3 := a.p1;
         ENDIF
         IF a.p4 = 0 THEN
-            a.p4 := 1000;
+            a.p4 := a.p1;
         ENDIF
 
         RETURN [a.p1, a.p2, a.p3, a.p4];
