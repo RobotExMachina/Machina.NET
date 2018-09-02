@@ -1014,7 +1014,7 @@ namespace Machina
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
+        internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null, ExternalAxes extAx = null,
             double speed = Control.DEFAULT_SPEED, double acc = Control.DEFAULT_ACCELERATION, double rotationSpeed = Control.DEFAULT_ROTATION_SPEED,
             double jointSpeed = Control.DEFAULT_JOINT_SPEED, double jointAcceleration = Control.DEFAULT_JOINT_ACCELERATION,
             double precision = Control.DEFAULT_PRECISION,
@@ -1022,9 +1022,9 @@ namespace Machina
 
         {
             bool success = true;
-            success &= virtualCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
-            success &= writeCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
-            success &= motionCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+            success &= virtualCursor.Initialize(position, rotation, joints, extAx, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+            success &= writeCursor.Initialize(position, rotation, joints, extAx, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+            success &= motionCursor.Initialize(position, rotation, joints, extAx, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
 
             _areCursorsInitialized = success;
 
@@ -1043,8 +1043,9 @@ namespace Machina
             Vector currPos = _driver.GetCurrentPosition();
             Rotation currRot = _driver.GetCurrentOrientation();
             Joints currJnts = _driver.GetCurrentJoints();
+            ExternalAxes currExtAx = _driver.GetCurrentExternalAxes();
 
-            return InitializeRobotCursors(currPos, currRot, currJnts);
+            return InitializeRobotCursors(currPos, currRot, currJnts, currExtAx);
         }
 
 
