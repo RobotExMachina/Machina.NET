@@ -1,4 +1,4 @@
-﻿MODULE Machina_Server
+MODULE Machina_Server
 
     ! ###\   ###\ #####\  ######\##\  ##\##\###\   ##\ #####\
     ! ####\ ####\##\\\##\##\\\\\\##\  ##\##\####\  ##\##\\\##\
@@ -58,9 +58,9 @@
         num p11;
     ENDRECORD
 
-    ! Server data: change IP from localhost to "192.168.125.1" (typically) if working with a real robot
-    CONST string SERVER_IP := "127.0.0.1";
-    CONST num SERVER_PORT := 7000;
+    ! SERVER DATA --> to modify by user
+    CONST string SERVER_IP := "{{HOSTNAME}}";    ! Change to server IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
+    CONST num SERVER_PORT := {{PORT}};           ! Change to custom port number, typically 7000.
 
     ! Useful for handshakes and version compatibility checks...
     CONST string MACHINA_SERVER_VERSION := "1.2.0";

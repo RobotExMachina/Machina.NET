@@ -785,7 +785,7 @@ namespace Machina.Drivers.Communication
 
 
             // Read the resource as a string
-            _streamingModule = Machina.IO.ReadTextResource("Machina.Resources.Modules.Machina_ABB_Server_SingleTask.txt");
+            _streamingModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.SingleTask.Machina_ABB_Server_SingleTask.mod");
 
             // Get the port number/s from the file's "CONST num SERVER_PORT := 7000;"
             // @TODO: this is super flimsy, use regex here...
