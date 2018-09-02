@@ -26,6 +26,7 @@ namespace Machina
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
         public Joints joints, prevJoints;
+        public ExternalAxes externalAxes, prevExternalAxes;
         public double speed;
         public double acceleration;
         public double rotationSpeed;
@@ -35,7 +36,6 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
-        public ExternalAxes externalAxes;
 
         // Some robots use ints as pin identifiers (UR, KUKA), while others use strings (ABB). 
         // All pin ids are stored as strings, and are parsed to ints internally if possible. 
@@ -153,7 +153,7 @@ namespace Machina
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        public bool Initialize(Vector position, Rotation rotation, Joints joints,
+        public bool Initialize(Vector position, Rotation rotation, Joints joints, ExternalAxes extAx,
             double speed, double acceleration, double rotationSpeed, double jointSpeed, double jointAcceleration,
             double precision, MotionType mType, ReferenceCS refCS)
         {
@@ -172,6 +172,12 @@ namespace Machina
                 this.joints = new Joints(joints);
                 this.prevJoints = new Joints(joints);
             }
+            if (extAx != null)
+            {
+                this.externalAxes = new ExternalAxes(extAx);
+                this.prevExternalAxes = new ExternalAxes(extAx);
+            }
+
             this.acceleration = acceleration;
             this.speed = speed;
             this.rotationSpeed = rotationSpeed;
@@ -189,9 +195,6 @@ namespace Machina
             isExtruding = false;
             extrusionRate = 0;
             extrudedLength = 0;
-
-            // Keep this null until initialized
-            //this.externalAxes = new ExternalAxes();  // @TODO: should this be passed as an argument?
 
             this.initialized = true;
             return this.initialized;
@@ -1099,7 +1102,10 @@ namespace Machina
             if (this.externalAxes == null)
             {
                 this.externalAxes = new ExternalAxes();
+                this.prevExternalAxes = new ExternalAxes();
             }
+
+            ExternalAxes newExternalAxes = new ExternalAxes(this.externalAxes);  // copy
 
             if (action.relative)
             {
@@ -1109,12 +1115,16 @@ namespace Machina
                     return false;
                 }
 
-                this.externalAxes[action.axisNumber - 1] += action.value;
+                newExternalAxes[action.axisNumber - 1] += action.value;
             }
             else
             {
-                this.externalAxes[action.axisNumber - 1] = action.value;
+                newExternalAxes[action.axisNumber - 1] = action.value;
             }
+
+            // Not sure if keeping prev states makes sense for extax, but just doing it for completeness...
+            this.prevExternalAxes = this.externalAxes;
+            this.externalAxes = newExternalAxes;
 
             return true;
         }

@@ -41,14 +41,28 @@ namespace Machina
 
         public int Length { get { return this._externalAxes.Length; } }
 
-
+        /// <summary>
+        /// Create an empty object with all axes null.
+        /// </summary>
         public ExternalAxes()
         {
             for (int i = 0; i < _externalAxes.Length; i++)
             {
                 this._externalAxes[i] = null;
             }
-        }       
+        }
+
+        /// <summary>
+        /// Create a new instance as a copy.
+        /// </summary>
+        /// <param name="extAx"></param>
+        public ExternalAxes(ExternalAxes extAx)
+        {
+            for (int i = 0; i < extAx.Length; i++)
+            {
+                this._externalAxes[i] = extAx[i];
+            }
+        }
 
         public ExternalAxes(double? exa1, double? exa2, double? exa3, double? exa4, double? exa5, double? exa6)
         {
