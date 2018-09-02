@@ -8,14 +8,12 @@ namespace Machina.Drivers.Communication.Protocols
 {
     class URCommunicationProtocol : Base
     {
-        // This protocol basically sends the literal URScript line/s based on the action, 
-        // and attaches an immediate socket response with the id to it, to keep track of runtime.
-        // Not ideal, but SG is around the freaking corner! 
-
-        // Not implemented yet
+        // (not implemented yet)
         internal static readonly char STR_MESSAGE_END_CHAR = ';';
         internal static readonly char STR_MESSAGE_ID_CHAR = '@';
         internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
+
+        internal static readonly string MACHINA_SERVER_VERSION = "1.1.0";
 
         // Instruction data will be sent to the socket in the form of 32 signed integers. 
         // To allow for float precision, the original values must be 'puffed' by these factors. 
@@ -46,6 +44,10 @@ namespace Machina.Drivers.Communication.Protocols
         const int INST_SET_TOOL = 12;               // [ID, CODE, X, Y, Z, RX, RY, RZ, KG] (in (int) M * FACTOR_M, RAD * FACTOR_RAD, KG * FACTOR_KG)
         const int INST_SET_DIGITAL_OUT = 13;        // [ID, CODE, PIN, ON] (in (int)) 
         const int INST_SET_ANALOG_OUT = 14;         // [ID, CODE, PIN, VOLTAGE] (in (int) VOLTAGE * FACTOR_VOLT)
+        // This value sets the same speed value for TCP and Q, taken as mm/s and deg/s. E.g: if setting to 20 mm/s or deg/s, the received value should be 0.02 m/s * FACTOR_M, and this will be converted internally to 0.349 rad/s (=20 deg/s)
+        const int INST_ALL_SPEED = 15;              // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
+        // Similarly here, a received value in "puffed" m/s^2 will be internally translated to rad/s^2
+        const int INST_ALL_ACC = 16;                // [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
 
         // For compilation reuse
         private byte[] _buffer;
@@ -191,23 +193,24 @@ namespace Machina.Drivers.Communication.Protocols
                 //  ╔═╗╔═╗╔╦╗╔╦╗╦╔╗╔╔═╗╔═╗
                 //  ╚═╗║╣  ║  ║ ║║║║║ ╦╚═╗
                 //  ╚═╝╚═╝ ╩  ╩ ╩╝╚╝╚═╝╚═╝
-                case ActionType.Speed:
-                    _params = new int[]
-                    {
-                        _action.Id,
-                        INST_TCP_SPEED,
-                        (int) Math.Round(cursor.speed * 0.001 * FACTOR_M)
-                    };
-                    break;
+                // Removed support for different types of speed/acceleration
+                //case ActionType.Speed:
+                //    _params = new int[]
+                //    {
+                //        _action.Id,
+                //        INST_TCP_SPEED,
+                //        (int) Math.Round(cursor.speed * 0.001 * FACTOR_M)
+                //    };
+                //    break;
 
-                case ActionType.Acceleration:
-                    _params = new int[]
-                    {
-                        _action.Id,
-                        INST_TCP_ACC,
-                        (int) Math.Round(cursor.acceleration * 0.001 * FACTOR_M)
-                    };
-                    break;
+                //case ActionType.Acceleration:
+                //    _params = new int[]
+                //    {
+                //        _action.Id,
+                //        INST_TCP_ACC,
+                //        (int) Math.Round(cursor.acceleration * 0.001 * FACTOR_M)
+                //    };
+                //    break;
 
                 //case ActionType.JointSpeed:
                 //    _params = new int[]
@@ -226,6 +229,26 @@ namespace Machina.Drivers.Communication.Protocols
                 //        (int) Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD)
                 //    };
                 //    break;
+
+                // Speed is now set globally, and the driver takes care of translating that internally
+                case ActionType.Speed:
+                    _params = new int[]
+                    {
+                        _action.Id,
+                        INST_ALL_SPEED,
+                        (int) Math.Round(cursor.speed * 0.001 * FACTOR_M)
+                    };
+                    break;
+
+                // Idem for acceleration
+                case ActionType.Acceleration:
+                    _params = new int[]
+                    {
+                        _action.Id,
+                        INST_ALL_ACC,
+                        (int) Math.Round(cursor.acceleration * 0.001 * FACTOR_M)
+                    };
+                    break;
 
                 case ActionType.Precision:
                     _params = new int[]
