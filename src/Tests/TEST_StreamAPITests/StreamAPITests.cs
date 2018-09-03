@@ -32,9 +32,9 @@ namespace TEST_StreamAPITests
 
             arm.DebugMode(true);
 
-            arm.BufferEmpty += LogEvent;
-            arm.ActionCompleted += LogEvent;
-            arm.MotionCursorUpdated += LogEvent;
+            //arm.BufferEmpty += LogEvent;
+            //arm.ActionCompleted += LogEvent;
+            //arm.MotionCursorUpdated += LogEvent;
 
             //arm.ActionCompleted += (sender, eventArgs) =>
             //{
@@ -54,6 +54,7 @@ namespace TEST_StreamAPITests
             //arm.StreamConfiguration(3, 10);
 
             arm.Message("Hello Robot!");
+            ToolTesting(arm);
 
             //LoopUp(arm);
 
@@ -120,6 +121,41 @@ namespace TEST_StreamAPITests
         private static void Logger_CustomLogging(LoggerArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        static void ToolTesting(Robot bot)
+        {
+            bot.SpeedTo(100);
+            bot.TransformTo(400, 0, 400, -1, 0, 0, 0, 1, 0);
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.Wait(2000);
+
+            bot.DefineTool("tool_100", new Point(0, 0, 100), Orientation.WorldXY);
+            bot.AttachTool("tool_100");
+            bot.MoveTo(400, 0, 400);
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.DetachTool();
+            bot.MoveTo(400, 0, 400);
+            bot.Wait(2000);
+
+            bot.DefineTool("tool_300", new Point(0, 0, 300), Orientation.WorldXY);
+            bot.AttachTool("tool_300");
+            bot.MoveTo(400, 0, 400);
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.DetachTool();
+            bot.MoveTo(400, 0, 400);
+            bot.Wait(2000);
+
+            bot.MoveTo(400, 0, 400);
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.MoveTo(400, 0, 400);
+            bot.Wait(2000);
+
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
         static void LoopUp(Robot bot)

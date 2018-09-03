@@ -393,7 +393,7 @@ namespace Machina
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },
             { typeof (ActionAcceleration),              (act, robCur) => robCur.ApplyAction((ActionAcceleration) act) },
             { typeof (ActionPrecision),                 (act, robCur) => robCur.ApplyAction((ActionPrecision) act) },
-            { typeof (ActionMotionMode),                    (act, robCur) => robCur.ApplyAction((ActionMotionMode) act) },
+            { typeof (ActionMotionMode),                (act, robCur) => robCur.ApplyAction((ActionMotionMode) act) },
             { typeof (ActionCoordinates),               (act, robCur) => robCur.ApplyAction((ActionCoordinates) act) },
             { typeof (ActionPushPop),                   (act, robCur) => robCur.ApplyAction((ActionPushPop) act) },
             { typeof (ActionTranslation),               (act, robCur) => robCur.ApplyAction((ActionTranslation) act) },
@@ -403,8 +403,9 @@ namespace Machina
             { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
             { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
             { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
-            { typeof (ActionAttachTool),                    (act, robCur) => robCur.ApplyAction((ActionAttachTool) act) },
-            { typeof (ActionDetachTool),                    (act, robCur) => robCur.ApplyAction((ActionDetachTool) act) },
+            { typeof (ActionDefineTool),                (act, robCur) => robCur.ApplyAction((ActionDefineTool) act) },
+            { typeof (ActionAttachTool),                (act, robCur) => robCur.ApplyAction((ActionAttachTool) act) },
+            { typeof (ActionDetachTool),                (act, robCur) => robCur.ApplyAction((ActionDetachTool) act) },
             { typeof (ActionIODigital),                 (act, robCur) => robCur.ApplyAction((ActionIODigital) act) },
             { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) },
             { typeof (ActionTemperature),               (act, robCur) => robCur.ApplyAction((ActionTemperature) act) },
@@ -860,12 +861,12 @@ namespace Machina
         public bool ApplyAction(ActionDefineTool action)
         {
             // Sanity
-            if (availableTools[action.tool.name] != null)
+            if (availableTools.ContainsKey(action.tool.name))
             {
                 logger.Info($"Robot already had a tool defined as \"{action.tool.name}\"; this will be overwritten.");
             }
 
-            availableTools[action.tool.name] = action.tool;  // is a reference here safe? Should clone the tool?
+            availableTools.Add(action.tool.name, action.tool);
 
             return true;
         }
@@ -878,7 +879,7 @@ namespace Machina
         public bool ApplyAction(ActionAttachTool action)
         {
             // Sanity
-            if (availableTools[action.toolName] == null)
+            if (!availableTools.ContainsKey(action.toolName))
             {
                 logger.Warning($"No tool named \"{action.toolName}\" defined in this robot; please use \"DefineTool\" first.");
                 return false;

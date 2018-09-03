@@ -172,6 +172,17 @@ namespace Machina
             return 0;
         }
 
+        /// <summary>
+        /// Checks if the argument is a valid variable name. 
+        /// Basically, it returns true if the first character of the string is a letter...
+        /// </summary>
+        /// <param name="varName"></param>
+        /// <returns></returns>
+        public static bool IsValidVariableName(string varName)
+        {
+            return !String.IsNullOrEmpty(varName) && Char.IsLetter(varName[0]);
+        }
+
     }
 
 

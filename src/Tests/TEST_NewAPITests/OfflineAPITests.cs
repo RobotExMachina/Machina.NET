@@ -14,9 +14,11 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = Robot.Create("HelloRobot", "UR");
+            Robot arm = Robot.Create("ToolTesting", "ABB");
 
-            HelloRobot(arm);
+            ToolTesting(arm);
+
+            //HelloRobot(arm);
 
             //ExternalAxes(arm);
 
@@ -97,6 +99,41 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+
+        static void ToolTesting(Robot bot)
+        {
+            bot.SpeedTo(100);
+            bot.TransformTo(400, 0, 400, -1, 0, 0, 0, 1, 0);
+            bot.Move(0, 0, 0);
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.Wait(2000);
+
+            bot.DefineTool("tool_100", new Point(0, 0, 100), Orientation.WorldXY);
+            bot.AttachTool("tool_100");
+            bot.Move(0, 0, 0);
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.DetachTool();
+            bot.Move(0, 0, 0);
+            bot.Wait(2000);
+
+            bot.DefineTool("tool_300", new Point(0, 0, 300), Orientation.WorldXY);
+            bot.AttachTool("tool_300");
+            bot.Move(0, 0, 0);
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.DetachTool();
+            bot.Move(0, 0, 0);
+            bot.Wait(2000);
+
+            bot.Move(0, 100, 0);
+            bot.Move(0, -100, 0);
+            bot.Wait(2000);
+
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
         static public void HelloRobot(Robot arm)

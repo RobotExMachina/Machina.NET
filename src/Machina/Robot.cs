@@ -66,9 +66,7 @@ namespace Machina
         /// </summary>
         internal RobotLogger logger;
 
-
-
-
+        
 
 
 
@@ -92,9 +90,7 @@ namespace Machina
             c = new Control(this);
         }
 
-
-
-
+        
 
         /// <summary>
         /// Create a new instance of a Robot.
@@ -104,6 +100,12 @@ namespace Machina
         /// <returns></returns>
         static public Robot Create(string name, RobotType make)
         {
+            if (!Util.IsValidVariableName(name))
+            {
+                Logger.Error($"\"{name}\" is not a valid robot name, please start with a letter.");
+                return null;
+            }
+
             return new Robot(name, make);
         }
 
@@ -936,6 +938,12 @@ namespace Machina
         /// <returns></returns>
         public bool DefineTool(Tool tool)
         {
+            if (!Util.IsValidVariableName(tool.name))
+            {
+                logger.Error($"\"{tool.name}\" is not a valid tool name, please start with a letter.");
+                return false;
+            }
+
             Tool copy = Tool.Create(tool);
             return c.IssueDefineToolRequest(copy);
         }
@@ -949,6 +957,12 @@ namespace Machina
         /// <returns></returns>
         public bool DefineTool(string name, Point TCPPosition, Orientation TCPOrientation)
         {
+            if (!Util.IsValidVariableName(name))
+            {
+                logger.Error($"\"{name}\" is not a valid tool name, please start with a letter.");
+                return false;
+            }
+
             Tool tool = Tool.Create(name, TCPPosition, TCPOrientation);
             return c.IssueDefineToolRequest(tool);
         }
@@ -964,6 +978,12 @@ namespace Machina
         /// <returns></returns>
         public bool DefineTool(string name, Point TCPPosition, Orientation TCPOrientation, double weightKg, Point centerOfGravity)
         {
+            if (!Util.IsValidVariableName(name))
+            {
+                logger.Error($"\"{name}\" is not a valid tool name, please start with a letter.");
+                return false;
+            }
+
             Tool tool = Tool.Create(name, TCPPosition, TCPOrientation, weightKg, centerOfGravity);
             return c.IssueDefineToolRequest(tool);
         }
@@ -990,6 +1010,12 @@ namespace Machina
             double tcp_vX0, double tcp_vX1, double tcp_vX2, double tcp_vY0, double tcp_vY1, double tcp_vY2,
             double weight, double cogX, double cogY, double cogZ)
         {
+            if (!Util.IsValidVariableName(name))
+            {
+                logger.Error($"\"{name}\" is not a valid tool name, please start with a letter.");
+                return false;
+            }
+
             Tool tool = Tool.Create(name,
                 tcpX, tcpY, tcpZ,
                 tcp_vX0, tcp_vX1, tcp_vX2,
@@ -1008,6 +1034,12 @@ namespace Machina
         /// <returns></returns>
         public bool AttachTool(string toolName)
         {
+            if (!Util.IsValidVariableName(toolName))
+            {
+                logger.Error($"\"{toolName}\" is not a valid tool name, please start with a letter.");
+                return false;
+            }
+
             return c.IssueAttachRequest(toolName);
         }
 
