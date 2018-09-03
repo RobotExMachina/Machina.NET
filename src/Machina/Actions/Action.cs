@@ -23,6 +23,7 @@ namespace Machina
         Message,
         Wait,
         Speed,
+        SpeedPlus,
         Acceleration,
         Precision,
         MotionMode,

@@ -25,6 +25,7 @@ namespace Machina
     /// </summary>
     class Control
     {
+<<<<<<< HEAD
         // Some 'environment variables' to define check states and behavior
         public const bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
         //public const bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
@@ -38,10 +39,11 @@ namespace Machina
 
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;        // default motion type for new actions
         public const ReferenceCS DEFAULT_REFCS = ReferenceCS.World;             // default reference coordinate system for relative transform actions
+=======
+        // Some defaults
+>>>>>>> 2ce80f32d646ca2ed599525ba68a2bd47278da4e
         public const ControlType DEFAULT_CONTROLMODE = ControlType.Offline;
-        public const CycleType DEFAULT_RUNMODE = CycleType.Once;
         public const ConnectionType DEFAULT_CONNECTIONMODE = ConnectionType.User;
-
 
 
         /// <summary>
@@ -50,9 +52,6 @@ namespace Machina
         internal ControlType _controlMode;
         public ControlType ControlMode { get { return _controlMode; } internal set { _controlMode = value; } }
         internal ControlManager _controlManager;
-
-
-        internal CycleType runMode = DEFAULT_RUNMODE;
         internal ConnectionType connectionMode;
 
 
@@ -331,7 +330,7 @@ namespace Machina
 
                 // If successful, initialize robot cursors to mirror the state of the device.
                 // The function will initialize them based on the _comm object.
-                InitializeRobotCursors();
+                InitializeRobotCursorsFromDriver();
             }
 
             return true;
@@ -351,7 +350,7 @@ namespace Machina
             }
             else
             {
-                InitializeRobotCursors();
+                InitializeRobotCursorsFromDriver();
             }
             return true;
         }
@@ -619,7 +618,7 @@ namespace Machina
         public double GetCurrentSpeedSetting()
         {
             // @TODO: will need to decide if this returns the current virtual, write or motion speed
-            return virtualCursor.speed;
+            return virtualCursor.speedValues[SpeedType.Linear];
         }
 
         /// <summary>
@@ -746,6 +745,8 @@ namespace Machina
 
 
         public bool IssueSpeedRequest(double speed, bool relative) => IssueApplyActionRequest(new ActionSpeed(speed, relative));
+
+        public bool IssueSpeedPlusRequest(double value, SpeedType speedType, bool relative) => IssueApplyActionRequest(new ActionSpeedPlus(value, speedType, relative));
 
         public bool IssueAccelerationRequest(double acc, bool relative) => IssueApplyActionRequest(new ActionAcceleration(acc, relative));
 
@@ -1004,13 +1005,35 @@ namespace Machina
         //    return InitializeCommunication();
         //}
 
+        ///// <summary>
+        ///// Initializes all instances of robotCursors with base state
+        ///// </summary>
+        ///// <param name="position"></param>
+        ///// <param name="rotation"></param>
+        ///// <param name="joints"></param>
+        ///// <returns></returns>
+        //internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null,
+        //    double speed = Control.DEFAULT_SPEED, double acc = Control.DEFAULT_ACCELERATION, double rotationSpeed = Control.DEFAULT_ROTATION_SPEED,
+        //    double jointSpeed = Control.DEFAULT_JOINT_SPEED, double jointAcceleration = Control.DEFAULT_JOINT_ACCELERATION,
+        //    double precision = Control.DEFAULT_PRECISION,
+        //    MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
+
+        //{
+        //    bool success = true;
+        //    success &= virtualCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+        //    success &= writeCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+        //    success &= motionCursor.Initialize(position, rotation, joints, speed, acc, jointSpeed, jointAcceleration, rotationSpeed, precision, mType, refCS);
+
+        //    _areCursorsInitialized = success;
+
+        //    return success;
+        //}
+
         /// <summary>
-        /// Initializes all instances of robotCursors with base information
+        /// Initializes all instances of robotCursors with their internal default state
         /// </summary>
-        /// <param name="position"></param>
-        /// <param name="rotation"></param>
-        /// <param name="joints"></param>
         /// <returns></returns>
+<<<<<<< HEAD
         internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null, ExternalAxes extAx = null,
             double speed = Control.DEFAULT_SPEED, double acc = Control.DEFAULT_ACCELERATION, double precision = Control.DEFAULT_PRECISION,
             MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
@@ -1020,14 +1043,32 @@ namespace Machina
             success &= virtualCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
             success &= writeCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
             success &= motionCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
+=======
+        internal bool InitializeRobotCursors()
+        {
+            bool success = true;
+            success &= virtualCursor.InitializeToDefaults();
+            success &= writeCursor.InitializeToDefaults();
+            success &= motionCursor.InitializeToDefaults();
+>>>>>>> 2ce80f32d646ca2ed599525ba68a2bd47278da4e
 
             _areCursorsInitialized = success;
 
             return success;
         }
 
+        internal bool InitializeRobotCursors(Vector pos, Rotation ori, Joints axes)
+        {
+            bool success = InitializeRobotCursors();
+            success &= virtualCursor.SetPose(pos, ori, axes);
+            success &= writeCursor.SetPose(pos, ori, axes);
+            success &= motionCursor.SetPose(pos, ori, axes);
 
-        internal bool InitializeRobotCursors()
+            return success;
+        }
+
+
+        internal bool InitializeRobotCursorsFromDriver()
         {
             if (_driver == null)
             {

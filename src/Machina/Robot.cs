@@ -537,44 +537,32 @@ namespace Machina
         //    return c.GetCurrentSpeedSetting();
         //}
 
-        /// <summary>
-        /// Increase the TCP velocity value new Actions will be ran at.
-        /// </summary>
-        /// <param name="speedInc">TCP speed increment in mm/s.</param>
-        public bool Speed(double speedInc)
+        ///// <summary>
+        ///// Increase the TCP velocity value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="speedInc">TCP speed increment in mm/s.</param>
+        //public bool Speed(double speedInc)
+        //{
+        //    return c.IssueSpeedRequest(speedInc, true);
+        //}
+
+        ///// <summary>
+        ///// Set the TCP velocity value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="speed">TCP speed value in mm/s</param>
+        //public bool SpeedTo(double speed)
+        //{
+        //    return c.IssueSpeedRequest(speed, false);
+        //}
+
+
+
+        public bool SpeedPlusTo(double value)
         {
-            return c.IssueSpeedRequest(speedInc, true);
+            return c.IssueSpeedPlusRequest(value, SpeedType.Global, false);
         }
 
-        /// <summary>
-        /// Set the TCP velocity value new Actions will be ran at.
-        /// </summary>
-        /// <param name="speed">TCP speed value in mm/s</param>
-        public bool SpeedTo(double speed)
-        {
-            return c.IssueSpeedRequest(speed, false);
-        }
-
-        /// <summary>
-        /// Increase the TCP acceleration value new Actions will be ran at.
-        /// </summary>
-        /// <param name="accInc">TCP acceleration increment in mm/s^2. Decreasing the total to zero or less will reset it back the robot's default.</param>
-        /// <returns></returns>
-        public bool Acceleration(double accInc)
-        {
-            return c.IssueAccelerationRequest(accInc, true);
-        }
-
-        /// <summary>
-        /// Set the TCP acceleration value new Actions will be ran at. 
-        /// </summary>
-        /// <param name="acceleration">TCP acceleration value in mm/s^2. Setting this value to zero or less will reset acceleration to the robot's default.</param>
-        /// <returns></returns>
-        public bool AccelerationTo(double acceleration)
-        {
-            return c.IssueAccelerationRequest(acceleration, false);
-        }
-
+<<<<<<< HEAD
 
         ///// <summary>
         ///// Gets the current zone setting.
@@ -585,6 +573,114 @@ namespace Machina
         //{
         //    return c.GetCurrentPrecisionSettings();
         //}
+=======
+        public bool SpeedPlusTo(double value, string speedType)
+        {
+            SpeedType st;
+            try
+            {
+                st = (SpeedType)Enum.Parse(typeof(SpeedType), speedType, true);
+                if (Enum.IsDefined(typeof(MotionType), st))
+                {
+                    return c.IssueSpeedPlusRequest(value, st, false);
+                }
+            }
+            catch
+            {
+                logger.Error($"\"{speedType}\" is not a valid speed type, please specify one of the following: ");
+                foreach (string str in Enum.GetNames(typeof(SpeedType)))
+                {
+                    logger.Error(str);
+                }
+            }
+            return false;
+        }
+
+        public bool SpeedPlusTo(double value, SpeedType speedType)
+        {
+            return c.IssueSpeedPlusRequest(value, speedType, false);
+        }
+
+
+
+        ///// <summary>
+        ///// Increase the TCP acceleration value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="accInc">TCP acceleration increment in mm/s^2. Decreasing the total to zero or less will reset it back the robot's default.</param>
+        ///// <returns></returns>
+        //public bool Acceleration(double accInc)
+        //{
+        //    return c.IssueAccelerationRequest(accInc, true);
+        //}
+
+        ///// <summary>
+        ///// Set the TCP acceleration value new Actions will be ran at. 
+        ///// </summary>
+        ///// <param name="acceleration">TCP acceleration value in mm/s^2. Setting this value to zero or less will reset acceleration to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool AccelerationTo(double acceleration)
+        //{
+        //    return c.IssueAccelerationRequest(acceleration, false);
+        //}
+
+        ///// <summary>
+        ///// Increase the TCP angular rotation speed value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="rotationSpeedInc">TCP angular rotation speed increment in deg/s. Decreasing the total to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool RotationSpeed(double rotationSpeedInc)
+        //{
+        //    return c.IssueRotationSpeedRequest(rotationSpeedInc, true);
+        //}
+
+        ///// <summary>
+        ///// Set the TCP angular rotation speed value new Actions will be ran at.
+        ///// </summary>
+        ///// <param name="rotationSpeed">TCP angular rotation speed value in deg/s. Setting this value to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool RotationSpeedTo(double rotationSpeed)
+        //{
+        //    return c.IssueRotationSpeedRequest(rotationSpeed, true);
+        //}
+
+        /// <summary>
+        ///// Increase the maximum joint angular rotation speed value. Movement will be constrained so that the fastest joint rotates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointSpeedInc">Maximum joint angular rotation speed increment in deg/s. Decreasing the total to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointSpeed(double jointSpeedInc) => c.IssueJointSpeedRequest(jointSpeedInc, true);
+
+        ///// <summary>
+        ///// Set the maximum joint angular rotation speed value. Movement will be constrained so that the fastest joint rotates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointSpeed">Maximum joint angular rotation speed value in deg/s. Setting this value to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointSpeedTo(double jointSpeed) => c.IssueJointSpeedRequest(jointSpeed, false);
+
+        ///// <summary>
+        ///// Increase the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointAccelerationInc">Maximum joint angular rotation acceleration increment in deg/s^2. Decreasing the total to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointAcceleration(double jointAccelerationInc) => c.IssueJointAccelerationRequest(jointAccelerationInc, true);
+
+        ///// <summary>
+        ///// Set the maximum joint angular rotation acceleration value. Movement will be constrained so that the fastest joint accelerates below this threshold. 
+        ///// </summary>
+        ///// <param name="jointAcceleration">Maximum joint angular rotation acceleration value in deg/s^2. Setting this value to zero or less will reset it back to the robot's default.</param>
+        ///// <returns></returns>
+        //public bool JointAccelerationTo(double jointAcceleration) => c.IssueJointAccelerationRequest(jointAcceleration, false);
+
+        /// <summary>
+        /// Gets the current zone setting.
+        /// </summary>
+        /// <returns></returns>
+        [System.Obsolete("Deprecated method, use GetPrecision() instead")]
+        public double Zone()
+        {
+            return c.GetCurrentPrecisionSettings();
+        }
+>>>>>>> 2ce80f32d646ca2ed599525ba68a2bd47278da4e
 
         ///// <summary>
         ///// Increase the default zone value new Actions will be given.

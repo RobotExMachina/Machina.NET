@@ -168,4 +168,30 @@ namespace Machina
         VERBOSE = 4,
         DEBUG = 5
     }
+
+    /// <summary>
+    /// Defines a type of speed for robot motion.
+    /// </summary>
+    public enum SpeedType
+    {
+        Global,
+        Linear, 
+        Rotational, 
+        Axes, 
+        ExternalAxesLinear, 
+        ExternalAxesRotational
+    }
+
+    /// <summary>
+    /// Defines a type of acceleration for robot motion.
+    /// </summary>
+    public enum AccelerationType
+    {
+        Global,
+        Linear,
+        Rotational,
+        Axes,
+        ExternalAxesLinear,
+        ExternalAxesRotational
+    }
 }

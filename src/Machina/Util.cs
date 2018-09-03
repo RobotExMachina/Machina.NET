@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 //██╗   ██╗████████╗██╗██╗     
 //██║   ██║╚══██╔══╝██║██║     
@@ -121,7 +122,7 @@ namespace Machina
         public static string SafeProgramName(string name)
         {
             string safe = "";
-            if (name.Length == 0) safe = "Machina"; 
+            if (name.Length == 0) safe = "Machina";
 
             // Replace whitespaces with underscores
             safe = name.Replace(' ', '_');
@@ -143,6 +144,7 @@ namespace Machina
         }
 
         /// <summary>
+<<<<<<< HEAD
         /// Compares strings representing semantic versioning versions, like "1.3.2".
         /// Returns 1 if A is newer than B, -1 if B is newer than A, and 0 if same version. 
         /// </summary>
@@ -170,10 +172,27 @@ namespace Machina
             }
 
             return 0;
+=======
+        /// Returns a new copy instance of a generic Dictionary. 
+        /// Note that this method only works for primitive elements; objects will be copied by reference. 
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static Dictionary<T1, T2> CopyGenericDictionary<T1, T2>(Dictionary<T1, T2> source)
+        {
+            Dictionary<T1, T2> copy = new Dictionary<T1, T2>();
+            foreach (KeyValuePair<T1, T2> item in source)
+            {
+                copy[item.Key] = item.Value;
+            }
+            return copy;
+>>>>>>> 2ce80f32d646ca2ed599525ba68a2bd47278da4e
         }
 
     }
 
 
-    
+
 }
