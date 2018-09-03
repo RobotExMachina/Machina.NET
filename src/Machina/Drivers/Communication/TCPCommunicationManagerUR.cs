@@ -38,7 +38,7 @@ namespace Machina.Drivers.Communication
 
         internal TCPConnectionStatus ClientSocketStatus { get; private set; }
 
-        private RobotCursor _writeCursor;
+        private RobotCursor _issueCursor;
         private RobotCursor _motionCursor;
         private Driver _parentDriver;
         internal RobotLogger logger;
@@ -97,7 +97,7 @@ namespace Machina.Drivers.Communication
         {
             this._parentDriver = driver;
             this.logger = driver.parentControl.logger;
-            this._writeCursor = writeCursor;
+            this._issueCursor = writeCursor;
             this._motionCursor = motionCursor;
             this._robotIP = robotIP;
             //this._robotPort = robotPort;  // It will always be 30003, user need not care about this
@@ -234,21 +234,24 @@ namespace Machina.Drivers.Communication
             // Expire thread if no socket
             while (_robotSocket != null)
             {
-                while (this.ShouldSend() && this._writeCursor.AreActionsPending())
+                while (this.ShouldSend() && this._issueCursor.AreActionsPending())
                 {
-                    _sendMsgBytes = this._translator.GetBytesForNextAction(this._writeCursor);
+                    _sendMsgBytes = this._translator.GetBytesForNextAction(this._issueCursor);
 
                     // If the action had instruction represenation
                     if (_sendMsgBytes != null)
                     {
                         _robotNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
-                        _sentIDs.Add(this._writeCursor.GetLastAction().Id);
+                        _sentIDs.Add(this._issueCursor.GetLastAction().Id);
                         _sentMessages++;
 
                         logger.Debug("Sending:");
-                        logger.Debug("  " + this._writeCursor.GetLastAction());
+                        logger.Debug("  " + this._issueCursor.GetLastAction());
                         logger.Debug("  [" + string.Join(",", (Util.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
                     }
+
+                    // Action was released to the device, raise event
+                    this._parentDriver.parentControl.RaiseActionReleasedEvent();
                 }
 
                 //RaiseBufferEmptyEventCheck();

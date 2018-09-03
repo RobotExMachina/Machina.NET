@@ -165,9 +165,13 @@ namespace Machina.Drivers.Communication
                             _sendMsgBytes = Encoding.ASCII.GetBytes(msg);
                             clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
                             _sentMessages++;
-                           //Console.WriteLine("Sending mgs: " + msg);
+                            //Console.WriteLine("Sending mgs: " + msg);
+                            logger.Debug($"Sent: {msg}");
                         }
                     }
+
+                    // Action was released to the device, raise event
+                    this._parentDriver.parentControl.RaiseActionReleasedEvent();
                 }
 
                 //RaiseBufferEmptyEventCheck();

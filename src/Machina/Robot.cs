@@ -1322,10 +1322,17 @@ namespace Machina
         //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
         //                                                      
         /// <summary>
+        /// Will be raised whenever an Action has been released to the device and is scheduled for execution.
+        /// </summary>
+        public event ActionReleasedHandler ActionReleased;
+        public delegate void ActionReleasedHandler(object sender, ActionReleasedArgs args);
+        internal virtual void OnActionReleased(ActionReleasedArgs args) => ActionReleased?.Invoke(this, args);
+
+        /// <summary>
         /// Will be raised whenever an Action has completed execution on the device. 
         /// </summary>
         public event ActionExecutedHandler ActionExecuted;
-        public delegate void ActionExecutedHandler(object sender, ActionExecutedArgs e);
+        public delegate void ActionExecutedHandler(object sender, ActionExecutedArgs args);
         internal virtual void OnActionExecuted(ActionExecutedArgs e) => ActionExecuted?.Invoke(this, e);
 
     }

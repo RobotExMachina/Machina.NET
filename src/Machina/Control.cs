@@ -1301,6 +1301,23 @@ namespace Machina
         //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
         //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
         //    
+        /// <summary>
+        /// Use this to trigger an `ActionReleased` event.
+        /// </summary>
+        internal void RaiseActionReleasedEvent()
+        {
+            Action lastAction = this.ReleaseCursor.GetLastAction();
+            int pendingRelease = this.ReleaseCursor.ActionsPendingCount();
+
+            ActionReleasedArgs args = new ActionReleasedArgs(lastAction, pendingRelease, this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
+
+            this.parentRobot.OnActionReleased(args);
+        }
+        
+
+        /// <summary>
+        /// Use this to trigger an `ActionExecuted` event.
+        /// </summary>
         internal void RaiseActionExecutedEvent()
         {
             Action lastAction = this.ExecutionCursor.GetLastAction();
@@ -1311,6 +1328,7 @@ namespace Machina
 
             this.parentRobot.OnActionExecuted(args);
         }
+
 
     }
 }

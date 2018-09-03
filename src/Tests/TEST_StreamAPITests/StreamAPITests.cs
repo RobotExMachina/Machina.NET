@@ -33,6 +33,8 @@ namespace TEST_StreamAPITests
             arm.DebugMode(true);
 
             arm.ActionExecuted += LogEvent;
+            arm.ActionReleased += LogEvent;
+
             arm.ActionExecuted += (sender, e) =>
             {
                 if (e.PendingExecutionTotal == 0) Loop(sender as Robot);
@@ -171,6 +173,28 @@ namespace TEST_StreamAPITests
             bot.Move(-50, 0, 0);
             bot.Move(0, -50, 0);
             bot.Move(0, 0, -10);
+
+            //bot.Move(50, 0, 0);
+            //bot.Move(0, 50, 0);
+            //bot.Move(-50, 0, 0);
+            //bot.Move(0, -50, 0);
+            //bot.Move(0, 0, 10);
+            //bot.Move(50, 0, 0);
+            //bot.Move(0, 50, 0);
+            //bot.Move(-50, 0, 0);
+            //bot.Move(0, -50, 0);
+            //bot.Move(0, 0, -10);
+
+            //bot.Move(50, 0, 0);
+            //bot.Move(0, 50, 0);
+            //bot.Move(-50, 0, 0);
+            //bot.Move(0, -50, 0);
+            //bot.Move(0, 0, 10);
+            //bot.Move(50, 0, 0);
+            //bot.Move(0, 50, 0);
+            //bot.Move(-50, 0, 0);
+            //bot.Move(0, -50, 0);
+            //bot.Move(0, 0, -10);
         }
 
         static public void ExternalAxes(Robot bot)
