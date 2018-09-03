@@ -1340,7 +1340,14 @@ namespace Machina
         /// </summary>
         public event ActionExecutedHandler ActionExecuted;
         public delegate void ActionExecutedHandler(object sender, ActionExecutedArgs args);
-        internal virtual void OnActionExecuted(ActionExecutedArgs e) => ActionExecuted?.Invoke(this, e);
+        internal virtual void OnActionExecuted(ActionExecutedArgs args) => ActionExecuted?.Invoke(this, args);
+
+        /// <summary>
+        /// Will be raised whenever new information is available about the real-time information about the state of the device.
+        /// </summary>
+        public event MotionUpdateHandler MotionUpdate;
+        public delegate void MotionUpdateHandler(object sender, MotionUpdateArgs args);
+        internal virtual void OnMotionUpdate(MotionUpdateArgs args) => MotionUpdate?.Invoke(this, args);
 
     }
 

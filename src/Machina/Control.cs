@@ -101,7 +101,7 @@ namespace Machina
         /// A virtual representation of the state of the device tracked in pseudo real time. 
         /// Is independent from the other cursors, and gets updated (if available) at periodic intervals from the controller. 
         /// </summary>
-        public RobotCursor MotionCursorRename => _motionCursor;
+        public RobotCursor MotionCursor => _motionCursor;
 
         /// <summary>
         /// Are cursors ready to start working?
@@ -1312,7 +1312,6 @@ namespace Machina
             this.parentRobot.OnActionIssued(args);
         }
 
-
         /// <summary>
         /// Use this to trigger an `ActionReleased` event.
         /// </summary>
@@ -1325,7 +1324,6 @@ namespace Machina
 
             this.parentRobot.OnActionReleased(args);
         }
-        
 
         /// <summary>
         /// Use this to trigger an `ActionExecuted` event.
@@ -1339,6 +1337,14 @@ namespace Machina
             ActionExecutedArgs args = new ActionExecutedArgs(lastAction, pendingExecutionOnDevice, pendingExecutionTotal, this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
 
             this.parentRobot.OnActionExecuted(args);
+        }
+
+        /// <summary>
+        /// Use this to trigger a `MotionUpdate` event.
+        /// </summary>
+        internal void RaiseMotionUpdateEvent()
+        {
+            throw new NotImplementedException();
         }
 
 
