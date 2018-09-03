@@ -27,13 +27,10 @@ namespace Machina
     {
         // Some 'environment variables' to define check states and behavior
         public const bool SAFETY_STOP_IMMEDIATE_ON_DISCONNECT = true;         // when disconnecting from a controller, issue an immediate Stop request?
-        //public const bool SAFETY_CHECK_TABLE_COLLISION = true;                // when issuing actions, check if it is about to hit the table?
-        //public const bool SAFETY_STOP_ON_TABLE_COLLISION = true;              // prevent from actually hitting the table?
-        //public const double SAFETY_TABLE_Z_LIMIT = -10000;                    // table security checks will trigger below this z height (mm)
 
         // @TODO: move to cursors, make it device specific
         public const double DEFAULT_SPEED = 20;                                 // default speed for new actions in mm/s and deg/s
-        public const double DEFAULT_ACCELERATION = 100;                         // default acc for new actions in mm/s^2 and deg/s^2; zero values let the controller figure out accelerations
+        public const double DEFAULT_ACCELERATION = 30;                          // default acc for new actions in mm/s^2 and deg/s^2; zero values let the controller figure out accelerations
         public const double DEFAULT_PRECISION = 5;                              // default precision for new actions
 
         public const MotionType DEFAULT_MOTION_TYPE = MotionType.Linear;        // default motion type for new actions
@@ -747,7 +744,9 @@ namespace Machina
             }
 
             bool success = IssueCursor.Issue(action);
-            //if (_controlMode == ControlType.Stream) _comm.TickStreamQueue(true);
+
+            if (success) RaiseActionIssuedEvent();
+
             return success;
         }
 
@@ -1301,6 +1300,19 @@ namespace Machina
         //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
         //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
         //    
+        /// <summary>
+        /// Use this to trigger an `ActionIssued` event.
+        /// </summary>
+        internal void RaiseActionIssuedEvent()
+        {
+            Action lastAction = this.IssueCursor.GetLastAction();
+
+            ActionIssuedArgs args = new ActionIssuedArgs(lastAction, this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
+
+            this.parentRobot.OnActionIssued(args);
+        }
+
+
         /// <summary>
         /// Use this to trigger an `ActionReleased` event.
         /// </summary>

@@ -34,6 +34,7 @@ namespace TEST_StreamAPITests
 
             arm.ActionExecuted += LogEvent;
             arm.ActionReleased += LogEvent;
+            arm.ActionIssued += LogEvent;
 
             arm.ActionExecuted += (sender, e) =>
             {
@@ -174,27 +175,27 @@ namespace TEST_StreamAPITests
             bot.Move(0, -50, 0);
             bot.Move(0, 0, -10);
 
-            //bot.Move(50, 0, 0);
-            //bot.Move(0, 50, 0);
-            //bot.Move(-50, 0, 0);
-            //bot.Move(0, -50, 0);
-            //bot.Move(0, 0, 10);
-            //bot.Move(50, 0, 0);
-            //bot.Move(0, 50, 0);
-            //bot.Move(-50, 0, 0);
-            //bot.Move(0, -50, 0);
-            //bot.Move(0, 0, -10);
+            bot.Move(50, 0, 0);
+            bot.Move(0, 50, 0);
+            bot.Move(-50, 0, 0);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, 10);
+            bot.Move(50, 0, 0);
+            bot.Move(0, 50, 0);
+            bot.Move(-50, 0, 0);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, -10);
 
-            //bot.Move(50, 0, 0);
-            //bot.Move(0, 50, 0);
-            //bot.Move(-50, 0, 0);
-            //bot.Move(0, -50, 0);
-            //bot.Move(0, 0, 10);
-            //bot.Move(50, 0, 0);
-            //bot.Move(0, 50, 0);
-            //bot.Move(-50, 0, 0);
-            //bot.Move(0, -50, 0);
-            //bot.Move(0, 0, -10);
+            bot.Move(50, 0, 0);
+            bot.Move(0, 50, 0);
+            bot.Move(-50, 0, 0);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, 10);
+            bot.Move(50, 0, 0);
+            bot.Move(0, 50, 0);
+            bot.Move(-50, 0, 0);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, -10);
         }
 
         static public void ExternalAxes(Robot bot)

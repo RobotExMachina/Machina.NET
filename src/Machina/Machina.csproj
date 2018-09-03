@@ -122,6 +122,7 @@
     <Compile Include="Drivers\Communication\Protocols\Base.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="EventArgs\ActionExecutedArgs.cs" />
+    <Compile Include="EventArgs\ActionIssuedArgs.cs" />
     <Compile Include="EventArgs\ActionReleasedArgs.cs" />
     <Compile Include="EventArgs\MachinaEventArgs.cs" />
     <Compile Include="IO\IO.cs" />
