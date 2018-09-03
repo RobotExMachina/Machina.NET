@@ -1312,10 +1312,5 @@ namespace Machina
             this.parentRobot.OnActionExecuted(args);
         }
 
-        internal void RaiseBufferEmptyEvent()
-        {
-            this.parentRobot.OnBufferEmpty(new BufferEmptyArgs());
-        }
-
     }
 }

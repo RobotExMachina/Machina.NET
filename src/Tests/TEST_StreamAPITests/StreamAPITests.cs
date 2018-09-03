@@ -32,18 +32,7 @@ namespace TEST_StreamAPITests
 
             arm.DebugMode(true);
 
-            //arm.BufferEmpty += LogEvent;
-            //arm.ActionCompleted += LogEvent;
-            //arm.MotionCursorUpdated += LogEvent;
-
-            //arm.ActionCompleted += (sender, eventArgs) =>
-            //{
-            //    if (eventArgs.RemainingActions == 0) Loop(sender as Robot);
-            //};
-
-            arm.BufferEmpty += LogEvent;
             arm.ActionExecuted += LogEvent;
-
             arm.ActionExecuted += (sender, e) =>
             {
                 if (e.PendingExecutionTotal == 0) Loop(sender as Robot);

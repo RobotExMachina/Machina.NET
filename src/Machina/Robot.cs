@@ -1322,37 +1322,13 @@ namespace Machina
         //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
         //                                                      
         /// <summary>
-        /// Will be raised when Machina has finished streaming all pending Actions to the controller.
-        /// Note that the controller still needs to receive them and execute them. This gives Machina 
-        /// time to prepare the next batch.
+        /// Will be raised whenever an Action has completed execution on the device. 
         /// </summary>
-        public event BufferEmptyHandler BufferEmpty;
-        public delegate void BufferEmptyHandler(object sender, BufferEmptyArgs e);
-        internal virtual void OnBufferEmpty(BufferEmptyArgs e) => BufferEmpty?.Invoke(this, e);
-
-
         public event ActionExecutedHandler ActionExecuted;
         public delegate void ActionExecutedHandler(object sender, ActionExecutedArgs e);
         internal virtual void OnActionExecuted(ActionExecutedArgs e) => ActionExecuted?.Invoke(this, e);
 
     }
 
-
-
-
-
-
-
-
-
-
-    public class BufferEmptyArgs : MachinaEventArgs
-    {
-        // There is nothing really worthy on this event...
-        public string eventType = "buffer-empty";
-
-        public override string ToJSONString() => $"{{\"event\":\"buffer-empty\"}}";
-    }
-    
 
 }

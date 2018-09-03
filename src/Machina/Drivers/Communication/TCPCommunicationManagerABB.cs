@@ -170,7 +170,7 @@ namespace Machina.Drivers.Communication
                     }
                 }
 
-                RaiseBufferEmptyEventCheck();
+                //RaiseBufferEmptyEventCheck();
 
                 Thread.Sleep(30);
             }
@@ -233,18 +233,18 @@ namespace Machina.Drivers.Communication
             }
         }
 
-        private void RaiseBufferEmptyEventCheck()
-        {
-            if (this._writeCursor.AreActionsPending())
-            {
-                _bufferEmptyEventIsRaiseable = true;
-            }
-            else if (_bufferEmptyEventIsRaiseable)
-            {
-                this._parentDriver.parentControl.RaiseBufferEmptyEvent();
-                _bufferEmptyEventIsRaiseable = false;
-            }
-        }
+        //private void RaiseBufferEmptyEventCheck()
+        //{
+        //    if (this._writeCursor.AreActionsPending())
+        //    {
+        //        _bufferEmptyEventIsRaiseable = true;
+        //    }
+        //    else if (_bufferEmptyEventIsRaiseable)
+        //    {
+        //        this._parentDriver.parentControl.RaiseBufferEmptyEvent();
+        //        _bufferEmptyEventIsRaiseable = false;
+        //    }
+        //}
 
 
 
