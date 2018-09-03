@@ -397,8 +397,8 @@ namespace Machina
 
         /// <summary>
         /// Turns this Rotation into its conjugate.
+        /// See http://mathworld.wolfram.com/QuaternionConjugate.html.
         /// </summary>
-        /// <seealso cref="http://mathworld.wolfram.com/QuaternionConjugate.html"/>
         public void Conjugate()
         {
             // W stays the same
@@ -704,7 +704,7 @@ namespace Machina
 
 
 
-        
+
 
 
 
@@ -712,8 +712,8 @@ namespace Machina
         /// Returns the AxisAngle rotation represented by this Quaternion. 
         /// Note it will always return the unit vector corresponding to a positive rotation, 
         /// even if the quaternion was created from a negative one (flipped vector).
+        /// See http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
         /// </summary>
-        /// <seealso cref="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm"/>
         /// <returns></returns>
         public AxisAngle ToAxisAngle()
         {

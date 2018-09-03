@@ -111,10 +111,12 @@ namespace Machina.Drivers.Communication.Protocols
                     msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_TPWRITE} \"{am.message}\"{STR_MESSAGE_END_CHAR}");
                     break;
 
-                case ActionType.Attach:
+                case ActionType.AttachTool:
                     // !(settool X Y Z QW QX QY QZ KG CX CY CZ)
-                    ActionAttach aa = (ActionAttach)action;
-                    Tool t = aa.tool;
+                    //ActionAttachTool aa = (ActionAttachTool)action;
+                    //Tool t = aa.tool;
+
+                    Tool t = cursor.tool;  // @TODO: should I just pull from the library? need to rethink the general approach: take info from cursor state (like motion actions) or action data...
 
                     msgs.Add(string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}{14}",
                         STR_MESSAGE_ID_CHAR,
@@ -128,13 +130,13 @@ namespace Machina.Drivers.Communication.Protocols
                         Math.Round(t.TCPOrientation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         Math.Round(t.TCPOrientation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         Math.Round(t.Weight, Geometry.STRING_ROUND_DECIMALS_KG),
-                        Math.Round(t.centerOfGravity.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(t.centerOfGravity.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(t.centerOfGravity.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.CenterOfGravity.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.CenterOfGravity.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.CenterOfGravity.Z, Geometry.STRING_ROUND_DECIMALS_MM),
                         STR_MESSAGE_END_CHAR));
                     break;
 
-                case ActionType.Detach:
+                case ActionType.DetachTool:
                     // !(settool0)
                     msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_NOTOOL}{STR_MESSAGE_END_CHAR}");
                     break;

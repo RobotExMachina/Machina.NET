@@ -37,7 +37,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1414;
+        public static readonly int Build = 1415;
 
         /// <summary>
         /// Version number.
@@ -929,6 +929,98 @@ namespace Machina
         public bool CustomCode(string statement, bool isDeclaration = false) =>
                 c.IssueCustomCodeRequest(statement, isDeclaration);
 
+        /// <summary>
+        /// Define a Tool object on the Robot's internal library to make it avaliable for future Attach/Detach actions.
+        /// </summary>
+        /// <param name="tool"></param>
+        /// <returns></returns>
+        public bool DefineTool(Tool tool)
+        {
+            Tool copy = Tool.Create(tool);
+            return c.IssueDefineToolRequest(copy);
+        }
+
+        /// <summary>
+        /// Define a Tool object on the Robot's internal library to make it avaliable for future Attach/Detach actions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="TCPPosition"></param>
+        /// <param name="TCPOrientation"></param>
+        /// <returns></returns>
+        public bool DefineTool(string name, Point TCPPosition, Orientation TCPOrientation)
+        {
+            Tool tool = Tool.Create(name, TCPPosition, TCPOrientation);
+            return c.IssueDefineToolRequest(tool);
+        }
+
+        /// <summary>
+        /// Define a Tool object on the Robot's internal library to make it avaliable for future Attach/Detach actions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="TCPPosition"></param>
+        /// <param name="TCPOrientation"></param>
+        /// <param name="weightKg"></param>
+        /// <param name="centerOfGravity"></param>
+        /// <returns></returns>
+        public bool DefineTool(string name, Point TCPPosition, Orientation TCPOrientation, double weightKg, Point centerOfGravity)
+        {
+            Tool tool = Tool.Create(name, TCPPosition, TCPOrientation, weightKg, centerOfGravity);
+            return c.IssueDefineToolRequest(tool);
+        }
+
+        /// <summary>
+        /// Define a Tool object on the Robot's internal library to make it avaliable for future Attach/Detach actions.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tcpX"></param>
+        /// <param name="tcpY"></param>
+        /// <param name="tcpZ"></param>
+        /// <param name="tcp_vX0"></param>
+        /// <param name="tcp_vX1"></param>
+        /// <param name="tcp_vX2"></param>
+        /// <param name="tcp_vY0"></param>
+        /// <param name="tcp_vY1"></param>
+        /// <param name="tcp_vY2"></param>
+        /// <param name="weight"></param>
+        /// <param name="cogX"></param>
+        /// <param name="cogY"></param>
+        /// <param name="cogZ"></param>
+        /// <returns></returns>
+        public bool DefineTool(string name, double tcpX, double tcpY, double tcpZ,
+            double tcp_vX0, double tcp_vX1, double tcp_vX2, double tcp_vY0, double tcp_vY1, double tcp_vY2,
+            double weight, double cogX, double cogY, double cogZ)
+        {
+            Tool tool = Tool.Create(name,
+                tcpX, tcpY, tcpZ,
+                tcp_vX0, tcp_vX1, tcp_vX2,
+                tcp_vY0, tcp_vY1, tcp_vY2,
+                weight,
+                cogX, cogY, cogZ);
+            return c.IssueDefineToolRequest(tool);
+        }
+
+        /// <summary>
+        /// Attach a Tool to the flange of this Robot. From this moment on, 
+        /// all actions will refer to the new Tool Center Point (TCP) of this Tool.
+        /// Note that the Tool must have been previously defined via "DefineTool".
+        /// </summary>
+        /// <param name="toolName"></param>
+        /// <returns></returns>
+        public bool AttachTool(string toolName)
+        {
+            return c.IssueAttachRequest(toolName);
+        }
+
+        /// <summary>
+        /// Detach all Tools from the flange of this Robot. From this moment on, 
+        /// all actions will refer to the flange as the Tool Center Point (TCP).
+        /// </summary>
+        /// <returns></returns>
+        public bool DetachTool()
+        {
+            return c.IssueDetachRequest();
+        }
+
 
         /// <summary>
         /// Attach a Tool to the flange of this Robot.
@@ -937,9 +1029,16 @@ namespace Machina
         /// </summary>
         /// <param name="tool"></param>
         /// <returns></returns>
+        [System.Obsolete("Use AttachTool() instead.")]
         public bool Attach(Tool tool)
         {
-            return c.IssueAttachRequest(tool);
+            logger.Warning("Attach is deprecated, Use AttachTool() instead.");
+
+            bool success = c.IssueDefineToolRequest(tool);
+            success &= c.IssueAttachRequest(tool.name);
+            return success;
+
+            //return c.IssueAttachRequest(tool);
         }
 
         /// <summary>
@@ -948,8 +1047,10 @@ namespace Machina
         /// to the Flange Center Point (FCP).
         /// </summary>
         /// <returns></returns>
+        [System.Obsolete("Detach is deprecated, Use DetachTool() instead.")]
         public bool Detach()
         {
+            logger.Warning("Detach is deprecated, Use DetachTool() instead.");
             return c.IssueDetachRequest();
         }
 

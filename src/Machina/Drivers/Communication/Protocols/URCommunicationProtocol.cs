@@ -134,9 +134,11 @@ namespace Machina.Drivers.Communication.Protocols
                 //        am.message);
                 //    break;
 
-                case ActionType.Attach:
-                    ActionAttach aatt = _action as ActionAttach;
-                    Tool t = aatt.tool;
+                case ActionType.AttachTool:
+                    //ActionAttachTool aatt = _action as ActionAttachTool;
+                    //Tool t = aatt.tool;
+
+                    Tool t = cursor.tool;  // can cursor.tool be null? The action would have not gone through if there wasn't a tool available for attachment, right?
                     RotationVector trv = t.TCPOrientation.ToRotationVector();
                     _params = new int[]
                     {
@@ -152,7 +154,7 @@ namespace Machina.Drivers.Communication.Protocols
                     };
                     break;
 
-                case ActionType.Detach:
+                case ActionType.DetachTool:
                     _params = new int[]
                     {
                         _action.Id,

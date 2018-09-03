@@ -20,13 +20,17 @@
 
 ---
 # v0.8.0
+## BUILD 1415
+- Created `DefineTool`, `AttachTool` and `DetachTool` as the new tool-related actions.
+- Flagged `Attach` and `Detach` for deprecation.
+
 ## BUILD 1414
 - Removal of all `JointAcceleration`, `JointSpeed` and `RotationSpeed` actions.
 - Add version check for ABB robots
 - Add `ExternalAxis` init msg from the ABB driver
 - Make sure correct speed values are being sent and parsed by the drivers...
   - [x] ABB
-  - [ ] UR
+  - [x] UR
 
 ## BUILD 1413
 - Massive API deprecation.

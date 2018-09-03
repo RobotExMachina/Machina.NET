@@ -376,16 +376,23 @@ namespace Machina
                         ac.comment);
                     break;
 
-                case ActionType.Attach:
-                    ActionAttach aa = (ActionAttach)action;
-                    dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
+                case ActionType.DefineTool:
+                    ActionDefineTool adt = action as ActionDefineTool;
+                    dec = string.Format("    {0} Tool \"{1}\" defined",  // this action has no actual RAPID instruction, just add a comment
                         commChar,
-                        aa.tool.name);
+                        adt.tool.name);
                     break;
 
-                case ActionType.Detach:
-                    ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("    {0} Tool detached",  // this action has no actual RAPID instruction, just add a comment
+                case ActionType.AttachTool:
+                    ActionAttachTool aa = (ActionAttachTool)action;
+                    dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
+                        commChar,
+                        aa.toolName);
+                    break;
+
+                case ActionType.DetachTool:
+                    ActionDetachTool ad = (ActionDetachTool)action;
+                    dec = string.Format("    {0} All tools detached",  // this action has no actual RAPID instruction, just add a comment
                         commChar);
                     break;
 
@@ -535,16 +542,23 @@ namespace Machina
                         ac.comment);
                     break;
 
-                case ActionType.Attach:
-                    ActionAttach aa = (ActionAttach)action;
-                    dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
+                case ActionType.DefineTool:
+                    ActionDefineTool adt = action as ActionDefineTool;
+                    dec = string.Format("    {0} Tool \"{1}\" defined",  // this action has no actual RAPID instruction, just add a comment
                         commChar,
-                        aa.tool.name);
+                        adt.tool.name);
                     break;
 
-                case ActionType.Detach:
-                    ActionDetach ad = (ActionDetach)action;
-                    dec = string.Format("    {0} Tools detached",   // this action has no actual RAPID instruction, just add a comment
+                case ActionType.AttachTool:
+                    ActionAttachTool aa = (ActionAttachTool)action;
+                    dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
+                        commChar,
+                        aa.toolName);
+                    break;
+
+                case ActionType.DetachTool:
+                    ActionDetachTool ad = (ActionDetachTool)action;
+                    dec = string.Format("    {0} All tools detached",  // this action has no actual RAPID instruction, just add a comment
                         commChar);
                     break;
 
@@ -697,7 +711,7 @@ namespace Machina
                 cursor.tool.TCPPosition,
                 cursor.tool.TCPOrientation.Q.ToString(false),
                 cursor.tool.Weight,
-                cursor.tool.centerOfGravity,
+                cursor.tool.CenterOfGravity,
                 "[1,0,0,0]");  // no internial axes by default
         }
 

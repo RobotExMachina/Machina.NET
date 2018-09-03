@@ -50,20 +50,20 @@ namespace Machina
         /// <summary>
         /// Position of the Tool's CoG relative to the flange.
         /// </summary>
-        public Vector centerOfGravity { get; internal set; }   
+        public Vector CenterOfGravity { get; internal set; }   
 
         // For the time being, tools will be defined through position (first) and orientation
         internal bool translationFirst = true;
 
         private Tool(string name, double tcpX, double tcpY, double tcpZ,
-            double tcp_vX0, double tcp_vX1, double tcp_vX2, double tcp_vY0, double tcpvY1, double tcp_vY2,
+            double tcp_vX0, double tcp_vX1, double tcp_vX2, double tcp_vY0, double tcp_vY1, double tcp_vY2,
             double weight, double cogX, double cogY, double cogZ)
         {
             this.name = name;
             this.TCPPosition = new Point(tcpX, tcpY, tcpZ);
-            this.TCPOrientation = new Orientation(tcp_vX0, tcp_vX1, tcp_vX2, tcp_vY0, tcpvY1, tcp_vY2);
+            this.TCPOrientation = new Orientation(tcp_vX0, tcp_vX1, tcp_vX2, tcp_vY0, tcp_vY1, tcp_vY2);
             this.Weight = weight;
-            this.centerOfGravity = new Point(cogX, cogY, cogZ);
+            this.CenterOfGravity = new Point(cogX, cogY, cogZ);
         }
 
         ///// <summary>
@@ -103,6 +103,21 @@ namespace Machina
         //    this.Weight = weightKg;
         //    this.centerOfGravity = centerOfGravity;
         //}
+
+        /// <summary>
+        /// Create a new Tool object as a clone of another one. 
+        /// </summary>
+        /// <param name="tool"></param>
+        /// <returns></returns>
+        static public Tool Create(Tool tool)
+        {
+            return new Tool(tool.name,
+                tool.TCPPosition.X, tool.TCPPosition.Y, tool.TCPPosition.Z,
+                tool.TCPOrientation.XAxis.X, tool.TCPOrientation.XAxis.Y, tool.TCPOrientation.XAxis.Z,
+                tool.TCPOrientation.YAxis.X, tool.TCPOrientation.YAxis.Y, tool.TCPOrientation.YAxis.Z,
+                tool.Weight,
+                tool.CenterOfGravity.X, tool.CenterOfGravity.Y, tool.CenterOfGravity.Z);
+        }
 
         /// <summary>
         /// Create a new Tool object by defining the Position and Orientation of the 
@@ -196,7 +211,7 @@ namespace Machina
         /// <returns></returns>
         public string ToInstruction()
         {
-            return $"Tool.Create(\"{this.name}\", {this.TCPPosition.X}, {this.TCPPosition.Y}, {this.TCPPosition.Z}, {this.TCPOrientation.XAxis.X}, {this.TCPOrientation.XAxis.Y}, {this.TCPOrientation.XAxis.Z}, {this.TCPOrientation.YAxis.X}, {this.TCPOrientation.YAxis.Y}, {this.TCPOrientation.YAxis.Z}, {this.Weight}, {this.centerOfGravity.X}, {this.centerOfGravity.Y}, {this.centerOfGravity.Z});";
+            return $"Tool.Create(\"{this.name}\", {this.TCPPosition.X}, {this.TCPPosition.Y}, {this.TCPPosition.Z}, {this.TCPOrientation.XAxis.X}, {this.TCPOrientation.XAxis.Y}, {this.TCPOrientation.XAxis.Z}, {this.TCPOrientation.YAxis.X}, {this.TCPOrientation.YAxis.Y}, {this.TCPOrientation.YAxis.Z}, {this.Weight}, {this.CenterOfGravity.X}, {this.CenterOfGravity.Y}, {this.CenterOfGravity.Z});";
         }
 
     }

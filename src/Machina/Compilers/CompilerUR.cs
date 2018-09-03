@@ -254,14 +254,21 @@ namespace Machina
                         ac.comment);
                     break;
 
-                case ActionType.Attach:
-                    ActionAttach aa = (ActionAttach)action;
+                case ActionType.DefineTool:
+                    ActionDefineTool adt = action as ActionDefineTool;
+                    dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
+                        COMMENT_CHAR,
+                        adt.tool.name);
+                    break;
+
+                case ActionType.AttachTool:
+                    ActionAttachTool aa = (ActionAttachTool)action;
                     dec = string.Format("  set_tcp({0})",  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                         GetToolValue(cursor));
                     break;
 
-                case ActionType.Detach:
-                    ActionDetach ad = (ActionDetach)action;
+                case ActionType.DetachTool:
+                    ActionDetachTool ad = (ActionDetachTool)action;
                     dec = string.Format("  set_tcp(p[0,0,0,0,0,0])");  // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                     break;
 
@@ -421,14 +428,21 @@ namespace Machina
                         ac.comment);
                     break;
 
-                case ActionType.Attach:
-                    ActionAttach aa = (ActionAttach)action;
+                case ActionType.DefineTool:
+                    ActionDefineTool adt = action as ActionDefineTool;
+                    dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
+                        COMMENT_CHAR,
+                        adt.tool.name);
+                    break;
+
+                case ActionType.AttachTool:
+                    ActionAttachTool aa = (ActionAttachTool)action;
                     dec = string.Format("  set_tcp({0})",   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                         GetToolValue(cursor));
                     break;
 
-                case ActionType.Detach:
-                    ActionDetach ad = (ActionDetach)action;
+                case ActionType.DetachTool:
+                    ActionDetachTool ad = (ActionDetachTool)action;
                     dec = string.Format("  set_tcp(p[0,0,0,0,0,0])");   // @TODO: should need to add a "set_payload(m, CoG)" dec afterwards...
                     break;
 

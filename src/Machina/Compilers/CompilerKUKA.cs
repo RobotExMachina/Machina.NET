@@ -272,14 +272,21 @@ namespace Machina
                         ac.comment);
                     break;
 
-                case ActionType.Attach:
-                    ActionAttach at = (ActionAttach)action;
+                case ActionType.DefineTool:
+                    ActionDefineTool adt = action as ActionDefineTool;
+                    dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
+                        COMMENT_CHAR,
+                        adt.tool.name);
+                    break;
+
+                case ActionType.AttachTool:
+                    ActionAttachTool at = (ActionAttachTool)action;
                     dec = string.Format("  $TOOL = {0}",
                         GetToolValue(cursor));
                     break;
 
-                case ActionType.Detach:
-                    ActionDetach ad = (ActionDetach)action;
+                case ActionType.DetachTool:
+                    ActionDetachTool ad = (ActionDetachTool)action;
                     dec = string.Format("  $TOOL = $NULLFRAME");
                     break;
 
@@ -408,15 +415,21 @@ namespace Machina
                         ac.comment);
                     break;
 
+                case ActionType.DefineTool:
+                    ActionDefineTool adt = action as ActionDefineTool;
+                    dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
+                        COMMENT_CHAR,
+                        adt.tool.name);
+                    break;
 
-                case ActionType.Attach:
-                    ActionAttach at = (ActionAttach)action;
+                case ActionType.AttachTool:
+                    ActionAttachTool at = (ActionAttachTool)action;
                     dec = string.Format("  $TOOL = {0}",
                         GetToolValue(cursor));
                     break;
 
-                case ActionType.Detach:
-                    ActionDetach ad = (ActionDetach)action;
+                case ActionType.DetachTool:
+                    ActionDetachTool ad = (ActionDetachTool)action;
                     dec = string.Format("  $TOOL = $NULLFRAME");
                     break;
 

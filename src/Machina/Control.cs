@@ -854,12 +854,21 @@ namespace Machina
 
 
         /// <summary>
+        /// Issue a reques to defin a Tool in the robot's internal library, avaliable for Attach/Detach requests.
+        /// </summary>
+        /// <param name="tool"></param>
+        /// <returns></returns>
+        public bool IssueDefineToolRequest(Tool tool) =>
+                IssueApplyActionRequest(new ActionDefineTool(tool));
+
+
+        /// <summary>
         /// Issue a request to attach a Tool to the flange of the robot
         /// </summary>
         /// <param name="tool"></param>
         /// <returns></returns>
-        public bool IssueAttachRequest(Tool tool) =>
-                IssueApplyActionRequest(new ActionAttach(tool));
+        public bool IssueAttachRequest(string toolName) =>
+                IssueApplyActionRequest(new ActionAttachTool(toolName));
 
 
         /// <summary>
@@ -867,7 +876,7 @@ namespace Machina
         /// </summary>
         /// <returns></returns>
         public bool IssueDetachRequest() =>
-                IssueApplyActionRequest(new ActionDetach());
+                IssueApplyActionRequest(new ActionDetachTool());
 
 
         /// <summary>
@@ -908,7 +917,7 @@ namespace Machina
         /// <param name="value"></param>
         /// <param name="relative"></param>
         /// <returns></returns>
-        public bool IssueExternalAxisRequest(int axisNumber, double value, bool relative) => 
+        public bool IssueExternalAxisRequest(int axisNumber, double value, bool relative) =>
                 IssueApplyActionRequest(new ActionExternalAxis(axisNumber, value, relative));
 
         /// <summary>

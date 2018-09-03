@@ -34,16 +34,19 @@ namespace Machina
         public ReferenceCS referenceCS;
         public Tool tool;
 
+        // Keep a dictionary of all Tools that have been defined on this robot, and are available for Attach/Detach
+        internal Dictionary<string, Tool> availableTools;
+
         // Some robots use ints as pin identifiers (UR, KUKA), while others use strings (ABB). 
         // All pin ids are stored as strings, and are parsed to ints internally if possible. 
-        Dictionary<string, bool> digitalOutputs = new Dictionary<string, bool>();
-        Dictionary<string, double> analogOutputs = new Dictionary<string, double>();
+        internal Dictionary<string, bool> digitalOutputs;
+        internal Dictionary<string, double> analogOutputs;
 
 
         // 3D printing
         public bool isExtruding;
         public double extrusionRate;
-        public Dictionary<RobotPartType, double> partTemperature = new Dictionary<RobotPartType, double>();
+        public Dictionary<RobotPartType, double> partTemperature;
         public double extrudedLength, prevExtrudedLength;  // the length of filament that has been extruded, i.e. the "E" parameter
 
         /// <summary>
@@ -180,7 +183,17 @@ namespace Machina
             this.motionType = mType;
             this.referenceCS = refCS;
 
+            this.tool = null;
+            this.availableTools = new Dictionary<string, Tool>();
+            // Add a "noTool" default object.
+            this.availableTools["noTool"] = Tool.Create("noTool", 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0, 0, 0);
+
+            this.digitalOutputs = new Dictionary<string, bool>();
+            this.analogOutputs = new Dictionary<string, double>();
+
+
             // Initialize temps to zero
+            this.partTemperature = new Dictionary<RobotPartType, double>();
             foreach (RobotPartType part in Enum.GetValues(typeof(RobotPartType)))
             {
                 partTemperature[part] = 0;
@@ -390,8 +403,8 @@ namespace Machina
             { typeof (ActionMessage),                   (act, robCur) => robCur.ApplyAction((ActionMessage) act) },
             { typeof (ActionWait),                      (act, robCur) => robCur.ApplyAction((ActionWait) act) },
             { typeof (ActionComment),                   (act, robCur) => robCur.ApplyAction((ActionComment) act) },
-            { typeof (ActionAttach),                    (act, robCur) => robCur.ApplyAction((ActionAttach) act) },
-            { typeof (ActionDetach),                    (act, robCur) => robCur.ApplyAction((ActionDetach) act) },
+            { typeof (ActionAttachTool),                    (act, robCur) => robCur.ApplyAction((ActionAttachTool) act) },
+            { typeof (ActionDetachTool),                    (act, robCur) => robCur.ApplyAction((ActionDetachTool) act) },
             { typeof (ActionIODigital),                 (act, robCur) => robCur.ApplyAction((ActionIODigital) act) },
             { typeof (ActionIOAnalog),                  (act, robCur) => robCur.ApplyAction((ActionIOAnalog) act) },
             { typeof (ActionTemperature),               (act, robCur) => robCur.ApplyAction((ActionTemperature) act) },
@@ -840,37 +853,59 @@ namespace Machina
         }
 
         /// <summary>
+        /// Adds the defined Tool to this cursor's Tool dict, becoming avaliable for Attach/Detach Actions.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionDefineTool action)
+        {
+            // Sanity
+            if (availableTools[action.tool.name] != null)
+            {
+                logger.Info($"Robot already had a tool defined as \"{action.tool.name}\"; this will be overwritten.");
+            }
+
+            availableTools[action.tool.name] = action.tool;  // is a reference here safe? Should clone the tool?
+
+            return true;
+        }
+
+        /// <summary>
         /// Apply Attach Tool Action.
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public bool ApplyAction(ActionAttach action)
+        public bool ApplyAction(ActionAttachTool action)
         {
-            // The cursor has now a tool attached to it
-            this.tool = action.tool;
-
+            // Sanity
+            if (availableTools[action.toolName] == null)
+            {
+                logger.Warning($"No tool named \"{action.toolName}\" defined in this robot; please use \"DefineTool\" first.");
+                return false;
+            }
             // Relative transform
             // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
             if (this.position == null || this.rotation == null)
             {
-                logger.Info($"Cannot apply \"{action}\", must provide absolute transform values before attaching a tool... ");
+                logger.Warning($"Cannot apply \"{action}\"; please provide absolute transform values before attaching a tool and try again.");
                 return false;
             }
-            else
-            {
-                // Now transform the cursor position to the tool's transformation params:
-                Vector worldVector = Vector.Rotation(action.tool.TCPPosition, this.rotation);
-                Vector newPos = this.position + worldVector;
-                Rotation newRot = Rotation.Combine(this.rotation, action.tool.TCPOrientation);  // postmultiplication
 
-                this.prevPosition = this.position;
-                this.position = newPos;
-                this.prevRotation = this.rotation;
-                this.rotation = newRot;
-                this.prevJoints = this.joints;  // why was this here? joints don't change on tool attachment...
+            // The cursor has now a tool attached to it 
+            this.tool = availableTools[action.toolName];
+            
+            // Now transform the cursor position to the tool's transformation params:
+            Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
+            Vector newPos = this.position + worldVector;
+            Rotation newRot = Rotation.Combine(this.rotation, this.tool.TCPOrientation);  // postmultiplication
 
-                // this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data --> no need to do this, joints remain the same anyway?
-            }
+            this.prevPosition = this.position;
+            this.position = newPos;
+            this.prevRotation = this.rotation;
+            this.rotation = newRot;
+            this.prevJoints = this.joints;  // why was this here? joints don't change on tool attachment...
+
+            // this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data --> no need to do this, joints remain the same anyway?
             
             return true;
         }
@@ -880,7 +915,7 @@ namespace Machina
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public bool ApplyAction(ActionDetach action)
+        public bool ApplyAction(ActionDetachTool action)
         {
             if (this.tool == null)
             {
@@ -892,7 +927,7 @@ namespace Machina
             // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
             if (this.position == null || this.rotation == null)
             {
-                logger.Info($"Cannot apply \"{action}\", must provide absolute transform values before detaching a tool... " + this);
+                logger.Warning($"Cannot apply \"{action}\"; please provide absolute transform values before detaching a tool and try again.");
                 return false;
             }
 
