@@ -24,7 +24,8 @@
 - Rename main `Control` `RobotCursor`s to match the issue/release/execute pattern.
 - New `ActionExecuted` event, combines former `MotionCursorUpdated` and `ActionCompleted` in the same event.
 - New `ActionReleased` event, raised any time an `Action` is sent to the device for execution.
-- New `ActionIssued` event, raised any time an `Action` is successfully issued and scheduled for release or compilation. 
+- New `ActionIssued` event, raised any time an `Action` is successfully issued and scheduled for release or compilation.
+- Base scaffolding for `MotionUpdate` event.
 
 
 ## BUILD 1415
