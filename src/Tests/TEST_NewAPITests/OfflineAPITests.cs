@@ -139,7 +139,7 @@ namespace TEST_OfflineAPITests
             bot.Message("Starting vertical square");
             
             // A 100 mm long tool with no TCP rotation
-            Tool rod = new Tool("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
+            Tool rod = Tool.Create("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
             bot.Attach(rod);
 
             // Home

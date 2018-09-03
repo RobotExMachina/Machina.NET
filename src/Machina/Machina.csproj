@@ -149,7 +149,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotCursor.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Tool.cs" />
+    <Compile Include="Tools\Tool.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>

@@ -854,6 +854,7 @@ namespace Machina
             if (this.position == null || this.rotation == null)
             {
                 logger.Info($"Cannot apply \"{action}\", must provide absolute transform values before attaching a tool... ");
+                return false;
             }
             else
             {
@@ -866,8 +867,8 @@ namespace Machina
                 this.position = newPos;
                 this.prevRotation = this.rotation;
                 this.rotation = newRot;
-                this.prevJoints = this.joints;
-                
+                this.prevJoints = this.joints;  // why was this here? joints don't change on tool attachment...
+
                 // this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data --> no need to do this, joints remain the same anyway?
             }
             

@@ -29,8 +29,8 @@ namespace Machina
         public override string ToString()
         {
             return relative ?
-                string.Format("{0} TCP acceleration by {1} mm/s^2", this.acceleration < 0 ? "Decrease" : "Increase", this.acceleration) :
-                string.Format("Set TCP acceleration to {0} mm/s^2", this.acceleration);
+                string.Format("{0} motion acceleration by {1} mm/s^2 or deg/s^2", this.acceleration < 0 ? "Decrease" : "Increase", this.acceleration) :
+                string.Format("Set motion acceleration to {0} mm/s^2 or deg/^s", this.acceleration);
         }
 
         public override string ToInstruction()

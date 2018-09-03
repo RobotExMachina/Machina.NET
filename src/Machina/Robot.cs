@@ -376,27 +376,27 @@ namespace Machina
         }
 
         /// <summary>
-        /// Increase the TCP velocity value new Actions will be ran at.
+        /// Increase the speed at which new Actions will be executed. This value will be applied to linear motion in mm/s, and rotational or angular motion in deg/s.
         /// </summary>
-        /// <param name="speedInc">TCP speed increment in mm/s.</param>
+        /// <param name="speedInc">Speed increment in mm/s or deg/s.</param>
         public bool Speed(double speedInc)
         {
             return c.IssueSpeedRequest(speedInc, true);
         }
 
         /// <summary>
-        /// Set the TCP velocity value new Actions will be ran at.
+        /// Set the speed at which new Actions will be executed. This value will be applied to linear motion in mm/s, and rotational or angular motion in deg/s.
         /// </summary>
-        /// <param name="speed">TCP speed value in mm/s</param>
+        /// <param name="speed">Speed value in mm/s or deg/s.</param>
         public bool SpeedTo(double speed)
         {
             return c.IssueSpeedRequest(speed, false);
         }
 
         /// <summary>
-        /// Increase the TCP acceleration value new Actions will be ran at.
+        /// Increase the acceleration at which new Actions will be executed. This value will be applied to linear motion in mm/s^2, and rotational or angular motion in deg/s^2.
         /// </summary>
-        /// <param name="accInc">TCP acceleration increment in mm/s^2. Decreasing the total to zero or less will reset it back the robot's default.</param>
+        /// <param name="accInc">Acceleration increment in mm/s^2 or deg/s^2.</param>
         /// <returns></returns>
         public bool Acceleration(double accInc)
         {
@@ -404,9 +404,9 @@ namespace Machina
         }
 
         /// <summary>
-        /// Set the TCP acceleration value new Actions will be ran at. 
+        /// Set the acceleration at which new Actions will be executed. This value will be applied to linear motion in mm/s^2, and rotational or angular motion in deg/s^2.
         /// </summary>
-        /// <param name="acceleration">TCP acceleration value in mm/s^2. Setting this value to zero or less will reset acceleration to the robot's default.</param>
+        /// <param name="acceleration">Acceleration value in mm/s^2 or deg/s^2.</param>
         /// <returns></returns>
         public bool AccelerationTo(double acceleration)
         {
@@ -928,6 +928,7 @@ namespace Machina
         /// <returns></returns>
         public bool CustomCode(string statement, bool isDeclaration = false) =>
                 c.IssueCustomCodeRequest(statement, isDeclaration);
+
 
         /// <summary>
         /// Attach a Tool to the flange of this Robot.

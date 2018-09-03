@@ -25,7 +25,8 @@ namespace Machina
         /// <summary>
         /// Gets a Tool object representing no tool attached. 
         /// </summary>
-        public static Tool Unset => new Tool("noTool", Point.Origin, Orientation.WorldXY, 0, Point.Origin);
+        //public static Tool Unset => new Tool("noTool", Point.Origin, Orientation.WorldXY, 0, Point.Origin);
+        public static Tool Unset => new Tool("noTool", 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0);
 
         public string name { get; internal set; }
 
@@ -65,43 +66,43 @@ namespace Machina
             this.centerOfGravity = new Point(cogX, cogY, cogZ);
         }
 
-        /// <summary>
-        /// Create a new Tool object by defining the Position and Orientation of the 
-        /// Tool Center Point (TCP) relative to the Tool's base coordinate system. 
-        /// In other words, if the Tool gets attached to the robot flange in 
-        /// XYZ [0, 0, 0], where is the tooltip and how is it oriented?
-        /// </summary>
-        /// <param name="TCPPosition"></param>
-        /// <param name="TCPOrientation"></param>
-        [System.Obsolete("Deprecated constructor, use Tool.Create() instead")]
-        public Tool(string name, Point TCPPosition, Orientation TCPOrientation)
-        {
-            this.name = name;
-            this.TCPPosition = TCPPosition;
-            this.TCPOrientation = TCPOrientation;
-            this.Weight = 1;
-            this.centerOfGravity = new Vector(TCPPosition);
-            this.centerOfGravity.Scale(0.5);  // quick estimation
-        }
+        ///// <summary>
+        ///// Create a new Tool object by defining the Position and Orientation of the 
+        ///// Tool Center Point (TCP) relative to the Tool's base coordinate system. 
+        ///// In other words, if the Tool gets attached to the robot flange in 
+        ///// XYZ [0, 0, 0], where is the tooltip and how is it oriented?
+        ///// </summary>
+        ///// <param name="TCPPosition"></param>
+        ///// <param name="TCPOrientation"></param>
+        //[System.Obsolete("Deprecated constructor, use Tool.Create() instead")]
+        //public Tool(string name, Point TCPPosition, Orientation TCPOrientation)
+        //{
+        //    this.name = name;
+        //    this.TCPPosition = TCPPosition;
+        //    this.TCPOrientation = TCPOrientation;
+        //    this.Weight = 1;
+        //    this.centerOfGravity = new Vector(TCPPosition);
+        //    this.centerOfGravity.Scale(0.5);  // quick estimation
+        //}
 
-        /// <summary>
-        /// Create a new Tool object by defining the Position and Orientation of the 
-        /// Tool Center Point (TCP), its weight in Kg and its center of gravity.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="TCPPosition"></param>
-        /// <param name="TCPOrientation"></param>
-        /// <param name="weightKg"></param>
-        /// <param name="centerOfGRavity"></param>
-        [System.Obsolete("Deprecated constructor, use Tool.Create() instead")]
-        public Tool(string name, Point TCPPosition, Orientation TCPOrientation, double weightKg, Point centerOfGravity)
-        {
-            this.name = name;
-            this.TCPPosition = TCPPosition;
-            this.TCPOrientation = TCPOrientation;
-            this.Weight = weightKg;
-            this.centerOfGravity = centerOfGravity;
-        }
+        ///// <summary>
+        ///// Create a new Tool object by defining the Position and Orientation of the 
+        ///// Tool Center Point (TCP), its weight in Kg and its center of gravity.
+        ///// </summary>
+        ///// <param name="name"></param>
+        ///// <param name="TCPPosition"></param>
+        ///// <param name="TCPOrientation"></param>
+        ///// <param name="weightKg"></param>
+        ///// <param name="centerOfGRavity"></param>
+        //[System.Obsolete("Deprecated constructor, use Tool.Create() instead")]
+        //public Tool(string name, Point TCPPosition, Orientation TCPOrientation, double weightKg, Point centerOfGravity)
+        //{
+        //    this.name = name;
+        //    this.TCPPosition = TCPPosition;
+        //    this.TCPOrientation = TCPOrientation;
+        //    this.Weight = weightKg;
+        //    this.centerOfGravity = centerOfGravity;
+        //}
 
         /// <summary>
         /// Create a new Tool object by defining the Position and Orientation of the 
