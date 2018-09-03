@@ -20,6 +20,10 @@
 
 ---
 # v0.8.0
+## BUILD 1416
+- Renamed main `Control` `RobotCursor`s to match the issue/release/execute pattern.
+ 
+
 ## BUILD 1415
 - Created `DefineTool`, `AttachTool` and `DetachTool` as the new tool-related actions.
 - Flagged `Attach` and `Detach` for deprecation.

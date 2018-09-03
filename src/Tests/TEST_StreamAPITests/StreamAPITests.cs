@@ -32,14 +32,14 @@ namespace TEST_StreamAPITests
 
             arm.DebugMode(true);
 
-            //arm.BufferEmpty += LogEvent;
-            //arm.ActionCompleted += LogEvent;
-            //arm.MotionCursorUpdated += LogEvent;
+            arm.BufferEmpty += LogEvent;
+            arm.ActionCompleted += LogEvent;
+            arm.MotionCursorUpdated += LogEvent;
 
-            //arm.ActionCompleted += (sender, eventArgs) =>
-            //{
-            //    if (eventArgs.RemainingActions == 0) LoopUp(sender as Robot);
-            //};
+            arm.ActionCompleted += (sender, eventArgs) =>
+            {
+                if (eventArgs.RemainingActions == 0) Loop(sender as Robot);
+            };
 
 
             arm.ControlMode("stream");
@@ -54,7 +54,7 @@ namespace TEST_StreamAPITests
             //arm.StreamConfiguration(3, 10);
 
             arm.Message("Hello Robot!");
-            ToolTesting(arm);
+            //ToolTesting(arm);
 
             //LoopUp(arm);
 
@@ -158,13 +158,19 @@ namespace TEST_StreamAPITests
             bot.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
-        static void LoopUp(Robot bot)
+        static void Loop(Robot bot)
         {
+            bot.SpeedTo(100);
             bot.Move(50, 0, 0);
             bot.Move(0, 50, 0);
             bot.Move(-50, 0, 0);
             bot.Move(0, -50, 0);
             bot.Move(0, 0, 10);
+            bot.Move(50, 0, 0);
+            bot.Move(0, 50, 0);
+            bot.Move(-50, 0, 0);
+            bot.Move(0, -50, 0);
+            bot.Move(0, 0, -10);
         }
 
         static public void ExternalAxes(Robot bot)

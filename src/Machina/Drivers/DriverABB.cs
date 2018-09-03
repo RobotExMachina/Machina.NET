@@ -64,7 +64,7 @@ namespace Machina.Drivers
         /// <returns></returns>
         public override bool ConnectToDevice(string ip, int port)
         {
-            _tcpManager = new TCPCommunicationManagerABB(this, this.WriteCursor, this.parentControl.motionCursor, ip, port);  // @TODO: the motionCursor should be part of the driver props?
+            _tcpManager = new TCPCommunicationManagerABB(this, this.ReleaseCursor, this.parentControl.ExecutionCursor, ip, port);  // @TODO: the motionCursor should be part of the driver props?
 
             if (_tcpManager.Connect())
             {

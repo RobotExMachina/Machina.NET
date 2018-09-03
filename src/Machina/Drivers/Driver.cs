@@ -30,12 +30,12 @@ namespace Machina.Drivers
         /// <summary>
         /// A reference to the shared Write RobotCursor object
         /// </summary>
-        public RobotCursor WriteCursor
+        public RobotCursor ReleaseCursor
         {
-            get { return _writeCursor; }
-            set { _writeCursor = value; }
+            get { return _releaseCursor; }
+            set { _releaseCursor = value; }
         }
-        private RobotCursor _writeCursor;
+        private RobotCursor _releaseCursor;
                 
         
         /// <summary>
@@ -224,9 +224,9 @@ namespace Machina.Drivers
         //    streamQueue = q;
         //}
 
-        public void LinkWriteCursor(ref RobotCursor wc)
+        public void LinkWriteCursor(RobotCursor wc)
         {
-            WriteCursor = wc;
+            ReleaseCursor = wc;
         }
 
 

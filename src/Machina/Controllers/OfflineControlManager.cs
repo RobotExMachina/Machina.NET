@@ -26,12 +26,12 @@ namespace Machina.Controllers
         internal override void LinkWriteCursor()
         {
             // Pass the streamQueue object as a shared reference
-            _control.Driver.LinkWriteCursor(ref _control.writeCursor);
+            _control.Driver.LinkWriteCursor(_control.ReleaseCursor);
         }
 
         internal override void SetStateCursor()
         {
-            _control.stateCursor = _control.virtualCursor;
+            _control.SetStateCursor(_control.IssueCursor);
         }
 
     }

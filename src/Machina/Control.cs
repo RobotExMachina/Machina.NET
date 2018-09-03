@@ -72,36 +72,46 @@ namespace Machina
         private Driver _driver;
         internal Driver Driver { get { return _driver; } set { _driver = value; } }
 
+        // Cursors
+        private RobotCursor _issueCursor, _releaseCursor, _executionCursor, _motionCursor;
+
+        /// <summary>
+        /// A mutable alias for the cursor that will be used to return the most recent state for the robot,
+        /// a.k.a. which cursor to use for sync GetJoints(), GetPose()-kind of functions...
+        /// Mainly the issueCursor for Offline modes, executionCursor for Stream, etc.
+        /// </summary>
+        private RobotCursor _stateCursor;
 
         /// <summary>
         /// A virtual representation of the state of the device after application of issued actions.
         /// </summary>
-        internal RobotCursor virtualCursor;
+        public RobotCursor IssueCursor => _issueCursor;
 
         /// <summary>
         /// A virtual representation of the state of the device after releasing pending actions to the controller.
-        /// Keeps track of the state of a virtual robot immediately following all the actions released from the 
+        /// Keeps track of the state of an issue robot immediately following all the actions released from the 
         /// actionsbuffer to target device defined by controlMode, like an offline program, a full intruction execution 
         /// or a streamed target.
         /// </summary>
-        internal RobotCursor writeCursor;
+        public RobotCursor ReleaseCursor => _releaseCursor;
 
         /// <summary>
-        /// A virtual representation of the current motion state of the device.
+        /// A virtual representation of the state of the device after an action has been executed. 
         /// </summary>
-        internal RobotCursor motionCursor;
+        public RobotCursor ExecutionCursor => _executionCursor;
+
+        /// <summary>
+        /// A virtual representation of the state of the device tracked in pseudo real time. 
+        /// Is independent from the other cursors, and gets updated (if available) at periodic intervals from the controller. 
+        /// </summary>
+        public RobotCursor MotionCursorRename => _motionCursor;
 
         /// <summary>
         /// Are cursors ready to start working?
         /// </summary>
         private bool _areCursorsInitialized = false;
 
-        /// <summary>
-        /// A mutable alias for the cursor that will be used to return the current state for the robot,
-        /// a.k.a. which cursor to use for sync GetJoints(), GetPose()-kind of functions...
-        /// Mainly the virtualCursor for Offline modes, motionCursor for Stream, etc.
-        /// </summary>
-        internal RobotCursor stateCursor;
+
 
         /// <summary>
         /// A shared instance of a Thread to manage sending and executing actions
@@ -136,9 +146,9 @@ namespace Machina
 
             // Reset();
 
-            motionCursor = new RobotCursor(this, "motionCursor", false, null);
-            writeCursor = new RobotCursor(this, "writeCursor", false, motionCursor);
-            virtualCursor = new RobotCursor(this, "virtualCursor", true, writeCursor);
+            _executionCursor = new RobotCursor(this, "ExecutionCursor", false, null);
+            _releaseCursor = new RobotCursor(this, "ReleaseCursor", false, _executionCursor);
+            _issueCursor = new RobotCursor(this, "IssueCursor", true, _releaseCursor);
 
             SetControlMode(DEFAULT_CONTROLMODE);
             SetConnectionMode(DEFAULT_CONNECTIONMODE);
@@ -505,41 +515,41 @@ namespace Machina
         //}
 
 
-        public Vector GetVirtualPosition() => virtualCursor.position;
-        public Rotation GetVirtualRotation() => virtualCursor.rotation;
-        public Joints GetVirtualAxes() => virtualCursor.joints;
-        public Tool GetVirtualTool() => virtualCursor.tool;
+        public Vector GetVirtualPosition() => IssueCursor.position;
+        public Rotation GetVirtualRotation() => IssueCursor.rotation;
+        public Joints GetVirtualAxes() => IssueCursor.joints;
+        public Tool GetVirtualTool() => IssueCursor.tool;
 
 
         /// <summary>
         /// Returns a Vector object representing the current robot's TCP position.
         /// </summary>
         /// <returns></returns>
-        public Vector GetCurrentPosition() => stateCursor.position;
+        public Vector GetCurrentPosition() => _stateCursor.position;
 
         /// <summary>
         /// Returns a Rotation object representing the current robot's TCP orientation.
         /// </summary>
         /// <returns></returns>
-        public Rotation GetCurrentRotation() => stateCursor.rotation;
+        public Rotation GetCurrentRotation() => _stateCursor.rotation;
 
         /// <summary>
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public Joints GetCurrentAxes() => stateCursor.joints;
+        public Joints GetCurrentAxes() => _stateCursor.joints;
 
         /// <summary>
         /// Returns a double?[] array representing the values for the external axes.
         /// </summary>
         /// <returns></returns>
-        public ExternalAxes GetCurrentExternalAxes() => stateCursor.externalAxes;
+        public ExternalAxes GetCurrentExternalAxes() => _stateCursor.externalAxes;
 
         /// <summary>
         /// Returns a Tool object representing the currently attached tool, null if none.
         /// </summary>
         /// <returns></returns>
-        public Tool GetCurrentTool() => stateCursor.tool;
+        public Tool GetCurrentTool() => _stateCursor.tool;
 
 
 
@@ -564,7 +574,7 @@ namespace Machina
             //List<Action> actions = actionBuffer.GetAllPending();
             //return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
 
-            return writeCursor.ProgramFromBuffer(inlineTargets, humanComments);
+            return ReleaseCursor.ProgramFromBuffer(inlineTargets, humanComments);
         }
 
         /// <summary>
@@ -619,7 +629,7 @@ namespace Machina
         public double GetCurrentSpeedSetting()
         {
             // @TODO: will need to decide if this returns the current virtual, write or motion speed
-            return virtualCursor.speed;
+            return IssueCursor.speed;
         }
 
         /// <summary>
@@ -628,7 +638,7 @@ namespace Machina
         /// <returns></returns>
         public double GetCurrentPrecisionSettings()
         {
-            return virtualCursor.precision;
+            return IssueCursor.precision;
         }
 
         /// <summary>
@@ -637,7 +647,7 @@ namespace Machina
         /// <returns></returns>
         public MotionType GetCurrentMotionTypeSetting()
         {
-            return virtualCursor.motionType;
+            return IssueCursor.motionType;
         }
 
         /// <summary>
@@ -646,7 +656,7 @@ namespace Machina
         /// <returns></returns>
         public ReferenceCS GetCurrentReferenceCS()
         {
-            return virtualCursor.referenceCS;
+            return IssueCursor.referenceCS;
         }
 
         ///// <summary>
@@ -736,7 +746,7 @@ namespace Machina
                 return false;
             }
 
-            bool success = virtualCursor.Issue(action);
+            bool success = IssueCursor.Issue(action);
             //if (_controlMode == ControlType.Stream) _comm.TickStreamQueue(true);
             return success;
         }
@@ -1026,9 +1036,9 @@ namespace Machina
 
         {
             bool success = true;
-            success &= virtualCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
-            success &= writeCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
-            success &= motionCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
+            success &= IssueCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
+            success &= ReleaseCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
+            success &= ExecutionCursor.Initialize(position, rotation, joints, extAx, speed, acc, precision, mType, refCS);
 
             _areCursorsInitialized = success;
 
@@ -1074,6 +1084,14 @@ namespace Machina
             return false;
         }
 
+        /// <summary>
+        /// Sets which cursor to use as most up-to-date tracker.
+        /// </summary>
+        /// <param name="cursor"></param>
+        internal void SetStateCursor(RobotCursor cursor)
+        {
+            this._stateCursor = cursor;
+        }
 
 
 
@@ -1223,31 +1241,31 @@ namespace Machina
         public void DebugBuffers()
         {
             logger.Debug("VIRTUAL BUFFER:");
-            virtualCursor.LogBufferedActions();
+            IssueCursor.LogBufferedActions();
 
             logger.Debug("WRITE BUFFER:");
-            writeCursor.LogBufferedActions();
+            ReleaseCursor.LogBufferedActions();
 
             logger.Debug("MOTION BUFFER");
-            motionCursor.LogBufferedActions();
+            ExecutionCursor.LogBufferedActions();
         }
 
         public void DebugRobotCursors()
         {
-            if (virtualCursor == null)
+            if (IssueCursor == null)
                 logger.Debug("Virtual cursor not initialized");
             else
-                logger.Debug(virtualCursor);
+                logger.Debug(IssueCursor);
 
-            if (writeCursor == null)
+            if (ReleaseCursor == null)
                 logger.Debug("Write cursor not initialized");
             else
-                logger.Debug(writeCursor);
+                logger.Debug(ReleaseCursor);
 
-            if (motionCursor == null)
+            if (ExecutionCursor == null)
                 logger.Debug("Motion cursor not initialized");
             else
-                logger.Debug(writeCursor);
+                logger.Debug(ReleaseCursor);
         }
 
         //public void DebugSettingsBuffer()
@@ -1285,9 +1303,9 @@ namespace Machina
         //    
         internal void RaiseActionCompletedEvent()
         {
-            Action lastAction = this.motionCursor.GetLastAction();
-            int pedingWrite = this.writeCursor.ActionsPendingCount();
-            int pendingBuffer = this.motionCursor.ActionsPendingCount();
+            Action lastAction = this.ExecutionCursor.GetLastAction();
+            int pedingWrite = this.ReleaseCursor.ActionsPendingCount();
+            int pendingBuffer = this.ExecutionCursor.ActionsPendingCount();
             ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
 
             this.parentRobot.OnActionCompleted(e);
