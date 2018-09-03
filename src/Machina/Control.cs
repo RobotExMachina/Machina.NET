@@ -1304,29 +1304,13 @@ namespace Machina
         internal void RaiseActionExecutedEvent()
         {
             Action lastAction = this.ExecutionCursor.GetLastAction();
+            int pendingExecutionOnDevice = this.ExecutionCursor.ActionsPendingCount();
+            int pendingExecutionTotal = this.ReleaseCursor.ActionsPendingCount() + pendingExecutionOnDevice;
 
-            int pendingTotal = this.ReleaseCursor.ActionsPendingCount() + this.ExecutionCursor.ActionsPendingCount();
-
-            ActionExecutedArgs args = new ActionExecutedArgs(lastAction, pendingTotal, this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
+            ActionExecutedArgs args = new ActionExecutedArgs(lastAction, pendingExecutionOnDevice, pendingExecutionTotal, this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
 
             this.parentRobot.OnActionExecuted(args);
         }
-
-        //internal void RaiseActionCompletedEvent()
-        //{
-        //    Action lastAction = this.ExecutionCursor.GetLastAction();
-        //    int pedingWrite = this.ReleaseCursor.ActionsPendingCount();
-        //    int pendingBuffer = this.ExecutionCursor.ActionsPendingCount();
-        //    ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
-
-        //    this.parentRobot.OnActionCompleted(e);
-        //}
-
-        //internal void RaiseMotionCursorUpdatedEvent()
-        //{
-        //    MotionCursorUpdatedArgs e = new MotionCursorUpdatedArgs(this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
-        //    this.parentRobot.OnMotionCursorUpdated(e);
-        //}
 
         internal void RaiseBufferEmptyEvent()
         {

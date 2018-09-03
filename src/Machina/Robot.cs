@@ -1344,42 +1344,6 @@ namespace Machina
 
 
 
-    //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗ █████╗ ██████╗  ██████╗ ███████╗
-    //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝
-    //  █████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████║██████╔╝██║  ███╗███████╗
-    //  ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ██╔══██║██╔══██╗██║   ██║╚════██║
-    //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ██║  ██║██║  ██║╚██████╔╝███████║
-    //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
-    //                                                                              
-    public abstract class MachinaEventArgs : EventArgs
-    {
-        /// <summary>
-        /// The arguments on this event must be serializable to a JSON object
-        /// </summary>
-        /// <returns></returns>
-        public abstract string ToJSONString();
-        
-
-        //public string SerializeToJSON()
-        //{
-        //    MemoryStream ms = new MemoryStream();
-        //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MachinaEventArgs));
-        //    ser.WriteObject(ms, this);
-        //    byte[] json = ms.ToArray();
-        //    ms.Close();
-        //    return Encoding.UTF8.GetString(json, 0, json.Length);
-        //}
-
-        //public MachinaEventArgs DeserializeFromJSON(string json)
-        //{
-        //    MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-        //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MachinaEventArgs));
-        //    MachinaEventArgs e = ser.ReadObject(ms) as MachinaEventArgs;
-        //    ms.Close();
-        //    return e;
-        //}
-        
-    }
 
 
     public class BufferEmptyArgs : MachinaEventArgs
@@ -1390,62 +1354,5 @@ namespace Machina
         public override string ToJSONString() => $"{{\"event\":\"buffer-empty\"}}";
     }
     
-    public class ActionExecutedArgs : MachinaEventArgs
-    {
-        /// <summary>
-        /// The last Action that was executed by the device. 
-        /// </summary>
-        public Action LastAction { get; }
-
-        /// <summary>
-        /// How many actions are pending to be released to + executed by the device.
-        /// </summary>
-        public int PendingExecutionCount { get; }
-
-        /// <summary>
-        /// Position of the TCP after last Action.
-        /// </summary>
-        public Vector Position { get; }
-
-        /// <summary>
-        /// Orientation of the TCP after last Action.
-        /// </summary>
-        public Rotation Rotation { get; }
-
-        /// <summary>
-        /// Robot axes after last Action.
-        /// </summary>
-        public Joints Axes { get; }
-
-        /// <summary>
-        /// Robot external axes after last Action.
-        /// </summary>
-        public ExternalAxes ExternalAxes { get; }
-
-        public ActionExecutedArgs(Action last, int pendingExecution, Vector pos, Rotation ori, Joints axes, ExternalAxes extax)
-        {
-            this.LastAction = last;
-            this.PendingExecutionCount = pendingExecution;
-            this.Position = pos;
-            this.Rotation = ori;
-            this.Axes = axes;
-            this.ExternalAxes = ExternalAxes;
-        }
-
-        public override string ToString() => ToJSONString();
-
-        public override string ToJSONString()
-        {
-            return string.Format("{{\"event\":\"action-executed\",\"last\":\"{0}\",\"rem\":{1},\"pos\":{2},\"ori\":{3},\"quat\":{4},\"axes\":{5},\"extax\":{6},\"conf\":{7}}}",
-                Util.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
-                this.PendingExecutionCount,
-                this.Position?.ToArrayString() ?? "null",
-                this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
-                this.Rotation?.Q.ToArrayString() ?? "null",
-                this.Axes?.ToArrayString() ?? "null",
-                this.ExternalAxes?.ToArrayString() ?? "null",
-                "null");  // placeholder for whenever IK are introduced...
-        }
-    }
 
 }

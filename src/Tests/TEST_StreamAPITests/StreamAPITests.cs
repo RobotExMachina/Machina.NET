@@ -46,7 +46,7 @@ namespace TEST_StreamAPITests
 
             arm.ActionExecuted += (sender, e) =>
             {
-                if (e.PendingExecutionCount == 0) Loop(sender as Robot);
+                if (e.PendingExecutionTotal == 0) Loop(sender as Robot);
             };
 
 
@@ -170,6 +170,7 @@ namespace TEST_StreamAPITests
 
         static void Loop(Robot bot)
         {
+            // Repeat three times to compare pending on device vs pending in total
             bot.SpeedTo(100);
             bot.Move(50, 0, 0);
             bot.Move(0, 50, 0);
