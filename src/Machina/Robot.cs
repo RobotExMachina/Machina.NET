@@ -78,54 +78,6 @@ namespace Machina
         //  ██╔═══╝ ██║   ██║██╔══██╗██║     ██║██║         ██╔══██║██╔═══╝ ██║
         //  ██║     ╚██████╔╝██████╔╝███████╗██║╚██████╗    ██║  ██║██║     ██║
         //  ╚═╝      ╚═════╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
-        ///// <summary>
-        ///// Base constructor.
-        ///// </summary>                                                       
-        //private Robot() : this("Machina", RobotType.HUMAN) { }
-
-        //private Robot(string make) : this("Machina", make) { }
-
-        ///// <summary>
-        ///// Base constructor.
-        ///// </summary>
-        ///// <param name="name">A name for this Robot</param>
-        ///// <param name="make">The robot make. This will determine which drivers/compilers are used to manage it.</param>
-        //private Robot(string name, string make)
-        //{
-        //    this.Name = name;
-        //    RobotType rt;
-
-        //    try
-        //    {
-        //        rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
-        //        if (Enum.IsDefined(typeof(RobotType), rt))
-        //        {
-        //            this.Brand = rt;
-        //            c = new Control(this);
-        //        }
-        //        else
-        //        {
-        //            logger.Error($"{make} is not a RobotType, please specify one of the following: ");
-        //            foreach (string str in Enum.GetNames(typeof(RobotType)))
-        //            {
-        //                logger.Error(str);
-        //            }
-        //            this.Brand = RobotType.HUMAN;
-        //            c = new Control(this);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        logger.Error($"{make} is not a RobotType, please specify one of the following: ");
-        //        foreach (string str in Enum.GetNames(typeof(RobotType)))
-        //        {
-        //            logger.Error(str);
-        //        }
-        //        this.Brand = RobotType.HUMAN;
-        //        c = new Control(this);
-        //    }
-        //}
-
         /// <summary>
         /// Internal constructor.
         /// </summary>
@@ -136,6 +88,7 @@ namespace Machina
             this.Name = name;
             this.Brand = make;
             this.logger = new RobotLogger(this);
+
             c = new Control(this);
         }
 
@@ -253,41 +206,6 @@ namespace Machina
             return false;
         }
 
-        ///// <summary>
-        ///// Sets the cycle the robot will run program in (Once or Loop).
-        ///// </summary>
-        ///// <param name="cycleType"></param>
-        ///// <returns></returns>
-        //public bool CycleMode(CycleType cycleType)
-        //{
-        //    //return c.SetRunMode(cycleType);
-        //    throw new NotImplementedException();
-        //}
-
-        ///// <summary>
-        ///// Sets the cycle the robot will run program in (Once or Loop).
-        ///// </summary>
-        ///// <param name="cycleType"></param>
-        //public bool CycleMode(string cycleType)
-        //{
-        //    //CycleType ct;
-        //    //try
-        //    //{
-        //    //    ct = (CycleType)Enum.Parse(typeof(CycleType), cycleType, true);
-        //    //    if (Enum.IsDefined(typeof(CycleType), ct))
-        //    //        return c.SetRunMode(ct);
-        //    //}
-        //    //catch
-        //    //{
-        //    //    Console.WriteLine($"{cycleType} is not a valid CycleMode type, please specify one of the following:");
-        //    //    foreach (string str in Enum.GetNames(typeof(CycleType)))
-        //    //        Console.WriteLine(str);
-        //    //}
-        //    //return false;
-
-        //    throw new NotImplementedException();
-        //}
-
         /// <summary>
         /// Sets who will be in charge of managing the connection to the device,
         /// i.e. having "Machina" try to load driver modules to the controller or 
@@ -376,47 +294,6 @@ namespace Machina
             return c.GetControllerIP();
         }
 
-        ///// <summary>
-        ///// Loads a program to the robot from a local file.
-        ///// </summary>
-        ///// <param name="filepath">Full absolute filepath including root, directory structure, filename and extension.</param>
-        ///// <returns></returns>
-        //public bool LoadProgram(string filepath)
-        //{
-        //    //return c.LoadProgramToDevice(filepath, true);
-        //    throw new NotImplementedException();
-        //}
-
-        ///// <summary>
-        ///// Loads a program to the robot from a string list of code.
-        ///// </summary>
-        ///// <param name="code"></param>
-        ///// <returns></returns>
-        //public bool LoadProgram(List<string> code)
-        //{
-        //    //return c.LoadProgramToDevice(code);
-        //    throw new NotImplementedException();
-        //}
-
-        ///// <summary>
-        ///// Starts execution of the current module/s in the controller.
-        ///// @TODO: The behavior of this method will change depending based on Off/Online mode
-        ///// </summary>
-        //public bool Start()
-        //{
-        //    //return c.StartProgramOnDevice();
-        //    throw new NotImplementedException();
-        //}
-
-        ///// <summary>
-        ///// Immediately stops execution of the current program/s in the connected robot. 
-        ///// </summary>
-        //public bool Stop()
-        //{
-        //    //return c.StopProgramOnDevice(true);
-        //    throw new NotImplementedException();
-        //}
-
         /// <summary>
         /// Create a program in the device's native language with all the buffered Actions and return it as a string List.
         /// Note all buffered Actions will be removed from the queue.
@@ -441,35 +318,6 @@ namespace Machina
         {
             return c.Export(filepath, inlineTargets, humanComments);
         }
-
-
-        ///// <summary>
-        ///// Create a program with all the buffered Actions and return it as a string List.
-        ///// Note all buffered Actions will be removed from the queue.
-        ///// </summary>
-        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
-        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
-        ///// <returns></returns>
-        //[System.Obsolete("Deprecated method, use Compile() instead")]
-        //public List<string> Export(bool inlineTargets = true, bool humanComments = true)
-        //{
-        //    return c.Export(inlineTargets, humanComments);
-        //}
-
-        ///// <summary>
-        ///// Create a program with all the buffered Actions and save it to a file. 
-        ///// Note all buffered Actions will be removed from the queue.
-        ///// </summary>
-        ///// <param name="filepath"></param>
-        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
-        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
-        ///// <returns></returns>
-        //[System.Obsolete("Deprecated method, use Compile() instead")]
-        //public bool Export(string filepath, bool inlineTargets = true, bool humanComments = true)
-        //{
-        //    return c.Export(filepath, inlineTargets, humanComments);
-        //}
-
 
         /// <summary>
         /// In 'execute' mode, flushes all pending Actions, creates a program, 
@@ -527,16 +375,6 @@ namespace Machina
             return false;
         }
 
-        ///// <summary>
-        ///// Gets the current speed setting.
-        ///// </summary>
-        ///// <returns></returns>
-        //[System.Obsolete("Deprecated method, use GetSpeed() instead")]
-        //public double Speed()
-        //{
-        //    return c.GetCurrentSpeedSetting();
-        //}
-
         /// <summary>
         /// Increase the TCP velocity value new Actions will be ran at.
         /// </summary>
@@ -575,37 +413,6 @@ namespace Machina
             return c.IssueAccelerationRequest(acceleration, false);
         }
 
-
-        ///// <summary>
-        ///// Gets the current zone setting.
-        ///// </summary>
-        ///// <returns></returns>
-        //[System.Obsolete("Deprecated method, use GetPrecision() instead")]
-        //public double Zone()
-        //{
-        //    return c.GetCurrentPrecisionSettings();
-        //}
-
-        ///// <summary>
-        ///// Increase the default zone value new Actions will be given.
-        ///// </summary>
-        ///// <param name="zoneInc"></param>
-        //[System.Obsolete("Deprecated method, use Precision(radiusInc) instead")]
-        //public void Zone(double zoneInc)
-        //{
-        //    c.IssuePrecisionRequest(zoneInc, true);
-        //}
-
-        ///// <summary>
-        ///// Sets the default zone value new Actions will be given.
-        ///// </summary>
-        ///// <param name="zone"></param>
-        //[System.Obsolete("Deprecated method, use PrecisionTo(radius) instead")]
-        //public void ZoneTo(double zone)
-        //{
-        //    c.IssuePrecisionRequest(zone, false);
-        //}
-
         /// <summary>
         /// Increase the default precision value new Actions will be given. 
         /// Precision is measured as the radius of the smooth interpolation
@@ -629,16 +436,6 @@ namespace Machina
         {
             return c.IssuePrecisionRequest(radius, false);
         }
-
-        ///// <summary>
-        ///// Gets the current MotionType setting.
-        ///// </summary>
-        ///// <returns></returns>
-        //public MotionType MotionMode()
-        //{
-        //    return c.GetCurrentMotionTypeSetting();
-        //}
-
 
         /// <summary>
         /// Gets current ReferenceCS setting.
@@ -1010,12 +807,6 @@ namespace Machina
             return c.IssueJointsRequest(incJoints, true);
         }
 
-        //[System.Obsolete("Deprecated, use Axes() instead")]
-        //public bool Joints(Joints incJoints)
-        //{
-        //    return c.IssueJointsRequest(incJoints, true);
-        //}
-
         /// <summary>
         /// Issue a request to increment the angular values of the robot joint axes rotations.
         /// Values expressed in degrees.
@@ -1032,12 +823,6 @@ namespace Machina
             return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
         }
 
-        //[System.Obsolete("Deprecated, use Axes() instead")]
-        //public bool Joints(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
-        //{
-        //    return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
-        //}
-
         /// <summary>
         /// Issue a request to set the angular values of the robot joint axes rotations.
         /// Values expressed in degrees.
@@ -1049,12 +834,6 @@ namespace Machina
         {
             return c.IssueJointsRequest(joints, false);
         }
-
-        //[System.Obsolete("Deprecated, use AxesTo() instead")]
-        //public bool JointsTo(Joints joints)
-        //{
-        //    return c.IssueJointsRequest(joints, false);
-        //}
 
         /// <summary>
         /// Issue a request to set the angular values of the robot joint axes rotations.
@@ -1071,12 +850,6 @@ namespace Machina
         {
             return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
         }
-
-        //[System.Obsolete("Deprecated, use AxesTo() instead")]
-        //public bool JointsTo(double j1, double j2, double j3, double j4, double j5, double j6)
-        //{
-        //    return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
-        //}
 
         /// <summary>
         /// Increase the value of one of the robot's external axis. 
@@ -1223,29 +996,6 @@ namespace Machina
         {
             return c.IssueWriteToAnalogIORequest(pinId.ToString(), value, toolPin);
         }
-
-        ///// <summary>
-        ///// Reads from the digital IO pin.
-        ///// </summary>
-        ///// <param name="pinNumber"></param>
-        ///// <returns></returns>
-        //private bool ReadDigital(int pinNumber)
-        //{
-        //    System.Console.WriteLine("ReadDigital not implemented yet!");
-        //    return false;
-        //}
-
-        ///// <summary>
-        ///// Reads from the analog IO pin.
-        ///// </summary>
-        ///// <param name="pinNumber"></param>
-        ///// <returns></returns>
-        //private double ReadAnalog(int pinNumber)
-        //{
-        //    System.Console.WriteLine("ReadAnalog not implemented yet!");
-        //    return 0.0;
-        //}
-        
 
         /// <summary>
         /// Turns extrusion in 3D printers on/off.
@@ -1461,17 +1211,6 @@ namespace Machina
         public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
         internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
 
-        //public event ToolCreatedHandler ToolCreated;
-        //public delegate void ToolCreatedHandler(object sender, ToolCreatedArgs e);
-        //internal virtual void OnToolCreated(ToolCreatedArgs e) => ToolCreated?.Invoke(this, e);
-
-        ///// <summary>
-        ///// Raised when Machina wants to log something. Suscribe to this event to receive string logs with prioroty level.
-        ///// </summary>
-        //public event LogHandler Log;
-        //public delegate void LogHandler(object sender, LogArgs e);
-        //internal virtual void OnLog(LogArgs e) => Log?.Invoke(this, e);
-
     }
 
 
@@ -1603,53 +1342,5 @@ namespace Machina
             );
         }
     }
-
-    //public class LogArgs : EventArgs
-    //{
-    //    public string Message { get; set; }
-    //    public int Level { get; set; }
-
-    //    public LogArgs(string message, int level)
-    //    {
-    //        Message = message;
-    //        Level = level;
-    //    }
-    //}
-
-    //[DataContract]
-    //public class FooBar
-    //{
-    //    [DataMember(Name = "myName")]
-    //    public string name;
-
-    //    [DataMember]
-    //    public int age;
-
-    //    [DataMember]
-    //    public Vector v;
-
-    //    public FooBar(string name, int age, Vector v)
-    //    {
-    //        this.name = name;
-    //        this.age = age;
-    //        this.v = v;
-    //    }
-
-    //    public string SelfSerializeToJSON()
-    //    {
-    //        //Create a stream to serialize the object to.  
-    //        MemoryStream ms = new MemoryStream();
-
-    //        // Serializer the User object to the stream.  
-    //        DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(FooBar));
-    //        ser.WriteObject(ms, this);
-    //        byte[] json = ms.ToArray();
-    //        ms.Close();
-    //        return Encoding.UTF8.GetString(json, 0, json.Length);
-    //    }
-        
-    //}
-
-
 
 }
