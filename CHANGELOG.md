@@ -21,8 +21,9 @@
 ---
 # v0.8.0
 ## BUILD 1416
-- Renamed main `Control` `RobotCursor`s to match the issue/release/execute pattern.
- 
+- Rename main `Control` `RobotCursor`s to match the issue/release/execute pattern.
+- New `ActionExecuted` event, combines former `MotionCursorUpdated` and `ActionCompleted` in the same event.
+
 
 ## BUILD 1415
 - Created `DefineTool`, `AttachTool` and `DetachTool` as the new tool-related actions.

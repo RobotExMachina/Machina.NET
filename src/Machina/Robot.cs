@@ -1217,31 +1217,31 @@ namespace Machina
         /// <returns>The Tool object currently attached to this Robot, null if none.</returns>
         public Tool GetCurrentTool() => c.GetCurrentTool();
 
-        /// <summary>
-        /// Returns a Point represnting the current location of the Tool Center Point
-        /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
-        /// </summary>
-        /// <returns></returns>
-        public Point GetVirtualPosition() => c.GetVirtualPosition();
+        ///// <summary>
+        ///// Returns a Point represnting the current location of the Tool Center Point
+        ///// (if there is a Tool attached) or the Flange Center Point (if there isn't).
+        ///// </summary>
+        ///// <returns></returns>
+        //public Point GetVirtualPosition() => c.GetVirtualPosition();
 
-        /// <summary>
-        /// Return a Orientation object representing the current orientation of the Tool Center Point
-        /// (if there is a Tool attached) or the Flange Center Point (if there isn't).
-        /// </summary>
-        /// <returns></returns>
-        public Orientation GetVirtualRotation() => c.GetVirtualRotation();
+        ///// <summary>
+        ///// Return a Orientation object representing the current orientation of the Tool Center Point
+        ///// (if there is a Tool attached) or the Flange Center Point (if there isn't).
+        ///// </summary>
+        ///// <returns></returns>
+        //public Orientation GetVirtualRotation() => c.GetVirtualRotation();
 
-        /// <summary>
-        /// Returns a Joint object representing the rotations in the robot axes.
-        /// </summary>
-        /// <returns></returns>
-        public Joints GetVirtualAxes() => c.GetVirtualAxes();
+        ///// <summary>
+        ///// Returns a Joint object representing the rotations in the robot axes.
+        ///// </summary>
+        ///// <returns></returns>
+        //public Joints GetVirtualAxes() => c.GetVirtualAxes();
 
-        /// <summary>
-        /// Returns the Tool object currently attached to this Robot, null if none.
-        /// </summary>
-        /// <returns>The Tool object currently attached to this Robot, null if none.</returns>
-        public Tool GetVirtualTool() => c.GetVirtualTool();
+        ///// <summary>
+        ///// Returns the Tool object currently attached to this Robot, null if none.
+        ///// </summary>
+        ///// <returns>The Tool object currently attached to this Robot, null if none.</returns>
+        //public Tool GetVirtualTool() => c.GetVirtualTool();
 
 
         public override string ToString() => $"Robot[\"{this.Name}\", {this.Brand}]";
@@ -1330,20 +1330,26 @@ namespace Machina
         public delegate void BufferEmptyHandler(object sender, BufferEmptyArgs e);
         internal virtual void OnBufferEmpty(BufferEmptyArgs e) => BufferEmpty?.Invoke(this, e);
 
-        /// <summary>
-        /// Will be raised when Machina received an update from the controller as has new motion
-        /// information available. Useful to keep track of the state of the controller.
-        /// </summary>
-        public event MotionCursorUpdatedHandler MotionCursorUpdated;
-        public delegate void MotionCursorUpdatedHandler(object sender, MotionCursorUpdatedArgs e);
-        internal virtual void OnMotionCursorUpdated(MotionCursorUpdatedArgs e) => MotionCursorUpdated?.Invoke(this, e);
+        ///// <summary>
+        ///// Will be raised when Machina received an update from the controller as has new motion
+        ///// information available. Useful to keep track of the state of the controller.
+        ///// </summary>
+        //public event MotionCursorUpdatedHandler MotionCursorUpdated;
+        //public delegate void MotionCursorUpdatedHandler(object sender, MotionCursorUpdatedArgs e);
+        //internal virtual void OnMotionCursorUpdated(MotionCursorUpdatedArgs e) => MotionCursorUpdated?.Invoke(this, e);
 
-        /// <summary>
-        /// Raised whenever an action has been completed by the device. 
-        /// </summary>
-        public event ActionCompletedHandler ActionCompleted;
-        public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
-        internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
+        ///// <summary>
+        ///// Raised whenever an action has been completed by the device. 
+        ///// </summary>
+        //public event ActionCompletedHandler ActionCompleted;
+        //public delegate void ActionCompletedHandler(object sender, ActionCompletedArgs e);
+        //internal virtual void OnActionCompleted(ActionCompletedArgs e) => ActionCompleted?.Invoke(this, e);
+
+
+
+        public event ActionExecutedHandler ActionExecuted;
+        public delegate void ActionExecutedHandler(object sender, ActionExecutedArgs e);
+        internal virtual void OnActionExecuted(ActionExecutedArgs e) => ActionExecuted?.Invoke(this, e);
 
     }
 
@@ -1401,53 +1407,88 @@ namespace Machina
     }
 
 
-    public class ActionCompletedArgs : MachinaEventArgs
+    //public class ActionCompletedArgs : MachinaEventArgs
+    //{
+    //    public Action LastAction { get; set; }
+    //    public int RemainingActions { get; set; }
+    //    public int RemainingInBuffer { get; set; }
+
+    //    /// <summary>
+    //    /// Arguments for onActionCompleted
+    //    /// </summary>
+    //    /// <param name="last">The last Action recently executed by the Robot.</param>
+    //    /// <param name="pendingWrite">How many Actions are left to be executed by the Robot?</param>
+    //    /// <param name="pendingBuffer">How many Actions are currently loaded in the Robot's buffer to be executed?</param>
+    //    public ActionCompletedArgs(Action last, int pendingWrite, int pendingBuffer)
+    //    {
+    //        LastAction = last;
+    //        RemainingActions = pendingWrite;
+    //        RemainingInBuffer = pendingBuffer;
+    //    }
+
+    //    public override string ToJSONString()
+    //    {
+    //        return string.Format("{{\"event\":\"action-completed\",\"rem\":{0},\"robBuf\":{1},\"last\":\"{2}\"}}",
+    //            this.RemainingActions,
+    //            this.RemainingInBuffer,
+    //            Util.EscapeDoubleQuotes(this.LastAction.ToInstruction())
+    //        );
+    //    }
+    //}
+
+    //public class MotionCursorUpdatedArgs : MachinaEventArgs
+    //{
+    //    public Vector Position;
+    //    public Rotation Rotation;
+    //    public Joints Axes;
+    //    public ExternalAxes ExternalAxes;
+
+    //    public MotionCursorUpdatedArgs(Vector pos, Rotation rot, Joints axes, ExternalAxes extAxes)
+    //    {
+    //        this.Position = pos;
+    //        this.Rotation = rot;
+    //        this.Axes = axes;
+    //        this.ExternalAxes = extAxes;
+    //    }
+
+    //    public override string ToJSONString()
+    //    {
+    //        return string.Format("{{\"event\":\"execution-update\",\"pos\":{0},\"ori\":{1},\"quat\":{2},\"axes\":{3},\"extax\":{4},\"conf\":{5}}}",
+    //            this.Position?.ToArrayString() ?? "null",
+    //            this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
+    //            this.Rotation?.Q.ToArrayString() ?? "null",
+    //            this.Axes?.ToArrayString() ?? "null",
+    //            this.ExternalAxes?.ToArrayString() ?? "null",
+    //            "null");  // placeholder for whenever IK are introduced...
+    //    }
+    //}
+
+    public class ActionExecutedArgs : MachinaEventArgs
     {
-        public Action LastAction { get; set; }
-        public int RemainingActions { get; set; }
-        public int RemainingInBuffer { get; set; }
+        public Action LastAction { get; }
+        public int PendingExecutionCount { get; }
+        public Vector Position { get; }
+        public Rotation Rotation { get; }
+        public Joints Axes { get; }
+        public ExternalAxes ExternalAxes { get; }
 
-        /// <summary>
-        /// Arguments for onActionCompleted
-        /// </summary>
-        /// <param name="last">The last Action recently executed by the Robot.</param>
-        /// <param name="pendingWrite">How many Actions are left to be executed by the Robot?</param>
-        /// <param name="pendingBuffer">How many Actions are currently loaded in the Robot's buffer to be executed?</param>
-        public ActionCompletedArgs(Action last, int pendingWrite, int pendingBuffer)
+        public ActionExecutedArgs(Action last, int pendingExecution, Vector pos, Rotation ori, Joints axes, ExternalAxes extax)
         {
-            LastAction = last;
-            RemainingActions = pendingWrite;
-            RemainingInBuffer = pendingBuffer;
-        }
-
-        public override string ToJSONString()
-        {
-            return string.Format("{{\"event\":\"action-completed\",\"rem\":{0},\"robBuf\":{1},\"last\":\"{2}\"}}",
-                this.RemainingActions,
-                this.RemainingInBuffer,
-                Util.EscapeDoubleQuotes(this.LastAction.ToInstruction())
-            );
-        }
-    }
-
-    public class MotionCursorUpdatedArgs : MachinaEventArgs
-    {
-        public Vector Position;
-        public Rotation Rotation;
-        public Joints Axes;
-        public ExternalAxes ExternalAxes;
-
-        public MotionCursorUpdatedArgs(Vector pos, Rotation rot, Joints axes, ExternalAxes extAxes)
-        {
+            this.LastAction = last;
+            this.PendingExecutionCount = pendingExecution;
             this.Position = pos;
-            this.Rotation = rot;
+            this.Rotation = ori;
             this.Axes = axes;
-            this.ExternalAxes = extAxes;
+            this.ExternalAxes = ExternalAxes;
         }
+
+        public override string ToString() => ToJSONString();
 
         public override string ToJSONString()
         {
-            return string.Format("{{\"event\":\"execution-update\",\"pos\":{0},\"ori\":{1},\"quat\":{2},\"axes\":{3},\"extax\":{4},\"conf\":{5}}}",
+            return string.Format("{{\"event\":\"action-executed\",\"last\":\"{0}\",\"rem\":{1},\"pos\":{2},\"ori\":{3},\"quat\":{4},\"axes\":{5},\"extax\":{6},\"conf\":{7}}}",
+                Util.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
+                this.PendingExecutionCount,
                 this.Position?.ToArrayString() ?? "null",
                 this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
                 this.Rotation?.Q.ToArrayString() ?? "null",
@@ -1457,24 +1498,24 @@ namespace Machina
         }
     }
 
-    /// <summary>
-    /// A quick tool-created event because the interns need it for their awesome project! :)
-    /// </summary>
-    public class ToolCreatedArgs : MachinaEventArgs
-    {
-        public Tool tool;
+    ///// <summary>
+    ///// A quick tool-created event because the interns need it for their awesome project! :)
+    ///// </summary>
+    //public class ToolCreatedArgs : MachinaEventArgs
+    //{
+    //    public Tool tool;
 
-        public ToolCreatedArgs(Tool tool)
-        {
-            this.tool = tool;
-        }
+    //    public ToolCreatedArgs(Tool tool)
+    //    {
+    //        this.tool = tool;
+    //    }
 
-        public override string ToJSONString()
-        {
-            return string.Format("{{\"event\":\"tool-created\",\"tool\":\"{0}\"}}",
-                Util.EscapeDoubleQuotes(tool.ToInstruction())
-            );
-        }
-    }
+    //    public override string ToJSONString()
+    //    {
+    //        return string.Format("{{\"event\":\"tool-created\",\"tool\":\"{0}\"}}",
+    //            Util.EscapeDoubleQuotes(tool.ToInstruction())
+    //        );
+    //    }
+    //}
 
 }

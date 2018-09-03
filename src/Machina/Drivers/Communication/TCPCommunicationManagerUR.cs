@@ -400,8 +400,9 @@ namespace Machina.Drivers.Communication
             this._motionCursor.ApplyActionsUntilId(id);
 
             // Raise appropriate events
-            this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
-            this._parentDriver.parentControl.RaiseActionCompletedEvent();
+            this._parentDriver.parentControl.RaiseActionExecutedEvent();
+            //this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
+            //this._parentDriver.parentControl.RaiseActionCompletedEvent();
 
             return true;
         }

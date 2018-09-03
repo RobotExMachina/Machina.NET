@@ -924,7 +924,7 @@ namespace Machina.Drivers.Communication
                 }
             }
             catch (Exception ex)
-            {
+            { 
                 //Console.WriteLine("ERROR: Could not load module");
                 logger.Debug(ex);
                 throw new Exception("ERROR: Could not load module");

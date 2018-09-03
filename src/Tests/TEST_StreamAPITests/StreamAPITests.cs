@@ -32,13 +32,21 @@ namespace TEST_StreamAPITests
 
             arm.DebugMode(true);
 
-            arm.BufferEmpty += LogEvent;
-            arm.ActionCompleted += LogEvent;
-            arm.MotionCursorUpdated += LogEvent;
+            //arm.BufferEmpty += LogEvent;
+            //arm.ActionCompleted += LogEvent;
+            //arm.MotionCursorUpdated += LogEvent;
 
-            arm.ActionCompleted += (sender, eventArgs) =>
+            //arm.ActionCompleted += (sender, eventArgs) =>
+            //{
+            //    if (eventArgs.RemainingActions == 0) Loop(sender as Robot);
+            //};
+
+            arm.BufferEmpty += LogEvent;
+            arm.ActionExecuted += LogEvent;
+
+            arm.ActionExecuted += (sender, e) =>
             {
-                if (eventArgs.RemainingActions == 0) Loop(sender as Robot);
+                if (e.PendingExecutionCount == 0) Loop(sender as Robot);
             };
 
 
@@ -54,6 +62,8 @@ namespace TEST_StreamAPITests
             //arm.StreamConfiguration(3, 10);
 
             arm.Message("Hello Robot!");
+            arm.SpeedTo(100);
+            arm.TransformTo(400, 400, 300, -1, 0, 0, 0, 1, 0);
             //ToolTesting(arm);
 
             //LoopUp(arm);

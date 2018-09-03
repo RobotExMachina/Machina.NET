@@ -515,10 +515,10 @@ namespace Machina
         //}
 
 
-        public Vector GetVirtualPosition() => IssueCursor.position;
-        public Rotation GetVirtualRotation() => IssueCursor.rotation;
-        public Joints GetVirtualAxes() => IssueCursor.joints;
-        public Tool GetVirtualTool() => IssueCursor.tool;
+        //public Vector GetVirtualPosition() => IssueCursor.position;
+        //public Rotation GetVirtualRotation() => IssueCursor.rotation;
+        //public Joints GetVirtualAxes() => IssueCursor.joints;
+        //public Tool GetVirtualTool() => IssueCursor.tool;
 
 
         /// <summary>
@@ -1301,21 +1301,32 @@ namespace Machina
         //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
         //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
         //    
-        internal void RaiseActionCompletedEvent()
+        internal void RaiseActionExecutedEvent()
         {
             Action lastAction = this.ExecutionCursor.GetLastAction();
-            int pedingWrite = this.ReleaseCursor.ActionsPendingCount();
-            int pendingBuffer = this.ExecutionCursor.ActionsPendingCount();
-            ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
 
-            this.parentRobot.OnActionCompleted(e);
+            int pendingTotal = this.ReleaseCursor.ActionsPendingCount() + this.ExecutionCursor.ActionsPendingCount();
+
+            ActionExecutedArgs args = new ActionExecutedArgs(lastAction, pendingTotal, this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
+
+            this.parentRobot.OnActionExecuted(args);
         }
 
-        internal void RaiseMotionCursorUpdatedEvent()
-        {
-            MotionCursorUpdatedArgs e = new MotionCursorUpdatedArgs(this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
-            this.parentRobot.OnMotionCursorUpdated(e);
-        }
+        //internal void RaiseActionCompletedEvent()
+        //{
+        //    Action lastAction = this.ExecutionCursor.GetLastAction();
+        //    int pedingWrite = this.ReleaseCursor.ActionsPendingCount();
+        //    int pendingBuffer = this.ExecutionCursor.ActionsPendingCount();
+        //    ActionCompletedArgs e = new ActionCompletedArgs(lastAction, pedingWrite + pendingBuffer, pendingBuffer);
+
+        //    this.parentRobot.OnActionCompleted(e);
+        //}
+
+        //internal void RaiseMotionCursorUpdatedEvent()
+        //{
+        //    MotionCursorUpdatedArgs e = new MotionCursorUpdatedArgs(this.GetCurrentPosition(), this.GetCurrentRotation(), this.GetCurrentAxes(), this.GetCurrentExternalAxes());
+        //    this.parentRobot.OnMotionCursorUpdated(e);
+        //}
 
         internal void RaiseBufferEmptyEvent()
         {
