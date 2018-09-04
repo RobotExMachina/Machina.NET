@@ -8,34 +8,36 @@ namespace Machina.Drivers.Communication.Protocols
 {
     class ABBCommunicationProtocol : Base
     {
-        // From the Machina_Server.mod file, must be consistent!
-        internal static readonly char STR_MESSAGE_END_CHAR = ';';
-        internal static readonly char STR_MESSAGE_ID_CHAR = '@';
-        internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
-
-        internal static readonly string MACHINA_SERVER_VERSION = "1.2.4";
+        internal static readonly string MACHINA_SERVER_VERSION = "1.3.0";
 
         // A RAPID-code oriented API:
-        //                                     // INSTRUCTION P1 P2 P3 P4...
-        internal const int INST_MOVEL = 1;              // MoveL X Y Z QW QX QY QZ
-        internal const int INST_MOVEJ = 2;              // MoveJ X Y Z QW QX QY QZ
-        internal const int INST_MOVEABSJ = 3;           // MoveAbsJ J1 J2 J3 J4 J5 J6
-        internal const int INST_SPEED = 4;              // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
-        internal const int INST_ZONE = 5;               // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
-        internal const int INST_WAITTIME = 6;           // WaitTime T
-        internal const int INST_TPWRITE = 7;            // TPWrite "MSG"
-        internal const int INST_TOOL = 8;               // (settool X Y Z QW QX QY QZ KG CX CY CZ)
-        internal const int INST_NOTOOL = 9;             // (settool tool0)
-        internal const int INST_SETDO = 10;             // SetDO "NAME" ON
-        internal const int INST_SETAO = 11;             // SetAO "NAME" V
-        internal const int INST_EXT_JOINTS = 12;        // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
-        internal const int INST_ACCELERATION = 13;      // (setacceleration values, TBD)
-        internal const int INST_SING_AREA = 14;         // SingArea bool (sets Wrist or Off)
+        //                                                      // INSTRUCTION P1 P2 P3 P4...
+        internal const int INST_MOVEL = 1;                      // MoveL X Y Z QW QX QY QZ
+        internal const int INST_MOVEJ = 2;                      // MoveJ X Y Z QW QX QY QZ
+        internal const int INST_MOVEABSJ = 3;                   // MoveAbsJ J1 J2 J3 J4 J5 J6
+        internal const int INST_SPEED = 4;                      // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
+        internal const int INST_ZONE = 5;                       // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
+        internal const int INST_WAITTIME = 6;                   // WaitTime T
+        internal const int INST_TPWRITE = 7;                    // TPWrite "MSG"
+        internal const int INST_TOOL = 8;                       // (settool X Y Z QW QX QY QZ KG CX CY CZ)
+        internal const int INST_NOTOOL = 9;                     // (settool tool0)
+        internal const int INST_SETDO = 10;                     // SetDO "NAME" ON
+        internal const int INST_SETAO = 11;                     // SetAO "NAME" V
+        internal const int INST_EXT_JOINTS = 12;                // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+        internal const int INST_ACCELERATION = 13;              // (setacceleration values, TBD)
+        internal const int INST_SING_AREA = 14;                 // SingArea bool (sets Wrist or Off)
 
-        internal const int RES_VERSION = 20;            // ">20 1 2 1;" Sends version numbers
-        internal const int RES_POSE = 21;               // ">21 400 300 500 0 0 1 0;"
-        internal const int RES_JOINTS = 22;             // ">22 0 0 0 0 90 0;"
-        internal const int RES_EXTAX = 23;              // ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
+        internal const int RES_VERSION = 20;                    // ">20 1 2 1;" Sends version numbers
+        internal const int RES_POSE = 21;                       // ">21 400 300 500 0 0 1 0;"
+        internal const int RES_JOINTS = 22;                     // ">22 0 0 0 0 90 0;"
+        internal const int RES_EXTAX = 23;                      // ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
+
+        
+        // Characters used for buffer parsing
+        internal const char STR_MESSAGE_END_CHAR = ';';       // Marks the end of a message
+        internal const char STR_MESSAGE_CONTINUE_CHAR = '>';  // Marks the end of an unfinished message, to be continued on next message
+        internal const char STR_MESSAGE_ID_CHAR = '@';        // Flags a message as an acknowledgment message corresponding to a source id
+        internal const char STR_MESSAGE_RESPONSE_CHAR = '$';  // Flags a message as a response to an information request(acknowledgments do not include it)
 
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace TEST_StreamAPITests
 
             arm.ActionExecuted += (sender, e) =>
             {
-                if (e.PendingExecutionTotal == 0) Loop(sender as Robot);
+                if (e.PendingExecutionTotal == 0) Loop(sender as Robot, 100);
             };
 
 
@@ -54,8 +54,9 @@ namespace TEST_StreamAPITests
             //arm.StreamConfiguration(3, 10);
 
             arm.Message("Hello Robot!");
-            arm.SpeedTo(100);
-            arm.TransformTo(400, 400, 300, -1, 0, 0, 0, 1, 0);
+            arm.SpeedTo(20);
+            arm.ExternalAxisTo(1, 0);
+            arm.TransformTo(1500, -1500, 1200, -1, 0, 0, 0, 1, 0);
             //ToolTesting(arm);
 
             //LoopUp(arm);
@@ -127,8 +128,7 @@ namespace TEST_StreamAPITests
 
         static void ToolTesting(Robot bot)
         {
-            bot.SpeedTo(100);
-            bot.TransformTo(400, 0, 400, -1, 0, 0, 0, 1, 0);
+            bot.SpeedTo(20);
             bot.Move(0, 100, 0);
             bot.Move(0, -100, 0);
             bot.Wait(2000);
@@ -160,42 +160,42 @@ namespace TEST_StreamAPITests
             bot.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
-        static void Loop(Robot bot)
+        static void Loop(Robot bot, double size)
         {
             // Repeat three times to compare pending on device vs pending in total
             bot.SpeedTo(100);
-            bot.Move(50, 0, 0);
-            bot.Move(0, 50, 0);
-            bot.Move(-50, 0, 0);
-            bot.Move(0, -50, 0);
-            bot.Move(0, 0, 10);
-            bot.Move(50, 0, 0);
-            bot.Move(0, 50, 0);
-            bot.Move(-50, 0, 0);
-            bot.Move(0, -50, 0);
-            bot.Move(0, 0, -10);
+            bot.Move(size, 0, 0);
+            bot.Move(0, size, 0);
+            bot.Move(-size, 0, 0);
+            bot.Move(0, -size, 0);
+            bot.Move(0, 0, size);
+            bot.Move(size, 0, 0);
+            bot.Move(0, size, 0);
+            bot.Move(-size, 0, 0);
+            bot.Move(0, -size, 0);
+            bot.Move(0, 0, -size);
 
-            bot.Move(50, 0, 0);
-            bot.Move(0, 50, 0);
-            bot.Move(-50, 0, 0);
-            bot.Move(0, -50, 0);
-            bot.Move(0, 0, 10);
-            bot.Move(50, 0, 0);
-            bot.Move(0, 50, 0);
-            bot.Move(-50, 0, 0);
-            bot.Move(0, -50, 0);
-            bot.Move(0, 0, -10);
+            bot.Move(size, 0, 0);
+            bot.Move(0, size, 0);
+            bot.Move(-size, 0, 0);
+            bot.Move(0, -size, 0);
+            bot.Move(0, 0, size);
+            bot.Move(size, 0, 0);
+            bot.Move(0, size, 0);
+            bot.Move(-size, 0, 0);
+            bot.Move(0, -size, 0);
+            bot.Move(0, 0, -size);
 
-            bot.Move(50, 0, 0);
-            bot.Move(0, 50, 0);
-            bot.Move(-50, 0, 0);
-            bot.Move(0, -50, 0);
-            bot.Move(0, 0, 10);
-            bot.Move(50, 0, 0);
-            bot.Move(0, 50, 0);
-            bot.Move(-50, 0, 0);
-            bot.Move(0, -50, 0);
-            bot.Move(0, 0, -10);
+            bot.Move(size, 0, 0);
+            bot.Move(0, size, 0);
+            bot.Move(-size, 0, 0);
+            bot.Move(0, -size, 0);
+            bot.Move(0, 0, size);
+            bot.Move(size, 0, 0);
+            bot.Move(0, size, 0);
+            bot.Move(-size, 0, 0);
+            bot.Move(0, -size, 0);
+            bot.Move(0, 0, -size);
         }
 
         static public void ExternalAxes(Robot bot)

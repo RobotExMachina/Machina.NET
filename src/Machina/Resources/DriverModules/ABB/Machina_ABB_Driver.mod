@@ -1,4 +1,4 @@
-MODULE Machina_Server
+MODULE Machina_Driver
 
     ! ###\   ###\ #####\  ######\##\  ##\##\###\   ##\ #####\
     ! ####\ ####\##\\\##\##\\\\\\##\  ##\##\####\  ##\##\\\##\
@@ -10,9 +10,9 @@ MODULE Machina_Server
     !
     ! This file starts a synchronous, single-threaded server on a virtual/real ABB robot,
     ! waits for a TCP client, listens to a stream of formatted string messages,
-    ! buffers them parsed into an 'action' struct, and runs a loop to execute them. .
+    ! buffers them parsed into an 'action' struct, and runs a loop to execute them.
     !
-    ! IMPORTANT: make sure to adjust SERVER_IP to your current setup
+    ! IMPORTANT: make sure to adjust 127.0.0.1 and {{PORTs}} to your current setup
     !
     ! More info on https://github.com/RobotExMachina
     ! A project by https://github.com/garciadelcastillo
@@ -59,68 +59,71 @@ MODULE Machina_Server
     ENDRECORD
 
     ! SERVER DATA --> to modify by user
-    CONST string SERVER_IP := "{{HOSTNAME}}";    ! Replace "{{HOSTNAME}}" with device IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
-    CONST num SERVER_PORT := {{PORT}};           ! Replace {{PORT}} with custom port number, like for example 7000.
+    PERS string SERVER_IP := "{{HOSTNAME}}";     ! Replace "127.0.0.1" with device IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
+    CONST num SERVER_PORT := {{PORT}};           ! Replace 7000 with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.2.4";
+    CONST string MACHINA_SERVER_VERSION := "1.3.0";
 
     ! Should program exit on any kind of error?
-    VAR bool USE_STRICT := TRUE;
+    PERS bool USE_STRICT := TRUE;
 
     ! TCP stuff
-    VAR string clientIp;
-    VAR socketdev serverSocket;
-    VAR socketdev clientSocket;
+    LOCAL VAR string clientIp;
+    LOCAL VAR socketdev serverSocket;
+    LOCAL VAR socketdev clientSocket;
 
     ! A RAPID-code oriented API:
-    !                                         INSTRUCTION P1 P2 P3 P4...
-    CONST num INST_MOVEL := 1;              ! MoveL X Y Z QW QX QY QZ
-    CONST num INST_MOVEJ := 2;              ! MoveJ X Y Z QW QX QY QZ
-    CONST num INST_MOVEABSJ := 3;           ! MoveAbsJ J1 J2 J3 J4 J5 J6
-    CONST num INST_SPEED := 4;              ! (setspeed V_TCP [V_ORI V_LEAX V_REAX])
-    CONST num INST_ZONE := 5;               ! (setzone FINE TCP [ORI EAX ORI LEAX REAX])
-    CONST num INST_WAITTIME := 6;           ! WaitTime T
-    CONST num INST_TPWRITE := 7;            ! TPWrite "MSG"
-    CONST num INST_TOOL := 8;               ! (settool X Y Z QW QX QY QZ KG CX CY CZ)
-    CONST num INST_NOTOOL := 9;             ! (settool tool0)
-    CONST num INST_SETDO := 10;             ! SetDO "NAME" ON
-    CONST num INST_SETAO := 11;             ! SetAO "NAME" V
-    CONST num INST_EXT_JOINTS := 12;        ! (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
-    CONST num INST_ACCELERATION := 13;      ! (setacceleration values, TBD)
-    CONST num INST_SING_AREA := 14;         ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
+    !                                                 INSTRUCTION P1 P2 P3 P4...
+    CONST num INST_MOVEL := 1;                      ! MoveL X Y Z QW QX QY QZ
+    CONST num INST_MOVEJ := 2;                      ! MoveJ X Y Z QW QX QY QZ
+    CONST num INST_MOVEABSJ := 3;                   ! MoveAbsJ J1 J2 J3 J4 J5 J6
+    CONST num INST_SPEED := 4;                      ! (setspeed V_TCP [V_ORI V_LEAX V_REAX])
+    CONST num INST_ZONE := 5;                       ! (setzone FINE TCP [ORI EAX ORI LEAX REAX])
+    CONST num INST_WAITTIME := 6;                   ! WaitTime T
+    CONST num INST_TPWRITE := 7;                    ! TPWrite "MSG"
+    CONST num INST_TOOL := 8;                       ! (settool X Y Z QW QX QY QZ KG CX CY CZ)
+    CONST num INST_NOTOOL := 9;                     ! (settool tool0)
+    CONST num INST_SETDO := 10;                     ! SetDO "NAME" ON
+    CONST num INST_SETAO := 11;                     ! SetAO "NAME" V
+    CONST num INST_EXT_JOINTS := 12;                ! (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+    CONST num INST_ACCELERATION := 13;              ! (setacceleration values, TBD)
+    CONST num INST_SING_AREA := 14;                 ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
 
-    CONST num INST_STOP_EXECUTION := 100;       ! Stops execution of the server module
-    CONST num INST_GET_INFO := 101;             ! A way to retreive state information from the server (not implemented)
-    CONST num INST_SET_CONFIGURATION := 102;    ! A way to make some changes to the configuration of the server
+    CONST num INST_STOP_EXECUTION := 100;           ! Stops execution of the server module
+    CONST num INST_GET_INFO := 101;                 ! A way to retreive state information from the server (not implemented)
+    CONST num INST_SET_CONFIGURATION := 102;        ! A way to make some changes to the configuration of the server
 
     ! (these could be straight strings since they are never used for checks...?)
-    CONST num RES_VERSION := 20;            ! ">20 1 2 1;" Sends version numbers
-    CONST num RES_POSE := 21;               ! ">21 400 300 500 0 0 1 0;" Sends pose
-    CONST num RES_JOINTS := 22;             ! ">22 0 0 0 0 90 0;" Sends joints
-    CONST num RES_EXTAX := 23;              ! ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
+    PERS num RES_VERSION := 20;                     ! ">20 1 2 1;" Sends version numbers
+    PERS num RES_POSE := 21;                        ! ">21 400 300 500 0 0 1 0;" Sends pose
+    PERS num RES_JOINTS := 22;                      ! ">22 0 0 0 0 90 0;" Sends joints
+    PERS num RES_EXTAX := 23;                       ! ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
+    PERS num RES_FULL_POSE := 24;                   ! ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
 
     ! Characters used for buffer parsing
-    CONST string STR_MESSAGE_END_CHAR := ";";
-    CONST string STR_MESSAGE_ID_CHAR := "@";
-    CONST string STR_MESSAGE_RESPONSE_CHAR := ">";  ! this will be added to information request responses (acknowledgments do not include it)
+    PERS string STR_MESSAGE_END_CHAR := ";";        ! Marks the end of a message
+    PERS string STR_MESSAGE_CONTINUE_CHAR := ">";   ! Marks the end of an unfinished message, to be continued on next message
+    PERS string STR_MESSAGE_ID_CHAR := "@";         ! Flags a message as an acknowledgment message corresponding to a source id
+    PERS string STR_MESSAGE_RESPONSE_CHAR := "$";   ! Flags a message as a response to an information request (acknowledgments do not include it)
 
     ! Rounding parameters for string representation of values (consistent with current Machina standards...)
-    CONST num STR_RND_M := 6;
-    CONST num STR_RND_MM := 3;
-    CONST num STR_RND_DEGS := 3;
-    CONST num STR_RND_QUAT := 4;
-    CONST num STR_RND_RADS := 6;
-    CONST num STR_RND_VOLT := 3;
-    CONST num STR_RND_TEMP := 0;
-    CONST num STR_RND_KG := 3;
-    CONST num STR_RND_VEC := 5;
+    PERS num STR_RND_M := 6;
+    PERS num STR_RND_MM := 3;
+    PERS num STR_RND_DEGS := 3;
+    PERS num STR_RND_QUAT := 4;
+    PERS num STR_RND_RADS := 6;
+    PERS num STR_RND_VOLT := 3;
+    PERS num STR_RND_TEMP := 0;
+    PERS num STR_RND_KG := 3;
+    PERS num STR_RND_VEC := 5;
 
     ! Other stuff for parsing
-    CONST string STR_DOT := ".";
+    PERS string STR_DOT := ".";
+    PERS string STR_DOUBLE_QUOTES := """";  ! A escaped double quote is written twice
 
     ! RobotWare 5.x shim
-    CONST num WAIT_MAX := 8388608;
+    PERS num WAIT_MAX := 8388608;
 
     ! State variables representing a virtual cursor of data the robot is instructed to
     PERS tooldata cursorTool;
@@ -135,8 +138,8 @@ MODULE Machina_Server
     VAR num maxAcceleration;
 
     ! State variables for real-time motion tracking
-    VAR robtarget nowrt;
-    VAR jointtarget nowjt;
+    PERS robtarget nowrt;
+    PERS jointtarget nowjt;
     VAR extjoint nowexj;
 
     ! Buffer of incoming messages
@@ -149,7 +152,6 @@ MODULE Machina_Server
     VAR bool isMsgBufferWriteLineWrapped;
     VAR bool streamBufferPending;
 
-    CONST string STR_DOUBLE_QUOTES := """";  ! A escaped double quote is written twice
 
     ! Buffer of pending actions
     CONST num actionsBufferSize := 1000;
@@ -159,7 +161,13 @@ MODULE Machina_Server
     VAR bool isActionPosWriteWrapped;
 
     ! Buffer of responses
-    VAR string response;
+    LOCAL VAR string response;
+
+
+    ! SHARED WITH MONITOR MODULE
+    ! If monitor module is available, these variables are shared and can be tweaked from this module.
+    PERS num monitorUpdateInterval;                 ! Wait time in secs before next update. Is global variable so that it can be changed from Driver.
+    PERS bool isMachinaDriverAvailable := TRUE;     ! Let the monitor know that the main task is running a valid Machina driver.
 
 
 
@@ -304,7 +312,7 @@ MODULE Machina_Server
 
     ! Start the TCP server
     PROC ServerInitialize()
-        TPWrite "Initializing Machina Driver...";
+        TPWrite "Machina Driver: Initializing...";
         ServerRecover;
     ENDPROC
 
@@ -316,12 +324,12 @@ MODULE Machina_Server
         SocketBind serverSocket, SERVER_IP, SERVER_PORT;
         SocketListen serverSocket;
 
-        TPWrite "Waiting for incoming connection...";
+        TPWrite "Machina Driver: Waiting for incoming connection on " + SERVER_IP + ":" + NumToStr(SERVER_PORT, 0);
 
         SocketAccept serverSocket, clientSocket \ClientAddress:=clientIp \Time:=WAIT_MAX;
 
-        TPWrite "Connected to client: " + clientIp;
-        TPWrite "Listening to remote instructions...";
+        TPWrite "Machina Driver: Connected to client: " + clientIp;
+        TPWrite "Machina Driver: Listening to remote instructions...";
 
         ! Update the client with some data
         SendVersion;
@@ -331,7 +339,7 @@ MODULE Machina_Server
 
         ERROR
             IF ERRNO = ERR_SOCK_TIMEOUT THEN
-                TPWrite "MACHINA ERROR: ServerRecover timeout. Retrying...";
+                TPWrite "MACHINA DRIVER ERROR: ServerRecover timeout. Retrying...";
                 RETRY;
             ELSEIF ERRNO = ERR_SOCK_CLOSED THEN
                 RETURN;

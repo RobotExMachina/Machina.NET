@@ -166,7 +166,8 @@
     <EmbeddedResource Include="Resources\DriverModules\UR\empty.script" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\DriverModules\ABB\SingleTask\Machina_ABB_Server_SingleTask.mod" />
+    <EmbeddedResource Include="Resources\DriverModules\ABB\Machina_ABB_Driver.mod" />
+    <EmbeddedResource Include="Resources\DriverModules\ABB\Machina_ABB_Monitor.mod" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -14,6 +14,7 @@ using ABB.Robotics.Controllers.Discovery;
 using ABB.Robotics.Controllers.RapidDomain;
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
+using ABBTask = ABB.Robotics.Controllers.RapidDomain.Task;
 
 namespace Machina.Drivers.Communication
 {
@@ -30,7 +31,7 @@ namespace Machina.Drivers.Communication
 
         // ABB stuff and flags
         private Controller controller;
-        private ABB.Robotics.Controllers.RapidDomain.Task tRob1Task;
+        private ABBTask tRob1Task, tMonitorTask;
         private RobotWare robotWare;
         private RobotWareOptionCollection robotWareOptions;
         private int _deviceId;
@@ -45,11 +46,11 @@ namespace Machina.Drivers.Communication
         public string IP => _ip;
         private int _port = 7000;   // @TODO: have a static counter keep track of used port for multi-robot
         public int Port => _port;
-                
-        private string _streamingModule;
-            
+
+        private string _driverModule, _monitorModule;
+
         private const string REMOTE_BUFFER_DIR = "Machina";
-                
+
 
         public RobotStudioManager(Driver parent)
         {
@@ -145,6 +146,14 @@ namespace Machina.Drivers.Communication
                 logger.Warning("Could not connect to controller, failed to load main task");
                 Disconnect();
                 return false;
+            }
+
+            if (this._hasMultiTasking)
+            {
+                if (!LoadMonitorTask())
+                {
+                    logger.Info("Your device has the capacity to be monitored in real time, but could not be set up automatically; please refer to the documentation on how to set Machina monitoring on ABB robots.");
+                }
             }
 
             if (!SetRunMode(CycleType.Once))
@@ -345,39 +354,49 @@ namespace Machina.Drivers.Communication
         }
 
         /// <summary>
-        /// Retrieves the main task from the ABB controller, typically 't_rob1'.
+        /// Retrieves the main task from the ABB controller, typically 'T_ROB1'.
         /// </summary>
         /// <returns></returns>
         private bool LoadMainTask()
         {
             if (controller == null)
             {
-                logger.Debug("Cannot retreive main task: no controller available");
+                logger.Debug("Cannot retrieve main task: no controller available");
                 return false;
             }
 
-            try
+            tRob1Task = controller.Rapid.GetTask("T_ROB1");
+            if (tRob1Task == null)
             {
-                ABB.Robotics.Controllers.RapidDomain.Task[] tasks = controller.Rapid.GetTasks();
-                if (tasks.Length > 0)
-                {
-                    tRob1Task = tasks[0];
-                    logger.Debug("Retrieved task " + tRob1Task.Name);
-                    return true;
-                }
-                else
-                {
-                    tRob1Task = null;
-                    logger.Debug("Could not retrieve any task from the controller");
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Debug("Could not retrieve main task from controller");
-                logger.Debug(ex);
+                logger.Error("Could not retrieve task T_ROB1 from the controller");
+                return false;
             }
 
-            return false;
+            logger.Debug("Retrieved task " + tRob1Task.Name);
+            return true;
+        }
+
+        /// <summary>
+        /// Retrieves the task used for real-time monitoring of the robot (must be set up manually by the user).
+        /// </summary>
+        /// <returns></returns>
+        private bool LoadMonitorTask()
+        {
+            if (controller == null)
+            {
+                logger.Debug("Cannot retrieve monitor task: no controller available");
+                return false;
+            }
+
+            tMonitorTask = controller.Rapid.GetTask("T_MACHINA_MONITOR");
+            if (tMonitorTask == null)
+            {
+                logger.Warning("Could not retrieve task \"T_MACHINA_MONITOR\" from the controller, was it set up?");
+                return false;
+            }
+
+            logger.Debug("Retrieved task " + tMonitorTask.Name);
+            return true;
         }
 
         /// <summary>
@@ -465,7 +484,7 @@ namespace Machina.Drivers.Communication
         /// Deletes all existing modules from main task in the controller. 
         /// </summary>
         /// <returns></returns>
-        private int ClearAllModules()
+        private int ClearAllModules(ABBTask task)
         {
             if (controller == null)
             {
@@ -473,9 +492,9 @@ namespace Machina.Drivers.Communication
                 return -1;
             }
 
-            if (tRob1Task == null)
+            if (task == null)
             {
-                logger.Debug("Cannot clear modules: main task not retrieved");
+                logger.Debug("Cannot clear modules: task not avaliable");
                 return -1;
             }
 
@@ -484,10 +503,10 @@ namespace Machina.Drivers.Communication
             {
                 using (Mastership.Request(controller.Rapid))
                 {
-                    ABB.Robotics.Controllers.RapidDomain.Module[] modules = tRob1Task.GetModules();
+                    ABB.Robotics.Controllers.RapidDomain.Module[] modules = task.GetModules();
                     foreach (ABB.Robotics.Controllers.RapidDomain.Module m in modules)
                     {
-                        logger.Verbose($"Deleting module: {m.Name}");
+                        logger.Verbose($"Deleting module {m.Name} from {task.Name}");
                         m.Delete();
                         count++;
                     }
@@ -507,7 +526,7 @@ namespace Machina.Drivers.Communication
         /// Resets the program pointer in the controller to the main entry point. Needs to be called
         /// before starting execution of a program, otherwise the controller will throw an error. 
         /// </summary>
-        internal bool ResetProgramPointer()
+        internal bool ResetProgramPointers()
         {
             if (controller == null)
             {
@@ -526,6 +545,10 @@ namespace Machina.Drivers.Communication
                 using (Mastership.Request(controller.Rapid))
                 {
                     tRob1Task.ResetProgramPointer();
+                    if (tMonitorTask != null)
+                    {
+                        tMonitorTask.ResetProgramPointer();
+                    }
                     return true;
                 }
 
@@ -626,7 +649,7 @@ namespace Machina.Drivers.Communication
                 return false;
             }
 
-            if (!ResetProgramPointer())
+            if (!ResetProgramPointers())
             {
                 logger.Debug("Cannot start program: cannot reset program pointer");
                 return false;
@@ -739,17 +762,29 @@ namespace Machina.Drivers.Communication
         {
             if (!LoadDriverScript())
             {
-                logger.Debug("Could not setup streaming modules");
+                logger.Debug("Could not setup Driver module");
                 return false;
             }
 
-            if (!UploadStreamingModules())
+            if (!UploadDriverModule())
             {
-                logger.Debug("Could not upload streaming modules");
+                logger.Debug("Could not upload Driver module");
                 return false;
             }
 
-            if (!ResetProgramPointer())
+            if (this._hasMultiTasking && this.tMonitorTask != null)
+            {
+                if (!LoadMonitorScript())
+                {
+                    logger.Debug("Could not setup Monitor module");
+                }
+                else if (!UploadMonitorModule())
+                {
+                    logger.Debug("Could not upload Monitor module to controller");
+                }
+            }
+
+            if (!ResetProgramPointers())
             {
                 logger.Debug("Could not reset the program pointer");
                 return false;
@@ -765,69 +800,44 @@ namespace Machina.Drivers.Communication
         }
 
 
-        ///// <summary>
-        ///// Read
-        ///// </summary>
-        ///// <returns></returns>
-        //private bool SetupStreamingModules()
-        //{
-        //    //if (hasMultiTasking)
-        //    //{
-        //    //    // TODO: depending on availability of multitasking, upload different modules... 
-        //    //}
-
-
-        //    // Read the resource as a string
-        //    _streamingModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.SingleTask.Machina_ABB_Server_SingleTask.mod");
-
-        //    // Get the port number/s from the file's "CONST num SERVER_PORT := 7000;"
-        //    // @TODO: this is super flimsy, use regex here...
-        //    int portPos = _streamingModule.IndexOf("SERVER_PORT") + 15;
-        //    string portStr = _streamingModule.Substring(portPos, 4);
-        //    _writePort = Convert.ToInt32(portStr);
-
-        //    _driverScript = _driverScript.Replace("{{HOSTNAME}}", _serverIP);
-        //    _driverScript = _driverScript.Replace("{{PORT}}", _serverPort.ToString());
-
-        //    logger.Debug($"_writePort set to {_writePort}");
-
-        //    // Replace the IP in the module with the one found by this manager: "CONST string SERVER_IP := "127.0.0.1";"
-        //    _streamingModule = _streamingModule.Replace("127.0.0.1", IP);
-
-        //    return true;
-        //}
-
         private bool LoadDriverScript()
         {
-            //if (hasMultiTasking)
-            //{
-            //    // TODO: depending on availability of multitasking, upload different modules... 
-            //}
-
             // Read the resource as a string
-            _streamingModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.SingleTask.Machina_ABB_Server_SingleTask.mod");
+            _driverModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.Machina_ABB_Driver.mod");
 
             // @TODO: remove comments, trailing spaces and empty lines from script
-            _streamingModule = _streamingModule.Replace("{{HOSTNAME}}", IP);
-            _streamingModule = _streamingModule.Replace("{{PORT}}", Port.ToString());
+            _driverModule = _driverModule.Replace("{{HOSTNAME}}", IP);
+            _driverModule = _driverModule.Replace("{{PORT}}", Port.ToString());
 
             logger.Debug($"Loaded ABB Driver module and cofigured to {IP}:{Port}");
 
             return true;
         }
 
+        private bool LoadMonitorScript()
+        {
+            // Read the resource as a string
+            _monitorModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.Machina_ABB_Monitor.mod");
+
+            _monitorModule = _monitorModule.Replace("{{PORT}}", (Port + 1).ToString());     // @TODO: make ports more programmatic
+
+            logger.Debug($"Loaded ABB Monitor module and configured to {IP}:{Port + 1}");
+
+            return true;
+        }
+
 
         /// <summary>
-        /// Loads the default StreamModule designed for streaming.
+        /// Loads the default Driver module designed for streaming.
         /// </summary>
-        internal bool UploadStreamingModules()
+        internal bool UploadDriverModule()
         {
-            //if (hasMultiTasking)
-            //{
-            //    // TODO: depending on availability of multitasking, upload different modules... 
-            //}
+            return LoadModuleToTask(tRob1Task, _driverModule, "Machina_ABB_Driver.mod");
+        }
 
-            return LoadModuleToController(_streamingModule, "Machina_ABB_Server_SingleTask.mod");
+        internal bool UploadMonitorModule()
+        {
+            return LoadModuleToTask(tMonitorTask, _monitorModule, "Machina_ABB_Monitor.mod");
         }
 
 
@@ -838,7 +848,7 @@ namespace Machina.Drivers.Communication
         /// <param name="resourceName"></param>
         /// <param name="targetName"></param>
         /// <returns></returns>
-        public bool LoadModuleToController(string module, string targetName)
+        public bool LoadModuleToTask(ABBTask task, string module, string targetName)
         {
             if (!_isConnected)
             {
@@ -855,9 +865,14 @@ namespace Machina.Drivers.Communication
                 logger.Debug("Saved module to " + path);
             }
 
-            if (!LoadFileToDevice(path))
+            if (!UploadFileToController(path))
             {
-                throw new Exception("Could not load module to controller");
+                throw new Exception($"Could not upload module {path} to controller");
+            }
+
+            if (!LoadModuleFromControllerToTask(task, targetName))
+            {
+                throw new Exception($"Could not load module {targetName} from controller to task {task.Name}");
             }
 
             return true;
@@ -865,13 +880,11 @@ namespace Machina.Drivers.Communication
 
 
         /// <summary>
-        /// Loads a module into de controller from a local file. 
-        /// @TODO: This is an expensive operation, should probably become threaded. 
+        /// Loads a file to the controller file system from a local file. 
         /// </summary>
         /// <param name="fullPath"></param>
-        /// <param name="wipeout"></param>
         /// <returns></returns>
-        public bool LoadFileToDevice(string fullPath, bool wipeout = true)
+        internal bool UploadFileToController(string fullPath)
         {
             string extension = Path.GetExtension(fullPath),     // ".mod"
                 filename = Path.GetFileName(fullPath);          // "Machina_Server.mod"
@@ -887,13 +900,7 @@ namespace Machina.Drivers.Communication
                 throw new Exception("Wrong file type, must use .mod files for ABB robots");
             }
 
-            // For the time being, we will always wipe out previous modules on load
-            if (ClearAllModules() < 0)
-            {
-                throw new Exception("Error clearing modules");
-            }
-
-            // Load the module
+            // Upload the module
             bool success = false;
             try
             {
@@ -916,47 +923,165 @@ namespace Machina.Drivers.Communication
                     //@TODO: Should implement some kind of file cleanup at somepoint...
 
                     // Copy the file to the remote controller
-                    controller.FileSystem.PutFile(fullPath, $"{REMOTE_BUFFER_DIR}/{filename}", wipeout);
+                    controller.FileSystem.PutFile(fullPath, $"{REMOTE_BUFFER_DIR}/{filename}", true);
                     logger.Debug($"Copied {filename} to {REMOTE_BUFFER_DIR}");
-
-                    // Loads a Rapid module to the task in the robot controller
-                    success = tRob1Task.LoadModuleFromFile($"{remotePath}/{filename}", RapidLoadMode.Replace);
                 }
             }
             catch (Exception ex)
-            { 
-                //Console.WriteLine("ERROR: Could not load module");
+            {
                 logger.Debug(ex);
-                throw new Exception("ERROR: Could not load module");
+                throw new Exception("ERROR: Could not upload module to controller");
             }
 
-            // True if loading succeeds without any errors, otherwise false.  
-            if (!success)
+            return true;
+        }
+
+        /// <summary>
+        /// Loads a module on a task from the controllers filesystem.
+        /// </summary>
+        /// <param name="task"></param>
+        /// <param name="filename"></param>
+        /// <param name="wipeout"></param>
+        /// <returns></returns>
+        internal bool LoadModuleFromControllerToTask(ABBTask task, string filename, bool wipeout = true)
+        {
+            // For the time being, we will always wipe out previous modules on load
+            if (wipeout)
             {
-                //// Gets the available categories of the EventLog. 
-                //foreach (EventLogCategory category in controller.EventLog.GetCategories())
-                //{
-                //    if (category.Name == "Common")
-                //    {
-                //        if (category.Messages.Count > 0)
-                //        {
-                //            foreach (EventLogMessage message in category.Messages)
-                //            {
-                //                Console.WriteLine("Program [{1}:{2}({0})] {3} {4}",
-                //                    message.Name, message.SequenceNumber,
-                //                    message.Timestamp, message.Title, message.Body);
-                //            }
-                //        }
-                //    }
-                //}
+                if (ClearAllModules(task) < 0)
+                {
+                    throw new Exception($"Error clearing modules on task {task.Name}");
+                }
             }
-            else
+
+            // Load the module
+            bool success = false;
+            try
             {
-                logger.Debug($"Sucessfully loaded {fullPath}");
+                using (Mastership.Request(controller.Rapid))
+                {
+                    FileSystem fs = controller.FileSystem;
+                    string remotePath = fs.RemoteDirectory + "/" + REMOTE_BUFFER_DIR;
+                    bool dirExists = fs.DirectoryExists(REMOTE_BUFFER_DIR);
+                    if (!dirExists)
+                    {
+                        logger.Error($"No directory named {remotePath} found on controller");
+                        return false;
+                    }
+
+                    // Loads a Rapid module to the task in the robot controller
+                    success = task.LoadModuleFromFile($"{remotePath}/{filename}", RapidLoadMode.Replace);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Debug(ex);
+                throw new Exception("ERROR: Could not LoadModuleFromControllerToTask");
+            }
+
+            if (success)
+            {
+                logger.Debug($"Sucessfully loaded {filename} to {task.Name}");
             }
 
             return success;
         }
+
+
+
+        ///// <summary>
+        ///// Loads a module into de controller from a local file. 
+        ///// @TODO: This is an expensive operation, should probably become threaded. 
+        ///// </summary>
+        ///// <param name="fullPath"></param>
+        ///// <param name="wipeout"></param>
+        ///// <returns></returns>
+        //public bool LoadFileToDevice(string fullPath, bool wipeout = true)
+        //{
+        //    string extension = Path.GetExtension(fullPath),     // ".mod"
+        //        filename = Path.GetFileName(fullPath);          // "Machina_Server.mod"
+
+        //    if (!_isConnected)
+        //    {
+        //        throw new Exception($"Could not load module '{fullPath}', not connected to controller");
+        //    }
+
+        //    // check for correct ABB file extension
+        //    if (!extension.ToLower().Equals(".mod"))
+        //    {
+        //        throw new Exception("Wrong file type, must use .mod files for ABB robots");
+        //    }
+
+        //    // For the time being, we will always wipe out previous modules on load
+        //    if (ClearAllModules() < 0)
+        //    {
+        //        throw new Exception("Error clearing modules");
+        //    }
+
+        //    // Load the module
+        //    bool success = false;
+        //    try
+        //    {
+        //        using (Mastership.Request(controller.Rapid))
+        //        {
+        //            // When connecting to a real controller, the reference filesystem 
+        //            // for Task.LoadModuleFromFile() becomes the controller's, so it is necessary
+        //            // to copy the file to the system first, and then load it. 
+
+        //            // Create the remoteBufferDirectory if applicable
+        //            FileSystem fs = controller.FileSystem;
+        //            string remotePath = fs.RemoteDirectory + "/" + REMOTE_BUFFER_DIR;
+        //            bool dirExists = fs.DirectoryExists(REMOTE_BUFFER_DIR);
+        //            if (!dirExists)
+        //            {
+        //                logger.Debug($"Creating {remotePath} on remote controller");
+        //                fs.CreateDirectory(REMOTE_BUFFER_DIR);
+        //            }
+
+        //            //@TODO: Should implement some kind of file cleanup at somepoint...
+
+        //            // Copy the file to the remote controller
+        //            controller.FileSystem.PutFile(fullPath, $"{REMOTE_BUFFER_DIR}/{filename}", wipeout);
+        //            logger.Debug($"Copied {filename} to {REMOTE_BUFFER_DIR}");
+
+        //            // Loads a Rapid module to the task in the robot controller
+        //            success = tRob1Task.LoadModuleFromFile($"{remotePath}/{filename}", RapidLoadMode.Replace);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //Console.WriteLine("ERROR: Could not load module");
+        //        logger.Debug(ex);
+        //        throw new Exception("ERROR: Could not load module");
+        //    }
+
+        //    // True if loading succeeds without any errors, otherwise false.  
+        //    if (!success)
+        //    {
+        //        //// Gets the available categories of the EventLog. 
+        //        //foreach (EventLogCategory category in controller.EventLog.GetCategories())
+        //        //{
+        //        //    if (category.Name == "Common")
+        //        //    {
+        //        //        if (category.Messages.Count > 0)
+        //        //        {
+        //        //            foreach (EventLogMessage message in category.Messages)
+        //        //            {
+        //        //                Console.WriteLine("Program [{1}:{2}({0})] {3} {4}",
+        //        //                    message.Name, message.SequenceNumber,
+        //        //                    message.Timestamp, message.Title, message.Body);
+        //        //            }
+        //        //        }
+        //        //    }
+        //        //}
+        //    }
+        //    else
+        //    {
+        //        logger.Debug($"Sucessfully loaded {fullPath}");
+        //    }
+
+        //    return success;
+        //}
 
 
         /// <summary>

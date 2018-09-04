@@ -195,7 +195,8 @@ namespace Machina.Drivers.Communication
                     _receiveByteCount = clientSocket.GetStream().Read(_receiveMsgBytes, 0, _receiveMsgBytes.Length);
                     _response = Encoding.UTF8.GetString(_receiveMsgBytes, 0, _receiveByteCount);
 
-                    var msgs = _response.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    //var msgs = _response.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    var msgs = SplitResponse(_response);
                     foreach (var msg in msgs)
                     {
                         //Console.WriteLine($"  RES: Server response was {msg};");
@@ -250,6 +251,50 @@ namespace Machina.Drivers.Communication
         //    }
         //}
 
+
+        /// <summary>
+        /// Take the response buffer and split it into single messages.
+        /// ABB cannot use strings longer that 80 chars, so some messages must be sent in chunks. 
+        /// This function parses the response for message continuation and end chars, 
+        /// and returns a list of joint messages if appropriate.
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        private string[] SplitResponse(string response)
+        {
+            bool unfinished = response[response.Length - 1] == ABBCommunicationProtocol.STR_MESSAGE_CONTINUE_CHAR;
+
+            string[] chunks = response.Split(new char[] { ABBCommunicationProtocol.STR_MESSAGE_END_CHAR }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (chunks.Length == 0)
+                // Return empty array (and keep unfinished chunk for next response with body
+                return chunks;
+
+            // Join '>' chunks with whitespaces
+            foreach (string chunk in chunks)
+            {
+                chunk.Replace(ABBCommunicationProtocol.STR_MESSAGE_CONTINUE_CHAR, ' ');
+            }
+
+            // Attach unfinished chunk from previous message
+            chunks[0] = unfinishedChunk + chunks[0];
+            unfinishedChunk = "";
+
+            // Remove unfinished chunk from array
+            if (unfinished)
+            {
+                unfinishedChunk = chunks[chunks.Length - 1];
+
+                string[] copy = new string[chunks.Length - 1];
+                Array.Copy(chunks, copy, chunks.Length - 1);
+
+                chunks = copy;
+            }
+
+            return chunks;
+        }
+
+        private string unfinishedChunk = "";
 
 
         /// <summary>
