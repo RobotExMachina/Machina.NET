@@ -68,6 +68,7 @@ namespace Machina.Drivers.Communication
         private int _monitorReceiveByteCount;
         private string _monitorMessage;
         private byte[] _monitorReceiveMsgBytes = new byte[1024];
+        private int _monitorReceivedMessages = 0;
 
         private bool _isMonitored = false;
         public bool IsMonitored => _isMonitored;
@@ -92,6 +93,7 @@ namespace Machina.Drivers.Communication
 
         internal bool Disconnect()
         {
+            DisconnectMonitor();
 
             if (_clientSocket != null)
             {
@@ -130,7 +132,12 @@ namespace Machina.Drivers.Communication
                     return false;
                 }
 
-                TryConnectMonitor();
+                if (TryConnectMonitor())
+                {
+                    // Establish a MotionCursor on `Control`
+                    this._parentDriver.parentControl.InitializeMotionCursor();
+                    this._motionCursor = this._parentDriver.parentControl.MotionCursor;
+                }
 
                 return _clientSocket.Connected;
             }
@@ -175,10 +182,19 @@ namespace Machina.Drivers.Communication
         {
             if (_monitorClientSocket != null)
             {
-                if (_monitorClientSocket.Connected)
+                try
                 {
-                    _monitorClientSocket.Client.Disconnect(false);
+                    if (_monitorClientSocket.Connected)
+                    {
+                        _monitorClientSocket.Client.Disconnect(false);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    logger.Error("Something went wrong trying to disconnect from monitor");
+                    logger.Error(ex.ToString());
+                }
+
                 _monitorClientSocket.Close();
                 _monitorStatus = TCPConnectionStatus.Disconnected;
                 _isMonitored = false;
@@ -258,6 +274,9 @@ namespace Machina.Drivers.Communication
                 Thread.CurrentThread.Name = "MachinaTCPDriverListeningThread";
             }
 
+            // Scope leftover chunks from response messages on this thread
+            string leftOverChunk = "";
+
             // Expire the thread on disconnection
             while (_clientStatus != TCPConnectionStatus.Disconnected)
             {
@@ -266,8 +285,7 @@ namespace Machina.Drivers.Communication
                     _receiveByteCount = _clientSocket.GetStream().Read(_receiveMsgBytes, 0, _receiveMsgBytes.Length);
                     _response = Encoding.UTF8.GetString(_receiveMsgBytes, 0, _receiveByteCount);
 
-                    //var msgs = _response.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    var msgs = SplitResponse(_response);
+                    var msgs = SplitResponse(_response, ref leftOverChunk);
                     foreach (var msg in msgs)
                     {
                         //Console.WriteLine($"  RES: Server response was {msg};");
@@ -289,6 +307,9 @@ namespace Machina.Drivers.Communication
                 Thread.CurrentThread.Name = "MachinaTCPMonitorListeningThread";
             }
 
+            // Scope leftover chunks from response messages on this thread
+            string leftOverChunk = "";
+
             while (_monitorStatus != TCPConnectionStatus.Disconnected)
             {
                 if (_monitorClientSocket.Available > 0)
@@ -296,11 +317,13 @@ namespace Machina.Drivers.Communication
                     _monitorReceiveByteCount = _monitorClientSocket.GetStream().Read(_monitorReceiveMsgBytes, 0, _monitorReceiveMsgBytes.Length);
                     _monitorMessage = Encoding.UTF8.GetString(_monitorReceiveMsgBytes, 0, _monitorReceiveByteCount);
 
-                    var msgs = SplitResponse(_monitorMessage);
+                    var msgs = SplitResponse(_monitorMessage, ref leftOverChunk);
                     foreach(var msg in msgs)
                     {
-                        logger.Debug("Received message from monitor: " + msg);
-                        // @TODO: do something with the message: update MotionCursor
+                        //logger.Debug("Received message from monitor: " + msg);
+                        ParseResponse(msg);
+                        _monitorReceivedMessages++;
+                        // @TODO: do something with the message: update MotionCursor --> Inserted in `DataReceived()`, not great place, make this more programmatic.
                     }
                 }
 
@@ -359,28 +382,24 @@ namespace Machina.Drivers.Communication
         /// </summary>
         /// <param name="response"></param>
         /// <returns></returns>
-        private string[] SplitResponse(string response)
+        private string[] SplitResponse(string response, ref string unfinishedChunk)
         {
-            bool unfinished = response[response.Length - 1] == ABBCommunicationProtocol.STR_MESSAGE_CONTINUE_CHAR;
+            // If there were leftovers from the previous message, attach them to the response
+            if (unfinishedChunk.Length != 0)
+            {
+                response = unfinishedChunk + response;
+                unfinishedChunk = "";
+            }
+
+            bool isThisResponseComplete = response[response.Length - 1] == ABBCommunicationProtocol.STR_MESSAGE_END_CHAR;
 
             string[] chunks = response.Split(new char[] { ABBCommunicationProtocol.STR_MESSAGE_END_CHAR }, StringSplitOptions.RemoveEmptyEntries);
-
             if (chunks.Length == 0)
                 // Return empty array (and keep unfinished chunk for next response with body
                 return chunks;
 
-            // Join '>' chunks with whitespaces
-            foreach (string chunk in chunks)
-            {
-                chunk.Replace(ABBCommunicationProtocol.STR_MESSAGE_CONTINUE_CHAR, ' ');
-            }
-
-            // Attach unfinished chunk from previous message
-            chunks[0] = unfinishedChunk + chunks[0];
-            unfinishedChunk = "";
-
-            // Remove unfinished chunk from array
-            if (unfinished)
+            // Store last chunk for next response and work with the rest. 
+            if (!isThisResponseComplete)
             {
                 unfinishedChunk = chunks[chunks.Length - 1];
 
@@ -389,12 +408,16 @@ namespace Machina.Drivers.Communication
 
                 chunks = copy;
             }
+            
+            // Join '>' chunks with whitespaces
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                chunks[i] = chunks[i].Replace(ABBCommunicationProtocol.STR_MESSAGE_CONTINUE_CHAR, ' ');
+            }
 
             return chunks;
         }
-
-        private string unfinishedChunk = "";
-
+        
 
         /// <summary>
         /// Parse the response and decide what to do with it.
@@ -427,7 +450,6 @@ namespace Machina.Drivers.Communication
             this._parentDriver.parentControl.RaiseActionExecutedEvent();
             //this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
             //this._parentDriver.parentControl.RaiseActionCompletedEvent();
-            
         }
 
         private void DataReceived(string res)
@@ -474,11 +496,16 @@ namespace Machina.Drivers.Communication
                     this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
                     break;
 
-
                 case ABBCommunicationProtocol.RES_FULL_POSE:
-                    logger.Debug("received full pose: " + data.ToString());
-                    break;
+                    Vector pos = new Vector(data[0], data[1], data[2]);
+                    Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
+                    Joints ax = new Joints(data[7], data[8], data[9], data[10], data[11], data[12]);
+                    ExternalAxes extax = new ExternalAxes(data[13], data[14], data[15], data[16], data[17], data[18]);
 
+                    this._motionCursor.UpdateFullPose(pos, rot, ax, extax);
+                    this._parentDriver.parentControl.RaiseMotionUpdateEvent();
+
+                    break;
             }
 
         }

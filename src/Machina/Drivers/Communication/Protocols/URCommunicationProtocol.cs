@@ -108,12 +108,12 @@ namespace Machina.Drivers.Communication.Protocols
                     {
                         _action.Id,
                         INST_MOVEJ_Q,
-                        (int) Math.Round(cursor.joints.J1 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.joints.J2 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.joints.J3 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.joints.J4 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.joints.J5 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.joints.J6 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.J1 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.J2 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.J3 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.J4 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.J5 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.J6 * Geometry.TO_RADS * FACTOR_RAD),
                     };
                     break;
 

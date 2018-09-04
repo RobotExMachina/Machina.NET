@@ -652,7 +652,7 @@ namespace Machina
         /// <returns></returns>
         static internal string GetJointTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0}, {1}]", cursor.joints, GetExternalJointsValue(cursor));
+            return string.Format("[{0}, {1}]", cursor.axes, GetExternalJointsValue(cursor));
         }
 
         /// <summary>

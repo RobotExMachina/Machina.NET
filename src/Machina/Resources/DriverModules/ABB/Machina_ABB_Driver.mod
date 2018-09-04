@@ -386,7 +386,7 @@ MODULE Machina_Driver
 
         ERROR
             IF ERRNO = ERR_SOCK_CLOSED THEN
-                TPWrite "MACHINA ERROR: client disconnected.";
+                TPWrite "MACHINA ERROR: acknowledgement lost, client disconnected.";
                 RETURN;
             ELSE
                 ! No error recovery handling

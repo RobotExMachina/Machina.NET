@@ -25,7 +25,7 @@ namespace Machina
         public string name;
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
-        public Joints joints, prevJoints;
+        public Joints axes, prevJoints;
         public ExternalAxes externalAxes, prevExternalAxes;
         public double speed;
         public double acceleration;
@@ -168,7 +168,7 @@ namespace Machina
             }
             if (joints != null)
             {
-                this.joints = new Joints(joints);
+                this.axes = new Joints(joints);
                 this.prevJoints = new Joints(joints);
             }
             if (extAx != null)
@@ -369,6 +369,28 @@ namespace Machina
         public Settings GetSettings()
         {
             return new Settings(this.speed, this.acceleration, this.precision, this.motionType, this.referenceCS, this.extrusionRate);
+        }
+
+
+
+
+        //  ╔═╗╔═╗╦═╗╔═╗╔═╗╔╦╗  ╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗╔═╗
+        //  ╠╣ ║ ║╠╦╝║  ║╣  ║║  ║ ║╠═╝ ║║╠═╣ ║ ║╣ ╚═╗
+        //  ╚  ╚═╝╩╚═╚═╝╚═╝═╩╝  ╚═╝╩  ═╩╝╩ ╩ ╩ ╚═╝╚═╝
+        /// <summary>
+        /// Force-update a full pose without going through Action application.
+        /// Temporarily here for MotionUpdate cursors, until I figure out a better way of dealing with it... 
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="rot"></param>
+        /// <param name="ax"></param>
+        /// <param name="extax"></param>
+        internal void UpdateFullPose(Vector pos, Rotation rot, Joints ax, ExternalAxes extax)
+        {
+            this.position = pos;
+            this.rotation = rot;
+            this.axes = ax;
+            this.externalAxes = extax;        
         }
 
 
@@ -611,8 +633,8 @@ namespace Machina
             prevPosition = position;
             position = newPosition;
 
-            prevJoints = joints;
-            joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
+            prevJoints = axes;
+            axes = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
 
@@ -666,8 +688,8 @@ namespace Machina
             prevRotation = rotation;
             rotation = newRot;
 
-            prevJoints = joints;
-            joints = null;      // flag joints as null to avoid Joint instructions using obsolete data
+            prevJoints = axes;
+            axes = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
 
@@ -763,8 +785,8 @@ namespace Machina
             prevRotation = rotation;
             rotation = newRot;
 
-            prevJoints = joints;
-            joints = null;  // flag joints as null to avoid Joint instructions using obsolete data
+            prevJoints = axes;
+            axes = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
 
@@ -787,21 +809,21 @@ namespace Machina
             {
                 // If user issued a relative action, make sure there are absolute values to work with. 
                 // (This limitation is due to current lack of FK/IK solvers)
-                if (joints == null)  // could also check for motionType == MotionType.Joints ?
+                if (axes == null)  // could also check for motionType == MotionType.Joints ?
                 {
                     logger.Info($"Cannot apply \"{action}\", must provide absolute Joints values first before applying relative ones...");
                     return false;
                 }
 
-                newJnt = Joints.Add(joints, action.joints);
+                newJnt = Joints.Add(axes, action.joints);
             }
             else
             {
                 newJnt = new Joints(action.joints);
             }
 
-            prevJoints = joints;
-            joints = newJnt;
+            prevJoints = axes;
+            axes = newJnt;
 
             // Flag the lack of other geometric data
             prevPosition = position;
@@ -904,7 +926,7 @@ namespace Machina
             this.position = newPos;
             this.prevRotation = this.rotation;
             this.rotation = newRot;
-            this.prevJoints = this.joints;  // why was this here? joints don't change on tool attachment...
+            this.prevJoints = this.axes;  // why was this here? joints don't change on tool attachment...
 
             // this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data --> no need to do this, joints remain the same anyway?
             
@@ -942,8 +964,8 @@ namespace Machina
             this.position = newPos;
             this.prevRotation = this.rotation;
             this.rotation = newRot;
-            this.prevJoints = this.joints;
-            this.joints = null;
+            this.prevJoints = this.axes;
+            this.axes = null;
 
             // Detach the tool
             this.tool = null;
@@ -1140,7 +1162,7 @@ namespace Machina
             this.extrudedLength += this.extrusionRate * this.prevPosition.DistanceTo(this.position);
         }
 
-        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{joints} a{acceleration} v{speed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
+        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{axes} a{acceleration} v{speed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
 
 
     }

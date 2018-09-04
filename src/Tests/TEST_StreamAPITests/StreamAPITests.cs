@@ -36,6 +36,8 @@ namespace TEST_StreamAPITests
             //arm.ActionReleased += LogEvent;
             //arm.ActionIssued += LogEvent;
 
+            arm.MotionUpdate += LogEvent;
+
             arm.ActionExecuted += (sender, e) =>
             {
                 if (e.PendingExecutionTotal == 0) Loop(sender as Robot, 100);

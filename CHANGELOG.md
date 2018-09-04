@@ -23,6 +23,7 @@
 ## BUILD 1417
 - Added monitoring module for real-time streaming of full poses.
 - Add TCP listener for monitor on `TCPCommunicationManagerABB`
+- `MotionUpdate` event is raised if realtime data is available on ABB robot.
 
 # v0.8.0
 ## BUILD 1416

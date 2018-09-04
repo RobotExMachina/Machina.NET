@@ -534,7 +534,7 @@ namespace Machina
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public Joints GetCurrentAxes() => _stateCursor.joints;
+        public Joints GetCurrentAxes() => _stateCursor.axes;
 
         /// <summary>
         /// Returns a double?[] array representing the values for the external axes.
@@ -1062,6 +1062,15 @@ namespace Machina
         }
 
 
+
+        internal bool InitializeMotionCursor()
+        {
+            _motionCursor = new RobotCursor(this, "MotionCursor", false, null);
+            //_motionCursor.Initialize();  // No need for this, since this is just a "zombie" cursor, a holder of static properties updated in real-time with no actions applied to it. Any init info is negligible.
+            return true;
+        }
+
+
         /// <summary>
         /// Saves a string List to a file.
         /// </summary>
@@ -1344,7 +1353,9 @@ namespace Machina
         /// </summary>
         internal void RaiseMotionUpdateEvent()
         {
-            throw new NotImplementedException();
+            MotionUpdateArgs args = new MotionUpdateArgs(this.MotionCursor.position, this.MotionCursor.rotation, this.MotionCursor.axes, this.MotionCursor.externalAxes);
+
+            this.parentRobot.OnMotionUpdate(args);
         }
 
 

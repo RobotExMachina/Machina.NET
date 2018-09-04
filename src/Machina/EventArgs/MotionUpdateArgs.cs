@@ -43,7 +43,7 @@ namespace Machina
             this.Position = pos;
             this.Rotation = ori;
             this.Axes = axes;
-            this.ExternalAxes = ExternalAxes;
+            this.ExternalAxes = extax;
         }
 
         public override string ToString() => ToJSONString();

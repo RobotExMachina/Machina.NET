@@ -530,12 +530,12 @@ namespace Machina
         internal string GetAxisTargetValue(RobotCursor cursor)
         {
             return string.Format("{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
-                Math.Round(cursor.joints.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.joints.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.joints.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.joints.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.joints.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.joints.J6, Geometry.STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(cursor.axes.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.J6, Geometry.STRING_ROUND_DECIMALS_DEGS));
         }
 
         /// <summary>
