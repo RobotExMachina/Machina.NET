@@ -19,6 +19,11 @@
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
 
 ---
+# v0.8.1
+## BUILD 1417
+- Added monitoring module for real-time streaming of full poses.
+- Add TCP listener for monitor on `TCPCommunicationManagerABB`
+
 # v0.8.0
 ## BUILD 1416
 - Rename main `Control` `RobotCursor`s to match the issue/release/execute pattern.

@@ -41,7 +41,6 @@ MODULE Machina_Driver
     ! SOFTWARE.
 
 
-
     !   __  __ __        __    ___  __      __
     !  |  \|_ /  |   /\ |__) /\ | |/  \|\ |(_
     !  |__/|__\__|__/--\| \ /--\| |\__/| \|__)
@@ -103,7 +102,7 @@ MODULE Machina_Driver
 
     ! Characters used for buffer parsing
     PERS string STR_MESSAGE_END_CHAR := ";";        ! Marks the end of a message
-    PERS string STR_MESSAGE_CONTINUE_CHAR := ">";   ! Marks the end of an unfinished message, to be continued on next message
+    PERS string STR_MESSAGE_CONTINUE_CHAR := ">";   ! Marks the end of an unfinished message, to be continued on next message. Useful when the message is too long and needs to be split in chunks
     PERS string STR_MESSAGE_ID_CHAR := "@";         ! Flags a message as an acknowledgment message corresponding to a source id
     PERS string STR_MESSAGE_RESPONSE_CHAR := "$";   ! Flags a message as a response to an information request (acknowledgments do not include it)
 

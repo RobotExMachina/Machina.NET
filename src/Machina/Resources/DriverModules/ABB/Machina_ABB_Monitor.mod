@@ -66,16 +66,17 @@ MODULE Machina_Monitor
     ! TCP stuff
     PERS string SERVER_IP;
 
-    PERS num RES_VERSION;                     ! ">20 1 2 1;" Sends version numbers
-    PERS num RES_POSE;                        ! ">21 400 300 500 0 0 1 0;" Sends pose
-    PERS num RES_JOINTS;                      ! ">22 0 0 0 0 90 0;" Sends joints
-    PERS num RES_EXTAX;                       ! ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
-    PERS num RES_FULL_POSE;                   ! ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
+    ! API (see Driver module for updated info)
+    PERS num RES_VERSION;
+    PERS num RES_POSE;
+    PERS num RES_JOINTS;
+    PERS num RES_EXTAX;
+    PERS num RES_FULL_POSE;
 
-    PERS string STR_MESSAGE_END_CHAR;         ! Marks the end of a message
-    PERS string STR_MESSAGE_CONTINUE_CHAR;    ! Marks the end of an unfinished message, to be continued on next message
-    PERS string STR_MESSAGE_ID_CHAR;          ! Flags a message as an acknowledgment message corresponding to a source id
-    PERS string STR_MESSAGE_RESPONSE_CHAR;    ! Flags a message as a response to an information request (acknowledgments do not include it)
+    PERS string STR_MESSAGE_END_CHAR;
+    PERS string STR_MESSAGE_CONTINUE_CHAR;
+    PERS string STR_MESSAGE_ID_CHAR;
+    PERS string STR_MESSAGE_RESPONSE_CHAR;
 
     ! Rounding parameters for string representation of values (consistent with current Machina standards...)
     PERS num STR_RND_M;

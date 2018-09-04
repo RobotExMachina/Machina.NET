@@ -37,12 +37,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1416;
+        public static readonly int Build = 1417;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.8.0." + Build;
+        public static readonly string Version = "0.8.1." + Build;
 
         /// <summary>
         /// A nickname for this Robot.

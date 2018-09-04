@@ -32,9 +32,9 @@ namespace TEST_StreamAPITests
 
             arm.DebugMode(true);
 
-            arm.ActionExecuted += LogEvent;
-            arm.ActionReleased += LogEvent;
-            arm.ActionIssued += LogEvent;
+            //arm.ActionExecuted += LogEvent;
+            //arm.ActionReleased += LogEvent;
+            //arm.ActionIssued += LogEvent;
 
             arm.ActionExecuted += (sender, e) =>
             {
@@ -43,10 +43,10 @@ namespace TEST_StreamAPITests
 
 
             arm.ControlMode("stream");
-            arm.ConnectionManager("machina");
-            arm.Connect();
-            //arm.ConnectionManager("user");
-            //arm.Connect("127.0.0.1", 7000);
+            //arm.ConnectionManager("machina");
+            //arm.Connect();
+            arm.ConnectionManager("user");
+            arm.Connect("127.0.0.1", 7000);
 
             //arm.SetUser("BUILD", "password");
             //arm.Connect("192.168.0.101", 6969);
