@@ -66,6 +66,8 @@ namespace Machina
         /// </summary>
         internal RobotLogger logger;
 
+        public RobotLogger Logger => logger;
+
         
 
 
@@ -102,7 +104,7 @@ namespace Machina
         {
             if (!Util.IsValidVariableName(name))
             {
-                Logger.Error($"\"{name}\" is not a valid robot name, please start with a letter.");
+                Machina.Logger.Error($"\"{name}\" is not a valid robot name, please start with a letter.");
                 return null;
             }
 
@@ -321,15 +323,15 @@ namespace Machina
             return c.Export(filepath, inlineTargets, humanComments);
         }
 
-        /// <summary>
-        /// In 'execute' mode, flushes all pending Actions, creates a program, 
-        /// uploads it to the controller and runs it.
-        /// </summary>
-        /// <returns></returns>
-        public void Execute()
-        {
-            c.Execute();
-        }
+        ///// <summary>
+        ///// In 'execute' mode, flushes all pending Actions, creates a program, 
+        ///// uploads it to the controller and runs it.
+        ///// </summary>
+        ///// <returns></returns>
+        //public void Execute()
+        //{
+        //    c.Execute();
+        //}
         
 
 

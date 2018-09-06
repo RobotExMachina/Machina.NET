@@ -68,7 +68,7 @@ namespace Machina
 
         public override string ToJSONString()
         {
-            return string.Format("{{\"event\":\"action-executed\",\"last\":\"{0}\",\"id\":\"{9}\",\"pendDev\":{1},\"pendTot\":{2},\"pos\":{3},\"ori\":{4},\"quat\":{5},\"axes\":{6},\"extax\":{7},\"conf\":{8}}}",
+            return string.Format("{{\"event\":\"action-executed\",\"last\":\"{0}\",\"id\":{9},\"pendDev\":{1},\"pendTot\":{2},\"pos\":{3},\"ori\":{4},\"quat\":{5},\"axes\":{6},\"extax\":{7},\"conf\":{8}}}",
                 Util.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
                 this.PendingExecutionOnDevice,
                 this.PendingExecutionTotal,

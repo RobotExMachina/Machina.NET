@@ -58,27 +58,27 @@ namespace Machina
         private static LogLevel _logLevel = LogLevel.INFO;
 
 
-        internal static void Error(string msg)
+        public static void Error(string msg)
         {
             OnCustomLogging(new LoggerArgs(null, LogLevel.ERROR, msg));
         }
 
-        internal static void Warning(string msg)
+        public static void Warning(string msg)
         {
             OnCustomLogging(new LoggerArgs(null, LogLevel.WARNING, msg));
         }
 
-        internal static void Info(string msg)
+        public static void Info(string msg)
         {
             OnCustomLogging(new LoggerArgs(null, LogLevel.INFO, msg));
         }
 
-        internal static void Verbose(string msg)
+        public static void Verbose(string msg)
         {
             OnCustomLogging(new LoggerArgs(null, LogLevel.VERBOSE, msg));
         }
 
-        internal static void Debug(string msg)
+        public static void Debug(string msg)
         {
             OnCustomLogging(new LoggerArgs(null, LogLevel.DEBUG, msg));
         }
@@ -107,7 +107,7 @@ namespace Machina
     /// <summary>
     /// A "Console" class that can be attached to objects to track their log messages.
     /// </summary>
-    internal class RobotLogger
+    public class RobotLogger
     {
         internal object _sender;
 
@@ -117,54 +117,54 @@ namespace Machina
         }
 
         // STRINGS
-        internal void Error(string msg)
+        public void Error(string msg)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, msg));
         }
 
-        internal void Warning(string msg)
+        public void Warning(string msg)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, msg));
         }
 
-        internal void Info(string msg)
+        public void Info(string msg)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, msg));
         }
 
-        internal void Verbose(string msg)
+        public void Verbose(string msg)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, msg));
         }
 
-        internal void Debug(string msg)
+        public void Debug(string msg)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, msg));
         }
 
 
         // OBJECTS
-        internal void Error(object obj)
+        public void Error(object obj)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, obj.ToString()));
         }
 
-        internal void Warning(object obj)
+        public void Warning(object obj)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, obj.ToString()));
         }
 
-        internal void Info(object obj)
+        public void Info(object obj)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, obj.ToString()));
         }
 
-        internal void Verbose(object obj)
+        public void Verbose(object obj)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, obj.ToString()));
         }
 
-        internal void Debug(object obj)
+        public void Debug(object obj)
         {
             Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, obj.ToString()));
         }

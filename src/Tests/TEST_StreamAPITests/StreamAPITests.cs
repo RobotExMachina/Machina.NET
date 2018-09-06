@@ -36,6 +36,9 @@ namespace TEST_StreamAPITests
             //arm.ActionReleased += LogEvent;
             //arm.ActionIssued += LogEvent;
 
+            Machina.Logger.SetLogLevel(3);
+
+            
             arm.MotionUpdate += LogEvent;
 
             arm.ActionExecuted += (sender, e) =>

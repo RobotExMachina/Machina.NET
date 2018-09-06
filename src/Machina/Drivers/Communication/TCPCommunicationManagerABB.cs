@@ -492,10 +492,12 @@ namespace Machina.Drivers.Communication
                     this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
                     break;
 
+                // ">23 1000 9E9 9E9 9E9 9E9 9E9;"
                 case ABBCommunicationProtocol.RES_EXTAX:
                     this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
                     break;
 
+                // ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
                 case ABBCommunicationProtocol.RES_FULL_POSE:
                     Vector pos = new Vector(data[0], data[1], data[2]);
                     Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
