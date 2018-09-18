@@ -31,7 +31,7 @@ namespace Machina.Drivers.Communication
 
         // ABB stuff and flags
         private Controller controller;
-        private ABBTask tRob1Task, tMonitorTask;
+        private ABBTask tMainTask, tMonitorTask;
         private RobotWare robotWare;
         private RobotWareOptionCollection robotWareOptions;
         private int _deviceId;
@@ -365,14 +365,33 @@ namespace Machina.Drivers.Communication
                 return false;
             }
 
-            tRob1Task = controller.Rapid.GetTask("T_ROB1");
-            if (tRob1Task == null)
+            tMainTask = controller.Rapid.GetTask("T_ROB1");
+            if (tMainTask == null)
             {
                 logger.Error("Could not retrieve task T_ROB1 from the controller");
+
+                // Quick workaround for Yumis to get the left hand
+                if (!LoadFirstTask())
+                {
+                    return false;
+                }
+            }
+
+            logger.Debug("Retrieved task " + tMainTask.Name);
+            return true;
+        }
+
+        private bool LoadFirstTask()
+        {
+            var tasks = controller.Rapid.GetTasks();
+            if (tasks.Length == 0)
+            {
+                logger.Error("No tasks available on the controller");
                 return false;
             }
 
-            logger.Debug("Retrieved task " + tRob1Task.Name);
+            tMainTask = tasks[0];
+
             return true;
         }
 
@@ -406,10 +425,10 @@ namespace Machina.Drivers.Communication
         /// <returns></returns>
         private bool ReleaseMainTask()
         {
-            if (tRob1Task != null)
+            if (tMainTask != null)
             {
-                tRob1Task.Dispose();
-                tRob1Task = null;
+                tMainTask.Dispose();
+                tMainTask = null;
                 return true;
             }
             return false;
@@ -534,7 +553,7 @@ namespace Machina.Drivers.Communication
                 return false;
             }
 
-            if (tRob1Task == null)
+            if (tMainTask == null)
             {
                 logger.Debug("Cannot reset pointer: mainTask not present");
                 return false;
@@ -544,7 +563,7 @@ namespace Machina.Drivers.Communication
             {
                 using (Mastership.Request(controller.Rapid))
                 {
-                    tRob1Task.ResetProgramPointer();
+                    tMainTask.ResetProgramPointer();
                     if (tMonitorTask != null)
                     {
                         tMonitorTask.ResetProgramPointer();
@@ -832,7 +851,7 @@ namespace Machina.Drivers.Communication
         /// </summary>
         internal bool UploadDriverModule()
         {
-            return LoadModuleToTask(tRob1Task, _driverModule, "Machina_ABB_Driver.mod");
+            return LoadModuleToTask(tMainTask, _driverModule, "Machina_ABB_Driver.mod");
         }
 
         internal bool UploadMonitorModule()
@@ -1204,25 +1223,25 @@ namespace Machina.Drivers.Communication
 
                 logger.Debug("");
                 logger.Debug("DEBUG TASK DUMP:");
-                logger.Debug("    Cycle: " + tRob1Task.Cycle);
-                logger.Debug("    Enabled: " + tRob1Task.Enabled);
-                logger.Debug("    ExecutionStatus: " + tRob1Task.ExecutionStatus);
+                logger.Debug("    Cycle: " + tMainTask.Cycle);
+                logger.Debug("    Enabled: " + tMainTask.Enabled);
+                logger.Debug("    ExecutionStatus: " + tMainTask.ExecutionStatus);
                 try
                 {
-                    logger.Debug("    ExecutionType: " + tRob1Task.ExecutionType);
+                    logger.Debug("    ExecutionType: " + tMainTask.ExecutionType);
                 }
                 catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
                 {
                     logger.Debug("    ExecutionType: UNSUPPORTED BY CONTROLLER");
                     logger.Debug(e);
                 }
-                logger.Debug("    Motion: " + tRob1Task.Motion);
-                logger.Debug("    MotionPointer: " + tRob1Task.MotionPointer.Module);
-                logger.Debug("    Name: " + tRob1Task.Name);
-                logger.Debug("    ProgramPointer: " + tRob1Task.ProgramPointer.Module);
-                logger.Debug("    RemainingCycles: " + tRob1Task.RemainingCycles);
-                logger.Debug("    TaskType: " + tRob1Task.TaskType);
-                logger.Debug("    Type: " + tRob1Task.Type);
+                logger.Debug("    Motion: " + tMainTask.Motion);
+                logger.Debug("    MotionPointer: " + tMainTask.MotionPointer.Module);
+                logger.Debug("    Name: " + tMainTask.Name);
+                logger.Debug("    ProgramPointer: " + tMainTask.ProgramPointer.Module);
+                logger.Debug("    RemainingCycles: " + tMainTask.RemainingCycles);
+                logger.Debug("    TaskType: " + tMainTask.TaskType);
+                logger.Debug("    Type: " + tMainTask.Type);
                 logger.Debug("");
 
                 logger.Debug("HAS MULTITASKING: " + this._hasMultiTasking);

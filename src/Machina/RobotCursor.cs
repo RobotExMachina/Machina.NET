@@ -886,9 +886,12 @@ namespace Machina
             if (availableTools.ContainsKey(action.tool.name))
             {
                 logger.Info($"Robot already had a tool defined as \"{action.tool.name}\"; this will be overwritten.");
+                availableTools.Remove(action.tool.name);
             }
-
-            availableTools.Add(action.tool.name, action.tool);
+            else
+            {
+                availableTools.Add(action.tool.name, action.tool);
+            }
 
             return true;
         }

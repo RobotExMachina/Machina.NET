@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using static System.FormattableString;
+
 
 namespace Machina.Drivers.Communication.Protocols
 {
@@ -59,7 +63,8 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Rotation:
                 case ActionType.Transformation:
                     //// MoveL/J X Y Z QW QX QY QZ
-                    msgs.Add(string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9}{10}",
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture, 
+                        "{0}{1} {2} {3} {4} {5} {6} {7} {8} {9}{10}",
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ,
@@ -75,7 +80,8 @@ namespace Machina.Drivers.Communication.Protocols
 
                 case ActionType.Axes:
                     // MoveAbsJ J1 J2 J3 J4 J5 J6
-                    msgs.Add(string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8}{9}",
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} {3} {4} {5} {6} {7} {8}{9}",
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         INST_MOVEABSJ,
@@ -90,7 +96,7 @@ namespace Machina.Drivers.Communication.Protocols
 
                 case ActionType.Speed:
                     // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");  // this accepts more velocity params, but those are still not implemented in Machina... 
+                    msgs.Add(Invariant($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}"));  // this accepts more velocity params, but those are still not implemented in Machina... 
                     break;
 
                 case ActionType.Acceleration:

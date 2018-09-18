@@ -50,7 +50,7 @@ namespace Machina.Drivers.Communication
         private byte[] _receiveMsgBytes = new byte[1024];
         private int _receiveByteCount;
         private string _response;
-        private string[] _responseChunks;
+        //private string[] _responseChunks;
 
         private int _sentMessages = 0;
         private int _receivedMessages = 0;
@@ -73,6 +73,7 @@ namespace Machina.Drivers.Communication
         private bool _isMonitored = false;
         public bool IsMonitored => _isMonitored;
 
+        private readonly object _dataReceivedLock = new object();
 
 
 
@@ -441,7 +442,7 @@ namespace Machina.Drivers.Communication
         private void AcknowledgmentReceived(string res)
         {
             // @TODO: Add some sanity here for incorrectly formatted messages
-            _responseChunks = res.Split(' ');
+            string[] _responseChunks = res.Split(' ');
             string idStr = _responseChunks[0].Substring(1);
             int id = Convert.ToInt32(idStr);
             this._executionCursor.ApplyActionsUntilId(id);
@@ -454,60 +455,64 @@ namespace Machina.Drivers.Communication
 
         private void DataReceived(string res)
         {
-            _responseChunks = res.Split(' ');
-            int resType = Convert.ToInt32(_responseChunks[0].Substring(1));
-
-            double[] data = new double[_responseChunks.Length - 1];
-            for (int i = 0; i < data.Length; i++)
+            lock(_dataReceivedLock)
             {
-                // @TODO: add sanity like Double.TryParse(...)
-                data[i] = Double.Parse(_responseChunks[i + 1]);
-            }
+                string[] _responseChunks = res.Split(' ');
+                int resType = Convert.ToInt32(_responseChunks[0].Substring(1));
 
-            switch (resType)
-            {
-                // ">20 1 2 1;" Sends version numbers
-                case ABBCommunicationProtocol.RES_VERSION:
-                    this._deviceDriverVersion = Convert.ToInt32(data[0]) + "." + Convert.ToInt32(data[1]) + "." + Convert.ToInt32(data[2]);
-                    int comp = Util.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
-                    if (comp > -1)
-                    {
-                        logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {_deviceDriverVersion}.");
-                    }
-                    else
-                    {
-                        logger.Warning($"Found driver version {_deviceDriverVersion}, expected at least {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}. Please update driver module or unexpected behavior may arise.");
-                    }
-                    break;
+                double[] data = new double[_responseChunks.Length - 1];
+                for (int i = 0; i < data.Length; i++)
+                {
+                    // @TODO: add sanity like Double.TryParse(...)
+                    data[i] = Double.Parse(_responseChunks[i + 1]);
+                }
 
-                // ">21 400 300 500 0 0 1 0;"
-                case ABBCommunicationProtocol.RES_POSE:
-                    this.initPos = new Vector(data[0], data[1], data[2]);
-                    this.initRot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
-                    break;
+                switch (resType)
+                {
+                    // ">20 1 2 1;" Sends version numbers
+                    case ABBCommunicationProtocol.RES_VERSION:
+                        this._deviceDriverVersion = Convert.ToInt32(data[0]) + "." + Convert.ToInt32(data[1]) + "." + Convert.ToInt32(data[2]);
+                        int comp = Util.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
+                        if (comp > -1)
+                        {
+                            logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {_deviceDriverVersion}.");
+                        }
+                        else
+                        {
+                            logger.Warning($"Found driver version {_deviceDriverVersion}, expected at least {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}. Please update driver module or unexpected behavior may arise.");
+                        }
+                        break;
+
+                    // ">21 400 300 500 0 0 1 0;"
+                    case ABBCommunicationProtocol.RES_POSE:
+                        this.initPos = new Vector(data[0], data[1], data[2]);
+                        this.initRot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
+                        break;
 
 
-                // ">22 0 0 0 0 90 0;"
-                case ABBCommunicationProtocol.RES_JOINTS:
-                    this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
-                    break;
+                    // ">22 0 0 0 0 90 0;"
+                    case ABBCommunicationProtocol.RES_JOINTS:
+                        this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
+                        break;
 
-                // ">23 1000 9E9 9E9 9E9 9E9 9E9;"
-                case ABBCommunicationProtocol.RES_EXTAX:
-                    this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
-                    break;
+                    // ">23 1000 9E9 9E9 9E9 9E9 9E9;"
+                    case ABBCommunicationProtocol.RES_EXTAX:
+                        this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
+                        break;
 
-                // ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
-                case ABBCommunicationProtocol.RES_FULL_POSE:
-                    Vector pos = new Vector(data[0], data[1], data[2]);
-                    Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
-                    Joints ax = new Joints(data[7], data[8], data[9], data[10], data[11], data[12]);
-                    ExternalAxes extax = new ExternalAxes(data[13], data[14], data[15], data[16], data[17], data[18]);
+                    // ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
+                    case ABBCommunicationProtocol.RES_FULL_POSE:
+                        Vector pos = new Vector(data[0], data[1], data[2]);
+                        Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
+                        Joints ax = new Joints(data[7], data[8], data[9], data[10], data[11], data[12]);
+                        ExternalAxes extax = new ExternalAxes(data[13], data[14], data[15], data[16], data[17], data[18]);
 
-                    this._motionCursor.UpdateFullPose(pos, rot, ax, extax);
-                    this._parentDriver.parentControl.RaiseMotionUpdateEvent();
+                        this._motionCursor.UpdateFullPose(pos, rot, ax, extax);
+                        this._parentDriver.parentControl.RaiseMotionUpdateEvent();
 
-                    break;
+                        break;
+                }
+
             }
 
         }

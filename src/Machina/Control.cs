@@ -318,13 +318,15 @@ namespace Machina
         {
             if (connectionMode == ConnectionType.User)
             {
-                throw new Exception("Cannot search for robots automatically, please use ConnectToDevice(ip, port) instead");
+                logger.Error("Cannot search for robots automatically, please use ConnectToDevice(ip, port) instead");
+                return false;
             }
 
             // Sanity
             if (!_driver.ConnectToDevice(robotId))
             {
-                throw new Exception("Cannot connect to device");
+                logger.Error("Cannot connect to device");
+                return false;
             }
             else
             {
@@ -341,6 +343,8 @@ namespace Machina
                 InitializeRobotCursors();
             }
 
+            logger.Info("Connected to " + parentRobot.Brand + " robot \"" + parentRobot.Name + "\" on " + _driver.IP + ":" + _driver.Port);
+
             return true;
         }
 
@@ -348,13 +352,15 @@ namespace Machina
         {
             if (connectionMode == ConnectionType.Machina)
             {
-                throw new Exception("Try ConnectToDevice() instead");
+                logger.Error("Try ConnectToDevice() instead");
+                return false;
             }
 
             // Sanity
             if (!_driver.ConnectToDevice(ip, port))
             {
-                throw new Exception("Cannot connect to device");
+                logger.Error("Cannot connect to device");
+                return false;
             }
             else
             {

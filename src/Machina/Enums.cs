@@ -168,4 +168,13 @@ namespace Machina
         VERBOSE = 4,
         DEBUG = 5
     }
+
+    public enum ExecutionState
+    {
+        Undefined, 
+        Issued,
+        Released,
+        Executing,
+        Executed
+    }
 }

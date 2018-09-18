@@ -86,7 +86,8 @@ namespace Machina.Drivers
         {
             if (this.parentControl.connectionMode != ConnectionType.Machina)
             {
-                throw new Exception("Can only connect to ConnectToDevice(int deviceId) in ConnectionType.Machina mode");
+                logger.Error("Can only connect to ConnectToDevice(int deviceId) in ConnectionType.Machina mode");
+                return false;
             }
 
             // 1. use RSmanager to connecto to devide
@@ -96,7 +97,8 @@ namespace Machina.Drivers
 
             if (!_rsBridge.Connect(deviceId))
             {
-                throw new Exception("Could not connect automatically to device");
+                logger.Error("Could not connect automatically to device");
+                return false;
             }
 
             
@@ -106,13 +108,15 @@ namespace Machina.Drivers
             {
                 if (!_rsBridge.SetupStreamingMode())
                 {
-                     throw new Exception("Could not initialize Streaming Mode in the controller");
+                     logger.Error("Could not initialize Streaming Mode in the controller");
+                    return false;
                 }
             }
             else
             {
                 // if on Execute mode on _rsBridge, do nothing (programs will be uploaded in batch)
-                throw new NotImplementedException();
+                logger.Error("Control mode " + this.parentControl.ControlMode + " not supported");
+                return false;
             }
 
             this.IP = _rsBridge.IP;
@@ -120,7 +124,8 @@ namespace Machina.Drivers
 
             if (!this.ConnectToDevice(this.IP, this.Port))
             {
-                throw new Exception("Could not establish TCP connection to the controller");
+                logger.Error("Could not establish TCP connection to the controller");
+                return false;
             }
 
             DebugDump();
