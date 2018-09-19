@@ -1,8 +1,9 @@
 # Machina
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1421943.svg)](https://doi.org/10.5281/zenodo.1421943)
 
-![](https://github.com/garciadelcastillo/Machina/blob/master/assets/banner_888x331.png)
+![](assets/banner_888x331.png)
 
-Machina is a .NET library for action-based real-time control of mechanical actuators. 
+Machina is a .NET library for action-based real-time control of mechanical actuators.
 
 Or in more _human terms_, it allows you to talk to a robot and tell it what to do.
 
