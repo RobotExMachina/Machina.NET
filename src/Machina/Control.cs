@@ -180,7 +180,7 @@ namespace Machina
         {
             if (mode == ControlType.Execute)
             {
-                logger.Warning($"Execute mode temporarily deactivated. Try 'stream' instead, it's cooler ;) ControlMode reverted to {_controlMode}");
+                logger.Warning($"Execute mode temporarily deactivated. Try 'online' instead, it's cooler ;) ControlMode reverted to {_controlMode}");
                 return false;
             }
 

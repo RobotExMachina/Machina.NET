@@ -28,6 +28,12 @@ namespace Machina
         /// at run time as they get priority. Provides the closest approximation to real-time
         /// interaction, useful on situations where low latency is required.
         /// </summary>
+        Online,
+
+        /// <summary>
+        /// Alias for online, to deprecate
+        /// </summary>
+        [System.Obsolete("To be deprected, please use \"online\"")]
         Stream
     }
 

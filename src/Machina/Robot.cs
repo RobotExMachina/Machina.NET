@@ -37,12 +37,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1418;
+        public static readonly int Build = 1419;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.8.2." + Build;
+        public static readonly string Version = "0.8.3." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
@@ -174,7 +174,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Sets the control type the robot will operate under, like "offline", "execute" or "stream".
+        /// Sets the control type the robot will operate under, like "offline" or "online".
         /// </summary>
         /// <param name="controlType"></param>
         /// <returns></returns>
@@ -184,7 +184,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Sets the control type the robot will operate under, like "offline", "execute" or "stream".
+        /// Sets the control type the robot will operate under, like "offline" or "online".
         /// </summary>
         /// <param name="controlType"></param>
         /// <returns></returns>
