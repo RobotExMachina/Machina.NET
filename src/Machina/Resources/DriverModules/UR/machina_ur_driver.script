@@ -145,12 +145,12 @@ def machina_ur_driver():
       elif action_code == INST_ALL_SPEED:
         params1 = socket_read_binary_integer(1)
         state_speed = params1[1] / FACTOR_M
-        state_joint_speed = 1000 * TO_RAD * state_speed;
+        state_joint_speed = 1000 * TO_RAD * state_speed
 
       elif action_code == INST_ALL_ACC:
         params1 = socket_read_binary_integer(1)
         state_acceleration = params1[1] / FACTOR_M
-        state_joint_acceleration = 1000 * TO_RAD * state_acceleration;
+        state_joint_acceleration = 1000 * TO_RAD * state_acceleration
 
 
       end

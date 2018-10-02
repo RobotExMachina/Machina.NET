@@ -412,13 +412,13 @@ namespace Machina.Drivers.Communication
 
         private bool LoadEmptyScript()
         {
-            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.Modules.empty.script");
+            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.empty.script");
             return true;
         }
 
         private bool LoadDriverScript()
         {
-            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.Modules.machina_ur_driver.script");
+            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.machina_ur_driver.script");
 
             // @TODO: remove comments, trailing spaces and empty lines from script
             _driverScript = _driverScript.Replace("{{HOSTNAME}}", _serverIP);
@@ -430,7 +430,7 @@ namespace Machina.Drivers.Communication
 
         private bool UploadScriptToDevice(string script, bool consoleDump = false)
         {
-            logger.Verbose("Uploading Machina UR Driver to device...");
+            logger.Verbose("Uploading module to device...");
             if (consoleDump) logger.Debug(script);
 
             _sendMsgBytes = Encoding.ASCII.GetBytes(script);

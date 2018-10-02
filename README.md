@@ -1,4 +1,4 @@
-# Machina
+# Machina.NET
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1421943.svg)](https://doi.org/10.5281/zenodo.1421943)
 
 ![](assets/banner_888x331.png)
