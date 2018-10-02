@@ -396,7 +396,7 @@ namespace Machina
         /// <param name="password"></param>
         /// <returns></returns>
         public bool SetUserCredentials(string name, string password) =>
-            Driver == null ? false : Driver.SetUser(name, password);
+            _driver == null ? false : _driver.SetUser(name, password);
 
         /// <summary>
         /// If connected to a device, return the IP address
@@ -522,6 +522,22 @@ namespace Machina
         //public Rotation GetVirtualRotation() => IssueCursor.rotation;
         //public Joints GetVirtualAxes() => IssueCursor.joints;
         //public Tool GetVirtualTool() => IssueCursor.tool;
+
+
+        
+        internal Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters)
+        {
+            if (_controlMode == ControlType.Offline)
+            {
+                logger.Warning("Could not retrieve driver modules in Offline mode, must define a ConnectionMode first.");
+                return null;
+            }
+
+            return _driver.GetDeviceDriverModules(parameters);
+        }
+
+
+
 
 
         /// <summary>

@@ -16,6 +16,7 @@ namespace Machina.Controllers
             switch (control.ControlMode)
             {
                 case ControlType.Stream:
+                case ControlType.Online:
                     return new StreamControlManager(control);
 
                 case ControlType.Offline:

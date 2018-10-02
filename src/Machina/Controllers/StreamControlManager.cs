@@ -13,7 +13,6 @@ namespace Machina.Controllers
     /// </summary>
     internal class StreamControlManager : ControlManager
     {
-
         public StreamControlManager(Control parent) : base(parent) { }
 
         public override bool Terminate()
@@ -24,17 +23,18 @@ namespace Machina.Controllers
         internal override void SetCommunicationObject()
         {
             // @TODO: shim assignment of correct robot model/brand
-            if (_control.parentRobot.Brand == RobotType.ABB)
+            switch (_control.parentRobot.Brand)
             {
-                _control.Driver = new DriverABB(_control);
-            }
-            else if (_control.parentRobot.Brand == RobotType.UR)
-            {
-                _control.Driver = new DriverUR(_control);
-            }
-            else
-            {
-                throw new NotImplementedException();
+                case RobotType.ABB:
+                    _control.Driver = new DriverABB(_control);
+                    break;
+
+                case RobotType.UR:
+                    _control.Driver = new DriverUR(_control);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
         }
 

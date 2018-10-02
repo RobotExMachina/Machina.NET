@@ -36,6 +36,12 @@ namespace Machina.Drivers
         private RobotLogger logger;
 
 
+
+
+
+
+
+
         //  ██████╗ ██╗   ██╗██████╗ ██╗     ██╗ ██████╗
         //  ██╔══██╗██║   ██║██╔══██╗██║     ██║██╔════╝
         //  ██████╔╝██║   ██║██████╔╝██║     ██║██║     
@@ -54,6 +60,56 @@ namespace Machina.Drivers
             }
 
             logger = this.parentControl.logger;
+        }
+
+        /// <summary>
+        /// Returns the driver modules necessary to run on this device for Machina to talk to it.
+        /// Takes a dictionary of values to be replaced on the modules, such as {"IP","192.168.125.1"} or {"PORT","7000"}.
+        /// Returns a dict with filename-file pairs. 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public override Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters)
+        {
+            if (!parameters.ContainsKey("HOSTNAME"))
+            {
+                Logger.Error("Cannot retrieve ABB driver modules, most provide a HOSTNAME value.");
+                return null;
+            }
+
+            if (!parameters.ContainsKey("PORT"))
+            {
+                Logger.Error("Cannot retrieve ABB driver modules, most provide a PORT value.");
+                return null;
+            }
+
+            int port = 0;
+            if (!Int32.TryParse(parameters["PORT"], out port))
+            {
+                Logger.Error("Invalid PORT value");
+                return null;
+            }
+
+            string driverMod = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.mod");
+            driverMod = driverMod.Replace("{{HOSTNAME}}", parameters["HOSTNAME"]);
+            driverMod = driverMod.Replace("{{PORT}}", parameters["PORT"]);
+
+            string driverPgf = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.pgf");
+
+            string monitorMod = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.mod");
+            monitorMod = monitorMod.Replace("{{PORT}}", (port + 1).ToString());  // @TODO: must make this more programmatic
+
+            string monitorPgf = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.pgf");
+
+            var files = new Dictionary<string, string>()
+            {
+                {"machina_abb_driver.mod", driverMod},
+                {"machina_abb_driver.pgf", driverPgf},
+                {"machina_abb_monitor.mod", monitorMod},
+                {"machina_abb_monitor.pgf", monitorPgf},
+            };
+
+            return files;
         }
 
         /// <summary>

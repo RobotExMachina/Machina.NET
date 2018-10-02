@@ -82,6 +82,11 @@ namespace Machina.Drivers
         {
             throw new NotImplementedException();
         }
+
+        public override Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

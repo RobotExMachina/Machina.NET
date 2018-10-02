@@ -18,7 +18,6 @@ namespace Machina.Drivers.Communication
     internal class TCPCommunicationManagerABB
     {
         
-
         private RobotCursor _releaseCursor;
         private RobotCursor _executionCursor;
         private RobotCursor _motionCursor;
@@ -74,8 +73,6 @@ namespace Machina.Drivers.Communication
         public bool IsMonitored => _isMonitored;
 
         private readonly object _dataReceivedLock = new object();
-
-
 
         internal TCPCommunicationManagerABB(Driver driver, RobotCursor releaseCursor, RobotCursor executionCursor, string ip, int port)
         {

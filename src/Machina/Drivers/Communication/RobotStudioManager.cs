@@ -822,7 +822,7 @@ namespace Machina.Drivers.Communication
         private bool LoadDriverScript()
         {
             // Read the resource as a string
-            _driverModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.Machina_ABB_Driver.mod");
+            _driverModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.mod");
 
             // @TODO: remove comments, trailing spaces and empty lines from script
             _driverModule = _driverModule.Replace("{{HOSTNAME}}", IP);
@@ -836,7 +836,7 @@ namespace Machina.Drivers.Communication
         private bool LoadMonitorScript()
         {
             // Read the resource as a string
-            _monitorModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.Machina_ABB_Monitor.mod");
+            _monitorModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.mod");
 
             _monitorModule = _monitorModule.Replace("{{PORT}}", (Port + 1).ToString());     // @TODO: make ports more programmatic
 

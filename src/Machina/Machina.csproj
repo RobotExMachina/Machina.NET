@@ -166,8 +166,12 @@
     <EmbeddedResource Include="Resources\DriverModules\UR\empty.script" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\DriverModules\ABB\Machina_ABB_Driver.mod" />
-    <EmbeddedResource Include="Resources\DriverModules\ABB\Machina_ABB_Monitor.mod" />
+    <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_driver.mod" />
+    <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_monitor.mod" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_driver.pgf" />
+    <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_monitor.pgf" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

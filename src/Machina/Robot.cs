@@ -1190,6 +1190,13 @@ namespace Machina
         //               
 
         /// <summary>
+        /// Returns the module files necessary to load on the device for a successful connection.
+        /// </summary>
+        /// <param name="parameters">Values necessary to be replaced on the modules, such as {"HOSTNAME","192.168.125.1"} or {"PORT","7000"}.</param>
+        /// <returns>A dict with filename-filecontent pairs.</returns>
+        public Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters) => c.GetDeviceDriverModules(parameters);
+
+        /// <summary>
         /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
         /// </summary>
         /// <returns></returns>

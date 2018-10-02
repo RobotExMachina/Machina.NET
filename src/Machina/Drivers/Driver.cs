@@ -106,12 +106,27 @@ namespace Machina.Drivers
         public abstract void Reset();
 
         /// <summary>
+        /// Returns the driver modules necessary to run on this device for Machina to talk to it.
+        /// Takes a dictionary of values to be replaced on the modules, such as {"IP","192.168.125.1"} or {"PORT","7000"}.
+        /// Returns a dict with filename-file pairs. 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public abstract Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters);
+
+        /// <summary>
         /// Performs all necessary operations for a successful real-time connection to a real/virtual device.
         /// </summary>
         /// <param name="deviceId"></param>
         /// <returns></returns>
         public abstract bool ConnectToDevice(int deviceId);
 
+        /// <summary>
+        /// Performs all necessary operations for a successful real-time connection to a real/virtual device.
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
         public abstract bool ConnectToDevice(string ip, int port);
 
         /// <summary>
@@ -121,6 +136,7 @@ namespace Machina.Drivers
         public abstract bool DisconnectFromDevice();
 
         public abstract bool Dispose();
+
 
 
         /// <summary>

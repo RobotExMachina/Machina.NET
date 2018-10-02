@@ -21,6 +21,13 @@
 - [ ] Change string rounding to make it culture-invariant; was getting troubles with international users getting wrong string rep.
 
 
+---
+# v0.8.3
+## BUILD 1419
+- Fix typos on UR modules
+- Add `.prg` program init for ABB modules
+- Add `GetDeviceDriverModules(params)` as a way of retrieving module files
+
 
 ---
 # v0.8.2

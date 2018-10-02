@@ -163,5 +163,9 @@ namespace Machina.Drivers
             return this._tcpManager.ConfigureBuffer(minActions, maxActions);
         }
 
+        public override Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
