@@ -147,7 +147,7 @@ namespace Machina.Drivers.Communication
                 _clientReceivingThread.IsBackground = true;
                 _clientReceivingThread.Start();
 
-                if (!Machina.Net.GetLocalIPAddressInNetwork(_robotIP, "255.255.255.0", out _serverIP))
+                if (!Machina.Net.Net.GetLocalIPAddressInNetwork(_robotIP, "255.255.255.0", out _serverIP))
                 {
                     throw new Exception("ERROR: Could not figure out local IP");
                 }

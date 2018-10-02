@@ -6,10 +6,55 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Machina
+namespace Machina.Net
 {
     public static class Net
     {
+        /// <summary>
+        /// Returns true if input it is a valid IPv4 address.
+        /// https://stackoverflow.com/a/11412991/1934487
+        /// </summary>
+        /// <param name="ipString"></param>
+        /// <returns></returns>
+        public static bool ValidateIPv4(string ipString)
+        {
+            if (String.IsNullOrWhiteSpace(ipString))
+            {
+                return false;
+            }
+
+            string[] splitValues = ipString.Split('.');
+            if (splitValues.Length != 4)
+            {
+                return false;
+            }
+
+            byte tempForParsing;
+
+            return splitValues.All(r => byte.TryParse(r, out tempForParsing));
+        }
+
+        /// <summary>
+        /// Returns true if input it is a valid IPv4 address + port, like "127.0.0.1:7000"
+        /// </summary>
+        /// <param name="ipString"></param>
+        /// <returns></returns>
+        public static bool ValidateIPv4Port(string ipString)
+        {
+            string[] parts = ipString.Split(':');
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            int port;
+            if (!int.TryParse(parts[1], out port) || port < 0 || port > 65535)
+            {
+                return false;
+            }
+
+            return ValidateIPv4(parts[0]);
+        }
 
         /// <summary>
         /// Given a remote IP address and a subnet mask, tries to find the local IP address of this host in the same subnet.
@@ -80,5 +125,7 @@ namespace Machina
 
             return network1.Equals(network2);
         }
+
+        
     }
 }
