@@ -112,7 +112,7 @@ namespace Machina.Drivers.Communication
             {
                 // Upload an empty script to stop the running program
                 LoadEmptyScript();
-                UploadScriptToDevice(_driverScript, false);
+                UploadScriptToDevice(_driverScript, true);
 
                 ClientSocketStatus = TCPConnectionStatus.Disconnected;
                 _clientSocket.Client.Disconnect(false);
@@ -120,6 +120,14 @@ namespace Machina.Drivers.Communication
                 if (_clientNetworkStream != null) _clientNetworkStream.Dispose();
 
                 _isServerListeningRunning = false;
+
+                // TESTING
+                _robotSocket.Close();
+                _robotSocket.Dispose();
+                _robotSocket = null;
+
+                _serverSocket.Stop();
+                _serverSocket = null;
 
                 return true;
             }
@@ -163,7 +171,8 @@ namespace Machina.Drivers.Communication
 
                 //LoadStreamProgramParts();
                 LoadDriverScript();
-                UploadScriptToDevice(_driverScript, false);
+                //LoadEmptyScript();
+                UploadScriptToDevice(_driverScript, true);
 
                 return _clientSocket.Connected;
             }
@@ -231,6 +240,12 @@ namespace Machina.Drivers.Communication
         /// <param name="obj"></param>
         private void ServerSendingMethod(object obj)
         {
+            if (Thread.CurrentThread.Name == null)
+            {
+                Thread.CurrentThread.Name = "MachinaTCPDriverServerSendingMethod";
+            }
+            logger.Verbose("Started TCP server sender for UR robot communication");
+
             // Expire thread if no socket
             while (_robotSocket != null)
             {
@@ -258,6 +273,8 @@ namespace Machina.Drivers.Communication
 
                 Thread.Sleep(30);
             }
+
+            logger.Verbose("Stopped TCP server sender for UR robot communication");
         }
 
         /// <summary>
@@ -267,6 +284,13 @@ namespace Machina.Drivers.Communication
         /// <param name="obj"></param>
         private void ServerReceivingMethod(object obj)
         {
+            if (Thread.CurrentThread.Name == null)
+            {
+                Thread.CurrentThread.Name = "MachinaTCPDriverServerReceivingMethod";
+            }
+
+            logger.Verbose("Started TCP server listener for UR robot communication");
+
             // Do not kill threads by aborting them... https://stackoverflow.com/questions/1559255/whats-wrong-with-using-thread-abort/1560567#1560567
             while (_isServerListeningRunning)
             {
@@ -287,7 +311,7 @@ namespace Machina.Drivers.Communication
                 int i;
                 try
                 {
-                    while ((i = _robotNetworkStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
+                    while (_isServerListeningRunning && (i = _robotNetworkStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
                     {
                         _serverListeningInts = Util.ByteArrayToInt32Array(_serverListeningBytes, i, false);
 
@@ -309,11 +333,13 @@ namespace Machina.Drivers.Communication
                 }
 
                 //Console.WriteLine("Closing client");
-                _robotSocket.Close();
-                _robotSocket = null;
+                //_robotSocket.Close();
+                //_robotSocket = null;
 
                 Thread.Sleep(30);
             }
+
+            logger.Verbose("Stopped TCP server listener for UR robot communication");
         }
 
         private bool ShouldSend()

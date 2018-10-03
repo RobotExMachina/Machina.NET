@@ -1,3 +1,5 @@
 def empty_driver():
   textmsg("Stopping")
 end
+
+empty_driver()  # we need this to denote that we want the function to only be executed once, avoiding infinite loop behavior (and the controller rejecting this script)
