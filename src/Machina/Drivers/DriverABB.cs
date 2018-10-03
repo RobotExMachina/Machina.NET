@@ -160,7 +160,7 @@ namespace Machina.Drivers
             
 
             // If on 'stream' mode, set up stream connection flow
-            if (this.parentControl.ControlMode == ControlType.Stream)
+            if (this.parentControl.ControlMode == ControlType.Stream || this.parentControl.ControlMode == ControlType.Online)
             {
                 if (!_rsBridge.SetupStreamingMode())
                 {
