@@ -112,7 +112,7 @@ namespace Machina.Drivers.Communication
             {
                 // Upload an empty script to stop the running program
                 LoadEmptyScript();
-                UploadScriptToDevice(_driverScript, true);
+                UploadScriptToDevice(_driverScript, false);
 
                 ClientSocketStatus = TCPConnectionStatus.Disconnected;
                 _clientSocket.Client.Disconnect(false);
@@ -169,10 +169,8 @@ namespace Machina.Drivers.Communication
                 _serverListeningThread.IsBackground = true;
                 _serverListeningThread.Start();
 
-                //LoadStreamProgramParts();
                 LoadDriverScript();
-                //LoadEmptyScript();
-                UploadScriptToDevice(_driverScript, true);
+                UploadScriptToDevice(_driverScript, false);
 
                 return _clientSocket.Connected;
             }

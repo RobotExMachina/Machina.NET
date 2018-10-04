@@ -162,3 +162,5 @@ def machina_ur_driver():
 
   end
 end
+
+machina_ur_driver()
