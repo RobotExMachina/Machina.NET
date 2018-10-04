@@ -28,6 +28,7 @@
 - Add `.prg` program init for ABB modules
 - Add `GetDeviceDriverModules(params)` as a way of retrieving module files
 - Quick and dirty fixing of the UR manager not being able to reconnect after disconnection
+- Fix tool detachment when robot was coming from axis motion. 
 
 
 ---

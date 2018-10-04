@@ -25,7 +25,7 @@ namespace Machina
         public string name;
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
-        public Joints axes, prevJoints;
+        public Joints axes, prevAxes;
         public ExternalAxes externalAxes, prevExternalAxes;
         public double speed;
         public double acceleration;
@@ -169,7 +169,7 @@ namespace Machina
             if (joints != null)
             {
                 this.axes = new Joints(joints);
-                this.prevJoints = new Joints(joints);
+                this.prevAxes = new Joints(joints);
             }
             if (extAx != null)
             {
@@ -633,7 +633,7 @@ namespace Machina
             prevPosition = position;
             position = newPosition;
 
-            prevJoints = axes;
+            prevAxes = axes;
             axes = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
@@ -688,7 +688,7 @@ namespace Machina
             prevRotation = rotation;
             rotation = newRot;
 
-            prevJoints = axes;
+            prevAxes = axes;
             axes = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
@@ -785,7 +785,7 @@ namespace Machina
             prevRotation = rotation;
             rotation = newRot;
 
-            prevJoints = axes;
+            prevAxes = axes;
             axes = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
@@ -822,7 +822,7 @@ namespace Machina
                 newJnt = new Joints(action.joints);
             }
 
-            prevJoints = axes;
+            prevAxes = axes;
             axes = newJnt;
 
             // Flag the lack of other geometric data
@@ -888,10 +888,10 @@ namespace Machina
                 logger.Info($"Robot already had a tool defined as \"{action.tool.name}\"; this will be overwritten.");
                 availableTools.Remove(action.tool.name);
             }
-            else
-            {
+            //else
+            //{
                 availableTools.Add(action.tool.name, action.tool);
-            }
+            //}
 
             return true;
         }
@@ -929,7 +929,7 @@ namespace Machina
             this.position = newPos;
             this.prevRotation = this.rotation;
             this.rotation = newRot;
-            this.prevJoints = this.axes;  // why was this here? joints don't change on tool attachment...
+            this.prevAxes = this.axes;  // why was this here? joints don't change on tool attachment...
 
             // this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data --> no need to do this, joints remain the same anyway?
             
@@ -949,29 +949,55 @@ namespace Machina
                 return false;
             }
 
-            // Relative transform
-            // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+            // Shim for lack of IK 
+            // If coming from axes motion, no need to undo the tool's transform on the TCP
             if (this.position == null || this.rotation == null)
             {
-                logger.Warning($"Cannot apply \"{action}\"; please provide absolute transform values before detaching a tool and try again.");
-                return false;
+                // Really nothing to do here right?
+            }
+            // Otherwise undo the tool's transforms
+            else
+            {
+                // TODO: at some point in the future, check for translationFirst here
+                Rotation newRot = Rotation.Combine(this.rotation, Rotation.Inverse(this.tool.TCPOrientation));  // postmultiplication by the inverse rotation
+                Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
+                Vector newPos = this.position - worldVector;
+
+                this.prevPosition = this.position;
+                this.position = newPos;
+                this.prevRotation = this.rotation;
+                this.rotation = newRot;
+                this.prevAxes = this.axes;
+                this.axes = null;
             }
 
-            // Now undo the tool's transforms
-            // TODO: at some point in the future, check for translationFirst here
-            Rotation newRot = Rotation.Combine(this.rotation, Rotation.Inverse(this.tool.TCPOrientation));  // postmultiplication by the inverse rotation
-            Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
-            Vector newPos = this.position - worldVector;
-
-            this.prevPosition = this.position;
-            this.position = newPos;
-            this.prevRotation = this.rotation;
-            this.rotation = newRot;
-            this.prevJoints = this.axes;
-            this.axes = null;
-
-            // Detach the tool
+            // "Detach" the tool
             this.tool = null;
+
+            // -> This code was not properly detaching the tool when coming from axis motion
+            //// Relative transform
+            //// If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+            //if (this.position == null || this.rotation == null)
+            //{
+            //    logger.Warning($"Cannot apply \"{action}\"; please provide absolute transform values before detaching a tool and try again.");
+            //    return false;
+            //}
+
+            //// Now undo the tool's transforms
+            //// TODO: at some point in the future, check for translationFirst here
+            //Rotation newRot = Rotation.Combine(this.rotation, Rotation.Inverse(this.tool.TCPOrientation));  // postmultiplication by the inverse rotation
+            //Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
+            //Vector newPos = this.position - worldVector;
+
+            //this.prevPosition = this.position;
+            //this.position = newPos;
+            //this.prevRotation = this.rotation;
+            //this.rotation = newRot;
+            //this.prevAxes = this.axes;
+            //this.axes = null;
+
+            //// Detach the tool
+            //this.tool = null;
 
             return true;
         }
