@@ -371,6 +371,13 @@ MODULE Machina_Driver
         ENDIF
     ENDPROC
 
+
+
+    !  __  __ __ __  __      __ __ __
+    ! |__)|_ (_ |__)/  \|\ |(_ |_ (_
+    ! | \ |____)|   \__/| \|__)|____)
+    !
+
     ! Sends a short acknowledgement response to the client with the recently
     ! executed instruction and an optional id
     PROC SendAcknowledgement(action a)
@@ -486,8 +493,8 @@ MODULE Machina_Driver
 
     ! Send the value of the current external axes to the socket
     PROC SendExtAx()
-        nowrt := CRobT(\Tool:=tool0, \WObj:=wobj0);
-        nowexj := nowrt.extax;
+        VAR jointtarget jt := CJointT();
+        nowexj := jt.extax;
 
         response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_EXTAX, 0);
         response := response + STR_WHITE
