@@ -493,7 +493,9 @@ MODULE Machina_Driver
 
     ! Send the value of the current external axes to the socket
     PROC SendExtAx()
-        VAR jointtarget jt := CJointT();
+        VAR jointtarget jt;
+
+        jt := CJointT();
         nowexj := jt.extax;
 
         response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_EXTAX, 0);
