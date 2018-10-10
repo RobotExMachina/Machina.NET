@@ -62,7 +62,7 @@ MODULE Machina_Driver
     CONST num SERVER_PORT := {{PORT}};           ! Replace 7000 with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.3.0";
+    CONST string MACHINA_SERVER_VERSION := "1.3.1";
 
     ! Should program exit on any kind of error?
     PERS bool USE_STRICT := TRUE;
@@ -85,9 +85,12 @@ MODULE Machina_Driver
     CONST num INST_NOTOOL := 9;                     ! (settool tool0)
     CONST num INST_SETDO := 10;                     ! SetDO "NAME" ON
     CONST num INST_SETAO := 11;                     ! SetAO "NAME" V
-    CONST num INST_EXT_JOINTS := 12;                ! (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+    CONST num INST_EXT_JOINTS_ALL := 12;            ! (setextjoints a1 a2 a3 a4 a5 a6, applies to both rob and jointtarget) --> send non-string 9E9 for inactive axes
     CONST num INST_ACCELERATION := 13;              ! (setacceleration values, TBD)
     CONST num INST_SING_AREA := 14;                 ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
+    CONST num INST_EXT_JOINTS_ROBTARGET := 15;      ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
+    CONST num INST_EXT_JOINTS_JOINTTARGET := 16;    ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
+
 
     CONST num INST_STOP_EXECUTION := 100;           ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;                 ! A way to retreive state information from the server (not implemented)
@@ -127,9 +130,10 @@ MODULE Machina_Driver
     ! State variables representing a virtual cursor of data the robot is instructed to
     PERS tooldata cursorTool;
     PERS wobjdata cursorWObj;
-    VAR robtarget cursorTarget;
-    VAR extjoint cursorExtJointsTarget;
-    VAR jointtarget cursorJoints;
+    VAR robtarget cursorRobTarget;
+    VAR jointtarget cursorJointTarget;
+    VAR extjoint cursorExtJointsRobTarget;  ! extax portion of robtarget
+    VAR extjoint cursorExtJointsJointTarget;  ! extax portion of jointtarget
     VAR speeddata cursorSpeed;
     VAR zonedata cursorZone;
     VAR signaldo cursorDO;
@@ -210,16 +214,16 @@ MODULE Machina_Driver
 
                 TEST currentAction.code
                 CASE INST_MOVEL:
-                    cursorTarget := GetRobTarget(currentAction);
-                    MoveL cursorTarget, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
+                    cursorRobTarget := GetRobTarget(currentAction);
+                    MoveL cursorRobTarget, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
 
                 CASE INST_MOVEJ:
-                    cursorTarget := GetRobTarget(currentAction);
-                    MoveJ cursorTarget, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
+                    cursorRobTarget := GetRobTarget(currentAction);
+                    MoveJ cursorRobTarget, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
 
                 CASE INST_MOVEABSJ:
-                    cursorJoints := GetJointTarget(currentAction);
-                    MoveAbsJ cursorJoints, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
+                    cursorJointTarget := GetJointTarget(currentAction);
+                    MoveAbsJ cursorJointTarget, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
 
                 CASE INST_SPEED:
                     cursorSpeed := GetSpeedData(currentAction);
@@ -247,8 +251,15 @@ MODULE Machina_Driver
                     GetDataVal currentAction.s1, cursorAO;
                     SetAO cursorAO, currentAction.p1;
 
-                CASE INST_EXT_JOINTS:
-                    cursorExtJointsTarget := GetExternalJointsData(currentAction);
+                CASE INST_EXT_JOINTS_ALL:
+                    cursorExtJointsRobTarget := GetExternalJointsData(currentAction);
+                    cursorExtJointsJointTarget := cursorExtJointsRobTarget;
+
+                CASE INST_EXT_JOINTS_ROBTARGET:
+                    cursorExtJointsRobTarget := GetExternalJointsData(currentAction);
+
+                CASE INST_EXT_JOINTS_JOINTTARGET:
+                    cursorExtJointsJointTarget := GetExternalJointsData(currentAction);
 
                 CASE INST_ACCELERATION:
                     maxAcceleration := currentAction.p1;
@@ -764,9 +775,10 @@ MODULE Machina_Driver
 
         cursorTool := tool0;
         cursorWObj := wobj0;
-        cursorJoints := CJointT();
-        cursorTarget := CRobT(\Tool:=tool0, \WObj:=wobj0);
-        cursorExtJointsTarget := cursorTarget.extax;
+        cursorRobTarget := CRobT(\Tool:=tool0, \WObj:=wobj0);
+        cursorExtJointsRobTarget := cursorRobTarget.extax;
+        cursorJointTarget := CJointT();
+        cursorExtJointsJointTarget := cursorJointTarget.extax;
         cursorSpeed := v20;
         cursorZone := z5;
         maxAcceleration := -1;
@@ -774,12 +786,12 @@ MODULE Machina_Driver
 
     ! Return the jointtarget represented by an Action
     FUNC jointtarget GetJointTarget(action a)
-        RETURN [[a.p1, a.p2, a.p3, a.p4, a.p5, a.p6], cursorExtJointsTarget];
+        RETURN [[a.p1, a.p2, a.p3, a.p4, a.p5, a.p6], cursorExtJointsJointTarget];
     ENDFUNC
 
     ! Return the robottarget represented by an Action
     FUNC robtarget GetRobTarget(action a)
-        RETURN [[a.p1, a.p2, a.p3], [a.p4, a.p5, a.p6, a.p7], [0, 0, 0, 0], cursorExtJointsTarget];
+        RETURN [[a.p1, a.p2, a.p3], [a.p4, a.p5, a.p6, a.p7], [0, 0, 0, 0], cursorExtJointsRobTarget];
     ENDFUNC
 
     ! Return the speeddata represented by an Action

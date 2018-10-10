@@ -23,12 +23,16 @@
 
 ---
 # v0.8.3
+## BUILD 1420 - The YuMi fix
+- Change ABB driver to account for different robtarget and jointtarget ext axes.
+
+
 ## BUILD 1419
 - Fix typos on UR modules
 - Add `.prg` program init for ABB modules
 - Add `GetDeviceDriverModules(params)` as a way of retrieving module files
 - Quick and dirty fixing of the UR manager not being able to reconnect after disconnection
-- Fix tool detachment when robot was coming from axis motion. 
+- Fix tool detachment when robot was coming from axis motion.
 
 
 ---
