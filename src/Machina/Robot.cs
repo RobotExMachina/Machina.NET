@@ -889,6 +889,24 @@ namespace Machina
             return c.IssueExternalAxisRequest(axisNumber, value, false);
         }
 
+        // At the moment, allow only absolute setting, since the controller may change his value to find an IK solution to the target.
+        // @TODO: bring back as soon as Machina does the IK.
+        //public bool ArmAngle(double increment)
+        //{
+        //    return c.IssueArmAngleRequest(increment, true);
+        //}
+
+        /// <summary>
+        /// Set the value of the arm-angle parameter.
+        /// This value represents the planar offset around the 7th axis for 7-dof robotic arms.
+        /// </summary>
+        /// <param name="value">Angular value in degrees.</param>
+        /// <returns></returns>
+        public bool ArmAngleTo(double value)
+        {
+            return c.IssueArmAngleRequest(value, false);
+        }
+
 
         /// <summary>
         /// Issue a request to wait idle before moving to next action. 

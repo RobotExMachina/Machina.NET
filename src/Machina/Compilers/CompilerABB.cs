@@ -285,7 +285,7 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  CONST robtarget target{0} := {1};", id, GetUNSAFERobTargetValue(cursor));
+                    dec = string.Format("  CONST robtarget target{0} := {1};", id, GetRobTargetValue(cursor));
                     break;
 
                 case ActionType.Axes:
@@ -505,7 +505,7 @@ namespace Machina
                 case ActionType.Transformation:
                     dec = string.Format("    {0} {1}, {2}, {3}, {4}\\{5};",
                         cursor.motionType == MotionType.Joint ? "MoveJ" : "MoveL",
-                        GetUNSAFERobTargetValue(cursor),
+                        GetRobTargetValue(cursor),
                         velNames[cursor.speed],
                         zoneNames[cursor.precision],
                         cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
@@ -633,17 +633,17 @@ namespace Machina
 
         /// <summary>
         /// Returns an RAPID robtarget representation of the current state of the cursor.
-        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        /// WARNING: this method is UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
         /// robot configuration and assumes the robot controller will figure out the correct one.
         /// </summary>
         /// <returns></returns>
-        static internal string GetUNSAFERobTargetValue(RobotCursor cursor)
+        static internal string GetRobTargetValue(RobotCursor cursor)
         {
             return string.Format("[{0}, {1}, {2}, {3}]",
                 cursor.position.ToString(false),
                 cursor.rotation.Q.ToString(false),
                 "[0,0,0,0]",  // no IK at this moment
-                GetExternalJointsValue(cursor)); 
+                GetExternalJointsRobTargetValue(cursor)); 
         }
 
         /// <summary>
@@ -738,6 +738,19 @@ namespace Machina
             }
             extj += "]";
             return extj;
+        }
+
+        static internal string GetExternalJointsRobTargetValue(RobotCursor cursor)
+        {
+            // If user initializes arm-angle, this extax is just the arm-angle value
+            if (cursor.armAngle != null)
+            {
+                string v = Math.Round((double)cursor.armAngle, Geometry.STRING_ROUND_DECIMALS_DEGS).ToString();
+                return $"[{v},9E9,9E9,9E9,9E9,9E9]";
+            }
+
+            // Otherwise, use externalAxes
+            return GetExternalJointsValue(cursor);
         }
 
         static internal string SafeDoubleName(double value) => Math.Round(value, Geometry.STRING_ROUND_DECIMALS_MM).ToString().Replace('.', '_');

@@ -39,7 +39,8 @@ namespace Machina
         ExtrusionRate,
         Initialization, 
         ExternalAxis,
-        CustomCode
+        CustomCode,
+        ArmAngle
     }
 
     

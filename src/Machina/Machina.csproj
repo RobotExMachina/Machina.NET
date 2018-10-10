@@ -76,6 +76,7 @@
     <Compile Include="Actions\Action.cs" />
     <Compile Include="ActionBuffer.cs" />
     <Compile Include="Actions\ActionAcceleration.cs" />
+    <Compile Include="Actions\ActionArmAngle.cs" />
     <Compile Include="Actions\ActionAttachTool.cs" />
     <Compile Include="Actions\ActionAxes.cs" />
     <Compile Include="Actions\ActionComment.cs" />

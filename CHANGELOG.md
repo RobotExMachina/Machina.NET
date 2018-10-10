@@ -25,7 +25,8 @@
 # v0.8.3
 ## BUILD 1420 - The YuMi fix
 - Change ABB driver to account for different robtarget and jointtarget ext axes.
-
+- Add `ArmAngle` action to set the value of the arm-angle for 7-dof robotic arms.
+- Add `ArmAngleTo` to the API. For the time being, we will only have absolute modal for this. 
 
 ## BUILD 1419
 - Fix typos on UR modules

@@ -30,6 +30,7 @@ namespace Machina
         public double speed;
         public double acceleration;
         public double precision;
+        public double? armAngle;
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
@@ -435,7 +436,8 @@ namespace Machina
             { typeof (ActionExtrusionRate),             (act, robCur) => robCur.ApplyAction((ActionExtrusionRate) act) },
             { typeof (ActionInitialization),            (act, robCur) => robCur.ApplyAction((ActionInitialization) act) },
             { typeof (ActionExternalAxis),              (act, robCur) => robCur.ApplyAction((ActionExternalAxis) act) },
-            { typeof (ActionCustomCode),                (act, robCur) => robCur.ApplyAction((ActionCustomCode) act) }
+            { typeof (ActionCustomCode),                (act, robCur) => robCur.ApplyAction((ActionCustomCode) act) },
+            { typeof (ActionArmAngle),                  (act, robCur) => robCur.ApplyAction((ActionArmAngle) act) }
         };
 
         /// <summary>
@@ -1134,7 +1136,8 @@ namespace Machina
             {
                 if (this.externalAxes[action.axisNumber - 1] == null)
                 {
-                    logger.Info($"Cannot apply \"{action}\", must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones...");
+                    //logger.Info($"Cannot apply \"{action}\", must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones...");
+                    logger.Error("Cannot increase external axis, value has not been initialized. Try `ExternalAxisTo()` instead.");
                     return false;
                 }
 
@@ -1148,6 +1151,33 @@ namespace Machina
             // Not sure if keeping prev states makes sense for extax, but just doing it for completeness...
             this.prevExternalAxes = this.externalAxes;
             this.externalAxes = newExternalAxes;
+
+            return true;
+        }
+
+
+
+        //  ╔═╗╦═╗╔╦╗    ╔═╗╔╗╔╔═╗╦  ╔═╗
+        //  ╠═╣╠╦╝║║║    ╠═╣║║║║ ╦║  ║╣ 
+        //  ╩ ╩╩╚═╩ ╩────╩ ╩╝╚╝╚═╝╩═╝╚═╝
+        public bool ApplyAction(ActionArmAngle action)
+        {
+            if (action.relative)
+            {
+                if (this.armAngle == null)
+                {
+                    logger.Error("Cannot increase arm-angle, value has not been initialized. Try `ArmAngleTo()` instead.");
+                    return false;
+                }
+                else
+                {
+                    this.armAngle += action.angle;
+                }
+            }
+            else
+            {
+                this.armAngle = action.angle;
+            }
 
             return true;
         }

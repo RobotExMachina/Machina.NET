@@ -776,15 +776,12 @@ namespace Machina
 
 
 
-        public bool IssueSpeedRequest(double speed, bool relative) => IssueApplyActionRequest(new ActionSpeed(speed, relative));
+        public bool IssueSpeedRequest(double speed, bool relative) => 
+                IssueApplyActionRequest(new ActionSpeed(speed, relative));
 
-        public bool IssueAccelerationRequest(double acc, bool relative) => IssueApplyActionRequest(new ActionAcceleration(acc, relative));
-
-        //public bool IssueRotationSpeedRequest(double rotSpeed, bool rel) => IssueApplyActionRequest(new ActionRotationSpeed(rotSpeed, rel));
-
-        //public bool IssueJointSpeedRequest(double jointSpeed, bool relative) => IssueApplyActionRequest(new ActionJointSpeed(jointSpeed, relative));
-
-        //public bool IssueJointAccelerationRequest(double jointAcceleration, bool relative) => IssueApplyActionRequest(new ActionJointAcceleration(jointAcceleration, relative));
+        public bool IssueAccelerationRequest(double acc, bool relative) => 
+                IssueApplyActionRequest(new ActionAcceleration(acc, relative));
+        
 
         public bool IssuePrecisionRequest(double precision, bool relative) =>
                 IssueApplyActionRequest(new ActionPrecision(precision, relative));
@@ -950,6 +947,16 @@ namespace Machina
         /// <returns></returns>
         public bool IssueExternalAxisRequest(int axisNumber, double value, bool relative) =>
                 IssueApplyActionRequest(new ActionExternalAxis(axisNumber, value, relative));
+
+        /// <summary>
+        /// Issue a request to modify the arm-angle value for 7-dof robotic arms. 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="relative"></param>
+        /// <returns></returns>
+        public bool IssueArmAngleRequest(double value, bool relative) =>
+            IssueApplyActionRequest(new ActionArmAngle(value, relative));
+
 
         /// <summary>
         /// Issue a request to add custom code to a compiled program.

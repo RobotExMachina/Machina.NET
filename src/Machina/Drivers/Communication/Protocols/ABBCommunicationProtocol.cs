@@ -30,6 +30,8 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int INST_EXT_JOINTS = 12;                // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
         internal const int INST_ACCELERATION = 13;              // (setacceleration values, TBD)
         internal const int INST_SING_AREA = 14;                 // SingArea bool (sets Wrist or Off)
+        internal const int INST_EXT_JOINTS_ROBTARGET = 15;      // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
+        internal const int INST_EXT_JOINTS_JOINTTARGET = 16;    // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
 
         internal const int RES_VERSION = 20;                    // ">20 1 2 1;" Sends version numbers
         internal const int RES_POSE = 21;                       // ">21 400 300 500 0 0 1 0;"
@@ -211,8 +213,20 @@ namespace Machina.Drivers.Communication.Protocols
 
                 // CustomCode --> is non-streamable
 
+                case ActionType.ArmAngle:
+                    // Send a request to change only the robtarget portion of the external axes for next motion.
+                    ActionArmAngle aaa = action as ActionArmAngle;
+                    msgs.Add(string.Format("{0}{1} {2} {3} 9E9 9E9 9E9 9E9 9E9{4}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_EXT_JOINTS_ROBTARGET,
+                        Math.Round(aaa.angle, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        STR_MESSAGE_END_CHAR));
+                    break;
+
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:
+                    Logger.Warning("Cannot stream action `" + action + "`");
                     return null;
             }
 
