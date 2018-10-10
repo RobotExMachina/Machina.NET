@@ -869,7 +869,56 @@ namespace Machina
                 logger.Error("Please enter an axis number between 1-6");
                 return false;
             }
-            return c.IssueExternalAxisRequest(axisNumber, increment, true);
+            return c.IssueExternalAxisRequest(axisNumber, increment, ExternalAxesTarget.All, true);
+        }
+
+        /// <summary>
+        /// Increase the value of one of the robot's external axis. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// </summary>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="increment">Increment value in mm or degrees.</param>
+        /// <param name="externalAxesTarget">Apply this change to all external axes, or only cartesian/joint targets.</param>
+        /// <returns></returns>
+        public bool ExternalAxis(int axisNumber, double increment, string externalAxesTarget)
+        {
+            ExternalAxesTarget eat;
+            try
+            {
+                eat = (ExternalAxesTarget)Enum.Parse(typeof(ExternalAxesTarget), externalAxesTarget, true);
+                if (Enum.IsDefined(typeof(ExternalAxesTarget), eat))
+                {
+                    return ExternalAxis(axisNumber, increment, eat);
+                }
+            }
+            catch
+            {
+                logger.Error($"{externalAxesTarget} is not a valid ExternalAxesTarget type, please specify one of the following:");
+                foreach (string str in Enum.GetNames(typeof(ExternalAxesTarget)))
+                {
+                    logger.Error(str);
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Increase the value of one of the robot's external axis. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// </summary>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="increment">Increment value in mm or degrees.</param>
+        /// <param name="externalAxesTarget">Apply this change to all external axes, or only cartesian/joint targets.</param>
+        public bool ExternalAxis(int axisNumber, double increment, ExternalAxesTarget externalAxesTarget)
+        {
+            if (axisNumber == 0)
+            {
+                logger.Error("Please enter an axis number between 1-6");
+                return false;
+            }
+            return c.IssueExternalAxisRequest(axisNumber, increment, externalAxesTarget, true);
         }
 
         /// <summary>
@@ -886,7 +935,56 @@ namespace Machina
                 logger.Error("Please enter an axis number between 1-6");
                 return false;
             }
-            return c.IssueExternalAxisRequest(axisNumber, value, false);
+            return c.IssueExternalAxisRequest(axisNumber, value, ExternalAxesTarget.All, false);
+        }
+
+        /// <summary>
+        /// Set the value of one of the robot's external axis. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// </summary>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="value">Axis value in mm or degrees.</param>
+        /// <param name="externalAxesTarget">Apply this change to all external axes, or only cartesian/joint targets.</param>
+        /// <returns></returns>
+        public bool ExternalAxisTo(int axisNumber, double value, string externalAxesTarget)
+        {
+            ExternalAxesTarget eat;
+            try
+            {
+                eat = (ExternalAxesTarget)Enum.Parse(typeof(ExternalAxesTarget), externalAxesTarget, true);
+                if (Enum.IsDefined(typeof(ExternalAxesTarget), eat))
+                {
+                    return ExternalAxisTo(axisNumber, value, eat);
+                }
+            }
+            catch
+            {
+                logger.Error($"{externalAxesTarget} is not a valid ExternalAxesTarget type, please specify one of the following:");
+                foreach (string str in Enum.GetNames(typeof(ExternalAxesTarget)))
+                {
+                    logger.Error(str);
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Set the value of one of the robot's external axis. 
+        /// Values expressed in degrees or milimeters, depending on the nature of the external axis.
+        /// Note that the effect of this change of external axis will go in effect on the next motion Action.
+        /// </summary>
+        /// <param name="axisNumber">Axis number from 1 to 6.</param>
+        /// <param name="value">Axis value in mm or degrees.</param>
+        /// <param name="externalAxesTarget">Apply this change to all external axes, or only cartesian/joint targets.</param>
+        public bool ExternalAxisTo(int axisNumber, double value, ExternalAxesTarget externalAxesTarget)
+        {
+            if (axisNumber == 0)
+            {
+                logger.Error("Please enter an axis number between 1-6");
+                return false;
+            }
+            return c.IssueExternalAxisRequest(axisNumber, value, externalAxesTarget, true);
         }
 
         // At the moment, allow only absolute setting, since the controller may change his value to find an IK solution to the target.

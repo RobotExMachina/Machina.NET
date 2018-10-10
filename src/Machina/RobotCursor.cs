@@ -26,7 +26,6 @@ namespace Machina
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
         public Joints axes, prevAxes;
-        public ExternalAxes externalAxes, prevExternalAxes;
         public double speed;
         public double acceleration;
         public double precision;
@@ -34,6 +33,10 @@ namespace Machina
         public MotionType motionType;
         public ReferenceCS referenceCS;
         public Tool tool;
+
+        // Because of YuMi, now we are keeping track of two sets of external axes! @TODO: make this less ABB-centric somehow?
+        public ExternalAxes externalAxesCartesian;
+        public ExternalAxes externalAxesJoints;
 
         // Keep a dictionary of all Tools that have been defined on this robot, and are available for Attach/Detach
         internal Dictionary<string, Tool> availableTools;
@@ -174,8 +177,9 @@ namespace Machina
             }
             if (extAx != null)
             {
-                this.externalAxes = new ExternalAxes(extAx);
-                this.prevExternalAxes = new ExternalAxes(extAx);
+                // @TODO split this definition
+                this.externalAxesCartesian = new ExternalAxes(extAx);
+                this.externalAxesJoints = new ExternalAxes(extAx);
             }
 
             this.acceleration = acceleration;
@@ -391,7 +395,7 @@ namespace Machina
             this.position = pos;
             this.rotation = rot;
             this.axes = ax;
-            this.externalAxes = extax;        
+            this.externalAxesCartesian = extax;        
         }
 
 
@@ -1124,33 +1128,56 @@ namespace Machina
         //  ╚═╝╩ ╚═ ╩ ╚═╝╩╚═╝╚╝╩ ╩╩═╝────╩ ╩╩ ╚═╩╚═╝
         public bool ApplyAction(ActionExternalAxis action)
         {
-            if (this.externalAxes == null)
+            // Cartesian targets
+            if (action.target == ExternalAxesTarget.All || action.target == ExternalAxesTarget.Cartesian)
             {
-                this.externalAxes = new ExternalAxes();
-                this.prevExternalAxes = new ExternalAxes();
+                if (this.externalAxesCartesian == null)
+                {
+                    this.externalAxesCartesian = new ExternalAxes();
+                }
+                
+
+                if (action.relative)
+                {
+                    if (this.externalAxesCartesian[action.axisNumber - 1] == null)
+                    {
+                        //logger.Info($"Cannot apply \"{action}\", must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones...");
+                        logger.Error("Cannot increase cartesian external axis, value has not been initialized. Try `ExternalAxisTo()` instead.");
+                        return false;
+                    }
+
+                    this.externalAxesCartesian[action.axisNumber - 1] += action.value;
+                }
+                else
+                {
+                    this.externalAxesCartesian[action.axisNumber - 1] = action.value;
+                }
             }
 
-            ExternalAxes newExternalAxes = new ExternalAxes(this.externalAxes);  // copy
-
-            if (action.relative)
+            // Joint targets 
+            if (action.target == ExternalAxesTarget.All || action.target == ExternalAxesTarget.Joint)
             {
-                if (this.externalAxes[action.axisNumber - 1] == null)
+                if (this.externalAxesJoints == null)
                 {
-                    //logger.Info($"Cannot apply \"{action}\", must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones...");
-                    logger.Error("Cannot increase external axis, value has not been initialized. Try `ExternalAxisTo()` instead.");
-                    return false;
+                    this.externalAxesJoints = new ExternalAxes();
                 }
 
-                newExternalAxes[action.axisNumber - 1] += action.value;
-            }
-            else
-            {
-                newExternalAxes[action.axisNumber - 1] = action.value;
-            }
+                if (action.relative)
+                {
+                    if (this.externalAxesJoints[action.axisNumber - 1] == null)
+                    {
+                        //logger.Info($"Cannot apply \"{action}\", must initialize absolute axis value first for axis {action.axisNumber} before applying relative ones...");
+                        logger.Error("Cannot increase joint external axis, value has not been initialized. Try `ExternalAxisTo()` instead.");
+                        return false;
+                    }
 
-            // Not sure if keeping prev states makes sense for extax, but just doing it for completeness...
-            this.prevExternalAxes = this.externalAxes;
-            this.externalAxes = newExternalAxes;
+                    this.externalAxesJoints[action.axisNumber - 1] += action.value;
+                }
+                else
+                {
+                    this.externalAxesJoints[action.axisNumber - 1] = action.value;
+                }
+            }
 
             return true;
         }

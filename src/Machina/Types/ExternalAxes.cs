@@ -64,7 +64,7 @@ namespace Machina
             }
         }
 
-        public ExternalAxes(double? exa1, double? exa2, double? exa3, double? exa4, double? exa5, double? exa6)
+        public ExternalAxes(double? exa1 = null, double? exa2 = null, double? exa3 = null, double? exa4 = null, double? exa5 = null, double? exa6 = null)
         {
             this._externalAxes[0] = FilterValue(exa1);
             this._externalAxes[1] = FilterValue(exa2);
@@ -82,7 +82,7 @@ namespace Machina
         // For ABB robots, a value of 9E9 means no axis
         private double? FilterValue(double? val)
         {
-            return val >= 9000000000 ? null : val;
+            return (val == null || val >= 9000000000) ? null : val;
         }
 
         public override string ToString()

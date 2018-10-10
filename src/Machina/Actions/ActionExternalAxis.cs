@@ -20,29 +20,51 @@ namespace Machina
     {
         public int axisNumber;
         public double value;
+        public ExternalAxesTarget target;
         public bool relative;
 
         public override ActionType Type => ActionType.ExternalAxis;
 
-        public ActionExternalAxis(int axisNumber, double value, bool relative) : base()
+        internal static readonly Dictionary<ExternalAxesTarget, string> TARGET_DOMAINS = new Dictionary<ExternalAxesTarget, string>()
+        {
+            {ExternalAxesTarget.All, "" },
+            {ExternalAxesTarget.Cartesian, "for cartesian targets." },
+            {ExternalAxesTarget.Joint, "for joint targets." }
+        };
+
+        public ActionExternalAxis(int axisNumber, double value, ExternalAxesTarget target, bool relative) : base()
         {
             this.axisNumber = axisNumber;
             this.value = value;
+            this.target = target;
             this.relative = relative;
         }
 
         public override string ToString()
         {
-            return this.relative ?
+            string str = this.relative ?
                 $"Increase external axis #{this.axisNumber} by {this.value}" :
                 $"Set external axis #{this.axisNumber} to {this.value}";
+
+            str += " " + TARGET_DOMAINS[this.target];
+
+            return str;
         }
 
         public override string ToInstruction()
         {
-            return relative ?
-                $"ExternalAxis({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)});" :
-                $"ExternalAxisTo({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)});";
+            string inst = relative ?
+                $"ExternalAxis({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)}" :
+                $"ExternalAxisTo({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)}";
+
+            if (this.target != ExternalAxesTarget.All)
+            {
+                inst += ",\"" + this.target.ToString() + "\"";
+            }
+
+            inst += ");";
+
+            return inst;
         }
     }
 }

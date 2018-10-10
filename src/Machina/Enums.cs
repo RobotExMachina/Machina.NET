@@ -175,12 +175,33 @@ namespace Machina
         DEBUG = 5
     }
 
-    public enum ExecutionState
+    //public enum ExecutionState
+    //{
+    //    Undefined, 
+    //    Issued,
+    //    Released,
+    //    Executing,
+    //    Executed
+    //}
+
+    /// <summary>
+    /// Defines where will the external axes be applied to.
+    /// </summary>
+    public enum ExternalAxesTarget
     {
-        Undefined, 
-        Issued,
-        Released,
-        Executing,
-        Executed
+        /// <summary>
+        /// All kinds of external axes.
+        /// </summary>
+        All,
+
+        /// <summary>
+        /// Only external axes for cartesian motion.
+        /// </summary>
+        Cartesian, 
+
+        /// <summary>
+        /// Only external axes for joint motion.
+        /// </summary>
+        Joint
     }
 }

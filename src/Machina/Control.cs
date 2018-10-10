@@ -562,7 +562,7 @@ namespace Machina
         /// Returns a double?[] array representing the values for the external axes.
         /// </summary>
         /// <returns></returns>
-        public ExternalAxes GetCurrentExternalAxes() => _stateCursor.externalAxes;
+        public ExternalAxes GetCurrentExternalAxes() => _stateCursor.externalAxesCartesian;
 
         /// <summary>
         /// Returns a Tool object representing the currently attached tool, null if none.
@@ -943,10 +943,11 @@ namespace Machina
         /// </summary>
         /// <param name="axisNumber"></param>
         /// <param name="value"></param>
+        /// <param name="target"></param>
         /// <param name="relative"></param>
         /// <returns></returns>
-        public bool IssueExternalAxisRequest(int axisNumber, double value, bool relative) =>
-                IssueApplyActionRequest(new ActionExternalAxis(axisNumber, value, relative));
+        public bool IssueExternalAxisRequest(int axisNumber, double value, ExternalAxesTarget target, bool relative) =>
+                IssueApplyActionRequest(new ActionExternalAxis(axisNumber, value, target, relative));
 
         /// <summary>
         /// Issue a request to modify the arm-angle value for 7-dof robotic arms. 
@@ -1382,7 +1383,7 @@ namespace Machina
         /// </summary>
         internal void RaiseMotionUpdateEvent()
         {
-            MotionUpdateArgs args = new MotionUpdateArgs(this.MotionCursor.position, this.MotionCursor.rotation, this.MotionCursor.axes, this.MotionCursor.externalAxes);
+            MotionUpdateArgs args = new MotionUpdateArgs(this.MotionCursor.position, this.MotionCursor.rotation, this.MotionCursor.axes, this.MotionCursor.externalAxesCartesian);
 
             this.parentRobot.OnMotionUpdate(args);
         }

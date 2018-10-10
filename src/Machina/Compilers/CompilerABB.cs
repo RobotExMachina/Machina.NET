@@ -652,7 +652,7 @@ namespace Machina
         /// <returns></returns>
         static internal string GetJointTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0}, {1}]", cursor.axes, GetExternalJointsValue(cursor));
+            return string.Format("[{0}, {1}]", cursor.axes, GetExternalJointsJointTargetValue(cursor));
         }
 
         /// <summary>
@@ -714,43 +714,53 @@ namespace Machina
                 cursor.tool.CenterOfGravity,
                 "[1,0,0,0]");  // no internial axes by default
         }
+        
 
         /// <summary>
-        /// Returns a RAPID representation of an extjoints object
+        /// Gets the cursors extax representation for a Cartesian target.
         /// </summary>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        static internal string GetExternalJointsValue(RobotCursor cursor)
+        static internal string GetExternalJointsRobTargetValue(RobotCursor cursor)
         {
-            if (cursor.externalAxes == null)
+            // If user initializes arm-angle, this extax is just the arm-angle value
+            if (cursor.armAngle != null)
+            {
+                return GetExternalAxesValue(new ExternalAxes(cursor.armAngle));
+            }
+
+            // Otherwise, use externalAxes
+            return GetExternalAxesValue(cursor.externalAxesCartesian);
+        }
+
+        static internal string GetExternalJointsJointTargetValue(RobotCursor cursor) =>
+                GetExternalAxesValue(cursor.externalAxesJoints);
+       
+        /// <summary>
+        /// Gets the RAPID extax representation from an ExternalAxes object.
+        /// </summary>
+        /// <param name="extax"></param>
+        /// <returns></returns>
+        static internal string GetExternalAxesValue(ExternalAxes extax)
+        {
+            if (extax == null)
             {
                 return "[9E9,9E9,9E9,9E9,9E9,9E9]";
             }
 
             string extj = "[";
             double? val;
-            for (int i = 0; i < cursor.externalAxes.Length; i++)
+            for (int i = 0; i < extax.Length; i++)
             {
-                val = cursor.externalAxes[i];
-                extj += (val == null) ? "9E9" : val.ToString();
-                if (i < cursor.externalAxes.Length - 1)
+                val = extax[i];
+                extj += (val == null) ? "9E9" : Math.Round((double) val, Geometry.STRING_ROUND_DECIMALS_MM).ToString();
+                if (i < extax.Length - 1)
+                {
                     extj += ",";
+                }
             }
             extj += "]";
             return extj;
-        }
-
-        static internal string GetExternalJointsRobTargetValue(RobotCursor cursor)
-        {
-            // If user initializes arm-angle, this extax is just the arm-angle value
-            if (cursor.armAngle != null)
-            {
-                string v = Math.Round((double)cursor.armAngle, Geometry.STRING_ROUND_DECIMALS_DEGS).ToString();
-                return $"[{v},9E9,9E9,9E9,9E9,9E9]";
-            }
-
-            // Otherwise, use externalAxes
-            return GetExternalJointsValue(cursor);
         }
 
         static internal string SafeDoubleName(double value) => Math.Round(value, Geometry.STRING_ROUND_DECIMALS_MM).ToString().Replace('.', '_');

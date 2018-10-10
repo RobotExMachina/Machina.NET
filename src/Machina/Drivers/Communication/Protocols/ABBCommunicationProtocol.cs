@@ -27,7 +27,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int INST_NOTOOL = 9;                     // (settool tool0)
         internal const int INST_SETDO = 10;                     // SetDO "NAME" ON
         internal const int INST_SETAO = 11;                     // SetAO "NAME" V
-        internal const int INST_EXT_JOINTS = 12;                // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+        internal const int INST_EXT_JOINTS_ALL = 12;                // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
         internal const int INST_ACCELERATION = 13;              // (setacceleration values, TBD)
         internal const int INST_SING_AREA = 14;                 // SingArea bool (sets Wrist or Off)
         internal const int INST_EXT_JOINTS_ROBTARGET = 15;      // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
@@ -193,25 +193,42 @@ namespace Machina.Drivers.Communication.Protocols
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
 
                 case ActionType.ExternalAxis:
-                    string msg = $"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_EXT_JOINTS} ";
-
-                    for (int i = 0; i < cursor.externalAxes.Length; i++)
+                    string msg, @params, id;
+                    ActionExternalAxis aea = action as ActionExternalAxis;
+                    
+                    // Cartesian msg
+                    if (aea.target == ExternalAxesTarget.All || aea.target == ExternalAxesTarget.Cartesian)
                     {
-                        // RAPID's StrToVal() will parse 9E9 into a 9E+9 num value, and ignore that axis on motions
-                        msg += cursor.externalAxes[i]?.ToString() ?? "9E9";
-                        if (i < cursor.externalAxes.Length - 1)
+                        if (aea.target == ExternalAxesTarget.All)
                         {
-                            msg += " ";
+                            id = "0";  // If will need to send two messages, only add real id to the last one.
                         }
+                        else
+                        {
+                            id = aea.Id.ToString();
+                        }
+
+                        @params = ExternalAxesToParameters(cursor.externalAxesCartesian);
+
+                        msg = $"{STR_MESSAGE_ID_CHAR}{id} {INST_EXT_JOINTS_ROBTARGET} {@params}{STR_MESSAGE_END_CHAR}";
+
+                        msgs.Add(msg);
                     }
 
-                    msg += STR_MESSAGE_END_CHAR;
+                    // Joints msg
+                    if (aea.target == ExternalAxesTarget.All || aea.target == ExternalAxesTarget.Joint)
+                    {
+                        id = aea.Id.ToString();  // now use the real id in any case
 
-                    msgs.Add(msg);
+                        @params = ExternalAxesToParameters(cursor.externalAxesJoints);
 
+                        msg = $"{STR_MESSAGE_ID_CHAR}{id} {INST_EXT_JOINTS_JOINTTARGET} {@params}{STR_MESSAGE_END_CHAR}";
+
+                        msgs.Add(msg);
+                    }
+                    
                     break;
 
-                // CustomCode --> is non-streamable
 
                 case ActionType.ArmAngle:
                     // Send a request to change only the robtarget portion of the external axes for next motion.
@@ -224,6 +241,9 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_END_CHAR));
                     break;
 
+                // CustomCode --> is non-streamable
+                
+                
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:
                     Logger.Warning("Cannot stream action `" + action + "`");
@@ -231,6 +251,30 @@ namespace Machina.Drivers.Communication.Protocols
             }
 
             return msgs;
+        }
+
+        internal static string ExternalAxesToParameters(ExternalAxes extax)
+        {
+            string param = "";
+            for (int i = 0; i < extax.Length; i++)
+            {
+                if (extax[i] == null)
+                {
+                    // RAPID's StrToVal() will parse 9E9 into a 9E+9 num value, and ignore that axis on motions
+                    param += "9E9";
+                }
+                else
+                {
+                    param += Math.Round((double) extax[i], Geometry.STRING_ROUND_DECIMALS_MM).ToString();
+                }
+
+                if (i < extax.Length - 1)
+                {
+                    param += " ";
+                }
+            }
+
+            return param;
         }
 
     }
