@@ -984,7 +984,7 @@ namespace Machina
                 logger.Error("Please enter an axis number between 1-6");
                 return false;
             }
-            return c.IssueExternalAxisRequest(axisNumber, value, externalAxesTarget, true);
+            return c.IssueExternalAxisRequest(axisNumber, value, externalAxesTarget, false);
         }
 
         // At the moment, allow only absolute setting, since the controller may change his value to find an IK solution to the target.

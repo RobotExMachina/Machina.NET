@@ -175,17 +175,17 @@ namespace Machina
         DEBUG = 5
     }
 
-    //public enum ExecutionState
-    //{
-    //    Undefined, 
-    //    Issued,
-    //    Released,
-    //    Executing,
-    //    Executed
-    //}
+    public enum ExecutionState
+    {
+        Undefined,
+        Issued,
+        Released,
+        Executing,
+        Executed
+    }
 
     /// <summary>
-    /// Defines where will the external axes be applied to.
+    /// Defines where will the external axes be applied to
     /// </summary>
     public enum ExternalAxesTarget
     {
