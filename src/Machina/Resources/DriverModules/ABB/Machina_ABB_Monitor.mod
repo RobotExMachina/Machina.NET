@@ -101,15 +101,15 @@ MODULE Machina_Monitor
     PERS wobjdata cursorWObj;
 
     ! State variables for real-time motion tracking
-    PERS robtarget nowrt;
-    PERS jointtarget nowjt;
-    PERS extjoint nowexj;
+    LOCAL VAR robtarget nowrt;
+    LOCAL VAR jointtarget nowjt;
+    LOCAL VAR extjoint nowexj;
 
 
     ! LOCAL VARS
     LOCAL VAR string clientIp;
-    LOCAL VAR socketdev serverSocket;
-    LOCAL VAR socketdev clientSocket;
+    LOCAL VAR socketdev monServerSocket;
+    LOCAL VAR socketdev monClientSocket;
 
     ! Buffer of responses
     LOCAL VAR string response;
@@ -144,7 +144,7 @@ MODULE Machina_Monitor
             WaitTime monitorUpdateInterval;
         ENDWHILE
 
-        ServerFinalize;
+        ServerFinalize(2);
 
         ERROR
             TPWrite("ERROR: Something went wrong...");
@@ -168,36 +168,37 @@ MODULE Machina_Monitor
 
     ! Recover from a disconnection
     PROC ServerRecover()
-        SocketClose serverSocket;
-        SocketClose clientSocket;
+        ServerFinalize(0);
 
-        SocketCreate serverSocket;
-        SocketBind serverSocket, SERVER_IP, MONITOR_PORT;
-        SocketListen serverSocket;
+        SocketCreate monServerSocket;
+        SocketBind monServerSocket, SERVER_IP, MONITOR_PORT;
+        SocketListen monServerSocket;
 
         TPWrite "Waiting for incoming connection on " + SERVER_IP + ":" + NumToStr(MONITOR_PORT, 0);
 
-        SocketAccept serverSocket, clientSocket \ClientAddress:=clientIp \Time:=WAIT_MAX;
+        SocketAccept monServerSocket, monClientSocket \ClientAddress:=clientIp \Time:=WAIT_MAX;
 
         TPWrite "Connected to client: " + clientIp;
-        TPWrite "Streaming real-time tracking info...";
+        TPWrite "Streaming real-time pose every " + NumToStr(monitorUpdateInterval, 2) + " s";
 
         ERROR
             IF ERRNO = ERR_SOCK_TIMEOUT THEN
                 TPWrite "ERROR: ServerRecover timeout. Retrying...";
                 RETRY;
             ELSEIF ERRNO = ERR_SOCK_CLOSED THEN
+                TPWrite "ERROR: socket closed.";
                 RETURN;
             ELSE
                 ! No error recovery handling
+                TPWrite "ERROR: something went wrong...";
             ENDIF
     ENDPROC
 
     ! Close sockets
-    PROC ServerFinalize()
-        SocketClose serverSocket;
-        SocketClose clientSocket;
-        WaitTime 2;
+    PROC ServerFinalize(num pauseTime)
+        SocketClose monServerSocket;
+        SocketClose monClientSocket;
+        WaitTime pauseTime;
     ENDPROC
 
     ! Send joints, pose and extax info in one message to the client
@@ -242,7 +243,7 @@ MODULE Machina_Monitor
 
     ! Send a message to the client socket
     PROC SendMessage(string msg)
-        SocketSend clientSocket \Str:=msg;
+        SocketSend monClientSocket \Str:=msg;
 
         ERROR
             IF ERRNO = ERR_SOCK_CLOSED THEN

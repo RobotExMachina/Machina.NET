@@ -89,22 +89,6 @@ namespace Machina.Drivers.Communication
             this._translator = Protocols.Factory.GetTranslator(this._parentDriver);
         }
 
-        internal bool Disconnect()
-        {
-            DisconnectMonitor();
-
-            if (_clientSocket != null)
-            {
-                _clientStatus = TCPConnectionStatus.Disconnected;
-                _clientSocket.Client.Disconnect(false);
-                _clientSocket.Close();
-                if (_clientNetworkStream != null) _clientNetworkStream.Dispose();
-                return true;
-            }
-            
-            return false;
-        }
-
         internal bool Connect()
         {
             try
@@ -127,9 +111,12 @@ namespace Machina.Drivers.Communication
                 if (!WaitForInitialization())
                 {
                     logger.Error("Timeout when waiting for initialization data from the controller");
+                    Disconnect();
                     return false;
                 }
 
+                // During YuMi development I was having a really weird problem: if a monitor is running, I cannot connect to another driver in the same unit... 
+                // So, for the time being, let's make monitoring an explicit process with its own API?
                 if (TryConnectMonitor())
                 {
                     // Establish a MotionCursor on `Control`
@@ -142,11 +129,47 @@ namespace Machina.Drivers.Communication
             catch (Exception ex)
             {
                 logger.Debug(ex);
-                throw new Exception("ERROR: could not establish TCP connection");
+                //throw new Exception("ERROR: could not establish TCP connection");
+                Disconnect();
             }
 
-            //return false;
+            return false;
         }
+
+        internal bool Disconnect()
+        {
+            DisconnectMonitor();
+
+            if (_clientSocket != null)
+            {
+                _clientStatus = TCPConnectionStatus.Disconnected;
+                try
+                {
+                    _clientSocket.Client.Disconnect(false);
+                }
+                catch { }
+                _clientSocket.Close();
+                if (_clientNetworkStream != null) _clientNetworkStream.Dispose();
+                return true;
+            }
+            
+            return false;
+        }
+
+
+        //internal bool Monitor()
+        //{
+        //    if (TryConnectMonitor())
+        //    {
+        //        // Establish a MotionCursor on `Control`
+        //        this._parentDriver.parentControl.InitializeMotionCursor();
+        //        this._motionCursor = this._parentDriver.parentControl.MotionCursor;
+
+        //        return true;
+        //    }
+
+        //    return false;
+        //}
 
         private bool TryConnectMonitor()
         {
@@ -178,11 +201,11 @@ namespace Machina.Drivers.Communication
 
         private bool DisconnectMonitor()
         {
-            if (_monitorClientSocket != null)
+            if (_monitorClientSocket != null && _isMonitored)
             {
                 try
                 {
-                    if (_monitorClientSocket.Connected)
+                    if (_monitorClientSocket.Connected != null && _monitorClientSocket.Connected)
                     {
                         _monitorClientSocket.Client.Disconnect(false);
                     }

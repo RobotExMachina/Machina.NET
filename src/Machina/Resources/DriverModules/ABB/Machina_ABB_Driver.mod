@@ -91,10 +91,10 @@ MODULE Machina_Driver
     CONST num INST_EXT_JOINTS_ROBTARGET := 15;      ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
     CONST num INST_EXT_JOINTS_JOINTTARGET := 16;    ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
 
-
     CONST num INST_STOP_EXECUTION := 100;           ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;                 ! A way to retreive state information from the server (not implemented)
     CONST num INST_SET_CONFIGURATION := 102;        ! A way to make some changes to the configuration of the server
+    CONST num INST_SET_MOTION_UPDATE_INTERVAL := 103;  ! Sets the motion update interval in seconds.
 
     ! (these could be straight strings since they are never used for checks...?)
     PERS num RES_VERSION := 20;                     ! ">20 1 2 1;" Sends version numbers
@@ -141,9 +141,9 @@ MODULE Machina_Driver
     VAR num maxAcceleration;
 
     ! State variables for real-time motion tracking
-    PERS robtarget nowrt;
-    PERS jointtarget nowjt;
-    VAR extjoint nowexj;
+    LOCAL VAR robtarget nowrt;
+    LOCAL VAR jointtarget nowjt;
+    LOCAL VAR extjoint nowexj;
 
     ! Buffer of incoming messages
     CONST num msgBufferSize := 1000;
@@ -154,7 +154,6 @@ MODULE Machina_Driver
     VAR num msgBufferWriteLine;
     VAR bool isMsgBufferWriteLineWrapped;
     VAR bool streamBufferPending;
-
 
     ! Buffer of pending actions
     CONST num actionsBufferSize := 1000;
@@ -282,6 +281,10 @@ MODULE Machina_Driver
                 CASE INST_GET_INFO:
                     SendInformation(currentAction);
 
+                CASE INST_SET_MOTION_UPDATE_INTERVAL:
+                    monitorUpdateInterval := currentAction.p1;
+                    TPWrite("Monitor update interval set to " + NumToStr(monitorUpdateInterval, 2) + " s.");
+
                 ENDTEST
 
                 ! Send acknowledgement message
@@ -330,6 +333,7 @@ MODULE Machina_Driver
     PROC ServerRecover()
         SocketClose serverSocket;
         SocketClose clientSocket;
+
         SocketCreate serverSocket;
         SocketBind serverSocket, SERVER_IP, SERVER_PORT;
         SocketListen serverSocket;
@@ -666,7 +670,9 @@ MODULE Machina_Driver
         IF NOT ok THEN
             TPWrite "MACHINA ERROR: received corrupt message:";
             TPWrite st;
-            IF USE_STRICT THEN EXIT; ENDIF
+            IF USE_STRICT THEN
+              EXIT;
+            ENDIF
             RETURN;
         ENDIF
 

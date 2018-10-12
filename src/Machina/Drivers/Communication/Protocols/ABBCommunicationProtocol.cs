@@ -241,9 +241,12 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_END_CHAR));
                     break;
 
-                // CustomCode --> is non-streamable
-                
-                
+                // When connected live, this is used as a way to stream a message directly to the robot. Unsafe, but oh well...
+                case ActionType.CustomCode:
+                    ActionCustomCode acc = action as ActionCustomCode;
+                    msgs.Add(acc.statement);
+                    break;
+                    
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:
                     Logger.Warning("Cannot stream action `" + action + "`");
