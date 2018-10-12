@@ -592,7 +592,7 @@ namespace Machina
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    logger.Info($"Cannot apply \"{action}\", must provide absolute position values first before applying relative ones... ");
+                    logger.Warning($"Cannot apply \"{action}\", must provide absolute position values first before applying relative ones... ");
                     return false;
                 }
 
@@ -612,7 +612,7 @@ namespace Machina
                 // Fail if issued abs movement without prior rotation info. (This limitation is due to current lack of FK/IK solvers)
                 if (rotation == null)
                 {
-                    logger.Info($"Cannot apply \"{action}\", currently missing TCP orientation to work with... ");
+                    logger.Warning($"Cannot apply \"{action}\", currently missing TCP orientation to work with... ");
                     return false;
                 }
 
@@ -663,7 +663,7 @@ namespace Machina
                 // If user issued a relative action, make sure there are absolute values to work with (this limitation is due to current lack of FK/IK solvers).
                 if (position == null || rotation == null)
                 {
-                    logger.Info($"Cannot apply \"{action}\", must provide absolute rotation values first before applying relative ones... ");
+                    logger.Warning($"Cannot apply \"{action}\", must provide absolute rotation values first before applying relative ones... ");
                     return false;
                 }
 
@@ -684,7 +684,7 @@ namespace Machina
                 // Fail if issued abs rotation without prior position info (this limitation is due to current lack of FK/IK solvers).
                 if (position == null)
                 {
-                    logger.Info($"Cannot apply \"{action}\", currently missing TCP position to work with... ");
+                    logger.Warning($"Cannot apply \"{action}\", currently missing TCP position to work with... ");
                     return false;
                 }
 
@@ -719,7 +719,7 @@ namespace Machina
                 // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
                 if (position == null || rotation == null)
                 {
-                    logger.Info($"Cannot apply \"{action}\", must provide absolute transform values first before applying relative ones...");
+                    logger.Warning($"Cannot apply \"{action}\", must provide absolute transform values first before applying relative ones...");
                     return false;
                 }
 
@@ -817,7 +817,7 @@ namespace Machina
                 // (This limitation is due to current lack of FK/IK solvers)
                 if (axes == null)  // could also check for motionType == MotionType.Joints ?
                 {
-                    logger.Info($"Cannot apply \"{action}\", must provide absolute Joints values first before applying relative ones...");
+                    logger.Warning($"Cannot apply \"{action}\", must provide absolute Joints values first before applying relative ones...");
                     return false;
                 }
 
@@ -915,29 +915,31 @@ namespace Machina
                 logger.Warning($"No tool named \"{action.toolName}\" defined in this robot; please use \"DefineTool\" first.");
                 return false;
             }
-            // Relative transform
-            // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+
+
+            // Shim for lack of IK 
+            // If coming from axes motion, no need to transform the TCP
             if (this.position == null || this.rotation == null)
             {
-                logger.Warning($"Cannot apply \"{action}\"; please provide absolute transform values before attaching a tool and try again.");
-                return false;
+                logger.Warning($"Attaching tool without TCP values, inconsistent results may follow...?");
+            }
+            // Otherwise transform the TCP
+            else
+            {
+                // Now transform the cursor position to the tool's transformation params:
+                Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
+                Vector newPos = this.position + worldVector;
+                Rotation newRot = Rotation.Combine(this.rotation, this.tool.TCPOrientation);  // postmultiplication
+
+                this.prevPosition = this.position;
+                this.position = newPos;
+                this.prevRotation = this.rotation;
+                this.rotation = newRot;
+                //this.prevAxes = this.axes;  // why was this here? joints don't change on tool attachment...
             }
 
             // The cursor has now a tool attached to it 
             this.tool = availableTools[action.toolName];
-            
-            // Now transform the cursor position to the tool's transformation params:
-            Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
-            Vector newPos = this.position + worldVector;
-            Rotation newRot = Rotation.Combine(this.rotation, this.tool.TCPOrientation);  // postmultiplication
-
-            this.prevPosition = this.position;
-            this.position = newPos;
-            this.prevRotation = this.rotation;
-            this.rotation = newRot;
-            this.prevAxes = this.axes;  // why was this here? joints don't change on tool attachment...
-
-            // this.joints = null;  // flag joints as null to avoid Joint instructions using obsolete data --> no need to do this, joints remain the same anyway?
             
             return true;
         }
@@ -973,8 +975,8 @@ namespace Machina
                 this.position = newPos;
                 this.prevRotation = this.rotation;
                 this.rotation = newRot;
-                this.prevAxes = this.axes;
-                this.axes = null;
+                //this.prevAxes = this.axes;
+                //this.axes = null;  // axes were null anyway...? 
             }
 
             // "Detach" the tool
