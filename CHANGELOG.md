@@ -27,8 +27,9 @@
 - Change ABB driver to account for different robtarget and jointtarget ext axes.
 - Add `ArmAngle` action to set the value of the arm-angle for 7-dof robotic arms.
 - Add `ArmAngleTo` to the API. For the time being, we will only have absolute modal for this.
-- `RobotCursor` now keeps track of cartesian and joint external axes separately. 
+- `RobotCursor` now keeps track of cartesian and joint external axes separately.
 - `ExternalAxis` now accepts a third parameter as the target for this action: cartesian targets, joint targets or all.
+- Changes to drivers, added motion update control and `CustomCode` for real-time streaming
 
 
 ## BUILD 1419
