@@ -12,7 +12,7 @@ namespace Machina.Drivers.Communication.Protocols
 {
     class ABBCommunicationProtocol : Base
     {
-        internal static readonly string MACHINA_SERVER_VERSION = "1.3.0";
+        internal static readonly string MACHINA_SERVER_VERSION = "1.3.1";
 
         // A RAPID-code oriented API:
         //                                                      // INSTRUCTION P1 P2 P3 P4...
