@@ -19,12 +19,15 @@
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
 - [ ] Change the ABB driver to get extaxes from the `jointtarget` rather than the `robttarget`: this is a problem with `Yumi` robots where the first extax in `robttarget` is the arm-angle, whereas the first extax in the `jointtarget` is the actual 7th axis rotation.
 - [ ] Change string rounding to make it culture-invariant; was getting troubles with international users getting wrong string rep.
+- [ ] `Do()` takes a Machina string, and deserializes it into an action! :)
+- [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
+- [ ] Add `IInstructionable` interface and implement it on `Tool` and all Actions
 
 
 ---
 # v0.8.4
 ## BUILD 1421
-
+- Made number stringification on compilers `CultureInvariant`
 
 
 
