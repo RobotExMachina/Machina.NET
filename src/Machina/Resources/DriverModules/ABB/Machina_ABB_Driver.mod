@@ -572,9 +572,6 @@ MODULE Machina_Driver
         ! TPWrite "Parsing buffered stream, actionPosWrite: " + NumToStr(actionPosWrite, 0);
 
         WHILE msgBufferReadLine < msgBufferWriteLine OR isMsgBufferWriteLineWrapped = TRUE DO
-            TPWrite("PARSING:");
-            TPWrite(msgBuffer{msgBufferReadLine});
-
             lineLength := StrLen(msgBuffer{msgBufferReadLine});
 
             WHILE msgBufferReadCurrPos <= lineLength DO
