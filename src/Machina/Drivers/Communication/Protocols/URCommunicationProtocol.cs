@@ -270,6 +270,11 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Coordinates:
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
 
+                // If the Action wasn't on the list above, it doesn't have a message representation...
+                default:
+                    Logger.Warning("Cannot stream action `" + _action + "`");
+                    return null;
+
             }
 
             if (_params == null) return null;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -828,7 +829,8 @@ namespace Machina
 
         public string ToString(bool labels)
         {
-            return string.Format("{0}[{1}{2}, {3}{4}, {5}{6}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "{0}[{1}{2}, {3}{4}, {5}{6}]",
                 labels ? "Vector" : "",
                 labels ? "X:" : "",
                 Math.Round(X, STRING_ROUND_DECIMALS_MM),
@@ -840,7 +842,8 @@ namespace Machina
 
         public string ToArrayString()
         {
-            return string.Format("[{0},{1},{2}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[{0},{1},{2}]",
                 Math.Round(X, STRING_ROUND_DECIMALS_MM),
                 Math.Round(Y, STRING_ROUND_DECIMALS_MM),
                 Math.Round(Z, STRING_ROUND_DECIMALS_MM));

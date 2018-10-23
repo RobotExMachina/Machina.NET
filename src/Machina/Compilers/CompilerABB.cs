@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Machina
 {
@@ -171,17 +172,17 @@ namespace Machina
             // Generate V+Z+T
             foreach (Tool t in toolNames.Keys)
             {
-                toolLines.Add(string.Format("  PERS tooldata {0} := {1};", toolNames[t], toolDecs[t]));
+                toolLines.Add(string.Format(CultureInfo.InvariantCulture, "  PERS tooldata {0} := {1};", toolNames[t], toolDecs[t]));
             }
             foreach (var v in velNames.Keys)
             {
-                velocityLines.Add(string.Format("  CONST speeddata {0} := {1};", velNames[v], velDecs[v]));
+                velocityLines.Add(string.Format(CultureInfo.InvariantCulture, "  CONST speeddata {0} := {1};", velNames[v], velDecs[v]));
             }
             foreach (var z in zoneNames.Keys)
             {
                 if (!zonePredef[z])  // no need to add declarations for predefined zones
                 {
-                    zoneLines.Add(string.Format("  CONST zonedata {0} := {1};", zoneNames[z], zoneDecs[z]));
+                    zoneLines.Add(string.Format(CultureInfo.InvariantCulture, "  CONST zonedata {0} := {1};", zoneNames[z], zoneDecs[z]));
                 }
             }
 
@@ -312,7 +313,7 @@ namespace Machina
                 case ActionType.Acceleration:
                     bool zero = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
-                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 //case ActionType.JointSpeed:
@@ -331,7 +332,7 @@ namespace Machina
                     // If here, there was a change, so...
                     bool zeroAcc = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
-                        zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                        zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 case ActionType.Translation:
@@ -360,12 +361,13 @@ namespace Machina
                     dec = string.Format("    TPWrite \"{0}\";",
                         am.message.Length <= 80 ?
                             am.message :
-                            am.message.Substring(0, 80));  // ABB TPWrite messages can only be 80 chars long
+                            am.message.Substring(0, 80));  // ABB strings can only be 80 chars long
                     break;
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("    WaitTime {0};",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "    WaitTime {0};",
                         0.001 * aw.millis);
                     break;
 
@@ -398,35 +400,11 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    //if (aiod.pinName < 0 || aiod.pinName >= cursor.digitalOutputs.Length)
-                    //{
-                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                    //        commChar,
-                    //        aiod.ToString());
-                    //}
-                    //else
-                    //{
-                    //    dec = string.Format("    SetDO {0}, {1};",
-                    //    cursor.digitalOutputNames[aiod.pinName],
-                    //    aiod.on ? "1" : "0");
-                    //}
                     dec = $"    SetDO {aiod.pinName}, {(aiod.on ? "1" : "0")};";
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    //if (aioa.pinName < 0 || aioa.pinName >= cursor.analogOutputs.Length)
-                    //{
-                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                    //        commChar,
-                    //        aioa.ToString());
-                    //}
-                    //else
-                    //{
-                    //    dec = string.Format("    SetAO {0}, {1};",
-                    //    cursor.analogOutputNames[aioa.pinName],
-                    //    aioa.value);
-                    //}
                     dec = $"    SetAO {aioa.pinName}, {aioa.value};";
                     break;
 
@@ -478,7 +456,7 @@ namespace Machina
                 case ActionType.Acceleration:
                     bool zero = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
-                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 //case ActionType.JointSpeed:
@@ -497,7 +475,10 @@ namespace Machina
                     // If here, there was a change, so...
                     bool zeroAcc = cursor.acceleration < Geometry.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
-                        zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M));
+                            zeroAcc
+                                ? "\\Off"
+                                : "\\On := " + Math.Round(0.001 * cursor.acceleration,
+                        Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 case ActionType.Translation:
@@ -526,12 +507,13 @@ namespace Machina
                     dec = string.Format("    TPWrite \"{0}\";",
                         am.message.Length <= 80 ?
                             am.message :
-                            am.message.Substring(0, 80));  // ABB TPWrite messages can only be 80 chars long
+                            am.message.Substring(0, 80));  // ABB strings can only be 80 chars long
                     break;
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("    WaitTime {0};",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "    WaitTime {0};",
                         0.001 * aw.millis);
                     break;
 
@@ -564,35 +546,11 @@ namespace Machina
 
                 case ActionType.IODigital:
                     ActionIODigital aiod = (ActionIODigital)action;
-                    //if (aiod.pinName < 0 || aiod.pinName >= cursor.digitalOutputs.Length)
-                    //{
-                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                    //        commChar,
-                    //        aiod.ToString());
-                    //}
-                    //else
-                    //{
-                    //    dec = string.Format("    SetDO {0}, {1};",
-                    //    cursor.digitalOutputNames[aiod.pinName],
-                    //    aiod.on ? "1" : "0");
-                    //}
                     dec = $"    SetDO {aiod.pinName}, {(aiod.on ? "1" : "0")};";
                     break;
 
                 case ActionType.IOAnalog:
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
-                    //if (aioa.pinName < 0 || aioa.pinName >= cursor.analogOutputs.Length)
-                    //{
-                    //    dec = string.Format("    {0} ERROR on \"{1}\": IO number not available",
-                    //        commChar,
-                    //        aioa.ToString());
-                    //}
-                    //else
-                    //{
-                    //    dec = string.Format("    SetAO {0}, {1};",
-                    //    cursor.analogOutputNames[aioa.pinName],
-                    //    aioa.value);
-                    //}
                     dec = $"    SetAO {aioa.pinName}, {aioa.value};";
                     break;
 
@@ -639,7 +597,8 @@ namespace Machina
         /// <returns></returns>
         static internal string GetRobTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0}, {1}, {2}, {3}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[{0}, {1}, {2}, {3}]",
                 cursor.position.ToString(false),
                 cursor.rotation.Q.ToString(false),
                 "[0,0,0,0]",  // no IK at this moment
@@ -652,7 +611,10 @@ namespace Machina
         /// <returns></returns>
         static internal string GetJointTargetValue(RobotCursor cursor)
         {
-            return string.Format("[{0}, {1}]", cursor.axes, GetExternalJointsJointTargetValue(cursor));
+            return string.Format(CultureInfo.InvariantCulture,
+                "[{0}, {1}]", 
+                cursor.axes, 
+                GetExternalJointsJointTargetValue(cursor));
         }
 
         /// <summary>
@@ -665,7 +627,7 @@ namespace Machina
             // ABB format: [TCP linear speed in mm/s, TCP reorientation speed in deg/s, linear external axis speed in mm/s, rotational external axis speed in deg/s]
             // Default linear speeddata are [vel, 500, 5000, 1000], which feels like a lot. 
             // Just use the speed data as linear or rotational value, and stay safe. 
-            string vel = Math.Round(cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM).ToString();
+            string vel = Math.Round(cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
 
             return string.Format("[{0},{1},{2},{3}]", vel, vel, vel, vel);
             
@@ -692,7 +654,9 @@ namespace Machina
             // Following conventions for default RAPID zones.
             double high = 1.5 * cursor.precision;
             double low = 0.10 * cursor.precision;
-            return string.Format("[FALSE,{0},{1},{2},{3},{4},{5}]", cursor.precision, high, high, low, high, low);
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[FALSE,{0},{1},{2},{3},{4},{5}]", 
+                cursor.precision, high, high, low, high, low);
         }
 
         /// <summary>
@@ -707,7 +671,8 @@ namespace Machina
                 throw new Exception("Cursor has no tool attached");
             }
 
-            return string.Format("[TRUE, [{0},{1}], [{2},{3},{4},0,0,0]]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[TRUE, [{0},{1}], [{2},{3},{4},0,0,0]]",
                 cursor.tool.TCPPosition,
                 cursor.tool.TCPOrientation.Q.ToString(false),
                 cursor.tool.Weight,
@@ -753,7 +718,7 @@ namespace Machina
             for (int i = 0; i < extax.Length; i++)
             {
                 val = extax[i];
-                extj += (val == null) ? "9E9" : Math.Round((double) val, Geometry.STRING_ROUND_DECIMALS_MM).ToString();
+                extj += (val == null) ? "9E9" : Math.Round((double) val, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
                 if (i < extax.Length - 1)
                 {
                     extj += ",";
@@ -763,7 +728,7 @@ namespace Machina
             return extj;
         }
 
-        static internal string SafeDoubleName(double value) => Math.Round(value, Geometry.STRING_ROUND_DECIMALS_MM).ToString().Replace('.', '_');
+        static internal string SafeDoubleName(double value) => Math.Round(value, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture).Replace('.', '_');
 
     }
 }

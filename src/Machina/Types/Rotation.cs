@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -318,7 +319,8 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("Rotation[X:{0}, Y:{1}, Z:{2}, A:{3}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "Rotation[X:{0}, Y:{1}, Z:{2}, A:{3}]",
                 Math.Round(AA.X, STRING_ROUND_DECIMALS_VECTOR),
                 Math.Round(AA.Y, STRING_ROUND_DECIMALS_VECTOR),
                 Math.Round(AA.Z, STRING_ROUND_DECIMALS_VECTOR),
@@ -327,7 +329,8 @@ namespace Machina
 
         public string ToArrayString()
         {
-            return string.Format("[{0},{1},{2},{3}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[{0},{1},{2},{3}]",
                 Math.Round(AA.X, STRING_ROUND_DECIMALS_VECTOR),
                 Math.Round(AA.Y, STRING_ROUND_DECIMALS_VECTOR),
                 Math.Round(AA.Z, STRING_ROUND_DECIMALS_VECTOR),

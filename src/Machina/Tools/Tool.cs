@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -197,7 +198,8 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("Tool[\"{0}\", Tip{1}, Orientation{2}, {3} kg]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "Tool[\"{0}\", Tip{1}, Orientation{2}, {3} kg]",
                 this.name,
                 this.TCPPosition,
                 this.TCPOrientation,
@@ -211,7 +213,24 @@ namespace Machina
         /// <returns></returns>
         public string ToInstruction()
         {
-            return $"Tool.Create(\"{this.name}\", {this.TCPPosition.X}, {this.TCPPosition.Y}, {this.TCPPosition.Z}, {this.TCPOrientation.XAxis.X}, {this.TCPOrientation.XAxis.Y}, {this.TCPOrientation.XAxis.Z}, {this.TCPOrientation.YAxis.X}, {this.TCPOrientation.YAxis.Y}, {this.TCPOrientation.YAxis.Z}, {this.Weight}, {this.CenterOfGravity.X}, {this.CenterOfGravity.Y}, {this.CenterOfGravity.Z});";
+            //$"Tool.Create(\"{this.name}\", {this.TCPPosition.X}, {this.TCPPosition.Y}, {this.TCPPosition.Z}, {this.TCPOrientation.XAxis.X}, {this.TCPOrientation.XAxis.Y}, {this.TCPOrientation.XAxis.Z}, {this.TCPOrientation.YAxis.X}, {this.TCPOrientation.YAxis.Y}, {this.TCPOrientation.YAxis.Z}, {this.Weight}, {this.CenterOfGravity.X}, {this.CenterOfGravity.Y}, {this.CenterOfGravity.Z});";
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "Tool.Create(\"{0}\",{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13});",
+                this.name,
+                this.TCPPosition.X,
+                this.TCPPosition.Y,
+                this.TCPPosition.Z,
+                this.TCPOrientation.XAxis.X,
+                this.TCPOrientation.XAxis.Y,
+                this.TCPOrientation.XAxis.Z,
+                this.TCPOrientation.YAxis.X,
+                this.TCPOrientation.YAxis.Y,
+                this.TCPOrientation.YAxis.Z,
+                this.Weight,
+                this.CenterOfGravity.X,
+                this.CenterOfGravity.Y,
+                this.CenterOfGravity.Z);
         }
 
     }

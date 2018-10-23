@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Machina
 {
@@ -195,7 +196,8 @@ namespace Machina
             switch (action.Type)
             {
                 case ActionType.Speed:
-                    dec = string.Format("G1 F{0}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "G1 F{0}",
                         Math.Round(60.0 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
@@ -216,7 +218,8 @@ namespace Machina
                 // In GCode, this is called "Dwell"
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("G4 P{0}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "G4 P{0}",
                         aw.millis);
                     break;
 
@@ -254,13 +257,21 @@ namespace Machina
                     }
                     else
                     {
-                        dec = $"M42 P{aioa.pinNum} S{Math.Round(aioa.value, 0)}";
+                        //dec = $"M42 P{aioa.pinNum} S{Math.Round(aioa.value, 0)}";
+                        dec = string.Format(CultureInfo.InvariantCulture,
+                            "M42 P{0} S{1}",
+                            aioa.pinNum,
+                            Math.Round(aioa.value, 0));
                     }
                     break;
 
                 case ActionType.Temperature:
                     ActionTemperature at = (ActionTemperature)action;
-                    dec = $"{tempToGCode[new Tuple<RobotPartType, bool>(at.robotPart, at.wait)]} S{Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE)}";
+                    //dec = $"{tempToGCode[new Tuple<RobotPartType, bool>(at.robotPart, at.wait)]} S{Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE)}";
+                    dec = string.Format(CultureInfo.InvariantCulture,
+                        "{0} S{1}",
+                        tempToGCode[new Tuple<RobotPartType, bool>(at.robotPart, at.wait)],
+                        Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE));
                     break;
 
                 case ActionType.Extrusion:
@@ -326,7 +337,8 @@ namespace Machina
         /// <returns></returns>
         internal string GetPositionTargetValue(RobotCursor cursor)
         {
-            return string.Format("X{0} Y{1} Z{2}",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "X{0} Y{1} Z{2}",
                 Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM));
@@ -351,7 +363,9 @@ namespace Machina
                 len = cursor.extrudedLength - this.extrusionLengthResetPosition;
             }
 
-            return $"E{Math.Round(len, 5)}";
+            return string.Format(CultureInfo.InvariantCulture, 
+                "E{0}",
+                Math.Round(len, 5));
         }
 
         /// <summary>
@@ -377,7 +391,9 @@ namespace Machina
 
             // Machina bolierplate
             this.instructionLines.Add("M82");                     // set extruder to absolute mode (this is actually ZMorph, but useful here
-            this.instructionLines.Add($"G1 F{Math.Round(cursor.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)}");  // initialize feed speed to the writer's state
+            this.instructionLines.Add(string.Format(CultureInfo.InvariantCulture, 
+                "G1 F{0}",
+                Math.Round(cursor.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)));  // initialize feed speed to the writer's state
         }
         
         /// <summary>

@@ -108,6 +108,7 @@ namespace Machina.Drivers.Communication.Protocols
                     break;
 
                 case ActionType.Acceleration:
+                    // WorldAccLim \On V (V = 0 sets \Off, any other value sets WorldAccLim \On V)
                     msgs.Add(string.Format(CultureInfo.InvariantCulture,
                         "{0}{1} {2} {3}{4}",
                         STR_MESSAGE_ID_CHAR,
@@ -118,30 +119,46 @@ namespace Machina.Drivers.Communication.Protocols
                     break;
 
                 case ActionType.Precision:
-                    // (setzone FINE TCP[ORI EAX ORI LEAX REAX])
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}");  // this accepts more zone params, but those are still not implemented in Machina... 
+                    // (setzone FINE TCP[ORI EAX ORI LEAX REAX])  --> this accepts more zone params, but those are still not implemented in Machina... 
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} {3}{4}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_ZONE,
+                        cursor.precision,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.Wait:
-                    // !WaitTime T
+                    // WaitTime T
                     ActionWait aw = (ActionWait)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_WAITTIME} {0.001 * aw.millis}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} {3}{4}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_WAITTIME,
+                        0.001 * aw.millis,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.Message:
-                    // !TPWrite "MSG"
+                    // TPWrite "MSG"
                     ActionMessage am = (ActionMessage)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_TPWRITE} \"{am.message}\"{STR_MESSAGE_END_CHAR}");
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} \"{3}\"{4}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_TPWRITE,
+                        am.message,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.AttachTool:
                     // !(settool X Y Z QW QX QY QZ KG CX CY CZ)
-                    //ActionAttachTool aa = (ActionAttachTool)action;
-                    //Tool t = aa.tool;
-
                     Tool t = cursor.tool;  // @TODO: should I just pull from the library? need to rethink the general approach: take info from cursor state (like motion actions) or action data...
 
-                    msgs.Add(string.Format("{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}{14}",
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}{14}",
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         INST_TOOL,
@@ -156,24 +173,59 @@ namespace Machina.Drivers.Communication.Protocols
                         Math.Round(t.CenterOfGravity.X, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(t.CenterOfGravity.Y, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(t.CenterOfGravity.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+
+                        //// Was getting messages longer than 80 chars, temporal worksround
+                        //Math.Round(t.TCPPosition.X, 1),
+                        //Math.Round(t.TCPPosition.Y, 1),
+                        //Math.Round(t.TCPPosition.Z, 1),
+                        //Math.Round(t.TCPOrientation.Q.W, 3),
+                        //Math.Round(t.TCPOrientation.Q.X, 3),
+                        //Math.Round(t.TCPOrientation.Q.Y, 3),
+                        //Math.Round(t.TCPOrientation.Q.Z, 3),
+                        //Math.Round(t.Weight, 1),
+                        //Math.Round(t.CenterOfGravity.X, 1),
+                        //Math.Round(t.CenterOfGravity.Y, 1),
+                        //Math.Round(t.CenterOfGravity.Z, 1),
+
                         STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.DetachTool:
                     // !(settool0)
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_NOTOOL}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2}{3}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_NOTOOL,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.IODigital:
                     // !SetDO "NAME" ON
                     ActionIODigital aiod = (ActionIODigital)action;
-                    msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SETDO} \"{aiod.pinName}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}");
+                    //msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SETDO} \"{aiod.pinName}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} \"{3}\" {4}{5}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_SETDO,
+                        aiod.pinName,
+                        aiod.on ? 1 : 0,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.IOAnalog:
                     // !SetAO "NAME" V
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SETAO} \"{aioa.pinName}\" {aioa.value}{STR_MESSAGE_END_CHAR}");
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} \"{3}\" {4}{5}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_SETAO,
+                        aioa.pinName,
+                        aioa.value,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.PushPop:
@@ -188,15 +240,33 @@ namespace Machina.Drivers.Communication.Protocols
                         Settings beforePop = cursor.settingsBuffer.SettingsBeforeLastPop;
                         if (beforePop.Speed != cursor.speed)
                         {
-                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}");
+                            msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                                "{0}{1} {2} {3}{4}",
+                                STR_MESSAGE_ID_CHAR,
+                                action.Id,
+                                INST_SPEED,
+                                cursor.speed,
+                                STR_MESSAGE_END_CHAR));
                         }
                         if (beforePop.Acceleration != cursor.acceleration)
                         {
-                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_ACCELERATION} {cursor.acceleration}{STR_MESSAGE_END_CHAR}");
+                            msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                                "{0}{1} {2} {3}{4}",
+                                STR_MESSAGE_ID_CHAR,
+                                action.Id,
+                                INST_ACCELERATION,
+                                cursor.acceleration,
+                                STR_MESSAGE_END_CHAR));
                         }
                         if (beforePop.Precision != cursor.precision)
                         {
-                            msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_ZONE} {cursor.precision}{STR_MESSAGE_END_CHAR}");
+                            msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                                "{0}{1} {2} {3}{4}",
+                                STR_MESSAGE_ID_CHAR,
+                                action.Id,
+                                INST_ZONE,
+                                cursor.precision,
+                                STR_MESSAGE_END_CHAR));
                         }
                     }
                     break;
@@ -205,7 +275,7 @@ namespace Machina.Drivers.Communication.Protocols
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
 
                 case ActionType.ExternalAxis:
-                    string msg, @params, id;
+                    string @params, id;
                     ActionExternalAxis aea = action as ActionExternalAxis;
                     
                     // Cartesian msg
@@ -222,9 +292,13 @@ namespace Machina.Drivers.Communication.Protocols
 
                         @params = ExternalAxesToParameters(cursor.externalAxesCartesian);
 
-                        msg = $"{STR_MESSAGE_ID_CHAR}{id} {INST_EXT_JOINTS_ROBTARGET} {@params}{STR_MESSAGE_END_CHAR}";
-
-                        msgs.Add(msg);
+                        msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                            "{0}{1} {2} {3}{4}",
+                            STR_MESSAGE_ID_CHAR,
+                            id,
+                            INST_EXT_JOINTS_ROBTARGET,
+                            @params,
+                            STR_MESSAGE_END_CHAR));
                     }
 
                     // Joints msg
@@ -234,18 +308,22 @@ namespace Machina.Drivers.Communication.Protocols
 
                         @params = ExternalAxesToParameters(cursor.externalAxesJoints);
 
-                        msg = $"{STR_MESSAGE_ID_CHAR}{id} {INST_EXT_JOINTS_JOINTTARGET} {@params}{STR_MESSAGE_END_CHAR}";
-
-                        msgs.Add(msg);
+                        msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                            "{0}{1} {2} {3}{4}",
+                            STR_MESSAGE_ID_CHAR,
+                            id,
+                            INST_EXT_JOINTS_JOINTTARGET,
+                            @params,
+                            STR_MESSAGE_END_CHAR));
                     }
                     
                     break;
 
-
                 case ActionType.ArmAngle:
-                    // Send a request to change only the robtarget portion of the external axes for next motion.
+                    // Send a request to change only the robtarget portion of the external axes for next motion
                     ActionArmAngle aaa = action as ActionArmAngle;
-                    msgs.Add(string.Format("{0}{1} {2} {3} 9E9 9E9 9E9 9E9 9E9{4}",
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} {3} 9E9 9E9 9E9 9E9 9E9{4}",
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         INST_EXT_JOINTS_ROBTARGET,
@@ -280,7 +358,8 @@ namespace Machina.Drivers.Communication.Protocols
                 }
                 else
                 {
-                    param += Math.Round((double) extax[i], Geometry.STRING_ROUND_DECIMALS_MM).ToString();
+                    param += Math.Round((double) extax[i], Geometry.STRING_ROUND_DECIMALS_MM)
+                        .ToString(CultureInfo.InvariantCulture);
                 }
 
                 if (i < extax.Length - 1)

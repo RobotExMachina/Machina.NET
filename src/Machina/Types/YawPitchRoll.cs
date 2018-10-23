@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -221,7 +222,8 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("EulerZYX[Z:{0}, Y:{1}, X:{2}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "EulerZYX[Z:{0}, Y:{1}, X:{2}]",
                 Math.Round(this.ZAngle, STRING_ROUND_DECIMALS_RADS),
                 Math.Round(this.YAngle, STRING_ROUND_DECIMALS_RADS),
                 Math.Round(this.XAngle, STRING_ROUND_DECIMALS_RADS));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Machina
 {
@@ -179,13 +180,11 @@ namespace Machina
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  POS target{0}",
-                        id);
+                    dec = string.Format("  POS target{0}", id);
                     break;
 
                 case ActionType.Axes:
-                    dec = string.Format("  AXIS target{0}",
-                        id);
+                    dec = string.Format("  AXIS target{0}", id);
                     break;
             }
 
@@ -225,12 +224,14 @@ namespace Machina
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
-                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Precision:
-                    dec = string.Format("  $APO.CDIS = {0}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  $APO.CDIS = {0}",
                         cursor.precision);
                     break;
 
@@ -261,7 +262,8 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("  WAIT SEC {0}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  WAIT SEC {0}",
                         0.001 * aw.millis);
                     break;
 
@@ -322,7 +324,12 @@ namespace Machina
                     }
                     else
                     {
-                        dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                        //dec = "  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                        dec = string.Format(CultureInfo.InvariantCulture,
+                            "  $ANOUT[{0}] = {1}",
+                            aioa.pinNum,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+
                     }
                     break;
 
@@ -368,12 +375,14 @@ namespace Machina
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
-                    dec = string.Format("  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Precision:
-                    dec = string.Format("  $APO.CDIS = {0}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  $APO.CDIS = {0}",
                         cursor.precision);
                     break;
 
@@ -404,7 +413,8 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("  WAIT SEC {0}",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  WAIT SEC {0}",
                         0.001 * aw.millis);
                     break;
 
@@ -465,7 +475,11 @@ namespace Machina
                     }
                     else
                     {
-                        dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                        //dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                        dec = string.Format(CultureInfo.InvariantCulture,
+                            "  $ANOUT[{0}] = {1}",
+                            aioa.pinNum,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
                     }
                     break;
 
@@ -513,7 +527,8 @@ namespace Machina
         {
             YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
 
-            return string.Format("{{POS: X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
+            return string.Format(CultureInfo.InvariantCulture,
+                "{{POS: X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
                 Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
@@ -529,7 +544,8 @@ namespace Machina
         /// <returns></returns>
         internal string GetAxisTargetValue(RobotCursor cursor)
         {
-            return string.Format("{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
                 Math.Round(cursor.axes.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(cursor.axes.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(cursor.axes.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
@@ -552,7 +568,8 @@ namespace Machina
 
             YawPitchRoll euler = cursor.tool.TCPOrientation.Q.ToYawPitchRoll();
 
-            return string.Format("{{X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "{{X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
                 Math.Round(cursor.tool.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.tool.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.tool.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_MM),

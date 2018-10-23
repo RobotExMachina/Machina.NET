@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -157,7 +158,8 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("[{0}, {1}, {2}, {3}, {4}, {5}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[{0}, {1}, {2}, {3}, {4}, {5}]",
                 Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),
@@ -168,7 +170,8 @@ namespace Machina
 
         public string ToArrayString()
         {
-            return string.Format("[{0},{1},{2},{3},{4},{5}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[{0},{1},{2},{3},{4},{5}]",
                 Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),

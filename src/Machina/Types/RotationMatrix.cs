@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -682,7 +683,8 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("RotationMatrix[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "RotationMatrix[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
                 Math.Round(m00, STRING_ROUND_DECIMALS_MM),
                 Math.Round(m01, STRING_ROUND_DECIMALS_MM),
                 Math.Round(m02, STRING_ROUND_DECIMALS_MM),

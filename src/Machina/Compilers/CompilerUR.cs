@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Machina
 {
@@ -181,7 +182,8 @@ namespace Machina
                     // Use speed and acceleration values as deg/s or mm/s (converted to rad and m) in either case. 
                     if (cursor.motionType == MotionType.Joint)
                     {
-                        dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
+                        dec = string.Format(CultureInfo.InvariantCulture, 
+                            "  movej(target{0}, a={1}, v={2}, r={3})",
                             id,
                             Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
                             Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
@@ -189,7 +191,8 @@ namespace Machina
                     }
                     else
                     {
-                        dec = string.Format("  movel(target{0}, a={1}, v={2}, r={3})",
+                        dec = string.Format(CultureInfo.InvariantCulture, 
+                            "  movel(target{0}, a={1}, v={2}, r={3})",
                             id,
                             Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
                             Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
@@ -217,12 +220,10 @@ namespace Machina
                     //}
                     break;
 
-                //case ActionType.RotationSpeed:
-                //    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", COMMENT_CHAR);
-                //    break;
 
                 case ActionType.Axes:
-                    dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                            "  movej(target{0}, a={1}, v={2}, r={3})",
                             id,
                             Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
                             Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
@@ -243,7 +244,8 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("  sleep({0})",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  sleep({0})",
                         0.001 * aw.millis);
                     break;
 
@@ -304,7 +306,13 @@ namespace Machina
                     }
                     else
                     {
-                        dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
+                        //dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
+                        dec = string.Format(CultureInfo.InvariantCulture,
+                            "  set_{0}_analog_out({1}, {2})",
+                            aioa.isToolPin ? "tool" : "standard",
+                            aioa.pinNum,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+
                     }
                     break;
 
@@ -355,7 +363,8 @@ namespace Machina
                     // Use speed and acceleration values as deg/s or mm/s (converted to rad and m) in either case. 
                     if (cursor.motionType == MotionType.Joint)
                     {
-                        dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
+                        dec = string.Format(CultureInfo.InvariantCulture, 
+                            "  movej(target{0}, a={1}, v={2}, r={3})",
                             GetPoseTargetValue(cursor),
                             Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
                             Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
@@ -363,7 +372,8 @@ namespace Machina
                     }
                     else
                     {
-                        dec = string.Format("  movel(target{0}, a={1}, v={2}, r={3})",
+                        dec = string.Format(CultureInfo.InvariantCulture, 
+                            "  movel(target{0}, a={1}, v={2}, r={3})",
                             GetPoseTargetValue(cursor),
                             Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
                             Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
@@ -391,12 +401,9 @@ namespace Machina
                 //}
                 //break;
 
-                //case ActionType.RotationSpeed:
-                //    dec = string.Format("  {0} WARNING: RotationSpeed() has no effect in UR robots, try JointSpeed() or JointAcceleration() instead", COMMENT_CHAR);
-                //    break;
-
                 case ActionType.Axes:
-                    dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  movej(target{0}, a={1}, v={2}, r={3})",
                         GetJointTargetValue(cursor),
                         Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
                         Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
@@ -417,7 +424,8 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format("  sleep({0})",
+                    dec = string.Format(CultureInfo.InvariantCulture, 
+                        "  sleep({0})",
                         0.001 * aw.millis);
                     break;
 
@@ -478,7 +486,12 @@ namespace Machina
                     }
                     else
                     {
-                        dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
+                        //dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
+                        dec = string.Format(CultureInfo.InvariantCulture,
+                            "  set_{0}_analog_out({1}, {2})",
+                            aioa.isToolPin ? "tool" : "standard",
+                            aioa.pinNum,
+                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
                     }
                     break;
 
@@ -524,7 +537,8 @@ namespace Machina
         internal static string GetPoseTargetValue(RobotCursor cursor)
         {
             RotationVector axisAng = cursor.rotation.GetRotationVector(true);
-            return string.Format("p[{0},{1},{2},{3},{4},{5}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "p[{0},{1},{2},{3},{4},{5}]",
                 Math.Round(0.001 * cursor.position.X, Geometry.STRING_ROUND_DECIMALS_M),
                 Math.Round(0.001 * cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_M),
                 Math.Round(0.001 * cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_M),
@@ -541,7 +555,8 @@ namespace Machina
         {
             Joints jrad = new Joints(cursor.axes);  // use a shallow copy
             jrad.Scale(Geometry.TO_RADS);  // convert to radians
-            return string.Format("[{0},{1},{2},{3},{4},{5}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "[{0},{1},{2},{3},{4},{5}]",
                 Math.Round(jrad.J1, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(jrad.J2, Geometry.STRING_ROUND_DECIMALS_RADS),
                 Math.Round(jrad.J3, Geometry.STRING_ROUND_DECIMALS_RADS),
@@ -564,7 +579,8 @@ namespace Machina
 
             RotationVector axisAng = cursor.tool.TCPOrientation.Q.ToRotationVector(true);
 
-            return string.Format("p[{0},{1},{2},{3},{4},{5}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "p[{0},{1},{2},{3},{4},{5}]",
                 Math.Round(0.001 * cursor.tool.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_M),
                 Math.Round(0.001 * cursor.tool.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_M),
                 Math.Round(0.001 * cursor.tool.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_M),

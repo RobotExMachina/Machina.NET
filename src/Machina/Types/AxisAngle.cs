@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -446,7 +447,8 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("AxisAngle[X:{0}, Y:{1}, Z:{2}, A:{3}]",
+            return string.Format(CultureInfo.InvariantCulture, 
+                "AxisAngle[X:{0}, Y:{1}, Z:{2}, A:{3}]",
                 Math.Round(Axis.X, STRING_ROUND_DECIMALS_MM),
                 Math.Round(Axis.Y, STRING_ROUND_DECIMALS_MM),
                 Math.Round(Axis.Z, STRING_ROUND_DECIMALS_MM),
