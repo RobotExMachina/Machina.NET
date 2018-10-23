@@ -139,7 +139,7 @@ namespace Machina
         /// <returns></returns>
         public static string EscapeDoubleQuotes(string str)
         {
-            return str.Replace("\"", "\\\"");
+            return str?.Replace("\"", "\\\"");
         }
 
         /// <summary>

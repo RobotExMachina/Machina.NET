@@ -12,7 +12,7 @@ namespace Machina.Drivers.Communication.Protocols
 {
     class ABBCommunicationProtocol : Base
     {
-        internal static readonly string MACHINA_SERVER_VERSION = "1.3.2";
+        internal static readonly string MACHINA_SERVER_VERSION = "1.4.0";
 
         // A RAPID-code oriented API:
         //                                                      // INSTRUCTION P1 P2 P3 P4...
@@ -41,10 +41,10 @@ namespace Machina.Drivers.Communication.Protocols
 
 
         // Characters used for buffer parsing
-        internal const char STR_MESSAGE_END_CHAR = ';';       // Marks the end of a message
-        internal const char STR_MESSAGE_CONTINUE_CHAR = '>';  // Marks the end of an unfinished message, to be continued on next message. Useful when the message is too long and needs to be split in chunks
-        internal const char STR_MESSAGE_ID_CHAR = '@';        // Flags a message as an acknowledgment message corresponding to a source id
-        internal const char STR_MESSAGE_RESPONSE_CHAR = '$';  // Flags a message as a response to an information request(acknowledgments do not include it)
+        internal const char STR_MESSAGE_END_CHAR = ';';         // Marks the end of a message
+        internal const char STR_MESSAGE_CONTINUE_CHAR = '>';    // Marks the end of an unfinished message, to be continued on next message. Useful when the message is too long and needs to be split in chunks
+        internal const char STR_MESSAGE_ID_CHAR = '@';          // Flags a message as an acknowledgment message corresponding to a source id
+        internal const char STR_MESSAGE_RESPONSE_CHAR = '$';    // Flags a message as a response to an information request(acknowledgments do not include it)
 
 
         /// <summary>
@@ -332,6 +332,7 @@ namespace Machina.Drivers.Communication.Protocols
                     break;
 
                 // When connected live, this is used as a way to stream a message directly to the robot. Unsafe, but oh well...
+                // @TODO: should the protocol add the action id, or is this also left to the user to handle?
                 case ActionType.CustomCode:
                     ActionCustomCode acc = action as ActionCustomCode;
                     msgs.Add(acc.statement);

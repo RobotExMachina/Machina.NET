@@ -12,7 +12,7 @@ MODULE Machina_Driver
     ! waits for a TCP client, listens to a stream of formatted string messages,
     ! buffers them parsed into an 'action' struct, and runs a loop to execute them.
     !
-    ! IMPORTANT: make sure to adjust 127.0.0.1 and {{PORTs}} to your current setup
+    ! IMPORTANT: make sure to adjust {{HOSTNAME}} and {{PORT}} to your current setup
     !
     ! More info on https://github.com/RobotExMachina
     ! A project by https://github.com/garciadelcastillo
@@ -62,7 +62,7 @@ MODULE Machina_Driver
     CONST num SERVER_PORT := {{PORT}};           ! Replace 7000 with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.3.2";
+    CONST string MACHINA_SERVER_VERSION := "1.4.0";
 
     ! Should program exit on any kind of error?
     PERS bool USE_STRICT := TRUE;
@@ -534,31 +534,11 @@ MODULE Machina_Driver
     ! Parse an incoming string buffer, and decide what to do with it
     ! based on its quality
     PROC ParseBuffer(string sb, num sbl)
-        VAR num endCurrentPos := 1;
-        VAR num endLastPos := 1;
-        VAR num endings := 0;
-
-        ! Check that there is at least one end_char in this string
-        endCurrentPos := StrFind(sb, 1, STR_MESSAGE_END_CHAR);
-        WHILE endCurrentPos <= sbl DO
-            endings := endings + 1;
-            endLastPos := endCurrentPos;
-            endCurrentPos := StrFind(sb, endCurrentPos + 1, STR_MESSAGE_END_CHAR);
-        ENDWHILE
-
-        ! Corrupt buffer
-        IF endings = 0 THEN
-            TPWrite "MACHINA ERROR: Received corrupt buffer";
-            TPWrite sb;
-            IF USE_STRICT THEN EXIT; ENDIF
-        ENDIF
-
         ! Store the buffer
         StoreBuffer sb;
 
         ! Keep going if the chunk was trimmed
-        streamBufferPending := endLastPos < sbl;
-
+        streamBufferPending := StrFind(sb, sbl, STR_MESSAGE_END_CHAR) > sbl;
     ENDPROC
 
     ! Add a string buffer to the buffer of received messages
@@ -585,20 +565,67 @@ MODULE Machina_Driver
         VAR num partLength;
         VAR num lineLength;
 
+        VAR bool parsingLongStatement := FALSE;
+        VAR string statementParts{10};
+        VAR num statementPartsCount := 0;
+
         ! TPWrite "Parsing buffered stream, actionPosWrite: " + NumToStr(actionPosWrite, 0);
 
         WHILE msgBufferReadLine < msgBufferWriteLine OR isMsgBufferWriteLineWrapped = TRUE DO
+            TPWrite("PARSING:");
+            TPWrite(msgBuffer{msgBufferReadLine});
+
             lineLength := StrLen(msgBuffer{msgBufferReadLine});
 
             WHILE msgBufferReadCurrPos <= lineLength DO
                 msgBufferReadCurrPos := StrFind(msgBuffer{msgBufferReadLine}, msgBufferReadPrevPos, STR_MESSAGE_END_CHAR);
 
                 partLength := msgBufferReadCurrPos - msgBufferReadPrevPos;
-                part := part + StrPart(msgBuffer{msgBufferReadLine}, msgBufferReadPrevPos, partLength);  ! take the statement without the STR_MESSAGE_END_CHAR
 
-                IF msgBufferReadCurrPos <= lineLength THEN
-                    ParseStatement(part + STR_MESSAGE_END_CHAR);  ! quick and dirty add of the end_char... XD
-                    part := "";
+                ! Work around RAPID's limitation of 80 chars per string
+                ! Long statement?
+                IF parsingLongStatement OR partLength + StrLen(part) > 80 THEN
+
+                    ! First encounter with long statement?
+                    IF parsingLongStatement = FALSE THEN
+                        ! Store previous chunk
+                        statementPartsCount := statementPartsCount + 1;
+                        statementParts{statementPartsCount} := part;
+                        parsingLongStatement := TRUE;
+                    ENDIF
+
+                    ! Add new chunk to list of statement lines
+                    statementPartsCount := statementPartsCount + 1;
+                    statementParts{statementPartsCount} := StrPart(msgBuffer{msgBufferReadLine}, msgBufferReadPrevPos, partLength);
+
+                    ! Sanity
+                    IF statementPartsCount > Dim(statementParts, 1) THEN
+                        TPWrite "MACHINA ERROR: message exceeds maximum character length.";
+                        IF USE_STRICT THEN
+                            EXIT;
+                        ELSE
+                            part := "";
+                            parsingLongStatement := FALSE;
+                            statementPartsCount := 0;
+                        ENDIF
+
+                    ! If cursor is not at end of line, finish this list and parse it
+                    ELSEIF msgBufferReadCurrPos <= lineLength THEN
+                        statementParts{statementPartsCount} := statementParts{statementPartsCount} + STR_MESSAGE_END_CHAR;  ! quick and dirty add of the end_char... XD
+                        ParseLongStatement statementParts, statementPartsCount;
+                        part := "";
+                        parsingLongStatement := FALSE;
+                        statementPartsCount := 0;
+                    ENDIF
+
+                ! Othwerwise, parse as regular single string statement
+                ELSE
+                    part := part + StrPart(msgBuffer{msgBufferReadLine}, msgBufferReadPrevPos, partLength);  ! take the statement without the STR_MESSAGE_END_CHAR
+
+                    IF msgBufferReadCurrPos <= lineLength THEN
+                        ParseStatement(part + STR_MESSAGE_END_CHAR);  ! quick and dirty add of the end_char... XD
+                        part := "";
+                    ENDIF
                 ENDIF
 
                 msgBufferReadCurrPos := msgBufferReadCurrPos + 1;
@@ -641,7 +668,7 @@ MODULE Machina_Driver
         ENDIF
 
         ! Does the message come with a leading ID?
-        IF StrPart(st, 1, 1) = STR_MESSAGE_ID_CHAR THEN  ! can't strings be treated as char arrays? st{1} = ... ?
+        IF StrPart(st, 1, 1) = STR_MESSAGE_ID_CHAR THEN
             nPos := StrFind(st, pos, STR_WHITE);
             IF nPos > len THEN
                 TPWrite "MACHINA ERROR: incorrectly formatted message:";
@@ -736,6 +763,121 @@ MODULE Machina_Driver
         StoreAction a;
 
     ENDPROC
+
+    ! Parse a multi-string representation of a statement into an Action
+    ! and store it in the buffer.
+    PROC ParseLongStatement(string statementList{*}, num lineCount)
+        ! This assumes a string formatted in the following form:
+        ! [@IDNUM ]INSCODE[ "stringParam"][ p0 p1 p2 ... p11]STR_MESSAGE_END_CHAR
+        VAR string arguments{100};
+        VAR num argCount := 0;
+        VAR num argId := 1;
+        VAR string part := "";
+
+        VAR bool ok;
+        VAR bool end;
+        VAR num pos := 1;
+        VAR num nPos;
+        VAR string s;
+        VAR num len;
+        VAR num params{11};
+        VAR num paramsPos := 1;
+        VAR action a;
+
+        FOR index FROM 1 TO lineCount DO
+            len := StrLen(statementList{index});
+
+            WHILE nPos <= len DO
+                nPos := StrFind(statementList{index}, pos, STR_WHITE);
+                part := part + StrPart(statementList{index}, pos, nPos - pos);
+
+                IF nPos <= len THEN
+                    argCount := argCount + 1;
+                    arguments{argCount} := part;
+                    part := "";
+                    pos := nPos + 1;
+                ENDIF
+
+            ENDWHILE
+
+            ! Ready to parse next line
+            pos := 1;
+            nPos := 0;
+        ENDFOR
+
+        ! PARSE THE ARGUMENTS
+        ! Does the message come with a leading ID?
+        IF StrPart(arguments{argId}, 1, 1) = STR_MESSAGE_ID_CHAR THEN
+            part := StrPart(arguments{argId}, 2, StrLen(arguments{argId}) - 1);
+            ok := StrToVal(part, a.id);
+            IF NOT ok THEN
+                TPWrite "MACHINA ERROR: incorrectly formatted message:";
+                TPWrite part;
+                IF USE_STRICT THEN
+                    EXIT;
+                ENDIF
+                RETURN;
+            ENDIF
+
+            ! Move to next arg
+            argId := argId + 1;
+        ENDIF
+
+        ! Read instruction code
+        ok := StrToVal(arguments{argId}, a.code);
+
+        ! If couldn't read instruction code, discard this message
+        IF NOT ok THEN
+            TPWrite "MACHINA ERROR: received corrupt message:";
+            TPWrite arguments{argId};
+            IF USE_STRICT THEN
+              EXIT;
+            ENDIF
+            RETURN;
+        ENDIF
+
+        argId := argId + 1;
+
+        ! Is there any string param?
+        len := StrLen(arguments{argId});
+        IF StrPart(arguments{argId}, 1, 1) = STR_DOUBLE_QUOTES AND StrPart(arguments{argId}, len, 1) = STR_DOUBLE_QUOTES THEN
+            ! Succesful find of a double quote
+            a.s1 := StrPart(arguments{argId}, 2, len - 2);
+            argId := argId + 1;
+        ENDIF
+
+        ! Parse rest of numerical characters
+        FOR index FROM argId TO argCount DO
+            ok := StrToVal(arguments{index}, params{paramsPos});
+            IF NOT ok THEN
+                TPWrite "MACHINA ERROR: received corrupt parameter:";
+                TPWrite arguments{index};
+                IF USE_STRICT THEN
+                    EXIT;
+                ENDIF
+                RETURN;
+            ENDIF
+            paramsPos := paramsPos + 1;
+        ENDFOR
+
+        ! Quick and dity to avoid a huge IF ELSE statement... unassigned vars use zeros
+        a.p1 := params{1};
+        a.p2 := params{2};
+        a.p3 := params{3};
+        a.p4 := params{4};
+        a.p5 := params{5};
+        a.p6 := params{6};
+        a.p7 := params{7};
+        a.p8 := params{8};
+        a.p9 := params{9};
+        a.p10 := params{10};
+        a.p11 := params{11};
+
+        ! Save it to the buffer
+        StoreAction a;
+    ENDPROC
+
+
 
     ! Stores this action in the buffer
     PROC StoreAction(action a)

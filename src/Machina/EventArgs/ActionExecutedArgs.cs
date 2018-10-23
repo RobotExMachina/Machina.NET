@@ -69,7 +69,7 @@ namespace Machina
         public override string ToJSONString()
         {
             return string.Format("{{\"event\":\"action-executed\",\"last\":\"{0}\",\"id\":{9},\"pendDev\":{1},\"pendTot\":{2},\"pos\":{3},\"ori\":{4},\"quat\":{5},\"axes\":{6},\"extax\":{7},\"conf\":{8}}}",
-                Util.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
+                Util.EscapeDoubleQuotes(this.LastAction?.ToInstruction()) ?? "null",
                 this.PendingExecutionOnDevice,
                 this.PendingExecutionTotal,
                 this.Position?.ToArrayString() ?? "null",
@@ -78,7 +78,7 @@ namespace Machina
                 this.Axes?.ToArrayString() ?? "null",
                 this.ExternalAxes?.ToArrayString() ?? "null",
                 "null",  // placeholder for whenever IK solvers are introduced...
-                this.LastAction.Id);
+                this.LastAction == null ? "null" : this.LastAction.Id.ToString());
         }
     }
 }

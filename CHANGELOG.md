@@ -30,8 +30,7 @@
 ## BUILD 1422
 - Add `IInstructionable` interface and implement it on `Tool` and all Actions
 - Fix `Tool` not attaching correctly when TCP info is missing
-- 
-
+- The ABB driver now accepts messages longer than 80 chars.
 
 
 ---
