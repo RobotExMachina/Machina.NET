@@ -21,7 +21,7 @@ namespace Machina
     /// This class is public and will be used directly by the user, so careful design of the API
     /// vs. internal methods will be relevant. 
     /// </summary>
-    public class Tool
+    public class Tool : IInstructable
     {
         /// <summary>
         /// Gets a Tool object representing no tool attached. 

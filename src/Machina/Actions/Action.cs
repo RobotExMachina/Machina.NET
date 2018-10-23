@@ -59,7 +59,7 @@ namespace Machina
     /// They are independent from the device's properties, and their translation into
     /// actual robotic instructions depends on the robot's properties and state. 
     /// </summary>
-    public abstract class Action
+    public abstract class Action : IInstructable
     {
         //  ╔═╗╔╦╗╔═╗╔╦╗╦╔═╗  ╔═╗╔╦╗╦ ╦╔═╗╔═╗
         //  ╚═╗ ║ ╠═╣ ║ ║║    ╚═╗ ║ ║ ║╠╣ ╠╣ 
@@ -86,7 +86,7 @@ namespace Machina
         }
 
         /// <summary>
-        /// Generates a string representing a "serialized" instruction representing the 
+        /// Generates a string representing a "serialized" instruction with the 
         /// Machina-API command that would have generated this action. 
         /// Useful for generating actions to send to the Bridge.
         /// </summary>
