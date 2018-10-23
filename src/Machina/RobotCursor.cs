@@ -189,8 +189,8 @@ namespace Machina
             this.referenceCS = refCS;
 
             this.tool = null;
+            // Add a "noTool" default object and make it the default.
             this.availableTools = new Dictionary<string, Tool>();
-            // Add a "noTool" default object.
             this.availableTools["noTool"] = Tool.Create("noTool", 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0, 0, 0);
 
             this.digitalOutputs = new Dictionary<string, bool>();
@@ -916,6 +916,8 @@ namespace Machina
                 return false;
             }
 
+            // The cursor has now a tool attached to it 
+            this.tool = availableTools[action.toolName];
 
             // Shim for lack of IK 
             // If coming from axes motion, no need to transform the TCP
@@ -937,9 +939,6 @@ namespace Machina
                 this.rotation = newRot;
                 //this.prevAxes = this.axes;  // why was this here? joints don't change on tool attachment...
             }
-
-            // The cursor has now a tool attached to it 
-            this.tool = availableTools[action.toolName];
             
             return true;
         }

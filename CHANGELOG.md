@@ -19,6 +19,7 @@
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
 - [ ] `Do()` takes a Machina string, and deserializes it into an action! :)
 - [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
+- [ ] Add string splitting for long messages on `ABBTransmissionProtocol`
 
 
 ---
@@ -28,6 +29,8 @@
 
 ## BUILD 1422
 - Add `IInstructionable` interface and implement it on `Tool` and all Actions
+- Fix `Tool` not attaching correctly when TCP info is missing
+- 
 
 
 
