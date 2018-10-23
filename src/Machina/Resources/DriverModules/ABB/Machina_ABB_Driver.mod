@@ -369,23 +369,6 @@ MODULE Machina_Driver
         WaitTime 2;
     ENDPROC
 
-    ! Read string buffer from the client and try to parse it
-    PROC ReadStream()
-        VAR string strBuffer;
-        VAR num strBufferLength;
-        SocketReceive clientSocket \Str:=strBuffer \NoRecBytes:=strBufferLength \Time:=WAIT_MAX;
-        ParseBuffer strBuffer, strBufferLength;
-
-        ERROR
-        IF ERRNO = ERR_SOCK_CLOSED THEN
-            ServerRecover;
-            RETRY;
-        ELSEIF ERRNO = ERR_SOCK_TIMEOUT THEN
-            TPWrite "MACHINA ERROR: ReadStream() timeout. Retrying.";
-            RETRY;
-        ENDIF
-    ENDPROC
-
 
 
     !  __  __ __ __  __      __ __ __
@@ -531,14 +514,31 @@ MODULE Machina_Driver
     !  |   /--\| \ __)|| \|\__)
     !
 
+    ! Read string buffer from the client and try to parse it
+    PROC ReadStream()
+        VAR string strBuffer;
+        VAR num strBufferLength;
+        SocketReceive clientSocket \Str:=strBuffer \NoRecBytes:=strBufferLength \Time:=WAIT_MAX;
+        ParseBuffer strBuffer, strBufferLength;
+
+        ERROR
+        IF ERRNO = ERR_SOCK_CLOSED THEN
+            ServerRecover;
+            RETRY;
+        ELSEIF ERRNO = ERR_SOCK_TIMEOUT THEN
+            TPWrite "MACHINA ERROR: ReadStream() timeout. Retrying.";
+            RETRY;
+        ENDIF
+    ENDPROC
+
     ! Parse an incoming string buffer, and decide what to do with it
     ! based on its quality
     PROC ParseBuffer(string sb, num sbl)
-        VAR num statementsLength;
         VAR num endCurrentPos := 1;
         VAR num endLastPos := 1;
         VAR num endings := 0;
 
+        ! Check that there is at least one end_char in this string
         endCurrentPos := StrFind(sb, 1, STR_MESSAGE_END_CHAR);
         WHILE endCurrentPos <= sbl DO
             endings := endings + 1;
