@@ -62,7 +62,7 @@ MODULE Machina_Driver
     CONST num SERVER_PORT := {{PORT}};           ! Replace 7000 with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.3.1";
+    CONST string MACHINA_SERVER_VERSION := "1.3.2";
 
     ! Should program exit on any kind of error?
     PERS bool USE_STRICT := TRUE;
@@ -86,7 +86,7 @@ MODULE Machina_Driver
     CONST num INST_SETDO := 10;                     ! SetDO "NAME" ON
     CONST num INST_SETAO := 11;                     ! SetAO "NAME" V
     CONST num INST_EXT_JOINTS_ALL := 12;            ! (setextjoints a1 a2 a3 a4 a5 a6, applies to both rob and jointtarget) --> send non-string 9E9 for inactive axes
-    CONST num INST_ACCELERATION := 13;              ! (setacceleration values, TBD)
+    CONST num INST_ACCELERATION := 13;              ! WorldAccLim \On V (V = 0 sets \Off, any other value sets WorldAccLim \On V)
     CONST num INST_SING_AREA := 14;                 ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
     CONST num INST_EXT_JOINTS_ROBTARGET := 15;      ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
     CONST num INST_EXT_JOINTS_JOINTTARGET := 16;    ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
@@ -263,7 +263,7 @@ MODULE Machina_Driver
                 CASE INST_ACCELERATION:
                     maxAcceleration := currentAction.p1;
                     IF maxAcceleration > 0 THEN
-                        WorldAccLim \On:=maxAcceleration;
+                        WorldAccLim \On := maxAcceleration;
                     ELSE
                         WorldAccLim \Off;
                     ENDIF

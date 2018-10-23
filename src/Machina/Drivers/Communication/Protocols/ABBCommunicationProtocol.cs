@@ -12,7 +12,7 @@ namespace Machina.Drivers.Communication.Protocols
 {
     class ABBCommunicationProtocol : Base
     {
-        internal static readonly string MACHINA_SERVER_VERSION = "1.3.1";
+        internal static readonly string MACHINA_SERVER_VERSION = "1.3.2";
 
         // A RAPID-code oriented API:
         //                                                      // INSTRUCTION P1 P2 P3 P4...
@@ -27,8 +27,8 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int INST_NOTOOL = 9;                     // (settool tool0)
         internal const int INST_SETDO = 10;                     // SetDO "NAME" ON
         internal const int INST_SETAO = 11;                     // SetAO "NAME" V
-        internal const int INST_EXT_JOINTS_ALL = 12;                // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
-        internal const int INST_ACCELERATION = 13;              // (setacceleration values, TBD)
+        internal const int INST_EXT_JOINTS_ALL = 12;            // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
+        internal const int INST_ACCELERATION = 13;              // WorldAccLim \On V (V = 0 sets \Off, any other value sets WorldAccLim \On V)
         internal const int INST_SING_AREA = 14;                 // SingArea bool (sets Wrist or Off)
         internal const int INST_EXT_JOINTS_ROBTARGET = 15;      // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
         internal const int INST_EXT_JOINTS_JOINTTARGET = 16;    // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
@@ -97,12 +97,24 @@ namespace Machina.Drivers.Communication.Protocols
                     break;
 
                 case ActionType.Speed:
-                    // (setspeed V_TCP[V_ORI V_LEAX V_REAX])
-                    msgs.Add(Invariant($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SPEED} {cursor.speed}{STR_MESSAGE_END_CHAR}"));  // this accepts more velocity params, but those are still not implemented in Machina... 
+                    // (setspeed V_TCP[V_ORI V_LEAX V_REAX]) --> this accepts more velocity params, but those are still not implemented in Machina... 
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,  
+                        "{0}{1} {2} {3}{4}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_SPEED,
+                        cursor.speed,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.Acceleration:
-                    Logger.Debug("Acceleration not implemented in ABBCommunicationProtocol");
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} {3}{4}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_ACCELERATION,
+                        cursor.acceleration,
+                        STR_MESSAGE_END_CHAR));
                     break;
 
                 case ActionType.Precision:
