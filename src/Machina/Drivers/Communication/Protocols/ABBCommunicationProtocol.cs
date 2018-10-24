@@ -153,6 +153,11 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_END_CHAR));
                     break;
 
+                case ActionType.DefineTool:
+                    // Add a log here to avoid a confusing default warning.
+                    Logger.Verbose("`DefineTool()` doesn't need to be streamed.");
+                    break;
+
                 case ActionType.AttachTool:
                     // !(settool X Y Z QW QX QY QZ KG CX CY CZ)
                     Tool t = cursor.tool;  // @TODO: should I just pull from the library? need to rethink the general approach: take info from cursor state (like motion actions) or action data...

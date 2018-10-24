@@ -366,6 +366,8 @@ namespace Machina
             {
                 InitializeRobotCursors();
             }
+
+            logger.Info("Connected to " + parentRobot.Brand + " robot \"" + parentRobot.Name + "\" on " + _driver.IP + ":" + _driver.Port);
             return true;
         }
 
@@ -377,7 +379,17 @@ namespace Machina
         /// <returns></returns>
         public bool DisconnectFromDevice()
         {
-            return _driver.DisconnectFromDevice();
+            bool result = _driver.DisconnectFromDevice();
+            if (result)
+            {
+                logger.Info("Disconnected from " + parentRobot.Brand + " robot \"" + parentRobot.Name + "\"");
+            }
+            else
+            {
+                logger.Warning("Could not disconnect from " + parentRobot.Brand + " robot \"" + parentRobot.Name + "\"");
+            }
+
+            return result;
         }
 
         /// <summary>
