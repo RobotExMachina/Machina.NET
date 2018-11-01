@@ -21,6 +21,13 @@
 - [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
 
 
+--
+# v0.8.5
+## BUILD 1423
+- UR now uses `movep` for linear motion, to ensure constant speed and blending radius
+- Fix UR tool rounding error on weight.
+
+
 ---
 # v0.8.4
 ## BUILD 1421

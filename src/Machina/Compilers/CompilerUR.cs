@@ -192,7 +192,7 @@ namespace Machina
                     else
                     {
                         dec = string.Format(CultureInfo.InvariantCulture, 
-                            "  movel(target{0}, a={1}, v={2}, r={3})",
+                            "  movep(target{0}, a={1}, v={2}, r={3})",
                             id,
                             Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
                             Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
@@ -373,7 +373,7 @@ namespace Machina
                     else
                     {
                         dec = string.Format(CultureInfo.InvariantCulture, 
-                            "  movel(target{0}, a={1}, v={2}, r={3})",
+                            "  movep(target{0}, a={1}, v={2}, r={3})",
                             GetPoseTargetValue(cursor),
                             Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
                             Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),

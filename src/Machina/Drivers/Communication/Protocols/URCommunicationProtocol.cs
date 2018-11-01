@@ -48,6 +48,7 @@ namespace Machina.Drivers.Communication.Protocols
         const int INST_ALL_SPEED = 15;              // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
         // Similarly here, a received value in "puffed" m/s^2 will be internally translated to rad/s^2
         const int INST_ALL_ACC = 16;                // [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
+        const int INST_MOVEP = 17;                  // [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
 
         // For compilation reuse
         private byte[] _buffer;
@@ -93,7 +94,7 @@ namespace Machina.Drivers.Communication.Protocols
                     _params = new int[]
                     {
                         _action.Id,
-                        cursor.motionType == MotionType.Joint ? INST_MOVEJ_P : INST_MOVEL,
+                        cursor.motionType == MotionType.Joint ? INST_MOVEJ_P : INST_MOVEP,
                         (int) Math.Round(cursor.position.X * 0.001 * FACTOR_M),
                         (int) Math.Round(cursor.position.Y * 0.001 * FACTOR_M),
                         (int) Math.Round(cursor.position.Z * 0.001 * FACTOR_M),
@@ -150,7 +151,7 @@ namespace Machina.Drivers.Communication.Protocols
                         (int) Math.Round(trv.X * Geometry.TO_RADS * FACTOR_RAD),
                         (int) Math.Round(trv.Y * Geometry.TO_RADS * FACTOR_RAD),
                         (int) Math.Round(trv.Z * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(t.Weight * FACTOR_M)
+                        (int) Math.Round(t.Weight * FACTOR_KG)
                     };
                     break;
 

@@ -43,6 +43,7 @@ def machina_ur_driver():
   INST_ALL_SPEED = 15               # [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
   # Similarly here, a received value in "puffed" m/s^2 will be internally translated to rad/s^2
   INST_ALL_ACC = 16                 # [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
+  INST_MOVEP = 17                   # [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
 
   # Some conventions for string parsing (NOT IMPLEMENTED, trying to figure out a solution compatible with SW3.0)
 #   STR_MESSAGE_END_CHAR = ";"
@@ -98,6 +99,12 @@ def machina_ur_driver():
         params6 = socket_read_binary_integer(6)
         joints = [params6[1] / FACTOR_RAD, params6[2] / FACTOR_RAD, params6[3] / FACTOR_RAD, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
         movej(joints, state_joint_acceleration, state_joint_speed, 0, state_blend_radius)
+      
+      # This motion maintains linear speed and does radius blending
+      elif action_code == INST_MOVEP:
+        params6 = socket_read_binary_integer(6)
+        pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
+        movep(pose, state_acceleration, state_speed, state_blend_radius)
 
       elif action_code == INST_TCP_SPEED:
         params1 = socket_read_binary_integer(1)
