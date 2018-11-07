@@ -4,7 +4,7 @@
 
 def machina_ur_driver():
   # Useful for handshakes and version compatibility checks...
-  MACHINA_DRIVER_VERSION = "1.1.0"
+  MACHINA_DRIVER_VERSION = "1.1.1"
 
   # Data of the TCP socket for communication
   HOSTNAME = "{{HOSTNAME}}"         # to be replaced with the driving device's IP (probably your computer) prior to uploading to controller
@@ -37,8 +37,8 @@ def machina_ur_driver():
 #   INST_TEXTMSG = 10                 # [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
 #   INST_POPUP = 11                   # [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
   INST_SET_TOOL = 12                # [ID, CODE, X, Y, Z, RX, RY, RZ, KG] (in (int) M * FACTOR_M, RAD * FACTOR_RAD, KG * FACTOR_KG)
-  INST_SET_DIGITAL_OUT = 13         # [ID, CODE, PIN, ON] (in (int))
-  INST_SET_ANALOG_OUT = 14          # [ID, CODE, PIN, VOLTAGE] (in (int) VOLTAGE * FACTOR_VOLT)
+  INST_SET_DIGITAL_OUT = 13         # [ID, CODE, PIN, ON, TOOL] (in (int), bool)
+  INST_SET_ANALOG_OUT = 14          # [ID, CODE, PIN, VOLTAGE, TOOL] (in (int) VOLTAGE * FACTOR_VOLT) (there is no analog out on the tool)
   # This value sets the same speed value for TCP and Q, taken as mm/s and deg/s. E.g: if setting to 20 mm/s or deg/s, the received value should be 0.02 m/s * FACTOR_M, and this will be converted internally to 0.349 rad/s (=20 deg/s)
   INST_ALL_SPEED = 15               # [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
   # Similarly here, a received value in "puffed" m/s^2 will be internally translated to rad/s^2
@@ -58,7 +58,7 @@ def machina_ur_driver():
   TO_RAD = TAU / 360
 
   # State variables
-  state_speed = 0.05
+  state_speed = 0.02
   state_acceleration = 0.2
   state_joint_speed = 0.35
   state_joint_acceleration = 0.7
@@ -141,13 +141,16 @@ def machina_ur_driver():
         set_payload(params7[7] / FACTOR_KG)
 
       elif action_code == INST_SET_DIGITAL_OUT:
-        params2 = socket_read_binary_integer(2)
-        set_standard_digital_out(params2[1], params2[2] != 0)
+        params3 = socket_read_binary_integer(3)
+        if params3[3] != 0:
+          set_tool_digital_out(params3[1], params3[2] != 0)
+        else: 
+          set_standard_digital_out(params3[1], params3[2] != 0)
+        end
 
       elif action_code == INST_SET_ANALOG_OUT:
-        params2 = socket_read_binary_integer(2)
-        set_standard_analog_out(params2[1], params2[2] / FACTOR_VOLT)
-
+        params3 = socket_read_binary_integer(3)
+        set_standard_analog_out(params3[1], params3[2] / FACTOR_VOLT)
 
       elif action_code == INST_ALL_SPEED:
         params1 = socket_read_binary_integer(1)

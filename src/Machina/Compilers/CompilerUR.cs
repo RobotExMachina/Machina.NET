@@ -308,8 +308,8 @@ namespace Machina
                     {
                         //dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
                         dec = string.Format(CultureInfo.InvariantCulture,
-                            "  set_{0}_analog_out({1}, {2})",
-                            aioa.isToolPin ? "tool" : "standard",
+                            "  set_standard_analog_out({0}, {1})",
+                            //aioa.isToolPin ? "tool" : "standard",  // there is no analog out on the tool!
                             aioa.pinNum,
                             Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
 

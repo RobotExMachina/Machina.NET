@@ -13,7 +13,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal static readonly char STR_MESSAGE_ID_CHAR = '@';
         internal static readonly char STR_MESSAGE_RESPONSE_CHAR = '>';
 
-        internal static readonly string MACHINA_SERVER_VERSION = "1.1.0";
+        internal static readonly string MACHINA_SERVER_VERSION = "1.1.1";
 
         // Instruction data will be sent to the socket in the form of 32 signed integers. 
         // To allow for float precision, the original values must be 'puffed' by these factors. 
@@ -42,8 +42,8 @@ namespace Machina.Drivers.Communication.Protocols
         //   const int INST_TEXTMSG = 10                 // [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
         //   const int INST_POPUP = 11                   // [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
         const int INST_SET_TOOL = 12;               // [ID, CODE, X, Y, Z, RX, RY, RZ, KG] (in (int) M * FACTOR_M, RAD * FACTOR_RAD, KG * FACTOR_KG)
-        const int INST_SET_DIGITAL_OUT = 13;        // [ID, CODE, PIN, ON] (in (int)) 
-        const int INST_SET_ANALOG_OUT = 14;         // [ID, CODE, PIN, VOLTAGE] (in (int) VOLTAGE * FACTOR_VOLT)
+        const int INST_SET_DIGITAL_OUT = 13;        // [ID, CODE, PIN, ON, TOOL] (in (int), bool) 
+        const int INST_SET_ANALOG_OUT = 14;         // [ID, CODE, PIN, VOLTAGE, TOOL] (in (int) VOLTAGE * FACTOR_VOLT) (there is no analog out on the tool)
         // This value sets the same speed value for TCP and Q, taken as mm/s and deg/s. E.g: if setting to 20 mm/s or deg/s, the received value should be 0.02 m/s * FACTOR_M, and this will be converted internally to 0.349 rad/s (=20 deg/s)
         const int INST_ALL_SPEED = 15;              // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
         // Similarly here, a received value in "puffed" m/s^2 will be internally translated to rad/s^2
@@ -177,7 +177,8 @@ namespace Machina.Drivers.Communication.Protocols
                         _action.Id,
                         INST_SET_DIGITAL_OUT,
                         aiod.pinNum,
-                        aiod.on ? 1 : 0
+                        aiod.on ? 1 : 0,
+                        aiod.isToolPin ? 1 : 0
                     };
                     break;
 
@@ -186,9 +187,10 @@ namespace Machina.Drivers.Communication.Protocols
                     _params = new int[]
                     {
                         _action.Id,
-                        INST_SET_DIGITAL_OUT,
+                        INST_SET_ANALOG_OUT,
                         aioa.pinNum,
                         (int) Math.Round(aioa.value * FACTOR_VOLT)
+                        //aioa.isToolPin ? 1 : 0  // there is no analog out on the tool
                     };
                     break;
 

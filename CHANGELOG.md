@@ -19,6 +19,15 @@
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
 - [ ] `Do()` takes a Machina string, and deserializes it into an action! :)
 - [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
+- [ ] Have UR driver send handshake information (and update cursor)
+```
+  get_actual_joint_positions()
+  get_actual_tcp_pose()
+  get_inverse_kin(x, qnear)
+```
+- [ ] Have Machina display TCP position and Axes upon any connection.
+- [ ] Add 'EASE' mode to motion, as an option for UR robots to do MoveL
+
 
 
 --
@@ -26,6 +35,8 @@
 ## BUILD 1423
 - UR now uses `movep` for linear motion, to ensure constant speed and blending radius
 - Fix UR tool rounding error on weight.
+- Fix UR analog out not existing for tool
+- Fix UR DO for tool not streaming.
 
 
 ---
