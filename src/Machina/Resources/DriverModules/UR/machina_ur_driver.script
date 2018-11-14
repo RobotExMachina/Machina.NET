@@ -4,11 +4,14 @@
 
 def machina_ur_driver():
   # Useful for handshakes and version compatibility checks...
-  MACHINA_DRIVER_VERSION = "1.1.1"
+  MACHINA_DRIVER_VERSION = "1.2.0"
 
   # Data of the TCP socket for communication
   HOSTNAME = "{{HOSTNAME}}"         # to be replaced with the driving device's IP (probably your computer) prior to uploading to controller
   PORT = {{PORT}}                   # idem
+
+
+  # CONSTANTS ------------------------------------------------------------
 
   # Instruction data will be sent to the socket in the form of 32 signed integers.
   # To allow for float precision, the original values must be 'puffed' by these factors.
@@ -45,12 +48,18 @@ def machina_ur_driver():
   INST_ALL_ACC = 16                 # [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
   INST_MOVEP = 17                   # [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
 
-  # Some conventions for string parsing (NOT IMPLEMENTED, trying to figure out a solution compatible with SW3.0)
-#   STR_MESSAGE_END_CHAR = ";"
-#   STR_MESSAGE_ID_CHAR = "@"         # response acknowledgements include this symbol with the action id
-#   STR_MESSAGE_RESPONSE_CHAR = ">"  # this will be added to infomation request responses (acknowledgments do not include it)
+  # # Some conventions for string parsing (NOT IMPLEMENTED, trying to figure out a solution compatible with SW3.0)
+  # STR_MESSAGE_END_CHAR = ";"        # Marks the end of a message
+  # STR_MESSAGE_CONTINUE_CHAR = ">"   # Marks the end of an unfinished message, to be continued on next message. Useful when the message is too long and needs to be split in chunks
+  # STR_MESSAGE_ID_CHAR = "@"         # Flags a message as an acknowledgment message corresponding to a source id
+  # STR_MESSAGE_RESPONSE_CHAR = "$"   # Flags a message as a response to an information request (acknowledgments do not include it)
 
-  # ------------------------------------------------------------
+  # RES_VERSION = -50                  # ">50 1 2 0;" Sends version numbers
+  # RES_POSE = -51                     # ">51 400 300 500 0 180 0;" Sends pose
+  # RES_JOINTS = -52                   # ">52 0 0 0 0 90 0;" Sends joints
+  # RES_EXTAX = 53                     #
+  RES_FULL_POSE = -54               # ">54 X Y Z RX RY RZ J1 J2 J3 J4 J5 J6;" Sends all pose and joint info
+  RES_END = -2147483648             # Used to denote the end of sending messages
 
   # Other constants
   TAU = 6.2831853                   # = 2 * PI :)
@@ -64,16 +73,45 @@ def machina_ur_driver():
   state_joint_acceleration = 0.7
   state_blend_radius = 0.01
 
+  # FUNCTIONS --------------------------------------------------
 
+  # For some reason, functions must have arguments and return somwthing! Otherwise, Machina cannot upload and run them... XD
+  # Adding a dummy variable to work around this shit... 
+  def send_full_pose(dummy = 0):
+
+    pose = get_actual_tcp_pose()
+    q = get_actual_joint_positions()
+
+    socket_send_int(RES_FULL_POSE)
+    socket_send_int(FACTOR_M * pose[0])
+    socket_send_int(FACTOR_M * pose[1])
+    socket_send_int(FACTOR_M * pose[2])
+    socket_send_int(FACTOR_RAD * pose[3])
+    socket_send_int(FACTOR_RAD * pose[4])
+    socket_send_int(FACTOR_RAD * pose[5])
+    socket_send_int(FACTOR_RAD * q[0])
+    socket_send_int(FACTOR_RAD * q[1])
+    socket_send_int(FACTOR_RAD * q[2])
+    socket_send_int(FACTOR_RAD * q[3])
+    socket_send_int(FACTOR_RAD * q[4])
+    socket_send_int(FACTOR_RAD * q[5])
+    socket_send_int(RES_END)
+    
+    return dummy
+  end
+
+
+  # MAIN -------------------------------------------------------
   # Let's go!
   socket_open(HOSTNAME, PORT)
   textmsg("Started Machina driver")
 
+  send_full_pose()
+
   # Main buffer reading and instructing loop (TODO: implement theaded buffer reading, if only URScript had some array management options... :()
   while True:
     header = socket_read_binary_integer(2)
-    textmsg("Received action request: ", header)
-
+    
     if header[0] == 0:
       # timeout, do nothing
 
@@ -81,6 +119,7 @@ def machina_ur_driver():
       textmsg("Incorrectly formatted buffer:", header)
 
     else:
+      textmsg("Received action request: ", header)
       action_id = header[1]
       action_code = header[2]
       # textmsg("Action ", action_code)
@@ -162,7 +201,6 @@ def machina_ur_driver():
         state_acceleration = params1[1] / FACTOR_M
         state_joint_acceleration = 1000 * TO_RAD * state_acceleration
 
-
       end
 
       # Send completion message with action ID
@@ -173,4 +211,6 @@ def machina_ur_driver():
   end
 end
 
+
+# Kickstart the driver
 machina_ur_driver()

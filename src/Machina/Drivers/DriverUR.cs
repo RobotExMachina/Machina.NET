@@ -101,20 +101,20 @@ namespace Machina.Drivers
 
         public override Joints GetCurrentJoints()
         {
-            // @TODO: fetch from the robot...
-            return null;
+            // temp using just the init values...
+            return this._tcpManager.initAx;
         }
 
         public override Rotation GetCurrentOrientation()
         {
-            // @TODO: fetch from the robot...
-            return null;
+            // temp using just the init values...
+            return this._tcpManager.initRot;
         }
 
         public override Vector GetCurrentPosition()
         {
-            // @TODO: fetch from the robot...
-            return null;
+            // temp using just the init values...
+            return this._tcpManager.initPos;
         }
 
         public override ExternalAxes GetCurrentExternalAxes()

@@ -156,15 +156,28 @@ namespace Machina
                               j1.J6 + j2.J6);
         }
 
+
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, 
-                "[{0}, {1}, {2}, {3}, {4}, {5}]",
+            return this.ToString(true);
+        }
+
+        public string ToString(bool labels)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}, {9}{10}, {11}{12}]",
+                labels ? "Axes" : "",
+                labels ? "J1:" : "",
                 Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
+                labels ? "J2:" : "",
                 Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
+                labels ? "J3:" : "",
                 Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),
+                labels ? "J4:" : "",
                 Math.Round(J4, STRING_ROUND_DECIMALS_DEGS),
+                labels ? "J5:" : "",
                 Math.Round(J5, STRING_ROUND_DECIMALS_DEGS),
+                labels ? "J6:" : "",
                 Math.Round(J6, STRING_ROUND_DECIMALS_DEGS));
         }
 

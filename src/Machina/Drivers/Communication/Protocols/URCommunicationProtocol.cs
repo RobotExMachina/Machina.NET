@@ -18,11 +18,11 @@ namespace Machina.Drivers.Communication.Protocols
         // Instruction data will be sent to the socket in the form of 32 signed integers. 
         // To allow for float precision, the original values must be 'puffed' by these factors. 
         // This works de facto as the maximum precision for unit value types.
-        const double FACTOR_M = 10000.0;
-        const double FACTOR_RAD = 10000.0;
-        const double FACTOR_SEC = 1000.0;
-        const double FACTOR_KG = 1000.0;
-        const double FACTOR_VOLT = 1000000.0;
+        internal const double FACTOR_M = 10000.0;
+        internal const double FACTOR_RAD = 10000.0;
+        internal const double FACTOR_SEC = 1000.0;
+        internal const double FACTOR_KG = 1000.0;
+        internal const double FACTOR_VOLT = 1000000.0;
 
         // Instruction codes. 
         // Instruction buffers start with an ID that will be sent back on the acknowledgement response (use -1 if not interested),
@@ -30,25 +30,30 @@ namespace Machina.Drivers.Communication.Protocols
         // Please note that, with the exception of strings (WIP), all parameters must be integers that have been premultiplied by
         // their corresponding unit factor (see above).
         // INCOMING BUFFER:
-        const int INST_MOVEL = 1;                   // [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
-        const int INST_MOVEJ_P = 2;                 // [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
-        const int INST_MOVEJ_Q = 3;                 // [ID, CODE, J1, J2, J3, J4, J5, J6] (in (int) RAD * FACTOR_RAD)
-        const int INST_TCP_SPEED = 4;               // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
-        const int INST_TCP_ACC = 5;                 // [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
-        const int INST_Q_SPEED = 6;                 // [ID, CODE, VEL] (in (int) RAD/S * FACTOR_RAD)
-        const int INST_Q_ACC = 7;                   // [ID, CODE, ACC] (in (int) RAD/S^2 * FACTOR_RAD)
-        const int INST_BLEND = 8;                   // [ID, CODE, RADIUS] (in (int) M * FACTOR_M)
-        const int INST_SLEEP = 9;                   // [ID, CODE, TIME] (in (int) S * FACTOR_SEC)
-        //   const int INST_TEXTMSG = 10                 // [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
-        //   const int INST_POPUP = 11                   // [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
-        const int INST_SET_TOOL = 12;               // [ID, CODE, X, Y, Z, RX, RY, RZ, KG] (in (int) M * FACTOR_M, RAD * FACTOR_RAD, KG * FACTOR_KG)
-        const int INST_SET_DIGITAL_OUT = 13;        // [ID, CODE, PIN, ON, TOOL] (in (int), bool) 
-        const int INST_SET_ANALOG_OUT = 14;         // [ID, CODE, PIN, VOLTAGE, TOOL] (in (int) VOLTAGE * FACTOR_VOLT) (there is no analog out on the tool)
+        internal const int INST_MOVEL = 1;                   // [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
+        internal const int INST_MOVEJ_P = 2;                 // [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
+        internal const int INST_MOVEJ_Q = 3;                 // [ID, CODE, J1, J2, J3, J4, J5, J6] (in (int) RAD * FACTOR_RAD)
+        internal const int INST_TCP_SPEED = 4;               // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
+        internal const int INST_TCP_ACC = 5;                 // [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
+        internal const int INST_Q_SPEED = 6;                 // [ID, CODE, VEL] (in (int) RAD/S * FACTOR_RAD)
+        internal const int INST_Q_ACC = 7;                   // [ID, CODE, ACC] (in (int) RAD/S^2 * FACTOR_RAD)
+        internal const int INST_BLEND = 8;                   // [ID, CODE, RADIUS] (in (int) M * FACTOR_M)
+        internal const int INST_SLEEP = 9;                   // [ID, CODE, TIME] (in (int) S * FACTOR_SEC)
+        //   internal const int INST_TEXTMSG = 10                 // [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
+        //   internal const int INST_POPUP = 11                   // [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
+        internal const int INST_SET_TOOL = 12;               // [ID, CODE, X, Y, Z, RX, RY, RZ, KG] (in (int) M * FACTOR_M, RAD * FACTOR_RAD, KG * FACTOR_KG)
+        internal const int INST_SET_DIGITAL_OUT = 13;        // [ID, CODE, PIN, ON, TOOL] (in (int), bool) 
+        internal const int INST_SET_ANALOG_OUT = 14;         // [ID, CODE, PIN, VOLTAGE, TOOL] (in (int) VOLTAGE * FACTOR_VOLT) (there is no analog out on the tool)
         // This value sets the same speed value for TCP and Q, taken as mm/s and deg/s. E.g: if setting to 20 mm/s or deg/s, the received value should be 0.02 m/s * FACTOR_M, and this will be converted internally to 0.349 rad/s (=20 deg/s)
-        const int INST_ALL_SPEED = 15;              // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
+        internal const int INST_ALL_SPEED = 15;              // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
         // Similarly here, a received value in "puffed" m/s^2 will be internally translated to rad/s^2
-        const int INST_ALL_ACC = 16;                // [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
-        const int INST_MOVEP = 17;                  // [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
+        internal const int INST_ALL_ACC = 16;                // [ID, CODE, ACC] (in (int) M/S^2 * FACTOR_M)
+        internal const int INST_MOVEP = 17;                  // [ID, CODE, X, Y, Z, RX, RY, RZ] (in (int) M * FACTOR_M, RAD * FACTOR_RAD)
+
+        internal const int RES_FULL_POSE = -54;              // ">54 X Y Z RX RY RZ J1 J2 J3 J4 J5 J6;" Sends all pose and joint info
+        internal const int RES_END = -2147483648;            // Used to denote the end of sending messages
+
+
 
         // For compilation reuse
         private byte[] _buffer;
@@ -272,6 +277,21 @@ namespace Machina.Drivers.Communication.Protocols
 
                 case ActionType.Coordinates:
                     throw new NotImplementedException();  // @TODO: this should also change the WObj, but not on it yet...
+
+                //// Send comma-separated integers
+                //case ActionType.CustomCode:
+                //    ActionCustomCode acc = _action as ActionCustomCode;
+                //    int[] values;
+                //    if (Util.CommaSeparatedStringToInts(out values))
+                //    {
+
+                //    }
+                //    else
+                //    {
+                //        Logger.Warning("Invalid CustomCode: please use a string of comma-separated integers, like \"1,);
+                //    }
+                    
+                //    break;
 
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:

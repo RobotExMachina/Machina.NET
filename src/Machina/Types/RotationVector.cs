@@ -91,8 +91,20 @@ namespace Machina
         //}
 
 
-
-
+        /// <summary>
+        /// Creates a rotation represented by a RotationVector: an unit rotation
+        /// axis multiplied by the rotation angle.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        public RotationVector(double x, double y, double z)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+        }
+        
         /// <summary>
         /// Creates a rotation represented by a RotationVector: an unit rotation
         /// axis multiplied by the rotation angle.

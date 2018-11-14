@@ -155,6 +155,7 @@ namespace Machina
         public RotationVector ToRotationVector() => this.Q.ToAxisAngle().ToRotationVector();  // @TODO: this is grose... 
 
 
+
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, 

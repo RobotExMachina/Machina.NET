@@ -43,6 +43,11 @@ namespace Machina.Drivers.Communication
         private Driver _parentDriver;
         internal RobotLogger logger;
 
+        private const int INIT_TIMEOUT = 5000;  // in millis
+        internal Vector initPos;
+        internal Rotation initRot;
+        internal Joints initAx;
+
         /// <summary>
         ///  The client socket that connects to the robot's secondary client.
         /// </summary>
@@ -171,6 +176,13 @@ namespace Machina.Drivers.Communication
 
                 LoadDriverScript();
                 UploadScriptToDevice(_driverScript, false);
+
+                if (!WaitForInitialization())
+                {
+                    logger.Error("Timeout when waiting for initialization data from the controller");
+                    Disconnect();
+                    return false;
+                }
 
                 return _clientSocket.Connected;
             }
@@ -305,23 +317,57 @@ namespace Machina.Drivers.Communication
 
                 _robotNetworkStream = _robotSocket.GetStream();
 
+                // Super quick and dirty workaround to receive data from the script, REALLY need to improve this...
+                List<int> responseBuffer = new List<int>();
+                bool buffering = false;
+
                 // Loop to receive all the data sent by the client.
-                int i;
+                int receivedCount;
                 try
                 {
-                    while (_isServerListeningRunning && (i = _robotNetworkStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
+                    while (_isServerListeningRunning && (receivedCount = _robotNetworkStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
                     {
-                        _serverListeningInts = Util.ByteArrayToInt32Array(_serverListeningBytes, i, false);
+                        _serverListeningInts = Util.ByteArrayToInt32Array(_serverListeningBytes, receivedCount, false);
 
                         logger.Debug("Received (id): [" + string.Join(",", _serverListeningInts) + "]");
-                        foreach(var id in _serverListeningInts)
+
+                        int item;
+                        for (int i = 0; i < _serverListeningInts.Length; i++)
                         {
-                            if (ProcessResponse(id))
+                            item = _serverListeningInts[i];
+
+                            // In the middle of receiving data
+                            if (responseBuffer.Count != 0)
                             {
-                                _receivedMessages++;
-                                logger.Debug("  REMAINING:" + CalculateRemaining());
+                                // If receiving RES_END, parse response
+                                if (item == URCommunicationProtocol.RES_END)
+                                {
+                                    ProcessResponse(responseBuffer);
+                                    responseBuffer.Clear();
+                                }
+                                else
+                                {
+                                    responseBuffer.Add(item);
+                                }
+                            }
+                            else
+                            {
+                                // It is a response flag
+                                if (item < -1)
+                                {
+                                    responseBuffer.Add(item);
+                                }
+                                else
+                                {
+                                    if (ProcessResponse(item))
+                                    {
+                                        _receivedMessages++;
+                                        //logger.Debug("  REMAINING:" + CalculateRemaining());
+                                    }
+                                }
                             }
                         }
+                        
                     }
                 }
                 catch (Exception e)
@@ -338,6 +384,22 @@ namespace Machina.Drivers.Communication
             }
 
             logger.Verbose("Stopped TCP server listener for UR robot communication");
+        }
+
+
+        private bool WaitForInitialization()
+        {
+            int time = 0;
+            logger.Debug("Waiting for intialization data from controller...");
+
+            // @TODO: this is awful, come on...
+            while ((initAx == null || initPos == null || initRot == null) && time < INIT_TIMEOUT)
+            {
+                time += 33;
+                Thread.Sleep(33);
+            }
+
+            return initAx != null && initPos != null && initRot != null;
         }
 
         private bool ShouldSend()
@@ -430,6 +492,43 @@ namespace Machina.Drivers.Communication
             this._parentDriver.parentControl.RaiseActionExecutedEvent();
             //this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
             //this._parentDriver.parentControl.RaiseActionCompletedEvent();
+
+            return true;
+        }
+
+        private bool ProcessResponse(List<int> values)
+        {
+            string res = string.Join(",", values.ToArray());
+            logger.Debug("Response: \"" + res + "\"");
+
+            // OMG THIS IS QUICK AND DIRTY...
+            switch (values[0])
+            {
+                case URCommunicationProtocol.RES_FULL_POSE:
+                    if (values.Count != 13)
+                    {
+                        Logger.Debug("Improperly formatted response: " + res);
+                    }
+
+                    initPos = new Vector(1000 * values[1] / 10000.0, 1000 * values[2] / 10000.0, 1000 * values[3] / 10000.0);
+
+                    initRot = new Rotation(new RotationVector(Geometry.TO_DEGS * values[4] / 10000.0,
+                        Geometry.TO_DEGS * values[5] / 10000.0, Geometry.TO_DEGS * values[6] / 10000.0).ToQuaternion());
+
+                    initAx = new Joints(Geometry.TO_DEGS * values[7] / 10000,
+                        Geometry.TO_DEGS * values[8] / 10000, 
+                        Geometry.TO_DEGS * values[9] / 10000,
+                        Geometry.TO_DEGS * values[10] / 10000,
+                        Geometry.TO_DEGS * values[11] / 10000,
+                        Geometry.TO_DEGS * values[12] / 10000);
+
+                    logger.Debug("Received robot pose:");
+                    logger.Debug(initPos);
+                    logger.Debug(initRot);
+                    logger.Debug(initAx);
+
+                    break;
+            }
 
             return true;
         }

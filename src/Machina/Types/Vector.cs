@@ -824,7 +824,7 @@ namespace Machina
 
         public override string ToString()
         {
-            return this.ToString(false);
+            return this.ToString(true);
         }
 
         public string ToString(bool labels)

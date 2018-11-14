@@ -38,6 +38,9 @@
 - Fix UR analog out not existing for tool
 - Fix UR DO for tool not streaming.
 
+## BUILD 1424
+- UR now initializes state (no need to start with a `Transform`...)
+- Improved native type stringification.
 
 ---
 # v0.8.4

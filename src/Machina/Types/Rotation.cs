@@ -315,16 +315,25 @@ namespace Machina
         }
 
 
-
-
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, 
-                "Rotation[X:{0}, Y:{1}, Z:{2}, A:{3}]",
+            return this.ToString(true);
+        }
+        
+        public string ToString(bool labels)
+        {
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}]",
+                labels ? "Rotation" : "",
+                labels ? "X:" : "",
                 Math.Round(AA.X, STRING_ROUND_DECIMALS_VECTOR),
+                labels ? "Y:" : "",
                 Math.Round(AA.Y, STRING_ROUND_DECIMALS_VECTOR),
+                labels ? "Z:" : "",
                 Math.Round(AA.Z, STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
+                labels ? "A:" : "",
+                Math.Round(Angle, STRING_ROUND_DECIMALS_VECTOR));
         }
 
         public string ToArrayString()
