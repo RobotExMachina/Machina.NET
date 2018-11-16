@@ -24,7 +24,7 @@
 
 
 --
-# v0.8.5
+# v0.8.5 - UR fixes
 ## BUILD 1423
 - UR now uses `movep` for linear motion, to ensure constant speed and blending radius
 - Fix UR tool rounding error on weight.
