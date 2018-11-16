@@ -36,8 +36,10 @@
 - Improved native type stringification.
 - TCP position and Axes are now displayed upon connection.
 - Fix typos on UR compiler
-- Reverted back to UR `movel` motion on online due to SW3.0 problems.
+- Reverted back to UR `movel` motion on online due to SW3.0 problems: https://github.com/RobotExMachina/Machina.NET/issues/7
 - Additional error handling for UR dis/connection.
+- Reverted default `ToString()` to no labels (must extend this behavior to all the other types)
+
 
 ---
 # v0.8.4
