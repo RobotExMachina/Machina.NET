@@ -76,7 +76,7 @@ namespace Machina.Drivers.Communication
         private TcpClient _robotSocket;
         private NetworkStream _robotNetworkStream;
 
-        private string _driverScript;
+        //private string _driverScript;
 
         private Protocols.Base _translator;
         //private StringBuilder _sb = new StringBuilder();
@@ -116,25 +116,36 @@ namespace Machina.Drivers.Communication
             if (_clientSocket != null)
             {
                 // Upload an empty script to stop the running program
-                LoadEmptyScript();
-                UploadScriptToDevice(_driverScript, false);
+                string emptyScript = LoadEmptyScript();
+                if (!UploadScriptToDevice(emptyScript, false))
+                {
+                    Logger.Error("Could not load empty script to robot");
+                }
 
-                ClientSocketStatus = TCPConnectionStatus.Disconnected;
-                _clientSocket.Client.Disconnect(false);
-                _clientSocket.Close();
-                if (_clientNetworkStream != null) _clientNetworkStream.Dispose();
+                try
+                {
+                    ClientSocketStatus = TCPConnectionStatus.Disconnected;
+                    _clientSocket.Client.Disconnect(false);
+                    _clientSocket.Close();
+                    if (_clientNetworkStream != null) _clientNetworkStream.Dispose();
 
-                _isServerListeningRunning = false;
+                    _isServerListeningRunning = false;
 
-                // TESTING
-                _robotSocket.Close();
-                _robotSocket.Dispose();
-                _robotSocket = null;
+                    // TESTING
+                    _robotSocket.Close();
+                    _robotSocket.Dispose();
+                    _robotSocket = null;
 
-                _serverSocket.Stop();
-                _serverSocket = null;
-
-                return true;
+                    _serverSocket.Stop();
+                    _serverSocket = null;
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Something went wrong on disconnection:");
+                    logger.Error(ex);
+                    return false;
+                }
             }
 
             return false;
@@ -174,8 +185,13 @@ namespace Machina.Drivers.Communication
                 _serverListeningThread.IsBackground = true;
                 _serverListeningThread.Start();
 
-                LoadDriverScript();
-                UploadScriptToDevice(_driverScript, false);
+                string drScript = LoadDriverScript();
+                if (!UploadScriptToDevice(drScript, false))
+                {
+                    logger.Error("Could not upload driver to robot");
+                    Disconnect();
+                    return false;
+                }
 
                 if (!WaitForInitialization())
                 {
@@ -190,7 +206,8 @@ namespace Machina.Drivers.Communication
             {
                 logger.Error("Something went wrong trying to connect to robot...");
                 logger.Debug(ex);
-                throw new Exception();
+                Disconnect();
+                return false;
             }
 
             //return false;
@@ -308,7 +325,16 @@ namespace Machina.Drivers.Communication
 
                 // Perform a blocking call to accept requests.
                 // You could also user server.AcceptSocket() here.
-                _robotSocket = _serverSocket.AcceptTcpClient();
+                try
+                {
+                    _robotSocket = _serverSocket.AcceptTcpClient();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Something went wrong waiting for client connection");
+                    logger.Error(ex);
+                    continue;  // does this work in a while loop?
+                }
                 logger.Verbose("Connected client: " + _robotIP);
 
                 _serverSendingThread = new Thread(ServerSendingMethod);
@@ -375,10 +401,6 @@ namespace Machina.Drivers.Communication
                     logger.Error("Something went wrong with the client... ");
                     logger.Error(e);
                 }
-
-                //Console.WriteLine("Closing client");
-                //_robotSocket.Close();
-                //_robotSocket = null;
 
                 Thread.Sleep(30);
             }
@@ -533,31 +555,46 @@ namespace Machina.Drivers.Communication
             return true;
         }
 
-        private bool LoadEmptyScript()
+        private string LoadEmptyScript()
         {
-            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.empty.script");
-            return true;
+            string emptyScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.empty.script");
+            return emptyScript;
         }
 
-        private bool LoadDriverScript()
+        private string LoadDriverScript()
         {
-            _driverScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.machina_ur_driver.script");
+            string driverScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.machina_ur_driver.script");
 
             // @TODO: remove comments, trailing spaces and empty lines from script
-            _driverScript = _driverScript.Replace("{{HOSTNAME}}", _serverIP);
-            _driverScript = _driverScript.Replace("{{PORT}}", _serverPort.ToString());
+            driverScript = driverScript.Replace("{{HOSTNAME}}", _serverIP);
+            driverScript = driverScript.Replace("{{PORT}}", _serverPort.ToString());
 
-            return true;
+            return driverScript;
         }
 
 
         private bool UploadScriptToDevice(string script, bool consoleDump = false)
         {
+            if (ClientSocketStatus != TCPConnectionStatus.Connected)
+            {
+                logger.Error("Not connected to device");
+                return false;
+            }
+
             logger.Verbose("Uploading module to device...");
             if (consoleDump) logger.Debug(script);
 
-            _sendMsgBytes = Encoding.ASCII.GetBytes(script);
-            _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+            try
+            {
+                _sendMsgBytes = Encoding.ASCII.GetBytes(script);
+                _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Something went wrong trying to upload module to robot:");
+                logger.Error(ex);
+                return false;
+            }
 
             return true;
         }

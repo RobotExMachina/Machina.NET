@@ -364,7 +364,7 @@ namespace Machina
                     if (cursor.motionType == MotionType.Joint)
                     {
                         dec = string.Format(CultureInfo.InvariantCulture, 
-                            "  movej(target{0}, a={1}, v={2}, r={3})",
+                            "  movej({0}, a={1}, v={2}, r={3})",
                             GetPoseTargetValue(cursor),
                             Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
                             Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
@@ -373,7 +373,7 @@ namespace Machina
                     else
                     {
                         dec = string.Format(CultureInfo.InvariantCulture, 
-                            "  movep(target{0}, a={1}, v={2}, r={3})",
+                            "  movep({0}, a={1}, v={2}, r={3})",
                             GetPoseTargetValue(cursor),
                             Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
                             Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
@@ -403,7 +403,7 @@ namespace Machina
 
                 case ActionType.Axes:
                     dec = string.Format(CultureInfo.InvariantCulture, 
-                        "  movej(target{0}, a={1}, v={2}, r={3})",
+                        "  movej({0}, a={1}, v={2}, r={3})",
                         GetJointTargetValue(cursor),
                         Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
                         Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),

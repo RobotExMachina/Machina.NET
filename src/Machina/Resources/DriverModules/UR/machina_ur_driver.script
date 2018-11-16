@@ -71,7 +71,7 @@ def machina_ur_driver():
   state_acceleration = 0.2
   state_joint_speed = 0.35
   state_joint_acceleration = 0.7
-  state_blend_radius = 0.01
+  state_blend_radius = 0.0          # if not zero, targets with same TCP position (like rotations) won't execute!
 
   # FUNCTIONS --------------------------------------------------
 
@@ -129,6 +129,15 @@ def machina_ur_driver():
         pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
         movel(pose, state_acceleration, state_speed, 0, state_blend_radius)
 
+      # This motion maintains linear speed and does radius blending
+      # However, for motion between targets with same TCP **position** (like a relative rotation), 
+      # it won't perform the motion because of blending proximity (SW3.0)...  
+      # Sticking mainly to movel for now.
+      elif action_code == INST_MOVEP:
+        params6 = socket_read_binary_integer(6)
+        pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
+        movep(pose, state_acceleration, state_speed, state_blend_radius)
+
       elif action_code == INST_MOVEJ_P:
         params6 = socket_read_binary_integer(6)
         pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
@@ -138,12 +147,6 @@ def machina_ur_driver():
         params6 = socket_read_binary_integer(6)
         joints = [params6[1] / FACTOR_RAD, params6[2] / FACTOR_RAD, params6[3] / FACTOR_RAD, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
         movej(joints, state_joint_acceleration, state_joint_speed, 0, state_blend_radius)
-      
-      # This motion maintains linear speed and does radius blending
-      elif action_code == INST_MOVEP:
-        params6 = socket_read_binary_integer(6)
-        pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
-        movep(pose, state_acceleration, state_speed, state_blend_radius)
 
       elif action_code == INST_TCP_SPEED:
         params1 = socket_read_binary_integer(1)

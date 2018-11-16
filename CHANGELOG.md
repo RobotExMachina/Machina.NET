@@ -19,13 +19,6 @@
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
 - [ ] `Do()` takes a Machina string, and deserializes it into an action! :)
 - [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
-- [ ] Have UR driver send handshake information (and update cursor)
-```
-  get_actual_joint_positions()
-  get_actual_tcp_pose()
-  get_inverse_kin(x, qnear)
-```
-- [ ] Have Machina display TCP position and Axes upon any connection.
 - [ ] Add 'EASE' mode to motion, as an option for UR robots to do MoveL
 
 
@@ -41,6 +34,10 @@
 ## BUILD 1424
 - UR now initializes state (no need to start with a `Transform`...)
 - Improved native type stringification.
+- TCP position and Axes are now displayed upon connection.
+- Fix typos on UR compiler
+- Reverted back to UR `movel` motion on online due to SW3.0 problems.
+- Additional error handling for UR dis/connection.
 
 ---
 # v0.8.4

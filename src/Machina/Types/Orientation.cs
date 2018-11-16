@@ -159,7 +159,7 @@ namespace Machina
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, 
-                "[X:[{0}, {1}, {2}], Y:[{3}, {4}, {5}], Z:[{6}, {7}, {8}]]",
+                "Orientation[X:[{0}, {1}, {2}], Y:[{3}, {4}, {5}], Z:[{6}, {7}, {8}]]",
                 Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
                 Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM),
                 Math.Round(this.RM.m02, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m22, STRING_ROUND_DECIMALS_MM));

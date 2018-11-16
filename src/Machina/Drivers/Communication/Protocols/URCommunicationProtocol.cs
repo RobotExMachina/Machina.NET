@@ -99,7 +99,7 @@ namespace Machina.Drivers.Communication.Protocols
                     _params = new int[]
                     {
                         _action.Id,
-                        cursor.motionType == MotionType.Joint ? INST_MOVEJ_P : INST_MOVEP,
+                        cursor.motionType == MotionType.Joint ? INST_MOVEJ_P : INST_MOVEL,
                         (int) Math.Round(cursor.position.X * 0.001 * FACTOR_M),
                         (int) Math.Round(cursor.position.Y * 0.001 * FACTOR_M),
                         (int) Math.Round(cursor.position.Z * 0.001 * FACTOR_M),

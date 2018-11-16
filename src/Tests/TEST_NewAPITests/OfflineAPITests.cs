@@ -14,9 +14,11 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = Robot.Create("ToolTesting", "ABB");
+            Robot arm = Robot.Create("ToolTesting", "UR");
 
-            ToolTesting(arm);
+            RotationTest(arm);
+
+            //ToolTesting(arm);
 
             //HelloRobot(arm);
 
@@ -88,7 +90,7 @@ namespace TEST_OfflineAPITests
             arm.Compile(arm.IsBrand("ABB") ? @"C:\offlineTests.prg" :
                 arm.IsBrand("UR") ? @"C:\offlineTests.script" :
                 arm.IsBrand("KUKA") ? @"C:\offlineTests.src" :
-                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
+                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, false);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
@@ -99,6 +101,20 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static void RotationTest(Robot bot)
+        {
+            bot.SpeedTo(50);
+            bot.Precision(1);
+            bot.TransformTo(600, 100, 500, -1, 0, 0, 0, 1, 0);
+            bot.Rotate(0, 1, 0, -90);
+            bot.Move(0, 200, 0);
+            bot.Move(0, 0, 200);
+            bot.Rotate(0, 1, 0, 90);
+            bot.Move(0, -200, 0);
+            bot.Move(0, 0, -200);
+            bot.AxesTo(0, -90, -90, -90, 90, 90);
         }
 
 
@@ -140,13 +156,15 @@ namespace TEST_OfflineAPITests
         {
             arm.ControlMode("offline");
 
-            arm.Message("Hello Robot!");
-            arm.SpeedTo(100);
-            arm.MoveTo(400, 300, 500);
+            //arm.Message("Hello Robot!");
+            arm.SpeedTo(50);
+            arm.MoveTo(600, 0, 500);
             arm.Rotate(0, 1, 0, -90);
             arm.Move(0, 0, 250);
             arm.Wait(2000);
-            arm.AxesTo(0, 0, 0, 0, 90, 0);
+            //arm.AxesTo(0, 0, 0, 0, 90, 0);
+            arm.AxesTo(0, -90, -90, -90, 90, 90);
+
 
             //List<string> program = arm.Compile();
             //Console.WriteLine(program);

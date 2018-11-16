@@ -368,6 +368,20 @@ namespace Machina
             }
 
             logger.Info("Connected to " + parentRobot.Brand + " robot \"" + parentRobot.Name + "\" on " + _driver.IP + ":" + _driver.Port);
+            logger.Info("TCP:");
+            logger.Info("  " + this.IssueCursor.position);
+            logger.Info("  " + new Orientation(this.IssueCursor.rotation));
+            logger.Info("  " + this.IssueCursor.axes);
+            if (this.IssueCursor.externalAxesCartesian != null)
+            {
+                logger.Info("External Axes (TCP):");
+                logger.Info("  " + this.IssueCursor.externalAxesCartesian);
+            }
+            if (this.IssueCursor.externalAxesJoints != null)
+            {
+                logger.Info("External Axes (J): ");
+                logger.Info("  " + this.IssueCursor.externalAxesJoints);
+            }
             return true;
         }
 
