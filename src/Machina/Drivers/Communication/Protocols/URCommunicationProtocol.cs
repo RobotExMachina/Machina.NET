@@ -295,7 +295,7 @@ namespace Machina.Drivers.Communication.Protocols
 
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:
-                    Logger.Warning("Cannot stream action `" + _action + "`");
+                    Logger.Verbose("Cannot stream action `" + _action + "`");
                     return null;
 
             }
