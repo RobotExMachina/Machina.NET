@@ -188,10 +188,11 @@ namespace Machina
             this.motionType = mType;
             this.referenceCS = refCS;
 
-            this.tool = null;
+            //this.tool = null;
             // Add a "noTool" default object and make it the default.
             this.availableTools = new Dictionary<string, Tool>();
             this.availableTools["noTool"] = Tool.Create("noTool", 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0, 0, 0);
+            this.tool = this.availableTools["noTool"];
 
             this.digitalOutputs = new Dictionary<string, bool>();
             this.analogOutputs = new Dictionary<string, double>();
