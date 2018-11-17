@@ -86,21 +86,65 @@ namespace Machina
             return (val == null || val >= 9000000000) ? null : val;
         }
 
+        
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, 
-                "[{0},{1},{2},{3},{4},{5}]",
-                this._externalAxes[0] == null ? "null" : Math.Round((double)this._externalAxes[0], STRING_ROUND_DECIMALS_MM).ToString(),
-                this._externalAxes[1] == null ? "null" : Math.Round((double)this._externalAxes[1], STRING_ROUND_DECIMALS_MM).ToString(),
-                this._externalAxes[2] == null ? "null" : Math.Round((double)this._externalAxes[2], STRING_ROUND_DECIMALS_MM).ToString(),
-                this._externalAxes[3] == null ? "null" : Math.Round((double)this._externalAxes[3], STRING_ROUND_DECIMALS_MM).ToString(),
-                this._externalAxes[4] == null ? "null" : Math.Round((double)this._externalAxes[4], STRING_ROUND_DECIMALS_MM).ToString(),
-                this._externalAxes[5] == null ? "null" : Math.Round((double)this._externalAxes[5], STRING_ROUND_DECIMALS_MM).ToString()
-            );
+            return this.ToString(false);
         }
 
-        // For the sake of simmetry
-        public string ToArrayString() => this.ToString();
+        public string ToString(bool labels)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}, {9}{10}, {11}{12}]",
+                labels ? "ExtAxes" : "",
+                labels ? "EA1:" : "",
+                this._externalAxes[0] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[0], STRING_ROUND_DECIMALS_MM).ToString(),
+                labels ? "EA2:" : "",
+                this._externalAxes[1] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[1], STRING_ROUND_DECIMALS_MM).ToString(),
+                labels ? "EA3:" : "",
+                this._externalAxes[2] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[2], STRING_ROUND_DECIMALS_MM).ToString(),
+                labels ? "EA4:" : "",
+                this._externalAxes[3] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[3], STRING_ROUND_DECIMALS_MM).ToString(),
+                labels ? "EA5:" : "",
+                this._externalAxes[4] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[4], STRING_ROUND_DECIMALS_MM).ToString(),
+                labels ? "EA6:" : "",
+                this._externalAxes[5] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[5], STRING_ROUND_DECIMALS_MM).ToString());
+        }
 
+        public string ToArrayString()
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "[{0},{1},{2},{3},{4},{5}]",
+                this._externalAxes[0] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[0], STRING_ROUND_DECIMALS_MM).ToString(),
+                this._externalAxes[1] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[1], STRING_ROUND_DECIMALS_MM).ToString(),
+                this._externalAxes[2] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[2], STRING_ROUND_DECIMALS_MM).ToString(),
+                this._externalAxes[3] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[3], STRING_ROUND_DECIMALS_MM).ToString(),
+                this._externalAxes[4] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[4], STRING_ROUND_DECIMALS_MM).ToString(),
+                this._externalAxes[5] == null
+                    ? "null"
+                    : Math.Round((double) this._externalAxes[5], STRING_ROUND_DECIMALS_MM).ToString());
+        }
     }
 }

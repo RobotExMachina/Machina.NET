@@ -167,17 +167,17 @@ namespace Machina
             return string.Format(CultureInfo.InvariantCulture,
                 "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}, {9}{10}, {11}{12}]",
                 labels ? "Axes" : "",
-                labels ? "J1:" : "",
+                labels ? "A1:" : "",
                 Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
-                labels ? "J2:" : "",
+                labels ? "A2:" : "",
                 Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
-                labels ? "J3:" : "",
+                labels ? "A3:" : "",
                 Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),
-                labels ? "J4:" : "",
+                labels ? "A4:" : "",
                 Math.Round(J4, STRING_ROUND_DECIMALS_DEGS),
-                labels ? "J5:" : "",
+                labels ? "A5:" : "",
                 Math.Round(J5, STRING_ROUND_DECIMALS_DEGS),
-                labels ? "J6:" : "",
+                labels ? "A6:" : "",
                 Math.Round(J6, STRING_ROUND_DECIMALS_DEGS));
         }
 

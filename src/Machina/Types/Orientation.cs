@@ -86,12 +86,12 @@ namespace Machina
         public Vector ZAxis => this.RM == null ? 
                     new Vector(0, 0, 1) : 
                     new Vector(this.RM.m02, this.RM.m12, this.RM.m22);
+
         /// <summary>
         /// Implicit conversion from Rotation to Orientation via its Quaternion.
         /// </summary>
         /// <param name="or"></param>
-        public static implicit operator Orientation(Rotation r) => new Orientation(r.Q);
-
+        public static implicit operator Orientation(Rotation r) => r == null ? null : new Orientation(r.Q);
 
         /// <summary>
         /// Create a  Rotation object representing no rotation.
@@ -156,13 +156,27 @@ namespace Machina
 
 
 
-        public override string ToString()
+
+        public override string ToString() => this.ToString(false);
+        
+        public string ToString(bool labels)
         {
-            return string.Format(CultureInfo.InvariantCulture, 
-                "Orientation[X:[{0}, {1}, {2}], Y:[{3}, {4}, {5}], Z:[{6}, {7}, {8}]]",
-                Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.m02, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m22, STRING_ROUND_DECIMALS_MM));
+            if (labels)
+            {
+                return string.Format(CultureInfo.InvariantCulture, 
+                    "Orientation[X:[{0}, {1}, {2}], Y:[{3}, {4}, {5}], Z:[{6}, {7}, {8}]]",
+                    Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.m02, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m22, STRING_ROUND_DECIMALS_MM));
+            }
+            else
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
+                    Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.m02, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m22, STRING_ROUND_DECIMALS_MM));
+            }
         }
 
         public string ToArrayString()
