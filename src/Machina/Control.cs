@@ -590,6 +590,41 @@ namespace Machina
         /// <returns></returns>
         public ExternalAxes GetCurrentExternalAxes() => _stateCursor.externalAxesCartesian;
 
+
+
+        /// <summary>
+        /// Gets current speed setting.
+        /// </summary>
+        /// <returns></returns>
+        public double GetCurrentSpeedSetting() => _stateCursor.speed;
+
+        /// <summary>
+        /// Gets current scceleration setting.
+        /// </summary>
+        /// <returns></returns>
+        public double GetCurrentAccelerationSetting() => _stateCursor.acceleration;
+
+        /// <summary>
+        /// Gets current precision setting.
+        /// </summary>
+        /// <returns></returns>
+        public double GetCurrentPrecisionSetting() => _stateCursor.precision;
+
+        /// <summary>
+        /// Gets current Motion setting.
+        /// </summary>
+        /// <returns></returns>
+        public MotionType GetCurrentMotionTypeSetting() => _stateCursor.motionType;
+
+        /// <summary>
+        /// Gets the reference coordinate system used for relative transform actions.
+        /// </summary>
+        /// <returns></returns>
+        public ReferenceCS GetCurrentReferenceCS()
+        {
+            return IssueCursor.referenceCS;
+        }
+
         /// <summary>
         /// Returns a Tool object representing the currently attached tool, null if none.
         /// </summary>
@@ -656,114 +691,6 @@ namespace Machina
 
             throw new NotImplementedException();
         }
-
-
-
-        //  ███████╗███████╗████████╗████████╗██╗███╗   ██╗ ██████╗ ███████╗
-        //  ██╔════╝██╔════╝╚══██╔══╝╚══██╔══╝██║████╗  ██║██╔════╝ ██╔════╝
-        //  ███████╗█████╗     ██║      ██║   ██║██╔██╗ ██║██║  ███╗███████╗
-        //  ╚════██║██╔══╝     ██║      ██║   ██║██║╚██╗██║██║   ██║╚════██║
-        //  ███████║███████╗   ██║      ██║   ██║██║ ╚████║╚██████╔╝███████║
-        //  ╚══════╝╚══════╝   ╚═╝      ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝
-        //   
-
-        /// <summary>
-        /// Gets current speed setting.
-        /// </summary>
-        /// <returns></returns>
-        public double GetCurrentSpeedSetting()
-        {
-            // @TODO: will need to decide if this returns the current virtual, write or motion speed
-            return IssueCursor.speed;
-        }
-
-        /// <summary>
-        /// Gets current precision setting.
-        /// </summary>
-        /// <returns></returns>
-        public double GetCurrentPrecisionSettings()
-        {
-            return IssueCursor.precision;
-        }
-
-        /// <summary>
-        /// Gets current Motion setting.
-        /// </summary>
-        /// <returns></returns>
-        public MotionType GetCurrentMotionTypeSetting()
-        {
-            return IssueCursor.motionType;
-        }
-
-        /// <summary>
-        /// Gets the reference coordinate system used for relative transform actions.
-        /// </summary>
-        /// <returns></returns>
-        public ReferenceCS GetCurrentReferenceCS()
-        {
-            return IssueCursor.referenceCS;
-        }
-
-        ///// <summary>
-        ///// Buffers current state settings (speed, zone, motion type...), and opens up for 
-        ///// temporary settings changes to be reverted by PopSettings().
-        ///// </summary>
-        //public void PushCurrentSettings()
-        //{
-        //    //Console.WriteLine("Pushing {0}", currentSettings);
-        //    settingsBuffer.Push(currentSettings);
-        //    currentSettings = currentSettings.Clone();  // sets currentS to a new object
-        //}
-
-        ///// <summary>
-        ///// Reverts the state settings (speed, zone, motion type...) to the previously buffered
-        ///// state by PushSettings().
-        ///// </summary>
-        //public void PopCurrentSettings()
-        //{
-        //    currentSettings = settingsBuffer.Pop();
-        //    //Console.WriteLine("Reverted to {0}", currentSettings);
-        //}
-
-
-
-        //// TODO: take another look at this, it was quick and dirty...
-        //public bool SetIOName(string ioName, int pinNumber, bool isDigital)
-        //{
-
-        //    if (isDigital)
-        //    {
-        //        if (pinNumber < 0 || pinNumber >= virtualCursor.digitalOutputs.Length)
-        //        {
-        //            Console.WriteLine("ERROR: pin # out of range");
-        //            return false;
-        //        }
-        //        else
-        //        {
-        //            virtualCursor.digitalOutputNames[pinNumber] = ioName;
-        //            writeCursor.digitalOutputNames[pinNumber] = ioName;
-        //        }
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        if (pinNumber < 0 || pinNumber >= virtualCursor.analogOutputs.Length)
-        //        {
-        //            Console.WriteLine("ERROR: pin # out of range");
-        //            return false;
-        //        }
-        //        else
-        //        {
-        //            virtualCursor.analogOutputNames[pinNumber] = ioName;
-        //            writeCursor.analogOutputNames[pinNumber] = ioName;
-        //        }
-        //        return true;
-        //    }
-        //}
-
-
-
-
 
 
 

@@ -1336,6 +1336,14 @@ namespace Machina
         /// <returns></returns>
         public ExternalAxes GetCurrentExternalAxes() => c.GetCurrentExternalAxes();
 
+        public double GetCurrentSpeed() => c.GetCurrentSpeedSetting();
+
+        public double GetCurrentAcceleration() => c.GetCurrentAccelerationSetting();
+
+        public double GetCurrentPrecision() => c.GetCurrentPrecisionSetting();
+
+        public MotionType GetCurrentMotionMode() => c.GetCurrentMotionTypeSetting();
+        
         /// <summary>
         /// Returns the Tool object currently attached to this Robot, null if none.
         /// </summary>
