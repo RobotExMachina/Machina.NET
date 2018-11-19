@@ -102,8 +102,6 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    
-                    
                     RotationVector rv = cursor.rotation.AA.ToRotationVector();
                     _params = new int[]
                     {

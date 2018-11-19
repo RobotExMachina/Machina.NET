@@ -146,6 +146,7 @@ namespace Machina
             _executionCursor = new RobotCursor(this, "ExecutionCursor", false, null);
             _releaseCursor = new RobotCursor(this, "ReleaseCursor", false, _executionCursor);
             _issueCursor = new RobotCursor(this, "IssueCursor", true, _releaseCursor);
+            _issueCursor.LogRelativeActions = true;
 
             SetControlMode(DEFAULT_CONTROLMODE);
             SetConnectionMode(DEFAULT_CONNECTIONMODE);
@@ -368,19 +369,19 @@ namespace Machina
             }
 
             logger.Info("Connected to " + parentRobot.Brand + " robot \"" + parentRobot.Name + "\" on " + _driver.IP + ":" + _driver.Port);
-            logger.Info("TCP:");
-            logger.Info("  " + this.IssueCursor.position);
-            logger.Info("  " + new Orientation(this.IssueCursor.rotation));
-            logger.Info("  " + this.IssueCursor.axes);
+            logger.Verbose("TCP:");
+            logger.Verbose("  " + this.IssueCursor.position.ToString(true));
+            logger.Verbose("  " + new Orientation(this.IssueCursor.rotation).ToString(true));
+            logger.Verbose("  " + this.IssueCursor.axes.ToString(true));
             if (this.IssueCursor.externalAxesCartesian != null)
             {
-                logger.Info("External Axes (TCP):");
-                logger.Info("  " + this.IssueCursor.externalAxesCartesian);
+                logger.Verbose("External Axes (TCP):");
+                logger.Verbose("  " + this.IssueCursor.externalAxesCartesian.ToString(true));
             }
             if (this.IssueCursor.externalAxesJoints != null)
             {
-                logger.Info("External Axes (J): ");
-                logger.Info("  " + this.IssueCursor.externalAxesJoints);
+                logger.Verbose("External Axes (J): ");
+                logger.Verbose("  " + this.IssueCursor.externalAxesJoints.ToString(true));
             }
             return true;
         }

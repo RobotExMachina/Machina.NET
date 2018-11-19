@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,13 @@ namespace Machina
     /// </summary>
     internal class RobotCursor
     {
+        public bool LogRelativeActions
+        {
+            get { return _logRelativeActions; }
+            set { _logRelativeActions = value; }
+        }
+        private bool _logRelativeActions = false;
+
         // Public props
         public string name;
         public Vector position, prevPosition;
@@ -485,6 +493,11 @@ namespace Machina
 
             if (this.acceleration < 0) this.acceleration = 0;
 
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("Acceleration set to " + this.acceleration);
+            }
+
             return true;
         }
 
@@ -502,6 +515,11 @@ namespace Machina
 
             if (this.speed < 0) this.speed = 0;
 
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("Speed set to " + this.speed);
+            }
+
             return true;
         }
 
@@ -518,6 +536,11 @@ namespace Machina
                 this.precision = action.precision;
 
             if (this.precision < 0) precision = 0;
+
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("Precision set to " + this.precision + " mm");
+            }
 
             return true;
         }
@@ -640,10 +663,17 @@ namespace Machina
             prevPosition = position;
             position = newPosition;
 
+            prevRotation = rotation;  // to flag same-orientation change
+
             prevAxes = axes;
             axes = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
+
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("TCP position at " + this.position);
+            }
 
             return true;
         }
@@ -695,10 +725,17 @@ namespace Machina
             prevRotation = rotation;
             rotation = newRot;
 
+            prevPosition = position;  // to flag same-position change
+
             prevAxes = axes;
             axes = null;      // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
+
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("TCP orientation at " + new Orientation(this.rotation));
+            }
 
             return true;
         }
@@ -797,6 +834,11 @@ namespace Machina
 
             if (isExtruding) this.ComputeExtrudedLength();
 
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("TCP transform at " + this.position + " " + new Orientation(this.rotation));
+            }
+
             return true;
         }
 
@@ -839,6 +881,11 @@ namespace Machina
             rotation = null;
 
             if (isExtruding) this.ComputeExtrudedLength();
+
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("Axes at " + this.axes);
+            }
 
             return true;
         }
@@ -895,10 +942,8 @@ namespace Machina
                 logger.Info($"Robot already had a tool defined as \"{action.tool.name}\"; this will be overwritten.");
                 availableTools.Remove(action.tool.name);
             }
-            //else
-            //{
-                availableTools.Add(action.tool.name, action.tool);
-            //}
+
+            availableTools.Add(action.tool.name, action.tool);
 
             return true;
         }
@@ -939,6 +984,11 @@ namespace Machina
                 this.prevRotation = this.rotation;
                 this.rotation = newRot;
                 //this.prevAxes = this.axes;  // why was this here? joints don't change on tool attachment...
+
+                if (_logRelativeActions)
+                {
+                    logger.Verbose("TCP changed to " + this.position + " " + new Orientation(this.rotation));
+                }
             }
             
             return true;
@@ -977,6 +1027,11 @@ namespace Machina
                 this.rotation = newRot;
                 //this.prevAxes = this.axes;
                 //this.axes = null;  // axes were null anyway...? 
+
+                if (_logRelativeActions)
+                {
+                    logger.Verbose("TCP changed to " + this.position + " " + new Orientation(this.rotation));
+                }
             }
 
             // "Detach" the tool
@@ -1082,6 +1137,11 @@ namespace Machina
             else
                 this.partTemperature[action.robotPart] = action.temperature;
 
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("Temperature set to " + this.partTemperature[action.robotPart]);
+            }
+
             return true;
         }
 
@@ -1108,6 +1168,11 @@ namespace Machina
                 this.extrusionRate += action.rate;
             else
                 this.extrusionRate = action.rate;
+
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("Extrusion rate set to " + this.extrusionRate);
+            }
 
             return true;
         }
@@ -1181,6 +1246,11 @@ namespace Machina
                 }
             }
 
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("External Axis " + action.axisNumber + " set to " + this.externalAxesJoints[action.axisNumber - 1]);
+            }
+
             return true;
         }
 
@@ -1206,6 +1276,11 @@ namespace Machina
             else
             {
                 this.armAngle = action.angle;
+            }
+
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("Arm-Angle set to " + this.armAngle);
             }
 
             return true;
