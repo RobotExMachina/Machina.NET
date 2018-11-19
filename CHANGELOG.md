@@ -22,8 +22,18 @@
 - [ ] Add 'EASE' mode to motion, as an option for UR robots to do MoveL
 
 
+# v0.8.6
+## BUILD 1424
+- Added more getters for robot state
+- More Type stringification
+- `RobotCursor` now has the `"noTool"` tool attached by default.
+- Unstreamable action now is logged at `Verbose` level
 
---
+## BUILD 1425
+- Workaround to SW3.0 crash problem: https://github.com/RobotExMachina/Machina.NET/issues/7
+- 
+
+
 # v0.8.5 - UR fixes
 ## BUILD 1423
 - UR now uses `movep` for linear motion, to ensure constant speed and blending radius

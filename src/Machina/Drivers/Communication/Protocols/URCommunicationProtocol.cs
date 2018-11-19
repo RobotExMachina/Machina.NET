@@ -53,7 +53,14 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int RES_FULL_POSE = -54;              // ">54 X Y Z RX RY RZ J1 J2 J3 J4 J5 J6;" Sends all pose and joint info
         internal const int RES_END = -2147483648;            // Used to denote the end of sending messages
 
-
+        // With older UR robots, I was getting a problem where the robot would
+        // not move (or even crash completely) if issuing an action that results in the 
+        // robot on the same target position, like a `Rotate` or moving the 6th axis.
+        // A quick workaround is to set precision to 0 before the action, 
+        // and reset it afterwards.
+        // https://github.com/RobotExMachina/Machina.NET/issues/7
+        private const bool ZERO_PRECISION_ON_SAME_POSITION_MOTION = true;
+        
 
         // For compilation reuse
         private byte[] _buffer;
@@ -95,6 +102,8 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
+                    
+                    
                     RotationVector rv = cursor.rotation.AA.ToRotationVector();
                     _params = new int[]
                     {
@@ -107,6 +116,14 @@ namespace Machina.Drivers.Communication.Protocols
                         (int) Math.Round(rv.Y * Geometry.TO_RADS * FACTOR_RAD),
                         (int) Math.Round(rv.Z * Geometry.TO_RADS * FACTOR_RAD)
                     };
+
+                    // Workaround to SW3.0 crash problem: https://github.com/RobotExMachina/Machina.NET/issues/7
+                    if (ZERO_PRECISION_ON_SAME_POSITION_MOTION && cursor.precision != 0 && cursor.position.IsSimilar(cursor.prevPosition))
+                    {
+                        Logger.Debug("Applying ZERO_PRECISION_ON_SAME_POSITION_MOTION");
+                        _params = WrapParamsWithZeroPrecision(_params, cursor);
+                    }
+
                     break;
 
                 case ActionType.Axes:
@@ -121,6 +138,9 @@ namespace Machina.Drivers.Communication.Protocols
                         (int) Math.Round(cursor.axes.J5 * Geometry.TO_RADS * FACTOR_RAD),
                         (int) Math.Round(cursor.axes.J6 * Geometry.TO_RADS * FACTOR_RAD),
                     };
+
+                    // Another ZERO_PRECISION_ON_SAME_POSITION_MOTION check should happen here for 6th axis rotation only...
+                    
                     break;
 
                 case ActionType.Wait:
@@ -307,6 +327,31 @@ namespace Machina.Drivers.Communication.Protocols
             return _buffer;
         }
 
+        /// <summary>
+        /// Workaround to SW3.0 crash problem: https://github.com/RobotExMachina/Machina.NET/issues/7
+        /// For such motions, make precision zero temporarily.
+        /// </summary>
+        /// <param name="_params"></param>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        private int[] WrapParamsWithZeroPrecision(int[] _params, RobotCursor cursor)
+        {
+            int len = 6 + _params.Length;
+
+            int[] wrapParam = new int[len];
+
+            wrapParam[0] = 0;  // no id
+            wrapParam[1] = INST_BLEND;
+            wrapParam[2] = 0;
+
+            _params.CopyTo(wrapParam, 3);
+
+            wrapParam[len - 3] = 0;
+            wrapParam[len - 2] = INST_BLEND;
+            wrapParam[len - 1] = (int) Math.Round(cursor.precision * 0.001 * FACTOR_M);
+
+            return wrapParam;
+        }
 
 
     }
