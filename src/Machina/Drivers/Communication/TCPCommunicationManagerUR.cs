@@ -271,7 +271,7 @@ namespace Machina.Drivers.Communication
             {
                 Thread.CurrentThread.Name = "MachinaTCPDriverServerSendingMethod";
             }
-            logger.Verbose("Started TCP server sender for UR robot communication");
+            logger.Debug("Started TCP server sender for UR robot communication");
 
             // Expire thread if no socket
             while (_robotSocket != null)
@@ -301,7 +301,7 @@ namespace Machina.Drivers.Communication
                 Thread.Sleep(30);
             }
 
-            logger.Verbose("Stopped TCP server sender for UR robot communication");
+            logger.Debug("Stopped TCP server sender for UR robot communication");
         }
 
         /// <summary>
@@ -316,12 +316,12 @@ namespace Machina.Drivers.Communication
                 Thread.CurrentThread.Name = "MachinaTCPDriverServerReceivingMethod";
             }
 
-            logger.Verbose("Started TCP server listener for UR robot communication");
+            logger.Debug("Started TCP server listener for UR robot communication");
 
             // Do not kill threads by aborting them... https://stackoverflow.com/questions/1559255/whats-wrong-with-using-thread-abort/1560567#1560567
             while (_isServerListeningRunning)
             {
-                logger.Verbose("Waiting for a connection... ");
+                logger.Debug("Waiting for a connection... ");
 
                 // Perform a blocking call to accept requests.
                 // You could also user server.AcceptSocket() here.
@@ -335,7 +335,7 @@ namespace Machina.Drivers.Communication
                     logger.Error(ex);
                     continue;  // does this work in a while loop?
                 }
-                logger.Verbose("Connected client: " + _robotIP);
+                logger.Debug("Connected client: " + _robotIP);
 
                 _serverSendingThread = new Thread(ServerSendingMethod);
                 _serverSendingThread.IsBackground = true;
@@ -405,7 +405,7 @@ namespace Machina.Drivers.Communication
                 Thread.Sleep(30);
             }
 
-            logger.Verbose("Stopped TCP server listener for UR robot communication");
+            logger.Debug("Stopped TCP server listener for UR robot communication");
         }
 
 
@@ -420,7 +420,7 @@ namespace Machina.Drivers.Communication
                 time += 33;
                 Thread.Sleep(33);
             }
-
+             
             return initAx != null && initPos != null && initRot != null;
         }
 
@@ -581,7 +581,7 @@ namespace Machina.Drivers.Communication
                 return false;
             }
 
-            logger.Verbose("Uploading module to device...");
+            logger.Debug("Uploading module to device...");
             if (consoleDump) logger.Debug(script);
 
             try
