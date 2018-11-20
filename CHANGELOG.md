@@ -31,7 +31,7 @@
 
 ## BUILD 1425
 - Workaround to SW3.0 crash problem: https://github.com/RobotExMachina/Machina.NET/issues/7
-- 
+- Relative actions now log absolute state on Verbose
 
 
 # v0.8.5 - UR fixes
