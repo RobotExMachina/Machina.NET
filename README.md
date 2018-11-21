@@ -48,7 +48,7 @@ bot.Message("Hello world!");
 
 // Move it to positive XYZ octant, face front and trace the square
 bot.SpeedTo(100);
-bot.ZoneTo(2);
+bot.PrecisionTo(2);
 bot.MoveTo(300, 300, 300);
 bot.Rotate(0, 1, 0, -90);
 bot.Move(0, 0, 50);
@@ -67,6 +67,11 @@ bot.Disconnect();
 
 Machina is its infancy, and rapid changes are happening with every commit! Your most reliable and up-to-date source of documentation is probably the code itself, and the comments within.
 
+A full set of tutorials and associated projects can be found here:
+
+![https://www.youtube.com/playlist?list=PLvxxYImPCApXj3tHVKmpTS_AuMPngnA47](assets/machina_tutorials_banner.png)
+
+_The following documentation is very dated, and lot of things have changed since then_
 To learn how to start using Machina, and examples of some of its features, please take a look at the [Walkthrough page](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Walkthrough.md).
 
 Documentation on Machina's API can be found on the [Reference](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Reference.md).
