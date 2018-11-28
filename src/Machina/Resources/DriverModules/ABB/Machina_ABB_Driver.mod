@@ -62,7 +62,7 @@ MODULE Machina_Driver
     CONST num SERVER_PORT := {{PORT}};           ! Replace 7000 with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.4.0";
+    CONST string MACHINA_SERVER_VERSION := "1.4.1";
 
     ! Should program exit on any kind of error?
     PERS bool USE_STRICT := TRUE;
@@ -90,6 +90,7 @@ MODULE Machina_Driver
     CONST num INST_SING_AREA := 14;                 ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
     CONST num INST_EXT_JOINTS_ROBTARGET := 15;      ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
     CONST num INST_EXT_JOINTS_JOINTTARGET := 16;    ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
+    CONST num INST_CUSTOM_ACTION := 17;             ! This is a wildcard for custom user functions that do not really fit in the Machina API (mainly Yumi gripping right now)
 
     CONST num INST_STOP_EXECUTION := 100;           ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;                 ! A way to retreive state information from the server (not implemented)
@@ -285,6 +286,8 @@ MODULE Machina_Driver
                     monitorUpdateInterval := currentAction.p1;
                     TPWrite("Monitor update interval set to " + NumToStr(monitorUpdateInterval, 2) + " s.");
 
+                CASE INST_CUSTOM_ACTION:
+                    CustomAction currentAction;
                 ENDTEST
 
                 ! Send acknowledgement message
@@ -1009,7 +1012,7 @@ MODULE Machina_Driver
     ENDFUNC
 
     ! TPWrite a string representation of an Action
-    PROC log(action a)
+    PROC LogAction(action a)
         TPWrite "ACTION: " + NumToStr(a.code, 0) + " "
             + a.s1 + " "
             + NumToStr(a.p1, 0) + " " + NumToStr(a.p2, 0) + " "
@@ -1018,6 +1021,20 @@ MODULE Machina_Driver
             + NumToStr(a.p7, 0) + " " + NumToStr(a.p8, 0) + " "
             + NumToStr(a.p9, 0) + " " + NumToStr(a.p10, 0) + " "
             + NumToStr(a.p11, 0) + STR_MESSAGE_END_CHAR;
+    ENDPROC
+
+
+
+
+    !   __     _____ __        __         _____  __      __
+    !  /  /  \(_  | /  \|\/|  |_ /  \|\ |/   | |/  \|\ |(_
+    !  \__\__/__) | \__/|  |  |  \__/| \|\__ | |\__/| \|__)
+    !
+    ! A wildcard function for users to customize particular behavior
+    PROC CustomAction(action a)
+      ! Write your own behavior here...
+      TPWrite "Custom action request";
+      LogAction a;
     ENDPROC
 
 ENDMODULE

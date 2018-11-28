@@ -32,6 +32,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int INST_SING_AREA = 14;                 // SingArea bool (sets Wrist or Off)
         internal const int INST_EXT_JOINTS_ROBTARGET = 15;      // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
         internal const int INST_EXT_JOINTS_JOINTTARGET = 16;    // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
+        internal const int INST_CUSTOM_ACTION = 17;             // This is a wildcard for custom user functions that do not really fit in the Machina API (mainly Yumi gripping right now)
 
         internal const int RES_VERSION = 20;                    // ">20 1 2 1;" Sends version numbers
         internal const int RES_POSE = 21;                       // ">21 400 300 500 0 0 1 0;"
@@ -337,10 +338,16 @@ namespace Machina.Drivers.Communication.Protocols
                     break;
 
                 // When connected live, this is used as a way to stream a message directly to the robot. Unsafe, but oh well...
-                // @TODO: should the protocol add the action id, or is this also left to the user to handle?
+                // ~~@TODO: should the protocol add the action id, or is this also left to the user to handle?~~
+                // --> Let's add the action id and statement terminator for the moment (using this mainly for Yumi gripping)
                 case ActionType.CustomCode:
                     ActionCustomCode acc = action as ActionCustomCode;
-                    msgs.Add(acc.statement);
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2}{3}",
+                        STR_MESSAGE_ID_CHAR,
+                        acc.Id,
+                        acc.statement,
+                        STR_MESSAGE_END_CHAR));
                     break;
                     
                 // If the Action wasn't on the list above, it doesn't have a message representation...
