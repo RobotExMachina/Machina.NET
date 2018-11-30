@@ -22,6 +22,15 @@
 - [ ] Add 'EASE' mode to motion, as an option for UR robots to do MoveL
 
 
+# v0.8.7
+## BUILD 1426
+- `CustomAction` on ABB now adds action id and statemenet terminator automatically.
+- Add quick custom action on ABB for Yumi gripping
+- Fix check on UR protocol
+
+## BUILD 1427
+
+
 # v0.8.6
 ## BUILD 1424
 - Added more getters for robot state

@@ -101,7 +101,7 @@ namespace Machina.Drivers.Communication.Protocols
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
-                case ActionType.Transformation:
+                case ActionType.Transformation:  
                     RotationVector rv = cursor.rotation.AA.ToRotationVector();
                     _params = new int[]
                     {
@@ -116,7 +116,7 @@ namespace Machina.Drivers.Communication.Protocols
                     };
 
                     // Workaround to SW3.0 crash problem: https://github.com/RobotExMachina/Machina.NET/issues/7
-                    if (ZERO_PRECISION_ON_SAME_POSITION_MOTION && cursor.precision != 0 && cursor.position.IsSimilar(cursor.prevPosition))
+                    if (ZERO_PRECISION_ON_SAME_POSITION_MOTION && cursor.precision != 0 && cursor.prevPosition != null && cursor.position.IsSimilar(cursor.prevPosition))
                     {
                         Logger.Debug("Applying ZERO_PRECISION_ON_SAME_POSITION_MOTION");
                         _params = WrapParamsWithZeroPrecision(_params, cursor);
