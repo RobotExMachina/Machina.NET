@@ -216,13 +216,13 @@ namespace Machina
     //        switch (axid)
     //        {
     //            case 0:
-    //                this.Position.X = Util.Remap(this.Position.X, prevMin, prevMax, newMin, newMax);
+    //                this.Position.X = Numeric.Remap(this.Position.X, prevMin, prevMax, newMin, newMax);
     //                break;
     //            case 1:
-    //                this.Position.Y = Util.Remap(this.Position.Y, prevMin, prevMax, newMin, newMax);
+    //                this.Position.Y = Numeric.Remap(this.Position.Y, prevMin, prevMax, newMin, newMax);
     //                break;
     //            default:
-    //                this.Position.Z = Util.Remap(this.Position.Z, prevMin, prevMax, newMin, newMax);
+    //                this.Position.Z = Numeric.Remap(this.Position.Z, prevMin, prevMax, newMin, newMax);
     //                break;
     //        }
 

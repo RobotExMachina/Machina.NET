@@ -6,9 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
-
-using Machina.Drivers;
 using Machina.Controllers;
+using Machina.Drivers;
 
 namespace Machina
 {

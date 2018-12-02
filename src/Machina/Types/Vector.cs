@@ -89,7 +89,7 @@ namespace Machina
         /// <param name="vec"></param>
         public static implicit operator Point(Vector vec)
         {
-            return vec == null ? null : new Machina.Point(vec.X, vec.Y, vec.Z);
+            return vec == null ? null : new Point(vec.X, vec.Y, vec.Z);
         }
 
         /// <summary>
@@ -540,12 +540,12 @@ namespace Machina
         /// <returns></returns>
         public static Vector RandomFromDoubles(double min, double max)
         {
-            return new Machina.Vector(Random(min, max), Random(min, max), Random(min, max));
+            return new Vector(Random(min, max), Random(min, max), Random(min, max));
         }
 
         public static Vector RandomFromInts(int min, int max)
         {
-            return new Machina.Vector(RandomInt(min, max), RandomInt(min, max), RandomInt(min, max));
+            return new Vector(RandomInt(min, max), RandomInt(min, max), RandomInt(min, max));
         }
 
         /// <summary>

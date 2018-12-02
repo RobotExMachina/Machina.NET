@@ -492,7 +492,7 @@ namespace Machina.Drivers.Communication
                     // ">20 1 2 1;" Sends version numbers
                     case ABBCommunicationProtocol.RES_VERSION:
                         this._deviceDriverVersion = Convert.ToInt32(data[0]) + "." + Convert.ToInt32(data[1]) + "." + Convert.ToInt32(data[2]);
-                        int comp = Util.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
+                        int comp = Utilities.Strings.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
                         if (comp > -1)
                         {
                             logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {_deviceDriverVersion}.");

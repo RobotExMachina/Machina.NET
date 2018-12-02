@@ -90,16 +90,16 @@ namespace Machina.Drivers
                 return null;
             }
 
-            string driverMod = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.mod");
+            string driverMod = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.mod");
             driverMod = driverMod.Replace("{{HOSTNAME}}", parameters["HOSTNAME"]);
             driverMod = driverMod.Replace("{{PORT}}", parameters["PORT"]);
 
-            string driverPgf = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.pgf");
+            string driverPgf = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.pgf");
 
             string monitorMod = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.mod");
             monitorMod = monitorMod.Replace("{{PORT}}", (port + 1).ToString());  // @TODO: must make this more programmatic
 
-            string monitorPgf = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.pgf");
+            string monitorPgf = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.pgf");
 
             var files = new Dictionary<string, string>()
             {

@@ -300,7 +300,7 @@ namespace Machina.Drivers.Communication.Protocols
                 //case ActionType.CustomCode:
                 //    ActionCustomCode acc = _action as ActionCustomCode;
                 //    int[] values;
-                //    if (Util.CommaSeparatedStringToInts(out values))
+                //    if (Numeric.CommaSeparatedStringToInts(out values))
                 //    {
 
                 //    }
@@ -320,7 +320,7 @@ namespace Machina.Drivers.Communication.Protocols
 
             if (_params == null) return null;
 
-            _buffer = Util.Int32ArrayToByteArray(_params, false);
+            _buffer = Utilities.Conversion.Int32ArrayToByteArray(_params, false);
 
             return _buffer;
         }

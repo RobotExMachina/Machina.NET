@@ -114,19 +114,19 @@ namespace Machina
     //            case 0:
     //                foreach (Frame f in Targets)
     //                {
-    //                    f.Position.X = Util.Remap(f.Position.X, prevMin, prevMax, newMin, newMax);
+    //                    f.Position.X = Numeric.Remap(f.Position.X, prevMin, prevMax, newMin, newMax);
     //                }
     //                break;
     //            case 1:
     //                foreach (Frame f in Targets)
     //                {
-    //                    f.Position.Y = Util.Remap(f.Position.Y, prevMin, prevMax, newMin, newMax);
+    //                    f.Position.Y = Numeric.Remap(f.Position.Y, prevMin, prevMax, newMin, newMax);
     //                }
     //                break;
     //            default:
     //                foreach (Frame f in Targets)
     //                {
-    //                    f.Position.Z = Util.Remap(f.Position.Z, prevMin, prevMax, newMin, newMax);
+    //                    f.Position.Z = Numeric.Remap(f.Position.Z, prevMin, prevMax, newMin, newMax);
     //                }
     //                break;
     //        }

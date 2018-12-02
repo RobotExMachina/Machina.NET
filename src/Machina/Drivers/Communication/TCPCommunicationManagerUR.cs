@@ -171,7 +171,7 @@ namespace Machina.Drivers.Communication
                 _clientReceivingThread.IsBackground = true;
                 _clientReceivingThread.Start();
 
-                if (!Machina.Net.Net.GetLocalIPAddressInNetwork(_robotIP, "255.255.255.0", out _serverIP))
+                if (!Net.Net.GetLocalIPAddressInNetwork(_robotIP, "255.255.255.0", out _serverIP))
                 {
                     throw new Exception("ERROR: Could not figure out local IP");
                 }
@@ -289,7 +289,7 @@ namespace Machina.Drivers.Communication
 
                         logger.Debug("Sending:");
                         logger.Debug("  " + this._issueCursor.GetLastAction());
-                        logger.Debug("  [" + string.Join(",", (Util.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
+                        logger.Debug("  [" + string.Join(",", (Utilities.Conversion.ByteArrayToInt32Array(_sendMsgBytes))) + "]");
                     }
 
                     // Action was released to the device, raise event
@@ -353,7 +353,7 @@ namespace Machina.Drivers.Communication
                 {
                     while (_isServerListeningRunning && (receivedCount = _robotNetworkStream.Read(_serverListeningBytes, 0, _serverListeningBytes.Length)) != 0)
                     {
-                        _serverListeningInts = Util.ByteArrayToInt32Array(_serverListeningBytes, receivedCount, false);
+                        _serverListeningInts = Utilities.Conversion.ByteArrayToInt32Array(_serverListeningBytes, receivedCount, false);
 
                         logger.Debug("Received (id): [" + string.Join(",", _serverListeningInts) + "]");
 
@@ -557,13 +557,13 @@ namespace Machina.Drivers.Communication
 
         private string LoadEmptyScript()
         {
-            string emptyScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.empty.script");
+            string emptyScript = IO.ReadTextResource("Machina.Resources.DriverModules.UR.empty.script");
             return emptyScript;
         }
 
         private string LoadDriverScript()
         {
-            string driverScript = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.UR.machina_ur_driver.script");
+            string driverScript = IO.ReadTextResource("Machina.Resources.DriverModules.UR.machina_ur_driver.script");
 
             // @TODO: remove comments, trailing spaces and empty lines from script
             driverScript = driverScript.Replace("{{HOSTNAME}}", _serverIP);

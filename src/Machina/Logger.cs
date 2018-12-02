@@ -119,54 +119,54 @@ namespace Machina
         // STRINGS
         public void Error(string msg)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, msg));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, msg));
         }
 
         public void Warning(string msg)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, msg));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, msg));
         }
 
         public void Info(string msg)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, msg));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, msg));
         }
 
         public void Verbose(string msg)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, msg));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, msg));
         }
 
         public void Debug(string msg)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, msg));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, msg));
         }
 
 
         // OBJECTS
         public void Error(object obj)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, obj.ToString()));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.ERROR, obj.ToString()));
         }
 
         public void Warning(object obj)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, obj.ToString()));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.WARNING, obj.ToString()));
         }
 
         public void Info(object obj)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, obj.ToString()));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.INFO, obj.ToString()));
         }
 
         public void Verbose(object obj)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, obj.ToString()));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.VERBOSE, obj.ToString()));
         }
 
         public void Debug(object obj)
         {
-            Machina.Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, obj.ToString()));
+            Logger.OnCustomLogging(new LoggerArgs(_sender, LogLevel.DEBUG, obj.ToString()));
         }
 
     }

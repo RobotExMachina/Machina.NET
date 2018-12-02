@@ -23,6 +23,12 @@ namespace Machina
 
         public override ActionType Type => ActionType.Translation;
 
+        public ActionTranslation(double x, double y, double z, bool relTrans) : base()
+        {
+            this.translation = new Vector(x, y, z);
+            this.relative = relTrans;
+        }
+
         public ActionTranslation(Vector trans, bool relTrans) : base()
         {
             this.translation = new Vector(trans);  // shallow copy

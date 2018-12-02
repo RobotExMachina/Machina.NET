@@ -47,7 +47,7 @@ namespace Machina
         /// <param name="p"></param>
         public static implicit operator Vector(Point p)
         {
-            return p == null ? null : new Machina.Vector(p.X, p.Y, p.Z);
+            return p == null ? null : new Vector(p.X, p.Y, p.Z);
         }
 
         /// <summary>

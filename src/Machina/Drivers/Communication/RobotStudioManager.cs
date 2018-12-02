@@ -5,15 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
-
-using Machina.Users;
-
 using ABB.Robotics;
 using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
 using ABB.Robotics.Controllers.RapidDomain;
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
+using Machina.Users;
 using ABBTask = ABB.Robotics.Controllers.RapidDomain.Task;
 
 namespace Machina.Drivers.Communication
@@ -822,7 +820,7 @@ namespace Machina.Drivers.Communication
         private bool LoadDriverScript()
         {
             // Read the resource as a string
-            _driverModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.mod");
+            _driverModule = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.mod");
 
             // @TODO: remove comments, trailing spaces and empty lines from script
             _driverModule = _driverModule.Replace("{{HOSTNAME}}", IP);
@@ -836,7 +834,7 @@ namespace Machina.Drivers.Communication
         private bool LoadMonitorScript()
         {
             // Read the resource as a string
-            _monitorModule = Machina.IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.mod");
+            _monitorModule = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.mod");
 
             _monitorModule = _monitorModule.Replace("{{PORT}}", (Port + 1).ToString());     // @TODO: make ports more programmatic
 
@@ -875,7 +873,7 @@ namespace Machina.Drivers.Communication
             }
 
             string path = Path.Combine(Path.GetTempPath(), targetName);
-            if (!Machina.IO.SaveStringToFile(path, module, Encoding.ASCII))
+            if (!IO.SaveStringToFile(path, module, Encoding.ASCII))
             {
                 throw new Exception("Could not save module to temp file");
             }

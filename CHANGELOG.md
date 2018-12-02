@@ -20,7 +20,7 @@
 - [ ] `Do()` takes a Machina string, and deserializes it into an action! :)
 - [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
 - [ ] Add 'EASE' mode to motion, as an option for UR robots to do MoveL
-
+- [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 
 # v0.8.7
 ## BUILD 1426
@@ -29,7 +29,7 @@
 - Fix check on UR protocol
 
 ## BUILD 1427
-
+- Helper methods are now under `Machina.Utilites` namespace.
 
 # v0.8.6
 ## BUILD 1424

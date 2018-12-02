@@ -39,8 +39,8 @@ namespace Machina
             }
             catch (Exception ex)
             {
-                Machina.Logger.Error("Could not save string to file...");
-                Machina.Logger.Error(ex.ToString());
+                Logger.Error("Could not save string to file...");
+                Logger.Error(ex.ToString());
             }
             return false;
         }
@@ -60,8 +60,8 @@ namespace Machina
             }
             catch (Exception ex)
             {
-                Machina.Logger.Error("Could not save stringList to file...");
-                Machina.Logger.Error(ex.ToString());
+                Logger.Error("Could not save stringList to file...");
+                Logger.Error(ex.ToString());
             }
             return false;
         }
@@ -86,8 +86,8 @@ namespace Machina
                 //Console.WriteLine("Could not save resource to file...");
                 //Console.WriteLine(ex);
 
-                Machina.Logger.Error("Could not save resource to file...");
-                Machina.Logger.Error(ex.ToString());
+                Logger.Error("Could not save resource to file...");
+                Logger.Error(ex.ToString());
             }
             return false;
         }

@@ -63,7 +63,7 @@ namespace Machina
         public override string ToJSONString()
         {
             return string.Format("{{\"event\":\"action-released\",\"last\":\"{0}\",\"id\":{8},\"pend\":{1},\"pos\":{2},\"ori\":{3},\"quat\":{4},\"axes\":{5},\"extax\":{6},\"conf\":{7}}}",
-                Util.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
+                Utilities.Strings.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
                 this.PendingReleaseToDevice,
                 this.Position?.ToArrayString() ?? "null",
                 this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",

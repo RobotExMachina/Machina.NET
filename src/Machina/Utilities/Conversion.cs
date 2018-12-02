@@ -1,36 +1,28 @@
 ﻿using System;
 
-//██╗   ██╗████████╗██╗██╗     
-//██║   ██║╚══██╔══╝██║██║     
-//██║   ██║   ██║   ██║██║     
-//██║   ██║   ██║   ██║██║     
-//╚██████╔╝   ██║   ██║███████╗
-// ╚═════╝    ╚═╝   ╚═╝╚══════╝
+//  ██╗   ██╗████████╗██╗██╗     ██╗████████╗██╗███████╗███████╗                      
+//  ██║   ██║╚══██╔══╝██║██║     ██║╚══██╔══╝██║██╔════╝██╔════╝                      
+//  ██║   ██║   ██║   ██║██║     ██║   ██║   ██║█████╗  ███████╗                      
+//  ██║   ██║   ██║   ██║██║     ██║   ██║   ██║██╔══╝  ╚════██║                      
+//  ╚██████╔╝   ██║   ██║███████╗██║   ██║   ██║███████╗███████║                      
+//   ╚═════╝    ╚═╝   ╚═╝╚══════╝╚═╝   ╚═╝   ╚═╝╚══════╝╚══════╝                      
+//                                                                                    
+//   ██████╗ ██████╗ ███╗   ██╗██╗   ██╗███████╗██████╗ ███████╗██╗ ██████╗ ███╗   ██╗
+//  ██╔════╝██╔═══██╗████╗  ██║██║   ██║██╔════╝██╔══██╗██╔════╝██║██╔═══██╗████╗  ██║
+//  ██║     ██║   ██║██╔██╗ ██║██║   ██║█████╗  ██████╔╝███████╗██║██║   ██║██╔██╗ ██║
+//  ██║     ██║   ██║██║╚██╗██║╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║██║██║   ██║██║╚██╗██║
+//  ╚██████╗╚██████╔╝██║ ╚████║ ╚████╔╝ ███████╗██║  ██║███████║██║╚██████╔╝██║ ╚████║
+//   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+//                                                                                    
 
-/// <summary>
-/// A bunch of static utility functions (probably many of them could be moved to certain related classes...)
-/// </summary>
-namespace Machina
+
+namespace Machina.Utilities
 {
     /// <summary>
-    /// Utility static methods
+    /// Utility functions for data conversions.
     /// </summary>
-    public static class Util
+    public static class Conversion
     {
-        /// <summary>
-        /// Remaps a value from source to target numerical domains.
-        /// </summary>
-        /// <param name="val"></param>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        /// <param name="newMin"></param>
-        /// <param name="newMax"></param>
-        /// <returns></returns>
-        public static double Remap(double val, double min, double max, double newMin, double newMax)
-        {
-            return newMin + (val - min) * (newMax - newMin) / (max - min);
-        }
-
         /// <summary>
         /// Converts an array of signed int32 to a byte array. Useful for buffering. 
         /// </summary>
@@ -114,77 +106,29 @@ namespace Machina
         }
 
         /// <summary>
-        /// Returns a string with safe ASCII characters to be used as a robot program name. 
+        /// Takes an array of objects and converts it into an array of nullable doubles.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="objs"></param>
         /// <returns></returns>
-        public static string SafeProgramName(string name)
+        public static double?[] NullableDoublesFromObjects(object[] objs)
         {
-            string safe = "";
-            if (name.Length == 0) safe = "Machina"; 
+            if (objs == null) return null;
 
-            // Replace whitespaces with underscores
-            safe = name.Replace(' ', '_');
+            double?[] d = new double?[objs.Length];
 
-            // Check if the name starts with a digit
-            if (char.IsDigit(safe[0])) safe = "_" + safe;
-
-            return safe;
-        }
-
-        /// <summary>
-        /// Finds double quotes on a string and scapes them adding a backlash in front.
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static string EscapeDoubleQuotes(string str)
-        {
-            return str?.Replace("\"", "\\\"");
-        }
-
-        /// <summary>
-        /// Compares strings representing semantic versioning versions, like "1.3.2".
-        /// Returns 1 if A is newer than B, -1 if B is newer than A, and 0 if same version. 
-        /// </summary>
-        /// <param name="versionA"></param>
-        /// <param name="versionB"></param>
-        /// <param name="delimiter"></param>
-        /// <returns></returns>
-        public static int CompareVersions(string versionA, string versionB, char delimiter = '.')
-        {
-            string[] A = versionA.Split(delimiter);
-            string[] B = versionB.Split(delimiter);
-
-            if (A.Length != B.Length)
+            for (int i = 0; i < d.Length; i++)
             {
-                throw new Exception("Incorrectly formatted version numbers, lengths must be equal");
+                try
+                {
+                    d[i] = Convert.ToDouble(objs[i]);
+                }
+                catch
+                {
+                    d[i] = null;
+                }
             }
 
-            int a, b;
-            for (int i = 0; i < A.Length; i++)
-            {
-                a = Convert.ToInt32(A[i]);
-                b = Convert.ToInt32(B[i]);
-                if (a > b) return 1;
-                if (a < b) return -1;
-            }
-
-            return 0;
+            return d;
         }
-
-        /// <summary>
-        /// Checks if the argument is a valid variable name. 
-        /// Basically, it returns true if the first character of the string is a letter...
-        /// </summary>
-        /// <param name="varName"></param>
-        /// <returns></returns>
-        public static bool IsValidVariableName(string varName)
-        {
-            return !String.IsNullOrEmpty(varName) && Char.IsLetter(varName[0]);
-        }
-
-    }
-
-
-    
+    }    
 }

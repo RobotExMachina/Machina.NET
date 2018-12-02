@@ -354,7 +354,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(Util.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
+            return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace Machina
         /// <returns></returns>
         public List<string> ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(Util.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
+            return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
         }
 
         public void LogBufferedActions()

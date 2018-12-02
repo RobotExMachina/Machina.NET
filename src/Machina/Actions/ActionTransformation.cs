@@ -25,13 +25,21 @@ namespace Machina
 
         public override ActionType Type => ActionType.Transformation;
 
+        public ActionTransformation(double x, double y, double z, double vx0, double vx1, double vx2, double vy0,
+            double vy1, double vy2, bool relative, bool translationFirst) : base()
+        {
+            this.translation = new Vector(x, y, z);
+            this.rotation = new Orientation(vx0, vx1, vx2, vy0, vy1, vy2);
+            this.relative = relative;
+            this.translationFirst = translationFirst;
+        }
+
         public ActionTransformation(Vector translation, Rotation rotation, bool relative, bool translationFirst) : base()
         {
             this.translation = new Vector(translation);  // shallow copy
             this.rotation = new Rotation(rotation);  // shallow copy
             this.relative = relative;
             this.translationFirst = translationFirst;
-
         }
 
         public override string ToString()
