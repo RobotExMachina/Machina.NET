@@ -955,6 +955,15 @@ namespace Machina
         /// <returns></returns>
         public bool ApplyAction(ActionAttachTool action)
         {
+            // Sanity: this is a fix for pre-0.8.x compatibility where Attach came with the Tool object, not the name. 
+            // Older versions of Machina would yield error searching for `null` key on `availableTools`
+            if (action.toolName == null)
+            {
+                logger.Error($"Obsolete version of AttachTool; please update Machina to latest update.");
+                return false;
+            }
+
+
             // Sanity
             if (!availableTools.ContainsKey(action.toolName))
             {
