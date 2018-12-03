@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 //  ██╗   ██╗████████╗██╗██╗     ██╗████████╗██╗███████╗███████╗
 //  ██║   ██║╚══██╔══╝██║██║     ██║╚══██╔══╝██║██╔════╝██╔════╝
@@ -147,6 +148,85 @@ namespace Machina.Utilities
                     }
                     return str;
             }
+        }
+
+
+        /// <summary>
+        /// Given a string, returns a new string with all preceding and trailing occurreces of another string removed.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="rem"></param>
+        /// <returns></returns>
+        public static string RemoveSideChars(string str, char rem)
+        {
+            if (str == "" || str == null)
+                return str;
+
+            string s = str;
+            while (s[0] == rem)
+            {
+                s = s.Remove(0, 1);
+            }
+
+            while (s[s.Length - 1] == rem)
+            {
+                s = s.Remove(s.Length - 1);
+            }
+
+            return s;
+        }
+
+        /// <summary>
+        /// Given a string, returns a new string with one occurrence of the param char removed. 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="rem"></param>
+        /// <returns></returns>
+        public static string RemoveSideChar(string str, char rem)
+        {
+            if (str == "" || str == null)
+                return str;
+
+            string s = str;
+            if (s[0] == rem)
+            {
+                s = s.Remove(0, 1);
+            }
+
+            if (s[s.Length - 1] == rem)
+            {
+                s = s.Remove(s.Length - 1);
+            }
+
+            return s;
+        }
+
+        // This is terrible, but does the job...
+        /// <summary>
+        /// Given an enumerable of strings, returns a clean list with no empty lines.  
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static List<string> RemoveEmptyLines(IEnumerable<string> array)
+        {
+            List<string> list = new List<string>();
+            foreach (var str in array)
+            {
+                if (str != String.Empty) list.Add(str);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Given a string, returns a new string with all occurrences of another string within it removed.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="rem"></param>
+        /// <returns></returns>
+        public static string RemoveString(string str, string rem)
+        {
+            return str.Replace(rem, "");
         }
     }    
 }

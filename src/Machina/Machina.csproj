@@ -159,6 +159,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Tools\Tool.cs" />
     <Compile Include="Users\User.cs" />
+    <Compile Include="Utilities\Parsing.cs" />
     <Compile Include="Utilities\Strings.cs" />
     <Compile Include="Utilities\Conversion.cs" />
     <Compile Include="Utilities\Numeric.cs" />
