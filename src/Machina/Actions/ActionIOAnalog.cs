@@ -44,7 +44,7 @@ namespace Machina
 
         public override string ToInstruction()
         {
-            return $"WriteAnalog({(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")},{this.value},{this.isToolPin});";
+            return $"WriteAnalog({(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")},{this.value}{(this.isToolPin ? "," + this.isToolPin : "")});";
         }
     }
 }

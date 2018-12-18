@@ -30,6 +30,7 @@
 
 ## BUILD 1427
 - Helper methods are now under `Machina.Utilites` namespace.
+- Add utility parsing functions.
 
 # v0.8.6
 ## BUILD 1424

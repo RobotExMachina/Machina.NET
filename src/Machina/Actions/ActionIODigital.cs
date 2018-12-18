@@ -42,7 +42,7 @@ namespace Machina
 
         public override string ToInstruction()
         {
-            return $"WriteDigital({(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")},{this.on},{this.isToolPin});";
+            return $"WriteDigital({(this.isDigit ? this.pinNum.ToString() : "\"" + this.pinName + "\"")},{this.on}{(this.isToolPin ? "," + this.isToolPin : "" )});";
         }
     }
 }

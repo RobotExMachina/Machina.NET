@@ -69,9 +69,9 @@ Machina is its infancy, and rapid changes are happening with every commit! Your 
 
 A full set of tutorials and associated projects can be found here:
 
-![https://www.youtube.com/playlist?list=PLvxxYImPCApXj3tHVKmpTS_AuMPngnA47](assets/machina_tutorials_banner.png)
+[![MACHINA TUTORIALS](assets/machina_tutorials_banner.png)](https://www.youtube.com/playlist?list=PLvxxYImPCApXj3tHVKmpTS_AuMPngnA47)
 
-_The following documentation is very dated, and lot of things have changed since then_
+_The following documentation is very outdated, and lot of things have changed since then._
 To learn how to start using Machina, and examples of some of its features, please take a look at the [Walkthrough page](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Walkthrough.md).
 
 Documentation on Machina's API can be found on the [Reference](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Reference.md).
@@ -80,6 +80,9 @@ Documentation on Machina's API can be found on the [Reference](https://github.co
 ## Related Projects
 
 Machina comes with a bunch of sample projects that may help you understand its possibilities. Take a look at them, and please don't blame me if they broke during development... :sweat_smile:
+
+A playlist of projects built by the community with different Machina flavors:
+https://www.youtube.com/playlist?list=PLvxxYImPCApXZ-yBCUtGzVWb2ZhduaSXR
 
 Here are some videos of things you can do with Machina:
 
