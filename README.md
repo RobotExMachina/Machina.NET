@@ -71,6 +71,10 @@ A full set of tutorials and associated projects can be found here:
 
 [![MACHINA TUTORIALS](assets/machina_tutorials_banner.png)](https://www.youtube.com/playlist?list=PLvxxYImPCApXj3tHVKmpTS_AuMPngnA47)
 
+Playlist: https://www.youtube.com/playlist?list=PLvxxYImPCApXj3tHVKmpTS_AuMPngnA47
+
+Instructions on how to setup your machine to work with the Machina framework can be found here: https://www.youtube.com/playlist?list=PLvxxYImPCApUffcv_KtdR-sQydA4O4CPH.
+
 _The following documentation is very outdated, and lot of things have changed since then._
 To learn how to start using Machina, and examples of some of its features, please take a look at the [Walkthrough page](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Walkthrough.md).
 
