@@ -21,6 +21,13 @@
 - [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
 - [ ] Add 'EASE' mode to motion, as an option for UR robots to do MoveL
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
+- [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
+
+# v0.8.8
+## BUILD 1428
+- Revert `RobotCursor` to default `null` tool; this was giving a full other set of problems... Let's see what I break now by doing this...
+- Fix bug where tools changes would accumulate rather than undo...
+- New build version to keep up with Dynamo app update.
 
 # v0.8.7
 ## BUILD 1426

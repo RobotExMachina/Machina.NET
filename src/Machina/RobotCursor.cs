@@ -196,11 +196,13 @@ namespace Machina
             this.motionType = mType;
             this.referenceCS = refCS;
 
-            //this.tool = null;
-            // Add a "noTool" default object and make it the default.
             this.availableTools = new Dictionary<string, Tool>();
-            this.availableTools["noTool"] = Tool.Create("noTool", 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0, 0, 0);
-            this.tool = this.availableTools["noTool"];
+
+            // Add a "noTool" default object and make it the default.
+            //this.availableTools["noTool"] = Tool.Create("noTool", 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0, 0, 0);
+            //this.tool = this.availableTools["noTool"];
+
+            this.tool = null;  // reverted back to default `null` tool...
 
             this.digitalOutputs = new Dictionary<string, bool>();
             this.analogOutputs = new Dictionary<string, double>();
@@ -963,15 +965,22 @@ namespace Machina
                 return false;
             }
 
-
             // Sanity
             if (!availableTools.ContainsKey(action.toolName))
             {
                 logger.Warning($"No tool named \"{action.toolName}\" defined in this robot; please use \"DefineTool\" first.");
                 return false;
             }
+            // This would not work in case the user had defined a new tool with different values but same name (not great practice, but technically possible anyway...)
+            //if (action.toolName == this.tool.name)
+            //{
+            //    logger.Verbose($"Attaching the same tool? No changes...");
+            //    return true;
+            //}
+
 
             // The cursor has now a tool attached to it 
+            Tool prevTool = this.tool;
             this.tool = availableTools[action.toolName];
 
             // Shim for lack of IK 
@@ -983,21 +992,13 @@ namespace Machina
             // Otherwise transform the TCP
             else
             {
-                // Now transform the cursor position to the tool's transformation params:
-                Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
-                Vector newPos = this.position + worldVector;
-                Rotation newRot = Rotation.Combine(this.rotation, this.tool.TCPOrientation);  // postmultiplication
-
-                this.prevPosition = this.position;
-                this.position = newPos;
-                this.prevRotation = this.rotation;
-                this.rotation = newRot;
-                //this.prevAxes = this.axes;  // why was this here? joints don't change on tool attachment...
-
-                if (_logRelativeActions)
+                if (prevTool != null)
                 {
-                    logger.Verbose("TCP changed to " + this.position + " " + new Orientation(this.rotation));
+                    logger.Debug($"Detaching tool {prevTool.name} before attaching {this.tool.name}.");
+                    UndoToolTransformOnCursor(this, prevTool, logger, _logRelativeActions);
                 }
+
+                ApplyToolTransformToCursor(this, this.tool, logger, _logRelativeActions);
             }
             
             return true;
@@ -1025,51 +1026,11 @@ namespace Machina
             // Otherwise undo the tool's transforms
             else
             {
-                // TODO: at some point in the future, check for translationFirst here
-                Rotation newRot = Rotation.Combine(this.rotation, Rotation.Inverse(this.tool.TCPOrientation));  // postmultiplication by the inverse rotation
-                Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
-                Vector newPos = this.position - worldVector;
-
-                this.prevPosition = this.position;
-                this.position = newPos;
-                this.prevRotation = this.rotation;
-                this.rotation = newRot;
-                //this.prevAxes = this.axes;
-                //this.axes = null;  // axes were null anyway...? 
-
-                if (_logRelativeActions)
-                {
-                    logger.Verbose("TCP changed to " + this.position + " " + new Orientation(this.rotation));
-                }
+                UndoToolTransformOnCursor(this, this.tool, logger, _logRelativeActions);
             }
 
             // "Detach" the tool
             this.tool = null;
-
-            // -> This code was not properly detaching the tool when coming from axis motion
-            //// Relative transform
-            //// If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
-            //if (this.position == null || this.rotation == null)
-            //{
-            //    logger.Warning($"Cannot apply \"{action}\"; please provide absolute transform values before detaching a tool and try again.");
-            //    return false;
-            //}
-
-            //// Now undo the tool's transforms
-            //// TODO: at some point in the future, check for translationFirst here
-            //Rotation newRot = Rotation.Combine(this.rotation, Rotation.Inverse(this.tool.TCPOrientation));  // postmultiplication by the inverse rotation
-            //Vector worldVector = Vector.Rotation(this.tool.TCPPosition, this.rotation);
-            //Vector newPos = this.position - worldVector;
-
-            //this.prevPosition = this.position;
-            //this.position = newPos;
-            //this.prevRotation = this.rotation;
-            //this.rotation = newRot;
-            //this.prevAxes = this.axes;
-            //this.axes = null;
-
-            //// Detach the tool
-            //this.tool = null;
 
             return true;
         }
@@ -1334,8 +1295,58 @@ namespace Machina
             this.extrudedLength += this.extrusionRate * this.prevPosition.DistanceTo(this.position);
         }
 
-        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{axes} a{acceleration} v{speed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
+        /// <summary>
+        /// Modify a cursor's TCP transform according to a tool. Useful for Attach operations.
+        /// </summary>
+        /// <param name="tool"></param>
+        internal void ApplyToolTransformToCursor(RobotCursor cursor, Tool tool, RobotLogger logger, bool log)
+        {
+            // Now transform the cursor position to the tool's transformation params:
+            Vector worldVector = Vector.Rotation(tool.TCPPosition, cursor.rotation);
+            Vector newPos = cursor.position + worldVector;
+            Rotation newRot = Rotation.Combine(cursor.rotation, tool.TCPOrientation);  // postmultiplication
 
+            cursor.prevPosition = cursor.position;
+            cursor.position = newPos;
+            cursor.prevRotation = cursor.rotation;
+            cursor.rotation = newRot;
+            //cursor.prevAxes = cursor.axes;  // why was this here? joints don't change on tool attachment...
+
+            if (log)
+            {
+                logger.Verbose("Cursor TCP changed to " + cursor.position + " " + new Orientation(cursor.rotation) + " due to tool attachment");
+            }
+
+        }
+
+        /// <summary>
+        /// Undo tool-based TCP transformations on a cursor. Useful for Detach operations.
+        /// </summary>
+        /// <param name="tool"></param>
+        internal void UndoToolTransformOnCursor(RobotCursor cursor, Tool tool, RobotLogger logger, bool log)
+        {
+            // TODO: at some point in the future, check for translationFirst here
+            Rotation newRot = Rotation.Combine(cursor.rotation, Rotation.Inverse(tool.TCPOrientation));  // postmultiplication by the inverse rotation
+            Vector worldVector = Vector.Rotation(tool.TCPPosition, cursor.rotation);
+            Vector newPos = cursor.position - worldVector;
+
+            cursor.prevPosition = cursor.position;
+            cursor.position = newPos;
+            cursor.prevRotation = cursor.rotation;
+            cursor.rotation = newRot;
+            //this.prevAxes = this.axes;
+            //this.axes = null;  // axes were null anyway...? 
+
+            if (log)
+            {
+                logger.Verbose("Cursor TCP changed to " + cursor.position + " " + new Orientation(cursor.rotation) + " due to tool removal");
+            }
+        }
+
+
+
+        public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{axes} a{acceleration} v{speed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";
+        
 
     }
 }
