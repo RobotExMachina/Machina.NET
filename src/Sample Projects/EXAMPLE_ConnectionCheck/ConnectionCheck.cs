@@ -27,12 +27,26 @@ namespace EXAMPLE_ConnectionCheck
         {
             Console.WriteLine("Initializing Connection Check Program");
 
-            Robot arm = new Robot("Connection test", "ABB");
+            // Create a new instance of a Robot
+            Robot arm = Robot.Create("ConnectionTest", "ABB");
 
-            arm.ControlMode("execute");
+            // Dumps all Log messages to the Console.
+            arm.DebugMode(true);
+
+            // Set connection mode to "online"
+            arm.ControlMode("online");
+
+            // Let Machina try to figure out the connection parameters. 
+            arm.ConnectionManager("Machina");
+
+            // Let Machina try to connect to a robot on the network
             arm.Connect();
 
-            arm.DebugDump();
+            // At this point, a lot of information about the robot should be displayed on the console. 
+
+            Console.WriteLine(" ");
+            Console.WriteLine("Press any key to DISCONNECT...");
+            Console.ReadKey();
 
             arm.Disconnect();
             

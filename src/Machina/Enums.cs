@@ -16,12 +16,12 @@ namespace Machina
         /// </summary>
         Offline,
 
-        /// <summary>
-        /// Online connection to a controller, the library will upload complete programs 
-        /// and run them. Provides robust and fluid movement, useful on real-time 
-        /// interactivity where response time is not a priority. 
-        /// </summary>
-        Execute,
+        ///// <summary>
+        ///// Online connection to a controller, the library will upload complete programs 
+        ///// and run them. Provides robust and fluid movement, useful on real-time 
+        ///// interactivity where response time is not a priority. 
+        ///// </summary>
+        //Execute,
 
         /// <summary>
         /// Online connection to a controller, the library will stream individual targets

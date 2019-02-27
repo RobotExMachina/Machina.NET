@@ -4,40 +4,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using BRobot;
+using Machina;
 
 namespace EXAMPLE_KeyboardControl
 {
     class KeyboardControl
     {
-        
 
         [MTAThread]
         static void Main(string[] args)
         {
+            // Some program parameters
             int leadSpeed = 100;
             int moveSpeed = 50;
             double inc = 25;
             bool input = true;
 
-            Robot arm = new Robot();
+            // Create a new instance of a Robot
+            Robot arm = Robot.Create("JoggingBot", "ABB");
 
             // Set connection properties
-            arm.Mode("stream");
+            arm.ControlMode("online");
+
+            // Let Machina try to connect to a robot on the network.
+            arm.ConnectionManager("Machina");
             arm.Connect();
 
-            arm.DebugDump();
-
-            // Start real-time streaming
-            arm.Start();
-
+            //// Alternativelly, connect manually with known network parameters (local RobotStudio simulation in this case)
+            //arm.Connect("127.0.0.1", 7000);
+            
             // Move to the positive XYZ octant
-            arm.Speed(leadSpeed);
-            arm.Zone(2);
-            //arm.RotateTo(Rotation.FlippedAroundY);
-            //arm.MoveTo(250, 250, 250);
+            arm.SpeedTo(leadSpeed);
+            arm.PrecisionTo(2);
+            arm.TransformTo(400, 0, 400, -1, 0, 0, 0, 1, 0);  // Be careful with these coordinates, tweak according to robot size 
 
-            arm.Speed(moveSpeed);
+            arm.SpeedTo(moveSpeed);
 
             while (input)
             {
@@ -76,7 +77,7 @@ namespace EXAMPLE_KeyboardControl
                 }
             }
 
-            //arm.Stop();
+
             arm.Disconnect();
 
             Console.WriteLine("Press any key to EXIT the program...");
