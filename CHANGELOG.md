@@ -23,6 +23,10 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
+# v0.8.9
+## BUILD 1429
+- Fix Example files.
+
 # v0.8.8
 ## BUILD 1428
 - Revert `RobotCursor` to default `null` tool; this was giving a full other set of problems... Let's see what I break now by doing this...

@@ -37,7 +37,7 @@ namespace TEST_StreamAPITests
             //arm.ActionIssued += LogEvent;
 
             Machina.Logger.SetLogLevel(3);
-
+            Machina.Logger.WriteLine += Console.WriteLine;
             
             arm.MotionUpdate += LogEvent;
 
