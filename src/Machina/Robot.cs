@@ -42,7 +42,7 @@ namespace Machina
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.8.8." + Build;
+        public static readonly string Version = "0.8.9." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
