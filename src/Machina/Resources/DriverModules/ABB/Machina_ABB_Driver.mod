@@ -82,7 +82,7 @@ MODULE Machina_Driver
     CONST num INST_WAITTIME := 6;                   ! WaitTime T
     CONST num INST_TPWRITE := 7;                    ! TPWrite "MSG"
     CONST num INST_TOOL := 8;                       ! (settool X Y Z QW QX QY QZ KG CX CY CZ)
-    CONST num INST_NOTOOL := 9;                     ! (settool tool0)
+    CONST num INST_NO_TOOL := 9;                    ! (settool tool0)
     CONST num INST_SETDO := 10;                     ! SetDO "NAME" ON
     CONST num INST_SETAO := 11;                     ! SetAO "NAME" V
     CONST num INST_EXT_JOINTS_ALL := 12;            ! (setextjoints a1 a2 a3 a4 a5 a6, applies to both rob and jointtarget) --> send non-string 9E9 for inactive axes
@@ -91,6 +91,8 @@ MODULE Machina_Driver
     CONST num INST_EXT_JOINTS_ROBTARGET := 15;      ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
     CONST num INST_EXT_JOINTS_JOINTTARGET := 16;    ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
     CONST num INST_CUSTOM_ACTION := 17;             ! This is a wildcard for custom user functions that do not really fit in the Machina API (mainly Yumi gripping right now)
+    CONST num INST_WOBJ := 18;                      ! (setwobj X Y Z QW QX QY QZ) --> defaults to not robot not holding wobj, fixed user coordinate system (ucs), and ucs == worldcs
+    CONST num INST_NO_WOBJ := 19;                   ! (setwobj wobj0)
 
     CONST num INST_STOP_EXECUTION := 100;           ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;                 ! A way to retreive state information from the server (not implemented)
@@ -240,7 +242,7 @@ MODULE Machina_Driver
                 CASE INST_TOOL:
                     cursorTool := GetToolData(currentAction);
 
-                CASE INST_NOTOOL:
+                CASE INST_NO_TOOL:
                     cursorTool := tool0;
 
                 CASE INST_SETDO:
@@ -288,6 +290,13 @@ MODULE Machina_Driver
 
                 CASE INST_CUSTOM_ACTION:
                     CustomAction currentAction;
+
+                CASE INST_WOBJ:
+                    cursorWObj := GetWObjData(currentAction);
+
+                CASE INST_NO_WOBJ:
+                    cursorWObj := wobj0;
+
                 ENDTEST
 
                 ! Send acknowledgement message
@@ -1009,6 +1018,10 @@ MODULE Machina_Driver
     ! Return the external joints represented by an Action
     FUNC extjoint GetExternalJointsData(action a)
       RETURN [a.p1, a.p2, a.p3, a.p4, a.p5, a.p6];
+    ENDFUNC
+
+    FUNC wobjdata GetWObjData(action a)
+      RETURN [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[a.p1, a.p2, a.p3], [a.p4, a.p5, a.p6, a.p7]]];
     ENDFUNC
 
     ! TPWrite a string representation of an Action

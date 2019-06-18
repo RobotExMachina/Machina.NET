@@ -36,32 +36,35 @@ namespace TEST_StreamAPITests
             //arm.ActionReleased += LogEvent;
             //arm.ActionIssued += LogEvent;
 
-            Machina.Logger.SetLogLevel(3);
-            Machina.Logger.WriteLine += Console.WriteLine;
-            
-            arm.MotionUpdate += LogEvent;
+            //Machina.Logger.SetLogLevel(5);
+            //Machina.Logger.WriteLine += Console.WriteLine;
 
-            arm.ActionExecuted += (sender, e) =>
-            {
-                if (e.PendingExecutionTotal == 0) Loop(sender as Robot, 100);
-            };
+            //arm.MotionUpdate += LogEvent;
+
+            //arm.ActionExecuted += (sender, e) =>
+            //{
+            //    if (e.PendingExecutionTotal == 0) Loop(sender as Robot, 100);
+            //};
 
 
             arm.ControlMode("stream");
-            //arm.ConnectionManager("machina");
-            //arm.Connect();
-            arm.ConnectionManager("user");
-            arm.Connect("127.0.0.1", 7000);
+            arm.ConnectionManager("machina");
+            arm.Connect();
+            //arm.ConnectionManager("user");
+            //arm.Connect("127.0.0.1", 7000);
 
             //arm.SetUser("BUILD", "password");
             //arm.Connect("192.168.0.101", 6969);
 
             //arm.StreamConfiguration(3, 10);
 
-            arm.Message("Hello Robot!");
-            arm.SpeedTo(20);
-            arm.ExternalAxisTo(1, 0);
-            arm.TransformTo(1500, -1500, 1200, -1, 0, 0, 0, 1, 0);
+            WObjTesting(arm);
+
+            //arm.Message("Hello Robot!");
+            //arm.SpeedTo(20);
+            //arm.ExternalAxisTo(1, 0);
+            //arm.TransformTo(1500, -1500, 1200, -1, 0, 0, 0, 1, 0);
+            
             //ToolTesting(arm);
 
             //LoopUp(arm);
@@ -129,6 +132,29 @@ namespace TEST_StreamAPITests
         private static void Logger_CustomLogging(LoggerArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        static void WObjTesting(Robot bot)
+        {
+            bot.Message("Homing...");
+            bot.SpeedTo(100);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+            bot.Wait(1000);
+
+            bot.Message("Moving to 300, 0, 300");
+            bot.TransformTo(300, 0, 300, -1, 0, 0, 0, 1, 0);
+            bot.Wait(2000);
+
+            bot.Message("Setting wobj");
+            bot.CustomCode("18 300 0 300 1 0 0 0");
+
+            bot.Message("Moving to 300, 0, 400");
+            bot.TransformTo(0, 0, 100, -1, 0, 0, 0, 1, 0);
+            bot.Wait(2000);
+
+            bot.Message("Homing...");
+            bot.SpeedTo(100);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
         }
 
         static void ToolTesting(Robot bot)

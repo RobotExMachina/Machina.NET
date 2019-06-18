@@ -130,5 +130,31 @@ namespace Machina.Utilities
 
             return d;
         }
+
+
+        /// <summary>
+        /// Quick conversion for wobjs, but totally dislike this here. Mmmm...
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="vx0"></param>
+        /// <param name="vx1"></param>
+        /// <param name="vx2"></param>
+        /// <param name="vy0"></param>
+        /// <param name="vy1"></param>
+        /// <param name="vy2"></param>
+        /// <returns></returns>
+        public static double[] PlaneToABBPose(double x, double y, double z, double vx0, double vx1, double vx2, double vy0, double vy1, double vy2)
+        {
+            Orientation o = new Orientation(vx0, vx1, vx2, vy0, vy1, vy2);
+            Quaternion q = o.Q;
+
+            return new double[]
+            {
+                x, y, z,
+                q.W, q.X, q.Y, q.Z
+            };
+        }
     }    
 }

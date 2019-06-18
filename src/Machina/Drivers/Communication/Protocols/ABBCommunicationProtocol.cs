@@ -24,7 +24,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int INST_WAITTIME = 6;                   // WaitTime T
         internal const int INST_TPWRITE = 7;                    // TPWrite "MSG"
         internal const int INST_TOOL = 8;                       // (settool X Y Z QW QX QY QZ KG CX CY CZ)
-        internal const int INST_NOTOOL = 9;                     // (settool tool0)
+        internal const int INST_NO_TOOL = 9;                    // (settool tool0)
         internal const int INST_SETDO = 10;                     // SetDO "NAME" ON
         internal const int INST_SETAO = 11;                     // SetAO "NAME" V
         internal const int INST_EXT_JOINTS_ALL = 12;            // (setextjoints a1 a2 a3 a4 a5 a6) --> send non-string 9E9 for inactive axes
@@ -33,6 +33,8 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int INST_EXT_JOINTS_ROBTARGET = 15;      // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
         internal const int INST_EXT_JOINTS_JOINTTARGET = 16;    // (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
         internal const int INST_CUSTOM_ACTION = 17;             // This is a wildcard for custom user functions that do not really fit in the Machina API (mainly Yumi gripping right now)
+        internal const int INST_WOBJ = 18;                      // (setwobj X Y Z QW QX QY QZ) --> defaults to not robot not holding wobj, fixed user coordinate system(ucs), and ucs == worldcs
+        internal const int INST_NO_WOBJ = 19;                   // (setwobj wobj0)
 
         internal const int RES_VERSION = 20;                    // ">20 1 2 1;" Sends version numbers
         internal const int RES_POSE = 21;                       // ">21 400 300 500 0 0 1 0;"
@@ -202,7 +204,7 @@ namespace Machina.Drivers.Communication.Protocols
                         "{0}{1} {2}{3}",
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
-                        INST_NOTOOL,
+                        INST_NO_TOOL,
                         STR_MESSAGE_END_CHAR));
                     break;
 

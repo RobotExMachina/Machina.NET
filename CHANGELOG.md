@@ -23,6 +23,11 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
+# v0.8.10
+## BUILD 1430
+- Add `wobj` code option for ABB driver.
+- Add quick conversion utility which I will totally revert...
+
 # v0.8.9
 ## BUILD 1429
 - Fix Example files.
