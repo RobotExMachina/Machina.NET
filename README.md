@@ -80,6 +80,10 @@ To learn how to start using Machina, and examples of some of its features, pleas
 
 Documentation on Machina's API can be found on the [Reference](https://github.com/garciadelcastillo/Machina/blob/master/Docs/Reference.md).
 
+A technical description of the project's goals and architecture is described here:
+
+> García del Castillo y López, J.L., 2019. **Machina.NET: A Library for Programming and Real-Time Control of Industrial Robots.** _Journal of Open Research Software_, 7(1), p.27. DOI: http://doi.org/10.5334/jors.247 
+
 
 ## Related Projects
 
