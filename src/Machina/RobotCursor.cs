@@ -1327,7 +1327,7 @@ namespace Machina
         {
             // TODO: at some point in the future, check for translationFirst here
             Rotation newRot = Rotation.Combine(cursor.rotation, Rotation.Inverse(tool.TCPOrientation));  // postmultiplication by the inverse rotation
-            Vector worldVector = Vector.Rotation(tool.TCPPosition, cursor.rotation);
+            Vector worldVector = Vector.Rotation(tool.TCPPosition, newRot);
             Vector newPos = cursor.position - worldVector;
 
             cursor.prevPosition = cursor.position;
