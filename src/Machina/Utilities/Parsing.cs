@@ -38,7 +38,7 @@ namespace Machina.Utilities
         {
             try
             {
-                // MEGA quick and idrty
+                // MEGA quick and dirty
                 // assuming a msg int he form of "MoveTo(300, 400, 500);" with optional spaces here and there...  
                 string[] split1 = statement.Split(new char[] { '(' });
                 string[] split2 = split1[1].Split(new char[] { ')' });

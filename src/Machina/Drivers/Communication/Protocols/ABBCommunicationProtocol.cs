@@ -67,7 +67,7 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    //// MoveL/J X Y Z QW QX QY QZ
+                    // MoveL/J X Y Z QW QX QY QZ
                     msgs.Add(string.Format(CultureInfo.InvariantCulture, 
                         "{0}{1} {2} {3} {4} {5} {6} {7} {8} {9}{10}",
                         STR_MESSAGE_ID_CHAR,

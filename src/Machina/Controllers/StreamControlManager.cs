@@ -31,7 +31,7 @@ namespace Machina.Controllers
                 case RobotType.UR:
                     _control.Driver = new DriverUR(_control);
                     break;
-
+                    
                 default:
                     throw new NotImplementedException();
             }
