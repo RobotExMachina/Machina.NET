@@ -11,15 +11,11 @@ namespace TEST_StreamAPITests
 {
     class StreamAPITests
     {
-        //static Robot arm = new Robot();
-        //static Point dir = new Point(20, 0, 0);
-        //static int it = 0;
-        //static int maxTargets = 36;
 
         static bool PHYSICAL_ROBOT = true;
 
-        //static Joints homeJoints = new Joints(0, 0, 0, 0, 90, 0);           // ABB
-        static Joints homeJoints = new Joints(0, -90, -90, -90, 90, 90);      // UR
+        static Joints homeJoints = new Joints(0, 0, 0, 0, 90, 0);           // ABB
+        //static Joints homeJoints = new Joints(0, -90, -90, -90, 90, 90);      // UR
 
         static public void LogEvent(object sender, MachinaEventArgs args)
         {
@@ -30,14 +26,14 @@ namespace TEST_StreamAPITests
         {
             Robot arm = Robot.Create("StreamTests", "ABB");
 
-            arm.DebugMode(true);
+            //arm.DebugMode(true);
 
             //arm.ActionExecuted += LogEvent;
             //arm.ActionReleased += LogEvent;
             //arm.ActionIssued += LogEvent;
 
-            //Machina.Logger.SetLogLevel(5);
-            //Machina.Logger.WriteLine += Console.WriteLine;
+            Machina.Logger.SetLogLevel(5);
+            Machina.Logger.WriteLine += Console.WriteLine;
 
             //arm.MotionUpdate += LogEvent;
 
@@ -58,64 +54,13 @@ namespace TEST_StreamAPITests
 
             //arm.StreamConfiguration(3, 10);
 
-            WObjTesting(arm);
-
-            //arm.Message("Hello Robot!");
-            //arm.SpeedTo(20);
-            //arm.ExternalAxisTo(1, 0);
-            //arm.TransformTo(1500, -1500, 1200, -1, 0, 0, 0, 1, 0);
-            
-            //ToolTesting(arm);
-
-            //LoopUp(arm);
-
-            //Console.WriteLine("DUMPING BUFFERS");
-            //arm.DebugRobotCursors();
-            //arm.DebugBuffers();
-
-            //arm.Start();
-
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START EXTERNAL AXIS TEST...");
-            //Console.ReadKey();
-            //ExternalAxes(arm);
-
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START THE VERTICAL SQUARE...");
-            //Console.ReadKey();
-            //VerticalSquareUR(arm);
-
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START THE VERTICAL CIRCLE...");
-            //Console.ReadKey();
-            //VerticalCircleUR(arm);
-
-
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START THE SPIRAL...");
-            //Console.ReadKey();
-            //Spiral(arm, 1);
-
-            //int frame = 0;
-            //while(frame < 20 * 1000/30.0)
-            //{
-            //    Console.WriteLine("Frame: " + (frame++) + " " + arm.GetCurrentPosition());
-            //    Thread.Sleep(30);
-            //}
-
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START THE SQUARE LOOP...");
-            //Console.ReadKey();
-            //arm.StreamConfiguration(2, 10);
-            //SquareSpiralUR(arm, 400, -400, 100, 25, 10, 10, 50);
-
-            //Console.WriteLine(" ");
-            //Console.WriteLine("Press any key to START THE LOOP...");
-            //Console.ReadKey();
-            //SpiralUR(arm, 400, -400, 200, 50, 10, 1, );
-
-            //arm.DebugRobotCursors();
-            //arm.DebugBuffer();
+            arm.SpeedTo(100);
+            arm.PrecisionTo(10);
+            arm.MoveTo(300, 300, 300);
+            arm.Move(0, 0, 200);
+            arm.Wait(1000);
+            arm.AxesTo(homeJoints);
+                       
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to DISCONNECT...");
