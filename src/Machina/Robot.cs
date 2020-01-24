@@ -636,7 +636,7 @@ namespace Machina
         /// <param name="incZ"></param>
         /// <returns></returns>
         [ParseableFromString]
-        public bool Move(double incX, double incY, double incZ)
+        public bool Move(double incX, double incY, double incZ = 0)
         {
             return Move(new Vector(incX, incY, incZ));
         }

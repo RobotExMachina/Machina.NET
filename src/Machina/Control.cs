@@ -746,32 +746,60 @@ namespace Machina
 
             // Correct number of parameters?
             ParameterInfo[] paramInfos = reflectedMethod.GetParameters();
+            int missingParameterCount = paramInfos.Length - args.Length + 1;  // how many did the user missed providing
+            int optionalParameterCount = 0;  // how many parameters are optional in the method (have default values)?
             if (paramInfos.Length != args.Length - 1)
             {
-                logger.Error($"Incorrect amount of parameters for \"{methodName}\", please use as \"{reflectedMethod}\"");
-
-                // An additional check woulc happen here to verify optional parameters with default values
-
-                return false;
+                // Check if the method contains any optional parameters
+                foreach (var param in paramInfos)
+                {
+                    if (param.IsOptional)
+                    {
+                        optionalParameterCount++;
+                    }
+                }
+                
+                if (paramInfos.Length < args.Length - 1 ||              // too many args provided
+                    missingParameterCount > optionalParameterCount)     // less than minimum
+                {
+                    logger.Error($"Incorrect amount of parameters for \"{methodName}\", please use as \"{reflectedMethod}\"");
+                    return false;
+                }
+                else
+                {
+                    logger.Debug($"Detected action entry with {optionalParameterCount} optional parameters.");
+                }
             }
 
             // Correct types of parameters?
             object[] convertedParam = new object[paramInfos.Length];
-            for (int i = 0; i < paramInfos.Length; i++)
+            // Iterate over known arguments first
+            for (int i = 1; i < args.Length; i++)
             {
-                Type t = paramInfos[i].ParameterType;
+                Type t = paramInfos[i - 1].ParameterType;
                 TypeConverter converter = TypeDescriptor.GetConverter(t);
                 try
                 {
-                    convertedParam[i] = converter.ConvertFromInvariantString(args[i + 1]);
+                    convertedParam[i - 1] = converter.ConvertFromInvariantString(args[i]);
                 }
                 catch (Exception e)
                 {
-                    logger.Error($"Could not parse \"{args[i + 1]}\" into a {t.Name}.");
+                    logger.Error($"Could not parse \"{args[i]}\" into a {t.Name}.");
                     logger.Error(e.ToString());
                     return false;
                 }
             }
+
+            // If there were optional parameters and they were not provided by user,
+            // fill in the blanks.
+            if (missingParameterCount > 0)
+            {
+                for (int i = paramInfos.Length - missingParameterCount; i < paramInfos.Length; i++)
+                {
+                    convertedParam[i] = Type.Missing;
+                }
+            }
+
 
             // Execute the thing now! 
             object returnObj = reflectedMethod.Invoke(this.parentRobot, convertedParam);
