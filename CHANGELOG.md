@@ -17,8 +17,6 @@
 - [ ] Hopefully turn this changelog into something more [orthodox](http://keepachangelog.com/en/1.0.0/)
 - [ ] Make `Machina` types JSON-de/serializable via `DataContract`s
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
-- [ ] `Do()` takes a Machina string, and deserializes it into an action! :)
-- [ ] Replace all Bridge parsing to just use `Do()` and the string instruction.
 - [ ] Add 'EASE' mode to motion, as an option for UR robots to do MoveL
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
