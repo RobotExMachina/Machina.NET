@@ -153,10 +153,15 @@ namespace Machina
 
 
 
-
+        //   ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗ 
+        //  ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝ 
+        //  ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
+        //  ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
+        //  ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
+        //   ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝ 
+        //                                                 
 
         /// What was this even for? Exports checks?
-        [ParseableFromString]
         public bool IsBrand(string brandName)
         {
             return this.Brand.ToString().Equals(brandName, StringComparison.OrdinalIgnoreCase);
@@ -337,8 +342,6 @@ namespace Machina
         //{
         //    c.Execute();
         //}
-        
-
 
 
 
@@ -362,6 +365,7 @@ namespace Machina
         /// Sets the motion type (linear, joint...) for future issued Actions.
         /// </summary>
         /// <param name="motionType">"linear", "joint", etc.</param>
+        [ParseableFromString]
         public bool MotionMode(string motionType)
         {
             MotionType mt;
@@ -388,6 +392,7 @@ namespace Machina
         /// Increase the speed at which new Actions will be executed. This value will be applied to linear motion in mm/s, and rotational or angular motion in deg/s.
         /// </summary>
         /// <param name="speedInc">Speed increment in mm/s or deg/s.</param>
+        [ParseableFromString]
         public bool Speed(double speedInc)
         {
             return c.IssueSpeedRequest(speedInc, true);
@@ -397,6 +402,7 @@ namespace Machina
         /// Set the speed at which new Actions will be executed. This value will be applied to linear motion in mm/s, and rotational or angular motion in deg/s.
         /// </summary>
         /// <param name="speed">Speed value in mm/s or deg/s.</param>
+        [ParseableFromString]
         public bool SpeedTo(double speed)
         {
             return c.IssueSpeedRequest(speed, false);
@@ -407,6 +413,7 @@ namespace Machina
         /// </summary>
         /// <param name="accInc">Acceleration increment in mm/s^2 or deg/s^2.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Acceleration(double accInc)
         {
             return c.IssueAccelerationRequest(accInc, true);
@@ -417,6 +424,7 @@ namespace Machina
         /// </summary>
         /// <param name="acceleration">Acceleration value in mm/s^2 or deg/s^2.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool AccelerationTo(double acceleration)
         {
             return c.IssueAccelerationRequest(acceleration, false);
@@ -429,6 +437,7 @@ namespace Machina
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
         /// <param name="radiusInc">Smoothing radius increment in mm.</param>
+        [ParseableFromString]
         public bool Precision(double radiusInc)
         {
             return c.IssuePrecisionRequest(radiusInc, true);
@@ -441,19 +450,21 @@ namespace Machina
         /// Positioning" or "Blending Radius" in different platforms. 
         /// </summary>
         /// <param name="radius">Smoothing radius in mm.</param>
+        [ParseableFromString]
         public bool PrecisionTo(double radius)
         {
             return c.IssuePrecisionRequest(radius, false);
         }
 
-        /// <summary>
-        /// Gets current ReferenceCS setting.
-        /// </summary>
-        /// <returns></returns>
-        public ReferenceCS Coordinates()
-        {
-            return c.GetCurrentReferenceCS();
-        }
+        // This should be a GetStuff method
+        ///// <summary>
+        ///// Gets current ReferenceCS setting.
+        ///// </summary>
+        ///// <returns></returns>
+        //public ReferenceCS Coordinates()
+        //{
+        //    return c.GetCurrentReferenceCS();
+        //}
 
         /// <summary>
         /// Sets the reference system used for relative transformations.
@@ -491,9 +502,9 @@ namespace Machina
             return false;
         }
 
-        
 
-        
+
+
         /// <summary>
         /// Increments the working temperature of one of the device's parts. Useful for 3D printing operations. 
         /// </summary>
@@ -501,6 +512,7 @@ namespace Machina
         /// <param name="devicePart">Device's part that will change temperature, e.g. "extruder", "bed", etc.</param>
         /// <param name="waitToReachTemp">If true, execution will wait for the part to heat up and resume when reached the target.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Temperature(double temp, string devicePart, bool waitToReachTemp = true)
         {
             RobotPartType tt;
@@ -530,6 +542,7 @@ namespace Machina
         /// <param name="devicePart">Device's part that will change temperature, e.g. "extruder", "bed", etc.</param>
         /// <param name="waitToReachTemp">If true, execution will wait for the part to heat up and resume when reached the target.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool TemperatureTo(double temp, string devicePart, bool waitToReachTemp = true)
         {
             RobotPartType tt;
@@ -557,6 +570,7 @@ namespace Machina
         /// </summary>
         /// <param name="rateInc">Increment of mm of filament per mm of movement.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool ExtrusionRate(double rateInc)
         {
             return c.IssueExtrusionRateRequest(rateInc, true);
@@ -567,6 +581,7 @@ namespace Machina
         /// </summary>
         /// <param name="rate">mm of filament per mm of movement.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool ExtrusionRateTo(double rate)
         {
             return c.IssueExtrusionRateRequest(rate, false);
@@ -576,18 +591,20 @@ namespace Machina
         /// Buffers current state settings (speed, precision, motion type...), and opens up for 
         /// temporary settings changes to be reverted by PopSettings().
         /// </summary>
-        public void PushSettings()
+        [ParseableFromString]
+        public bool PushSettings()
         {
-            c.IssuePushPopRequest(true);
+            return c.IssuePushPopRequest(true);
         }
 
         /// <summary>
         /// Reverts the state settings (speed, precision, motion type...) to the previously buffered
         /// state by PushSettings().
         /// </summary>
-        public void PopSettings()
+        [ParseableFromString]
+        public bool PopSettings()
         {
-            c.IssuePushPopRequest(false);
+            return c.IssuePushPopRequest(false);
         }
 
 
@@ -1141,6 +1158,7 @@ namespace Machina
         /// <param name="cogY"></param>
         /// <param name="cogZ"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool DefineTool(string name, double tcpX, double tcpY, double tcpZ,
             double tcp_vX0, double tcp_vX1, double tcp_vX2, double tcp_vY0, double tcp_vY1, double tcp_vY2,
             double weight, double cogX, double cogY, double cogZ)
@@ -1167,6 +1185,7 @@ namespace Machina
         /// </summary>
         /// <param name="toolName"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool AttachTool(string toolName)
         {
             if (!Utilities.Strings.IsValidVariableName(toolName))
@@ -1183,6 +1202,7 @@ namespace Machina
         /// all actions will refer to the flange as the Tool Center Point (TCP).
         /// </summary>
         /// <returns></returns>
+        [ParseableFromString]
         public bool DetachTool()
         {
             return c.IssueDetachRequest();
@@ -1239,6 +1259,7 @@ namespace Machina
         /// <param name="pinId">Pin name.</param>
         /// <param name="isOn"></param>
         /// <param name="toolPin">Is this pin on the tool?</param>
+        [ParseableFromString]
         public bool WriteDigital(string pinId, bool isOn, bool toolPin = false)
         {
             return c.IssueWriteToDigitalIORequest(pinId, isOn, toolPin);
@@ -1261,9 +1282,10 @@ namespace Machina
         /// <param name="pinId">Pin name.</param>
         /// <param name="value"></param>
         /// <param name="toolPin">Is this pin on the tool?</param>
+        [ParseableFromString]
         public bool WriteAnalog(string pinId, double value, bool toolPin = false)
         {
-            return c.IssueWriteToAnalogIORequest(pinId.ToString(), value, toolPin);
+            return c.IssueWriteToAnalogIORequest(pinId, value, toolPin);
         }
 
         /// <summary>
@@ -1271,6 +1293,7 @@ namespace Machina
         /// </summary>
         /// <param name="extrude">True/false for on/off.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Extrude(bool extrude = true)
         {
             return c.IssueExtrudeRequest(extrude);
@@ -1282,6 +1305,7 @@ namespace Machina
         /// device ready for typical procedures like 3D printing. 
         /// </summary>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Initialize()
         {
             return c.IssueInitializationRequest(true);
@@ -1293,6 +1317,7 @@ namespace Machina
         /// the device for idleness.
         /// </summary>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Terminate()
         {
             return c.IssueInitializationRequest(false);
@@ -1311,6 +1336,9 @@ namespace Machina
             // If it was, it would be hard to by-pass creating another Action when the reflected method is called...
             // So keep it as a "Setting" method for the time being...? Although it should prob be it's own Action,
             // just by design...
+
+            // Also, should this method also be `[ParseableFromString]`?? So meta...! lol
+
             return c.IssueApplyActionRequestFromStringStatement(actionStatement);
         }
 
