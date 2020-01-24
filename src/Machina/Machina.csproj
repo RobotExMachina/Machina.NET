@@ -100,6 +100,7 @@
     <Compile Include="Actions\ActionTranslation.cs" />
     <Compile Include="Actions\ActionWait.cs" />
     <Compile Include="Actions\ActionExternalAxis.cs" />
+    <Compile Include="Attributes\ParseableFromString.cs" />
     <Compile Include="Compilers\CompilerMACHINA.cs" />
     <Compile Include="Compilers\CompilerZMORPH.cs" />
     <Compile Include="Compilers\CompilerKUKA.cs" />
