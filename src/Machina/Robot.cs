@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reflection;
 
 using System.Runtime.Serialization;
 using System.IO;
 using System.Runtime.Serialization.Json;
 
+using Machina.Attributes;
 
 //  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ 
 //  ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗
@@ -20,7 +22,6 @@ using System.Runtime.Serialization.Json;
 
 namespace Machina
 {
-
     //  ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
     //  ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
     //  ██████╔╝██║   ██║██████╔╝██║   ██║   ██║   
@@ -37,12 +38,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1430;
+        public static readonly int Build = 1500;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.8.10." + Build;
+        public static readonly string Version = "0.8.11." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
@@ -68,7 +69,6 @@ namespace Machina
 
         public RobotLogger Logger => logger;
 
-        
 
 
 
@@ -89,10 +89,14 @@ namespace Machina
             this.Brand = make;
             this.logger = new RobotLogger(this);
 
+            if (_reflectedAPI == null || _reflectedAPI.Count == 0)
+            {
+                LoadReflectedAPI();
+            }
+
             c = new Control(this);
         }
 
-        
 
         /// <summary>
         /// Create a new instance of a Robot.
@@ -152,6 +156,7 @@ namespace Machina
 
 
         /// What was this even for? Exports checks?
+        [ParseableFromString]
         public bool IsBrand(string brandName)
         {
             return this.Brand.ToString().Equals(brandName, StringComparison.OrdinalIgnoreCase);
@@ -613,7 +618,8 @@ namespace Machina
         /// <param name="incY"></param>
         /// <param name="incZ"></param>
         /// <returns></returns>
-        public bool Move(double incX, double incY, double incZ = 0)
+        [ParseableFromString]
+        public bool Move(double incX, double incY, double incZ)
         {
             return Move(new Vector(incX, incY, incZ));
         }
@@ -635,6 +641,7 @@ namespace Machina
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool MoveTo(double x, double y, double z)
         {
             return MoveTo(new Vector(x, y, z));
@@ -669,6 +676,7 @@ namespace Machina
         /// <param name="rotVecZ"></param>
         /// <param name="angDegs"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Rotate(double rotVecX, double rotVecY, double rotVecZ, double angDegs)
         {
             return Rotate(new Rotation(rotVecX, rotVecY, rotVecZ, angDegs, true));
@@ -715,6 +723,7 @@ namespace Machina
         /// <param name="y1"></param>
         /// <param name="y2"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool RotateTo(double x0, double x1, double x2, double y0, double y1, double y2)
         {
             return RotateTo((Rotation)new Orientation(x0, x1, x2, y0, y1, y2));
@@ -796,6 +805,7 @@ namespace Machina
         /// <param name="vY1"></param>
         /// <param name="vY2"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool TransformTo(double x, double y, double z, double vX0, double vX1, double vX2, double vY0, double vY1, double vY2) =>
             c.IssueTransformationRequest(new Vector(x, y, z), new Orientation(vX0, vX1, vX2, vY0, vY1, vY2), false, true);
 
@@ -822,6 +832,7 @@ namespace Machina
         /// <param name="incJ5"></param>
         /// <param name="incJ6"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Axes(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
         {
             return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
@@ -850,6 +861,7 @@ namespace Machina
         /// <param name="j5"></param>
         /// <param name="j6"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool AxesTo(double j1, double j2, double j3, double j4, double j5, double j6)
         {
             return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
@@ -862,6 +874,7 @@ namespace Machina
         /// </summary>
         /// <param name="axisNumber">Axis number from 1 to 6.</param>
         /// <param name="increment">Increment value in mm or degrees.</param>
+        [ParseableFromString]
         public bool ExternalAxis(int axisNumber, double increment)
         {
             if (axisNumber == 0)
@@ -928,6 +941,7 @@ namespace Machina
         /// </summary>
         /// <param name="axisNumber">Axis number from 1 to 6.</param>
         /// <param name="value">Axis value in mm or degrees.</param>
+        [ParseableFromString]
         public bool ExternalAxisTo(int axisNumber, double value)
         {
             if (axisNumber == 0)
@@ -1011,6 +1025,7 @@ namespace Machina
         /// </summary>
         /// <param name="timeMillis">Time expressed in milliseconds</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Wait(long timeMillis)
         {
             return c.IssueWaitRequest(timeMillis);
@@ -1021,6 +1036,7 @@ namespace Machina
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Message(string message)
         {
             return c.IssueMessageRequest(message);
@@ -1032,6 +1048,7 @@ namespace Machina
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool Comment(string comment)
         {
             return c.IssueCommentRequest(comment);
@@ -1282,11 +1299,29 @@ namespace Machina
         }
 
         /// <summary>
-        /// Applies an Action object to this robot. 
+        /// Issue an Action represented by a string in the Machina Common Language, such as `Do("Move(100,0,0);")`.
+        /// The Action will parse the string and use reflection to figure out the most suitable Action
+        /// to associate to this. 
+        /// </summary>
+        /// <param name="actionStatement"></param>
+        /// <returns></returns>
+        public bool Do(string actionStatement)
+        {
+            // Should `Do` just generate the corresponding Action, or should it be an Action in itself...?
+            // If it was, it would be hard to by-pass creating another Action when the reflected method is called...
+            // So keep it as a "Setting" method for the time being...? Although it should prob be it's own Action,
+            // just by design...
+            return c.IssueApplyActionRequestFromStringStatement(actionStatement);
+        }
+
+
+        /// <summary>
+        /// Issues an Action object to this robot. This is useful when a list of Actions
+        /// is already available, and needs to be applied to this Robot.
         /// </summary>
         /// <param name="action"></param>
         /// <returns></returns>
-        public bool Do(Action action)
+        public bool Issue(Action action)
         {
             return c.IssueApplyActionRequest(action);
         }
@@ -1481,6 +1516,63 @@ namespace Machina
         public event MotionUpdateHandler MotionUpdate;
         public delegate void MotionUpdateHandler(object sender, MotionUpdateArgs args);
         internal virtual void OnMotionUpdate(MotionUpdateArgs args) => MotionUpdate?.Invoke(this, args);
+
+
+
+
+
+        //  ██╗███╗   ██╗████████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     
+        //  ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     
+        //  ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝██╔██╗ ██║███████║██║     
+        //  ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     
+        //  ██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗
+        //  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
+        //                                                                  
+        /// <summary>
+        /// A <Name, MethodInfo> dict of reflected methods from the main Robot class, 
+        /// that can be invoked from parsed strings from primitive values. 
+        /// Such methods are flagged with attributes, and loaded at runtime. 
+        /// </summary>
+        internal static Dictionary<string, MethodInfo> _reflectedAPI;
+
+        /// <summary>
+        /// A <Name, MethodInfo> dict of CASE-INSENSITIVE reflected methods from the main Robot class, 
+        /// that can be invoked from parsed strings from primitive values. 
+        /// Such methods are flagged with attributes, and loaded at runtime. 
+        /// </summary>
+        internal static Dictionary<string, MethodInfo> _reflectedAPICaseInsensitive;
+
+        ///// <summary>
+        ///// Stores how many overrides a particular method has. Useful to perform extra checks 
+        ///// when a call might be ambiguous.  
+        ///// </summary>
+        //private Dictionary<string, int> _reflectedAPIOverrides;
+
+
+        /// <summary>
+        /// Used to load all methods from the API that can be parseable from a string, using reflection. 
+        /// </summary>
+        internal static void LoadReflectedAPI()
+        {
+            // https://stackoverflow.com/a/14362272/1934487
+            Type robotType = typeof(Robot);
+            _reflectedAPI = robotType
+                .GetMethods()
+                .Where(x => x.GetCustomAttributes().OfType<Attributes.ParseableFromString>().Any())
+                .ToDictionary(y => y.Name);
+
+            // This one is to issue warnings for badly cased instructions.  
+            _reflectedAPICaseInsensitive = robotType
+                .GetMethods()
+                .Where(x => x.GetCustomAttributes().OfType<Attributes.ParseableFromString>().Any())
+                .ToDictionary(y => y.Name, StringComparer.InvariantCultureIgnoreCase);
+
+            Machina.Logger.Debug("Loaded reflected API");
+            foreach (var pair in _reflectedAPI)
+            {
+                Machina.Logger.Debug(pair.Key + " --> " + pair.Value);
+            }
+        }
 
     }
 

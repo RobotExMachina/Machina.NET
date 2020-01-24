@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
+using System.ComponentModel;
 using Machina.Controllers;
 using Machina.Drivers;
 
@@ -119,6 +120,8 @@ namespace Machina
 
         //// @TODO: this will need to get reallocated when fixing stream mode...
         //public StreamQueue streamQueue;
+
+
 
 
 
@@ -705,6 +708,92 @@ namespace Machina
         //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
         //                                                         
 
+        public bool IssueApplyActionRequestFromStringStatement(string statement)
+        {
+
+            string[] args = Machina.Utilities.Parsing.ParseStatement(statement);
+            if (args == null || args.Length == 0)
+            {
+                logger.Error($"I don't understand \"{statement}\"...");
+                return false;
+            }
+
+            // Perform some sanity checks
+            string methodName = args[0];
+
+            // Correct method name, including casing?
+            MethodInfo reflectedMethod;
+            if (!Robot._reflectedAPI.TryGetValue(methodName, out reflectedMethod))
+            {
+                // Was it a casing problem?
+                MethodInfo methodNoCasing;
+                bool exists = Robot._reflectedAPICaseInsensitive.TryGetValue(methodName, out methodNoCasing);
+                if (exists)
+                {
+                    logger.Error($"I don't understand \"{methodName}\", did you mean \"{methodNoCasing.Name}\"...? Remember that Machina is case-sensitive...");
+                }
+                else
+                {
+                    logger.Error($"No instruction found with the name \"{methodName}\"");
+                }
+                return false;
+            }
+            if (reflectedMethod == null)
+            {
+                logger.Error($"Something went wrong \"{methodName}\"");
+                return false;
+            }
+
+            // Correct number of parameters?
+            ParameterInfo[] paramInfos = reflectedMethod.GetParameters();
+            if (paramInfos.Length != args.Length - 1)
+            {
+                logger.Error($"Incorrect amount of parameters for \"{methodName}\", please use as \"{reflectedMethod}\"");
+
+                // An additional check woulc happen here to verify optional parameters with default values
+
+                return false;
+            }
+
+            // Correct types of parameters?
+            object[] convertedParam = new object[paramInfos.Length];
+            for (int i = 0; i < paramInfos.Length; i++)
+            {
+                Type t = paramInfos[i].ParameterType;
+                TypeConverter converter = TypeDescriptor.GetConverter(t);
+                try
+                {
+                    convertedParam[i] = converter.ConvertFromInvariantString(args[i + 1]);
+                }
+                catch (Exception e)
+                {
+                    logger.Error($"Could not parse \"{args[i + 1]}\" into a {t.Name}.");
+                    logger.Error(e.ToString());
+                    return false;
+                }
+            }
+
+            // Execute the thing now! 
+            object returnObj = reflectedMethod.Invoke(this.parentRobot, convertedParam);
+
+            // Should I check something here before returning? 
+
+            // Format return val
+            bool success;
+            try
+            {
+                success = (bool)returnObj;
+            }
+            catch
+            {
+                logger.Error("INTERNAL MACHINA ERROR, Badly formatted return object??");
+                return false;
+            }
+
+            return success;
+        }
+
+
         /// <summary>
         /// Issue an Action of whatever kind...
         /// </summary>
@@ -1083,6 +1172,8 @@ namespace Machina
         {
             this._stateCursor = cursor;
         }
+
+
 
 
 
