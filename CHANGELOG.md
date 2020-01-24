@@ -23,6 +23,13 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
+# v0.8.11
+## BUILD 1500
+- Picked the project up after a long hiatus...
+- Added `[ParseableFromString]` attribute for those methods in the API that can be parsed from primitive values.
+- Changed `Do()`: it now parses a string and tries to turn it into an action using reflection.
+- Added `Issue(Action)`: does what `Do()` used to do, take an Action and issue it.
+
 # v0.8.10
 ## BUILD 1430
 - Add `wobj` code option for ABB driver.
