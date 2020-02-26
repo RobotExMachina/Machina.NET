@@ -14,83 +14,17 @@ namespace TEST_OfflineAPITests
         {
             Console.WriteLine("--> GENERAL TEST");
 
-            Robot arm = Robot.Create("HelloRobot", "KUKA");
 
-            //RotationTest(arm);
+            Robot arm = Robot.Create("SimpleFK", "ABB");
 
-            //ToolTesting(arm);
+            arm.DebugMode(true);
+            
+            SimpleFK(arm);
 
-            HelloRobot(arm);
-
-            //ExternalAxes(arm);
-
-            //VerticalSquare(arm);
-
-            //Robot arm = new Robot("3dprinter", "ZMorph");
-            //ZMorphSimpleMovementTest(arm);
-            //ZMorphSimple3DPrintTest(arm);
-
-
-
-            //Robot arm = new Robot("foo", "ZMorph");
-            //arm.Mode("offline");
-
-            //// An generic test program
-            //GeneralTest(arm, 50);
-
-            //// Trace a planar square in space
-            //TracePlanarRectangle(arm);
-
-            //// Trace a straight line in Linear and Joint movement modes
-            //TraceYLine(arm, false);
-            //TraceYLine(arm, true);
-
-            //// Test security table check
-            //ApproachBaseXYPlane(arm, 300, 25);
-
-            //// Use Push & PopSettings ;)
-            //PushAndPopSettingsTest(arm);
-
-            //// Rotation tests
-            //RotationTests(arm);
-
-            //// Advanced rotation tests
-            //RotationTestsAdvanced(arm);
-            //RotationTests2(arm);
-
-            //// Rel/abs movements
-            //TestLocalWorldMovements(arm);
-
-            //// Generative circle movement
-            //TestCircle(arm);
-
-            //// Transformations
-            //TransformTests(arm);
-            //TestCircleTransformAbsolute(arm, 50);
-            //TestCircleTransformLocal(arm, 10);
-            //TestCircleTransformGlobal(arm, 10);
-            //TestZTableLimitations(arm);
-
-            //// Snake
-            //TestSnake(arm);
-
-            //// Joint movements
-            //TestJointMovementRange(arm);
-            //TestRandomJointMovements(arm);
-
-            //// Absolute vs relative movement buffers
-            //TestChangesInMovementModes(arm);
-
-            //// Wait and Message
-            //TestWaitAndMessage(arm);
-
-            //arm.DebugBuffers();  // read all pending buffered actions
-            //arm.DebugRobotCursors();
-
-            arm.Compile(arm.IsBrand("ABB") ? @"C:\offlineTests.prg" :
-                arm.IsBrand("UR") ? @"C:\offlineTests.script" :
-                arm.IsBrand("KUKA") ? @"C:\offlineTests.src" :
-                arm.IsBrand("ZMORPH") ? @"C:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
+            arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :
+                arm.IsBrand("UR") ? @"D:\offlineTests.script" :
+                arm.IsBrand("KUKA") ? @"D:\offlineTests.src" :
+                arm.IsBrand("ZMORPH") ? @"D:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
@@ -101,6 +35,14 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static void SimpleFK(Robot bot)
+        {
+            bot.SpeedTo(100);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+            bot.Move(0, 0, -10);
+            bot.Wait(2000);
         }
 
         static void RotationTest(Robot bot)
