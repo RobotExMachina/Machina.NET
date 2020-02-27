@@ -46,7 +46,7 @@ namespace Machina
 
 
             // HEADER file
-            Types.MachinaFile datFile = new Types.MachinaFile(programName, "dat", Encoding);
+            Types.MachinaFile datFile = new Types.MachinaFile(programName, "dat", Encoding, CC);
             
             List<string> header = new List<string>();
             header.AddRange(GenerateDisclaimerHeader(programName));
@@ -56,7 +56,7 @@ namespace Machina
             header.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
             header.Add(@"& PARAM DISKPATH = KRC:\R1\Program");  // @TODO: this path should be programmatically generated...
             header.Add(string.Format("DEFDAT  {0}", programName));
-            header.Add("EXT  BAS(BAS_COMMAND: IN, REAL: IN)");
+            header.Add("EXT BAS (BAS_COMMAND: IN, REAL: IN)");
             header.Add("DECL INT SUCCESS");
             header.Add("ENDDAT");
 
@@ -193,7 +193,7 @@ namespace Machina
             module.Add("");
 
 
-            Types.MachinaFile srcFile = new Types.MachinaFile(programName, "src", Encoding);
+            Types.MachinaFile srcFile = new Types.MachinaFile(programName, "src", Encoding, CC);
             srcFile.SetContent(module);
 
 
@@ -555,8 +555,9 @@ namespace Machina
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
-                    dec = string.Format(CultureInfo.InvariantCulture, 
-                        "  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
+                    dec = string.Format(CultureInfo.InvariantCulture,
+                        //"  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",  // This was reported to not work
+                        "  $VEL.CP = {0}",  // @TODO: figure out how to also incorporate ORI1 and ORI2
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
