@@ -201,149 +201,149 @@ namespace Machina
         }
 
 
-        /// <summary>
-        /// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
-        /// </summary>
-        /// <param name="programName"></param>
-        /// <param name="writePointer"></param>
-        /// <param name="block">Use actions in waiting queue or buffer?</param>
-        /// <returns></returns>
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
-        {
-            addActionString = humanComments;
+        ///// <summary>
+        ///// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
+        ///// </summary>
+        ///// <param name="programName"></param>
+        ///// <param name="writePointer"></param>
+        ///// <param name="block">Use actions in waiting queue or buffer?</param>
+        ///// <returns></returns>
+        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        //{
+        //    addActionString = humanComments;
 
-            // Which pending Actions are used for this program?
-            // Copy them without flushing the buffer.
-            List<Action> actions = block ?
-                writer.actionBuffer.GetBlockPending(false) :
-                writer.actionBuffer.GetAllPending(false);
+        //    // Which pending Actions are used for this program?
+        //    // Copy them without flushing the buffer.
+        //    List<Action> actions = block ?
+        //        writer.actionBuffer.GetBlockPending(false) :
+        //        writer.actionBuffer.GetAllPending(false);
 
-            // CODE LINES GENERATION
-            // TARGETS AND INSTRUCTIONS
-            List<string> declarationLines = new List<string>();
-            List<string> customDeclarationLines = new List<string>();
-            List<string> initializationLines = new List<string>();
-            List<string> instructionLines = new List<string>();
+        //    // CODE LINES GENERATION
+        //    // TARGETS AND INSTRUCTIONS
+        //    List<string> declarationLines = new List<string>();
+        //    List<string> customDeclarationLines = new List<string>();
+        //    List<string> initializationLines = new List<string>();
+        //    List<string> instructionLines = new List<string>();
 
-            //KUKA INITIALIZATION BOILERPLATE
-            //declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
-            //declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");              // import BAS sys function  --> This needs to move to `.dat` file
+        //    //KUKA INITIALIZATION BOILERPLATE
+        //    //declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
+        //    //declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");              // import BAS sys function  --> This needs to move to `.dat` file
 
-            initializationLines.Add("  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM()");  // legacy support for user-programming safety
-            initializationLines.Add("  INTERRUPT ON 3");
-            initializationLines.Add("  BAS (#INITMOV, 0)");  // use base function to initialize sys vars to defaults
-            initializationLines.Add("");
+        //    initializationLines.Add("  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM()");  // legacy support for user-programming safety
+        //    initializationLines.Add("  INTERRUPT ON 3");
+        //    initializationLines.Add("  BAS (#INITMOV, 0)");  // use base function to initialize sys vars to defaults
+        //    initializationLines.Add("");
 
-            // This was reported not to work
-            //initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
-            //initializationLines.Add("  $LOAD.M = 0");   // no mass
-            //initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
+        //    // This was reported not to work
+        //    //initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
+        //    //initializationLines.Add("  $LOAD.M = 0");   // no mass
+        //    //initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
 
-            // This was reported to be needed
-            initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
+        //    // This was reported to be needed
+        //    initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
 
-            // DATA GENERATION
-            // Use the write RobotCursor to generate the data
-            int it = 0;
-            string line = null;
-            foreach (Action a in actions)
-            {
-                // Move writerCursor to this action state
-                writer.ApplyNextAction();  // for the buffer to correctly manage them
+        //    // DATA GENERATION
+        //    // Use the write RobotCursor to generate the data
+        //    int it = 0;
+        //    string line = null;
+        //    foreach (Action a in actions)
+        //    {
+        //        // Move writerCursor to this action state
+        //        writer.ApplyNextAction();  // for the buffer to correctly manage them
 
-                if (a.Type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
-                {
-                    customDeclarationLines.Add("  " + (a as ActionCustomCode).statement);
-                }
+        //        if (a.Type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+        //        {
+        //            customDeclarationLines.Add("  " + (a as ActionCustomCode).statement);
+        //        }
 
-                if (inlineTargets)
-                {
-                    if (GenerateInstructionDeclaration(a, writer, out line))
-                    {
-                        instructionLines.Add(line);
-                    }
-                }
-                else
-                {
-                    if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
-                    {
-                        declarationLines.Add(line);
-                    }
+        //        if (inlineTargets)
+        //        {
+        //            if (GenerateInstructionDeclaration(a, writer, out line))
+        //            {
+        //                instructionLines.Add(line);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+        //            {
+        //                declarationLines.Add(line);
+        //            }
 
-                    if (GenerateVariableInitialization(a, writer, it, out line))
-                    {
-                        initializationLines.Add(line);
-                    }
+        //            if (GenerateVariableInitialization(a, writer, it, out line))
+        //            {
+        //                initializationLines.Add(line);
+        //            }
 
-                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
-                    {
-                        instructionLines.Add(line);
-                    }
-                }
+        //            if (GenerateInstructionDeclarationFromVariable(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+        //            {
+        //                instructionLines.Add(line);
+        //            }
+        //        }
 
-                // Move on
-                it++;
-            }
+        //        // Move on
+        //        it++;
+        //    }
 
 
-            // PROGRAM ASSEMBLY
-            // Initialize a module list
-            List<string> module = new List<string>();
+        //    // PROGRAM ASSEMBLY
+        //    // Initialize a module list
+        //    List<string> module = new List<string>();
 
-            // Banner
-            module.AddRange(GenerateDisclaimerHeader(programName));
-            module.Add("");
+        //    // Banner
+        //    module.AddRange(GenerateDisclaimerHeader(programName));
+        //    module.Add("");
 
-            // SOME INTERFACE INITIALIZATION
-            // These are all for interface handling, ignored by the compiler (?)
-            module.Add(@"&ACCESS RVP");  // read-write permissions
-            module.Add(@"&REL 1");       // release number (increments on file changes)
-            //module.Add(@"&COMMENT MACHINA PROGRAM");  // This was reported to not work
-            module.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
-            module.Add(@"&PARAM EDITMASK = *");
-            module.Add("");
+        //    // SOME INTERFACE INITIALIZATION
+        //    // These are all for interface handling, ignored by the compiler (?)
+        //    module.Add(@"&ACCESS RVP");  // read-write permissions
+        //    module.Add(@"&REL 1");       // release number (increments on file changes)
+        //    //module.Add(@"&COMMENT MACHINA PROGRAM");  // This was reported to not work
+        //    module.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
+        //    module.Add(@"&PARAM EDITMASK = *");
+        //    module.Add("");
 
-            // MODULE HEADER
-            module.Add("DEF " + programName + "()");
-            module.Add("");
+        //    // MODULE HEADER
+        //    module.Add("DEF " + programName + "()");
+        //    module.Add("");
 
-            // Declarations
-            if (declarationLines.Count != 0)
-            {
-                module.AddRange(declarationLines);
-                module.Add("");
-            }
+        //    // Declarations
+        //    if (declarationLines.Count != 0)
+        //    {
+        //        module.AddRange(declarationLines);
+        //        module.Add("");
+        //    }
 
-            // Custom declarations
-            if (customDeclarationLines.Count != 0)
-            {
-                module.AddRange(customDeclarationLines);
-                module.Add("");
-            }
+        //    // Custom declarations
+        //    if (customDeclarationLines.Count != 0)
+        //    {
+        //        module.AddRange(customDeclarationLines);
+        //        module.Add("");
+        //    }
 
-            // Initializations
-            if (initializationLines.Count != 0)
-            {
-                module.AddRange(initializationLines);
-                module.Add("");
-            }
+        //    // Initializations
+        //    if (initializationLines.Count != 0)
+        //    {
+        //        module.AddRange(initializationLines);
+        //        module.Add("");
+        //    }
 
-            // MAIN PROCEDURE
-            // Instructions
-            if (instructionLines.Count != 0)
-            {
-                module.AddRange(instructionLines);
-                module.Add("");
-            }
+        //    // MAIN PROCEDURE
+        //    // Instructions
+        //    if (instructionLines.Count != 0)
+        //    {
+        //        module.AddRange(instructionLines);
+        //        module.Add("");
+        //    }
 
-            module.Add("END");
-            module.Add("");
+        //    module.Add("END");
+        //    module.Add("");
 
-            //// MODULE KICKOFF
-            //module.Add(programName + "()");  // no need for this in KRL if file name is same as module name --> what if user exports them with different names?
+        //    //// MODULE KICKOFF
+        //    //module.Add(programName + "()");  // no need for this in KRL if file name is same as module name --> what if user exports them with different names?
 
-            return module;
-        }
+        //    return module;
+        //}
 
 
 
