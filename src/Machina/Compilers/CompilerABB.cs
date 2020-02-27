@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Machina.Types;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -48,12 +49,6 @@ namespace Machina
         };
 
 
-        public override List<Types.RobotProgramFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
-        {
-            return null;
-        }
-
-
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
@@ -64,8 +59,25 @@ namespace Machina
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
             //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        public override RobotProgram UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
+            // The program files to be returned
+            RobotProgram robotProgram = new RobotProgram(programName, CC);
+
+            // HEADER file
+            RobotProgramFile pgfFile = new RobotProgramFile(programName, "pgf", Encoding, CC);
+
+            List<string> header = new List<string>();
+
+            header.Add("<?xml version=\"1.0\" encoding=\"ISO - 8859 - 1\" ?>");
+            header.Add("<Program>");
+            header.Add($"	<Module>{programName}.mod</Module>");
+            header.Add("</Program>");
+
+            pgfFile.SetContent(header);
+            robotProgram.Add(pgfFile);
+
+            // PROGRAM FILE
             addActionString = humanComments;
 
             // Which pending Actions are used for this program?
@@ -279,7 +291,12 @@ namespace Machina
             // MODULE FOOTER
             module.Add("ENDMODULE");
 
-            return module;
+
+            RobotProgramFile modFile = new RobotProgramFile(programName, "mod", Encoding, CC);
+            modFile.SetContent(module);
+            robotProgram.Add(modFile);
+
+            return robotProgram;
         }
 
 

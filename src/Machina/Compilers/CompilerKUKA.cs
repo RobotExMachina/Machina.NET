@@ -193,7 +193,7 @@ namespace Machina
             module.Add("");
 
 
-            RobotProgramFile srcFile = new Types.RobotProgramFile(programName, "src", Encoding, CC);
+            RobotProgramFile srcFile = new RobotProgramFile(programName, "src", Encoding, CC);
             srcFile.SetContent(module);
             robotProgram.Add(srcFile);
 
