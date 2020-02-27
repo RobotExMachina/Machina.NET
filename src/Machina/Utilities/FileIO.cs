@@ -63,7 +63,17 @@ namespace Machina.Utilities
         internal static bool SaveProgramToFolder(RobotProgram program, string folderPath, RobotLogger logger)
         {
             // Create a subfolder within folderPath
-            string programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(program.Name) + "_Program");
+            string programFolderPath = "";
+            try
+            {
+                programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(program.Name) + "_Program");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Badly formatted folder path: " + folderPath);
+                logger.Debug(ex);
+                return false;
+            }
 
             // Check if directory exists, and create it otherwise
             try
