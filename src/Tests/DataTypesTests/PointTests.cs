@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using Machina;
+using Machina.Types.Geometry;
 
 namespace DataTypesTests
 {

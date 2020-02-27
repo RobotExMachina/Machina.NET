@@ -5,14 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
+
+using Machina.Users;
+using Machina.Types.Geometry;
+
 using ABB.Robotics;
 using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
 using ABB.Robotics.Controllers.RapidDomain;
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
-using Machina.Users;
 using ABBTask = ABB.Robotics.Controllers.RapidDomain.Task;
+
 
 namespace Machina.Drivers.Communication
 {

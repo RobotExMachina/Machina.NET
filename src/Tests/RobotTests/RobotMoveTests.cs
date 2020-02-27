@@ -4,9 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 
 using Machina;
+using Machina.Types.Geometry;
+using Machina.Types.Data;
 using SysQuat = System.Numerics.Quaternion;
 using SysVec = System.Numerics.Vector3;
 using SysMatrix44 = System.Numerics.Matrix4x4;
+using Machina.Types;
 
 namespace RobotTests
 {
@@ -75,7 +78,6 @@ namespace RobotTests
         }
 
 
-
         [TestMethod]
         public void Robot_Rotate_Simple()
         {
@@ -99,10 +101,10 @@ namespace RobotTests
             Trace.WriteLine(ror);
             Trace.WriteLine(ror.Q);
 
-            List<string> code = bot.Compile();
-            foreach (string s in code)
+            RobotProgram program = bot.Compile();
+            foreach (var line in program.ToStringList())
             {
-                Trace.WriteLine(s);
+                Trace.WriteLine(line);
             }
         }
     }

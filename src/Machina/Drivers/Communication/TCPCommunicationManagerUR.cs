@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using Machina.Drivers.Communication;
 using Machina.Drivers.Communication.Protocols;
+using Machina.Types.Geometry;
 
 namespace Machina.Drivers.Communication
 {

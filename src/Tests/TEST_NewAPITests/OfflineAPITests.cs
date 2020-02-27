@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Machina;
+using Machina.Types.Geometry;
 
 namespace TEST_OfflineAPITests
 {
@@ -15,19 +16,21 @@ namespace TEST_OfflineAPITests
             Console.WriteLine("--> GENERAL TEST");
 
 
-            Robot arm = Robot.Create("SimpleFK", "ABB");
+            Robot arm = Robot.Create("SimpleFK", "KUKA");
 
             arm.DebugMode(true);
-            
-            SimpleFK(arm);
 
-            arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :
-                arm.IsBrand("UR") ? @"D:\offlineTests.script" :
-                arm.IsBrand("KUKA") ? @"D:\offlineTests.src" :
-                arm.IsBrand("ZMORPH") ? @"D:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
+            //SimpleFK(arm);
+            //RotationTest(arm);
+            ToolTesting(arm);
 
-            //List<string> code = arm.Export();
-            //foreach (string s in code) Console.WriteLine(s);
+            //arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :
+            //    arm.IsBrand("UR") ? @"D:\offlineTests.script" :
+            //    arm.IsBrand("KUKA") ? @"D:\offlineTests.src" :
+            //    arm.IsBrand("ZMORPH") ? @"D:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
+
+            var program = arm.Compile();
+            arm.SaveProgram(program, @"D:\temp");
 
             //arm.DebugRobotCursors();
             //arm.DebugBuffers();  // at this point, the buffer should be empty and nothing should show up

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 using Machina;
-using System.Threading;
+using Machina.Types.Geometry;
 
 namespace TEST_StreamAPITests
 {

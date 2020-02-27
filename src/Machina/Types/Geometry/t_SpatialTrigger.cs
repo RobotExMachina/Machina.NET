@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina
+namespace Machina.Types.Geometry
 {
 
     // A DRAFT ON WHAT A SPATIAL TRIGGER COULD LOOK LIKE.

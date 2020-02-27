@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Machina.Users;
+using Machina.Types.Geometry;
 
 
 namespace Machina.Drivers

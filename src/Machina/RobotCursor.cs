@@ -4,6 +4,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Machina.Types.Geometry;
+using Machina.Types.Data;
 
 namespace Machina
 {
@@ -348,16 +350,29 @@ namespace Machina
             return actionBuffer.ActionsPendingCount();
         }
 
+        ///// <summary>
+        ///// Return a device-specific program with all the Actions pending in the buffer.
+        ///// </summary>
+        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        ///// <returns></returns>
+        //public List<string> ProgramFromBuffer(bool inlineTargets, bool humanComments)
+        //{
+        //    return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
+        //}
+
         /// <summary>
-        /// Return a device-specific program with all the Actions pending in the buffer.
+        /// Return a device-specific RobotProgram with all the Actions pending in the buffer.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> ProgramFromBuffer(bool inlineTargets, bool humanComments)
+        public RobotProgram FullProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
+            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
         }
+
+
 
         /// <summary>
         /// Return a device-specific program with the next block of Actions pending in the buffer.
@@ -365,9 +380,9 @@ namespace Machina
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> ProgramFromBlock(bool inlineTargets, bool humanComments)
+        public RobotProgram ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
+            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
         }
 
         public void LogBufferedActions()

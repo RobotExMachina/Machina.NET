@@ -9,6 +9,8 @@ using System.Reflection;
 using System.ComponentModel;
 using Machina.Controllers;
 using Machina.Drivers;
+using Machina.Types.Geometry;
+using Machina.Types.Data;
 
 namespace Machina
 {
@@ -637,16 +639,14 @@ namespace Machina
 
 
 
-
-
         /// <summary>
         /// For Offline modes, it flushes all pending actions and returns a devide-specific program 
-        /// as a stringList representation.
+        /// as a nested string List, representing the different program files.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> Export(bool inlineTargets, bool humanComments)
+        public RobotProgram Export(bool inlineTargets, bool humanComments)
         {
             if (_controlMode != ControlType.Offline)
             {
@@ -654,27 +654,36 @@ namespace Machina
                 return null;
             }
 
-            //List<Action> actions = actionBuffer.GetAllPending();
-            //return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
+            var robotProgram = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
 
-            return ReleaseCursor.ProgramFromBuffer(inlineTargets, humanComments);
+            return robotProgram;
         }
 
-        /// <summary>
-        /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program as a text file.
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
-        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
-        /// <returns></returns>
-        public bool Export(string filepath, bool inlineTargets, bool humanComments)
-        {
-            // @TODO: add some filepath sanity here
 
-            List<string> programCode = Export(inlineTargets, humanComments);
-            if (programCode == null) return false;
-            return SaveStringListToFile(programCode, filepath);
-        }
+        ///// <summary>
+        ///// For Offline modes, it flushes all pending actions and exports them to a robot-specific program files. 
+        ///// Files will be exported to a new program folder in the specified folderPath.
+        ///// </summary>
+        ///// <param name="filepath"></param>
+        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        ///// <returns></returns>
+        //public bool Export(string folderPath, bool inlineTargets, bool humanComments)
+        //{
+        //    var programFiles = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
+
+        //    if (programFiles == null)
+        //    {
+        //        logger.Error("Program could not be compiled...");
+        //        return false;
+        //    }
+
+        //    string programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(parentRobot.Name) + "_Program");
+
+        //    return Utilities.FileIO.SaveProgramToFolder(programFiles, programFolderPath, logger);
+        //}
+
+        
 
         /// <summary>
         /// In 'execute' mode, flushes all pending actions, creates a program, 
@@ -1171,26 +1180,26 @@ namespace Machina
         }
 
 
-        /// <summary>
-        /// Saves a string List to a file.
-        /// </summary>
-        /// <param name="lines"></param>
-        /// <param name="filepath"></param>
-        /// <returns></returns>
-        internal bool SaveStringListToFile(List<string> lines, string filepath)
-        {
-            try
-            {
-                System.IO.File.WriteAllLines(filepath, lines, this.parentRobot.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Could not save program to file...");
-                logger.Error(ex);
-            }
-            return false;
-        }
+        ///// <summary>
+        ///// Saves a string List to a file.
+        ///// </summary>
+        ///// <param name="lines"></param>
+        ///// <param name="filepath"></param>
+        ///// <returns></returns>
+        //internal bool SaveStringListToFile(List<string> lines, string filepath)
+        //{
+        //    try
+        //    {
+        //        System.IO.File.WriteAllLines(filepath, lines, this.parentRobot.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("Could not save program to file...");
+        //        logger.Error(ex);
+        //    }
+        //    return false;
+        //}
 
         /// <summary>
         /// Sets which cursor to use as most up-to-date tracker.

@@ -22,9 +22,22 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 # v0.8.12
+## BUILD 1502
+- Compilers now have embedded abstract comment characters and encoding
+- Compilers now return `MachinaFile` objects instead of `List<string>`. This helps with multi-file program creation.
+- `MachinaFiles` serialize to different string lists...
+- `KUKA` compiler now returns `dat` and `src` files.
+- - `MachinaFiles` is now `RobotProgramFile`
+- [x] Added `RobotProgram` as an aggregator of `RobotProgramFiles`.
+- [x] Adapt the `ABB` compiler to spit out two files
+- [x] Adapt the `UR` compiler to spit out the `script` file
+- [x] Adapt all the other compilers to reflect these changes
+- [x] Check that all changes work
+- [ ] Split `Types` namespace into `Types.Geometry` and `Types.Data` or similar
+- [ ] Will need to change the GH + Dynamo compilers to adapt to these changes...
+
 ## BUILD 1501
 - Changed the KUKA compiler with edits suggested by Alexander and Matty from RMIT.
-- 
 
 
 # v0.8.11

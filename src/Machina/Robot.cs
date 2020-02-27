@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
-
 using System.Runtime.Serialization;
 using System.IO;
 using System.Runtime.Serialization.Json;
-
 using Machina.Attributes;
+using Machina.Types;
+using Machina.Types.Geometry;
+using Machina.Types.Data;
 
 //  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ 
 //  ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗
@@ -38,12 +39,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1500;
+        public static readonly int Build = 1502;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.8.11." + Build;
+        public static readonly string Version = "0.8.12." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
@@ -309,29 +310,39 @@ namespace Machina
         }
 
         /// <summary>
-        /// Create a program in the device's native language with all the buffered Actions and return it as a string List.
-        /// Note all buffered Actions will be removed from the queue.
+        /// Create a program in the device's native language with all the buffered Actions and return it as a RobotProgram,
+        /// representing the different program files. Note all buffered Actions will be removed from the queue.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> Compile(bool inlineTargets = true, bool humanComments = true)
+        public RobotProgram Compile(bool inlineTargets = true, bool humanComments = true)
         {
             return c.Export(inlineTargets, humanComments);
         }
 
-        /// <summary>
-        /// Create a program in the device's native language with all the buffered Actions and save it to a file. 
-        /// Note all buffered Actions will be removed from the queue.
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
-        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
-        /// <returns></returns>
-        public bool Compile(string filepath, bool inlineTargets = true, bool humanComments = true)
+
+        public bool SaveProgram(RobotProgram program, string folderPath)
         {
-            return c.Export(filepath, inlineTargets, humanComments);
+            return program.SaveToFolder(folderPath, logger);
         }
+
+
+        ///// <summary>
+        ///// Create a program in the device's native language with all the buffered Actions and save it to files. 
+        ///// Note all buffered Actions will be removed from the queue.
+        ///// </summary>
+        ///// <param name="folderPath">The folder where the program files will be written to.</param>
+        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        ///// <returns></returns>
+        //public bool CompileToFolder(string folderPath, bool inlineTargets = true, bool humanComments = true)
+        //{
+        //    return c.Export(folderPath, inlineTargets, humanComments);
+        //}
+
+
+
 
         ///// <summary>
         ///// In 'execute' mode, flushes all pending Actions, creates a program, 

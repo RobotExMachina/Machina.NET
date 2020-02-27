@@ -5,8 +5,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Machina.Drivers.Communication.Protocols;
+using Machina.Types.Geometry;
 
 namespace Machina.Drivers.Communication
 {
