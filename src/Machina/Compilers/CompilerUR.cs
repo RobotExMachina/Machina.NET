@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Machina.Types;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -12,14 +13,14 @@ namespace Machina
     //  ██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║██║     ██╔══╝  ██╔══██╗
     //  ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║███████╗███████╗██║  ██║
     //   ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
-
+    //
     //  ██╗   ██╗██████╗ 
     //  ██║   ██║██╔══██╗
     //  ██║   ██║██████╔╝
     //  ██║   ██║██╔══██╗
     //  ╚██████╔╝██║  ██║
     //   ╚═════╝ ╚═╝  ╚═╝
-
+    //
     /// <summary>
     /// A compiler for Universal Robots 6-axis robotic arms.
     /// </summary>
@@ -38,11 +39,6 @@ namespace Machina
         internal CompilerUR() : base() { }
 
 
-        public override List<Types.RobotProgramFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
-        {
-            return null;
-        }
-
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native UR Script.
@@ -51,10 +47,11 @@ namespace Machina
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        public override RobotProgram UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
-            // @TODO: deprecate all instantiation shit, and make compilers be mostly static 
-            //ADD_ACTION_STRING = humanComments;
+            // The program files to be returned
+            RobotProgram robotProgram = new RobotProgram(programName, CC);
+
 
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -149,7 +146,11 @@ namespace Machina
             // MODULE KICKOFF
             module.Add(programName + "()");
 
-            return module;
+            RobotProgramFile mainFile = new RobotProgramFile(programName, "script", Encoding, CC);
+            mainFile.SetContent(module);
+            robotProgram.Add(mainFile);
+
+            return robotProgram;
         }
 
 

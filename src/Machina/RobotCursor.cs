@@ -379,9 +379,9 @@ namespace Machina
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> ProgramFromBlock(bool inlineTargets, bool humanComments)
+        public RobotProgram ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
+            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
         }
 
         public void LogBufferedActions()

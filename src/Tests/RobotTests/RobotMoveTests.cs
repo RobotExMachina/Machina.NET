@@ -99,7 +99,7 @@ namespace RobotTests
             Trace.WriteLine(ror);
             Trace.WriteLine(ror.Q);
 
-            RobotProgram program = bot.Compile();
+            Machina.Types.RobotProgram program = bot.Compile();
             foreach (var line in program.ToStringList())
             {
                 Trace.WriteLine(line);

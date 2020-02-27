@@ -11,13 +11,14 @@ namespace Machina
     //  ██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║██║     ██╔══╝  ██╔══██╗
     //  ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║███████╗███████╗██║  ██║
     //   ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
-
+    //
     //  ██╗  ██╗██╗   ██╗███╗   ███╗ █████╗ ███╗   ██╗
     //  ██║  ██║██║   ██║████╗ ████║██╔══██╗████╗  ██║
     //  ███████║██║   ██║██╔████╔██║███████║██╔██╗ ██║
     //  ██╔══██║██║   ██║██║╚██╔╝██║██╔══██║██║╚██╗██║
     //  ██║  ██║╚██████╔╝██║ ╚═╝ ██║██║  ██║██║ ╚████║
     //  ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝
+    //
     /// <summary>
     /// A quick compiler for human-readable instructions.
     /// </summary>
@@ -74,7 +75,7 @@ namespace Machina
             module.AddRange(actionLines);
 
             // MAIN file
-            RobotProgramFile pFile = new RobotProgramFile(programName, "machina", Encoding, CC);
+            RobotProgramFile pFile = new RobotProgramFile(programName, "txt", Encoding, CC);
             pFile.SetContent(module);
             robotProgram.Add(pFile);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Machina.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,13 +33,20 @@ namespace Machina
 
         internal CompilerMACHINA() : base() { }
 
-        public override List<Types.RobotProgramFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
-        {
-            return null;
-        }
 
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        /// <summary>
+        /// Creates a textual program representation of a set of Actions using the Machina Common Language.
+        /// </summary>
+        /// <param name="programName"></param>
+        /// <param name="writePointer"></param>
+        /// <param name="block">Use actions in waiting queue or buffer?</param>
+        /// <returns></returns>
+        public override RobotProgram UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
+            // The program files to be returned
+            RobotProgram robotProgram = new RobotProgram(programName, CC);
+
+
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
             List<Action> actions = block ?
@@ -76,7 +84,12 @@ namespace Machina
             // Code lines
             module.AddRange(actionLines);
 
-            return module;
+
+            RobotProgramFile mainFile = new RobotProgramFile(programName, "machina", Encoding, CC);
+            mainFile.SetContent(module);
+            robotProgram.Add(mainFile);
+
+            return robotProgram;
         }
 
     }

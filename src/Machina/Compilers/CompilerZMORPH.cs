@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Machina.Types;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -11,14 +12,14 @@ namespace Machina
     //  ██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║██║     ██╔══╝  ██╔══██╗
     //  ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║███████╗███████╗██║  ██║
     //   ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
-
+    //
     //  ███████╗███╗   ███╗ ██████╗ ██████╗ ██████╗ ██╗  ██╗
     //  ╚══███╔╝████╗ ████║██╔═══██╗██╔══██╗██╔══██╗██║  ██║
     //    ███╔╝ ██╔████╔██║██║   ██║██████╔╝██████╔╝███████║
     //   ███╔╝  ██║╚██╔╝██║██║   ██║██╔══██╗██╔═══╝ ██╔══██║
     //  ███████╗██║ ╚═╝ ██║╚██████╔╝██║  ██║██║     ██║  ██║
     //  ╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝
-
+    //
     /// <summary>
     /// A compiler for ZMorph 3D printers. 
     /// </summary>
@@ -56,23 +57,21 @@ namespace Machina
         // Base constructor
         internal CompilerZMORPH() : base() { }
 
-        public override List<Types.RobotProgramFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
-        {
-            return null;
-        }
+
 
         /// <summary>
-        /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
-        /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
-        /// robot configuration and assumes the robot controller will figure out the correct one.
+        /// Creates a textual program representation of a set of Actions using native GCode Laguage.
         /// </summary>
         /// <param name="programName"></param>
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
-        public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        public override RobotProgram UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
+            // The program files to be returned
+            RobotProgram robotProgram = new RobotProgram(programName, CC);
+
+
             addActionString = humanComments;
 
             // Which pending Actions are used for this program?
@@ -187,7 +186,11 @@ namespace Machina
                 module.Add("");
             }
 
-            return module;
+            RobotProgramFile mainFile = new RobotProgramFile(programName, "gcode", Encoding, CC);
+            mainFile.SetContent(module);
+            robotProgram.Add(mainFile);
+
+            return robotProgram;
         }
 
 
