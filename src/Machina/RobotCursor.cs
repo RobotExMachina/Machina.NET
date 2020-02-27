@@ -873,14 +873,32 @@ namespace Machina
                 newJnt = new Joints(action.joints);
             }
 
+            // Update prev and current axes
             prevAxes = axes;
             axes = newJnt;
 
             // Flag the lack of other geometric data
             prevPosition = position;
-            position = null;
             prevRotation = rotation;
+            position = null;
             rotation = null;
+
+            // THIS IS STILL PSEUDO-CODE
+            //// Store previous positions
+            //prevPosition = position;
+            //prevRotation = rotation;
+
+            //// If possible, update pos/rot or flag them as unavailable
+            //if (FKavailable)
+            //{
+            //    position = computeFK(axes);
+            //    rotation = computaFK(axes);
+            //}
+            //else
+            //{
+            //    position = null;
+            //    rotation = null;
+            //}
 
             if (isExtruding) this.ComputeExtrudedLength();
 
