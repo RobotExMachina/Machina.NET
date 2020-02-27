@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 namespace Machina
 {
@@ -23,7 +24,9 @@ namespace Machina
     /// </summary>
     internal class CompilerZMORPH : Compiler
     {
-        public static readonly char COMMENT_CHAR = ';';
+        internal override Encoding Encoding => Encoding.ASCII;
+
+        internal override char CC => ';';
 
         // A 'multidimensional' Dict to store permutations of (part, wait) to their corresponding GCode command
         // https://stackoverflow.com/a/15826532/1934487
@@ -51,8 +54,13 @@ namespace Machina
                      closingLines;
 
         // Base constructor
-        internal CompilerZMORPH() : base(COMMENT_CHAR) { }
-    
+        internal CompilerZMORPH() : base() { }
+
+        public override List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        {
+            return null;
+        }
+
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
         /// WARNING: this method is EXTREMELY UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
@@ -65,7 +73,7 @@ namespace Machina
         //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
-            ADD_ACTION_STRING = humanComments;
+            addActionString = humanComments;
 
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -226,7 +234,7 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("{0} {1}",
-                        commChar,
+                        CC,
                         ac.comment);
                     break;
 
@@ -236,7 +244,7 @@ namespace Machina
                     ActionIODigital aiod = (ActionIODigital)action;
                     if (!aiod.isDigit)
                     {
-                        dec = $"{commChar} ERROR on \"{aiod}\": only integer pin names allowed";
+                        dec = $"{CC} ERROR on \"{aiod}\": only integer pin names allowed";
                     }
                     else
                     {
@@ -249,11 +257,11 @@ namespace Machina
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (!aioa.isDigit)
                     {
-                        dec = $"{commChar} ERROR on \"{aioa}\": only integer pin names allowed";
+                        dec = $"{CC} ERROR on \"{aioa}\": only integer pin names allowed";
                     }
                     else if (aioa.value < 0 || aioa.value > 255)
                     {
-                        dec = $"{commChar} ERROR on \"{aioa.ToString()}\": value out of range [0..255]";
+                        dec = $"{CC} ERROR on \"{aioa.ToString()}\": value out of range [0..255]";
                     }
                     else
                     {
@@ -276,7 +284,7 @@ namespace Machina
 
                 case ActionType.Extrusion:
                 case ActionType.ExtrusionRate:
-                    dec = $"{commChar} {action.ToString()}";  // has no direct G-code, simply annotate it as a comment
+                    dec = $"{CC} {action.ToString()}";  // has no direct G-code, simply annotate it as a comment
                     break;
 
                 case ActionType.Initialization:
@@ -298,7 +306,7 @@ namespace Machina
 
                 // If action wasn't implemented before, then it doesn't apply to this device
                 default:
-                    dec = $"{commChar} ACTION \"{action}\" NOT APPLICABLE TO THIS DEVICE";
+                    dec = $"{CC} ACTION \"{action}\" NOT APPLICABLE TO THIS DEVICE";
                     break;
 
                 //case ActionType.Rotation:
@@ -311,18 +319,18 @@ namespace Machina
             }
 
             // Add trailing comments or ids if speficied
-            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
+            if (addActionString && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.ToString());
             }
-            else if (ADD_ACTION_ID)
+            else if (addActionID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.Id);
             }
 
@@ -357,7 +365,7 @@ namespace Machina
 
             // If extruded over the limit, reset extrude position and start over
             if (len > extrusionLengthResetEvery) {
-                this.instructionLines.Add($"{commChar} Homing extrusion length after {cursor.prevExtrudedLength - this.extrusionLengthResetPosition} mm ({this.extrusionLengthResetEvery} mm limit)");
+                this.instructionLines.Add($"{CC} Homing extrusion length after {cursor.prevExtrudedLength - this.extrusionLengthResetPosition} mm ({this.extrusionLengthResetEvery} mm limit)");
                 this.instructionLines.Add($"G92 E0.0000");
                 this.extrusionLengthResetPosition = cursor.prevExtrudedLength;
                 len = cursor.extrudedLength - this.extrusionLengthResetPosition;

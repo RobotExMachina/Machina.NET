@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Machina
 {
@@ -21,9 +22,16 @@ namespace Machina
     /// </summary>
     internal class CompilerHuman : Compiler
     {
-        public static readonly char COMMENT_CHAR = '/';
+        internal override Encoding Encoding => Encoding.UTF8;
 
-        internal CompilerHuman() : base(COMMENT_CHAR) { }
+        internal override char CC => '/';
+
+        internal CompilerHuman() : base() { }
+
+        public override List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        {
+            return null;
+        }
 
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {

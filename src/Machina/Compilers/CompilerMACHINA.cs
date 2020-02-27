@@ -26,9 +26,16 @@ namespace Machina
     /// </summary>
     class CompilerMACHINA : Compiler
     {
-        public static readonly char COMMENT_CHAR = '/';
+        internal override Encoding Encoding => Encoding.UTF8;
 
-        internal CompilerMACHINA() : base(COMMENT_CHAR) { }
+        internal override char CC => '/';
+
+        internal CompilerMACHINA() : base() { }
+
+        public override List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        {
+            return null;
+        }
 
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {

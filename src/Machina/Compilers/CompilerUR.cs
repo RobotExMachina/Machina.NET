@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
+
 
 namespace Machina
 {
@@ -23,16 +25,24 @@ namespace Machina
     /// </summary>
     internal class CompilerUR : Compiler
     {
-        // From the URScript manual
-        public static readonly char COMMENT_CHAR = '#';
+        internal override Encoding Encoding => Encoding.ASCII;
+
+        internal override char CC => '#';
 
         // DISABLED: take values from cursor
         //public static readonly double DEFAULT_JOINT_ACCELERATION = 1.4;
         //public static readonly double DEFAULT_JOINT_SPEED = 1.05;
         //public static readonly double DEFAULT_TOOL_ACCELERATION = 1.2;
         //public static readonly double DEFAULT_TOOL_SPEED = 0.25;
-        
-        internal CompilerUR() : base(COMMENT_CHAR) { }
+
+        internal CompilerUR() : base() { }
+
+
+        public override List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        {
+            return null;
+        }
+
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native UR Script.
@@ -148,7 +158,7 @@ namespace Machina
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        internal static bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
         {
             string dec = null;
             switch (action.Type)
@@ -168,7 +178,7 @@ namespace Machina
             return dec != null;
         }
 
-        internal static bool GenerateInstructionDeclarationFromVariable(
+        internal bool GenerateInstructionDeclarationFromVariable(
             Action action, RobotCursor cursor, int id, bool humanComments,
             out string declaration)
         {
@@ -252,14 +262,14 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        COMMENT_CHAR,
+                        CC,
                         ac.comment);
                     break;
 
                 case ActionType.DefineTool:
                     ActionDefineTool adt = action as ActionDefineTool;
                     dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
-                        COMMENT_CHAR,
+                        CC,
                         adt.tool.name);
                     break;
 
@@ -278,11 +288,11 @@ namespace Machina
                     ActionIODigital aiod = (ActionIODigital)action;
                     if (!aiod.isDigit)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aiod}\": only integer pin names are possible";
                     }
                     else if (aiod.pinNum < 0 || aiod.pinNum > 7)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
@@ -294,15 +304,15 @@ namespace Machina
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (!aioa.isDigit)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aioa}\": only integer pin names are possible";
                     }
                     else if (aioa.pinNum < 0 || aioa.pinNum > 1)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": value out of range [0.0, 1.0]";
+                        dec = $"  {CC} ERROR on \"{aioa}\": value out of range [0.0, 1.0]";
                     }
                     else
                     {
@@ -334,7 +344,7 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    COMMENT_CHAR,
+                    CC,
                     action.ToString());
             }
             //else if (ADD_ACTION_ID)
@@ -349,7 +359,7 @@ namespace Machina
             return dec != null;
         }
 
-        internal static bool GenerateInstructionDeclaration(
+        internal bool GenerateInstructionDeclaration(
             Action action, RobotCursor cursor, bool humanComments,
             out string declaration)
         {
@@ -432,14 +442,14 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        COMMENT_CHAR,
+                        CC,
                         ac.comment);
                     break;
 
                 case ActionType.DefineTool:
                     ActionDefineTool adt = action as ActionDefineTool;
                     dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
-                        COMMENT_CHAR,
+                        CC,
                         adt.tool.name);
                     break;
 
@@ -458,11 +468,11 @@ namespace Machina
                     ActionIODigital aiod = (ActionIODigital)action;
                     if (!aiod.isDigit)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aiod}\": only integer pin names are possible";
                     }
                     else if (aiod.pinNum < 0 || aiod.pinNum > 7)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aiod}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
@@ -474,15 +484,15 @@ namespace Machina
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (!aioa.isDigit)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aioa}\": only integer pin names are possible";
                     }
                     else if (aioa.pinNum < 0 || aioa.pinNum > 1)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < 0 || aioa.value > 1)
                     {
-                        dec = $"  {COMMENT_CHAR} ERROR on \"{aioa}\": value out of range [0.0, 1.0]";
+                        dec = $"  {CC} ERROR on \"{aioa}\": value out of range [0.0, 1.0]";
                     }
                     else
                     {
@@ -512,14 +522,14 @@ namespace Machina
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    COMMENT_CHAR,
+                    CC,
                     action.ToString());
             }
             //else if (ADD_ACTION_ID)
             //{
             //    dec = string.Format("{0}  {1} [{2}]",
             //        dec,
-            //        COMMENT_CHAR,
+            //        CC,
             //        action.id);
             //}
 

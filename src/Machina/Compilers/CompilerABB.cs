@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 namespace Machina
 {
@@ -25,16 +26,18 @@ namespace Machina
         // @TODO: deprecate all instantiation shit, and make compilers be mostly static, like CompilerUR:
         /*
          * // From the URScript manual
-        public static readonly char COMMENT_CHAR = '#';
+        public static readonly char CC = '#';
         public static readonly double DEFAULT_JOINT_ACCELERATION = 1.4;
         public static readonly double DEFAULT_JOINT_SPEED = 1.05;
         public static readonly double DEFAULT_TOOL_ACCELERATION = 1.2;
         public static readonly double DEFAULT_TOOL_SPEED = 0.25;
         */
-        
-        public static readonly char COMMENT_CHAR = '!';
 
-        internal CompilerABB() : base(COMMENT_CHAR) { }
+        internal override Encoding Encoding => Encoding.ASCII;
+
+        internal override char CC => '!';
+
+        internal CompilerABB() : base() { }
 
         /// <summary>
         /// A Set of RAPID's predefined zone values. 
@@ -43,6 +46,13 @@ namespace Machina
         {
             0, 1, 5, 10, 15, 20, 30, 40, 50, 60, 80, 100, 150, 200
         };
+
+
+        public override List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        {
+            return null;
+        }
+
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native RAPID Laguage.
@@ -53,10 +63,10 @@ namespace Machina
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
+            //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
-            ADD_ACTION_STRING = humanComments;
+            addActionString = humanComments;
 
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -190,7 +200,7 @@ namespace Machina
             if (usesIO)
             {
                 introLines.Add(string.Format("  {0} NOTE: your program is interfacing with the robot's IOs. Make sure to properly configure their names/properties through system preferences in the ABB robot controller.",
-                    commChar));
+                    CC));
             }
 
 
@@ -374,28 +384,28 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("    {0} {1}",
-                        commChar,
+                        CC,
                         ac.comment);
                     break;
 
                 case ActionType.DefineTool:
                     ActionDefineTool adt = action as ActionDefineTool;
                     dec = string.Format("    {0} Tool \"{1}\" defined",  // this action has no actual RAPID instruction, just add a comment
-                        commChar,
+                        CC,
                         adt.tool.name);
                     break;
 
                 case ActionType.AttachTool:
                     ActionAttachTool aa = (ActionAttachTool)action;
                     dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
-                        commChar,
+                        CC,
                         aa.toolName);
                     break;
 
                 case ActionType.DetachTool:
                     ActionDetachTool ad = (ActionDetachTool)action;
                     dec = string.Format("    {0} All tools detached",  // this action has no actual RAPID instruction, just add a comment
-                        commChar);
+                        CC);
                     break;
 
                 case ActionType.IODigital:
@@ -423,18 +433,18 @@ namespace Machina
 
             }
 
-            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
+            if (addActionString && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.ToString());
             }
-            else if (ADD_ACTION_ID)
+            else if (addActionID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.Id);
             }
 
@@ -520,28 +530,28 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("    {0} {1}",
-                        commChar,
+                        CC,
                         ac.comment);
                     break;
 
                 case ActionType.DefineTool:
                     ActionDefineTool adt = action as ActionDefineTool;
                     dec = string.Format("    {0} Tool \"{1}\" defined",  // this action has no actual RAPID instruction, just add a comment
-                        commChar,
+                        CC,
                         adt.tool.name);
                     break;
 
                 case ActionType.AttachTool:
                     ActionAttachTool aa = (ActionAttachTool)action;
                     dec = string.Format("    {0} Tool \"{1}\" attached",  // this action has no actual RAPID instruction, just add a comment
-                        commChar,
+                        CC,
                         aa.toolName);
                     break;
 
                 case ActionType.DetachTool:
                     ActionDetachTool ad = (ActionDetachTool)action;
                     dec = string.Format("    {0} All tools detached",  // this action has no actual RAPID instruction, just add a comment
-                        commChar);
+                        CC);
                     break;
 
                 case ActionType.IODigital:
@@ -568,20 +578,20 @@ namespace Machina
 
             }
 
-            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
+            if (addActionString && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}{1}  {2} [{3}]",
                     dec,
                     dec == null ? "  " : "",  // add indentation to align with code
-                    commChar,
+                    CC,
                     action.ToString());
             }
-            else if (ADD_ACTION_ID)
+            else if (addActionID)
             {
                 dec = string.Format("{0}{1}  {2} [{3}]",
                     dec,
                     dec == null ? "  " : "",  // add indentation to align with code
-                    commChar,
+                    CC,
                     action.Id);
             }
 
