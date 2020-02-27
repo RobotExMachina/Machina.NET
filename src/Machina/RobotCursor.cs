@@ -369,7 +369,7 @@ namespace Machina
         /// <returns></returns>
         public RobotProgram FullProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
+            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name), this, false, inlineTargets, humanComments);
         }
 
 
@@ -382,7 +382,7 @@ namespace Machina
         /// <returns></returns>
         public RobotProgram ProgramFromBlock(bool inlineTargets, bool humanComments)
         {
-            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, true, inlineTargets, humanComments);
+            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name), this, true, inlineTargets, humanComments);
         }
 
         public void LogBufferedActions()

@@ -66,7 +66,7 @@ namespace Machina.Utilities
             string programFolderPath = "";
             try
             {
-                programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(program.Name) + "_Program");
+                programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(program.Name + "_Program"));
             }
             catch (Exception ex)
             {

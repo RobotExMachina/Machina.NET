@@ -34,7 +34,7 @@
 - [x] Adapt all the other compilers to reflect these changes
 - [x] Check that all changes work
 - [x] Split `Types` namespace into `Types.Geometry` and `Types.Data` or similar
-- [ ] Will need to change the GH + Dynamo compilers to adapt to these changes...
+- [x] Will need to change the GH + Dynamo compilers to adapt to these changes...
 
 ## BUILD 1501
 - Changed the KUKA compiler with edits suggested by Alexander and Matty from RMIT.
