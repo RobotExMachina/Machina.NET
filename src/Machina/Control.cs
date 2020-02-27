@@ -9,7 +9,8 @@ using System.Reflection;
 using System.ComponentModel;
 using Machina.Controllers;
 using Machina.Drivers;
-using Machina.Types;
+using Machina.Types.Geometry;
+using Machina.Types.Data;
 
 namespace Machina
 {

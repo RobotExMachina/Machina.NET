@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
 using System.Net.Sockets;
-
 using System.Threading;
-
 using Machina.Drivers.Communication;
+using Machina.Types.Geometry;
 
 namespace Machina.Drivers
 {

@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
-
 using System.Runtime.Serialization;
 using System.IO;
 using System.Runtime.Serialization.Json;
-
 using Machina.Attributes;
 using Machina.Types;
+using Machina.Types.Geometry;
+using Machina.Types.Data;
 
 //  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ 
 //  ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace Machina.Types
+namespace Machina.Types.Data
 {
     /// <summary>
     /// Represents a file inside a RobotProgram. Includes filename, extension and content as a string List.

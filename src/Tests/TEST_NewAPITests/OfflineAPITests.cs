@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Machina;
+using Machina.Types.Geometry;
 
 namespace TEST_OfflineAPITests
 {

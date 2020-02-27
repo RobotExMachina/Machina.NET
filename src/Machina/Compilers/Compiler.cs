@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Machina.Types;
+using Machina.Types.Data;
 
 namespace Machina
 {

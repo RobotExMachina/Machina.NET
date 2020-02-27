@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina.Types
+namespace Machina.Types.Data
 {
     /// <summary>
     /// Represents a robot program written in the robot's native language. Includes the files that make it up.

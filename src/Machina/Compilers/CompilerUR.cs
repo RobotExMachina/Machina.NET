@@ -1,8 +1,9 @@
-﻿using Machina.Types;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Machina.Types.Geometry;
+using Machina.Types.Data;
 
 
 namespace Machina
