@@ -75,7 +75,6 @@ namespace RobotTests
         }
 
 
-
         [TestMethod]
         public void Robot_Rotate_Simple()
         {

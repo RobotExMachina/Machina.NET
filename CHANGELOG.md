@@ -22,9 +22,14 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 # v0.8.12
+## BUILD 1502
+- Compilers now have embedded abstract comment characters and encoding
+- Compilers now return `MachinaFile` objects instead of `List<string>`. This helps with multi-file program creation.
+- `MachinaFiles` serialize to different string lists...
+- `KUKA` compiler now returns `dat` and `src` files.
+
 ## BUILD 1501
 - Changed the KUKA compiler with edits suggested by Alexander and Matty from RMIT.
-- 
 
 
 # v0.8.11
