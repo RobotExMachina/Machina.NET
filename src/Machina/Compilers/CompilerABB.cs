@@ -72,9 +72,9 @@ namespace Machina
 
             List<string> header = new List<string>();
 
-            header.Add("<?xml version=\"1.0\" encoding=\"ISO - 8859 - 1\" ?>");
+            header.Add("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>");
             header.Add("<Program>");
-            header.Add($"	<Module>{programName}.mod</Module>");
+            header.Add($"    <Module>{programName}.mod</Module>");
             header.Add("</Program>");
 
             pgfFile.SetContent(header);
