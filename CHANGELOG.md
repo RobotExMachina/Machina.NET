@@ -27,6 +27,12 @@
 - Compilers now return `MachinaFile` objects instead of `List<string>`. This helps with multi-file program creation.
 - `MachinaFiles` serialize to different string lists...
 - `KUKA` compiler now returns `dat` and `src` files.
+- - `MachinaFiles` is now `RobotProgramFile`
+- [x] Added `RobotProgram` as an aggregator of `RobotProgramFiles`.
+- [ ] Adapt the `ABB` compiler to spit out two files
+- [ ] Adapt the `UR` compiler to spit out the `script` file
+- [ ] Adapt all the other compilers to reflect these changes
+- [ ] Will need to change the GH + Dynamo compilers to adapt to these changes...
 
 ## BUILD 1501
 - Changed the KUKA compiler with edits suggested by Alexander and Matty from RMIT.

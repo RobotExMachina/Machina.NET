@@ -23,16 +23,13 @@ namespace TEST_OfflineAPITests
             //RotationTest(arm);
             ToolTesting(arm);
 
-            arm.CompileToFolder(@"D:\temp");
-
-
             //arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :
             //    arm.IsBrand("UR") ? @"D:\offlineTests.script" :
             //    arm.IsBrand("KUKA") ? @"D:\offlineTests.src" :
             //    arm.IsBrand("ZMORPH") ? @"D:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
 
-            //List<string> code = arm.Export();
-            //foreach (string s in code) Console.WriteLine(s);
+            var program = arm.Compile();
+            arm.SaveProgram(program, @"D:\temp");
 
             //arm.DebugRobotCursors();
             //arm.DebugBuffers();  // at this point, the buffer should be empty and nothing should show up

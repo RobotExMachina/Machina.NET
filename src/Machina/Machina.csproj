@@ -134,10 +134,11 @@
     <Compile Include="Net\Net.cs" />
     <Compile Include="Types\AxisAngle.cs" />
     <Compile Include="Types\ExternalAxes.cs" />
-    <Compile Include="Types\MachinaFile.cs" />
+    <Compile Include="Types\RobotProgramFile.cs" />
     <Compile Include="Types\Orientation.cs" />
     <Compile Include="Types\Geometry.cs" />
     <Compile Include="Types\Plane.cs" />
+    <Compile Include="Types\RobotProgram.cs" />
     <Compile Include="Types\Rotation.cs" />
     <Compile Include="Types\t_CoordinateSystem.cs" />
     <Compile Include="Types\Joints.cs" />

@@ -9,7 +9,7 @@ using System.Reflection;
 using System.ComponentModel;
 using Machina.Controllers;
 using Machina.Drivers;
-
+using Machina.Types;
 
 namespace Machina
 {
@@ -645,7 +645,7 @@ namespace Machina
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<List<string>> Export(bool inlineTargets, bool humanComments)
+        public RobotProgram Export(bool inlineTargets, bool humanComments)
         {
             if (_controlMode != ControlType.Offline)
             {
@@ -653,15 +653,9 @@ namespace Machina
                 return null;
             }
 
-            var programFiles = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
+            var robotProgram = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
 
-            List<List<string>> program = new List<List<string>>();
-            foreach (var file in programFiles)
-            {
-                program.Add(file.ToStringList());
-            }
-
-            return program;
+            return robotProgram;
         }
 
 

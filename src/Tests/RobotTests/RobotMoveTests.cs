@@ -7,6 +7,7 @@ using Machina;
 using SysQuat = System.Numerics.Quaternion;
 using SysVec = System.Numerics.Vector3;
 using SysMatrix44 = System.Numerics.Matrix4x4;
+using Machina.Types;
 
 namespace RobotTests
 {
@@ -98,13 +99,10 @@ namespace RobotTests
             Trace.WriteLine(ror);
             Trace.WriteLine(ror.Q);
 
-            List<List<string>> code = bot.Compile();
-            foreach (var list in code)
+            RobotProgram program = bot.Compile();
+            foreach (var line in program.ToStringList())
             {
-                foreach (string s in list)
-                {
-                    Trace.WriteLine(s);
-                }
+                Trace.WriteLine(line);
             }
         }
     }

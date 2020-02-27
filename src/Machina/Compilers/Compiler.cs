@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Machina.Types;
 
 namespace Machina
 {
@@ -54,7 +55,7 @@ namespace Machina
         /// <returns></returns>
         public abstract List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments);
 
-        public abstract List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments);
+        public abstract RobotProgram UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments);
 
         public List<String> GenerateDisclaimerHeader(string programName)
         {

@@ -55,12 +55,12 @@ namespace Machina.Utilities
         /// <summary>
         /// Saves a List of program Files to a folder (creates the folder if needed).
         /// </summary>
-        /// <param name="files"></param>
+        /// <param name="program"></param>
         /// <param name="folderPath"></param>
         /// <param name="encoding"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        internal static bool SaveProgramToFolder(List<MachinaFile> files, string folderPath, RobotLogger logger)
+        internal static bool SaveProgramToFolder(RobotProgram program, string folderPath, RobotLogger logger)
         {
             // Check if directory exists, and create it otherwise
             try
@@ -91,10 +91,10 @@ namespace Machina.Utilities
 
             // Write each file
             bool success = true;
-            foreach (var file in files)
+            foreach (var file in program.Files)
             {
                 string fullPath = Path.Combine(folderPath, file.Name + "." + file.Extension);
-                success = success && SaveStringListToFile(file.Content, fullPath, file.Encoding, logger);
+                success = success && SaveStringListToFile(file.Lines, fullPath, file.Encoding, logger);
             }
 
             return success;

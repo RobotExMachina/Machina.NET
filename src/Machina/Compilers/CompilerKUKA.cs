@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Machina.Types;
 
 namespace Machina
 {
@@ -39,14 +40,13 @@ namespace Machina
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        public override List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        public override RobotProgram UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
             // The program files to be returned
-            List<Types.MachinaFile> programFiles = new List<Types.MachinaFile>();
-
+            RobotProgram robotProgram = new RobotProgram(programName, CC);
 
             // HEADER file
-            Types.MachinaFile datFile = new Types.MachinaFile(programName, "dat", Encoding, CC);
+            RobotProgramFile datFile = new RobotProgramFile(programName, "dat", Encoding, CC);
             
             List<string> header = new List<string>();
             header.AddRange(GenerateDisclaimerHeader(programName));
@@ -61,7 +61,7 @@ namespace Machina
             header.Add("ENDDAT");
 
             datFile.SetContent(header);
-            programFiles.Add(datFile);
+            robotProgram.Add(datFile);
                         
             // PROGRAM FILE
             addActionString = humanComments;
@@ -193,11 +193,11 @@ namespace Machina
             module.Add("");
 
 
-            Types.MachinaFile srcFile = new Types.MachinaFile(programName, "src", Encoding, CC);
+            RobotProgramFile srcFile = new Types.RobotProgramFile(programName, "src", Encoding, CC);
             srcFile.SetContent(module);
+            robotProgram.Add(srcFile);
 
-
-            return new List<Types.MachinaFile> { datFile, srcFile };
+            return robotProgram;
         }
 
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Machina.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -359,7 +360,7 @@ namespace Machina
             return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
         }
 
-        public List<Types.MachinaFile> FullProgramFromBuffer(bool inlineTargets, bool humanComments)
+        public RobotProgram FullProgramFromBuffer(bool inlineTargets, bool humanComments)
         {
             return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
         }

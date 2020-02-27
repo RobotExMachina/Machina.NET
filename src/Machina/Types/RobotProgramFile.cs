@@ -8,19 +8,19 @@ using System.IO;
 namespace Machina.Types
 {
     /// <summary>
-    /// Represents a file with filename, extension and content as a string List.
+    /// Represents a file inside a RobotProgram. Includes filename, extension and content as a string List.
     /// </summary>
-    internal class MachinaFile
+    public class RobotProgramFile
     {
 
-        internal string Name { get; }
-        internal string Extension { get; }
+        public string Name { get; }
+        public string Extension { get; }
         internal Encoding Encoding { get; }
         internal char CommentChar { get; }
 
-        internal List<string> Content { get; private set; }
+        internal List<string> Lines { get; private set; }
 
-        internal MachinaFile(string name, string extension, Encoding encoding, char commentChar)
+        internal RobotProgramFile(string name, string extension, Encoding encoding, char commentChar)
         {
             this.Name = name;
             this.Extension = extension;
@@ -30,19 +30,19 @@ namespace Machina.Types
 
         internal void SetContent(List<string> lines)
         {
-            this.Content = lines;
+            this.Lines = lines;
         }
          
         public override string ToString()
         {
-            return String.Join(Environment.NewLine, ToStringList());
+            return $"Robot Program File \"{Name}.{Extension}\" with {Lines.Count} lines of code.";
         }
 
         internal List<string> ToStringList()
         {
             List<string> lines = new List<string>();
             lines.AddRange(GetHeader());
-            lines.AddRange(Content);
+            lines.AddRange(Lines);
             lines.AddRange(GetFooter());
             lines.Add("");
             return lines;
@@ -51,7 +51,7 @@ namespace Machina.Types
         private List<string> GetHeader()
         {
             List<string> header = new List<string>();
-            string ccline = new String(CommentChar, 80);
+            string ccline = new String(CommentChar, 65);
             header.Add(ccline);
             header.Add($"{CommentChar}{CommentChar} START OF FILE \"{Name}.{Extension}\"");
             header.Add(ccline);
@@ -62,7 +62,7 @@ namespace Machina.Types
         private List<string> GetFooter()
         {
             List<string> footer = new List<string>();
-            string ccline = new String(CommentChar, 80);
+            string ccline = new String(CommentChar, 65);
             footer.Add(ccline);
             footer.Add($"{CommentChar}{CommentChar} END OF FILE \"{Name}.{Extension}\"");
             footer.Add(ccline);
