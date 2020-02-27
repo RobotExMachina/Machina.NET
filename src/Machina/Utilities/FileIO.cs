@@ -28,7 +28,6 @@ namespace Machina.Utilities
     /// </summary>
     internal static class FileIO
     {
-        
         /// <summary>
         /// Saves a List of strings to a file.
         /// </summary>
@@ -42,11 +41,12 @@ namespace Machina.Utilities
             try
             {
                 System.IO.File.WriteAllLines(filepath, lines, encoding);
+                logger.Debug($"Saved content to file \"{filepath}\"");
                 return true;
             }
             catch (Exception ex)
             {
-                logger.Error("Could not save program to file...");
+                logger.Error("Could not save content to file \"{filepath}\"");
                 logger.Debug(ex);
             }
             return false;
@@ -62,31 +62,34 @@ namespace Machina.Utilities
         /// <returns></returns>
         internal static bool SaveProgramToFolder(RobotProgram program, string folderPath, RobotLogger logger)
         {
+            // Create a subfolder within folderPath
+            string programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(program.Name) + "_Program");
+
             // Check if directory exists, and create it otherwise
             try
             {
-                if (Directory.Exists(folderPath))
+                if (Directory.Exists(programFolderPath))
                 {
-                    logger.Debug("Found existing folder on " + folderPath + ", deleting it...");
-                    EmptyDirectory(folderPath, logger);
+                    logger.Debug("Found existing folder on " + programFolderPath + ", deleting it...");
+                    EmptyDirectory(programFolderPath, logger);
                 }
                 else
                 {
-                    DirectoryInfo di = Directory.CreateDirectory(folderPath);
-                    logger.Debug("Created folder " + folderPath);
+                    DirectoryInfo di = Directory.CreateDirectory(programFolderPath);
+                    logger.Debug("Created folder " + programFolderPath);
                 }
             }
             catch (Exception ex)
             {
-                logger.Error("Could not create folder " + folderPath);
+                logger.Error("Could not create folder " + programFolderPath);
                 logger.Debug(ex);
                 return false;
             }
             
             // More sanity
-            if (!IsDirectoryWritable(folderPath))
+            if (!IsDirectoryWritable(programFolderPath))
             {
-                logger.Error("Cannot write to folder " + folderPath);
+                logger.Error("Cannot write to folder " + programFolderPath);
                 return false;
             }
 
@@ -94,7 +97,7 @@ namespace Machina.Utilities
             bool success = true;
             foreach (var file in program.Files)
             {
-                string fullPath = Path.Combine(folderPath, file.Name + "." + file.Extension);
+                string fullPath = Path.Combine(programFolderPath, file.Name + "." + file.Extension);
                 success = success && SaveStringListToFile(file.Lines, fullPath, file.Encoding, logger);
             }
 

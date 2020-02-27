@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,12 @@ namespace Machina.Types
             Files.Add(file);
         }
 
+        /// <summary>
+        /// Saves the files in this program to a folder in the system.
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         internal bool SaveToFolder(string folderPath, RobotLogger logger)
         {
             return Utilities.FileIO.SaveProgramToFolder(this, folderPath, logger);

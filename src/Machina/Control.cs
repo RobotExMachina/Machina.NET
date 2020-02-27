@@ -659,28 +659,28 @@ namespace Machina
         }
 
 
-        /// <summary>
-        /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program files. 
-        /// Files will be exported to a new program folder in the specified folderPath.
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
-        /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
-        /// <returns></returns>
-        public bool Export(string folderPath, bool inlineTargets, bool humanComments)
-        {
-            var programFiles = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
+        ///// <summary>
+        ///// For Offline modes, it flushes all pending actions and exports them to a robot-specific program files. 
+        ///// Files will be exported to a new program folder in the specified folderPath.
+        ///// </summary>
+        ///// <param name="filepath"></param>
+        ///// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
+        ///// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
+        ///// <returns></returns>
+        //public bool Export(string folderPath, bool inlineTargets, bool humanComments)
+        //{
+        //    var programFiles = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
 
-            if (programFiles == null)
-            {
-                logger.Error("Program could not be compiled...");
-                return false;
-            }
+        //    if (programFiles == null)
+        //    {
+        //        logger.Error("Program could not be compiled...");
+        //        return false;
+        //    }
 
-            string programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(parentRobot.Name) + "_Program");
+        //    string programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(parentRobot.Name) + "_Program");
 
-            return Utilities.FileIO.SaveProgramToFolder(programFiles, programFolderPath, logger);
-        }
+        //    return Utilities.FileIO.SaveProgramToFolder(programFiles, programFolderPath, logger);
+        //}
 
         
 
