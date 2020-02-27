@@ -43,6 +43,7 @@ namespace Machina.Types
             List<string> lines = new List<string>();
             lines.AddRange(GetHeader());
             lines.AddRange(Content);
+            lines.AddRange(GetFooter());
             lines.Add("");
             return lines;
         }
@@ -52,10 +53,21 @@ namespace Machina.Types
             List<string> header = new List<string>();
             string ccline = new String(CommentChar, 80);
             header.Add(ccline);
-            header.Add($"{CommentChar}{CommentChar} FILENAME: \"{Name}.{Extension}\"");
+            header.Add($"{CommentChar}{CommentChar} START OF FILE \"{Name}.{Extension}\"");
             header.Add(ccline);
             header.Add("");
             return header;
+        }
+
+        private List<string> GetFooter()
+        {
+            List<string> footer = new List<string>();
+            string ccline = new String(CommentChar, 80);
+            footer.Add(ccline);
+            footer.Add($"{CommentChar}{CommentChar} END OF FILE \"{Name}.{Extension}\"");
+            footer.Add(ccline);
+            footer.Add("");
+            return footer;
         }
     }
 }
