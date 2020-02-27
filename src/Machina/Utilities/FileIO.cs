@@ -67,7 +67,8 @@ namespace Machina.Utilities
             {
                 if (Directory.Exists(folderPath))
                 {
-                    logger.Debug("Found existing folder on " + folderPath);
+                    logger.Debug("Found existing folder on " + folderPath + ", deleting it...");
+                    EmptyDirectory(folderPath, logger);
                 }
                 else
                 {
@@ -130,6 +131,38 @@ namespace Machina.Utilities
                 else
                     return false;
             }
+        }
+
+        /// <summary>
+        /// Removes all files and directories in a folder, keeping the folder.
+        /// From: https://www.techiedelight.com/delete-all-files-sub-directories-csharp/
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        internal static bool EmptyDirectory(string folderPath, RobotLogger logger)
+        {
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+
+            try
+            {
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+                    dir.Delete(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Could not delete files in \"{folderPath}\"");
+                logger.Debug(ex);
+                return false;
+            }
+
+            return true;
         }
 
 
