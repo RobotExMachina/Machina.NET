@@ -638,16 +638,14 @@ namespace Machina
 
 
 
-
-
         /// <summary>
         /// For Offline modes, it flushes all pending actions and returns a devide-specific program 
-        /// as a stringList representation.
+        /// as a nested string List, representing the different program files.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> Export(bool inlineTargets, bool humanComments)
+        public List<List<string>> Export(bool inlineTargets, bool humanComments)
         {
             if (_controlMode != ControlType.Offline)
             {
@@ -655,48 +653,29 @@ namespace Machina
                 return null;
             }
 
-            //List<Action> actions = actionBuffer.GetAllPending();
-            //return programGenerator.UNSAFEProgramFromActions("BRobotProgram", writeCursor, actions);
+            var programFiles = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
 
-            return ReleaseCursor.ProgramFromBuffer(inlineTargets, humanComments);
-        }
-
-        public List<Types.MachinaFile> ExportFullProgram(bool inlineTargets, bool humanComments)
-        {
-            if (_controlMode != ControlType.Offline)
+            List<List<string>> program = new List<List<string>>();
+            foreach (var file in programFiles)
             {
-                logger.Warning("Export() only works in Offline mode");
-                return null;
+                program.Add(file.ToStringList());
             }
 
-            return ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
+            return program;
         }
-
 
 
         /// <summary>
-        /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program as a text file.
+        /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program files. 
+        /// Files will be exported to a new program folder in the specified folderPath.
         /// </summary>
         /// <param name="filepath"></param>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public bool Export(string filepath, bool inlineTargets, bool humanComments)
+        public bool Export(string folderPath, bool inlineTargets, bool humanComments)
         {
-            // @TODO: add some filepath sanity here
-
-            List<string> programCode = Export(inlineTargets, humanComments);
-            if (programCode == null) return false;
-
-            Encoding encoding = this.parentRobot.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII;
-
-            return Utilities.FileIO.SaveStringListToFile(programCode, filepath, encoding, logger);
-        }
-
-
-        public bool ExportFullProgram(string folderPath, bool inlineTargets, bool humanComments)
-        {
-            var programFiles = ExportFullProgram(inlineTargets, humanComments);
+            var programFiles = ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
 
             if (programFiles == null)
             {
@@ -709,7 +688,7 @@ namespace Machina
             return Utilities.FileIO.SaveProgramToFolder(programFiles, programFolderPath, logger);
         }
 
-
+        
 
         /// <summary>
         /// In 'execute' mode, flushes all pending actions, creates a program, 

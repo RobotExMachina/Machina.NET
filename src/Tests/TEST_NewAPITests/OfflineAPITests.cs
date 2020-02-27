@@ -20,9 +20,10 @@ namespace TEST_OfflineAPITests
             arm.DebugMode(true);
 
             //SimpleFK(arm);
-            RotationTest(arm);
+            //RotationTest(arm);
+            ToolTesting(arm);
 
-            arm.CompileFullProgram(@"D:\temp");
+            arm.CompileToFolder(@"D:\temp");
 
 
             //arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :

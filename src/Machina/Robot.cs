@@ -309,47 +309,30 @@ namespace Machina
         }
 
         /// <summary>
-        /// Create a program in the device's native language with all the buffered Actions and return it as a string List.
-        /// Note all buffered Actions will be removed from the queue.
+        /// Create a program in the device's native language with all the buffered Actions and return it as a nested string List,
+        /// representing the different program files. Note all buffered Actions will be removed from the queue.
         /// </summary>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public List<string> Compile(bool inlineTargets = true, bool humanComments = true)
+        public List<List<string>> Compile(bool inlineTargets = true, bool humanComments = true)
         {
             return c.Export(inlineTargets, humanComments);
         }
 
 
-
-        //public List<Types.MachinaFile> CompileFullProgram(bool inlineTargets = true, bool humanComments = true)
-        //{
-        //    return c.ExportFullProgram(inlineTargets, humanComments);
-        //}
-
-
-
         /// <summary>
-        /// Create a program in the device's native language with all the buffered Actions and save it to a file. 
+        /// Create a program in the device's native language with all the buffered Actions and save it to files. 
         /// Note all buffered Actions will be removed from the queue.
         /// </summary>
-        /// <param name="filepath"></param>
+        /// <param name="folderPath">The folder where the program files will be written to.</param>
         /// <param name="inlineTargets">Write inline targets on action statements, or declare them as independent variables?</param>
         /// <param name="humanComments">If true, a human-readable description will be added to each line of code</param>
         /// <returns></returns>
-        public bool Compile(string filepath, bool inlineTargets = true, bool humanComments = true)
+        public bool CompileToFolder(string folderPath, bool inlineTargets = true, bool humanComments = true)
         {
-            return c.Export(filepath, inlineTargets, humanComments);
+            return c.Export(folderPath, inlineTargets, humanComments);
         }
-
-        public bool CompileFullProgram(string folderPath, bool inlineTargets = true, bool humanComments = true)
-        {
-            return c.ExportFullProgram(folderPath, inlineTargets, humanComments);
-        }
-
-
-
-
 
 
 

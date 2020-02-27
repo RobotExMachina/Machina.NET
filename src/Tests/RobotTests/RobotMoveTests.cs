@@ -99,10 +99,13 @@ namespace RobotTests
             Trace.WriteLine(ror);
             Trace.WriteLine(ror.Q);
 
-            List<string> code = bot.Compile();
-            foreach (string s in code)
+            List<List<string>> code = bot.Compile();
+            foreach (var list in code)
             {
-                Trace.WriteLine(s);
+                foreach (string s in list)
+                {
+                    Trace.WriteLine(s);
+                }
             }
         }
     }
