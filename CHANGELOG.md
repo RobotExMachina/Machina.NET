@@ -21,6 +21,12 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
+# v0.8.12
+## BUILD 1501
+- Changed the KUKA compiler with edits suggested by Alexander and Matty from RMIT.
+- 
+
+
 # v0.8.11
 ## BUILD 1500
 - Picked the project up after a long hiatus...

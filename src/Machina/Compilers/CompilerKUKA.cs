@@ -33,7 +33,6 @@ namespace Machina
         /// <param name="writePointer"></param>
         /// <param name="block">Use actions in waiting queue or buffer?</param>
         /// <returns></returns>
-        //public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writePointer, bool block)
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
             ADD_ACTION_STRING = humanComments;
@@ -52,16 +51,21 @@ namespace Machina
             List<string> instructionLines = new List<string>();
 
             //KUKA INITIALIZATION BOILERPLATE
-            declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
-            declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");              // import BAS sys function
+            //declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
+            //declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");              // import BAS sys function  --> This needs to move to `.dat` file
 
             initializationLines.Add("  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM()");  // legacy support for user-programming safety
             initializationLines.Add("  INTERRUPT ON 3");
             initializationLines.Add("  BAS (#INITMOV, 0)");  // use base function to initialize sys vars to defaults
             initializationLines.Add("");
-            initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
-            initializationLines.Add("  $LOAD.M = 0");   // no mass
-            initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
+
+            // This was reported not to work
+            //initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
+            //initializationLines.Add("  $LOAD.M = 0");   // no mass
+            //initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
+
+            // This was reported to be needed
+            initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
 
             // DATA GENERATION
             // Use the write RobotCursor to generate the data
@@ -119,7 +123,7 @@ namespace Machina
             // These are all for interface handling, ignored by the compiler (?)
             module.Add(@"&ACCESS RVP");  // read-write permissions
             module.Add(@"&REL 1");       // release number (increments on file changes)
-            module.Add(@"&COMMENT MACHINA PROGRAM");
+            //module.Add(@"&COMMENT MACHINA PROGRAM");  // This was reported to not work
             module.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
             module.Add(@"&PARAM EDITMASK = *");
             module.Add("");
@@ -224,8 +228,9 @@ namespace Machina
             {
                 // KUKA does explicit setting of velocities and approximate positioning, so these actions make sense as instructions
                 case ActionType.Speed:
-                    dec = string.Format(CultureInfo.InvariantCulture, 
-                        "  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",
+                    dec = string.Format(CultureInfo.InvariantCulture,
+                        //"  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",  // This was reported to not work
+                        "  $VEL.CP = {0}",  // @TODO: figure out how to also incorporate ORI1 and ORI2
                         Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
                     break;
 
