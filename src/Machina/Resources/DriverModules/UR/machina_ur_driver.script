@@ -128,6 +128,8 @@ def machina_ur_driver():
         params6 = socket_read_binary_integer(6)
         pose = p[params6[1] / FACTOR_M, params6[2] / FACTOR_M, params6[3] / FACTOR_M, params6[4] / FACTOR_RAD, params6[5] / FACTOR_RAD, params6[6] / FACTOR_RAD]
         movel(pose, state_acceleration, state_speed, 0, state_blend_radius)
+        ### WARNING: I just changed this temporarily to `movep` for Merritt's project, must reverted on main code --> Add as a new `MotionMode`?
+        # movep(pose, state_acceleration, state_speed, state_blend_radius)
 
       # This motion maintains linear speed and does radius blending
       # However, for motion between targets with same TCP **position** (like a relative rotation), 
