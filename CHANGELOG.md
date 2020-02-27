@@ -32,6 +32,7 @@
 - [x] Adapt the `ABB` compiler to spit out two files
 - [ ] Adapt the `UR` compiler to spit out the `script` file
 - [ ] Adapt all the other compilers to reflect these changes
+- [ ] Check that all changes work
 - [ ] Split `Types` namespace into `Types.Geometry` and `Types.Data` or similar
 - [ ] Will need to change the GH + Dynamo compilers to adapt to these changes...
 
