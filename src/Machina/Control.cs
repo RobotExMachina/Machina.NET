@@ -10,6 +10,7 @@ using System.ComponentModel;
 using Machina.Controllers;
 using Machina.Drivers;
 
+
 namespace Machina
 {
     //   ██████╗ ██████╗ ███╗   ██╗████████╗██████╗  ██████╗ ██╗     
@@ -660,6 +661,19 @@ namespace Machina
             return ReleaseCursor.ProgramFromBuffer(inlineTargets, humanComments);
         }
 
+        public List<Types.MachinaFile> ExportFullProgram(bool inlineTargets, bool humanComments)
+        {
+            if (_controlMode != ControlType.Offline)
+            {
+                logger.Warning("Export() only works in Offline mode");
+                return null;
+            }
+
+            return ReleaseCursor.FullProgramFromBuffer(inlineTargets, humanComments);
+        }
+
+
+
         /// <summary>
         /// For Offline modes, it flushes all pending actions and exports them to a robot-specific program as a text file.
         /// </summary>
@@ -673,8 +687,29 @@ namespace Machina
 
             List<string> programCode = Export(inlineTargets, humanComments);
             if (programCode == null) return false;
-            return SaveStringListToFile(programCode, filepath);
+
+            Encoding encoding = this.parentRobot.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII;
+
+            return Utilities.FileIO.SaveStringListToFile(programCode, filepath, encoding, logger);
         }
+
+
+        public bool ExportFullProgram(string folderPath, bool inlineTargets, bool humanComments)
+        {
+            var programFiles = ExportFullProgram(inlineTargets, humanComments);
+
+            if (programFiles == null)
+            {
+                logger.Error("Program could not be compiled...");
+                return false;
+            }
+
+            string programFolderPath = Path.Combine(folderPath, Utilities.Strings.SafeProgramName(parentRobot.Name) + "_Program");
+
+            return Utilities.FileIO.SaveProgramToFolder(programFiles, programFolderPath, logger);
+        }
+
+
 
         /// <summary>
         /// In 'execute' mode, flushes all pending actions, creates a program, 
@@ -1171,26 +1206,26 @@ namespace Machina
         }
 
 
-        /// <summary>
-        /// Saves a string List to a file.
-        /// </summary>
-        /// <param name="lines"></param>
-        /// <param name="filepath"></param>
-        /// <returns></returns>
-        internal bool SaveStringListToFile(List<string> lines, string filepath)
-        {
-            try
-            {
-                System.IO.File.WriteAllLines(filepath, lines, this.parentRobot.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Could not save program to file...");
-                logger.Error(ex);
-            }
-            return false;
-        }
+        ///// <summary>
+        ///// Saves a string List to a file.
+        ///// </summary>
+        ///// <param name="lines"></param>
+        ///// <param name="filepath"></param>
+        ///// <returns></returns>
+        //internal bool SaveStringListToFile(List<string> lines, string filepath)
+        //{
+        //    try
+        //    {
+        //        System.IO.File.WriteAllLines(filepath, lines, this.parentRobot.Brand == RobotType.HUMAN ? Encoding.UTF8 : Encoding.ASCII);  // human compiler works better at UTF8, but this was ASCII for ABB controllers, right??
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("Could not save program to file...");
+        //        logger.Error(ex);
+        //    }
+        //    return false;
+        //}
 
         /// <summary>
         /// Sets which cursor to use as most up-to-date tracker.

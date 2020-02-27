@@ -134,6 +134,7 @@
     <Compile Include="Net\Net.cs" />
     <Compile Include="Types\AxisAngle.cs" />
     <Compile Include="Types\ExternalAxes.cs" />
+    <Compile Include="Types\MachinaFile.cs" />
     <Compile Include="Types\Orientation.cs" />
     <Compile Include="Types\Geometry.cs" />
     <Compile Include="Types\Plane.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Tools\Tool.cs" />
     <Compile Include="Users\User.cs" />
+    <Compile Include="Utilities\FileIO.cs" />
     <Compile Include="Utilities\Parsing.cs" />
     <Compile Include="Utilities\Strings.cs" />
     <Compile Include="Utilities\Conversion.cs" />

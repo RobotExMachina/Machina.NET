@@ -38,12 +38,12 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1500;
+        public static readonly int Build = 1502;
 
         /// <summary>
         /// Version number.
         /// </summary>
-        public static readonly string Version = "0.8.11." + Build;
+        public static readonly string Version = "0.8.12." + Build;
 
         /// <summary>
         /// A nickname for this Robot.
@@ -320,6 +320,15 @@ namespace Machina
             return c.Export(inlineTargets, humanComments);
         }
 
+
+
+        //public List<Types.MachinaFile> CompileFullProgram(bool inlineTargets = true, bool humanComments = true)
+        //{
+        //    return c.ExportFullProgram(inlineTargets, humanComments);
+        //}
+
+
+
         /// <summary>
         /// Create a program in the device's native language with all the buffered Actions and save it to a file. 
         /// Note all buffered Actions will be removed from the queue.
@@ -332,6 +341,18 @@ namespace Machina
         {
             return c.Export(filepath, inlineTargets, humanComments);
         }
+
+        public bool CompileFullProgram(string folderPath, bool inlineTargets = true, bool humanComments = true)
+        {
+            return c.ExportFullProgram(folderPath, inlineTargets, humanComments);
+        }
+
+
+
+
+
+
+
 
         ///// <summary>
         ///// In 'execute' mode, flushes all pending Actions, creates a program, 

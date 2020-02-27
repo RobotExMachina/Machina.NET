@@ -359,6 +359,13 @@ namespace Machina
             return compiler.UNSAFEProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
         }
 
+        public List<Types.MachinaFile> FullProgramFromBuffer(bool inlineTargets, bool humanComments)
+        {
+            return compiler.UNSAFEFullProgramFromBuffer(Utilities.Strings.SafeProgramName(parentControl.parentRobot.Name) + "_Program", this, false, inlineTargets, humanComments);
+        }
+
+
+
         /// <summary>
         /// Return a device-specific program with the next block of Actions pending in the buffer.
         /// </summary>
