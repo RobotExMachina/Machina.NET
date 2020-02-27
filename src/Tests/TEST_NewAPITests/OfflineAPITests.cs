@@ -15,16 +15,20 @@ namespace TEST_OfflineAPITests
             Console.WriteLine("--> GENERAL TEST");
 
 
-            Robot arm = Robot.Create("SimpleFK", "ABB");
+            Robot arm = Robot.Create("SimpleFK", "KUKA");
 
             arm.DebugMode(true);
-            
-            SimpleFK(arm);
 
-            arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :
-                arm.IsBrand("UR") ? @"D:\offlineTests.script" :
-                arm.IsBrand("KUKA") ? @"D:\offlineTests.src" :
-                arm.IsBrand("ZMORPH") ? @"D:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
+            //SimpleFK(arm);
+            RotationTest(arm);
+
+            arm.CompileFullProgram(@"D:\temp");
+
+
+            //arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :
+            //    arm.IsBrand("UR") ? @"D:\offlineTests.script" :
+            //    arm.IsBrand("KUKA") ? @"D:\offlineTests.src" :
+            //    arm.IsBrand("ZMORPH") ? @"D:\offlineTests.gcode" : @"C:\offlineTests.machina", true, true);
 
             //List<string> code = arm.Export();
             //foreach (string s in code) Console.WriteLine(s);
