@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 namespace Machina
 {
@@ -10,21 +11,195 @@ namespace Machina
     //  ██║     ██║   ██║██║╚██╔╝██║██╔═══╝ ██║██║     ██╔══╝  ██╔══██╗
     //  ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║     ██║███████╗███████╗██║  ██║
     //   ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝
-
+    //
     //  ██╗  ██╗██╗   ██╗██╗  ██╗ █████╗ 
     //  ██║ ██╔╝██║   ██║██║ ██╔╝██╔══██╗
     //  █████╔╝ ██║   ██║█████╔╝ ███████║
     //  ██╔═██╗ ██║   ██║██╔═██╗ ██╔══██║
     //  ██║  ██╗╚██████╔╝██║  ██╗██║  ██║
     //  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+    //
     /// <summary>
     /// A compiler for KUKA 6-axis industrial robotic arms.
     /// </summary>
     internal class CompilerKUKA : Compiler
     {
-        public static readonly char COMMENT_CHAR = ';';
 
-        internal CompilerKUKA() : base(COMMENT_CHAR) { }
+        internal override Encoding Encoding => Encoding.ASCII;
+
+        internal override char CC => ';';
+
+        internal CompilerKUKA() : base() { }
+
+
+        /// <summary>
+        /// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
+        /// </summary>
+        /// <param name="programName"></param>
+        /// <param name="writePointer"></param>
+        /// <param name="block">Use actions in waiting queue or buffer?</param>
+        /// <returns></returns>
+        public override List<Types.MachinaFile> UNSAFEFullProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
+        {
+            // The program files to be returned
+            List<Types.MachinaFile> programFiles = new List<Types.MachinaFile>();
+
+
+            // HEADER file
+            Types.MachinaFile datFile = new Types.MachinaFile(programName, "dat", Encoding);
+            
+            List<string> header = new List<string>();
+            header.AddRange(GenerateDisclaimerHeader(programName));
+            header.Add("&ACCESS RVP");
+            header.Add("& REL 1");
+            header.Add("& PARAM EDITMASK = *");
+            header.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
+            header.Add(@"& PARAM DISKPATH = KRC:\R1\Program");  // @TODO: this path should be programmatically generated...
+            header.Add(string.Format("DEFDAT  {0}", programName));
+            header.Add("EXT  BAS(BAS_COMMAND: IN, REAL: IN)");
+            header.Add("DECL INT SUCCESS");
+            header.Add("ENDDAT");
+
+            datFile.SetContent(header);
+            programFiles.Add(datFile);
+                        
+            // PROGRAM FILE
+            addActionString = humanComments;
+
+            // Which pending Actions are used for this program?
+            // Copy them without flushing the buffer.
+            List<Action> actions = block ?
+                writer.actionBuffer.GetBlockPending(false) :
+                writer.actionBuffer.GetAllPending(false);
+
+            // CODE LINES GENERATION
+            // TARGETS AND INSTRUCTIONS
+            List<string> declarationLines = new List<string>();
+            List<string> customDeclarationLines = new List<string>();
+            List<string> initializationLines = new List<string>();
+            List<string> instructionLines = new List<string>();
+                       
+            //KUKA INITIALIZATION BOILERPLATE
+            //declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
+            //declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");              // import BAS sys function  --> This needs to move to `.dat` file
+
+            initializationLines.Add("  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM()");  // legacy support for user-programming safety
+            initializationLines.Add("  INTERRUPT ON 3");
+            initializationLines.Add("  BAS (#INITMOV, 0)");  // use base function to initialize sys vars to defaults
+            initializationLines.Add("");
+
+            // This was reported not to work
+            //initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
+            //initializationLines.Add("  $LOAD.M = 0");   // no mass
+            //initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
+
+            // This was reported to be needed
+            initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
+
+            // DATA GENERATION
+            // Use the write RobotCursor to generate the data
+            int it = 0;
+            string line = null;
+            foreach (Action a in actions)
+            {
+                // Move writerCursor to this action state
+                writer.ApplyNextAction();  // for the buffer to correctly manage them
+
+                if (a.Type == ActionType.CustomCode && (a as ActionCustomCode).isDeclaration)
+                {
+                    customDeclarationLines.Add("  " + (a as ActionCustomCode).statement);
+                }
+
+                if (inlineTargets)
+                {
+                    if (GenerateInstructionDeclaration(a, writer, out line))
+                    {
+                        instructionLines.Add(line);
+                    }
+                }
+                else
+                {
+                    if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        declarationLines.Add(line);
+                    }
+
+                    if (GenerateVariableInitialization(a, writer, it, out line))
+                    {
+                        initializationLines.Add(line);
+                    }
+
+                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    {
+                        instructionLines.Add(line);
+                    }
+                }
+
+                // Move on
+                it++;
+            }
+
+
+            // PROGRAM ASSEMBLY
+            // Initialize a module list
+            List<string> module = new List<string>();
+
+            // Banner
+            module.AddRange(GenerateDisclaimerHeader(programName));
+
+            // SOME INTERFACE INITIALIZATION
+            // These are all for interface handling, ignored by the compiler (?)
+            module.Add(@"&ACCESS RVP");  // read-write permissions
+            module.Add(@"&REL 1");       // release number (increments on file changes)
+            //module.Add(@"&COMMENT MACHINA PROGRAM");  // This was reported to not work
+            module.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
+            module.Add(@"&PARAM EDITMASK = *");
+            module.Add("");
+
+            // MODULE HEADER
+            module.Add("DEF " + programName + "()");
+            module.Add("");
+
+            // Declarations
+            if (declarationLines.Count != 0)
+            {
+                module.AddRange(declarationLines);
+                module.Add("");
+            }
+
+            // Custom declarations
+            if (customDeclarationLines.Count != 0)
+            {
+                module.AddRange(customDeclarationLines);
+                module.Add("");
+            }
+
+            // Initializations
+            if (initializationLines.Count != 0)
+            {
+                module.AddRange(initializationLines);
+                module.Add("");
+            }
+
+            // MAIN PROCEDURE
+            // Instructions
+            if (instructionLines.Count != 0)
+            {
+                module.AddRange(instructionLines);
+                module.Add("");
+            }
+
+            module.Add("END");
+            module.Add("");
+
+
+            Types.MachinaFile srcFile = new Types.MachinaFile(programName, "src", Encoding);
+            srcFile.SetContent(module);
+
+
+            return new List<Types.MachinaFile> { datFile, srcFile };
+        }
+
 
         /// <summary>
         /// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
@@ -35,7 +210,7 @@ namespace Machina
         /// <returns></returns>
         public override List<string> UNSAFEProgramFromBuffer(string programName, RobotCursor writer, bool block, bool inlineTargets, bool humanComments)
         {
-            ADD_ACTION_STRING = humanComments;
+            addActionString = humanComments;
 
             // Which pending Actions are used for this program?
             // Copy them without flushing the buffer.
@@ -261,7 +436,7 @@ namespace Machina
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
                     dec = string.Format("  {0} MESSAGE: \"{1}\" (messages in KRL currently not supported in Machina)",
-                        COMMENT_CHAR,
+                        CC,
                         am.message);
                     break;
 
@@ -275,14 +450,14 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        cursor.compiler.commChar,
+                        CC,
                         ac.comment);
                     break;
 
                 case ActionType.DefineTool:
                     ActionDefineTool adt = action as ActionDefineTool;
                     dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
-                        COMMENT_CHAR,
+                        CC,
                         adt.tool.name);
                     break;
 
@@ -301,11 +476,11 @@ namespace Machina
                     ActionIODigital aiod = (ActionIODigital)action;
                     if (!aiod.isDigit)
                     {
-                        dec = $"  {commChar} ERROR on \"{aiod}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aiod}\": only integer pin names are possible";
                     }
                     else if (aiod.pinNum < 1 || aiod.pinNum > 32)  // KUKA starts counting pins by 1
                     {
-                        dec = $"  {commChar} ERROR on \"{aiod}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
@@ -317,15 +492,15 @@ namespace Machina
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (!aioa.isDigit)
                     {
-                        dec = $"  {commChar} ERROR on \"{aioa}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aioa}\": only integer pin names are possible";
                     }
                     else if (aioa.pinNum < 1 || aioa.pinNum > 16)    // KUKA: analog pins [1 to 16]
                     {
-                        dec = $"  {commChar} ERROR on \"{aioa}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < -1 || aioa.value > 1)
                     {
-                        dec = $"  {commChar} ERROR on \"{aioa}\": value out of range [-1.0, 1.0]";
+                        dec = $"  {CC} ERROR on \"{aioa}\": value out of range [-1.0, 1.0]";
                     }
                     else
                     {
@@ -351,18 +526,18 @@ namespace Machina
                     //    break;
             }
 
-            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
+            if (addActionString && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.ToString());
             }
-            else if (ADD_ACTION_ID)
+            else if (addActionID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.Id);
             }
 
@@ -412,7 +587,7 @@ namespace Machina
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
                     dec = string.Format("  {0} MESSAGE: \"{1}\" (messages in KRL currently not supported in Machina)",
-                        commChar,
+                        CC,
                         am.message);
                     break;
 
@@ -426,14 +601,14 @@ namespace Machina
                 case ActionType.Comment:
                     ActionComment ac = (ActionComment)action;
                     dec = string.Format("  {0} {1}",
-                        commChar,
+                        CC,
                         ac.comment);
                     break;
 
                 case ActionType.DefineTool:
                     ActionDefineTool adt = action as ActionDefineTool;
                     dec = string.Format("  {0} Tool \"{1}\" defined",  // this action has no actual instruction, just add a comment
-                        COMMENT_CHAR,
+                        CC,
                         adt.tool.name);
                     break;
 
@@ -452,11 +627,11 @@ namespace Machina
                     ActionIODigital aiod = (ActionIODigital)action;
                     if (!aiod.isDigit)
                     {
-                        dec = $"  {commChar} ERROR on \"{aiod}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aiod}\": only integer pin names are possible";
                     }
                     else if (aiod.pinNum < 1 || aiod.pinNum > 32)  // KUKA starts counting pins by 1
                     {
-                        dec = $"  {commChar} ERROR on \"{aiod}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aiod}\": IO number not available";
                     }
                     else
                     {
@@ -468,15 +643,15 @@ namespace Machina
                     ActionIOAnalog aioa = (ActionIOAnalog)action;
                     if (!aioa.isDigit)
                     {
-                        dec = $"  {commChar} ERROR on \"{aioa}\": only integer pin names are possible";
+                        dec = $"  {CC} ERROR on \"{aioa}\": only integer pin names are possible";
                     }
                     else if (aioa.pinNum < 1 || aioa.pinNum > 16)    // KUKA: analog pins [1 to 16]
                     {
-                        dec = $"  {commChar} ERROR on \"{aioa}\": IO number not available";
+                        dec = $"  {CC} ERROR on \"{aioa}\": IO number not available";
                     }
                     else if (aioa.value < -1 || aioa.value > 1)
                     {
-                        dec = $"  {commChar} ERROR on \"{aioa}\": value out of range [-1.0, 1.0]";
+                        dec = $"  {CC} ERROR on \"{aioa}\": value out of range [-1.0, 1.0]";
                     }
                     else
                     {
@@ -501,18 +676,18 @@ namespace Machina
                     //    break;
             }
 
-            if (ADD_ACTION_STRING && action.Type != ActionType.Comment)
+            if (addActionString && action.Type != ActionType.Comment)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.ToString());
             }
-            else if (ADD_ACTION_ID)
+            else if (addActionID)
             {
                 dec = string.Format("{0}  {1} [{2}]",
                     dec,
-                    commChar,
+                    CC,
                     action.Id);
             }
 
