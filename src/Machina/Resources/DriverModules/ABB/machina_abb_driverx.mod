@@ -58,8 +58,8 @@ MODULE Machina_Driver
     ENDRECORD
 
     ! SERVER DATA --> to modify by user
-    PERS string SERVER_IP := "{{HOSTNAME}}";     ! Replace "127.0.0.1" with device IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
-    CONST num SERVER_PORT := {{PORT}};           ! Replace 7000 with custom port number, like for example 7000
+    PERS string SERVER_IP := "{{HOSTNAME}}";     ! Replace "{{HOSTNAME}}" with device IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
+    CONST num SERVER_PORT := {{PORT}};           ! Replace {{PORT}} with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
     CONST string MACHINA_SERVER_VERSION := "1.4.1";
