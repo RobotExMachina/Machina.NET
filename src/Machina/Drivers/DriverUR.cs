@@ -98,7 +98,7 @@ namespace Machina.Drivers
             return DisconnectFromDevice();
         }
 
-        public override Joints GetCurrentJoints()
+        public override Axes GetCurrentJoints()
         {
             // temp using just the init values...
             return this._tcpManager.initAx;

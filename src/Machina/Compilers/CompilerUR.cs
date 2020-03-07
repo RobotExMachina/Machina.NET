@@ -566,16 +566,16 @@ namespace Machina
         /// <returns></returns>
         internal static string GetJointTargetValue(RobotCursor cursor)
         {
-            Joints jrad = new Joints(cursor.axes);  // use a shallow copy
+            Axes jrad = new Axes(cursor.axes);  // use a shallow copy
             jrad.Scale(Geometry.TO_RADS);  // convert to radians
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(jrad.J1, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.J2, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.J3, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.J4, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.J5, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.J6, Geometry.STRING_ROUND_DECIMALS_RADS));
+                Math.Round(jrad.A1, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A2, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A3, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A4, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A5, Geometry.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A6, Geometry.STRING_ROUND_DECIMALS_RADS));
         }
 
         /// <summary>

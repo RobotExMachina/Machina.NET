@@ -29,7 +29,7 @@ namespace Machina.Drivers.Communication
         private const int INIT_TIMEOUT = 5000;  // in millis
         internal Vector initPos;
         internal Rotation initRot;
-        internal Joints initAx;
+        internal Axes initAx;
         internal ExternalAxes initExtAx;
 
         // Properties for Driver module
@@ -513,7 +513,7 @@ namespace Machina.Drivers.Communication
 
                     // ">22 0 0 0 0 90 0;"
                     case ABBCommunicationProtocol.RES_JOINTS:
-                        this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
+                        this.initAx = new Axes(data[0], data[1], data[2], data[3], data[4], data[5]);
                         break;
 
                     // ">23 1000 9E9 9E9 9E9 9E9 9E9;"
@@ -525,7 +525,7 @@ namespace Machina.Drivers.Communication
                     case ABBCommunicationProtocol.RES_FULL_POSE:
                         Vector pos = new Vector(data[0], data[1], data[2]);
                         Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
-                        Joints ax = new Joints(data[7], data[8], data[9], data[10], data[11], data[12]);
+                        Axes ax = new Axes(data[7], data[8], data[9], data[10], data[11], data[12]);
                         ExternalAxes extax = new ExternalAxes(data[13], data[14], data[15], data[16], data[17], data[18]);
 
                         this._motionCursor.UpdateFullPose(pos, rot, ax, extax);

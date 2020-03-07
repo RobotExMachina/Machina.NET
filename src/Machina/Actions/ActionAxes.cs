@@ -20,14 +20,14 @@ namespace Machina
     /// </summary>
     public class ActionAxes : Action
     {
-        public Joints joints;
+        public Axes joints;
         public bool relative;
 
         public override ActionType Type => ActionType.Axes;
 
-        public ActionAxes(Joints joints, bool relative) : base()
+        public ActionAxes(Axes joints, bool relative) : base()
         {
-            this.joints = new Joints(joints);  // shallow copy
+            this.joints = new Axes(joints);  // shallow copy
             this.relative = relative;
         }
 
@@ -42,12 +42,12 @@ namespace Machina
         {
             return string.Format("{0}({1},{2},{3},{4},{5},{6});",
                 (this.relative ? "Axes" : "AxesTo"),
-                Math.Round(this.joints.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.J6, Geometry.STRING_ROUND_DECIMALS_DEGS)
+                Math.Round(this.joints.A1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A6, Geometry.STRING_ROUND_DECIMALS_DEGS)
             );
         }
     }

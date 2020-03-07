@@ -216,7 +216,7 @@ namespace Machina.Drivers
             return DisconnectFromDevice();
         }
 
-        public override Joints GetCurrentJoints()
+        public override Axes GetCurrentJoints()
         {
             if (_rsBridge != null && _rsBridge.Connected)
             {

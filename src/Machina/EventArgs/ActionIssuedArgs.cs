@@ -37,14 +37,14 @@ namespace Machina
         /// <summary>
         /// Robot axes after last issued Action.
         /// </summary>
-        public Joints Axes { get; }
+        public Axes Axes { get; }
 
         /// <summary>
         /// Robot external axes after last issued Action.
         /// </summary>
         public ExternalAxes ExternalAxes { get; }
 
-        public ActionIssuedArgs(Action last, Vector pos, Rotation ori, Joints axes, ExternalAxes extax)
+        public ActionIssuedArgs(Action last, Vector pos, Rotation ori, Axes axes, ExternalAxes extax)
         {
             this.LastAction = last;
             this.Position = pos;

@@ -131,12 +131,12 @@ namespace Machina.Drivers.Communication.Protocols
                     {
                         _action.Id,
                         INST_MOVEJ_Q,
-                        (int) Math.Round(cursor.axes.J1 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.J2 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.J3 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.J4 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.J5 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.J6 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A1 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A2 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A3 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A4 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A5 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A6 * Geometry.TO_RADS * FACTOR_RAD),
                     };
 
                     // Another ZERO_PRECISION_ON_SAME_POSITION_MOTION check should happen here for 6th axis rotation only...

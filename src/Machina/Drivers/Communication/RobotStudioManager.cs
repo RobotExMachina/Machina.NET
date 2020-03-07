@@ -1145,7 +1145,7 @@ namespace Machina.Drivers.Communication
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public Joints GetCurrentJoints()
+        public Axes GetCurrentJoints()
         {
             if (!_isConnected)
             {
@@ -1156,7 +1156,7 @@ namespace Machina.Drivers.Communication
             try
             {
                 JointTarget jt = controller.MotionSystem.ActiveMechanicalUnit.GetPosition();
-                return new Joints(jt.RobAx.Rax_1, jt.RobAx.Rax_2, jt.RobAx.Rax_3, jt.RobAx.Rax_4, jt.RobAx.Rax_5, jt.RobAx.Rax_6);
+                return new Axes(jt.RobAx.Rax_1, jt.RobAx.Rax_2, jt.RobAx.Rax_3, jt.RobAx.Rax_4, jt.RobAx.Rax_5, jt.RobAx.Rax_6);
             }
             catch (ABB.Robotics.Controllers.ServiceNotSupportedException e)
             {

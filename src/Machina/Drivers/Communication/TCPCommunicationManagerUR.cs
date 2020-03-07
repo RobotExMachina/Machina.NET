@@ -48,7 +48,7 @@ namespace Machina.Drivers.Communication
         private const int INIT_TIMEOUT = 5000;  // in millis
         internal Vector initPos;
         internal Rotation initRot;
-        internal Joints initAx;
+        internal Axes initAx;
 
         /// <summary>
         ///  The client socket that connects to the robot's secondary client.
@@ -539,7 +539,7 @@ namespace Machina.Drivers.Communication
                     initRot = new Rotation(new RotationVector(Geometry.TO_DEGS * values[4] / 10000.0,
                         Geometry.TO_DEGS * values[5] / 10000.0, Geometry.TO_DEGS * values[6] / 10000.0).ToQuaternion());
 
-                    initAx = new Joints(Geometry.TO_DEGS * values[7] / 10000,
+                    initAx = new Axes(Geometry.TO_DEGS * values[7] / 10000,
                         Geometry.TO_DEGS * values[8] / 10000, 
                         Geometry.TO_DEGS * values[9] / 10000,
                         Geometry.TO_DEGS * values[10] / 10000,

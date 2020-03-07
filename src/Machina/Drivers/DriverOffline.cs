@@ -49,7 +49,7 @@ namespace Machina.Drivers
             return false;
         }
 
-        public override Joints GetCurrentJoints()
+        public override Axes GetCurrentJoints()
         {
             return null;
         }

@@ -47,14 +47,14 @@ namespace Machina
         /// <summary>
         /// Robot axes after last Action.
         /// </summary>
-        public Joints Axes { get; }
+        public Axes Axes { get; }
 
         /// <summary>
         /// Robot external axes after last Action.
         /// </summary>
         public ExternalAxes ExternalAxes { get; }
 
-        public ActionExecutedArgs(Action last, int pendingExecutionOnDevice, int pendingExecutionTotal, Vector pos, Rotation ori, Joints axes, ExternalAxes extax)
+        public ActionExecutedArgs(Action last, int pendingExecutionOnDevice, int pendingExecutionTotal, Vector pos, Rotation ori, Axes axes, ExternalAxes extax)
         {
             this.LastAction = last;
             this.PendingExecutionOnDevice = pendingExecutionOnDevice;

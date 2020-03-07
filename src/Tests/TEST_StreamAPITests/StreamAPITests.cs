@@ -15,7 +15,7 @@ namespace TEST_StreamAPITests
 
         static bool PHYSICAL_ROBOT = true;
 
-        static Joints homeJoints = new Joints(0, 0, 0, 0, 90, 0);           // ABB
+        static Axes homeJoints = new Axes(0, 0, 0, 0, 90, 0);           // ABB
         //static Joints homeJoints = new Joints(0, -90, -90, -90, 90, 90);      // UR
 
         static public void LogEvent(object sender, MachinaEventArgs args)

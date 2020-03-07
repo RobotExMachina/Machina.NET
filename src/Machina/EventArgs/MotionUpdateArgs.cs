@@ -32,14 +32,14 @@ namespace Machina
         /// <summary>
         /// Last known robot axes.
         /// </summary>
-        public Joints Axes { get; }
+        public Axes Axes { get; }
 
         /// <summary>
         /// Last known roobt external axes.
         /// </summary>
         public ExternalAxes ExternalAxes { get; }
 
-        public MotionUpdateArgs(Vector pos, Rotation ori, Joints axes, ExternalAxes extax)
+        public MotionUpdateArgs(Vector pos, Rotation ori, Axes axes, ExternalAxes extax)
         {
             this.Position = pos;
             this.Rotation = ori;

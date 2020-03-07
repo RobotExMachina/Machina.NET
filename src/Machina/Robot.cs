@@ -844,7 +844,7 @@ namespace Machina
         /// </summary>
         /// <param name="incJoints"></param>
         /// <returns></returns>
-        public bool Axes(Joints incJoints)
+        public bool Axes(Axes incJoints)
         {
             return c.IssueJointsRequest(incJoints, true);
         }
@@ -863,7 +863,7 @@ namespace Machina
         [ParseableFromString]
         public bool Axes(double incJ1, double incJ2, double incJ3, double incJ4, double incJ5, double incJ6)
         {
-            return c.IssueJointsRequest(new Joints(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
+            return c.IssueJointsRequest(new Axes(incJ1, incJ2, incJ3, incJ4, incJ5, incJ6), true);
         }
 
         /// <summary>
@@ -873,7 +873,7 @@ namespace Machina
         /// <param name="joints"></param>
         /// <returns></returns>
         /// 
-        public bool AxesTo(Joints joints)
+        public bool AxesTo(Axes joints)
         {
             return c.IssueJointsRequest(joints, false);
         }
@@ -892,7 +892,7 @@ namespace Machina
         [ParseableFromString]
         public bool AxesTo(double j1, double j2, double j3, double j4, double j5, double j6)
         {
-            return c.IssueJointsRequest(new Joints(j1, j2, j3, j4, j5, j6), false);
+            return c.IssueJointsRequest(new Axes(j1, j2, j3, j4, j5, j6), false);
         }
 
         /// <summary>
@@ -1402,7 +1402,7 @@ namespace Machina
         /// Returns a Joint object representing the rotations in the robot axes.
         /// </summary>
         /// <returns></returns>
-        public Joints GetCurrentAxes() => c.GetCurrentAxes();
+        public Axes GetCurrentAxes() => c.GetCurrentAxes();
 
         /// <summary>
         /// Retuns an ExternalAxes object representing the values of the external axes. If a value is null, that axis is not valid.

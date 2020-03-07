@@ -91,12 +91,12 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         INST_MOVEABSJ,
-                        Math.Round(cursor.axes.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.J6, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A6, Geometry.STRING_ROUND_DECIMALS_DEGS),
                         STR_MESSAGE_END_CHAR));
                     break;
 

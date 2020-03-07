@@ -17,9 +17,9 @@ namespace Machina.Types.Geometry
     /// <summary>
     /// Represents the 6 angular rotations of the axes in a 6-axis manipulator, in degrees.
     /// </summary>
-    public class Joints : Geometry
+    public class Axes : Geometry
     {
-        public double J1, J2, J3, J4, J5, J6;
+        public double A1, A2, A3, A4, A5, A6;
 
         public double this[int i]
         {
@@ -31,12 +31,12 @@ namespace Machina.Types.Geometry
                 }
                 switch (i)
                 {
-                    case 0: return J1;
-                    case 1: return J2;
-                    case 2: return J3;
-                    case 3: return J4;
-                    case 4: return J5;
-                    case 5: return J6;
+                    case 0: return A1;
+                    case 1: return A2;
+                    case 2: return A3;
+                    case 3: return A4;
+                    case 4: return A5;
+                    case 5: return A6;
                 }
                 return 0;
             }
@@ -48,25 +48,25 @@ namespace Machina.Types.Geometry
                 }
                 switch (i)
                 {
-                    case 0: J1 = value; break;
-                    case 1: J2 = value; break;
-                    case 2: J3 = value; break;
-                    case 3: J4 = value; break;
-                    case 4: J5 = value; break;
-                    case 5: J6 = value; break;
+                    case 0: A1 = value; break;
+                    case 1: A2 = value; break;
+                    case 2: A3 = value; break;
+                    case 3: A4 = value; break;
+                    case 4: A5 = value; break;
+                    case 5: A6 = value; break;
                 }
             }
         }
 
 
-        public Joints()
+        public Axes()
         {
-            this.J1 = 0;
-            this.J2 = 0;
-            this.J3 = 0;
-            this.J4 = 0;
-            this.J5 = 0;
-            this.J6 = 0;
+            this.A1 = 0;
+            this.A2 = 0;
+            this.A3 = 0;
+            this.A4 = 0;
+            this.A5 = 0;
+            this.A6 = 0;
         }
 
         /// <summary>
@@ -78,54 +78,54 @@ namespace Machina.Types.Geometry
         /// <param name="j4"></param>
         /// <param name="j5"></param>
         /// <param name="j6"></param>
-        public Joints(double j1, double j2, double j3, double j4, double j5, double j6)
+        public Axes(double j1, double j2, double j3, double j4, double j5, double j6)
         {
-            this.J1 = j1;
-            this.J2 = j2;
-            this.J3 = j3;
-            this.J4 = j4;
-            this.J5 = j5;
-            this.J6 = j6;
+            this.A1 = j1;
+            this.A2 = j2;
+            this.A3 = j3;
+            this.A4 = j4;
+            this.A5 = j5;
+            this.A6 = j6;
         }
 
-        public Joints(Joints j)
+        public Axes(Axes j)
         {
-            this.J1 = j.J1;
-            this.J2 = j.J2;
-            this.J3 = j.J3;
-            this.J4 = j.J4;
-            this.J5 = j.J5;
-            this.J6 = j.J6;
+            this.A1 = j.A1;
+            this.A2 = j.A2;
+            this.A3 = j.A3;
+            this.A4 = j.A4;
+            this.A5 = j.A5;
+            this.A6 = j.A6;
         }
 
-        public void Add(Joints j)
+        public void Add(Axes j)
         {
-            this.J1 += j.J1;
-            this.J2 += j.J2;
-            this.J3 += j.J3;
-            this.J4 += j.J4;
-            this.J5 += j.J5;
-            this.J6 += j.J6;
+            this.A1 += j.A1;
+            this.A2 += j.A2;
+            this.A3 += j.A3;
+            this.A4 += j.A4;
+            this.A5 += j.A5;
+            this.A6 += j.A6;
         }
 
-        public void Set(Joints j)
+        public void Set(Axes j)
         {
-            this.J1 = j.J1;
-            this.J2 = j.J2;
-            this.J3 = j.J3;
-            this.J4 = j.J4;
-            this.J5 = j.J5;
-            this.J6 = j.J6;
+            this.A1 = j.A1;
+            this.A2 = j.A2;
+            this.A3 = j.A3;
+            this.A4 = j.A4;
+            this.A5 = j.A5;
+            this.A6 = j.A6;
         }
 
         public void Scale(double s)
         {
-            this.J1 *= s;
-            this.J2 *= s;
-            this.J3 *= s;
-            this.J4 *= s;
-            this.J5 *= s;
-            this.J6 *= s;
+            this.A1 *= s;
+            this.A2 *= s;
+            this.A3 *= s;
+            this.A4 *= s;
+            this.A5 *= s;
+            this.A6 *= s;
         }
 
         /// <summary>
@@ -143,17 +143,17 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public double NormSq()
         {
-            return J1 * J1 + J2 * J2 + J3 * J3 + J4 * J4 + J5 * J5 + J6 * J6;
+            return A1 * A1 + A2 * A2 + A3 * A3 + A4 * A4 + A5 * A5 + A6 * A6;
         }
 
-        public static Joints Add(Joints j1, Joints j2)
+        public static Axes Add(Axes j1, Axes j2)
         {
-            return new Joints(j1.J1 + j2.J1,
-                              j1.J2 + j2.J2,
-                              j1.J3 + j2.J3,
-                              j1.J4 + j2.J4,
-                              j1.J5 + j2.J5,
-                              j1.J6 + j2.J6);
+            return new Axes(j1.A1 + j2.A1,
+                              j1.A2 + j2.A2,
+                              j1.A3 + j2.A3,
+                              j1.A4 + j2.A4,
+                              j1.A5 + j2.A5,
+                              j1.A6 + j2.A6);
         }
 
 
@@ -168,29 +168,29 @@ namespace Machina.Types.Geometry
                 "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}, {9}{10}, {11}{12}]",
                 labels ? "Axes" : "",
                 labels ? "A1:" : "",
-                Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A1, STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A2:" : "",
-                Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A2, STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A3:" : "",
-                Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A3, STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A4:" : "",
-                Math.Round(J4, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A4, STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A5:" : "",
-                Math.Round(J5, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A5, STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A6:" : "",
-                Math.Round(J6, STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(A6, STRING_ROUND_DECIMALS_DEGS));
         }
 
         public string ToArrayString()
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(J1, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(J2, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(J3, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(J4, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(J5, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(J6, STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(A1, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A2, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A3, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A4, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A5, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A6, STRING_ROUND_DECIMALS_DEGS));
         }
 
     }

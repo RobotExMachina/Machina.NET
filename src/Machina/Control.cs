@@ -588,7 +588,7 @@ namespace Machina
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public Joints GetCurrentAxes() => _stateCursor.axes;
+        public Axes GetCurrentAxes() => _stateCursor.axes;
 
         /// <summary>
         /// Returns a double?[] array representing the values for the external axes.
@@ -930,7 +930,7 @@ namespace Machina
         /// <param name="speed"></param>
         /// <param name="zone"></param>
         /// <returns></returns>
-        public bool IssueJointsRequest(Joints joints, bool relJnts) =>
+        public bool IssueJointsRequest(Axes joints, bool relJnts) =>
                 IssueApplyActionRequest(new ActionAxes(joints, relJnts));
 
 
@@ -1139,7 +1139,7 @@ namespace Machina
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Joints joints = null, ExternalAxes extAx = null,
+        internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Axes joints = null, ExternalAxes extAx = null,
             double speed = Control.DEFAULT_SPEED, double acc = Control.DEFAULT_ACCELERATION, double precision = Control.DEFAULT_PRECISION,
             MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
 
@@ -1165,7 +1165,7 @@ namespace Machina
             // If successful, initialize robot cursors to mirror the state of the device
             Vector currPos = _driver.GetCurrentPosition();
             Rotation currRot = _driver.GetCurrentOrientation();
-            Joints currJnts = _driver.GetCurrentJoints();
+            Axes currJnts = _driver.GetCurrentJoints();
             ExternalAxes currExtAx = _driver.GetCurrentExternalAxes();
 
             return InitializeRobotCursors(currPos, currRot, currJnts, currExtAx);

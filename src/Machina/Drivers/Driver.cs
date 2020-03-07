@@ -191,7 +191,7 @@ namespace Machina.Drivers
         /// Returns a Joints object representing the rotations of the 6 axes of this robot.
         /// </summary>
         /// <returns></returns>
-        public abstract Joints GetCurrentJoints();
+        public abstract Axes GetCurrentJoints();
 
         /// <summary>
         /// Returns a ExternalAxes object representing the rotations/translations of the 6 external axes of this robot.

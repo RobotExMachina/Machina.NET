@@ -729,12 +729,12 @@ namespace Machina
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
-                Math.Round(cursor.axes.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.J6, Geometry.STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(cursor.axes.A1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A6, Geometry.STRING_ROUND_DECIMALS_DEGS));
         }
 
         /// <summary>

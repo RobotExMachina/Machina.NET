@@ -35,7 +35,7 @@ namespace Machina.Descriptors.Cursors
         public string name;
         public Vector position, prevPosition;
         public Rotation rotation, prevRotation;
-        public Joints axes, prevAxes;
+        public Axes axes, prevAxes;
         public double speed;
         public double acceleration;
         public double precision;
@@ -167,7 +167,7 @@ namespace Machina.Descriptors.Cursors
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        public bool Initialize(Vector position, Rotation rotation, Joints joints, ExternalAxes extAx,
+        public bool Initialize(Vector position, Rotation rotation, Axes joints, ExternalAxes extAx,
             double speed, double acceleration, double precision, MotionType mType, ReferenceCS refCS)
         {
             if (position != null)
@@ -182,8 +182,8 @@ namespace Machina.Descriptors.Cursors
             }
             if (joints != null)
             {
-                this.axes = new Joints(joints);
-                this.prevAxes = new Joints(joints);
+                this.axes = new Axes(joints);
+                this.prevAxes = new Axes(joints);
             }
             if (extAx != null)
             {
@@ -416,7 +416,7 @@ namespace Machina.Descriptors.Cursors
         /// <param name="rot"></param>
         /// <param name="ax"></param>
         /// <param name="extax"></param>
-        internal void UpdateFullPose(Vector pos, Rotation rot, Joints ax, ExternalAxes extax)
+        internal void UpdateFullPose(Vector pos, Rotation rot, Axes ax, ExternalAxes extax)
         {
             this.position = pos;
             this.rotation = rot;
@@ -871,7 +871,7 @@ namespace Machina.Descriptors.Cursors
         /// <returns></returns>
         public bool ApplyAction(ActionAxes action)
         {
-            Joints newJnt;
+            Axes newJnt;
 
             // @TODO: implement joint limits checks and general safety...
 
@@ -886,11 +886,11 @@ namespace Machina.Descriptors.Cursors
                     return false;
                 }
 
-                newJnt = Joints.Add(axes, action.joints);
+                newJnt = Axes.Add(axes, action.joints);
             }
             else
             {
-                newJnt = new Joints(action.joints);
+                newJnt = new Axes(action.joints);
             }
 
             // Update prev and current axes
