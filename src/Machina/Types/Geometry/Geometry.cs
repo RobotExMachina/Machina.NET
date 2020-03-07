@@ -74,6 +74,11 @@ namespace Machina.Types.Geometry
             return Math.Sqrt(x * x + y * y + z * z);
         }
 
+        public static float Length(float x, float y, float z)
+        {
+            return (float) Math.Sqrt(x * x + y * y + z * z);
+        }
+
         public static double Length(double w, double x, double y, double z)
         {
             return Math.Sqrt(w * w + x * x + y * y + z * z);
@@ -94,13 +99,23 @@ namespace Machina.Types.Geometry
             return w * w + x * x + y * y + z * z;
         }
 
-        public static void Normalize(double x, double y, double z,
+
+        public static bool Normalize(double x, double y, double z,
             out double newX, out double newY, out double newZ)
         {
             double len = Length(x, y, z);
+            if (len < EPSILON2)
+            {
+                newX = x;
+                newY = y;
+                newZ = z;
+                return false;
+            }
             newX = x / len;
             newY = y / len;
             newZ = z / len;
+
+            return true;
         }
 
         internal static Random rnd = new System.Random();

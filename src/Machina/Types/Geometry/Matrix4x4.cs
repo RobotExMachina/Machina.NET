@@ -688,6 +688,97 @@ namespace Machina.Types.Geometry
 
 
         /// <summary>
+        /// Creates a matrix that rotates around an arbitrary vector.
+        /// </summary>
+        /// <param name="axisAngle">The AxisAngle object</param>
+        /// <returns></returns>
+        public static Matrix4x4 CreateFromAxisAngle(AxisAngle axisAngle)
+        {
+            return Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, (float)axisAngle.Angle);
+        }
+
+        /// <summary>
+        /// Creates a matrix that represents a Plane object.
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <returns></returns>
+        public static Matrix4x4 CreateFromPlane(Plane plane)
+        {
+            // This needs a LOT of optimization...
+            Matrix4x4 result;
+
+            result.M11 = (float)plane.XAxis.X;
+            result.M12 = (float)plane.YAxis.X;
+            result.M13 = (float)plane.ZAxis.X;
+            result.M14 = (float)plane.Origin.X;
+
+            result.M21 = (float)plane.XAxis.Y;
+            result.M22 = (float)plane.YAxis.Y;
+            result.M23 = (float)plane.ZAxis.Y;
+            result.M24 = (float)plane.Origin.Y;
+
+            result.M31 = (float)plane.XAxis.Z;
+            result.M32 = (float)plane.YAxis.Z;
+            result.M33 = (float)plane.ZAxis.Z;
+            result.M34 = (float)plane.Origin.Z;
+
+            result.M41 = 0.0f;
+            result.M42 = 0.0f;
+            result.M43 = 0.0f;
+            result.M44 = 1.0f;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a matrix that represents a Plane object. 
+        /// This method assumes input vectors are unitary and orthogonal.
+        /// </summary>
+        /// <param name="originX"></param>
+        /// <param name="originY"></param>
+        /// <param name="originZ"></param>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        /// <returns></returns>
+        public static bool CreateFromPlane(
+                float originX, float originY, float originZ,
+                float x0, float x1, float x2,
+                float y0, float y1, float y2)
+        {
+            Vector.CrossProduct(x0, x1, x2, y0, y1, y2, 
+                out float z0, out float z1, out float z2);
+            
+            Matrix4x4 m;
+
+            m.M11 = x0;
+            m.M12 = y0;
+            m.M13 = z0;
+            m.M14 = originX;
+
+            m.M21 = x1;
+            m.M22 = y1;
+            m.M23 = z1;
+            m.M24 = originY;
+
+            m.M31 = x2;
+            m.M32 = y2;
+            m.M33 = z2;
+            m.M34 = originZ;
+
+            m.M41 = 0.0f;
+            m.M42 = 0.0f;
+            m.M43 = 0.0f;
+            m.M44 = 1.0f;
+
+            return false;
+        }
+
+
+        /// <summary>
         /// Creates a rotation matrix from the given Quaternion rotation value.
         /// </summary>
         /// <param name="quaternion">The source Quaternion.</param>

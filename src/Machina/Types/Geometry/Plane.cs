@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Machina.Types.Geometry
 {
-    class Plane : Geometry
+    public class Plane : Geometry
     {
         public static Plane WorldXY => new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);
         
@@ -17,7 +17,14 @@ namespace Machina.Types.Geometry
         public Vector YAxis => this.Orientation.YAxis;
         public Vector ZAxis => this.Orientation.ZAxis;
 
-
+        /// <summary>
+        /// Turns this Plane into an identity Plane
+        /// </summary>
+        public void Identity()
+        {
+            this.Origin = new Point(0, 0, 0);
+            this.Orientation = new Orientation(1, 0, 0, 0, 1, 0);
+        }
 
         /// <summary>
         /// Creates a World centered Plane. 
@@ -59,20 +66,8 @@ namespace Machina.Types.Geometry
             this.Origin = new Point(originX, originY, originZ);
         }
 
-        /// <summary>
-        /// Turns this Plane into an identity Plane
-        /// </summary>
-        public void Identity()
-        {
-            this.Origin = new Point(0, 0, 0);
-            this.Orientation = new Orientation(1, 0, 0, 0, 1, 0);
-        }
 
-        // @TODO: create a function that returns the plane that is targetPlane in basePlane coordinates
-        //public static Plane Remap(Plane basePlane, Plane targetPlane)
-        //{
-        //    // must apply to targetPlane the inverse transformation represented by baseplane
-        //}
+
 
 
     }

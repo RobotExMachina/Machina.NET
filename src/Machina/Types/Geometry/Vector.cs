@@ -15,11 +15,11 @@ namespace Machina.Types.Geometry
     //   ╚████╔╝ ███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║
     //    ╚═══╝  ╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
     //                                                     
-    
+
     // BIG @TODO list here:
     // - Turn class into struct
     // - Refactor properties to floats
-        
+
     /// <summary>
     /// Represents a three dimensional vector.
     /// </summary>
@@ -379,6 +379,7 @@ namespace Machina.Types.Geometry
             return p1.X * p2.X + p1.Y * p2.Y + p1.Z * p2.Z;
         }
 
+
         /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
         /// of specified Points (Vectors).
@@ -433,6 +434,48 @@ namespace Machina.Types.Geometry
                 p1.Y * p2.Z - p1.Z * p2.Y,
                 p1.Z * p2.X - p1.X * p2.Z,
                 p1.X * p2.Y - p1.Y * p2.X);
+        }
+
+        
+        /// <summary>
+        /// Returns the cross product of specified vectors as Vector.
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        /// <returns></returns>
+        public static Vector CrossProduct(float x0, float x1, float x2, float y0, float y1, float y2)
+        {
+            return new Vector(
+                x1 * y2 - x2 * y1,
+                x2 * y0 - x0 * y2,
+                x0 * y1 - x1 * y0);
+        }
+
+        /// <summary>
+        /// Returns the cross product of specified vectors as vector components. 
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y0"></param>
+        /// <param name="y1"></param>
+        /// <param name="y2"></param>
+        /// <param name="z0"></param>
+        /// <param name="z1"></param>
+        /// <param name="z2"></param>
+        public static void CrossProduct(
+            float x0, float x1, float x2,
+            float y0, float y1, float y2,
+            out float z0, out float z1, out float z2)
+        {
+
+            z0 = x1 * y2 - x2 * y1;
+            z1 = x2 * y0 - x0 * y2;
+            z2 = x0 * y1 - x1 * y0;
         }
 
         ///// <summary>
@@ -619,6 +662,7 @@ namespace Machina.Types.Geometry
             return (dx * dx) + (dy * dy) + (dz * dz);
         }
 
+
         /// <summary>
         /// Given two vectors, this method outputs two new orthogonal vectors, where the first one is 
         /// parallel to the original (although normalized), and the second one is perpendicular to the 
@@ -651,7 +695,6 @@ namespace Machina.Types.Geometry
 
             return true;
         }
-
 
 
 
