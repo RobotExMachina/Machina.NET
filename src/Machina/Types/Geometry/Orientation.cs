@@ -71,21 +71,21 @@ namespace Machina.Types.Geometry
         /// </summary>
         public Vector XAxis => this.RM == null ? 
                     new Vector(1, 0, 0) : 
-                    new Vector(this.RM.m00, this.RM.m10, this.RM.m20);
+                    new Vector(this.RM.M11, this.RM.M21, this.RM.M31);
 
         /// <summary>
         /// The main Y direction of this Orientation.
         /// </summary>
         public Vector YAxis => this.RM == null ? 
                     new Vector(0, 1, 0) : 
-                    new Vector(this.RM.m01, this.RM.m11, this.RM.m21);
+                    new Vector(this.RM.M12, this.RM.M22, this.RM.M32);
 
         /// <summary>
         /// The main Z direction of this Orientation.
         /// </summary>
         public Vector ZAxis => this.RM == null ? 
                     new Vector(0, 0, 1) : 
-                    new Vector(this.RM.m02, this.RM.m12, this.RM.m22);
+                    new Vector(this.RM.M13, this.RM.M23, this.RM.M33);
 
         /// <summary>
         /// Implicit conversion from Rotation to Orientation via its Quaternion.
@@ -165,17 +165,17 @@ namespace Machina.Types.Geometry
             {
                 return string.Format(CultureInfo.InvariantCulture, 
                     "Orientation[X:[{0}, {1}, {2}], Y:[{3}, {4}, {5}], Z:[{6}, {7}, {8}]]",
-                    Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
-                    Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM),
-                    Math.Round(this.RM.m02, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m22, STRING_ROUND_DECIMALS_MM));
+                    Math.Round(this.RM.M11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M21, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M31, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.M12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M22, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M32, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.M13, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M23, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M33, STRING_ROUND_DECIMALS_MM));
             }
             else
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     "[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
-                    Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
-                    Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM),
-                    Math.Round(this.RM.m02, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.m22, STRING_ROUND_DECIMALS_MM));
+                    Math.Round(this.RM.M11, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M21, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M31, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.M12, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M22, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M32, STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.RM.M13, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M23, STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M33, STRING_ROUND_DECIMALS_MM));
             }
         }
 
@@ -183,12 +183,12 @@ namespace Machina.Types.Geometry
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(this.RM.m00, STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.m10, STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.m20, STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.m01, STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.m11, STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.m21, STRING_ROUND_DECIMALS_MM));
+                Math.Round(this.RM.M11, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.M21, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.M31, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.M12, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.M22, STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.RM.M32, STRING_ROUND_DECIMALS_MM));
         }
 
     }

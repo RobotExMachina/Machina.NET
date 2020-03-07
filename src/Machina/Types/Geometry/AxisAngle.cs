@@ -368,24 +368,24 @@ namespace Machina.Types.Geometry
             double t = 1 - c;
 
             RotationMatrix m = new RotationMatrix();
-            m.m00 = c + t * this.Axis.X * this.Axis.X;
-            m.m11 = c + t * this.Axis.Y * this.Axis.Y;
-            m.m22 = c + t * this.Axis.Z * this.Axis.Z;
+            m.M11 = c + t * this.Axis.X * this.Axis.X;
+            m.M22 = c + t * this.Axis.Y * this.Axis.Y;
+            m.M33 = c + t * this.Axis.Z * this.Axis.Z;
 
             double t1 = t * this.Axis.X * this.Axis.Y;
             double t2 = s * this.Axis.Z;
-            m.m10 = t1 + t2;
-            m.m01 = t1 - t2;
+            m.M21 = t1 + t2;
+            m.M12 = t1 - t2;
 
             t1 = t * this.Axis.X * this.Axis.Z;
             t2 = s * this.Axis.Y;
-            m.m20 = t1 - t2;
-            m.m02 = t1 + t2;
+            m.M31 = t1 - t2;
+            m.M13 = t1 + t2;
 
             t1 = t * this.Axis.Y * this.Axis.Z;
             t2 = s * this.Axis.X;
-            m.m21 = t1 + t2;
-            m.m12 = t1 - t2;
+            m.M32 = t1 + t2;
+            m.M23 = t1 - t2;
 
             return m;
         }

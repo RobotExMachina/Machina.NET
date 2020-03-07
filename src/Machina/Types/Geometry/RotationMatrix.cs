@@ -23,54 +23,54 @@ namespace Machina.Types.Geometry
     {
         /// <summary>
         /// Elements of the rotation matrix, ordered in row to column way, 
-        /// i.e. r[2] is r13 (row 1 col 3), r[6] is r31, etc. 
+        /// i.e. r[2] is M13 (row 1 col 3), r[6] is M31, etc. 
         /// </summary>
         public double[] R { get; internal set; }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m00 { get { return this.R[0]; } internal set { R[0] = value; } }
+        public double M11 { get { return this.R[0]; } internal set { R[0] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m01 { get { return this.R[1]; } internal set { R[1] = value; } }
+        public double M12 { get { return this.R[1]; } internal set { R[1] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m02 { get { return this.R[2]; } internal set { R[2] = value; } }
+        public double M13 { get { return this.R[2]; } internal set { R[2] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m10 { get { return this.R[3]; } internal set { R[3] = value; } }
+        public double M21 { get { return this.R[3]; } internal set { R[3] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m11 { get { return this.R[4]; } internal set { R[4] = value; } }
+        public double M22 { get { return this.R[4]; } internal set { R[4] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m12 { get { return this.R[5]; } internal set { R[5] = value; } }
+        public double M23 { get { return this.R[5]; } internal set { R[5] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m20 { get { return this.R[6]; } internal set { R[6] = value; } }
+        public double M31 { get { return this.R[6]; } internal set { R[6] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m21 { get { return this.R[7]; } internal set { R[7] = value; } }
+        public double M32 { get { return this.R[7]; } internal set { R[7] = value; } }
 
         /// <summary>
         /// Alias
         /// </summary>
-        public double m22 { get { return this.R[8]; } internal set { R[8] = value; } }
+        public double M33 { get { return this.R[8]; } internal set { R[8] = value; } }
 
         /// <summary>
         /// Test if this RotationMatrix is approximately equal to another.
@@ -453,7 +453,7 @@ namespace Machina.Types.Geometry
             // This conversion assumes the rotation matrix is special orthogonal.
             // As a result, the returned Quaternion will be a versor.
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-            double trace = m00 + m11 + m22;
+            double trace = M11 + M22 + M33;
             Quaternion q = new Quaternion();
             double s;
 
@@ -462,37 +462,37 @@ namespace Machina.Types.Geometry
             {
                 s = 2 * Math.Sqrt(trace + 1);
                 q.W = 0.25 * s;
-                q.X = (m21 - m12) / s;
-                q.Y = (m02 - m20) / s;
-                q.Z = (m10 - m01) / s;
+                q.X = (M32 - M23) / s;
+                q.Y = (M13 - M31) / s;
+                q.Z = (M21 - M12) / s;
             }
 
             // If trace is zero or negative, avoid division by zero, square root of negative and floating-point degeneracy
             // by searching which major diagonal element has the greatest value:
             else
             {
-                if (m00 > m11 && m00 > m22)
+                if (M11 > M22 && M11 > M33)
                 {
-                    s = 2 * Math.Sqrt(1 + m00 - m11 - m22);
-                    q.W = (m21 - m12) / s;
+                    s = 2 * Math.Sqrt(1 + M11 - M22 - M33);
+                    q.W = (M32 - M23) / s;
                     q.X = 0.25 * s;
-                    q.Y = (m01 + m10) / s;
-                    q.Z = (m02 + m20) / s;
+                    q.Y = (M12 + M21) / s;
+                    q.Z = (M13 + M31) / s;
                 }
-                else if (m11 > m22)
+                else if (M22 > M33)
                 {
-                    s = 2 * Math.Sqrt(1 + m11 - m00 - m22);
-                    q.W = (m02 - m20) / s;
-                    q.X = (m01 + m10) / s;
+                    s = 2 * Math.Sqrt(1 + M22 - M11 - M33);
+                    q.W = (M13 - M31) / s;
+                    q.X = (M12 + M21) / s;
                     q.Y = 0.25 * s;
-                    q.Z = (m12 + m21) / s;
+                    q.Z = (M23 + M32) / s;
                 }
                 else
                 {
-                    s = 2 * Math.Sqrt(1 + m22 - m00 - m11);
-                    q.W = (m10 - m01) / s;
-                    q.X = (m02 + m20) / s;
-                    q.Y = (m12 + m21) / s;
+                    s = 2 * Math.Sqrt(1 + M33 - M11 - M22);
+                    q.W = (M21 - M12) / s;
+                    q.X = (M13 + M31) / s;
+                    q.Y = (M23 + M32) / s;
                     q.Z = 0.25 * s;
                 }
             }
@@ -529,9 +529,9 @@ namespace Machina.Types.Geometry
             double sinv = 1 / Math.Sqrt(2);  // 0.7071...
 
             // Check for singularities
-            if (Math.Abs(m01 - m10) < EPSILON2
-                && Math.Abs(m02 - m20) < EPSILON2
-                && Math.Abs(m12 - m21) < EPSILON2)
+            if (Math.Abs(M12 - M21) < EPSILON2
+                && Math.Abs(M13 - M31) < EPSILON2
+                && Math.Abs(M23 - M32) < EPSILON2)
             {
                 // If identity matrix (angle = 0), return a non rotation AxisAngle
                 if (this.IsIdentity())
@@ -540,12 +540,12 @@ namespace Machina.Types.Geometry
                 }
                 // Otherwise, angle is 180
                 angle = 180;
-                double xx = 0.5 * m00 + 0.5;
-                double yy = 0.5 * m11 + 0.5;
-                double zz = 0.5 * m22 + 0.5;
-                double xy = 0.25 * (m01 + m10);
-                double xz = 0.25 * (m02 + m20);
-                double yz = 0.25 * (m12 + m21);
+                double xx = 0.5 * M11 + 0.5;
+                double yy = 0.5 * M22 + 0.5;
+                double zz = 0.5 * M33 + 0.5;
+                double xy = 0.25 * (M12 + M21);
+                double xz = 0.25 * (M13 + M31);
+                double yz = 0.25 * (M23 + M32);
 
                 // If m00 is the largest diagonal
                 if (xx > yy && xx > zz)
@@ -600,14 +600,14 @@ namespace Machina.Types.Geometry
             }
 
             // No singularities then, proceed normally
-            double s = Math.Sqrt((m21 - m12) * (m21 - m12)
-                    + (m02 - m20) * (m02 - m20)
-                    + (m10 - m01) * (m10 - m01));  // for normalization (is this necessary here?)
+            double s = Math.Sqrt((M32 - M23) * (M32 - M23)
+                    + (M13 - M31) * (M13 - M31)
+                    + (M21 - M12) * (M21 - M12));  // for normalization (is this necessary here?)
             if (Math.Abs(s) < EPSILON2) s = 1;  // "prevent divide by zero, should not happen if matrix is orthogonal and should be caught by singularity test above, but I've left it in just in case"
-            angle = TO_DEGS * Math.Acos(0.5 * (m00 + m11 + m22 - 1));
-            x = (m21 - m12) / s;
-            y = (m02 - m20) / s;
-            z = (m10 - m01) / s;
+            angle = TO_DEGS * Math.Acos(0.5 * (M11 + M22 + M33 - 1));
+            x = (M32 - M23) / s;
+            y = (M13 - M31) / s;
+            z = (M21 - M12) / s;
 
             return new AxisAngle(x, y, z, angle, false);
         }
@@ -648,21 +648,21 @@ namespace Machina.Types.Geometry
             double xAng, yAng, zAng;
 
             // North pole singularity (yAng ~ 90degs)? Note m02 is -sin(y) = -sin(90) = -1
-            if (this.m20 < -1 + EPSILON3)
+            if (this.M31 < -1 + EPSILON3)
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
-                zAng = Math.Atan2(this.m12, this.m02);
+                zAng = Math.Atan2(this.M23, this.M13);
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
             }
 
             // South pole singularity (yAng ~ -90degs)? Note m02 is -sin(y) = -sin(-90) = 1
-            else if (this.m20 > 1 - EPSILON3) 
+            else if (this.M31 > 1 - EPSILON3) 
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;
-                zAng = Math.Atan2(-this.m12, -this.m02);
+                zAng = Math.Atan2(-this.M23, -this.M13);
                 if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
                 else if (zAng > Math.PI) zAng -= TAU;
             }
@@ -670,9 +670,9 @@ namespace Machina.Types.Geometry
             // Regular derivation
             else
             {
-                xAng = Math.Atan2(this.m21, this.m22);
-                yAng = -Math.Asin(this.m20);
-                zAng = Math.Atan2(this.m10, this.m00);
+                xAng = Math.Atan2(this.M32, this.M33);
+                yAng = -Math.Asin(this.M31);
+                zAng = Math.Atan2(this.M21, this.M11);
             }
 
             return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
@@ -685,15 +685,15 @@ namespace Machina.Types.Geometry
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "RotationMatrix[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
-                Math.Round(m00, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m01, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m02, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m10, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m11, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m12, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m20, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m21, STRING_ROUND_DECIMALS_MM),
-                Math.Round(m22, STRING_ROUND_DECIMALS_MM));
+                Math.Round(M11, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M12, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M13, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M21, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M22, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M23, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M31, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M32, STRING_ROUND_DECIMALS_MM),
+                Math.Round(M33, STRING_ROUND_DECIMALS_MM));
         }
 
     }

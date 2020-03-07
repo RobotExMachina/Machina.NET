@@ -15,6 +15,11 @@ namespace Machina.Types.Geometry
     //   ╚████╔╝ ███████╗╚██████╗   ██║   ╚██████╔╝██║  ██║
     //    ╚═══╝  ╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
     //                                                     
+    
+    // BIG @TODO list here:
+    // - Turn class into struct
+    // - Refactor properties to floats
+        
     /// <summary>
     /// Represents a three dimensional vector.
     /// </summary>

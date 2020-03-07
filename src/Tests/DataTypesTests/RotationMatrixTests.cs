@@ -89,7 +89,7 @@ namespace DataTypesTests
                 Trace.WriteLine(m);
                 Assert.IsTrue(m.IsOrthogonal(), "RotationMatrix isn't orthogonal");
 
-                mVecX = new Vector(m.m00, m.m10, m.m20);
+                mVecX = new Vector(m.M11, m.M21, m.M31);
                 Assert.IsTrue(Vector.CompareDirections(vecX, mVecX) == 1, "Original VectorX and orthogonalized one are not parallel");
             }
 
@@ -113,13 +113,13 @@ namespace DataTypesTests
                 {
                     Assert.IsTrue(m.IsOrthogonal(), "RotationMatrix isn't orthogonal");
 
-                    mVecX = new Vector(m.m00, m.m10, m.m20);
+                    mVecX = new Vector(m.M11, m.M21, m.M31);
                     Assert.IsTrue(Vector.CompareDirections(vecX, mVecX) == 1, "Original VectorX and orthogonalized X should be parallel");
 
-                    mVecY = new Vector(m.m01, m.m11, m.m21);
+                    mVecY = new Vector(m.M12, m.M22, m.M32);
                     Assert.IsTrue(Vector.CompareDirections(vecX, mVecY) == 2, "Original VectorX and orthogonalized Y should be perpendicular");
 
-                    mVecZ = new Vector(m.m02, m.m12, m.m22);
+                    mVecZ = new Vector(m.M13, m.M23, m.M33);
                     Assert.IsTrue(Vector.CompareDirections(vecX, mVecZ) == 2, "Original VectorX and orthogonalized Z should be perpendicular");
 
                     Assert.IsTrue(Vector.CompareDirections(mVecX, mVecY) == 2);
@@ -171,9 +171,9 @@ namespace DataTypesTests
                 Trace.WriteLine(q);
 
                 // Use the matrix's orthogonal values to create a M44 matrix with just rotation values:
-                m44 = new SysMatrix44((float)m.m00, (float)m.m01, (float)m.m02, 0,
-                                        (float)m.m10, (float)m.m11, (float)m.m12, 0,
-                                        (float)m.m20, (float)m.m21, (float)m.m22, 0,
+                m44 = new SysMatrix44((float)m.M11, (float)m.M12, (float)m.M13, 0,
+                                        (float)m.M21, (float)m.M22, (float)m.M23, 0,
+                                        (float)m.M31, (float)m.M32, (float)m.M33, 0,
                                         0, 0, 0, 1);
                 m44 = SysMatrix44.Transpose(m44);  // Numerics.Matrix4x4 uses a transposed convention, meaning the translation vector is horizontal in m41-42-43 instead of vertical in m14-24-34
                 sq = SysQuat.CreateFromRotationMatrix(m44);
