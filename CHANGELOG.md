@@ -21,6 +21,14 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
+# v0.9.0
+## BUILD 1503
+- Testing implementing FK/IK solvers...
+- Added `Matrix4x4` as a copy of `System.Numerics.Matrix4x4` chaning row-colum convention.
+- Refactored `Joints` to `Axes`.
+- Added `Interval` struct
+
+
 # v0.8.12
 ## BUILD 1502
 - Compilers now have embedded abstract comment characters and encoding
