@@ -769,8 +769,7 @@ namespace Machina.Types.Geometry
                 yz2 = 2 * this.Y * this.Z,
                 yw2 = 2 * this.Y * this.W,
                 zz2 = 2 * this.Z * this.Z,
-                zw2 = 2 * this.Z * this.W,
-                ww2 = 2 * this.W * this.W;
+                zw2 = 2 * this.Z * this.W;
 
             return new RotationMatrix(1 - yy2 - zz2, xy2 - zw2, xz2 + yw2,
                                           xy2 + zw2, 1 - xx2 - zz2, yz2 - xw2,

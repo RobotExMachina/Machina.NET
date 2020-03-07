@@ -41,12 +41,19 @@ namespace Machina.Types.Geometry
         /// </summary>
         public double Z { get; internal set; }
 
-        public static bool AreSimilar(Vector a, Vector b, double epsilon = 0.000001)
+        public static bool AreSimilar(Vector a, Vector b)
         {
             return Math.Abs(a.X - b.X) < EPSILON2
                    && Math.Abs(a.Y - b.Y) < EPSILON2
                    && Math.Abs(a.Z - b.Z) < EPSILON2;
         }
+        public static bool AreSimilar(Vector a, Vector b, double epsilon)
+        {
+            return Math.Abs(a.X - b.X) < epsilon
+                   && Math.Abs(a.Y - b.Y) < epsilon
+                   && Math.Abs(a.Z - b.Z) < epsilon;
+        }
+
 
         /// <summary>
         /// Test if this Vector is approximately equal to another.
