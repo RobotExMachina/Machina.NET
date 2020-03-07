@@ -744,7 +744,7 @@ namespace Machina.Types.Geometry
         /// <param name="y1"></param>
         /// <param name="y2"></param>
         /// <returns></returns>
-        public static bool CreateFromPlane(
+        public static Matrix4x4 CreateFromPlane(
                 float originX, float originY, float originZ,
                 float x0, float x1, float x2,
                 float y0, float y1, float y2)
@@ -774,7 +774,7 @@ namespace Machina.Types.Geometry
             m.M43 = 0.0f;
             m.M44 = 1.0f;
 
-            return false;
+            return m;
         }
 
 

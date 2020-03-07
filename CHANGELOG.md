@@ -22,6 +22,10 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 # v0.9.0
+## BUILD 1504
+- Added some robot description classes
+- Added hardcoded ABB IRB 140 for testing.
+
 ## BUILD 1503
 - Testing implementing FK/IK solvers...
 - Added `Matrix4x4` as a copy of `System.Numerics.Matrix4x4` chaning row-colum convention.

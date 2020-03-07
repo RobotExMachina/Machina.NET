@@ -204,4 +204,25 @@ namespace Machina
         /// </summary>
         Joint
     }
+
+    /// <summary>
+    /// Defines the type of RobotJoint.
+    /// </summary>
+    public enum RobotJointType
+    {
+        /// <summary>
+        /// Joint doesn't move (like a Base joint).
+        /// </summary>
+        Static, 
+
+        /// <summary>
+        /// Joint moves linearly along Z axis.
+        /// </summary>
+        Linear,
+
+        /// <summary>
+        /// Joint rotates around Z axis.
+        /// </summary>
+        Revolute
+    };
 }
