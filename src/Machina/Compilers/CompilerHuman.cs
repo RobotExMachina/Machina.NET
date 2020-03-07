@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Machina.Types.Geometry;
 using Machina.Types.Data;
+using Machina.Descriptors.Cursors;
 
 namespace Machina
 {

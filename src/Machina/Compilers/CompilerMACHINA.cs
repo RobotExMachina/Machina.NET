@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Machina.Types.Geometry;
 using Machina.Types.Data;
+using Machina.Descriptors.Cursors;
 
 namespace Machina
 {

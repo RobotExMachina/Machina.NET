@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.FormattableString;
 using Machina.Types.Geometry;
+using Machina.Descriptors.Cursors;
 
 
 namespace Machina.Drivers.Communication.Protocols

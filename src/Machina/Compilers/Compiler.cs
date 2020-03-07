@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Machina.Types.Data;
+using Machina.Descriptors.Cursors;
 
 namespace Machina
 {

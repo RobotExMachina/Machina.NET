@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Machina.Types.Geometry;
+using Machina.Descriptors.Cursors;
 
 namespace Machina.Drivers.Communication.Protocols
 {

@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 using Machina.Types.Geometry;
 using Machina.Types.Data;
 
-namespace Machina
+namespace Machina.Descriptors.Cursors
 {
-    //   ██████╗██╗   ██╗██████╗ ███████╗ ██████╗ ██████╗ 
-    //  ██╔════╝██║   ██║██╔══██╗██╔════╝██╔═══██╗██╔══██╗
-    //  ██║     ██║   ██║██████╔╝███████╗██║   ██║██████╔╝
-    //  ██║     ██║   ██║██╔══██╗╚════██║██║   ██║██╔══██╗
-    //  ╚██████╗╚██████╔╝██║  ██║███████║╚██████╔╝██║  ██║
-    //   ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝
-    //                                                    
+    //  ██████╗  ██████╗ ██████╗  ██████╗ ████████╗ ██████╗██╗   ██╗██████╗ ███████╗ ██████╗ ██████╗ 
+    //  ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║   ██║██╔══██╗██╔════╝██╔═══██╗██╔══██╗
+    //  ██████╔╝██║   ██║██████╔╝██║   ██║   ██║   ██║     ██║   ██║██████╔╝███████╗██║   ██║██████╔╝
+    //  ██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║   ██║     ██║   ██║██╔══██╗╚════██║██║   ██║██╔══██╗
+    //  ██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║   ╚██████╗╚██████╔╝██║  ██║███████║╚██████╔╝██║  ██║
+    //  ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝
+    //                                                                                               
     /// <summary>
     /// Represents an abstraction of the state of a robotic device. 
     /// Keeps track of things such as position, orientation, joint configuration,
@@ -441,6 +441,11 @@ namespace Machina
         /// A dict that maps Action types to the cursor's applicable method.
         /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
         /// </summary>
+        /// <remarks>
+        /// While this Dictionary dispatch pattern is a bit convoluted, it is faster than dynamic casting, 
+        /// more stable and allows for compiler-time checks and non-error fallback.
+        /// https://chodounsky.net/2014/01/29/dynamic-dispatch-in-c-number/
+        /// </remarks>
         Dictionary<Type, Func<Action, RobotCursor, bool>> ActionsMap = new Dictionary<Type, Func<Action, RobotCursor, bool>>()
         {
             { typeof (ActionSpeed),                     (act, robCur) => robCur.ApplyAction((ActionSpeed) act) },

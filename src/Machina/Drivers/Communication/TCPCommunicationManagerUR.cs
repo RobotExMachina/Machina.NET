@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Machina.Drivers.Communication;
 using Machina.Drivers.Communication.Protocols;
 using Machina.Types.Geometry;
+using Machina.Descriptors.Cursors;
 
 namespace Machina.Drivers.Communication
 {

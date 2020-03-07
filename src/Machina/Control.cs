@@ -11,6 +11,7 @@ using Machina.Controllers;
 using Machina.Drivers;
 using Machina.Types.Geometry;
 using Machina.Types.Data;
+using Machina.Descriptors.Cursors;
 
 namespace Machina
 {
