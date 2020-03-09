@@ -9,7 +9,7 @@ namespace Machina.Descriptors.Models
     /// <summary>
     /// A base class for the description of machine models.
     /// </summary>
-    abstract class RobotModelBase
+    public abstract class RobotModelBase
     {
 
     }

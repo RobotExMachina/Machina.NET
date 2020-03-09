@@ -9,15 +9,15 @@ using Machina.Descriptors.Components;
 
 namespace Machina.Descriptors.Models
 {
-    class RobotSixAxesArm : RobotModelBase
+    public class RobotSixAxesArm : RobotModelBase
     {
-        RobotJoint Base;
-        RobotJoint Joint1;
-        RobotJoint Joint2;
-        RobotJoint Joint3;
-        RobotJoint Joint4;
-        RobotJoint Joint5;
-        RobotJoint Joint6;
+        public RobotJoint Base;
+        public RobotJoint Joint1;
+        public RobotJoint Joint2;
+        public RobotJoint Joint3;
+        public RobotJoint Joint4;
+        public RobotJoint Joint5;
+        public RobotJoint Joint6;
         
         public RobotSixAxesArm() : base()
         {
