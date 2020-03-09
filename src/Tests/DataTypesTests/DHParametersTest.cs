@@ -143,44 +143,42 @@ namespace DataTypesTests
                 RobotJointType.Revolute, Interval.Zero, 0);
 
             // Values from GH tests
-            Matrix4x4 j1 = Matrix4x4.CreateFromPlane(0, 0, 127.3f, 1, 0, 0, 0, 0, 1);
+            Matrix4x4 j1 = Matrix4x4.CreateFromPlane(0, 0, 127.3, 1, 0, 0, 0, 0, 1);
             Assert.IsTrue(j1.IsSimilar(bot.Joint1.TransformedPlane, Geometry.EPSILON2));
             
             bot.Joint2 = RobotJoint.CreateFromDHParameters(
                 bot.Joint1,
                 0, -612, 0, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
-            Matrix4x4 j2 = Matrix4x4.CreateFromPlane(-612, 0, 127.3f, 1, 0, 0, 0, 0, 1);
+            Matrix4x4 j2 = Matrix4x4.CreateFromPlane(-612, 0, 127.3, 1, 0, 0, 0, 0, 1);
             Assert.IsTrue(j2.IsSimilar(bot.Joint2.TransformedPlane, Geometry.EPSILON2));
 
             bot.Joint3 = RobotJoint.CreateFromDHParameters(
                 bot.Joint2,
                 0, -572.3, 0, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
-            Matrix4x4 j3 = Matrix4x4.CreateFromPlane(-1184.3f, 0, 127.3f, 1, 0, 0, 0, 0, 1);
+            Matrix4x4 j3 = Matrix4x4.CreateFromPlane(-1184.3, 0, 127.3, 1, 0, 0, 0, 0, 1);
             Assert.IsTrue(j3.IsSimilar(bot.Joint3.TransformedPlane, Geometry.EPSILON2));
 
             bot.Joint4 = RobotJoint.CreateFromDHParameters(
                 bot.Joint3,
                 163.941, 0, 90, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
-            Matrix4x4 j4 = Matrix4x4.CreateFromPlane(-1184.3f, -163.941f, 127.3f, 1, 0, 0, 0, -1, 0);
+            Matrix4x4 j4 = Matrix4x4.CreateFromPlane(-1184.3, -163.941, 127.3, 1, 0, 0, 0, -1, 0);
             Assert.IsTrue(j4.IsSimilar(bot.Joint4.TransformedPlane, Geometry.EPSILON2));
 
             bot.Joint5 = RobotJoint.CreateFromDHParameters(
                 bot.Joint4,
                 115.7, 0, -90, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
-            Matrix4x4 j5 = Matrix4x4.CreateFromPlane(-1184.3f, -163.941f, 11.6f, 1, 0, 0, 0, 0, 1);
-            Console.WriteLine(j5);
-            Console.WriteLine(bot.Joint5.TransformedPlane);
+            Matrix4x4 j5 = Matrix4x4.CreateFromPlane(-1184.3, -163.941, 11.6, 1, 0, 0, 0, 0, 1);
             Assert.IsTrue(j5.IsSimilar(bot.Joint5.TransformedPlane, Geometry.EPSILON2));
 
             bot.Joint6 = RobotJoint.CreateFromDHParameters(
                 bot.Joint5,
                 92.2, 0, 0, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
-            Matrix4x4 j6 = Matrix4x4.CreateFromPlane(-1184.3f, -256.141f, 11.6f, 1, 0, 0, 0, 0, 1);
+            Matrix4x4 j6 = Matrix4x4.CreateFromPlane(-1184.3, -256.141, 11.6, 1, 0, 0, 0, 0, 1);
             Assert.IsTrue(j6.IsSimilar(bot.Joint6.TransformedPlane, Geometry.EPSILON2));
 
         }

@@ -33,6 +33,7 @@
 - Refactored `Joints` to `Axes`.
 - Added `Interval` struct
 - Added `DHParameters`! :)
+- `Matrix4x4` has now `double` fields.
 
 
 # v0.8.12
