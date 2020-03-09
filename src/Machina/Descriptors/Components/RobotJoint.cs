@@ -65,26 +65,22 @@ namespace Machina.Descriptors.Components
             double distance, double radius, double alpha, double theta,
             RobotJointType robotJointType, Interval jointRange, double maxSpeed)
         {
-
-            // This would be the "manual" way, which the DH matrix simplifies.
-            Matrix4x4 m = baseJoint.TransformedPlane;
-            m = Matrix4x4.CreateTranslation(m.Z * distance) * m;
-            m = Matrix4x4.CreateFromAxisAngle(m.Z, (float)theta, m.Translation) * m;
-            m = Matrix4x4.CreateTranslation(m.X * radius) * m;
-            m = Matrix4x4.CreateFromAxisAngle(m.X, (float)alpha, m.Translation) * m;
-            Console.WriteLine("Manual: " + m);
+            //// This would be the "manual" way, which the DH matrix simplifies.
+            //Matrix4x4 m = baseJoint.TransformedPlane;
+            //m = Matrix4x4.CreateTranslation(m.Z * distance) * m;
+            //m = Matrix4x4.CreateFromAxisAngle(m.Z, (float)theta, m.Translation) * m;
+            //m = Matrix4x4.CreateTranslation(m.X * radius) * m;
+            //m = Matrix4x4.CreateFromAxisAngle(m.X, (float)alpha, m.Translation) * m;
 
             // Faster way with DH matrix:
             Matrix4x4 mm = baseJoint.TransformedPlane;
             Matrix4x4 dhm = Matrix4x4.CreateFromDHParameters(distance, radius, alpha, theta);
             mm = mm * dhm;  // remember the DH is post-multiplied
-            Console.WriteLine("DH: " + mm);
-            Console.WriteLine(m == mm);
 
             return new RobotJoint
             {
                 BasePlane = baseJoint.TransformedPlane,
-                TransformedPlane = m,
+                TransformedPlane = mm,
                 RobotJointType = robotJointType,
                 JointRange = jointRange,
                 MaxSpeed = maxSpeed
