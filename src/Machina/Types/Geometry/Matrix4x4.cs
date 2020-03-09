@@ -1672,6 +1672,20 @@ namespace Machina.Types.Geometry
             return false;
         }
 
+        public bool IsSimilar(Matrix4x4 other, double epsilon)
+        {
+            return (
+                // Check diagonal element first for early out.
+                Math.Abs(M11 - other.M11) < epsilon && Math.Abs(M22 - other.M22) < epsilon &&
+                Math.Abs(M33 - other.M33) < epsilon && Math.Abs(M44 - other.M44) < epsilon &&
+
+                Math.Abs(M12 - other.M12) < epsilon && Math.Abs(M13 - other.M13) < epsilon && Math.Abs(M14 - other.M14) < epsilon &&
+                Math.Abs(M21 - other.M21) < epsilon && Math.Abs(M23 - other.M23) < epsilon && Math.Abs(M24 - other.M24) < epsilon &&
+                Math.Abs(M31 - other.M31) < epsilon && Math.Abs(M32 - other.M32) < epsilon && Math.Abs(M34 - other.M34) < epsilon &&
+                Math.Abs(M41 - other.M41) < epsilon && Math.Abs(M42 - other.M42) < epsilon && Math.Abs(M43 - other.M43) < epsilon);
+
+        }
+
         /// <summary>
         /// Returns a String representing this matrix instance.
         /// </summary>

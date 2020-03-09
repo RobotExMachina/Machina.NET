@@ -32,6 +32,7 @@
 - Added `Matrix4x4` as a copy of `System.Numerics.Matrix4x4` chaning row-colum convention.
 - Refactored `Joints` to `Axes`.
 - Added `Interval` struct
+- Added `DHParameters`! :)
 
 
 # v0.8.12
