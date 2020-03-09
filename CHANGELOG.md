@@ -26,15 +26,14 @@
 - Added some robot description classes
 - Added hardcoded ABB IRB 140 for testing.
 - Added Denavit-Hartenberg parameter computation from `RobotJoint` object.
+- Added `DHParameters`! :)
+- `Matrix4x4` has now `double` fields.
 
 ## BUILD 1503
 - Testing implementing FK/IK solvers...
 - Added `Matrix4x4` as a copy of `System.Numerics.Matrix4x4` chaning row-colum convention.
 - Refactored `Joints` to `Axes`.
 - Added `Interval` struct
-- Added `DHParameters`! :)
-- `Matrix4x4` has now `double` fields.
-
 
 # v0.8.12
 ## BUILD 1502
