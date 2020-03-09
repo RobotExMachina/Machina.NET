@@ -100,6 +100,7 @@ namespace Machina.Types.Geometry
         /// Value at row 4, column 4 of the matrix.
         /// </summary>
         public float M44;
+
         #endregion Public Fields
 
         private static readonly Matrix4x4 _identity = new Matrix4x4
@@ -134,20 +135,53 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
+        /// Gets the X vector component of this matrix (first three elements of first column).
+        /// </summary>
+        public Vector X
+        {
+            get
+            {
+                return new Vector(M11, M21, M31);
+            }
+        }
+
+        /// <summary>
+        /// Gets the Y vector component of this matrix (first three elements of second column).
+        /// </summary>
+        public Vector Y
+        {
+            get
+            {
+                return new Vector(M12, M22, M32);
+            }
+        }
+
+        /// <summary>
+        /// Gets the Z vector component of this matrix (first three elements of third column).
+        /// </summary>
+        public Vector Z
+        {
+            get
+            {
+                return new Vector(M13, M23, M33);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the translation component of this matrix.
         /// </summary>
         public Vector Translation
         {
             get
             {
-                return new Vector(M41, M42, M43);
+                return new Vector(M14, M24, M34);
             }
             set
             {
                 // @TODO remove casting when Vector uses floats
-                M41 = (float) value.X;
-                M42 = (float) value.Y;
-                M43 = (float) value.Z;
+                M14 = (float) value.X;
+                M24 = (float) value.Y;
+                M34 = (float) value.Z;
             }
         }
 
