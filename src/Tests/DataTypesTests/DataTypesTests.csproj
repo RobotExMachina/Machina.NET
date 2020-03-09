@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="AxisAngleTests.cs" />
     <Compile Include="DataTypesTests.cs" />
+    <Compile Include="DHParametersTest.cs" />
     <Compile Include="YawPitchRollTests.cs" />
     <Compile Include="PointTests.cs" />
     <Compile Include="QuaternionTests.cs" />
