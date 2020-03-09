@@ -447,7 +447,7 @@ namespace Machina.Types.Geometry
         /// <param name="y1"></param>
         /// <param name="y2"></param>
         /// <returns></returns>
-        public static Vector CrossProduct(float x0, float x1, float x2, float y0, float y1, float y2)
+        public static Vector CrossProduct(double x0, double x1, double x2, double y0, double y1, double y2)
         {
             return new Vector(
                 x1 * y2 - x2 * y1,
@@ -468,9 +468,9 @@ namespace Machina.Types.Geometry
         /// <param name="z1"></param>
         /// <param name="z2"></param>
         public static void CrossProduct(
-            float x0, float x1, float x2,
-            float y0, float y1, float y2,
-            out float z0, out float z1, out float z2)
+            double x0, double x1, double x2,
+            double y0, double y1, double y2,
+            out double z0, out double z1, out double z2)
         {
 
             z0 = x1 * y2 - x2 * y1;

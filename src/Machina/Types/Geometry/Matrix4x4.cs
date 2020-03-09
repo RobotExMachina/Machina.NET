@@ -38,70 +38,70 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Value at row 1, column 1 of the matrix.
         /// </summary>
-        public float M11;
+        public double M11;
         /// <summary>
         /// Value at row 1, column 2 of the matrix.
         /// </summary>
-        public float M12;
+        public double M12;
         /// <summary>
         /// Value at row 1, column 3 of the matrix.
         /// </summary>
-        public float M13;
+        public double M13;
         /// <summary>
         /// Value at row 1, column 4 of the matrix.
         /// </summary>
-        public float M14;
+        public double M14;
 
         /// <summary>
         /// Value at row 2, column 1 of the matrix.
         /// </summary>
-        public float M21;
+        public double M21;
         /// <summary>
         /// Value at row 2, column 2 of the matrix.
         /// </summary>
-        public float M22;
+        public double M22;
         /// <summary>
         /// Value at row 2, column 3 of the matrix.
         /// </summary>
-        public float M23;
+        public double M23;
         /// <summary>
         /// Value at row 2, column 4 of the matrix.
         /// </summary>
-        public float M24;
+        public double M24;
 
         /// <summary>
         /// Value at row 3, column 1 of the matrix.
         /// </summary>
-        public float M31;
+        public double M31;
         /// <summary>
         /// Value at row 3, column 2 of the matrix.
         /// </summary>
-        public float M32;
+        public double M32;
         /// <summary>
         /// Value at row 3, column 3 of the matrix.
         /// </summary>
-        public float M33;
+        public double M33;
         /// <summary>
         /// Value at row 3, column 4 of the matrix.
         /// </summary>
-        public float M34;
+        public double M34;
 
         /// <summary>
         /// Value at row 4, column 1 of the matrix.
         /// </summary>
-        public float M41;
+        public double M41;
         /// <summary>
         /// Value at row 4, column 2 of the matrix.
         /// </summary>
-        public float M42;
+        public double M42;
         /// <summary>
         /// Value at row 4, column 3 of the matrix.
         /// </summary>
-        public float M43;
+        public double M43;
         /// <summary>
         /// Value at row 4, column 4 of the matrix.
         /// </summary>
-        public float M44;
+        public double M44;
 
         #endregion Public Fields
 
@@ -180,20 +180,20 @@ namespace Machina.Types.Geometry
             }
             set
             {
-                // @TODO remove casting when Vector uses floats
-                M14 = (float) value.X;
-                M24 = (float) value.Y;
-                M34 = (float) value.Z;
+                // @TODO remove casting when Vector uses doubles
+                M14 =  value.X;
+                M24 =  value.Y;
+                M34 =  value.Z;
             }
         }
 
         /// <summary>
         /// Constructs a Matrix4x4 from the given components.
         /// </summary>
-        public Matrix4x4(float m11, float m12, float m13, float m14,
-                         float m21, float m22, float m23, float m24,
-                         float m31, float m32, float m33, float m34,
-                         float m41, float m42, float m43, float m44)
+        public Matrix4x4(double m11, double m12, double m13, double m14,
+                         double m21, double m22, double m23, double m24,
+                         double m31, double m32, double m33, double m34,
+                         double m41, double m42, double m43, double m44)
         {
             this.M11 = m11;
             this.M12 = m12;
@@ -228,17 +228,17 @@ namespace Machina.Types.Geometry
             result.M11 = 1.0f;
             result.M12 = 0.0f;
             result.M13 = 0.0f;
-            result.M14 = (float)position.X;
+            result.M14 = position.X;
 
             result.M21 = 0.0f;
             result.M22 = 1.0f;
             result.M23 = 0.0f;
-            result.M24 = (float)position.Y;
+            result.M24 = position.Y;
 
             result.M31 = 0.0f;
             result.M32 = 0.0f;
             result.M33 = 1.0f;
-            result.M34 = (float)position.Z;
+            result.M34 = position.Z;
 
             result.M41 = 0.0f;
             result.M42 = 0.0f;
@@ -255,7 +255,7 @@ namespace Machina.Types.Geometry
         /// <param name="yPosition">The amount to translate on the Y-axis.</param>
         /// <param name="zPosition">The amount to translate on the Z-axis.</param>
         /// <returns>The translation matrix.</returns>
-        public static Matrix4x4 CreateTranslation(float xPosition, float yPosition, float zPosition)
+        public static Matrix4x4 CreateTranslation(double xPosition, double yPosition, double zPosition)
         {
             Matrix4x4 result;
 
@@ -289,7 +289,7 @@ namespace Machina.Types.Geometry
         /// <param name="yScale">Value to scale by on the Y-axis.</param>
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <returns>The scaling matrix.</returns>
-        public static Matrix4x4 CreateScale(float xScale, float yScale, float zScale)
+        public static Matrix4x4 CreateScale(double xScale, double yScale, double zScale)
         {
             Matrix4x4 result;
 
@@ -325,19 +325,19 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            result.M11 = (float)scales.X;
+            result.M11 = scales.X;
             result.M12 = 0.0f;
             result.M13 = 0.0f;
             result.M14 = 0.0f;
 
             result.M21 = 0.0f;
-            result.M22 = (float)scales.Y;
+            result.M22 = scales.Y;
             result.M23 = 0.0f;
             result.M24 = 0.0f;
 
             result.M31 = 0.0f;
             result.M32 = 0.0f;
-            result.M33 = (float)scales.Z;
+            result.M33 = scales.Z;
             result.M34 = 0.0f;
 
             result.M41 = 0.0f;
@@ -353,7 +353,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="scale">The uniform scaling factor.</param>
         /// <returns>The scaling matrix.</returns>
-        public static Matrix4x4 CreateScale(float scale)
+        public static Matrix4x4 CreateScale(double scale)
         {
             Matrix4x4 result;
 
@@ -388,13 +388,13 @@ namespace Machina.Types.Geometry
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static Matrix4x4 CreateScale(float xScale, float yScale, float zScale, Vector centerPoint)
+        public static Matrix4x4 CreateScale(double xScale, double yScale, double zScale, Vector centerPoint)
         {
             Matrix4x4 result;
 
-            float tx = (float)centerPoint.X * (1 - xScale);
-            float ty = (float)centerPoint.Y * (1 - yScale);
-            float tz = (float)centerPoint.Z * (1 - zScale);
+            double tx = centerPoint.X * (1 - xScale);
+            double ty = centerPoint.Y * (1 - yScale);
+            double tz = centerPoint.Z * (1 - zScale);
 
             result.M11 = xScale;
             result.M12 = 0.0f;
@@ -424,13 +424,13 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="degrees">The amount, in degrees, by which to rotate around the X-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationX(float degrees)
+        public static Matrix4x4 CreateRotationX(double degrees)
         {
             Matrix4x4 result;
 
             double radians = degrees * Geometry.TO_RADS;
-            float c = (float)Math.Cos(radians);
-            float s = (float)Math.Sin(radians);
+            double c = Math.Cos(radians);
+            double s = Math.Sin(radians);
 
             // [  1  0  0  0 ]
             // [  0  c -s  0 ]
@@ -465,16 +465,16 @@ namespace Machina.Types.Geometry
         /// <param name="degrees">The amount, in degrees, by which to rotate around the X-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationX(float degrees, Vector centerPoint)
+        public static Matrix4x4 CreateRotationX(double degrees, Vector centerPoint)
         {
             Matrix4x4 result;
 
             double radians = degrees * Geometry.TO_RADS;
-            float c = (float)Math.Cos(radians);
-            float s = (float)Math.Sin(radians);
+            double c = Math.Cos(radians);
+            double s = Math.Sin(radians);
 
-            float y = (float)centerPoint.Y * (1 - c) + (float)centerPoint.Z * s;
-            float z = (float)centerPoint.Z * (1 - c) - (float)centerPoint.Y * s;
+            double y = centerPoint.Y * (1 - c) + centerPoint.Z * s;
+            double z = centerPoint.Z * (1 - c) - centerPoint.Y * s;
 
             // [  1  0  0  0 ]
             // [  0  c -s  y ]
@@ -508,13 +508,13 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="degrees">The amount, in degrees, by which to rotate around the Y-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationY(float degrees)
+        public static Matrix4x4 CreateRotationY(double degrees)
         {
             Matrix4x4 result;
 
             double radians = degrees * Geometry.TO_RADS;
-            float c = (float)Math.Cos(radians);
-            float s = (float)Math.Sin(radians);
+            double c = Math.Cos(radians);
+            double s = Math.Sin(radians);
 
             // [  c  0  s  0 ]
             // [  0  1  0  0 ]
@@ -549,16 +549,16 @@ namespace Machina.Types.Geometry
         /// <param name="degrees">The amount, in degrees, by which to rotate around the Y-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationY(float degrees, Vector centerPoint)
+        public static Matrix4x4 CreateRotationY(double degrees, Vector centerPoint)
         {
             Matrix4x4 result;
 
             double radians = degrees * Geometry.TO_RADS;
-            float c = (float)Math.Cos(radians);
-            float s = (float)Math.Sin(radians);
+            double c = Math.Cos(radians);
+            double s = Math.Sin(radians);
 
-            float x = (float)centerPoint.X * (1 - c) - (float)centerPoint.Z * s;
-            float z = (float)centerPoint.Z * (1 - c) + (float)centerPoint.X * s;
+            double x = centerPoint.X * (1 - c) - centerPoint.Z * s;
+            double z = centerPoint.Z * (1 - c) + centerPoint.X * s;
 
             // [  c  0  s  x ]
             // [  0  1  0  0 ]
@@ -592,13 +592,13 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="degrees">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationZ(float degrees)
+        public static Matrix4x4 CreateRotationZ(double degrees)
         {
             Matrix4x4 result;
 
             double radians = degrees * Geometry.TO_RADS;
-            float c = (float)Math.Cos(radians);
-            float s = (float)Math.Sin(radians);
+            double c = Math.Cos(radians);
+            double s = Math.Sin(radians);
 
             // [  c -s  0  0 ]
             // [  s  c  0  0 ]
@@ -633,16 +633,16 @@ namespace Machina.Types.Geometry
         /// <param name="degrees">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationZ(float degrees, Vector centerPoint)
+        public static Matrix4x4 CreateRotationZ(double degrees, Vector centerPoint)
         {
             Matrix4x4 result;
 
             double radians = degrees * Geometry.TO_RADS;
-            float c = (float)Math.Cos(radians);
-            float s = (float)Math.Sin(radians);
+            double c = Math.Cos(radians);
+            double s = Math.Sin(radians);
 
-            float x = (float)centerPoint.X * (1 - c) + (float)centerPoint.Y * s;
-            float y = (float)centerPoint.Y * (1 - c) - (float)centerPoint.X * s;
+            double x = centerPoint.X * (1 - c) + centerPoint.Y * s;
+            double y = centerPoint.Y * (1 - c) - centerPoint.X * s;
 
             // [  c -s  0  x ]
             // [  s  c  0  y ]
@@ -677,7 +677,7 @@ namespace Machina.Types.Geometry
         /// <param name="axis">The normalized axis to rotate around.</param>
         /// <param name="angleDegs">The angle to rotate around the given axis, in degrees.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateFromAxisAngle(Vector axis, float angleDegs)
+        public static Matrix4x4 CreateFromAxisAngle(Vector axis, double angleDegs)
         {
             // Not using the original System.Numerics.Matrix4x4 implementation, but yields same results. 
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
@@ -690,12 +690,12 @@ namespace Machina.Types.Geometry
             //
 
             double ang = angleDegs * Geometry.TO_RADS;
-            float c = (float)Math.Cos(ang);
-            float s = (float)Math.Sin(ang);
-            float t = 1 - c;
-            float x = (float)axis.X, y = (float)axis.Y, z = (float)axis.Z;
-            float xx = x * x, yy = y * y, zz = z * z;
-            float xy = x * y, xz = x * z, yz = y * z;
+            double c = Math.Cos(ang);
+            double s = Math.Sin(ang);
+            double t = 1 - c;
+            double x = axis.X, y = axis.Y, z = axis.Z;
+            double xx = x * x, yy = y * y, zz = z * z;
+            double xy = x * y, xz = x * z, yz = y * z;
 
             Matrix4x4 result;
 
@@ -722,7 +722,7 @@ namespace Machina.Types.Geometry
             return result;
         }
 
-        public static Matrix4x4 CreateFromAxisAngle(Vector axis, float angleDegs, Vector center)
+        public static Matrix4x4 CreateFromAxisAngle(Vector axis, double angleDegs, Vector center)
         {
             // @TODO: this should be optimized to use an algebraic form.
             Matrix4x4 T1 = Matrix4x4.CreateTranslation(-center);
@@ -740,7 +740,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Matrix4x4 CreateFromAxisAngle(AxisAngle axisAngle)
         {
-            return CreateFromAxisAngle(axisAngle.Axis, (float)axisAngle.Angle);
+            return CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
         }
 
         /// <summary>
@@ -753,20 +753,20 @@ namespace Machina.Types.Geometry
             // This needs a LOT of optimization...
             Matrix4x4 result;
 
-            result.M11 = (float)plane.XAxis.X;
-            result.M12 = (float)plane.YAxis.X;
-            result.M13 = (float)plane.ZAxis.X;
-            result.M14 = (float)plane.Origin.X;
+            result.M11 = plane.XAxis.X;
+            result.M12 = plane.YAxis.X;
+            result.M13 = plane.ZAxis.X;
+            result.M14 = plane.Origin.X;
 
-            result.M21 = (float)plane.XAxis.Y;
-            result.M22 = (float)plane.YAxis.Y;
-            result.M23 = (float)plane.ZAxis.Y;
-            result.M24 = (float)plane.Origin.Y;
+            result.M21 = plane.XAxis.Y;
+            result.M22 = plane.YAxis.Y;
+            result.M23 = plane.ZAxis.Y;
+            result.M24 = plane.Origin.Y;
 
-            result.M31 = (float)plane.XAxis.Z;
-            result.M32 = (float)plane.YAxis.Z;
-            result.M33 = (float)plane.ZAxis.Z;
-            result.M34 = (float)plane.Origin.Z;
+            result.M31 = plane.XAxis.Z;
+            result.M32 = plane.YAxis.Z;
+            result.M33 = plane.ZAxis.Z;
+            result.M34 = plane.Origin.Z;
 
             result.M41 = 0.0f;
             result.M42 = 0.0f;
@@ -791,12 +791,12 @@ namespace Machina.Types.Geometry
         /// <param name="y2"></param>
         /// <returns></returns>
         public static Matrix4x4 CreateFromPlane(
-                float originX, float originY, float originZ,
-                float x0, float x1, float x2,
-                float y0, float y1, float y2)
+                double originX, double originY, double originZ,
+                double x0, double x1, double x2,
+                double y0, double y1, double y2)
         {
             Vector.CrossProduct(x0, x1, x2, y0, y1, y2, 
-                out float z0, out float z1, out float z2);
+                out double z0, out double z1, out double z2);
             
             Matrix4x4 m;
 
@@ -831,11 +831,11 @@ namespace Machina.Types.Geometry
         /// <returns>The rotation matrix.</returns>
         public static Matrix4x4 CreateFromQuaternion(Quaternion quaternion)
         {
-            // Float implementation of Quaternion.ToRotationMatrix()
+            // double implementation of Quaternion.ToRotationMatrix()
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
-            float x = (float)quaternion.X, y = (float)quaternion.Y,
-                z = (float)quaternion.Z, w = (float)quaternion.W;
-            float xx2 = 2 * x * x,
+            double x = quaternion.X, y = quaternion.Y,
+                z = quaternion.Z, w = quaternion.W;
+            double xx2 = 2 * x * x,
                 xy2 = 2 * x * y,
                 xz2 = 2 * x * z,
                 xw2 = 2 * x * w,
@@ -901,27 +901,27 @@ namespace Machina.Types.Geometry
 
             double a = alpha * Geometry.TO_RADS,
                 t = theta * Geometry.TO_RADS;
-            float sa = (float)Math.Sin(a),
-                ca = (float)Math.Cos(a),
-                st = (float)Math.Sin(t),
-                ct = (float)Math.Cos(t);
+            double sa = Math.Sin(a),
+                ca = Math.Cos(a),
+                st = Math.Sin(t),
+                ct = Math.Cos(t);
 
             Matrix4x4 result;
 
             result.M11 = ct;
             result.M12 = -st * ca;
             result.M13 = st * sa;
-            result.M14 = (float)radius * ct;
+            result.M14 = radius * ct;
 
             result.M21 = st;
             result.M22 = ct * ca;
             result.M23 = -ct * sa;
-            result.M24 = (float)radius * st;
+            result.M24 = radius * st;
 
             result.M31 = 0.0f;
             result.M32 = sa;
             result.M33 = ca;
-            result.M34 = (float)distance;
+            result.M34 = distance;
 
             result.M41 = 0.0f;
             result.M42 = 0.0f;
@@ -949,7 +949,7 @@ namespace Machina.Types.Geometry
         /// Calculates the determinant of the matrix.
         /// </summary>
         /// <returns>The determinant of the matrix.</returns>
-        public float GetDeterminant()
+        public double GetDeterminant()
         {
             // | a b c d |     | f g h |     | e g h |     | e f h |     | e f g |
             // | e f g h | = a | j k l | - b | i k l | + c | i j l | - d | i j k |
@@ -978,17 +978,17 @@ namespace Machina.Types.Geometry
             // add: 6 + 8 + 3 = 17
             // mul: 12 + 16 = 28
 
-            float a = M11, b = M12, c = M13, d = M14;
-            float e = M21, f = M22, g = M23, h = M24;
-            float i = M31, j = M32, k = M33, l = M34;
-            float m = M41, n = M42, o = M43, p = M44;
+            double a = M11, b = M12, c = M13, d = M14;
+            double e = M21, f = M22, g = M23, h = M24;
+            double i = M31, j = M32, k = M33, l = M34;
+            double m = M41, n = M42, o = M43, p = M44;
 
-            float kp_lo = k * p - l * o;
-            float jp_ln = j * p - l * n;
-            float jo_kn = j * o - k * n;
-            float ip_lm = i * p - l * m;
-            float io_km = i * o - k * m;
-            float in_jm = i * n - j * m;
+            double kp_lo = k * p - l * o;
+            double jp_ln = j * p - l * n;
+            double jo_kn = j * o - k * n;
+            double ip_lm = i * p - l * m;
+            double io_km = i * o - k * m;
+            double in_jm = i * n - j * m;
 
             return a * (f * kp_lo - g * jp_ln + h * jo_kn) -
                    b * (e * kp_lo - g * ip_lm + h * io_km) +
@@ -1096,35 +1096,35 @@ namespace Machina.Types.Geometry
             //
             // Cost of operation
             // 53 adds, 104 muls, and 1 div.
-            float a = matrix.M11, b = matrix.M12, c = matrix.M13, d = matrix.M14;
-            float e = matrix.M21, f = matrix.M22, g = matrix.M23, h = matrix.M24;
-            float i = matrix.M31, j = matrix.M32, k = matrix.M33, l = matrix.M34;
-            float m = matrix.M41, n = matrix.M42, o = matrix.M43, p = matrix.M44;
+            double a = matrix.M11, b = matrix.M12, c = matrix.M13, d = matrix.M14;
+            double e = matrix.M21, f = matrix.M22, g = matrix.M23, h = matrix.M24;
+            double i = matrix.M31, j = matrix.M32, k = matrix.M33, l = matrix.M34;
+            double m = matrix.M41, n = matrix.M42, o = matrix.M43, p = matrix.M44;
 
-            float kp_lo = k * p - l * o;
-            float jp_ln = j * p - l * n;
-            float jo_kn = j * o - k * n;
-            float ip_lm = i * p - l * m;
-            float io_km = i * o - k * m;
-            float in_jm = i * n - j * m;
+            double kp_lo = k * p - l * o;
+            double jp_ln = j * p - l * n;
+            double jo_kn = j * o - k * n;
+            double ip_lm = i * p - l * m;
+            double io_km = i * o - k * m;
+            double in_jm = i * n - j * m;
 
-            float a11 = +(f * kp_lo - g * jp_ln + h * jo_kn);
-            float a12 = -(e * kp_lo - g * ip_lm + h * io_km);
-            float a13 = +(e * jp_ln - f * ip_lm + h * in_jm);
-            float a14 = -(e * jo_kn - f * io_km + g * in_jm);
+            double a11 = +(f * kp_lo - g * jp_ln + h * jo_kn);
+            double a12 = -(e * kp_lo - g * ip_lm + h * io_km);
+            double a13 = +(e * jp_ln - f * ip_lm + h * in_jm);
+            double a14 = -(e * jo_kn - f * io_km + g * in_jm);
 
-            float det = a * a11 + b * a12 + c * a13 + d * a14;
+            double det = a * a11 + b * a12 + c * a13 + d * a14;
 
-            if (Math.Abs(det) < float.Epsilon)
+            if (Math.Abs(det) < double.Epsilon)
             {
-                result = new Matrix4x4(float.NaN, float.NaN, float.NaN, float.NaN,
-                                       float.NaN, float.NaN, float.NaN, float.NaN,
-                                       float.NaN, float.NaN, float.NaN, float.NaN,
-                                       float.NaN, float.NaN, float.NaN, float.NaN);
+                result = new Matrix4x4(double.NaN, double.NaN, double.NaN, double.NaN,
+                                       double.NaN, double.NaN, double.NaN, double.NaN,
+                                       double.NaN, double.NaN, double.NaN, double.NaN,
+                                       double.NaN, double.NaN, double.NaN, double.NaN);
                 return false;
             }
 
-            float invDet = 1.0f / det;
+            double invDet = 1.0f / det;
 
             result.M11 = a11 * invDet;
             result.M21 = a12 * invDet;
@@ -1136,24 +1136,24 @@ namespace Machina.Types.Geometry
             result.M32 = -(a * jp_ln - b * ip_lm + d * in_jm) * invDet;
             result.M42 = +(a * jo_kn - b * io_km + c * in_jm) * invDet;
 
-            float gp_ho = g * p - h * o;
-            float fp_hn = f * p - h * n;
-            float fo_gn = f * o - g * n;
-            float ep_hm = e * p - h * m;
-            float eo_gm = e * o - g * m;
-            float en_fm = e * n - f * m;
+            double gp_ho = g * p - h * o;
+            double fp_hn = f * p - h * n;
+            double fo_gn = f * o - g * n;
+            double ep_hm = e * p - h * m;
+            double eo_gm = e * o - g * m;
+            double en_fm = e * n - f * m;
 
             result.M13 = +(b * gp_ho - c * fp_hn + d * fo_gn) * invDet;
             result.M23 = -(a * gp_ho - c * ep_hm + d * eo_gm) * invDet;
             result.M33 = +(a * fp_hn - b * ep_hm + d * en_fm) * invDet;
             result.M43 = -(a * fo_gn - b * eo_gm + c * en_fm) * invDet;
 
-            float gl_hk = g * l - h * k;
-            float fl_hj = f * l - h * j;
-            float fk_gj = f * k - g * j;
-            float el_hi = e * l - h * i;
-            float ek_gi = e * k - g * i;
-            float ej_fi = e * j - f * i;
+            double gl_hk = g * l - h * k;
+            double fl_hj = f * l - h * j;
+            double fk_gj = f * k - g * j;
+            double el_hi = e * l - h * i;
+            double ek_gi = e * k - g * i;
+            double ej_fi = e * j - f * i;
 
             result.M14 = -(b * gl_hk - c * fl_hj + d * fk_gj) * invDet;
             result.M24 = +(a * gl_hk - c * el_hi + d * ek_gi) * invDet;
@@ -1176,34 +1176,34 @@ namespace Machina.Types.Geometry
             // and premultiplying it by the matrix...
 
             // Compute rotation matrix.
-            float x = (float)rotation.X, y = (float)rotation.Y,
-                z = (float)rotation.Z, w = (float)rotation.W;
+            double x = rotation.X, y = rotation.Y,
+                z = rotation.Z, w = rotation.W;
 
-            float x2 = x + x;
-            float y2 = y + y;
-            float z2 = z + z;
+            double x2 = x + x;
+            double y2 = y + y;
+            double z2 = z + z;
 
-            float wx2 = w * x2;
-            float wy2 = w * y2;
-            float wz2 = w * z2;
-            float xx2 = x * x2;
-            float xy2 = x * y2;
-            float xz2 = x * z2;
-            float yy2 = y * y2;
-            float yz2 = y * z2;
-            float zz2 = z * z2;
+            double wx2 = w * x2;
+            double wy2 = w * y2;
+            double wz2 = w * z2;
+            double xx2 = x * x2;
+            double xy2 = x * y2;
+            double xz2 = x * z2;
+            double yy2 = y * y2;
+            double yz2 = y * z2;
+            double zz2 = z * z2;
 
-            float q11 = 1.0f - yy2 - zz2;
-            float q12 = xy2 - wz2;
-            float q13 = xz2 + wy2;
+            double q11 = 1.0f - yy2 - zz2;
+            double q12 = xy2 - wz2;
+            double q13 = xz2 + wy2;
 
-            float q21 = xy2 + wz2;
-            float q22 = 1.0f - xx2 - zz2;
-            float q23 = yz2 - wx2;
+            double q21 = xy2 + wz2;
+            double q22 = 1.0f - xx2 - zz2;
+            double q23 = yz2 - wx2;
 
-            float q31 = xz2 - wy2;
-            float q32 = yz2 + wx2;
-            float q33 = 1.0f - xx2 - yy2;
+            double q31 = xz2 - wy2;
+            double q32 = yz2 + wx2;
+            double q33 = 1.0f - xx2 - yy2;
 
             Matrix4x4 result;
 
@@ -1270,7 +1270,7 @@ namespace Machina.Types.Geometry
         /// <param name="matrix2">The second source matrix.</param>
         /// <param name="amount">The relative weight of the second source matrix.</param>
         /// <returns>The interpolated matrix.</returns>
-        public static Matrix4x4 Lerp(Matrix4x4 matrix1, Matrix4x4 matrix2, float amount)
+        public static Matrix4x4 Lerp(Matrix4x4 matrix1, Matrix4x4 matrix2, double amount)
         {
             Matrix4x4 result;
 
@@ -1435,7 +1435,7 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The source matrix.</param>
         /// <param name="value2">The scaling factor.</param>
         /// <returns>The scaled matrix.</returns>
-        public static Matrix4x4 Multiply(Matrix4x4 value1, float value2)
+        public static Matrix4x4 Multiply(Matrix4x4 value1, double value2)
         {
             Matrix4x4 result;
 
@@ -1591,7 +1591,7 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The source matrix.</param>
         /// <param name="value2">The scaling factor.</param>
         /// <returns>The scaled matrix.</returns>
-        public static Matrix4x4 operator *(Matrix4x4 value1, float value2)
+        public static Matrix4x4 operator *(Matrix4x4 value1, double value2)
         {
             Matrix4x4 m;
 
