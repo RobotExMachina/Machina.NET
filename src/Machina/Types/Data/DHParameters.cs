@@ -60,6 +60,21 @@ namespace Machina.Types.Data
         public double Theta { get; private set; }
 
         /// <summary>
+        /// Create a set of Denavit-Hartberger parameters. 
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <param name="radius"></param>
+        /// <param name="alpha"></param>
+        /// <param name="theta"></param>
+        public DHParameters(double distance, double radius, double alpha, double theta)
+        {
+            D = distance;
+            R = radius;
+            Alpha = alpha;
+            Theta = theta;
+        }
+
+        /// <summary>
         /// Compute the Denavit-Hartenberg parameters of a robot joint. 
         /// </summary>
         /// <param name="joint"></param>

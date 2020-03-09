@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace Machina.Types.Geometry
     /// </summary>
     public struct Interval
     {
+        #region Public Fields
         /// <summary>
         /// Initial value of this interval.
         /// </summary>
@@ -42,6 +44,15 @@ namespace Machina.Types.Geometry
         /// Gets min of two extremes. 
         /// </summary>
         public double Min => End > Start ? Start : End;
+        #endregion Public Fields
+
+        private static readonly Interval _zero = new Interval(0, 0);
+
+        /// <summary>
+        /// Returns a [0, 0] interval.
+        /// </summary>
+        /// <returns></returns>
+        public static Interval Zero => _zero;
 
         /// <summary>
         /// Create new Interval.
@@ -62,6 +73,14 @@ namespace Machina.Types.Geometry
         public bool IncludesParameter(double val)
         {
             return val >= Min && val <= Max;
+        }
+
+
+        public override string ToString()
+        {
+            CultureInfo ci = CultureInfo.InvariantCulture;
+
+            return String.Format(ci, "[{0}, {1}]", Start.ToString(ci), End.ToString(ci));
         }
     }
 }

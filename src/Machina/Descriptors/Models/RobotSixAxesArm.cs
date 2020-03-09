@@ -18,7 +18,7 @@ namespace Machina.Descriptors.Models
         public RobotJoint Joint4;
         public RobotJoint Joint5;
         public RobotJoint Joint6;
-        
+
         public RobotSixAxesArm() : base()
         {
 
@@ -39,7 +39,7 @@ namespace Machina.Descriptors.Models
                 TransformedPlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
                 RobotJointType = RobotJointType.Static,
                 JointRange = new Interval(0, 0),
-                MaxSpeed = 200
+                MaxSpeed = 0
             };
 
             // Joint 1
@@ -104,5 +104,57 @@ namespace Machina.Descriptors.Models
 
             return bot;
         }
+
+        /// <summary>
+        /// A hard-coded factory creator for testing purposes. 
+        /// </summary>
+        /// <returns></returns>
+        public static RobotSixAxesArm CreateUR10()
+        {
+            RobotSixAxesArm bot = new RobotSixAxesArm();
+
+            // The Base (this is currently reduntant, but we will need it down the road?).
+            bot.Base = new RobotJoint
+            {
+                BasePlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
+                TransformedPlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
+                RobotJointType = RobotJointType.Static,
+                JointRange = new Interval(0, 0),
+                MaxSpeed = 0
+            };
+
+            bot.Joint1 = RobotJoint.CreateFromDHParameters(
+                bot.Base,
+                127.3, 0, 90, 0,
+                RobotJointType.Revolute, Interval.Zero, 0);
+
+            bot.Joint2 = RobotJoint.CreateFromDHParameters(
+                bot.Joint1,
+                0, -612, 0, 0,
+                RobotJointType.Revolute, Interval.Zero, 0);
+
+            bot.Joint3 = RobotJoint.CreateFromDHParameters(
+                bot.Joint2,
+                0, -572.3, 0, 0,
+                RobotJointType.Revolute, Interval.Zero, 0);
+
+            bot.Joint4 = RobotJoint.CreateFromDHParameters(
+                bot.Joint3,
+                163.941, 0, 90, 0,
+                RobotJointType.Revolute, Interval.Zero, 0);
+
+            bot.Joint5 = RobotJoint.CreateFromDHParameters(
+                bot.Joint4,
+                115.7, 0, -90, 0,
+                RobotJointType.Revolute, Interval.Zero, 0);
+
+            bot.Joint6 = RobotJoint.CreateFromDHParameters(
+                bot.Joint5,
+                92.2, 0, 0, 0,
+                RobotJointType.Revolute, Interval.Zero, 0);
+
+            return bot;
+        }
+
     }
 }

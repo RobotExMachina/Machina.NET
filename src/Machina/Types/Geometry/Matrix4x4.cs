@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Machina.Types.Data;
+
 namespace Machina.Types.Geometry
 {
     //  ███╗   ███╗ █████╗ ████████╗██████╗ ██╗██╗  ██╗██╗  ██╗██╗  ██╗██╗  ██╗
@@ -720,6 +722,16 @@ namespace Machina.Types.Geometry
             return result;
         }
 
+        public static Matrix4x4 CreateFromAxisAngle(Vector axis, float angleDegs, Vector center)
+        {
+            // @TODO: this should be optimized to use an algebraic form.
+            Matrix4x4 T1 = Matrix4x4.CreateTranslation(-center);
+            Matrix4x4 R = Matrix4x4.CreateFromAxisAngle(axis, angleDegs);
+            Matrix4x4 T2 = Matrix4x4.CreateTranslation(center);
+
+            return T2 * R * T1;
+        }
+
 
         /// <summary>
         /// Creates a matrix that rotates around an arbitrary vector.
@@ -728,7 +740,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Matrix4x4 CreateFromAxisAngle(AxisAngle axisAngle)
         {
-            return Matrix4x4.CreateFromAxisAngle(axisAngle.Axis, (float)axisAngle.Angle);
+            return CreateFromAxisAngle(axisAngle.Axis, (float)axisAngle.Angle);
         }
 
         /// <summary>
@@ -857,6 +869,81 @@ namespace Machina.Types.Geometry
 
             return result;
         }
+
+
+
+        /// <summary>
+        /// Creates a transformation matrix from Denavit-Hartenberg parameters.
+        /// </summary>
+        /// <param name="distance">Depth along base Z axis to the common normal.</param>
+        /// <param name="radius">Distance between axes, or length of the common normal. </param>
+        /// <param name="alpha">Rotation in degrees around base X to align base Z to new Z.</param>
+        /// <param name="theta">Angle in degrees from base X to align with new common normal. </param>
+        /// <returns></returns>
+        public static Matrix4x4 CreateFromDHParameters(double distance, double radius, double alpha, double theta)
+        {
+            // The DH convention makes it very easy/fast to create the transformation
+            // matrix between a Joint's base axis plane and its transformed one. 
+            // See https://en.wikipedia.org/wiki/Denavit%E2%80%93Hartenberg_parameters#Denavit%E2%80%93Hartenberg_matrix
+            // 
+            // (n-1)T(n) = Trans.d * Rot.θ * Trans.r * Rot.α;
+            // 
+            //             [ cθ  -sθ*cα   sθ*sα  r*cθ ]
+            // (n-1)T(n) = [ sθ   cθ*cα  -cθ*sα  r*sθ ]
+            //             [ 0    sα      cα     d    ]  
+            //             [ 0    0       0      1    ]
+            //
+            // NOTE: because of transformation order, this matrix should be POST-multiplied
+            // to the previous joint matrix:
+            //
+            // M(2) = M(1) * (1)T(2)
+            //
+
+            double a = alpha * Geometry.TO_RADS,
+                t = theta * Geometry.TO_RADS;
+            float sa = (float)Math.Sin(a),
+                ca = (float)Math.Cos(a),
+                st = (float)Math.Sin(t),
+                ct = (float)Math.Cos(t);
+
+            Matrix4x4 result;
+
+            result.M11 = ct;
+            result.M12 = -st * ca;
+            result.M13 = st * sa;
+            result.M14 = (float)radius * ct;
+
+            result.M21 = st;
+            result.M22 = ct * ca;
+            result.M23 = -ct * sa;
+            result.M24 = (float)radius * st;
+
+            result.M31 = 0.0f;
+            result.M32 = sa;
+            result.M33 = ca;
+            result.M34 = (float)distance;
+
+            result.M41 = 0.0f;
+            result.M42 = 0.0f;
+            result.M43 = 0.0f;
+            result.M44 = 1.0f;
+
+            return result;
+        }
+
+
+
+        /// <summary>
+        /// Creates a transformation matrix from Denavit-Hartenberg parameters.
+        /// See https://en.wikipedia.org/wiki/Denavit%E2%80%93Hartenberg_parameters#Denavit%E2%80%93Hartenberg_matrix
+        /// </summary>
+        /// <param name="dh">DHParameters object.</param>
+        /// <returns></returns>
+        public static Matrix4x4 CreateFromDHParameters(DHParameters dh)
+        {
+            return CreateFromDHParameters(dh.D, dh.R, dh.Alpha, dh.Theta);
+        }
+
 
         /// <summary>
         /// Calculates the determinant of the matrix.
