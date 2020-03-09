@@ -25,6 +25,7 @@
 ## BUILD 1504
 - Added some robot description classes
 - Added hardcoded ABB IRB 140 for testing.
+- Added Denavit-Hartenberg parameter computation from `RobotJoint` object.
 
 ## BUILD 1503
 - Testing implementing FK/IK solvers...

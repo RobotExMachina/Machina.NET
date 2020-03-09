@@ -135,6 +135,7 @@
     <Compile Include="IO\IO.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Net\Net.cs" />
+    <Compile Include="Types\Data\DHParameters.cs" />
     <Compile Include="Types\Geometry\AxisAngle.cs" />
     <Compile Include="Types\Geometry\ExternalAxes.cs" />
     <Compile Include="Types\Data\RobotProgramFile.cs" />
