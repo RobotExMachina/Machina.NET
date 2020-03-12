@@ -126,32 +126,32 @@ namespace Machina.Descriptors.Models
             bot.Joint1 = RobotJoint.CreateFromDHParameters(
                 bot.Base,
                 127.3, 0, 90, 0,
-                RobotJointType.Revolute, Interval.Zero, 0);
+                RobotJointType.Revolute, new Interval(-360, 360), 120);
 
             bot.Joint2 = RobotJoint.CreateFromDHParameters(
                 bot.Joint1,
                 0, -612, 0, 0,
-                RobotJointType.Revolute, Interval.Zero, 0);
+                RobotJointType.Revolute, new Interval(-360, 360), 120);
 
             bot.Joint3 = RobotJoint.CreateFromDHParameters(
                 bot.Joint2,
                 0, -572.3, 0, 0,
-                RobotJointType.Revolute, Interval.Zero, 0);
+                RobotJointType.Revolute, new Interval(-360, 360), 180);
 
             bot.Joint4 = RobotJoint.CreateFromDHParameters(
                 bot.Joint3,
                 163.941, 0, 90, 0,
-                RobotJointType.Revolute, Interval.Zero, 0);
+                RobotJointType.Revolute, new Interval(-360, 360), 180);
 
             bot.Joint5 = RobotJoint.CreateFromDHParameters(
                 bot.Joint4,
                 115.7, 0, -90, 0,
-                RobotJointType.Revolute, Interval.Zero, 0);
+                RobotJointType.Revolute, new Interval(-360, 360), 180);
 
             bot.Joint6 = RobotJoint.CreateFromDHParameters(
                 bot.Joint5,
                 92.2, 0, 0, 0,
-                RobotJointType.Revolute, Interval.Zero, 0);
+                RobotJointType.Revolute, new Interval(-360, 360), 180);
 
             return bot;
         }
