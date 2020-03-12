@@ -39,7 +39,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1503;
+        public static readonly int Build = 1504;
 
         /// <summary>
         /// Version number.
@@ -60,7 +60,7 @@ namespace Machina
         /// The main Control object, acts as an interface to all classes that
         /// manage robot control.
         /// </summary>
-        private Control c;  // the main control object
+        private Control c;
 
 
         /// <summary>
@@ -321,7 +321,12 @@ namespace Machina
             return c.Export(inlineTargets, humanComments);
         }
 
-
+        /// <summary>
+        /// Saves a RobotProgram to a folder in the system, generating all the required files and extensions.
+        /// </summary>
+        /// <param name="program"></param>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
         public bool SaveProgram(RobotProgram program, string folderPath)
         {
             return program.SaveToFolder(folderPath, logger);

@@ -28,11 +28,21 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
-# v0.8.12
+# v0.8.12b
+## BUILD 1504
+`Action.Id` generation comes from a `static` counter in the `Action` class. This had a couple problems:
+    - The counter is unique to the library. So, if a `Robot` was Disposed and a new one created, the first action for the second one would pick up from where the previous robot left (like resetting the Bridge multiple times). Alternatively, if the same assembly manages two robots, their action ids would alternate or be entwined. 
+    - Can't do it instance, because it would require factory methods from the robot to create `actions`.
+    - Solution: new `Actions` are created with an `id` of -1 (or id-less). This maintains the flexibility of creating robot-agnostic actions. However, when they get issued to a `Robot` instance, the instance adds a rolling `id` coming from an internal counter. 
+    - Let's see how many things I break by doing this... XD
+    - In any case, in the future, migration to non-numeric ids would be preferred... 
+- [x] Shift `Action.Id` generation to `OnIssue`.
+
 ## BUILD 1503
 - [x] Softened exceptions for `RobotStudioManager`: they are now Machina Logger Errors.
-- [x] `ActionExecuted` events are now raised for `Actions` that are non-streamable (like `MotionMode`). This is a good improvement, and solves a problem with the Bridge were such actions would not get acknowledged.  
+- [x] `ActionExecuted` events are now raised for `Actions` that are non-streamable (like `MotionMode`). This is a good improvement, and solves a problem with the Bridge were such actions would not get acknowledged.
 
+# v0.8.12
 ## BUILD 1502
 - Compilers now have embedded abstract comment characters and encoding
 - Compilers now return `MachinaFile` objects instead of `List<string>`. This helps with multi-file program creation.

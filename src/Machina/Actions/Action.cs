@@ -64,12 +64,12 @@ namespace Machina
         //  ╔═╗╔╦╗╔═╗╔╦╗╦╔═╗  ╔═╗╔╦╗╦ ╦╔═╗╔═╗
         //  ╚═╗ ║ ╠═╣ ║ ║║    ╚═╗ ║ ║ ║╠╣ ╠╣ 
         //  ╚═╝ ╩ ╩ ╩ ╩ ╩╚═╝  ╚═╝ ╩ ╚═╝╚  ╚  
-        internal static int currentId = 1;  // a rolling id counter
+        //internal static int currentId = 1;  // a rolling id counter
 
         /// <summary>
         /// Unique id for this Action.
         /// </summary>
-        public int Id { get; }
+        public int Id { get; internal set; }
 
         /// <summary>
         /// The type of Action this object is representing.
@@ -82,7 +82,8 @@ namespace Machina
         /// </summary>
         public Action()
         {
-            this.Id = currentId++;
+            //this.Id = currentId++;
+            this.Id = -1;
         }
 
         /// <summary>

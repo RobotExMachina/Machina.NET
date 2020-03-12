@@ -123,7 +123,10 @@ namespace Machina
         //// @TODO: this will need to get reallocated when fixing stream mode...
         //public StreamQueue streamQueue;
 
-
+        /// <summary>
+        /// A new instance rolling counter for action ids, to replace the previous static one. 
+        /// </summary>
+        private int _actionCounter = 1;
 
 
 
@@ -843,6 +846,9 @@ namespace Machina
                 logger.Error("Cursors not initialized. Did you .Connect()?");
                 return false;
             }
+
+            // Use this robot instance to id the action.
+            action.Id = _actionCounter++;
 
             bool success = IssueCursor.Issue(action);
 
