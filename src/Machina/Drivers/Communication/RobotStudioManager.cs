@@ -873,13 +873,15 @@ namespace Machina.Drivers.Communication
         {
             if (!_isConnected)
             {
-                throw new Exception("Cannot load program, not connected to controller");
+                logger.Error("Cannot load program, not connected to controller");
+                return false;
             }
 
             string path = Path.Combine(Path.GetTempPath(), targetName);
             if (!IO.SaveStringToFile(path, module, Encoding.ASCII))
             {
-                throw new Exception("Could not save module to temp file");
+                logger.Error("Could not save module to temp file");
+                return false;
             }
             else
             {
@@ -888,12 +890,14 @@ namespace Machina.Drivers.Communication
 
             if (!UploadFileToController(path))
             {
-                throw new Exception($"Could not upload module {path} to controller");
+                logger.Error($"Could not upload module {path} to controller");
+                return false;
             }
 
             if (!LoadModuleFromControllerToTask(task, targetName))
             {
-                throw new Exception($"Could not load module {targetName} from controller to task {task.Name}");
+                logger.Error($"Could not load module {targetName} from controller to task {task.Name}");
+                return false;
             }
 
             return true;
@@ -996,9 +1000,8 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
-                logger.Debug(ex);
-                throw new Exception("ERROR: Could not LoadModuleFromControllerToTask");
-            }
+                logger.Error("Could not LoadModuleFromControllerToTask");
+                logger.Debug(ex);            }
 
             if (success)
             {
