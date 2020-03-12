@@ -225,4 +225,17 @@ namespace Machina
         /// </summary>
         Revolute
     };
+
+    /// <summary>
+    /// Defines an unit type.
+    /// </summary>
+    public enum Units
+    {
+        Undefined,
+        Mixed,
+        Degrees,
+        Radians,
+        Milimiters,
+        Meters
+    }
 }

@@ -722,7 +722,7 @@ namespace Machina.Types.Geometry
             return result;
         }
 
-        public static Matrix4x4 CreateFromAxisAngle(Vector axis, double angleDegs, Vector center)
+        public static Matrix4x4 CreateRotation(Vector axis, double angleDegs, Vector center)
         {
             // @TODO: this should be optimized to use an algebraic form.
             Matrix4x4 T1 = Matrix4x4.CreateTranslation(-center);
@@ -1672,6 +1672,12 @@ namespace Machina.Types.Geometry
             return false;
         }
 
+        /// <summary>
+        /// Checks if all the values of the matrices are below a threshold.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <param name="epsilon"></param>
+        /// <returns></returns>
         public bool IsSimilar(Matrix4x4 other, double epsilon)
         {
             return (

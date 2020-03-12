@@ -18,7 +18,7 @@ namespace Machina.Drivers
     //  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
     //                                              
     /// <summary>
-    /// A class to handle communication with external controllers, real or virtual
+    /// A base class to handle communication with external controllers, real or virtual.
     /// </summary>
     abstract class Driver
     {
