@@ -22,14 +22,17 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 # v0.9.0
-## BUILD 1504
+## BUILD 1602
+
+
+## BUILD 1601
 - Added some robot description classes
 - Added hardcoded ABB IRB 140 for testing.
 - Added Denavit-Hartenberg parameter computation from `RobotJoint` object.
 - Added `DHParameters`! :)
 - `Matrix4x4` has now `double` fields.
 
-## BUILD 1503
+## BUILD 1600
 - Testing implementing FK/IK solvers...
 - Added `Matrix4x4` as a copy of `System.Numerics.Matrix4x4` chaning row-colum convention.
 - Refactored `Joints` to `Axes`.
