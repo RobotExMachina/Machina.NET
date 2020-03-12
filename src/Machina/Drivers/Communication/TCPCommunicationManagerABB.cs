@@ -465,12 +465,33 @@ namespace Machina.Drivers.Communication
             string[] _responseChunks = res.Split(' ');
             string idStr = _responseChunks[0].Substring(1);
             int id = Convert.ToInt32(idStr);
-            this._executionCursor.ApplyActionsUntilId(id);
 
-            // Raise appropriate events
-            this._parentDriver.parentControl.RaiseActionExecutedEvent();
-            //this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
-            //this._parentDriver.parentControl.RaiseActionCompletedEvent();
+            // An Action may have been issued and released, but we may have not received an acknowledgement
+            // (like for example `MotionMode` which has no streamable counterpart). 
+            // Since actions have correlating ids, apply all up to the last received id. 
+
+            // To raise all proper events, even for actions that are not streamable (and no acknowledgement 
+            // is received), apply all actions one at a time until reching target id. 
+            int nextId = this._executionCursor.GetNextActionId();
+
+            if (nextId <= id)
+            {
+                while (nextId <= id)
+                {
+                    this._executionCursor.ApplyNextAction();
+
+                    // Raise appropriate events
+                    this._parentDriver.parentControl.RaiseActionExecutedEvent();
+                    //this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
+                    //this._parentDriver.parentControl.RaiseActionCompletedEvent();
+
+                    nextId++;
+                }
+            }
+            else
+            {
+                throw new Exception("WEIRD ERROR, TAKE A LOOK AT THIS!");
+            }
         }
 
         private void DataReceived(string res)

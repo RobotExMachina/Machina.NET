@@ -1,11 +1,18 @@
 ``` text
-//  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗
+//  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ 
 //  ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗
 //  ██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║███████║
 //  ██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══██║
 //  ██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║██║  ██║
 //  ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝
-//
+//                                                          
+//     ███╗   ██╗███████╗████████╗                          
+//     ████╗  ██║██╔════╝╚══██╔══╝                          
+//     ██╔██╗ ██║█████╗     ██║                             
+//     ██║╚██╗██║██╔══╝     ██║                             
+//  ██╗██║ ╚████║███████╗   ██║                             
+//  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝                             
+//                                                          
 //   ██████╗██╗  ██╗ █████╗ ███╗   ██╗ ██████╗ ███████╗██╗      ██████╗  ██████╗
 //  ██╔════╝██║  ██║██╔══██╗████╗  ██║██╔════╝ ██╔════╝██║     ██╔═══██╗██╔════╝
 //  ██║     ███████║███████║██╔██╗ ██║██║  ███╗█████╗  ██║     ██║   ██║██║  ███╗
@@ -22,6 +29,10 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 # v0.8.12
+## BUILD 1503
+- [x] Softened exceptions for `RobotStudioManager`: they are now Machina Logger Errors.
+- [x] `ActionExecuted` events are now raised for `Actions` that are non-streamable (like `MotionMode`). This is a good improvement, and solves a problem with the Bridge were such actions would not get acknowledged.  
+
 ## BUILD 1502
 - Compilers now have embedded abstract comment characters and encoding
 - Compilers now return `MachinaFile` objects instead of `List<string>`. This helps with multi-file program creation.

@@ -283,6 +283,12 @@ namespace Machina
         }
 
         /// <summary>
+        /// Returns the id of the next Action pending to be applied. 
+        /// </summary>
+        /// <returns></returns>
+        internal int GetNextActionId() => actionBuffer.QueryIdOfNext();
+
+        /// <summary>
         /// Ascends the pending actions buffer searching for the given id, and applies
         /// them all, inclusive of the one searched. 
         /// This assumes ids are correlative and ascending, will stop if it finds an
@@ -290,7 +296,7 @@ namespace Machina
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool ApplyActionsUntilId(int id)
+        public List<Action> ApplyActionsUntilId(int id)
         {
             lock (actionBufferLock)
             {
@@ -307,7 +313,7 @@ namespace Machina
                     }
                 }
 
-                return success;
+                return actions;
             }
         }
 

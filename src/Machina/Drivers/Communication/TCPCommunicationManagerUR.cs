@@ -509,12 +509,44 @@ namespace Machina.Drivers.Communication
                 return false;
             
             _receivedIDs.Add(id);
-            this._motionCursor.ApplyActionsUntilId(id);
 
-            // Raise appropriate events
-            this._parentDriver.parentControl.RaiseActionExecutedEvent();
-            //this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
-            //this._parentDriver.parentControl.RaiseActionCompletedEvent();
+            
+            //// THIS BLOCK HAS BEEN UPDATED, SEE BELOW
+            //this._motionCursor.ApplyActionsUntilId(id);
+
+            //// Raise appropriate events
+            //this._parentDriver.parentControl.RaiseActionExecutedEvent();
+            ////this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
+            ////this._parentDriver.parentControl.RaiseActionCompletedEvent();
+
+
+            //// THIS IS CURRENTLY UNTESTED FOR URs. @TODO: VERIFY THIS WORKS.
+            // An Action may have been issued and released, but we may have not received an acknowledgement
+            // (like for example `MotionMode` which has no streamable counterpart). 
+            // Since actions have correlating ids, apply all up to the last received id. 
+
+            // To raise all proper events, even for actions that are not streamable (and no acknowledgement 
+            // is received), apply all actions one at a time until reching target id. 
+            int nextId = this._motionCursor.GetNextActionId();
+
+            if (nextId <= id)
+            {
+                while (nextId <= id)
+                {
+                    this._motionCursor.ApplyNextAction();
+
+                    // Raise appropriate events
+                    this._parentDriver.parentControl.RaiseActionExecutedEvent();
+                    //this._parentDriver.parentControl.RaiseMotionCursorUpdatedEvent();
+                    //this._parentDriver.parentControl.RaiseActionCompletedEvent();
+
+                    nextId++;
+                }
+            }
+            else
+            {
+                throw new Exception("WEIRD ERROR, TAKE A LOOK AT THIS!");
+            }
 
             return true;
         }

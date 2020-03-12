@@ -55,6 +55,13 @@ namespace Machina
         }
 
         /// <summary>
+        /// Returns the id of the next Action pending release, without releasing it. 
+        /// </summary>
+        /// <returns></returns>
+        public int QueryIdOfNext() => pending.Count > 0 ? pending[0].Id : -1;
+
+
+        /// <summary>
         /// Release the next pending Action with the highest priority.
         /// </summary>
         /// <returns></returns>
