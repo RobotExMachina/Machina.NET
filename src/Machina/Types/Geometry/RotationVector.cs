@@ -244,7 +244,7 @@ namespace Machina.Types.Geometry
         /// Returns a Rotation Matrix representation of this rotation.
         /// </summary>
         /// <returns></returns>
-        public Matrix4x4 ToMatrix()
+        public Matrix ToMatrix()
         {
             return this.ToAxisAngle().ToMatrix();
         }

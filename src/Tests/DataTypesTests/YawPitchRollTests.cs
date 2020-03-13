@@ -144,7 +144,7 @@ namespace DataTypesTests
         public void YawPitchRoll_ToRotationMatrix_ToYawPitchRoll()
         {
             YawPitchRoll eu1, eu2, eu3;
-            Matrix4x4 m1, m2, m3;
+            Matrix m1, m2, m3;
 
             double x, y, z;
 
@@ -212,7 +212,7 @@ namespace DataTypesTests
         public void YawPitchRoll_ToRotationMAtrix_ToYawPitchRoll_Singularities()
         {
             YawPitchRoll eu1, eu2;
-            Matrix4x4 m1, m2;
+            Matrix m1, m2;
 
             double x, y, z;
             int cycles = 500;

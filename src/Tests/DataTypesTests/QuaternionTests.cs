@@ -367,7 +367,7 @@ namespace DataTypesTests
         public void Quaternion_ToRotationMatrix_ToQuaternion()
         {
             Quaternion q1, q2;
-            Matrix4x4 m;
+            Matrix m;
 
             SysQuat sq1, sq2;
             SysMatrix44 sm;
@@ -462,7 +462,7 @@ namespace DataTypesTests
         public void Quaternion_ToRotationMatrix_FromEquivalentQuaternions()
         {
             Quaternion q1, q2;
-            Matrix4x4 m1, m2;
+            Matrix m1, m2;
 
             double w, x, y, z, factor;
 

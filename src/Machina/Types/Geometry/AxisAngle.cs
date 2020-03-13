@@ -354,12 +354,12 @@ namespace Machina.Types.Geometry
         /// If this AxiAngle represents no effective rotation, the identity matrix will be returned. 
         /// </summary>
         /// <returns></returns>
-        public Matrix4x4 ToMatrix()
+        public Matrix ToMatrix()
         {
             // Some sanity: if this AA represents no rotation, return identity matrix
             if (this.IsZero())
             {
-                return Matrix4x4.Identity;
+                return Matrix.Identity;
             }
 
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
@@ -369,7 +369,7 @@ namespace Machina.Types.Geometry
             double s = Math.Sin(ang);
             double t = 1 - c;
 
-            Matrix4x4 m = Matrix4x4.Identity;
+            Matrix m = Matrix.Identity;
             m.M11 = c + t * this.Axis.X * this.Axis.X;
             m.M22 = c + t * this.Axis.Y * this.Axis.Y;
             m.M33 = c + t * this.Axis.Z * this.Axis.Z;

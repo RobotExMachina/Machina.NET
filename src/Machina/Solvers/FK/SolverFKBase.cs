@@ -34,7 +34,7 @@ namespace Machina.Solvers.FK
         /// <param name="jointValues">These are typically the angular rotation of the joints, but could be motion for linear joints.</param>
         /// <param name="units">Units defined for these joint values.</param>
         /// <returns>Transformation matrices for each joint.</returns>
-        internal abstract List<Matrix4x4> ForwardKinematics(List<double> jointValues, Units units);
+        internal abstract List<Matrix> ForwardKinematics(List<double> jointValues, Units units);
 
     }
 }

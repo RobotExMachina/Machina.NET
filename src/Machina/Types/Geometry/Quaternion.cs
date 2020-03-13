@@ -758,7 +758,7 @@ namespace Machina.Types.Geometry
         /// Returns a 3x3 Rotation Matrix representing this Quaternion's rotation. 
         /// </summary>
         /// <returns></returns>
-        public Matrix4x4 ToMatrix()
+        public Matrix ToMatrix()
         {
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
             double xx2 = 2 * this.X * this.X,
@@ -771,7 +771,7 @@ namespace Machina.Types.Geometry
                 zz2 = 2 * this.Z * this.Z,
                 zw2 = 2 * this.Z * this.W;
 
-            return new Matrix4x4(
+            return new Matrix(
                 1 - yy2 - zz2,  xy2 - zw2,      xz2 + yw2,      0,
                 xy2 + zw2,      1 - xx2 - zz2,  yz2 - xw2,      0,
                 xz2 - yw2,      yz2 + xw2,      1 - xx2 - yy2,  0,

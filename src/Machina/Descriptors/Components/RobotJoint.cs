@@ -22,12 +22,12 @@ namespace Machina.Descriptors.Components
         /// <summary>
         /// The base plane for this joint's transformation (linear or rotary).
         /// </summary>
-        public Matrix4x4 BasePlane { get; set; }
+        public Matrix BasePlane { get; set; }
 
         /// <summary>
         /// The end plane this joint transforms. 
         /// </summary>
-        public Matrix4x4 TransformedPlane { get; set; }
+        public Matrix TransformedPlane { get; set; }
 
         /// <summary>
         /// Is this a linear a revolution joint?
@@ -73,8 +73,8 @@ namespace Machina.Descriptors.Components
             //m = Matrix4x4.CreateFromAxisAngle(m.X, (float)alpha, m.Translation) * m;
 
             // Faster way with DH matrix:
-            Matrix4x4 mm = baseJoint.TransformedPlane;
-            Matrix4x4 dhm = Matrix4x4.CreateFromDHParameters(distance, radius, alpha, theta);
+            Matrix mm = baseJoint.TransformedPlane;
+            Matrix dhm = Matrix.CreateFromDHParameters(distance, radius, alpha, theta);
             mm = mm * dhm;  // remember the DH is post-multiplied
 
             return new RobotJoint

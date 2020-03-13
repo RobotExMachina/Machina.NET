@@ -23,6 +23,9 @@
 
 # v0.9.0
 ## BUILD 1602
+- Pimped up `Vector` class.
+- Merged `RotationMatrix` into `Matrix4x4`
+- Renamed `Matrix4x4` to `Matrix`
 
 
 ## BUILD 1601

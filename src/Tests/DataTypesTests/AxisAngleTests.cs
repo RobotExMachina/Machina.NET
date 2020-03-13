@@ -430,7 +430,7 @@ namespace DataTypesTests
         public void AxisAngle_ToMatrix_ToAxisAngle()
         {
             AxisAngle aa, aabis;
-            Matrix4x4 m;
+            Matrix m;
 
             double x, y, z, angle;
             Vector axis;
@@ -481,7 +481,7 @@ namespace DataTypesTests
         public void AxisAngle_ToYawPitchRoll_ComparisonThroughRotationMatrix()
         {
             AxisAngle aa;
-            Matrix4x4 m;
+            Matrix m;
             YawPitchRoll eu1, eu2;
 
             double x, y, z, angle;

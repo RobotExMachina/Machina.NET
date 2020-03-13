@@ -17,7 +17,7 @@ namespace TEST_Workbench
             Machina.Logger.SetLogLevel(5);
             Machina.Logger.WriteLine += Console.WriteLine;
 
-            Matrix4x4 a = Matrix4x4.CreateFromQuaternion(1, 2, 3, 4);
+            Matrix a = Matrix.CreateFromQuaternion(1, 2, 3, 4);
             Console.WriteLine(a);
             Console.WriteLine(a.IsOrthogonalRotation);
             Console.WriteLine(a.OrthogonalizeRotation());

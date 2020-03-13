@@ -9,13 +9,13 @@ using Machina.Types.Data;
 
 namespace Machina.Types.Geometry
 {
-    //  ███╗   ███╗ █████╗ ████████╗██████╗ ██╗██╗  ██╗██╗  ██╗██╗  ██╗██╗  ██╗
-    //  ████╗ ████║██╔══██╗╚══██╔══╝██╔══██╗██║╚██╗██╔╝██║  ██║╚██╗██╔╝██║  ██║
-    //  ██╔████╔██║███████║   ██║   ██████╔╝██║ ╚███╔╝ ███████║ ╚███╔╝ ███████║
-    //  ██║╚██╔╝██║██╔══██║   ██║   ██╔══██╗██║ ██╔██╗ ╚════██║ ██╔██╗ ╚════██║
-    //  ██║ ╚═╝ ██║██║  ██║   ██║   ██║  ██║██║██╔╝ ██╗     ██║██╔╝ ██╗     ██║
-    //  ╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝     ╚═╝╚═╝  ╚═╝     ╚═╝
-    //                                                                         
+    //  ███╗   ███╗ █████╗ ████████╗██████╗ ██╗██╗  ██╗
+    //  ████╗ ████║██╔══██╗╚══██╔══╝██╔══██╗██║╚██╗██╔╝
+    //  ██╔████╔██║███████║   ██║   ██████╔╝██║ ╚███╔╝ 
+    //  ██║╚██╔╝██║██╔══██║   ██║   ██╔══██╗██║ ██╔██╗ 
+    //  ██║ ╚═╝ ██║██║  ██║   ██║   ██║  ██║██║██╔╝ ██╗
+    //  ╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝
+    //                                                 
     /// <summary>
     /// A 4x4 matrix for spatial transformations. Matrix is in vector-column format, 
     /// i.e. vector multiplication is M' = Mv 
@@ -33,7 +33,7 @@ namespace Machina.Types.Geometry
     /// - To integrate it with other Machina data types.
     /// Will bring a lot of code from the System.Numerics version anyway!
     /// </remarks>
-    public struct Matrix4x4 : IEquatable<Matrix4x4>, IEpsilonComparable<Matrix4x4>, ISerializableArray, ISerializableJSON
+    public struct Matrix : IEquatable<Matrix>, IEpsilonComparable<Matrix>, ISerializableArray, ISerializableJSON
     {
         #region Public Fields
         /// <summary>
@@ -111,7 +111,7 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Constructs a Matrix4x4 from the given components.
         /// </summary>
-        public Matrix4x4(double m11, double m12, double m13, double m14,
+        public Matrix(double m11, double m12, double m13, double m14,
                          double m21, double m22, double m23, double m24,
                          double m31, double m32, double m33, double m34,
                          double m41, double m42, double m43, double m44)
@@ -140,7 +140,7 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Constructs a Matrix4x4 from the given components.
         /// </summary>
-        public Matrix4x4(double[] values)
+        public Matrix(double[] values)
         {
             this.M11 = values[0];
             this.M12 = values[1];
@@ -163,7 +163,7 @@ namespace Machina.Types.Geometry
             this.M44 = values[15];
         }
 
-        private static readonly Matrix4x4 _identity = new Matrix4x4
+        private static readonly Matrix _identity = new Matrix
         (
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -174,7 +174,7 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Returns the multiplicative identity matrix.
         /// </summary>
-        public static Matrix4x4 Identity
+        public static Matrix Identity
         {
             get { return _identity; }
         }
@@ -184,9 +184,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="position">The amount to translate in each axis.</param>
         /// <returns>The translation matrix.</returns>
-        public static Matrix4x4 CreateTranslation(Vector position)
+        public static Matrix CreateTranslation(Vector position)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = 1;
             result.M12 = 0;
@@ -218,9 +218,9 @@ namespace Machina.Types.Geometry
         /// <param name="yPosition">The amount to translate on the Y-axis.</param>
         /// <param name="zPosition">The amount to translate on the Z-axis.</param>
         /// <returns>The translation matrix.</returns>
-        public static Matrix4x4 CreateTranslation(double xPosition, double yPosition, double zPosition)
+        public static Matrix CreateTranslation(double xPosition, double yPosition, double zPosition)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = 1;
             result.M12 = 0;
@@ -252,9 +252,9 @@ namespace Machina.Types.Geometry
         /// <param name="yScale">Value to scale by on the Y-axis.</param>
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <returns>The scaling matrix.</returns>
-        public static Matrix4x4 CreateScale(double xScale, double yScale, double zScale)
+        public static Matrix CreateScale(double xScale, double yScale, double zScale)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = xScale;
             result.M12 = 0;
@@ -284,9 +284,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="scales">The vector containing the amount to scale by on each axis.</param>
         /// <returns>The scaling matrix.</returns>
-        public static Matrix4x4 CreateScale(Vector scales)
+        public static Matrix CreateScale(Vector scales)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = scales.X;
             result.M12 = 0;
@@ -316,9 +316,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="scale">The uniform scaling factor.</param>
         /// <returns>The scaling matrix.</returns>
-        public static Matrix4x4 CreateScale(double scale)
+        public static Matrix CreateScale(double scale)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = scale;
             result.M12 = 0;
@@ -351,9 +351,9 @@ namespace Machina.Types.Geometry
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static Matrix4x4 CreateScale(double xScale, double yScale, double zScale, Vector centerPoint)
+        public static Matrix CreateScale(double xScale, double yScale, double zScale, Vector centerPoint)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             double tx = centerPoint.X * (1 - xScale);
             double ty = centerPoint.Y * (1 - yScale);
@@ -387,9 +387,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="degrees">The amount, in degrees, by which to rotate around the X-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationX(double degrees)
+        public static Matrix CreateRotationX(double degrees)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
@@ -428,9 +428,9 @@ namespace Machina.Types.Geometry
         /// <param name="degrees">The amount, in degrees, by which to rotate around the X-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationX(double degrees, Vector centerPoint)
+        public static Matrix CreateRotationX(double degrees, Vector centerPoint)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
@@ -471,9 +471,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="degrees">The amount, in degrees, by which to rotate around the Y-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationY(double degrees)
+        public static Matrix CreateRotationY(double degrees)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
@@ -512,9 +512,9 @@ namespace Machina.Types.Geometry
         /// <param name="degrees">The amount, in degrees, by which to rotate around the Y-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationY(double degrees, Vector centerPoint)
+        public static Matrix CreateRotationY(double degrees, Vector centerPoint)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
@@ -555,9 +555,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="degrees">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationZ(double degrees)
+        public static Matrix CreateRotationZ(double degrees)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
@@ -596,9 +596,9 @@ namespace Machina.Types.Geometry
         /// <param name="degrees">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateRotationZ(double degrees, Vector centerPoint)
+        public static Matrix CreateRotationZ(double degrees, Vector centerPoint)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
@@ -640,7 +640,7 @@ namespace Machina.Types.Geometry
         /// <param name="axis">The normalized axis to rotate around.</param>
         /// <param name="angleDegs">The angle to rotate around the given axis, in degrees.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateFromAxisAngle(Vector axis, double angleDegs)
+        public static Matrix CreateFromAxisAngle(Vector axis, double angleDegs)
         {
             // Not using the original System.Numerics.Matrix4x4 implementation, but yields same results. 
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
@@ -660,7 +660,7 @@ namespace Machina.Types.Geometry
             double xx = x * x, yy = y * y, zz = z * z;
             double xy = x * y, xz = x * z, yz = y * z;
 
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = t * xx + c;
             result.M12 = t * xy - z * s;
@@ -685,12 +685,12 @@ namespace Machina.Types.Geometry
             return result;
         }
 
-        public static Matrix4x4 CreateRotation(Vector axis, double angleDegs, Vector center)
+        public static Matrix CreateRotation(Vector axis, double angleDegs, Vector center)
         {
             // @TODO: this should be optimized to use an algebraic form.
-            Matrix4x4 T1 = Matrix4x4.CreateTranslation(-center);
-            Matrix4x4 R = Matrix4x4.CreateFromAxisAngle(axis, angleDegs);
-            Matrix4x4 T2 = Matrix4x4.CreateTranslation(center);
+            Matrix T1 = Matrix.CreateTranslation(-center);
+            Matrix R = Matrix.CreateFromAxisAngle(axis, angleDegs);
+            Matrix T2 = Matrix.CreateTranslation(center);
 
             return T2 * R * T1;
         }
@@ -701,7 +701,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="axisAngle">The AxisAngle object</param>
         /// <returns></returns>
-        public static Matrix4x4 CreateFromAxisAngle(AxisAngle axisAngle)
+        public static Matrix CreateFromAxisAngle(AxisAngle axisAngle)
         {
             return CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
         }
@@ -711,10 +711,10 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="plane"></param>
         /// <returns></returns>
-        public static Matrix4x4 CreateFromPlane(Plane plane)
+        public static Matrix CreateFromPlane(Plane plane)
         {
             // This needs a LOT of optimization...
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = plane.XAxis.X;
             result.M12 = plane.YAxis.X;
@@ -753,7 +753,7 @@ namespace Machina.Types.Geometry
         /// <param name="y1"></param>
         /// <param name="y2"></param>
         /// <returns></returns>
-        public static Matrix4x4 CreateFromPlane(
+        public static Matrix CreateFromPlane(
                 double originX, double originY, double originZ,
                 double x0, double x1, double x2,
                 double y0, double y1, double y2)
@@ -763,7 +763,7 @@ namespace Machina.Types.Geometry
             double z1 = x2 * y0 - x0 * y2;
             double z2 = x0 * y1 - x1 * y0;
 
-            Matrix4x4 m;
+            Matrix m;
 
             m.M11 = x0;
             m.M12 = y0;
@@ -795,7 +795,7 @@ namespace Machina.Types.Geometry
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>True if </returns>
-        public static bool CreateOrthogonal(double x0, double x1, double x2, double y0, double y1, double y2, out Matrix4x4 m)
+        public static bool CreateOrthogonal(double x0, double x1, double x2, double y0, double y1, double y2, out Matrix m)
         {
             m.M11 = x0;
             m.M21 = x1;
@@ -833,7 +833,7 @@ namespace Machina.Types.Geometry
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public static bool  CreateOrthogonal(Vector x, Vector y, out Matrix4x4 m)
+        public static bool  CreateOrthogonal(Vector x, Vector y, out Matrix m)
         {
             return CreateOrthogonal(x.X, x.Y, x.Z, y.X, y.Y, y.Z, out m);
         }
@@ -844,7 +844,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="quaternion">The source Quaternion.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateFromQuaternion(Quaternion quaternion)
+        public static Matrix CreateFromQuaternion(Quaternion quaternion)
         {
             return CreateFromQuaternion(quaternion.W, quaternion.X, quaternion.Y, quaternion.Z);
         }
@@ -857,7 +857,7 @@ namespace Machina.Types.Geometry
         /// <param name="y">The j part.</param>
         /// <param name="z">The k part.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix4x4 CreateFromQuaternion(double w, double x, double y, double z)
+        public static Matrix CreateFromQuaternion(double w, double x, double y, double z)
         {
             // double implementation of Quaternion.ToRotationMatrix()
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
@@ -872,7 +872,7 @@ namespace Machina.Types.Geometry
                 zz2 = 2 * z * z,
                 zw2 = 2 * z * w;
 
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = 1 - yy2 - zz2;
             result.M12 = xy2 - zw2;
@@ -907,7 +907,7 @@ namespace Machina.Types.Geometry
         /// <param name="alpha">Rotation in degrees around base X to align base Z to new Z.</param>
         /// <param name="theta">Angle in degrees from base X to align with new common normal. </param>
         /// <returns></returns>
-        public static Matrix4x4 CreateFromDHParameters(double distance, double radius, double alpha, double theta)
+        public static Matrix CreateFromDHParameters(double distance, double radius, double alpha, double theta)
         {
             // The DH convention makes it very easy/fast to create the transformation
             // matrix between a Joint's base axis plane and its transformed one. 
@@ -933,7 +933,7 @@ namespace Machina.Types.Geometry
                 st = Math.Sin(t),
                 ct = Math.Cos(t);
 
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = ct;
             result.M12 = -st * ca;
@@ -966,7 +966,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="dh">DHParameters object.</param>
         /// <returns></returns>
-        public static Matrix4x4 CreateFromDHParameters(DHParameters dh)
+        public static Matrix CreateFromDHParameters(DHParameters dh)
         {
             return CreateFromDHParameters(dh.D, dh.R, dh.Alpha, dh.Theta);
         }
@@ -983,9 +983,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="value">The source matrix.</param>
         /// <returns>The negated matrix.</returns>
-        public static Matrix4x4 operator -(Matrix4x4 value)
+        public static Matrix operator -(Matrix value)
         {
-            Matrix4x4 m;
+            Matrix m;
 
             m.M11 = -value.M11;
             m.M12 = -value.M12;
@@ -1013,9 +1013,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first source matrix.</param>
         /// <param name="value2">The second source matrix.</param>
         /// <returns>The resulting matrix.</returns>
-        public static Matrix4x4 operator +(Matrix4x4 value1, Matrix4x4 value2)
+        public static Matrix operator +(Matrix value1, Matrix value2)
         {
-            Matrix4x4 m;
+            Matrix m;
 
             m.M11 = value1.M11 + value2.M11;
             m.M12 = value1.M12 + value2.M12;
@@ -1043,9 +1043,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first source matrix.</param>
         /// <param name="value2">The second source matrix.</param>
         /// <returns>The result of the subtraction.</returns>
-        public static Matrix4x4 operator -(Matrix4x4 value1, Matrix4x4 value2)
+        public static Matrix operator -(Matrix value1, Matrix value2)
         {
-            Matrix4x4 m;
+            Matrix m;
 
             m.M11 = value1.M11 - value2.M11;
             m.M12 = value1.M12 - value2.M12;
@@ -1073,9 +1073,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first source matrix.</param>
         /// <param name="value2">The second source matrix.</param>
         /// <returns>The result of the multiplication.</returns>
-        public static Matrix4x4 operator *(Matrix4x4 value1, Matrix4x4 value2)
+        public static Matrix operator *(Matrix value1, Matrix value2)
         {
-            Matrix4x4 m;
+            Matrix m;
 
             // First row
             m.M11 = value1.M11 * value2.M11 + value1.M12 * value2.M21 + value1.M13 * value2.M31 + value1.M14 * value2.M41;
@@ -1110,9 +1110,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The source matrix.</param>
         /// <param name="value2">The scaling factor.</param>
         /// <returns>The scaled matrix.</returns>
-        public static Matrix4x4 operator *(Matrix4x4 value1, double value2)
+        public static Matrix operator *(Matrix value1, double value2)
         {
-            Matrix4x4 m;
+            Matrix m;
 
             m.M11 = value1.M11 * value2;
             m.M12 = value1.M12 * value2;
@@ -1139,7 +1139,7 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first matrix to compare.</param>
         /// <param name="value2">The second matrix to compare.</param>
         /// <returns>True if the given matrices are equal; False otherwise.</returns>
-        public static bool operator ==(Matrix4x4 value1, Matrix4x4 value2)
+        public static bool operator ==(Matrix value1, Matrix value2)
         {
             return (value1.M11 == value2.M11 && value1.M22 == value2.M22 && value1.M33 == value2.M33 && value1.M44 == value2.M44 && // Check diagonal element first for early out.
                                                 value1.M12 == value2.M12 && value1.M13 == value2.M13 && value1.M14 == value2.M14 &&
@@ -1154,7 +1154,7 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first matrix to compare.</param>
         /// <param name="value2">The second matrix to compare.</param>
         /// <returns>True if the given matrices are not equal; False if they are equal.</returns>
-        public static bool operator !=(Matrix4x4 value1, Matrix4x4 value2)
+        public static bool operator !=(Matrix value1, Matrix value2)
         {
             return (value1.M11 != value2.M11 || value1.M12 != value2.M12 || value1.M13 != value2.M13 || value1.M14 != value2.M14 ||
                     value1.M21 != value2.M21 || value1.M22 != value2.M22 || value1.M23 != value2.M23 || value1.M24 != value2.M24 ||
@@ -1168,7 +1168,7 @@ namespace Machina.Types.Geometry
         /// <param name="matrix">The source matrix to invert.</param>
         /// <param name="result">If successful, contains the inverted matrix.</param>
         /// <returns>True if the source matrix could be inverted; False otherwise.</returns>
-        public static bool Invert(Matrix4x4 matrix, out Matrix4x4 result)
+        public static bool Invert(Matrix matrix, out Matrix result)
         {
             //                                       -1
             // If you have matrix M, inverse Matrix M   can compute
@@ -1283,7 +1283,7 @@ namespace Machina.Types.Geometry
 
             if (Math.Abs(det) < double.Epsilon)
             {
-                result = new Matrix4x4(double.NaN, double.NaN, double.NaN, double.NaN,
+                result = new Matrix(double.NaN, double.NaN, double.NaN, double.NaN,
                                        double.NaN, double.NaN, double.NaN, double.NaN,
                                        double.NaN, double.NaN, double.NaN, double.NaN,
                                        double.NaN, double.NaN, double.NaN, double.NaN);
@@ -1336,7 +1336,7 @@ namespace Machina.Types.Geometry
         /// <param name="value">The source matrix to transform.</param>
         /// <param name="rotation">The rotation to apply.</param>
         /// <returns>The transformed matrix.</returns>
-        public static Matrix4x4 Transform(Matrix4x4 value, Quaternion rotation)
+        public static Matrix Transform(Matrix value, Quaternion rotation)
         {
             // This is basically computing the 3x3 matrix out of the quaternion 
             // and premultiplying it by the matrix...
@@ -1371,7 +1371,7 @@ namespace Machina.Types.Geometry
             double q32 = yz2 + wx2;
             double q33 = 1 - xx2 - yy2;
 
-            Matrix4x4 result;
+            Matrix result;
 
             // First row
             result.M11 = q11 * value.M11 + q12 * value.M21 + q13 * value.M31;
@@ -1405,9 +1405,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="matrix">The source matrix.</param>
         /// <returns>The transposed matrix.</returns>
-        public static Matrix4x4 Transpose(Matrix4x4 matrix)
+        public static Matrix Transpose(Matrix matrix)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = matrix.M11;
             result.M12 = matrix.M21;
@@ -1436,9 +1436,9 @@ namespace Machina.Types.Geometry
         /// <param name="matrix2">The second source matrix.</param>
         /// <param name="amount">The relative weight of the second source matrix.</param>
         /// <returns>The interpolated matrix.</returns>
-        public static Matrix4x4 Lerp(Matrix4x4 matrix1, Matrix4x4 matrix2, double amount)
+        public static Matrix Lerp(Matrix matrix1, Matrix matrix2, double amount)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             // First row
             result.M11 = matrix1.M11 + (matrix2.M11 - matrix1.M11) * amount;
@@ -1472,9 +1472,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="value">The source matrix.</param>
         /// <returns>The negated matrix.</returns>
-        public static Matrix4x4 Negate(Matrix4x4 value)
+        public static Matrix Negate(Matrix value)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = -value.M11;
             result.M12 = -value.M12;
@@ -1502,9 +1502,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first source matrix.</param>
         /// <param name="value2">The second source matrix.</param>
         /// <returns>The resulting matrix.</returns>
-        public static Matrix4x4 Add(Matrix4x4 value1, Matrix4x4 value2)
+        public static Matrix Add(Matrix value1, Matrix value2)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = value1.M11 + value2.M11;
             result.M12 = value1.M12 + value2.M12;
@@ -1532,9 +1532,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first source matrix.</param>
         /// <param name="value2">The second source matrix.</param>
         /// <returns>The result of the subtraction.</returns>
-        public static Matrix4x4 Subtract(Matrix4x4 value1, Matrix4x4 value2)
+        public static Matrix Subtract(Matrix value1, Matrix value2)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = value1.M11 - value2.M11;
             result.M12 = value1.M12 - value2.M12;
@@ -1563,9 +1563,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The first source matrix.</param>
         /// <param name="value2">The second source matrix.</param>
         /// <returns>The result of the multiplication.</returns>
-        public static Matrix4x4 Multiply(Matrix4x4 value1, Matrix4x4 value2)
+        public static Matrix Multiply(Matrix value1, Matrix value2)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             // First row
             result.M11 = value1.M11 * value2.M11 + value1.M12 * value2.M21 + value1.M13 * value2.M31 + value1.M14 * value2.M41;
@@ -1601,9 +1601,9 @@ namespace Machina.Types.Geometry
         /// <param name="value1">The source matrix.</param>
         /// <param name="value2">The scaling factor.</param>
         /// <returns>The scaled matrix.</returns>
-        public static Matrix4x4 Multiply(Matrix4x4 value1, double value2)
+        public static Matrix Multiply(Matrix value1, double value2)
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = value1.M11 * value2;
             result.M12 = value1.M12 * value2;
@@ -1640,7 +1640,7 @@ namespace Machina.Types.Geometry
         /// <param name="other"></param>
         /// <param name="epsilon"></param>
         /// <returns></returns>
-        public bool IsSimilarTo(Matrix4x4 other, double epsilon)
+        public bool IsSimilarTo(Matrix other, double epsilon)
         {
             return (
                 // Check diagonal element first for early out.
@@ -1751,9 +1751,9 @@ namespace Machina.Types.Geometry
                 // (the matrix multiplied by its transpose yields the identity matrix)
                 // As a consequence, it also holds that the transpose of an orthogonal matrix equals its inverse:
                 // Qt = Q^-1
-                Matrix4x4 rot = this.GetRotationMatrix();
-                Matrix4x4 trans = Transpose(rot);
-                Matrix4x4 ident = this * trans;
+                Matrix rot = this.GetRotationMatrix();
+                Matrix trans = Transpose(rot);
+                Matrix ident = this * trans;
                 return 
                     ident.IsSimilarTo(Identity, MMath.EPSILON3) && 
                     Math.Abs(this.GetDeterminant() - 1) < MMath.EPSILON2;
@@ -1859,7 +1859,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         public void Transpose()
         {
-            Matrix4x4 trans = Matrix4x4.Transpose(this);
+            Matrix trans = Matrix.Transpose(this);
             
             M11 = trans.M11;
             M12 = trans.M12;
@@ -1884,9 +1884,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public Matrix4x4 GetRotationMatrix()
+        public Matrix GetRotationMatrix()
         {
-            Matrix4x4 result;
+            Matrix result;
 
             result.M11 = M11;
             result.M12 = M12;
@@ -2199,7 +2199,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="other">The matrix to compare this instance to.</param>
         /// <returns>True if the matrices are equal; False otherwise.</returns>
-        public bool Equals(Matrix4x4 other)
+        public bool Equals(Matrix other)
         {
             return (M11 == other.M11 && M22 == other.M22 && M33 == other.M33 && M44 == other.M44 && // Check diagonal element first for early out.
                                         M12 == other.M12 && M13 == other.M13 && M14 == other.M14 &&
@@ -2215,9 +2215,9 @@ namespace Machina.Types.Geometry
         /// <returns>True if the Object is equal to this matrix; False otherwise.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Matrix4x4)
+            if (obj is Matrix)
             {
-                return Equals((Matrix4x4)obj);
+                return Equals((Matrix)obj);
             }
 
             return false;

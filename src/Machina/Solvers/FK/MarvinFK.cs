@@ -33,7 +33,7 @@ namespace Machina.Solvers.FK
             _model = (RobotSixAxesArm) model;  // we want an exception if this doesn't work...
         }
 
-        internal override List<Matrix4x4> ForwardKinematics(List<double> jointValues, Units units)
+        internal override List<Matrix> ForwardKinematics(List<double> jointValues, Units units)
         {
             // Sanity
             if (jointValues.Count != 6)
@@ -61,13 +61,13 @@ namespace Machina.Solvers.FK
 
 
             // List of joint frames
-            List<Matrix4x4> frames = new List<Matrix4x4>();
+            List<Matrix> frames = new List<Matrix>();
 
             // Base
             frames.Add(_model.Base.BasePlane);
 
             // Arm portion
-            List<Matrix4x4> armFrames = forwardKinematicsArm(rotsRad);
+            List<Matrix> armFrames = forwardKinematicsArm(rotsRad);
             frames.AddRange(armFrames);
 
             //// Wrist portion
@@ -82,10 +82,10 @@ namespace Machina.Solvers.FK
         /// </summary>
         /// <param name="rots">The list of the full arm rotations.</param>
         /// <returns>List of the three transforms for the arm axes.</returns>
-        private List<Matrix4x4> forwardKinematicsArm(List<double> rots)
+        private List<Matrix> forwardKinematicsArm(List<double> rots)
         {
             // List of joint frames
-            List<Matrix4x4> frames = new List<Matrix4x4>();
+            List<Matrix> frames = new List<Matrix>();
 
 
             // Remember: this was my first FK solver, I clearly didn't have a 
@@ -105,8 +105,8 @@ namespace Machina.Solvers.FK
 
 
             // FRAME 1
-            Matrix4x4 p1 = _model.Base.BasePlane;
-            p1 = Matrix4x4.CreateRotation(p1.Z, rots[0] * MMath.TO_DEGS, p1.Translation);
+            Matrix p1 = _model.Base.BasePlane;
+            p1 = Matrix.CreateRotation(p1.Z, rots[0] * MMath.TO_DEGS, p1.Translation);
 
 
 

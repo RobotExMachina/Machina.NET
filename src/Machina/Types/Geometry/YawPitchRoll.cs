@@ -160,7 +160,7 @@ namespace Machina.Types.Geometry
         /// Returns the Rotation Matrix representation os this rotation.
         /// </summary>
         /// <returns></returns>
-        public Matrix4x4 ToMatrix()
+        public Matrix ToMatrix()
         {
             // From https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles
             double cX = Math.Cos(MMath.TO_RADS * this.XAngle),
@@ -170,7 +170,7 @@ namespace Machina.Types.Geometry
                    sY = Math.Sin(MMath.TO_RADS * this.YAngle),
                    sZ = Math.Sin(MMath.TO_RADS * this.ZAngle);
 
-            return new Matrix4x4(
+            return new Matrix(
                 cY * cZ,  sX * sY * cZ - cX * sZ,  cX * sY * cZ + sX * sZ,  0,
                 cY * sZ,  sX * sY * sZ + cX * cZ,  cX * sY * sZ - sX * cZ,  0,
                 -sY,      sX * cY,                 cX * cY,                 0,

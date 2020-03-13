@@ -60,11 +60,11 @@ namespace Machina.Types.Geometry
         /// Implicit conversion to RotationMatrix object.
         /// </summary>
         /// <param name="ori"></param>
-        public static implicit operator Matrix4x4(Orientation ori) => ori.RM;
+        public static implicit operator Matrix(Orientation ori) => ori.RM;
 
 
         internal Quaternion Q = null;
-        internal Matrix4x4 RM;  // useful for vector-to-quaternion conversions and as storage of orientation vectors
+        internal Matrix RM;  // useful for vector-to-quaternion conversions and as storage of orientation vectors
 
         /// <summary>
         /// The main X direction of this Orientation.
@@ -99,7 +99,7 @@ namespace Machina.Types.Geometry
         public Orientation()
         {
             this.Q = new Quaternion();
-            this.RM = new Matrix4x4();
+            this.RM = new Matrix();
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace Machina.Types.Geometry
         /// <param name="y2"></param>
         public Orientation(double x0, double x1, double x2, double y0, double y1, double y2)
         {
-            Matrix4x4.CreateOrthogonal(x0, x1, x2, y0, y1, y2, out this.RM);
+            Matrix.CreateOrthogonal(x0, x1, x2, y0, y1, y2, out this.RM);
             //this.Q = 
             this.RM.GetQuaternion(out this.Q);
         }
@@ -152,7 +152,7 @@ namespace Machina.Types.Geometry
 
 
         public Quaternion ToQuaternion() => this.Q;
-        public Matrix4x4 ToMatrix() => this.RM;
+        public Matrix ToMatrix() => this.RM;
         public RotationVector ToRotationVector() => this.Q.ToAxisAngle().ToRotationVector();  // @TODO: this is grose... 
 
 

@@ -35,8 +35,8 @@ namespace Machina.Descriptors.Models
             // The Base (this is currently reduntant, but we will need it down the road?)
             bot.Base = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
-                TransformedPlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
+                BasePlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
+                TransformedPlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
                 RobotJointType = RobotJointType.Static,
                 JointRange = new Interval(0, 0),
                 MaxSpeed = 0
@@ -45,8 +45,8 @@ namespace Machina.Descriptors.Models
             // Joint 1
             bot.Joint1 = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
-                TransformedPlane = Matrix4x4.CreateFromPlane(70, 0, 352, 1, 0, 0, 0, 0, -1),
+                BasePlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
+                TransformedPlane = Matrix.CreateFromPlane(70, 0, 352, 1, 0, 0, 0, 0, -1),
                 RobotJointType = RobotJointType.Revolute,
                 JointRange = new Interval(-180, 180),
                 MaxSpeed = 200
@@ -55,8 +55,8 @@ namespace Machina.Descriptors.Models
             // Joint 2
             bot.Joint2 = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(70, 0, 352, 1, 0, 0, 0, 0, -1),
-                TransformedPlane = Matrix4x4.CreateFromPlane(70, 0, 712, 0, 0, 1, 1, 0, 0),
+                BasePlane = Matrix.CreateFromPlane(70, 0, 352, 1, 0, 0, 0, 0, -1),
+                TransformedPlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 1, 0, 0),
                 RobotJointType = RobotJointType.Revolute,
                 JointRange = new Interval(-90, 110),
                 MaxSpeed = 200
@@ -65,8 +65,8 @@ namespace Machina.Descriptors.Models
             // Joint 3
             bot.Joint3 = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(70, 0, 712, 0, 0, 1, 1, 0, 0),
-                TransformedPlane = Matrix4x4.CreateFromPlane(70, 0, 712, 0, 0, 1, 0, -1, 0),
+                BasePlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 1, 0, 0),
+                TransformedPlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 0, -1, 0),
                 RobotJointType = RobotJointType.Revolute,
                 JointRange = new Interval(-230, 50),
                 MaxSpeed = 260
@@ -75,8 +75,8 @@ namespace Machina.Descriptors.Models
             // Joint 4
             bot.Joint4 = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(70, 0, 712, 0, 0, 1, 0, -1, 0),
-                TransformedPlane = Matrix4x4.CreateFromPlane(450, 0, 712, 0, 0, 1, 1, 0, 0),
+                BasePlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 0, -1, 0),
+                TransformedPlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 1, 0, 0),
                 RobotJointType = RobotJointType.Revolute,
                 JointRange = new Interval(-200, 200),
                 MaxSpeed = 360
@@ -85,8 +85,8 @@ namespace Machina.Descriptors.Models
             // Joint 5
             bot.Joint5 = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(450, 0, 712, 0, 0, 1, 1, 0, 0),
-                TransformedPlane = Matrix4x4.CreateFromPlane(450, 0, 712, 0, 0, 1, 0, -1, 0),
+                BasePlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 1, 0, 0),
+                TransformedPlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 0, -1, 0),
                 RobotJointType = RobotJointType.Revolute,
                 JointRange = new Interval(-115, 115),
                 MaxSpeed = 360
@@ -95,8 +95,8 @@ namespace Machina.Descriptors.Models
             // Joint 6
             bot.Joint6 = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(450, 0, 712, 0, 0, 1, 0, -1, 0),
-                TransformedPlane = Matrix4x4.CreateFromPlane(515, 0, 712, 0, 0, -1, 0, 1, 0),
+                BasePlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 0, -1, 0),
+                TransformedPlane = Matrix.CreateFromPlane(515, 0, 712, 0, 0, -1, 0, 1, 0),
                 RobotJointType = RobotJointType.Revolute,
                 JointRange = new Interval(-400, 400),
                 MaxSpeed = 450
@@ -116,8 +116,8 @@ namespace Machina.Descriptors.Models
             // The Base (this is currently reduntant, but we will need it down the road?).
             bot.Base = new RobotJoint
             {
-                BasePlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
-                TransformedPlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
+                BasePlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
+                TransformedPlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
                 RobotJointType = RobotJointType.Static,
                 JointRange = new Interval(0, 0),
                 MaxSpeed = 0

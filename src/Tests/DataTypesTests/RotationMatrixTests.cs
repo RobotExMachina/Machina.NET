@@ -27,7 +27,7 @@ namespace DataTypesTests
         [TestMethod]
         public void Matrix_Orthogonalization_RandomValues()
         {
-            Matrix4x4 m;
+            Matrix m;
 
             double[] r = new double[16];
 
@@ -38,7 +38,7 @@ namespace DataTypesTests
                     r[j] = Random(-100, 100);
                 }
 
-                m = new Matrix4x4(r);
+                m = new Matrix(r);
                 m = m.GetRotationMatrix();
 
                 Trace.WriteLine("");
@@ -70,7 +70,7 @@ namespace DataTypesTests
                     r[j] = RandomInt(-1, 1);
                 }
 
-                m = new Matrix4x4(r);
+                m = new Matrix(r);
                 m = m.GetRotationMatrix();
 
                 Trace.WriteLine("");
@@ -107,7 +107,7 @@ namespace DataTypesTests
         [TestMethod]
         public void Matrix_Orthogonalization_RandomVectors()
         {
-            Matrix4x4 m;
+            Matrix m;
             Vector vecX, vecY;
             Vector mVecX, mVecY, mVecZ;
             Direction dir;
@@ -117,7 +117,7 @@ namespace DataTypesTests
             {
                 vecX = Vector.RandomFromDoubles(-100, 100);
                 vecY = Vector.RandomFromDoubles(-100, 100);
-                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m);
+                success = Matrix.CreateOrthogonal(vecX, vecY, out m);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY);
@@ -135,7 +135,7 @@ namespace DataTypesTests
                 vecY = Vector.RandomFromInts(-1, 1);
                 dir = Vector.CompareDirections(vecX, vecY);
 
-                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m);
+                success = Matrix.CreateOrthogonal(vecX, vecY, out m);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
@@ -173,7 +173,7 @@ namespace DataTypesTests
         [TestMethod]
         public void Matrix_ToQuaternion_VsSystemNumerics()
         {
-            Matrix4x4 m;
+            Matrix m;
             Quaternion q;
             SysMatrix44 m44, m44bis;
             SysQuat sq;
@@ -196,7 +196,7 @@ namespace DataTypesTests
                 }
 
                 dir = Vector.CompareDirections(vecX, vecY);
-                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m);
+                success = Matrix.CreateOrthogonal(vecX, vecY, out m);
                 Assert.IsTrue(m.GetQuaternion(out q), "Could not convert to Quaternion");
 
                 Trace.WriteLine("");
@@ -225,10 +225,10 @@ namespace DataTypesTests
         [TestMethod]
         public void Matrix_ToQuaternion_LowTrace()
         {
-            bool success = Matrix4x4.CreateOrthogonal(new Vector(0, 1, 0), new Vector(-1, 0, 0), out Matrix4x4 m);
+            bool success = Matrix.CreateOrthogonal(new Vector(0, 1, 0), new Vector(-1, 0, 0), out Matrix m);
             Quaternion q;
             Assert.IsTrue(m.GetQuaternion(out q), "Could not convert to Quaternion");
-            Matrix4x4 m1 = Matrix4x4.CreateFromQuaternion(q);
+            Matrix m1 = Matrix.CreateFromQuaternion(q);
 
             Assert.IsTrue(m.IsSimilarTo(m1, MMath.EPSILON3));
         }
@@ -237,7 +237,7 @@ namespace DataTypesTests
         [TestMethod]
         public void Matrix_ToQuaternion_ToMatrix()
         {
-            Matrix4x4 m1, m2;
+            Matrix m1, m2;
             Quaternion q;
             Vector vecX, vecY;
             Direction dir;
@@ -251,9 +251,9 @@ namespace DataTypesTests
                 vecY = Vector.RandomFromDoubles(-100, 100);
                 dir = Vector.CompareDirections(vecX, vecY);
 
-                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m1);
+                success = Matrix.CreateOrthogonal(vecX, vecY, out m1);
                 Assert.IsTrue(m1.GetQuaternion(out q), "Could not convert to Quaternion");
-                m2 = Matrix4x4.CreateFromQuaternion(q);
+                m2 = Matrix.CreateFromQuaternion(q);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
@@ -269,7 +269,7 @@ namespace DataTypesTests
         public void Matrix_ToAxisAngle_ToMatrix()
         {
 
-            Matrix4x4 m1, m2;
+            Matrix m1, m2;
             AxisAngle aa1, aa2;
 
             double x, y, z, angle;
@@ -327,7 +327,7 @@ namespace DataTypesTests
         public void RotationMatrix_ToYawPitchRoll_ToRotationMatrix()
         {
 
-            Matrix4x4 m1, m2, m3;
+            Matrix m1, m2, m3;
             YawPitchRoll eu1, eu2, eu3;
             AxisAngle aa;
 
