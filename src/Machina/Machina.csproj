@@ -149,12 +149,7 @@
     <Compile Include="Types\Geometry\Plane.cs" />
     <Compile Include="Types\Data\RobotProgram.cs" />
     <Compile Include="Types\Geometry\Rotation.cs" />
-    <Compile Include="Types\Geometry\t_CoordinateSystem.cs" />
     <Compile Include="Types\Geometry\Axes.cs" />
-    <Compile Include="Types\Geometry\t_Frame.cs" />
-    <Compile Include="Types\Geometry\t_Path.cs" />
-    <Compile Include="Types\Geometry\t_Rotation.cs" />
-    <Compile Include="Types\Geometry\t_SpatialTrigger.cs" />
     <Compile Include="Types\Geometry\Vector.cs" />
     <Compile Include="Types\Geometry\YawPitchRoll.cs" />
     <Compile Include="Types\Geometry\RotationMatrix.cs" />

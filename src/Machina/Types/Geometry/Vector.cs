@@ -18,13 +18,14 @@ namespace Machina.Types.Geometry
     /// <summary>
     /// Represents a three dimensional vector.
     /// </summary>
+    /// <remarks>Some methods are borrowed from Rhinocommon.</remarks>
     public class Vector : IEpsilonComparable<Vector>, ISerializableArray, ISerializableJSON
     {
 
         #region fields
-        internal double x;
-        internal double y;
-        internal double z;
+        private double _x;
+        private double _y;
+        private double _z;
         #endregion fields
 
 
@@ -37,9 +38,9 @@ namespace Machina.Types.Geometry
         /// <param name="z">The Z (third) component.</param>
         public Vector(double x, double y, double z)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this._x = x;
+            this._y = y;
+            this._z = z;
         }
         
         /// <summary>
@@ -48,9 +49,9 @@ namespace Machina.Types.Geometry
         /// <param name="vector">A double-precision vector.</param>
         public Vector(Vector vector)
         {
-            x = vector.x;
-            y = vector.y;
-            z = vector.z;
+            _x = vector._x;
+            _y = vector._y;
+            _z = vector._z;
         }
 
         /// <summary>
@@ -146,7 +147,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static bool operator ==(Vector a, Vector b)
         {
-            return a.x == b.x && a.y == b.y && a.z == b.z;
+            return a._x == b._x && a._y == b._y && a._z == b._z;
         }
 
         /// <summary>
@@ -157,7 +158,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static bool operator !=(Vector a, Vector b)
         {
-            return a.x != b.x || a.y != b.y || a.z == b.z;
+            return a._x != b._x || a._y != b._y || a._z == b._z;
         }
 
 
@@ -169,7 +170,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Vector operator +(Vector a, Vector b)
         {
-            return new Vector(a.x + b.x, a.y + b.y, a.z + b.z);
+            return new Vector(a._x + b._x, a._y + b._y, a._z + b._z);
         }
 
         /// <summary>
@@ -179,7 +180,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Vector operator -(Vector v)
         {
-            return new Vector(-v.x, -v.y, -v.z);
+            return new Vector(-v._x, -v._y, -v._z);
         }
 
         /// <summary>
@@ -190,7 +191,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Vector operator -(Vector a, Vector b)
         {
-            return new Vector(a.x - b.x, a.y - b.y, a.z - b.z);
+            return new Vector(a._x - b._x, a._y - b._y, a._z - b._z);
         }
 
         /// <summary>
@@ -201,7 +202,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Vector operator *(double s, Vector v)
         {
-            return new Vector(s * v.x, s * v.y, s * v.z);
+            return new Vector(s * v._x, s * v._y, s * v._z);
         }
 
         /// <summary>
@@ -212,7 +213,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Vector operator *(Vector v, double s)
         {
-            return new Vector(s * v.x, s * v.y, s * v.z);
+            return new Vector(s * v._x, s * v._y, s * v._z);
         }
 
         /// <summary>
@@ -224,7 +225,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static double operator *(Vector a, Vector b)
         {
-            return a.x * b.x + a.y * b.y + a.x * b.y;
+            return a._x * b._x + a._y * b._y + a._x * b._y;
         }
 
         /// <summary>
@@ -237,7 +238,7 @@ namespace Machina.Types.Geometry
         public static double DotProduct(Vector a, Vector b)
         {
             // A · B = Ax * Bx + Ay * By + Az * Bz
-            return a.x * b.x + a.y * b.y + a.z * b.z;
+            return a._x * b._x + a._y * b._y + a._z * b._z;
         }
 
 
@@ -265,19 +266,63 @@ namespace Machina.Types.Geometry
             return Math.Acos(div);
         }
 
+        ///// <summary>
+        ///// Computes the angle on a plane between two vectors.
+        ///// </summary>
+        ///// <param name="a">First vector.</param>
+        ///// <param name="b">Second vector.</param>
+        ///// <param name="plane">Two-dimensional plane on which to perform the angle measurement.</param>
+        ///// <returns>On success, the angle (in radians) between a and b as projected onto the plane; RhinoMath.UnsetValue on failure.</returns>
+        //public static double AngleBetween(Vector3d a, Vector3d b, Plane plane)
+        //{
+        //    { // Project vectors onto plane.
+        //        Point3d pA = plane.Origin + a;
+        //        Point3d pB = plane.Origin + b;
+
+        //        pA = plane.ClosestPoint(pA);
+        //        pB = plane.ClosestPoint(pB);
+
+        //        a = pA - plane.Origin;
+        //        b = pB - plane.Origin;
+        //    }
+
+        //    // Abort on invalid cases.
+        //    if (!a.Unitize()) { return RhinoMath.UnsetValue; }
+        //    if (!b.Unitize()) { return RhinoMath.UnsetValue; }
+
+        //    double dot = a * b;
+        //    { // Limit dot product to valid range.
+        //        if (dot >= 1.0)
+        //        { dot = 1.0; }
+        //        else if (dot < -1.0)
+        //        { dot = -1.0; }
+        //    }
+
+        //    double angle = Math.Acos(dot);
+        //    { // Special case (anti)parallel vectors.
+        //        if (Math.Abs(angle) < 1e-64) { return 0.0; }
+        //        if (Math.Abs(angle - Math.PI) < 1e-64) { return Math.PI; }
+        //    }
+
+        //    Vector3d cross = Vector3d.CrossProduct(a, b);
+        //    if (plane.ZAxis.IsParallelTo(cross) == +1)
+        //        return angle;
+        //    return 2.0 * Math.PI - angle;
+        //}
+
         /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Cross_product">Cross Product</a>
-        /// of specified Vectors (Points).
+        /// of specified Vectors.
         /// </summary>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
         /// <returns></returns>
-        public static Vector CrossProduct(Vector p1, Vector p2)
+        public static Vector CrossProduct(Vector a, Vector b)
         {
             return new Vector(
-                p1.y * p2.z - p1.z * p2.y,
-                p1.z * p2.x - p1.x * p2.z,
-                p1.x * p2.y - p1.y * p2.x);
+                a._y * b._z - a._z * b._y,
+                a._z * b._x - a._x * b._z,
+                a._x * b._y - a._y * b._x);
         }
 
 
@@ -379,29 +424,64 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// X property of the Vector.
         /// </summary>
-        public double X { get { return x; } set { x = value; } }
+        public double X { get { return _x; } set { _x = value; } }
 
         /// <summary>
         /// Y property of the Vector.
         /// </summary>
-        public double Y { get { return y; } set { y = value; } }
+        public double Y { get { return _y; } set { _y = value; } }
 
         /// <summary>
         /// Z property of the Vector.
         /// </summary>
-        public double Z { get { return z; } set { z = value; } }
+        public double Z { get { return _z; } set { _z = value; } }
+
+        /// <summary>
+        /// Gets or sets a vector component at the given index.
+        /// </summary>
+        /// <param name="index">Index of vector component. Valid values are: 
+        /// <para>0 = X-component</para>
+        /// <para>1 = Y-component</para>
+        /// <para>2 = Z-component</para>
+        /// .</param>
+        public double this[int index]
+        {
+            // From Rhinocommon
+            get
+            {
+                if (0 == index)
+                    return _x;
+                if (1 == index)
+                    return _y;
+                if (2 == index)
+                    return _z;
+                // IronPython works with indexing when we thrown an IndexOutOfRangeException
+                throw new IndexOutOfRangeException();
+            }
+            set
+            {
+                if (0 == index)
+                    _x = value;
+                else if (1 == index)
+                    _y = value;
+                else if (2 == index)
+                    _z = value;
+                else
+                    throw new IndexOutOfRangeException();
+            }
+        }
 
         /// <summary>
         /// Returns the length of this Vector.
         /// </summary>
         /// <returns></returns>
-        public double Length => Math.Sqrt(x * x + y * y + z * z);
+        public double Length => Math.Sqrt(_x * _x + _y * _y + _z * _z);
 
         /// <summary>
         /// Returns the squared length of this Vector.
         /// </summary>
         /// <returns></returns>
-        public double SqLength => x * x + y * y + z * z;
+        public double SqLength => _x * _x + _y * _y + _z * _z;
 
         /// <summary>
         /// Is this a unit Vector?
@@ -432,9 +512,9 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static double Distance(Vector p1, Vector p2)
         {
-            double dx = p1.x - p2.x,
-                dy = p1.y - p2.y,
-                dz = p1.z - p2.z;
+            double dx = p1._x - p2._x,
+                dy = p1._y - p2._y,
+                dz = p1._z - p2._z;
 
             return Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
         }
@@ -447,9 +527,9 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static double SqDistance(Vector p1, Vector p2)
         {
-            double dx = p1.x - p2.x,
-                dy = p1.y - p2.y,
-                dz = p1.z - p2.z;
+            double dx = p1._x - p2._x,
+                dy = p1._y - p2._y,
+                dz = p1._z - p2._z;
 
             return (dx * dx) + (dy * dy) + (dz * dz);
         }
@@ -530,12 +610,12 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static double SqSegmentDistance(Vector p, Vector p1, Vector p2)
         {
-            var x1 = p1.x;
-            var y1 = p1.y;
-            var z1 = p1.z;
-            var dx = p2.x - x1;
-            var dy = p2.y - y1;
-            var dz = p2.z - z1;
+            var x1 = p1._x;
+            var y1 = p1._y;
+            var z1 = p1._z;
+            var dx = p2._x - x1;
+            var dy = p2._y - y1;
+            var dz = p2._z - z1;
 
             if (!dx.Equals(0.0) || !dy.Equals(0.0) || !dz.Equals(0.0))
             {
@@ -714,9 +794,9 @@ namespace Machina.Types.Geometry
         /// <param name="newZ"></param>
         public void Set(Vector clone)
         {
-            x = clone.x;
-            y = clone.y;
-            z = clone.z;
+            _x = clone._x;
+            _y = clone._y;
+            _z = clone._z;
         }
 
         /// <summary>
@@ -727,9 +807,9 @@ namespace Machina.Types.Geometry
         /// <param name="newZ"></param>
         public void Set(double newX, double newY, double newZ)
         {
-            x = newX;
-            y = newY;
-            z = newZ;
+            _x = newX;
+            _y = newY;
+            _z = newZ;
         }
 
         /// <summary>
@@ -740,9 +820,9 @@ namespace Machina.Types.Geometry
         /// <param name="incZ"></param>
         public void Add(double incX, double incY, double incZ)
         {
-            x += incX;
-            y += incY;
-            z += incZ;
+            _x += incX;
+            _y += incY;
+            _z += incZ;
         }
 
         /// <summary>
@@ -751,9 +831,9 @@ namespace Machina.Types.Geometry
         /// <param name="p"></param>
         public void Add(Vector p)
         {
-            x += p.x;
-            y += p.y;
-            z += p.z;
+            _x += p._x;
+            _y += p._y;
+            _z += p._z;
         }
 
         /// <summary>
@@ -765,9 +845,9 @@ namespace Machina.Types.Geometry
         {
             double len = this.Length;
             if (len < MMath.EPSILON2) return false;
-            x /= len;
-            y /= len;
-            z /= len;
+            _x /= len;
+            _y /= len;
+            _z /= len;
             return true;
         }
 
@@ -776,9 +856,9 @@ namespace Machina.Types.Geometry
         /// </summary>
         public void Reverse()
         {
-            x = -x;
-            y = -y;
-            z = -z;
+            _x = -_x;
+            _y = -_y;
+            _z = -_z;
         }
 
         /// <summary>
@@ -787,9 +867,9 @@ namespace Machina.Types.Geometry
         /// <param name="factor"></param>
         public void Scale(double factor)
         {
-            x *= factor;
-            y *= factor;
-            y *= factor;
+            _x *= factor;
+            _y *= factor;
+            _y *= factor;
         }
 
         /// <summary>
@@ -800,14 +880,14 @@ namespace Machina.Types.Geometry
         {
             // P.out = Q * P.in * conj(Q);
             // From gl-matrix.js
-            double ix = q.W * x + q.Y * z - q.Z * y,
-                   iy = q.W * y + q.Z * x - q.X * z,
-                   iz = q.W * z + q.X * y - q.Y * x,
-                   iw = -q.X * x - q.Y * y - q.Z * z;
+            double ix = q.W * _x + q.Y * _z - q.Z * _y,
+                   iy = q.W * _y + q.Z * _x - q.X * _z,
+                   iz = q.W * _z + q.X * _y - q.Y * _x,
+                   iw = -q.X * _x - q.Y * _y - q.Z * _z;
 
-            x = ix * q.W - iw * q.X - iy * q.Z + iz * q.Y;
-            y = iy * q.W - iw * q.Y - iz * q.X + ix * q.Z;
-            z = iz * q.W - iw * q.Z - ix * q.Y + iy * q.X;
+            _x = ix * q.W - iw * q.X - iy * q.Z + iz * q.Y;
+            _y = iy * q.W - iw * q.Y - iz * q.X + ix * q.Z;
+            _z = iz * q.W - iw * q.Z - ix * q.Y + iy * q.X;
 
             return true;
         }
@@ -865,10 +945,20 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public double DistanceTo(Vector other)
         {
-            double dx = x - other.x,
-                   dy = y - other.y,
-                   dz = z - other.z;
+            double dx = _x - other._x,
+                   dy = _y - other._y,
+                   dz = _z - other._z;
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
+        /// <summary>
+        /// Computes the hash code for the current vector.
+        /// </summary>
+        /// <returns>A non-unique number that represents the components of this vector.</returns>
+        public override int GetHashCode()
+        {
+            // MSDN docs recommend XOR'ing the internal values to get a hash code
+            return _x.GetHashCode() ^ _y.GetHashCode() ^ _z.GetHashCode();
         }
 
 
