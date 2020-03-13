@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace Machina.Types.Geometry
 {
+    
+
+
     //public class Plane : Geometry
     //{
     //    public static Plane WorldXY => new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);
-        
+
     //    public Vector Origin { get; internal set; }
     //    public Orientation Orientation { get; internal set; }
 

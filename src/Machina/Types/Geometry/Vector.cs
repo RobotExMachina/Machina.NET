@@ -363,7 +363,8 @@ namespace Machina.Types.Geometry
 
         /// <summary>
         /// Creates a vector perpendicular to the source one. The direction of the perpendicular
-        /// vector depends on the orientation of the source one.
+        /// vector depends on the orientation of the source one. Note that the result is NOT 
+        /// guaranteed to be a unit vector.
         /// </summary>
         /// <param name="vec"></param>
         /// <returns></returns>

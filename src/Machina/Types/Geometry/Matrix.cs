@@ -706,38 +706,38 @@ namespace Machina.Types.Geometry
             return CreateFromAxisAngle(axisAngle.Axis, axisAngle.Angle);
         }
 
-        ///// <summary>
-        ///// Creates a matrix that represents a Plane object.
-        ///// </summary>
-        ///// <param name="plane"></param>
-        ///// <returns></returns>
-        //public static Matrix CreateFromPlane(Plane plane)
-        //{
-        //    // This needs a LOT of optimization...
-        //    Matrix result;
+        /// <summary>
+        /// Creates a matrix that represents a Plane object.
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <returns></returns>
+        public static Matrix CreateFromPlane(Plane plane)
+        {
+            // This needs a LOT of optimization...
+            Matrix result;
 
-        //    result.M11 = plane.XAxis.X;
-        //    result.M12 = plane.YAxis.X;
-        //    result.M13 = plane.ZAxis.X;
-        //    result.M14 = plane.Origin.X;
+            result.M11 = plane.XAxis.X;
+            result.M12 = plane.YAxis.X;
+            result.M13 = plane.ZAxis.X;
+            result.M14 = plane.Origin.X;
 
-        //    result.M21 = plane.XAxis.Y;
-        //    result.M22 = plane.YAxis.Y;
-        //    result.M23 = plane.ZAxis.Y;
-        //    result.M24 = plane.Origin.Y;
+            result.M21 = plane.XAxis.Y;
+            result.M22 = plane.YAxis.Y;
+            result.M23 = plane.ZAxis.Y;
+            result.M24 = plane.Origin.Y;
 
-        //    result.M31 = plane.XAxis.Z;
-        //    result.M32 = plane.YAxis.Z;
-        //    result.M33 = plane.ZAxis.Z;
-        //    result.M34 = plane.Origin.Z;
+            result.M31 = plane.XAxis.Z;
+            result.M32 = plane.YAxis.Z;
+            result.M33 = plane.ZAxis.Z;
+            result.M34 = plane.Origin.Z;
 
-        //    result.M41 = 0;
-        //    result.M42 = 0;
-        //    result.M43 = 0;
-        //    result.M44 = 1;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
-        //    return result;
-        //}
+            return result;
+        }
 
         /// <summary>
         /// Creates a matrix that represents a Plane object. 

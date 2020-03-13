@@ -269,4 +269,26 @@ namespace Machina
         /// </summary>
         Opposite = 3
     }
+
+    /// <summary>
+    /// Enumerates all possible outcomes of a Least-Squares plane fitting operation.
+    /// </summary>
+    public enum PlaneFitResult
+    {
+        /// <summary>
+        /// No plane could be found.
+        /// </summary>
+        Failure = -1,
+
+        /// <summary>
+        /// A plane was successfully fitted.
+        /// </summary>
+        Success = 0,
+
+        /// <summary>
+        /// A valid plane was found, but it is an inconclusive result. 
+        /// This might happen with co-linear points for example.
+        /// </summary>
+        Inconclusive = 1
+    }
 }

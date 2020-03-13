@@ -55,6 +55,7 @@
     <Compile Include="AxisAngleTests.cs" />
     <Compile Include="DataTypesTests.cs" />
     <Compile Include="DHParametersTest.cs" />
+    <Compile Include="PlaneTests.cs" />
     <Compile Include="VectorTests.cs" />
     <Compile Include="YawPitchRollTests.cs" />
     <Compile Include="PointTests.cs" />

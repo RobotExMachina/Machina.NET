@@ -23,7 +23,7 @@
 
 # v0.9.0
 ## BUILD 1603
-- 
+- Port `Plane` object from Rhinocomm/OpenNurbs
 
 ## BUILD 1602
 - Pimped up `Vector` class.
