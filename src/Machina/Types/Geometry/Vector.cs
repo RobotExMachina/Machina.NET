@@ -29,6 +29,7 @@ namespace Machina.Types.Geometry
         #endregion fields
 
 
+
         #region constructors
         /// <summary>
         /// Initializes a new instance of a vector, using its three components.
@@ -376,6 +377,7 @@ namespace Machina.Types.Geometry
         #endregion operators
 
 
+
         #region interfaces
         /// <summary>
         /// Compare to other Vector under a numeric threshold.
@@ -395,26 +397,40 @@ namespace Machina.Types.Geometry
         /// Array representation of this Vector.
         /// </summary>
         /// <returns></returns>
-        public string ToArrayString()
+        public string ToArrayString(int decimals)
         {
+            if (decimals == -1)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "[{0},{1},{2}]",
+                    _x, _y, _z);
+            }
+
             return string.Format(CultureInfo.InvariantCulture,
                 "[{0},{1},{2}]",
-                Math.Round(X, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(Y, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(Z, MMath.STRING_ROUND_DECIMALS_MM));
+                Math.Round(_x, decimals),
+                Math.Round(_y, decimals),
+                Math.Round(_z, decimals));
         }
 
         /// <summary>
         /// JSON object representation of this Vector.
         /// </summary>
         /// <returns></returns>
-        public string ToJSONString()
+        public string ToJSONString(int decimals)
         {
+            if (decimals == -1)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "{{\"X\":{0},\"Y\":{1},\"Z\":{2}}}",
+                    _x, _y, _z);
+            }
+
             return string.Format(CultureInfo.InvariantCulture,
-                "{{\"x\":{0},\"y\":{1},\"z\":{2}}}",
-                Math.Round(X, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(Y, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(Z, MMath.STRING_ROUND_DECIMALS_MM));
+                "{{\"X\":{0},\"Y\":{1},\"Z\":{2}}}",
+                Math.Round(_x, decimals),
+                Math.Round(_y, decimals),
+                Math.Round(_z, decimals));
         }
         #endregion interfaces
 
@@ -498,8 +514,6 @@ namespace Machina.Types.Geometry
 
 
         #endregion properties
-
-
 
 
 

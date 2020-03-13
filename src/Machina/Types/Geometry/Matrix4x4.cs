@@ -30,9 +30,10 @@ namespace Machina.Types.Geometry
     ///     if you are reading this, you should know your matrix algebra well... :) 
     /// - To learn/practice/expand. "What I cannot create, I do not understand..." Richard Feynmann. 
     /// - This also contributes to the educational character of this open-source project.
+    /// - To integrate it with other Machina data types.
     /// Will bring a lot of code from the System.Numerics version anyway!
     /// </remarks>
-    public struct Matrix4x4 : IEquatable<Matrix4x4>
+    public struct Matrix4x4 : IEquatable<Matrix4x4>, IEpsilonComparable<Matrix4x4>, ISerializableArray, ISerializableJSON
     {
         #region Public Fields
         /// <summary>
@@ -105,88 +106,8 @@ namespace Machina.Types.Geometry
 
         #endregion Public Fields
 
-        private static readonly Matrix4x4 _identity = new Matrix4x4
-        (
-            1f, 0f, 0f, 0f,
-            0f, 1f, 0f, 0f,
-            0f, 0f, 1f, 0f,
-            0f, 0f, 0f, 1f
-        );
 
-        /// <summary>
-        /// Returns the multiplicative identity matrix.
-        /// </summary>
-        public static Matrix4x4 Identity
-        {
-            get { return _identity; }
-        }
-
-        /// <summary>
-        /// Returns whether the matrix is the identity matrix.
-        /// </summary>
-        public bool IsIdentity
-        {
-            get
-            {
-                return M11 == 1f && M22 == 1f && M33 == 1f && M44 == 1f && // Check diagonal element first for early out.
-                       M12 == 0f && M13 == 0f && M14 == 0f &&
-                       M21 == 0f && M23 == 0f && M24 == 0f &&
-                       M31 == 0f && M32 == 0f && M34 == 0f &&
-                       M41 == 0f && M42 == 0f && M43 == 0f;
-            }
-        }
-
-        /// <summary>
-        /// Gets the X vector component of this matrix (first three elements of first column).
-        /// </summary>
-        public Vector X
-        {
-            get
-            {
-                return new Vector(M11, M21, M31);
-            }
-        }
-
-        /// <summary>
-        /// Gets the Y vector component of this matrix (first three elements of second column).
-        /// </summary>
-        public Vector Y
-        {
-            get
-            {
-                return new Vector(M12, M22, M32);
-            }
-        }
-
-        /// <summary>
-        /// Gets the Z vector component of this matrix (first three elements of third column).
-        /// </summary>
-        public Vector Z
-        {
-            get
-            {
-                return new Vector(M13, M23, M33);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the translation component of this matrix.
-        /// </summary>
-        public Vector Translation
-        {
-            get
-            {
-                return new Vector(M14, M24, M34);
-            }
-            set
-            {
-                // @TODO remove casting when Vector uses doubles
-                M14 =  value.X;
-                M24 =  value.Y;
-                M34 =  value.Z;
-            }
-        }
-
+        #region constructors
         /// <summary>
         /// Constructs a Matrix4x4 from the given components.
         /// </summary>
@@ -214,6 +135,22 @@ namespace Machina.Types.Geometry
             this.M42 = m42;
             this.M43 = m43;
             this.M44 = m44;
+        }
+
+        private static readonly Matrix4x4 _identity = new Matrix4x4
+        (
+            1f, 0f, 0f, 0f,
+            0f, 1f, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f
+        );
+
+        /// <summary>
+        /// Returns the multiplicative identity matrix.
+        /// </summary>
+        public static Matrix4x4 Identity
+        {
+            get { return _identity; }
         }
 
         /// <summary>
@@ -410,7 +347,7 @@ namespace Machina.Types.Geometry
             result.M32 = 0.0f;
             result.M33 = zScale;
             result.M34 = tz;
-            
+
             result.M41 = 0.0f;
             result.M42 = 0.0f;
             result.M43 = 0.0f;
@@ -613,12 +550,12 @@ namespace Machina.Types.Geometry
             result.M22 = c;
             result.M23 = 0.0f;
             result.M24 = 0.0f;
-            
+
             result.M31 = 0.0f;
             result.M32 = 0.0f;
             result.M33 = 1.0f;
             result.M34 = 0.0f;
-            
+
             result.M41 = 0.0f;
             result.M42 = 0.0f;
             result.M43 = 0.0f;
@@ -662,7 +599,7 @@ namespace Machina.Types.Geometry
             result.M32 = 0.0f;
             result.M33 = 1.0f;
             result.M34 = 0.0f;
-            
+
             result.M41 = 0.0f;
             result.M42 = 0.0f;
             result.M43 = 0.0f;
@@ -799,7 +736,7 @@ namespace Machina.Types.Geometry
             double z0 = x1 * y2 - x2 * y1;
             double z1 = x2 * y0 - x0 * y2;
             double z2 = x0 * y1 - x1 * y0;
-            
+
             Matrix4x4 m;
 
             m.M11 = x0;
@@ -947,55 +884,194 @@ namespace Machina.Types.Geometry
         }
 
 
+
+        #endregion constructors
+
+
+        #region operators
+
         /// <summary>
-        /// Calculates the determinant of the matrix.
+        /// Returns a new matrix with the negated elements of the given matrix.
         /// </summary>
-        /// <returns>The determinant of the matrix.</returns>
-        public double GetDeterminant()
+        /// <param name="value">The source matrix.</param>
+        /// <returns>The negated matrix.</returns>
+        public static Matrix4x4 operator -(Matrix4x4 value)
         {
-            // | a b c d |     | f g h |     | e g h |     | e f h |     | e f g |
-            // | e f g h | = a | j k l | - b | i k l | + c | i j l | - d | i j k |
-            // | i j k l |     | n o p |     | m o p |     | m n p |     | m n o |
-            // | m n o p |
-            //
-            //   | f g h |
-            // a | j k l | = a ( f ( kp - lo ) - g ( jp - ln ) + h ( jo - kn ) )
-            //   | n o p |
-            //
-            //   | e g h |     
-            // b | i k l | = b ( e ( kp - lo ) - g ( ip - lm ) + h ( io - km ) )
-            //   | m o p |     
-            //
-            //   | e f h |
-            // c | i j l | = c ( e ( jp - ln ) - f ( ip - lm ) + h ( in - jm ) )
-            //   | m n p |
-            //
-            //   | e f g |
-            // d | i j k | = d ( e ( jo - kn ) - f ( io - km ) + g ( in - jm ) )
-            //   | m n o |
-            //
-            // Cost of operation
-            // 17 adds and 28 muls.
-            //
-            // add: 6 + 8 + 3 = 17
-            // mul: 12 + 16 = 28
+            Matrix4x4 m;
 
-            double a = M11, b = M12, c = M13, d = M14;
-            double e = M21, f = M22, g = M23, h = M24;
-            double i = M31, j = M32, k = M33, l = M34;
-            double m = M41, n = M42, o = M43, p = M44;
+            m.M11 = -value.M11;
+            m.M12 = -value.M12;
+            m.M13 = -value.M13;
+            m.M14 = -value.M14;
+            m.M21 = -value.M21;
+            m.M22 = -value.M22;
+            m.M23 = -value.M23;
+            m.M24 = -value.M24;
+            m.M31 = -value.M31;
+            m.M32 = -value.M32;
+            m.M33 = -value.M33;
+            m.M34 = -value.M34;
+            m.M41 = -value.M41;
+            m.M42 = -value.M42;
+            m.M43 = -value.M43;
+            m.M44 = -value.M44;
 
-            double kp_lo = k * p - l * o;
-            double jp_ln = j * p - l * n;
-            double jo_kn = j * o - k * n;
-            double ip_lm = i * p - l * m;
-            double io_km = i * o - k * m;
-            double in_jm = i * n - j * m;
+            return m;
+        }
 
-            return a * (f * kp_lo - g * jp_ln + h * jo_kn) -
-                   b * (e * kp_lo - g * ip_lm + h * io_km) +
-                   c * (e * jp_ln - f * ip_lm + h * in_jm) -
-                   d * (e * jo_kn - f * io_km + g * in_jm);
+        /// <summary>
+        /// Adds two matrices together.
+        /// </summary>
+        /// <param name="value1">The first source matrix.</param>
+        /// <param name="value2">The second source matrix.</param>
+        /// <returns>The resulting matrix.</returns>
+        public static Matrix4x4 operator +(Matrix4x4 value1, Matrix4x4 value2)
+        {
+            Matrix4x4 m;
+
+            m.M11 = value1.M11 + value2.M11;
+            m.M12 = value1.M12 + value2.M12;
+            m.M13 = value1.M13 + value2.M13;
+            m.M14 = value1.M14 + value2.M14;
+            m.M21 = value1.M21 + value2.M21;
+            m.M22 = value1.M22 + value2.M22;
+            m.M23 = value1.M23 + value2.M23;
+            m.M24 = value1.M24 + value2.M24;
+            m.M31 = value1.M31 + value2.M31;
+            m.M32 = value1.M32 + value2.M32;
+            m.M33 = value1.M33 + value2.M33;
+            m.M34 = value1.M34 + value2.M34;
+            m.M41 = value1.M41 + value2.M41;
+            m.M42 = value1.M42 + value2.M42;
+            m.M43 = value1.M43 + value2.M43;
+            m.M44 = value1.M44 + value2.M44;
+
+            return m;
+        }
+
+        /// <summary>
+        /// Subtracts the second matrix from the first.
+        /// </summary>
+        /// <param name="value1">The first source matrix.</param>
+        /// <param name="value2">The second source matrix.</param>
+        /// <returns>The result of the subtraction.</returns>
+        public static Matrix4x4 operator -(Matrix4x4 value1, Matrix4x4 value2)
+        {
+            Matrix4x4 m;
+
+            m.M11 = value1.M11 - value2.M11;
+            m.M12 = value1.M12 - value2.M12;
+            m.M13 = value1.M13 - value2.M13;
+            m.M14 = value1.M14 - value2.M14;
+            m.M21 = value1.M21 - value2.M21;
+            m.M22 = value1.M22 - value2.M22;
+            m.M23 = value1.M23 - value2.M23;
+            m.M24 = value1.M24 - value2.M24;
+            m.M31 = value1.M31 - value2.M31;
+            m.M32 = value1.M32 - value2.M32;
+            m.M33 = value1.M33 - value2.M33;
+            m.M34 = value1.M34 - value2.M34;
+            m.M41 = value1.M41 - value2.M41;
+            m.M42 = value1.M42 - value2.M42;
+            m.M43 = value1.M43 - value2.M43;
+            m.M44 = value1.M44 - value2.M44;
+
+            return m;
+        }
+
+        /// <summary>
+        /// Multiplies a matrix by another matrix.
+        /// </summary>
+        /// <param name="value1">The first source matrix.</param>
+        /// <param name="value2">The second source matrix.</param>
+        /// <returns>The result of the multiplication.</returns>
+        public static Matrix4x4 operator *(Matrix4x4 value1, Matrix4x4 value2)
+        {
+            Matrix4x4 m;
+
+            // First row
+            m.M11 = value1.M11 * value2.M11 + value1.M12 * value2.M21 + value1.M13 * value2.M31 + value1.M14 * value2.M41;
+            m.M12 = value1.M11 * value2.M12 + value1.M12 * value2.M22 + value1.M13 * value2.M32 + value1.M14 * value2.M42;
+            m.M13 = value1.M11 * value2.M13 + value1.M12 * value2.M23 + value1.M13 * value2.M33 + value1.M14 * value2.M43;
+            m.M14 = value1.M11 * value2.M14 + value1.M12 * value2.M24 + value1.M13 * value2.M34 + value1.M14 * value2.M44;
+
+            // Second row
+            m.M21 = value1.M21 * value2.M11 + value1.M22 * value2.M21 + value1.M23 * value2.M31 + value1.M24 * value2.M41;
+            m.M22 = value1.M21 * value2.M12 + value1.M22 * value2.M22 + value1.M23 * value2.M32 + value1.M24 * value2.M42;
+            m.M23 = value1.M21 * value2.M13 + value1.M22 * value2.M23 + value1.M23 * value2.M33 + value1.M24 * value2.M43;
+            m.M24 = value1.M21 * value2.M14 + value1.M22 * value2.M24 + value1.M23 * value2.M34 + value1.M24 * value2.M44;
+
+            // Third row
+            m.M31 = value1.M31 * value2.M11 + value1.M32 * value2.M21 + value1.M33 * value2.M31 + value1.M34 * value2.M41;
+            m.M32 = value1.M31 * value2.M12 + value1.M32 * value2.M22 + value1.M33 * value2.M32 + value1.M34 * value2.M42;
+            m.M33 = value1.M31 * value2.M13 + value1.M32 * value2.M23 + value1.M33 * value2.M33 + value1.M34 * value2.M43;
+            m.M34 = value1.M31 * value2.M14 + value1.M32 * value2.M24 + value1.M33 * value2.M34 + value1.M34 * value2.M44;
+
+            // Fourth row
+            m.M41 = value1.M41 * value2.M11 + value1.M42 * value2.M21 + value1.M43 * value2.M31 + value1.M44 * value2.M41;
+            m.M42 = value1.M41 * value2.M12 + value1.M42 * value2.M22 + value1.M43 * value2.M32 + value1.M44 * value2.M42;
+            m.M43 = value1.M41 * value2.M13 + value1.M42 * value2.M23 + value1.M43 * value2.M33 + value1.M44 * value2.M43;
+            m.M44 = value1.M41 * value2.M14 + value1.M42 * value2.M24 + value1.M43 * value2.M34 + value1.M44 * value2.M44;
+
+            return m;
+        }
+
+        /// <summary>
+        /// Multiplies a matrix by a scalar value.
+        /// </summary>
+        /// <param name="value1">The source matrix.</param>
+        /// <param name="value2">The scaling factor.</param>
+        /// <returns>The scaled matrix.</returns>
+        public static Matrix4x4 operator *(Matrix4x4 value1, double value2)
+        {
+            Matrix4x4 m;
+
+            m.M11 = value1.M11 * value2;
+            m.M12 = value1.M12 * value2;
+            m.M13 = value1.M13 * value2;
+            m.M14 = value1.M14 * value2;
+            m.M21 = value1.M21 * value2;
+            m.M22 = value1.M22 * value2;
+            m.M23 = value1.M23 * value2;
+            m.M24 = value1.M24 * value2;
+            m.M31 = value1.M31 * value2;
+            m.M32 = value1.M32 * value2;
+            m.M33 = value1.M33 * value2;
+            m.M34 = value1.M34 * value2;
+            m.M41 = value1.M41 * value2;
+            m.M42 = value1.M42 * value2;
+            m.M43 = value1.M43 * value2;
+            m.M44 = value1.M44 * value2;
+            return m;
+        }
+
+        /// <summary>
+        /// Returns a boolean indicating whether the given two matrices are equal.
+        /// </summary>
+        /// <param name="value1">The first matrix to compare.</param>
+        /// <param name="value2">The second matrix to compare.</param>
+        /// <returns>True if the given matrices are equal; False otherwise.</returns>
+        public static bool operator ==(Matrix4x4 value1, Matrix4x4 value2)
+        {
+            return (value1.M11 == value2.M11 && value1.M22 == value2.M22 && value1.M33 == value2.M33 && value1.M44 == value2.M44 && // Check diagonal element first for early out.
+                                                value1.M12 == value2.M12 && value1.M13 == value2.M13 && value1.M14 == value2.M14 &&
+                    value1.M21 == value2.M21 && value1.M23 == value2.M23 && value1.M24 == value2.M24 &&
+                    value1.M31 == value2.M31 && value1.M32 == value2.M32 && value1.M34 == value2.M34 &&
+                    value1.M41 == value2.M41 && value1.M42 == value2.M42 && value1.M43 == value2.M43);
+        }
+
+        /// <summary>
+        /// Returns a boolean indicating whether the given two matrices are not equal.
+        /// </summary>
+        /// <param name="value1">The first matrix to compare.</param>
+        /// <param name="value2">The second matrix to compare.</param>
+        /// <returns>True if the given matrices are not equal; False if they are equal.</returns>
+        public static bool operator !=(Matrix4x4 value1, Matrix4x4 value2)
+        {
+            return (value1.M11 != value2.M11 || value1.M12 != value2.M12 || value1.M13 != value2.M13 || value1.M14 != value2.M14 ||
+                    value1.M21 != value2.M21 || value1.M22 != value2.M22 || value1.M23 != value2.M23 || value1.M24 != value2.M24 ||
+                    value1.M31 != value2.M31 || value1.M32 != value2.M32 || value1.M33 != value2.M33 || value1.M34 != value2.M34 ||
+                    value1.M41 != value2.M41 || value1.M42 != value2.M42 || value1.M43 != value2.M43 || value1.M44 != value2.M44);
         }
 
         /// <summary>
@@ -1392,7 +1468,7 @@ namespace Machina.Types.Geometry
             return result;
         }
 
-               
+
         /// <summary>
         /// Multiplies a matrix by another matrix.
         /// </summary>
@@ -1461,188 +1537,230 @@ namespace Machina.Types.Geometry
             return result;
         }
 
+        #endregion operators
+
+
+
+
+        #region interfaces
+
         /// <summary>
-        /// Returns a new matrix with the negated elements of the given matrix.
+        /// Checks if all the values of the matrices are below a threshold.
         /// </summary>
-        /// <param name="value">The source matrix.</param>
-        /// <returns>The negated matrix.</returns>
-        public static Matrix4x4 operator -(Matrix4x4 value)
+        /// <param name="other"></param>
+        /// <param name="epsilon"></param>
+        /// <returns></returns>
+        public bool IsSimilarTo(Matrix4x4 other, double epsilon)
         {
-            Matrix4x4 m;
+            return (
+                // Check diagonal element first for early out.
+                Math.Abs(M11 - other.M11) < epsilon && Math.Abs(M22 - other.M22) < epsilon &&
+                Math.Abs(M33 - other.M33) < epsilon && Math.Abs(M44 - other.M44) < epsilon &&
 
-            m.M11 = -value.M11;
-            m.M12 = -value.M12;
-            m.M13 = -value.M13;
-            m.M14 = -value.M14;
-            m.M21 = -value.M21;
-            m.M22 = -value.M22;
-            m.M23 = -value.M23;
-            m.M24 = -value.M24;
-            m.M31 = -value.M31;
-            m.M32 = -value.M32;
-            m.M33 = -value.M33;
-            m.M34 = -value.M34;
-            m.M41 = -value.M41;
-            m.M42 = -value.M42;
-            m.M43 = -value.M43;
-            m.M44 = -value.M44;
+                Math.Abs(M12 - other.M12) < epsilon && Math.Abs(M13 - other.M13) < epsilon && Math.Abs(M14 - other.M14) < epsilon &&
+                Math.Abs(M21 - other.M21) < epsilon && Math.Abs(M23 - other.M23) < epsilon && Math.Abs(M24 - other.M24) < epsilon &&
+                Math.Abs(M31 - other.M31) < epsilon && Math.Abs(M32 - other.M32) < epsilon && Math.Abs(M34 - other.M34) < epsilon &&
+                Math.Abs(M41 - other.M41) < epsilon && Math.Abs(M42 - other.M42) < epsilon && Math.Abs(M43 - other.M43) < epsilon);
 
-            return m;
         }
 
         /// <summary>
-        /// Adds two matrices together.
+        /// JSON array representation of this object with rounding decimals. Use -1 for no rounding.
         /// </summary>
-        /// <param name="value1">The first source matrix.</param>
-        /// <param name="value2">The second source matrix.</param>
-        /// <returns>The resulting matrix.</returns>
-        public static Matrix4x4 operator +(Matrix4x4 value1, Matrix4x4 value2)
+        /// <returns></returns>
+        public string ToArrayString(int decimals)
         {
-            Matrix4x4 m;
+            if (decimals == -1)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "[{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}]",
+                    M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44);
+            }
 
-            m.M11 = value1.M11 + value2.M11;
-            m.M12 = value1.M12 + value2.M12;
-            m.M13 = value1.M13 + value2.M13;
-            m.M14 = value1.M14 + value2.M14;
-            m.M21 = value1.M21 + value2.M21;
-            m.M22 = value1.M22 + value2.M22;
-            m.M23 = value1.M23 + value2.M23;
-            m.M24 = value1.M24 + value2.M24;
-            m.M31 = value1.M31 + value2.M31;
-            m.M32 = value1.M32 + value2.M32;
-            m.M33 = value1.M33 + value2.M33;
-            m.M34 = value1.M34 + value2.M34;
-            m.M41 = value1.M41 + value2.M41;
-            m.M42 = value1.M42 + value2.M42;
-            m.M43 = value1.M43 + value2.M43;
-            m.M44 = value1.M44 + value2.M44;
-
-            return m;
+            return string.Format(CultureInfo.InvariantCulture,
+                "[{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}]",
+                Math.Round(M11, decimals),
+                Math.Round(M12, decimals),
+                Math.Round(M13, decimals),
+                Math.Round(M14, decimals),
+                Math.Round(M21, decimals),
+                Math.Round(M22, decimals),
+                Math.Round(M23, decimals),
+                Math.Round(M24, decimals),
+                Math.Round(M31, decimals),
+                Math.Round(M32, decimals),
+                Math.Round(M33, decimals),
+                Math.Round(M34, decimals),
+                Math.Round(M41, decimals),
+                Math.Round(M42, decimals),
+                Math.Round(M43, decimals),
+                Math.Round(M44, decimals));
         }
 
         /// <summary>
-        /// Subtracts the second matrix from the first.
+        /// JSON representation of this object, with rounding decimals. Use -1 for no rounding.
         /// </summary>
-        /// <param name="value1">The first source matrix.</param>
-        /// <param name="value2">The second source matrix.</param>
-        /// <returns>The result of the subtraction.</returns>
-        public static Matrix4x4 operator -(Matrix4x4 value1, Matrix4x4 value2)
+        /// <returns></returns>
+        public string ToJSONString(int decimals)
         {
-            Matrix4x4 m;
 
-            m.M11 = value1.M11 - value2.M11;
-            m.M12 = value1.M12 - value2.M12;
-            m.M13 = value1.M13 - value2.M13;
-            m.M14 = value1.M14 - value2.M14;
-            m.M21 = value1.M21 - value2.M21;
-            m.M22 = value1.M22 - value2.M22;
-            m.M23 = value1.M23 - value2.M23;
-            m.M24 = value1.M24 - value2.M24;
-            m.M31 = value1.M31 - value2.M31;
-            m.M32 = value1.M32 - value2.M32;
-            m.M33 = value1.M33 - value2.M33;
-            m.M34 = value1.M34 - value2.M34;
-            m.M41 = value1.M41 - value2.M41;
-            m.M42 = value1.M42 - value2.M42;
-            m.M43 = value1.M43 - value2.M43;
-            m.M44 = value1.M44 - value2.M44;
+            if (decimals == -1)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "{{\"M11\":{0},\"M12\":{1},\"M13\":{2},\"M14\":{3},\"M21\":{4},\"M22\":{5},\"M23\":{6},\"M24\":{7},\"M31\":{8},\"M32\":{9},\"M33\":{10},\"M34\":{11},\"M41\":{12},\"M42\":{13},\"M43\":{14},\"M44\":{15}}}",
+                    M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44);
+            }
 
-            return m;
+            return String.Format(CultureInfo.InvariantCulture,
+                "{{\"M11\":{0},\"M12\":{1},\"M13\":{2},\"M14\":{3},\"M21\":{4},\"M22\":{5},\"M23\":{6},\"M24\":{7},\"M31\":{8},\"M32\":{9},\"M33\":{10},\"M34\":{11},\"M41\":{12},\"M42\":{13},\"M43\":{14},\"M44\":{15}}}",
+                Math.Round(M11, decimals),
+                Math.Round(M12, decimals),
+                Math.Round(M13, decimals),
+                Math.Round(M14, decimals),
+                Math.Round(M21, decimals),
+                Math.Round(M22, decimals),
+                Math.Round(M23, decimals),
+                Math.Round(M24, decimals),
+                Math.Round(M31, decimals),
+                Math.Round(M32, decimals),
+                Math.Round(M33, decimals),
+                Math.Round(M34, decimals),
+                Math.Round(M41, decimals),
+                Math.Round(M42, decimals),
+                Math.Round(M43, decimals),
+                Math.Round(M44, decimals));
+        }
+
+        #endregion interfaces
+
+
+
+        #region properties
+
+        /// <summary>
+        /// Returns whether the matrix is the identity matrix.
+        /// </summary>
+        public bool IsIdentity
+        {
+            get
+            {
+                return M11 == 1f && M22 == 1f && M33 == 1f && M44 == 1f && // Check diagonal element first for early out.
+                       M12 == 0f && M13 == 0f && M14 == 0f &&
+                       M21 == 0f && M23 == 0f && M24 == 0f &&
+                       M31 == 0f && M32 == 0f && M34 == 0f &&
+                       M41 == 0f && M42 == 0f && M43 == 0f;
+            }
         }
 
         /// <summary>
-        /// Multiplies a matrix by another matrix.
+        /// Gets the X vector component of this matrix (first three elements of first column).
         /// </summary>
-        /// <param name="value1">The first source matrix.</param>
-        /// <param name="value2">The second source matrix.</param>
-        /// <returns>The result of the multiplication.</returns>
-        public static Matrix4x4 operator *(Matrix4x4 value1, Matrix4x4 value2)
+        public Vector X
         {
-            Matrix4x4 m;
-
-            // First row
-            m.M11 = value1.M11 * value2.M11 + value1.M12 * value2.M21 + value1.M13 * value2.M31 + value1.M14 * value2.M41;
-            m.M12 = value1.M11 * value2.M12 + value1.M12 * value2.M22 + value1.M13 * value2.M32 + value1.M14 * value2.M42;
-            m.M13 = value1.M11 * value2.M13 + value1.M12 * value2.M23 + value1.M13 * value2.M33 + value1.M14 * value2.M43;
-            m.M14 = value1.M11 * value2.M14 + value1.M12 * value2.M24 + value1.M13 * value2.M34 + value1.M14 * value2.M44;
-
-            // Second row
-            m.M21 = value1.M21 * value2.M11 + value1.M22 * value2.M21 + value1.M23 * value2.M31 + value1.M24 * value2.M41;
-            m.M22 = value1.M21 * value2.M12 + value1.M22 * value2.M22 + value1.M23 * value2.M32 + value1.M24 * value2.M42;
-            m.M23 = value1.M21 * value2.M13 + value1.M22 * value2.M23 + value1.M23 * value2.M33 + value1.M24 * value2.M43;
-            m.M24 = value1.M21 * value2.M14 + value1.M22 * value2.M24 + value1.M23 * value2.M34 + value1.M24 * value2.M44;
-
-            // Third row
-            m.M31 = value1.M31 * value2.M11 + value1.M32 * value2.M21 + value1.M33 * value2.M31 + value1.M34 * value2.M41;
-            m.M32 = value1.M31 * value2.M12 + value1.M32 * value2.M22 + value1.M33 * value2.M32 + value1.M34 * value2.M42;
-            m.M33 = value1.M31 * value2.M13 + value1.M32 * value2.M23 + value1.M33 * value2.M33 + value1.M34 * value2.M43;
-            m.M34 = value1.M31 * value2.M14 + value1.M32 * value2.M24 + value1.M33 * value2.M34 + value1.M34 * value2.M44;
-
-            // Fourth row
-            m.M41 = value1.M41 * value2.M11 + value1.M42 * value2.M21 + value1.M43 * value2.M31 + value1.M44 * value2.M41;
-            m.M42 = value1.M41 * value2.M12 + value1.M42 * value2.M22 + value1.M43 * value2.M32 + value1.M44 * value2.M42;
-            m.M43 = value1.M41 * value2.M13 + value1.M42 * value2.M23 + value1.M43 * value2.M33 + value1.M44 * value2.M43;
-            m.M44 = value1.M41 * value2.M14 + value1.M42 * value2.M24 + value1.M43 * value2.M34 + value1.M44 * value2.M44;
-
-            return m;
+            get
+            {
+                return new Vector(M11, M21, M31);
+            }
         }
 
         /// <summary>
-        /// Multiplies a matrix by a scalar value.
+        /// Gets the Y vector component of this matrix (first three elements of second column).
         /// </summary>
-        /// <param name="value1">The source matrix.</param>
-        /// <param name="value2">The scaling factor.</param>
-        /// <returns>The scaled matrix.</returns>
-        public static Matrix4x4 operator *(Matrix4x4 value1, double value2)
+        public Vector Y
         {
-            Matrix4x4 m;
-
-            m.M11 = value1.M11 * value2;
-            m.M12 = value1.M12 * value2;
-            m.M13 = value1.M13 * value2;
-            m.M14 = value1.M14 * value2;
-            m.M21 = value1.M21 * value2;
-            m.M22 = value1.M22 * value2;
-            m.M23 = value1.M23 * value2;
-            m.M24 = value1.M24 * value2;
-            m.M31 = value1.M31 * value2;
-            m.M32 = value1.M32 * value2;
-            m.M33 = value1.M33 * value2;
-            m.M34 = value1.M34 * value2;
-            m.M41 = value1.M41 * value2;
-            m.M42 = value1.M42 * value2;
-            m.M43 = value1.M43 * value2;
-            m.M44 = value1.M44 * value2;
-            return m;
+            get
+            {
+                return new Vector(M12, M22, M32);
+            }
         }
 
         /// <summary>
-        /// Returns a boolean indicating whether the given two matrices are equal.
+        /// Gets the Z vector component of this matrix (first three elements of third column).
         /// </summary>
-        /// <param name="value1">The first matrix to compare.</param>
-        /// <param name="value2">The second matrix to compare.</param>
-        /// <returns>True if the given matrices are equal; False otherwise.</returns>
-        public static bool operator ==(Matrix4x4 value1, Matrix4x4 value2)
+        public Vector Z
         {
-            return (value1.M11 == value2.M11 && value1.M22 == value2.M22 && value1.M33 == value2.M33 && value1.M44 == value2.M44 && // Check diagonal element first for early out.
-                                                value1.M12 == value2.M12 && value1.M13 == value2.M13 && value1.M14 == value2.M14 &&
-                    value1.M21 == value2.M21 && value1.M23 == value2.M23 && value1.M24 == value2.M24 &&
-                    value1.M31 == value2.M31 && value1.M32 == value2.M32 && value1.M34 == value2.M34 &&
-                    value1.M41 == value2.M41 && value1.M42 == value2.M42 && value1.M43 == value2.M43);
+            get
+            {
+                return new Vector(M13, M23, M33);
+            }
         }
 
         /// <summary>
-        /// Returns a boolean indicating whether the given two matrices are not equal.
+        /// Gets or sets the translation component of this matrix.
         /// </summary>
-        /// <param name="value1">The first matrix to compare.</param>
-        /// <param name="value2">The second matrix to compare.</param>
-        /// <returns>True if the given matrices are not equal; False if they are equal.</returns>
-        public static bool operator !=(Matrix4x4 value1, Matrix4x4 value2)
+        public Vector Translation
         {
-            return (value1.M11 != value2.M11 || value1.M12 != value2.M12 || value1.M13 != value2.M13 || value1.M14 != value2.M14 ||
-                    value1.M21 != value2.M21 || value1.M22 != value2.M22 || value1.M23 != value2.M23 || value1.M24 != value2.M24 ||
-                    value1.M31 != value2.M31 || value1.M32 != value2.M32 || value1.M33 != value2.M33 || value1.M34 != value2.M34 ||
-                    value1.M41 != value2.M41 || value1.M42 != value2.M42 || value1.M43 != value2.M43 || value1.M44 != value2.M44);
+            get
+            {
+                return new Vector(M14, M24, M34);
+            }
+            set
+            {
+                // @TODO remove casting when Vector uses doubles
+                M14 = value.X;
+                M24 = value.Y;
+                M34 = value.Z;
+            }
+        }
+
+        #endregion properties
+
+
+
+
+
+
+        #region methods
+
+        /// <summary>
+        /// Calculates the determinant of the matrix.
+        /// </summary>
+        /// <returns>The determinant of the matrix.</returns>
+        public double GetDeterminant()
+        {
+            // | a b c d |     | f g h |     | e g h |     | e f h |     | e f g |
+            // | e f g h | = a | j k l | - b | i k l | + c | i j l | - d | i j k |
+            // | i j k l |     | n o p |     | m o p |     | m n p |     | m n o |
+            // | m n o p |
+            //
+            //   | f g h |
+            // a | j k l | = a ( f ( kp - lo ) - g ( jp - ln ) + h ( jo - kn ) )
+            //   | n o p |
+            //
+            //   | e g h |     
+            // b | i k l | = b ( e ( kp - lo ) - g ( ip - lm ) + h ( io - km ) )
+            //   | m o p |     
+            //
+            //   | e f h |
+            // c | i j l | = c ( e ( jp - ln ) - f ( ip - lm ) + h ( in - jm ) )
+            //   | m n p |
+            //
+            //   | e f g |
+            // d | i j k | = d ( e ( jo - kn ) - f ( io - km ) + g ( in - jm ) )
+            //   | m n o |
+            //
+            // Cost of operation
+            // 17 adds and 28 muls.
+            //
+            // add: 6 + 8 + 3 = 17
+            // mul: 12 + 16 = 28
+
+            double a = M11, b = M12, c = M13, d = M14;
+            double e = M21, f = M22, g = M23, h = M24;
+            double i = M31, j = M32, k = M33, l = M34;
+            double m = M41, n = M42, o = M43, p = M44;
+
+            double kp_lo = k * p - l * o;
+            double jp_ln = j * p - l * n;
+            double jo_kn = j * o - k * n;
+            double ip_lm = i * p - l * m;
+            double io_km = i * o - k * m;
+            double in_jm = i * n - j * m;
+
+            return a * (f * kp_lo - g * jp_ln + h * jo_kn) -
+                   b * (e * kp_lo - g * ip_lm + h * io_km) +
+                   c * (e * jp_ln - f * ip_lm + h * in_jm) -
+                   d * (e * jo_kn - f * io_km + g * in_jm);
         }
 
         /// <summary>
@@ -1675,38 +1793,80 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
-        /// Checks if all the values of the matrices are below a threshold.
-        /// </summary>
-        /// <param name="other"></param>
-        /// <param name="epsilon"></param>
-        /// <returns></returns>
-        public bool IsSimilar(Matrix4x4 other, double epsilon)
-        {
-            return (
-                // Check diagonal element first for early out.
-                Math.Abs(M11 - other.M11) < epsilon && Math.Abs(M22 - other.M22) < epsilon &&
-                Math.Abs(M33 - other.M33) < epsilon && Math.Abs(M44 - other.M44) < epsilon &&
-
-                Math.Abs(M12 - other.M12) < epsilon && Math.Abs(M13 - other.M13) < epsilon && Math.Abs(M14 - other.M14) < epsilon &&
-                Math.Abs(M21 - other.M21) < epsilon && Math.Abs(M23 - other.M23) < epsilon && Math.Abs(M24 - other.M24) < epsilon &&
-                Math.Abs(M31 - other.M31) < epsilon && Math.Abs(M32 - other.M32) < epsilon && Math.Abs(M34 - other.M34) < epsilon &&
-                Math.Abs(M41 - other.M41) < epsilon && Math.Abs(M42 - other.M42) < epsilon && Math.Abs(M43 - other.M43) < epsilon);
-
-        }
-
-        /// <summary>
         /// Returns a String representing this matrix instance.
         /// </summary>
         /// <returns>The string representation.</returns>
         public override string ToString()
         {
-            CultureInfo ci = CultureInfo.InvariantCulture;
+            //CultureInfo ci = CultureInfo.InvariantCulture;
 
-            return String.Format(ci, "{{ {{M11:{0} M12:{1} M13:{2} M14:{3}}} {{M21:{4} M22:{5} M23:{6} M24:{7}}} {{M31:{8} M32:{9} M33:{10} M34:{11}}} {{M41:{12} M42:{13} M43:{14} M44:{15}}} }}",
-                                 M11.ToString(ci), M12.ToString(ci), M13.ToString(ci), M14.ToString(ci),
-                                 M21.ToString(ci), M22.ToString(ci), M23.ToString(ci), M24.ToString(ci),
-                                 M31.ToString(ci), M32.ToString(ci), M33.ToString(ci), M34.ToString(ci),
-                                 M41.ToString(ci), M42.ToString(ci), M43.ToString(ci), M44.ToString(ci));
+            //return String.Format(ci, "{{ {{M11:{0} M12:{1} M13:{2} M14:{3}}} {{M21:{4} M22:{5} M23:{6} M24:{7}}} {{M31:{8} M32:{9} M33:{10} M34:{11}}} {{M41:{12} M42:{13} M43:{14} M44:{15}}} }}",
+            //                     M11.ToString(ci), M12.ToString(ci), M13.ToString(ci), M14.ToString(ci),
+            //                     M21.ToString(ci), M22.ToString(ci), M23.ToString(ci), M24.ToString(ci),
+            //                     M31.ToString(ci), M32.ToString(ci), M33.ToString(ci), M34.ToString(ci),
+            //                     M41.ToString(ci), M42.ToString(ci), M43.ToString(ci), M44.ToString(ci));
+
+            return string.Format(CultureInfo.InvariantCulture,
+                "[{0}, {1}, {2}, {3}]\n[{4}, {5}, {6}, {7}]\n[{8}, {9}, {10}, {11}]\n[{12}, {13}, {14}, {15}]",
+                Math.Round(M11, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M12, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M13, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M14, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M21, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M22, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M23, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M24, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M31, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M32, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M33, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M34, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M41, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M42, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M43, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M44, MMath.STRING_ROUND_DECIMALS_MM));
         }
+
+
+        #endregion methods
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        
+
+        
+
+        
     }
 }

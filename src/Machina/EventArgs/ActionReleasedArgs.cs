@@ -66,7 +66,7 @@ namespace Machina
             return string.Format("{{\"event\":\"action-released\",\"last\":\"{0}\",\"id\":{8},\"pend\":{1},\"pos\":{2},\"ori\":{3},\"quat\":{4},\"axes\":{5},\"extax\":{6},\"conf\":{7}}}",
                 Utilities.Strings.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
                 this.PendingReleaseToDevice,
-                this.Position?.ToArrayString() ?? "null",
+                this.Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
                 this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
                 this.Rotation?.Q.ToArrayString() ?? "null",
                 this.Axes?.ToArrayString() ?? "null",

@@ -34,7 +34,12 @@ namespace Machina
     /// </summary>
     public interface ISerializableArray
     {
-        string ToArrayString();
+        /// <summary>
+        /// JSON array representation of this object with rounding decimals. Use -1 for no rounding.
+        /// </summary>
+        /// <param name="decimals"></param>
+        /// <returns></returns>
+        string ToArrayString(int decimals);
     }
 
     /// <summary>
@@ -42,6 +47,11 @@ namespace Machina
     /// </summary>
     public interface ISerializableJSON
     {
-        string ToJSONString();
+        /// <summary>
+        /// JSON representation of this object, with rounding decimals. Use -1 for no rounding.
+        /// </summary>
+        /// <param name="decimals"></param>
+        /// <returns></returns>
+        string ToJSONString(int decimals);
     }
 }

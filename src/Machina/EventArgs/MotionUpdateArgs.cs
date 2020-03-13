@@ -52,7 +52,7 @@ namespace Machina
         public override string ToJSONString()
         {
             return string.Format("{{\"event\":\"motion-update\",\"pos\":{0},\"ori\":{1},\"quat\":{2},\"axes\":{3},\"extax\":{4},\"conf\":{5}}}",
-                this.Position?.ToArrayString() ?? "null",
+                this.Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
                 this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
                 this.Rotation?.Q.ToArrayString() ?? "null",
                 this.Axes?.ToArrayString() ?? "null",

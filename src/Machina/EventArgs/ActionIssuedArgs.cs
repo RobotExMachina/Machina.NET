@@ -59,7 +59,7 @@ namespace Machina
         {
             return string.Format("{{\"event\":\"action-issued\",\"last\":\"{0}\",\"id\":{7},\"pos\":{1},\"ori\":{2},\"quat\":{3},\"axes\":{4},\"extax\":{5},\"conf\":{6}}}",
                 Utilities.Strings.EscapeDoubleQuotes(this.LastAction.ToInstruction()),
-                this.Position?.ToArrayString() ?? "null",
+                this.Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
                 this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
                 this.Rotation?.Q.ToArrayString() ?? "null",
                 this.Axes?.ToArrayString() ?? "null",

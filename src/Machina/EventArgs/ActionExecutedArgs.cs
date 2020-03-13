@@ -73,7 +73,7 @@ namespace Machina
                 Utilities.Strings.EscapeDoubleQuotes(this.LastAction?.ToInstruction()) ?? "null",
                 this.PendingExecutionOnDevice,
                 this.PendingExecutionTotal,
-                this.Position?.ToArrayString() ?? "null",
+                this.Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
                 this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
                 this.Rotation?.Q.ToArrayString() ?? "null",
                 this.Axes?.ToArrayString() ?? "null",
