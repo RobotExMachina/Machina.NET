@@ -97,8 +97,8 @@ namespace DataTypesTests
                 }
                 else
                 {
-                    int dir = Vector.CompareDirections(m.X, m.Y);
-                    Assert.IsTrue(dir == -1 || dir == 1 || dir == 3, "Matrix didn't orthogonalize vectors with direction " + dir);
+                    Direction dir = Vector.CompareDirections(m.X, m.Y);
+                    Assert.IsTrue(dir == Direction.Invalid || dir == Direction.Parallel || dir == Direction.Opposite, "Matrix didn't orthogonalize vectors with direction " + dir);
                 }
 
             }
@@ -110,7 +110,7 @@ namespace DataTypesTests
             Matrix4x4 m;
             Vector vecX, vecY;
             Vector mVecX, mVecY, mVecZ;
-            int dir;
+            Direction dir;
             bool success;
 
             for (var i = 0; i < 50; i++)
@@ -126,7 +126,7 @@ namespace DataTypesTests
 
                 mVecX = new Vector(m.M11, m.M21, m.M31);
                 dir = Vector.CompareDirections(vecX, mVecX);
-                Assert.IsTrue(dir == 1, "Original VectorX and orthogonalized one are not parallel");
+                Assert.IsTrue(dir == Direction.Parallel, "Original VectorX and orthogonalized one are not parallel");
             }
 
             for (var i = 0; i < 100; i++)
@@ -141,11 +141,11 @@ namespace DataTypesTests
                 Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
                 Trace.WriteLine(m);
 
-                if (dir == -1)
+                if (dir == Direction.Invalid)
                 {
                     Assert.IsTrue(vecX.IsZero || vecY.IsZero, "One of the vectors should be zero.");
                 }
-                else if (dir == 1 || dir == 3)
+                else if (dir == Direction.Parallel || dir == Direction.Opposite)
                 {
                     Assert.IsTrue(m.IsIdentity, "Parallel vectors should yield an identity matrix");
                 }
@@ -154,17 +154,17 @@ namespace DataTypesTests
                     Assert.IsTrue(m.IsOrthogonalRotation, "Matrix isn't orthogonal");
 
                     mVecX = new Vector(m.M11, m.M21, m.M31);
-                    Assert.IsTrue(Vector.CompareDirections(vecX, mVecX) == 1, "Original VectorX and orthogonalized X should be parallel");
+                    Assert.IsTrue(Vector.CompareDirections(vecX, mVecX) == Direction.Parallel, "Original VectorX and orthogonalized X should be parallel");
 
                     mVecY = new Vector(m.M12, m.M22, m.M32);
-                    Assert.IsTrue(Vector.CompareDirections(vecX, mVecY) == 2, "Original VectorX and orthogonalized Y should be perpendicular");
+                    Assert.IsTrue(Vector.CompareDirections(vecX, mVecY) == Direction.Orthogonal, "Original VectorX and orthogonalized Y should be perpendicular");
 
                     mVecZ = new Vector(m.M13, m.M23, m.M33);
-                    Assert.IsTrue(Vector.CompareDirections(vecX, mVecZ) == 2, "Original VectorX and orthogonalized Z should be perpendicular");
+                    Assert.IsTrue(Vector.CompareDirections(vecX, mVecZ) == Direction.Orthogonal, "Original VectorX and orthogonalized Z should be perpendicular");
 
-                    Assert.IsTrue(Vector.CompareDirections(mVecX, mVecY) == 2);
-                    Assert.IsTrue(Vector.CompareDirections(mVecX, mVecZ) == 2);
-                    Assert.IsTrue(Vector.CompareDirections(mVecY, mVecZ) == 2);
+                    Assert.IsTrue(Vector.CompareDirections(mVecX, mVecY) == Direction.Orthogonal);
+                    Assert.IsTrue(Vector.CompareDirections(mVecX, mVecZ) == Direction.Orthogonal);
+                    Assert.IsTrue(Vector.CompareDirections(mVecY, mVecZ) == Direction.Orthogonal);
                 }
             }
         }
@@ -178,7 +178,7 @@ namespace DataTypesTests
             SysMatrix44 m44, m44bis;
             SysQuat sq;
             Vector vecX, vecY;
-            int dir;
+            Direction dir;
             bool success;
 
             int runs = 500;
@@ -240,7 +240,7 @@ namespace DataTypesTests
             Matrix4x4 m1, m2;
             Quaternion q;
             Vector vecX, vecY;
-            int dir;
+            Direction dir;
             bool success;
 
             double[] r = new double[9];
@@ -405,7 +405,7 @@ namespace DataTypesTests
 
             double x0, y0, z0, x1, y1, z1;
             Vector xAxis, yAxis;
-            int dir;
+            Direction dir;
 
             // Test random permutations
             for (var i = 0; i < 200; i++)
@@ -441,7 +441,7 @@ namespace DataTypesTests
                 Trace.WriteLine(ori);
 
                 // If parallel or opposite, rotation matrix should be identity...
-                if (dir == -1 || dir == 1 || dir == 3)
+                if (dir == Direction.Invalid || dir == Direction.Parallel || dir == Direction.Opposite)
                 {
                     Assert.IsTrue(ori.XAxis.IsSimilarTo(Vector.XAxis, MMath.EPSILON2));
                 }

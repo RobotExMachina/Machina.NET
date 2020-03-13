@@ -354,13 +354,13 @@ namespace Machina.Types.Geometry
         public static bool Orthogonalize(Vector refX, Vector refY, out Vector orthoX, out Vector orthoY, out Vector orthoZ)
         {
             // Some sanity
-            int dir = Vector.CompareDirections(refX, refY);
-            if (dir == -1 || dir == 1 || dir == 3)
+            Direction dir = Vector.CompareDirections(refX, refY);
+            if (dir == Direction.Invalid || dir == Direction.Parallel || dir == Direction.Opposite)
             {
                 Logger.Verbose("Invalid vectors for orthogonalization.");
-                orthoX = Unset;
-                orthoY = Unset;
-                orthoZ = Unset;
+                orthoX = null;
+                orthoY = null;
+                orthoZ = null;
                 return false;
             }
 
@@ -595,27 +595,27 @@ namespace Machina.Types.Geometry
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Directions CompareDirections(Vector a, Vector b)
+        public static Direction CompareDirections(Vector a, Vector b)
         {
             double alpha = AngleBetween(a, b);
 
             if (alpha == MMath.UNSET_VALUE)
             {
-                return Directions.Invalid;
+                return Direction.Invalid;
             } 
             else if (alpha < MMath.EPSILON2)
             {
-                return Directions.Parallel;
+                return Direction.Parallel;
             }
             else if (alpha < 0.5 * Math.PI + MMath.EPSILON2 && alpha > 0.5 * Math.PI - MMath.EPSILON2)
             {
-                return Directions.Orthogonal;
+                return Direction.Orthogonal;
             }
             else if (Math.Abs(alpha - Math.PI) < MMath.EPSILON2)
             {
-                return Directions.Opposite;
+                return Direction.Opposite;
             }
-            return Directions.Other;
+            return Direction.Other;
         }
 
         /// <summary>

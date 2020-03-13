@@ -242,7 +242,7 @@ namespace Machina
     /// <summary>
     /// Defines the direction relation between two vectors.
     /// </summary>
-    public enum Directions
+    public enum Direction
     {
         /// <summary>
         /// Can't determine, one of them is probably zero.

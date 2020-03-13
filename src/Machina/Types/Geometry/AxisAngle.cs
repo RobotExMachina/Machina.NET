@@ -263,10 +263,10 @@ namespace Machina.Types.Geometry
             //Vector v1 = new Vector(this.X, this.Y, this.Z),
             //v2 = new Vector(axisAngle.X, axisAngle.Y, axisAngle.Z);
             //int directions = Vector.CompareDirections(v1, v2);
-            int directions = Vector.CompareDirections(this, other);
+            Direction dir = Vector.CompareDirections(this, other);
             
             // If axes are not parallel, they are not equivalent
-            if (directions == 0 || directions == 2)
+            if (dir == Direction.Other || dir == Direction.Orthogonal)
             {
                 return false;
             }
@@ -289,13 +289,13 @@ namespace Machina.Types.Geometry
             if (Math.Abs(a2 - 360) < MMath.EPSILON2) a2 = 0;
 
             // If the vectors have the same direction, angles should be module of each other.
-            if (directions == 1)
+            if (dir == Direction.Parallel)
             {
                 return Math.Abs(a1 - a2) < MMath.EPSILON2;
             }
 
             // If opposite directions, they should add up to 360 degs.
-            if (directions == 3)
+            if (dir == Direction.Opposite)
             {
                 return Math.Abs(a1 + a2 - 360) < MMath.EPSILON2;
             }
