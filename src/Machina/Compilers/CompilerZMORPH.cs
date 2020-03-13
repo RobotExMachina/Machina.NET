@@ -107,7 +107,7 @@ namespace Machina
 
             //// Machina bolierplate
             //this.initializationLines.Add("M82");                     // set extruder to absolute mode (this is actually ZMorph, but useful here
-            //this.initializationLines.Add($"G1 F{Math.Round(writer.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)}");  // initialize feed speed to the writer's state
+            //this.initializationLines.Add($"G1 F{Math.Round(writer.speed * 60.0, MachinaMath.STRING_ROUND_DECIMALS_MM)}");  // initialize feed speed to the writer's state
 
             this.initializationLines.AddRange(GenerateDisclaimerHeader(programName));
 
@@ -211,7 +211,7 @@ namespace Machina
                 case ActionType.Speed:
                     dec = string.Format(CultureInfo.InvariantCulture, 
                         "G1 F{0}",
-                        Math.Round(60.0 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(60.0 * cursor.speed, MMath.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Translation:
@@ -280,11 +280,11 @@ namespace Machina
 
                 case ActionType.Temperature:
                     ActionTemperature at = (ActionTemperature)action;
-                    //dec = $"{tempToGCode[new Tuple<RobotPartType, bool>(at.robotPart, at.wait)]} S{Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE)}";
+                    //dec = $"{tempToGCode[new Tuple<RobotPartType, bool>(at.robotPart, at.wait)]} S{Math.Round(cursor.partTemperature[at.robotPart], MMath.STRING_ROUND_DECIMALS_TEMPERATURE)}";
                     dec = string.Format(CultureInfo.InvariantCulture,
                         "{0} S{1}",
                         tempToGCode[new Tuple<RobotPartType, bool>(at.robotPart, at.wait)],
-                        Math.Round(cursor.partTemperature[at.robotPart], Geometry.STRING_ROUND_DECIMALS_TEMPERATURE));
+                        Math.Round(cursor.partTemperature[at.robotPart], MMath.STRING_ROUND_DECIMALS_TEMPERATURE));
                     break;
 
                 case ActionType.Extrusion:
@@ -352,9 +352,9 @@ namespace Machina
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "X{0} Y{1} Z{2}",
-                Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM));
+                Math.Round(cursor.position.X, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Z, MMath.STRING_ROUND_DECIMALS_MM));
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace Machina
             this.instructionLines.Add("M82");                     // set extruder to absolute mode (this is actually ZMorph, but useful here
             this.instructionLines.Add(string.Format(CultureInfo.InvariantCulture, 
                 "G1 F{0}",
-                Math.Round(cursor.speed * 60.0, Geometry.STRING_ROUND_DECIMALS_MM)));  // initialize feed speed to the writer's state
+                Math.Round(cursor.speed * 60.0, MMath.STRING_ROUND_DECIMALS_MM)));  // initialize feed speed to the writer's state
         }
         
         /// <summary>

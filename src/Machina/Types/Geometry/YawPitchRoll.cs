@@ -74,9 +74,9 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsSimilar(YawPitchRoll other)
         {
-            return Math.Abs(this.XAngle - other.XAngle) < EPSILON2
-                && Math.Abs(this.YAngle - other.YAngle) < EPSILON2
-                && Math.Abs(this.ZAngle - other.ZAngle) < EPSILON2;
+            return Math.Abs(this.XAngle - other.XAngle) < MMath.EPSILON2
+                && Math.Abs(this.YAngle - other.YAngle) < MMath.EPSILON2
+                && Math.Abs(this.ZAngle - other.ZAngle) < MMath.EPSILON2;
         }
 
         ///// <summary>
@@ -143,12 +143,12 @@ namespace Machina.Types.Geometry
         {
             // From Shoemake, Ken. "Animating rotation with quaternion curves." ACM SIGGRAPH computer graphics. Vol. 19. No. 3. ACM, 1985.
             // (using a different Euler convention than EuclideanSpace)
-            double cX = Math.Cos(0.5 * TO_RADS * this.XAngle),
-                   cY = Math.Cos(0.5 * TO_RADS * this.YAngle),
-                   cZ = Math.Cos(0.5 * TO_RADS * this.ZAngle),
-                   sX = Math.Sin(0.5 * TO_RADS * this.XAngle),
-                   sY = Math.Sin(0.5 * TO_RADS * this.YAngle),
-                   sZ = Math.Sin(0.5 * TO_RADS * this.ZAngle);
+            double cX = Math.Cos(0.5 * MMath.TO_RADS * this.XAngle),
+                   cY = Math.Cos(0.5 * MMath.TO_RADS * this.YAngle),
+                   cZ = Math.Cos(0.5 * MMath.TO_RADS * this.ZAngle),
+                   sX = Math.Sin(0.5 * MMath.TO_RADS * this.XAngle),
+                   sY = Math.Sin(0.5 * MMath.TO_RADS * this.YAngle),
+                   sZ = Math.Sin(0.5 * MMath.TO_RADS * this.ZAngle);
 
             return new Quaternion(cX * cY * cZ + sX * sY * sZ,
                                   sX * cY * cZ - cX * sY * sZ,
@@ -163,12 +163,12 @@ namespace Machina.Types.Geometry
         public RotationMatrix ToRotationMatrix()
         {
             // From https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles
-            double cX = Math.Cos(TO_RADS * this.XAngle),
-                   cY = Math.Cos(TO_RADS * this.YAngle),
-                   cZ = Math.Cos(TO_RADS * this.ZAngle),
-                   sX = Math.Sin(TO_RADS * this.XAngle),
-                   sY = Math.Sin(TO_RADS * this.YAngle),
-                   sZ = Math.Sin(TO_RADS * this.ZAngle);
+            double cX = Math.Cos(MMath.TO_RADS * this.XAngle),
+                   cY = Math.Cos(MMath.TO_RADS * this.YAngle),
+                   cZ = Math.Cos(MMath.TO_RADS * this.ZAngle),
+                   sX = Math.Sin(MMath.TO_RADS * this.XAngle),
+                   sY = Math.Sin(MMath.TO_RADS * this.YAngle),
+                   sZ = Math.Sin(MMath.TO_RADS * this.ZAngle);
 
             return new RotationMatrix(cY * cZ, sX * sY * cZ - cX * sZ, cX * sY * cZ + sX * sZ,
                                       cY * sZ, sX * sY * sZ + cX * cZ, cX * sY * sZ - sX * cZ,
@@ -185,16 +185,16 @@ namespace Machina.Types.Geometry
             double x, y, z, angle;
             double s;
 
-            double cX = Math.Cos(0.5 * TO_RADS * this.XAngle),
-                   cY = Math.Cos(0.5 * TO_RADS * this.YAngle),
-                   cZ = Math.Cos(0.5 * TO_RADS * this.ZAngle),
-                   sX = Math.Sin(0.5 * TO_RADS * this.XAngle),
-                   sY = Math.Sin(0.5 * TO_RADS * this.YAngle),
-                   sZ = Math.Sin(0.5 * TO_RADS * this.ZAngle);
+            double cX = Math.Cos(0.5 * MMath.TO_RADS * this.XAngle),
+                   cY = Math.Cos(0.5 * MMath.TO_RADS * this.YAngle),
+                   cZ = Math.Cos(0.5 * MMath.TO_RADS * this.ZAngle),
+                   sX = Math.Sin(0.5 * MMath.TO_RADS * this.XAngle),
+                   sY = Math.Sin(0.5 * MMath.TO_RADS * this.YAngle),
+                   sZ = Math.Sin(0.5 * MMath.TO_RADS * this.ZAngle);
 
             angle = 2 * Math.Acos(cX * cY * cZ + sX * sY * sZ);
             s = Math.Sin(0.5 * angle);
-            if (s < EPSILON2)
+            if (s < MMath.EPSILON2)
             {
                 // This AxisAngle represents no rotation (full turn).
                 x = y = z = 0;
@@ -207,7 +207,7 @@ namespace Machina.Types.Geometry
                 z = (cX * cY * sZ - sX * sY * cZ) / s;
             }
 
-            return new AxisAngle(x, y, z, TO_DEGS * angle, false);
+            return new AxisAngle(x, y, z, MMath.TO_DEGS * angle, false);
         }
 
         /// <summary>
@@ -224,9 +224,9 @@ namespace Machina.Types.Geometry
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "EulerZYX[Z:{0}, Y:{1}, X:{2}]",
-                Math.Round(this.ZAngle, STRING_ROUND_DECIMALS_RADS),
-                Math.Round(this.YAngle, STRING_ROUND_DECIMALS_RADS),
-                Math.Round(this.XAngle, STRING_ROUND_DECIMALS_RADS));
+                Math.Round(this.ZAngle, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(this.YAngle, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(this.XAngle, MMath.STRING_ROUND_DECIMALS_RADS));
         }
 
     }

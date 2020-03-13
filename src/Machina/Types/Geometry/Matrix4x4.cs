@@ -428,7 +428,7 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            double radians = degrees * Geometry.TO_RADS;
+            double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -469,7 +469,7 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            double radians = degrees * Geometry.TO_RADS;
+            double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -512,7 +512,7 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            double radians = degrees * Geometry.TO_RADS;
+            double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -553,7 +553,7 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            double radians = degrees * Geometry.TO_RADS;
+            double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -596,7 +596,7 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            double radians = degrees * Geometry.TO_RADS;
+            double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -637,7 +637,7 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            double radians = degrees * Geometry.TO_RADS;
+            double radians = degrees * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -689,7 +689,7 @@ namespace Machina.Types.Geometry
             //      [ 0          0          0          1]
             //
 
-            double ang = angleDegs * Geometry.TO_RADS;
+            double ang = angleDegs * MMath.TO_RADS;
             double c = Math.Cos(ang);
             double s = Math.Sin(ang);
             double t = 1 - c;
@@ -795,8 +795,10 @@ namespace Machina.Types.Geometry
                 double x0, double x1, double x2,
                 double y0, double y1, double y2)
         {
-            Vector.CrossProduct(x0, x1, x2, y0, y1, y2, 
-                out double z0, out double z1, out double z2);
+            // Cross product
+            double z0 = x1 * y2 - x2 * y1;
+            double z1 = x2 * y0 - x0 * y2;
+            double z2 = x0 * y1 - x1 * y0;
             
             Matrix4x4 m;
 
@@ -899,8 +901,8 @@ namespace Machina.Types.Geometry
             // M(2) = M(1) * (1)T(2)
             //
 
-            double a = alpha * Geometry.TO_RADS,
-                t = theta * Geometry.TO_RADS;
+            double a = alpha * MMath.TO_RADS,
+                t = theta * MMath.TO_RADS;
             double sa = Math.Sin(a),
                 ca = Math.Cos(a),
                 st = Math.Sin(t),

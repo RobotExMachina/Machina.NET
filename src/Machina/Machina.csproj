@@ -135,12 +135,15 @@
     <Compile Include="IO\IO.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Net\Net.cs" />
+    <Compile Include="Solvers\FK\MarvinFK.cs" />
+    <Compile Include="Solvers\FK\SolverFKBase.cs" />
     <Compile Include="Types\Data\DHParameters.cs" />
     <Compile Include="Types\Geometry\AxisAngle.cs" />
     <Compile Include="Types\Geometry\ExternalAxes.cs" />
     <Compile Include="Types\Data\RobotProgramFile.cs" />
     <Compile Include="Types\Geometry\Interval.cs" />
     <Compile Include="Types\Geometry\Matrix4x4.cs" />
+    <Compile Include="Types\Geometry\ONPlane.cs" />
     <Compile Include="Types\Geometry\Orientation.cs" />
     <Compile Include="Types\Geometry\Geometry.cs" />
     <Compile Include="Types\Geometry\Plane.cs" />
@@ -148,7 +151,6 @@
     <Compile Include="Types\Geometry\Rotation.cs" />
     <Compile Include="Types\Geometry\t_CoordinateSystem.cs" />
     <Compile Include="Types\Geometry\Axes.cs" />
-    <Compile Include="Types\Geometry\Point.cs" />
     <Compile Include="Types\Geometry\t_Frame.cs" />
     <Compile Include="Types\Geometry\t_Path.cs" />
     <Compile Include="Types\Geometry\t_Rotation.cs" />
@@ -172,7 +174,7 @@
     <Compile Include="Utilities\Parsing.cs" />
     <Compile Include="Utilities\Strings.cs" />
     <Compile Include="Utilities\Conversion.cs" />
-    <Compile Include="Utilities\Numeric.cs" />
+    <Compile Include="Utilities\MMath.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\DriverModules\UR\machina_ur_driver.script" />

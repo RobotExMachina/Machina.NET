@@ -21,10 +21,12 @@ namespace Machina.Types.Geometry
     /// </summary>
     public class AxisAngle : Geometry
     {
+        private Vector _axis; 
+
         /// <summary>
         /// The rotation axis.
         /// </summary>
-        public Vector Axis { get; internal set; }
+        public Vector Axis { get { return _axis; } internal set { _axis = value; } }
 
         /// <summary>
         /// Rotation angle in degrees.
@@ -34,17 +36,17 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// X coordinate of the rotation vector.
         /// </summary>
-        public double X { get { return this.Axis.X; } internal set { this.Axis.X = value; } }
+        public double X { get { return _axis.X; } internal set { _axis.X = value; } }
 
         /// <summary>
         /// Y coordinate of the rotation vector.
         /// </summary>
-        public double Y { get { return this.Axis.Y; } internal set { this.Axis.Y = value; } }
+        public double Y { get { return _axis.Y; } internal set { _axis.Y = value; } }
 
         /// <summary>
         /// Z coordinate of the rotation vector.
         /// </summary>
-        public double Z { get { return this.Axis.Z; } internal set { this.Axis.Z = value; } }
+        public double Z { get { return _axis.Z; } internal set { _axis.Z = value; } }
 
         /// <summary>
         /// Test if this AxisAngle is approximately equal to another.
@@ -53,10 +55,10 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsSimilar(AxisAngle other)
         {
-            return Math.Abs(this.Axis.X - other.Axis.X) < EPSILON2
-                && Math.Abs(this.Axis.Y - other.Axis.Y) < EPSILON2
-                && Math.Abs(this.Axis.Z - other.Axis.Z) < EPSILON2
-                && Math.Abs(this.Angle - other.Angle) < EPSILON2;
+            return Math.Abs(this.Axis.X - other.Axis.X) < MMath.EPSILON2
+                && Math.Abs(this.Axis.Y - other.Axis.Y) < MMath.EPSILON2
+                && Math.Abs(this.Axis.Z - other.Axis.Z) < MMath.EPSILON2
+                && Math.Abs(this.Angle - other.Angle) < MMath.EPSILON2;
         }
 
         ///// <summary>
@@ -165,20 +167,20 @@ namespace Machina.Types.Geometry
         /// </summary>
         public bool Normalize()
         {
-            double len = Axis.Length();
+            double len = Axis.Length;
 
-            if (len < EPSILON2)
+            if (len < MMath.EPSILON2)
             {
-                this.Axis.X = 0;
-                this.Axis.Y = 0;
-                this.Axis.Z = 0;
+                _axis.X = 0;
+                _axis.Y = 0;
+                _axis.Z = 0;
 
                 return false;
             }
 
-            this.Axis.X /= len;
-            this.Axis.Y /= len;
-            this.Axis.Z /= len;
+            _axis.X /= len;
+            _axis.Y /= len;
+            _axis.Z /= len;
 
             return true;
         }
@@ -194,8 +196,8 @@ namespace Machina.Types.Geometry
             //        && Math.Abs(this.Y) < EPSILON
             //        && Math.Abs(this.Z) < EPSILON);
 
-            return Math.Abs(this.Angle % 360) < EPSILON2
-                || this.Axis.IsZero();
+            return Math.Abs(this.Angle % 360) < MMath.EPSILON2
+                || this.Axis.IsZero;
         }
 
         /// <summary>
@@ -204,7 +206,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public double AxisLength()
         {
-            return this.Axis.Length();
+            return this.Axis.Length;
         }
 
         /// <summary>
@@ -225,7 +227,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         public void Flip()
         {
-            this.Axis.Invert();
+            this.Axis.Reverse();
             this.Angle *= -1;
         }
 
@@ -251,11 +253,11 @@ namespace Machina.Types.Geometry
             // Sanity checks
             if (this.IsZero())
             {
-                return Math.Abs(other.Angle % 360) < EPSILON2;
+                return Math.Abs(other.Angle % 360) < MMath.EPSILON2;
             } 
             else if (other.IsZero())
             {
-                return Math.Abs(this.Angle % 360) < EPSILON2;
+                return Math.Abs(this.Angle % 360) < MMath.EPSILON2;
             }
 
             //Vector v1 = new Vector(this.X, this.Y, this.Z),
@@ -276,7 +278,7 @@ namespace Machina.Types.Geometry
                 a1 += 360;
             }
             a1 %= 360;
-            if (Math.Abs(a1 - 360) < EPSILON2) a1 = 0;
+            if (Math.Abs(a1 - 360) < MMath.EPSILON2) a1 = 0;
 
             double a2 = other.Angle;
             while (a2 < 0)
@@ -284,18 +286,18 @@ namespace Machina.Types.Geometry
                 a2 += 360;
             }
             a2 %= 360;
-            if (Math.Abs(a2 - 360) < EPSILON2) a2 = 0;
+            if (Math.Abs(a2 - 360) < MMath.EPSILON2) a2 = 0;
 
             // If the vectors have the same direction, angles should be module of each other.
             if (directions == 1)
             {
-                return Math.Abs(a1 - a2) < EPSILON2;
+                return Math.Abs(a1 - a2) < MMath.EPSILON2;
             }
 
             // If opposite directions, they should add up to 360 degs.
             if (directions == 3)
             {
-                return Math.Abs(a1 + a2 - 360) < EPSILON2;
+                return Math.Abs(a1 + a2 - 360) < MMath.EPSILON2;
             }
 
             return false;  // if here, something went wrong
@@ -315,7 +317,7 @@ namespace Machina.Types.Geometry
                 return new Quaternion(1, 0, 0, 0);
             }
 
-            double a2 = 0.5 * TO_RADS * this.Angle;
+            double a2 = 0.5 * MMath.TO_RADS * this.Angle;
             double s = Math.Sin(a2);
 
             // Remember that axis vector is already normalized ;)
@@ -340,7 +342,7 @@ namespace Machina.Types.Geometry
             return new RotationVector(this.Axis.X, 
                 this.Axis.Y, 
                 this.Axis.Z, 
-                radians ? TO_RADS * this.Angle : this.Angle, 
+                radians ? MMath.TO_RADS * this.Angle : this.Angle, 
                 false);  // this vector should already be normalized
         }
 
@@ -362,7 +364,7 @@ namespace Machina.Types.Geometry
 
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
             // This conversion assumes the rotation vector is normalized.
-            double ang = this.Angle * TO_RADS;
+            double ang = this.Angle * MMath.TO_RADS;
             double c = Math.Cos(ang);
             double s = Math.Sin(ang);
             double t = 1 - c;
@@ -406,7 +408,7 @@ namespace Machina.Types.Geometry
             // The above may actually be faster, we will see...
 
             // This conversion assumes the rotation vector is normalized.
-            double ang = this.Angle * TO_RADS;
+            double ang = this.Angle * MMath.TO_RADS;
             double c = Math.Cos(ang);
             double s = Math.Sin(ang);
             double t = 1 - c;
@@ -415,23 +417,23 @@ namespace Machina.Types.Geometry
             double xAng, yAng, zAng;
 
             // North pole singularity (yAng ~ 90degs)? Note m02 is -sin(y) = -sin(90) = -1
-            if (trace < -1 + EPSILON3)
+            if (trace < -1 + MMath.EPSILON3)
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
                 zAng = Math.Atan2(t * this.Axis.Y * this.Axis.Z - s * this.Axis.X, t * this.Axis.X * this.Axis.Z + s * this.Axis.Y);
-                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
-                else if (zAng > Math.PI) zAng -= TAU;
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
             }
 
             // South pole singularity (yAng ~ -90degs)? Note m02 is -sin(y) = -sin(-90) = 1
-            else if (trace > 1 - EPSILON3)
+            else if (trace > 1 - MMath.EPSILON3)
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;
                 zAng = Math.Atan2(-t * this.Axis.Y * this.Axis.Z + s * this.Axis.X, -t * this.Axis.X * this.Axis.Z - s * this.Axis.Y);
-                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
-                else if (zAng > Math.PI) zAng -= TAU;
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
             }
 
             // Regular derivation
@@ -442,17 +444,17 @@ namespace Machina.Types.Geometry
                 zAng = Math.Atan2(t * this.Axis.X * this.Axis.Y + s * this.Axis.Z, c + t * this.Axis.X * this.Axis.X);
             }
 
-            return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
+            return new YawPitchRoll(MMath.TO_DEGS * xAng, MMath.TO_DEGS * yAng, MMath.TO_DEGS * zAng);
         }
 
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "AxisAngle[X:{0}, Y:{1}, Z:{2}, A:{3}]",
-                Math.Round(Axis.X, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Axis.Y, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Axis.Z, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(Axis.X, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(Axis.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(Axis.Z, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(Angle, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
     }
 }

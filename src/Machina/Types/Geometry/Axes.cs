@@ -168,29 +168,29 @@ namespace Machina.Types.Geometry
                 "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}, {9}{10}, {11}{12}]",
                 labels ? "Axes" : "",
                 labels ? "A1:" : "",
-                Math.Round(A1, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A1, MMath.STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A2:" : "",
-                Math.Round(A2, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A2, MMath.STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A3:" : "",
-                Math.Round(A3, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A3, MMath.STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A4:" : "",
-                Math.Round(A4, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A4, MMath.STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A5:" : "",
-                Math.Round(A5, STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A5, MMath.STRING_ROUND_DECIMALS_DEGS),
                 labels ? "A6:" : "",
-                Math.Round(A6, STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(A6, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
 
         public string ToArrayString()
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(A1, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A2, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A3, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A4, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A5, STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A6, STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(A1, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A2, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A3, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A4, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A5, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A6, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
 
     }

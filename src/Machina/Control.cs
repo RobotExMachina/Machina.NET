@@ -1139,7 +1139,7 @@ namespace Machina
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        internal bool InitializeRobotCursors(Point position = null, Rotation rotation = null, Axes joints = null, ExternalAxes extAx = null,
+        internal bool InitializeRobotCursors(Vector position = null, Rotation rotation = null, Axes joints = null, ExternalAxes extAx = null,
             double speed = Control.DEFAULT_SPEED, double acc = Control.DEFAULT_ACCELERATION, double precision = Control.DEFAULT_PRECISION,
             MotionType mType = Control.DEFAULT_MOTION_TYPE, ReferenceCS refCS = Control.DEFAULT_REFCS)
 

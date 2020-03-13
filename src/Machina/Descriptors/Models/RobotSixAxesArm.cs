@@ -32,7 +32,7 @@ namespace Machina.Descriptors.Models
         {
             RobotSixAxesArm bot = new RobotSixAxesArm();
 
-            // The Base (this is currently reduntant, but we will need it down the road?).
+            // The Base (this is currently reduntant, but we will need it down the road?)
             bot.Base = new RobotJoint
             {
                 BasePlane = Matrix4x4.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),

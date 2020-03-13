@@ -55,8 +55,8 @@ namespace Machina
         public override string ToInstruction()
         {
             string inst = relative ?
-                $"ExternalAxis({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)}" :
-                $"ExternalAxisTo({this.axisNumber},{Math.Round(this.value, Geometry.STRING_ROUND_DECIMALS_MM)}";
+                $"ExternalAxis({this.axisNumber},{Math.Round(this.value, MMath.STRING_ROUND_DECIMALS_MM)}" :
+                $"ExternalAxisTo({this.axisNumber},{Math.Round(this.value, MMath.STRING_ROUND_DECIMALS_MM)}";
 
             if (this.target != ExternalAxesTarget.All)
             {

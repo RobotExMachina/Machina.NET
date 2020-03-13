@@ -47,9 +47,9 @@ namespace Machina
         {
             return string.Format("{0}({1},{2},{3});",
                 (this.relative ? "Move" : "MoveTo"),
-                Math.Round(this.translation.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.translation.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.translation.Z, Geometry.STRING_ROUND_DECIMALS_MM)
+                Math.Round(this.translation.X, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.translation.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(this.translation.Z, MMath.STRING_ROUND_DECIMALS_MM)
             );
         }
     }

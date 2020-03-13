@@ -110,7 +110,7 @@ namespace TEST_StreamAPITests
             bot.Move(0, -100, 0);
             bot.Wait(2000);
 
-            bot.DefineTool("tool_100", new Point(0, 0, 100), Orientation.WorldXY);
+            bot.DefineTool("tool_100", new Vector(0, 0, 100), Orientation.WorldXY);
             bot.AttachTool("tool_100");
             bot.MoveTo(400, 0, 400);
             bot.Move(0, 100, 0);
@@ -119,7 +119,7 @@ namespace TEST_StreamAPITests
             bot.MoveTo(400, 0, 400);
             bot.Wait(2000);
 
-            bot.DefineTool("tool_300", new Point(0, 0, 300), Orientation.WorldXY);
+            bot.DefineTool("tool_300", new Vector(0, 0, 300), Orientation.WorldXY);
             bot.AttachTool("tool_300");
             bot.MoveTo(400, 0, 400);
             bot.Move(0, 100, 0);
@@ -200,7 +200,7 @@ namespace TEST_StreamAPITests
             bot.Message("Starting vertical square");
 
             // A 100 mm long tool with no TCP rotation
-            //Tool rod = new Tool("rod", new Point(0, 0, 100), Orientation.WorldXY, 1, new Point(0, 0, 50));
+            //Tool rod = new Tool("rod", new Vector(0, 0, 100), Orientation.WorldXY, 1, new Vector(0, 0, 50));
             //bot.Attach(rod);
 
             // Home
@@ -208,12 +208,12 @@ namespace TEST_StreamAPITests
             bot.PrecisionTo(10);
             bot.AxesTo(homeJoints);
 
-            // Joint move and rotate to starting point
+            // Joint move and rotate to starting Vector
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
             bot.SpeedTo(300 * (PHYSICAL_ROBOT ? 0.2 : 1));
             bot.PrecisionTo(5);
-            bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
+            bot.TransformTo(new Vector(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.Rotate(0, 1, 0, -90);
             bot.PopSettings();
             bot.Wait(500);
@@ -248,7 +248,7 @@ namespace TEST_StreamAPITests
             bot.Message("Starting vertical square");
 
             ////A 100 mm long tool with no TCP rotation
-            //Tool rod = new Tool("rod", new Point(0, 0, 100), Orientation.WorldXY, 1, new Point(0, 0, 50));
+            //Tool rod = new Tool("rod", new Vector(0, 0, 100), Orientation.WorldXY, 1, new Vector(0, 0, 50));
             //bot.Attach(rod);
 
             // UR is giving me problems with stupid linear mode...
@@ -260,12 +260,12 @@ namespace TEST_StreamAPITests
             bot.PrecisionTo(10);
             bot.AxesTo(homeJoints);
 
-            // Joint move and rotate to starting point
+            // Joint move and rotate to starting Vector
             bot.PushSettings();
             //bot.SpeedTo(100);
             //bot.AccelerationTo(50);
             bot.PrecisionTo(1);
-            bot.TransformTo(new Point(300, 300, 300), new Orientation(1, 0, 0, 0, -1, 0));
+            bot.TransformTo(new Vector(300, 300, 300), new Orientation(1, 0, 0, 0, -1, 0));
             bot.Rotate(0, 1, 0, 90);
             bot.PopSettings();
             bot.Wait(1000);
@@ -300,7 +300,7 @@ namespace TEST_StreamAPITests
             bot.Message("Starting vertical square");
 
             ////A 100 mm long tool with no TCP rotation
-            //Tool rod = new Tool("rod", new Point(0, 0, 100), Orientation.WorldXY, 1, new Point(0, 0, 50));
+            //Tool rod = new Tool("rod", new Vector(0, 0, 100), Orientation.WorldXY, 1, new Vector(0, 0, 50));
             //bot.Attach(rod);
 
             // UR is giving me problems with stupid linear mode...
@@ -319,12 +319,12 @@ namespace TEST_StreamAPITests
                    angle = Math.PI / 2;
             int steps = 32;
 
-            // Joint move and rotate to starting point
+            // Joint move and rotate to starting Vector
             bot.PushSettings();
             //bot.SpeedTo(100);
             //bot.AccelerationTo(50);
             bot.PrecisionTo(1);
-            bot.TransformTo(new Point(x, y, z), new Orientation(1, 0, 0, 0, -1, 0));
+            bot.TransformTo(new Vector(x, y, z), new Orientation(1, 0, 0, 0, -1, 0));
             bot.Rotate(0, 1, 0, 90);
             bot.PopSettings();
             //bot.Wait(1000);
@@ -370,12 +370,12 @@ namespace TEST_StreamAPITests
             bot.PrecisionTo(10);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
 
-            // Joint move and rotate to starting point
+            // Joint move and rotate to starting Vector
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
             bot.SpeedTo((int)(300 * (PHYSICAL_ROBOT ? 0.2 : 1)));
             bot.PrecisionTo(5);
-            bot.TransformTo(new Point(x, y, z), new Orientation(-1, 0, 0, 0, 1, 0));
+            bot.TransformTo(new Vector(x, y, z), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.PopSettings();
             bot.Wait(500);
 
@@ -410,7 +410,7 @@ namespace TEST_StreamAPITests
             bot.PrecisionTo(10);
             bot.AxesTo(0, -90, -90, -90, 90, 90);
 
-            // Approach first point
+            // Approach first Vector
             bot.MotionMode(MotionType.Linear);
             bot.SpeedTo(linearSpeed);
             bot.PrecisionTo(5);
@@ -449,7 +449,7 @@ namespace TEST_StreamAPITests
             bot.PrecisionTo(10);
             bot.AxesTo(0, -90, -90, -90, 90, 90);
 
-            // Approach first point
+            // Approach first Vector
             bot.MotionMode(MotionType.Linear);
             bot.SpeedTo(5 * linearSpeed);
             bot.PrecisionTo(5);
@@ -487,7 +487,7 @@ namespace TEST_StreamAPITests
 
         //    // Test MoveL
         //    arm.Speed(200);
-        //    arm.TransformTo(new Point(300, 300, 300), Rotation.FlippedAroundY);
+        //    arm.TransformTo(new Vector(300, 300, 300), Rotation.FlippedAroundY);
         //    arm.Speed(25);
         //    arm.Move(50, 0);
         //    arm.Move(0, 50);
@@ -516,7 +516,7 @@ namespace TEST_StreamAPITests
         //    if (it < maxTargets)
         //    {
         //        arm.Move(dir);
-        //        dir.Rotate(Point.ZAxis, 10);
+        //        dir.Rotate(Vector.ZAxis, 10);
         //    }
         //    else if (it == maxTargets)
         //    {

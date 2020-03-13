@@ -50,9 +50,9 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsSimilar(RotationVector other)
         {
-            return Math.Abs(this.X - other.X) < EPSILON2
-                && Math.Abs(this.Y - other.Y) < EPSILON2
-                && Math.Abs(this.Z - other.Z) < EPSILON2;
+            return Math.Abs(this.X - other.X) < MMath.EPSILON2
+                && Math.Abs(this.Y - other.Y) < MMath.EPSILON2
+                && Math.Abs(this.Z - other.Z) < MMath.EPSILON2;
         }
 
         ///// <summary>
@@ -127,9 +127,9 @@ namespace Machina.Types.Geometry
         {
             if (normalize)
             {
-                double len = Vector.Length(x, y, z);
+                double len = MMath.Length(x, y, z);
 
-                if (len < EPSILON2)
+                if (len < MMath.EPSILON2)
                 {
                     this.X = 0;
                     this.Y = 0;
@@ -177,7 +177,7 @@ namespace Machina.Types.Geometry
         public bool IsZero()
         {
             double sqlen = this.SqLength();
-            return sqlen < EPSILON2;
+            return sqlen < MMath.EPSILON2;
         }
 
 
@@ -222,7 +222,7 @@ namespace Machina.Types.Geometry
         public AxisAngle ToAxisAngle()
         {
             double angle = this.GetAngle();
-            if (angle < EPSILON2) return new AxisAngle(0, 0, 0, 0, false);
+            if (angle < MMath.EPSILON2) return new AxisAngle(0, 0, 0, 0, false);
 
             double x = this.X / angle,
                 y = this.Y / angle,
@@ -262,9 +262,9 @@ namespace Machina.Types.Geometry
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "RotationVector[{0}, {1}, {2}]",
-                Math.Round(X, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Y, STRING_ROUND_DECIMALS_MM),
-                Math.Round(Z, STRING_ROUND_DECIMALS_MM));
+                Math.Round(X, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(Y, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(Z, MMath.STRING_ROUND_DECIMALS_MM));
         }
 
     }

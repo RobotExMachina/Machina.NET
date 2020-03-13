@@ -10,7 +10,7 @@ namespace Machina.Types.Geometry
     {
         public static Plane WorldXY => new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);
         
-        public Point Origin { get; internal set; }
+        public Vector Origin { get; internal set; }
         public Orientation Orientation { get; internal set; }
 
         public Vector XAxis => this.Orientation.XAxis;
@@ -22,7 +22,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         public void Identity()
         {
-            this.Origin = new Point(0, 0, 0);
+            this.Origin = new Vector(0, 0, 0);
             this.Orientation = new Orientation(1, 0, 0, 0, 1, 0);
         }
 
@@ -40,7 +40,7 @@ namespace Machina.Types.Geometry
         /// <param name="origin"></param>
         /// <param name="xAxis"></param>
         /// <param name="yAxis"></param>
-        public Plane(Point origin, Vector xAxis, Vector yAxis) :
+        public Plane(Vector origin, Vector xAxis, Vector yAxis) :
             this(origin.X, origin.Y, origin.Z,
                  xAxis.X, xAxis.Y, xAxis.Z,
                  yAxis.X, yAxis.Y, yAxis.Z)
@@ -63,7 +63,7 @@ namespace Machina.Types.Geometry
                      double yVecX, double yVecY, double yVecZ)
         {
             this.Orientation = new Orientation(xVecX, xVecY, xVecZ, yVecX, yVecY, yVecZ);
-            this.Origin = new Point(originX, originY, originZ);
+            this.Origin = new Vector(originX, originY, originZ);
         }
 
 

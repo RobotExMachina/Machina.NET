@@ -79,15 +79,15 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsSimilar(RotationMatrix other)
         {
-            return Math.Abs(this.R[0] - other.R[0]) < EPSILON2
-                && Math.Abs(this.R[1] - other.R[1]) < EPSILON2
-                && Math.Abs(this.R[2] - other.R[2]) < EPSILON2
-                && Math.Abs(this.R[3] - other.R[3]) < EPSILON2
-                && Math.Abs(this.R[4] - other.R[4]) < EPSILON2
-                && Math.Abs(this.R[5] - other.R[5]) < EPSILON2
-                && Math.Abs(this.R[6] - other.R[6]) < EPSILON2
-                && Math.Abs(this.R[7] - other.R[7]) < EPSILON2
-                && Math.Abs(this.R[8] - other.R[8]) < EPSILON2;
+            return Math.Abs(this.R[0] - other.R[0]) < MMath.EPSILON2
+                && Math.Abs(this.R[1] - other.R[1]) < MMath.EPSILON2
+                && Math.Abs(this.R[2] - other.R[2]) < MMath.EPSILON2
+                && Math.Abs(this.R[3] - other.R[3]) < MMath.EPSILON2
+                && Math.Abs(this.R[4] - other.R[4]) < MMath.EPSILON2
+                && Math.Abs(this.R[5] - other.R[5]) < MMath.EPSILON2
+                && Math.Abs(this.R[6] - other.R[6]) < MMath.EPSILON2
+                && Math.Abs(this.R[7] - other.R[7]) < MMath.EPSILON2
+                && Math.Abs(this.R[8] - other.R[8]) < MMath.EPSILON2;
         }
 
         //public static bool operator ==(RotationMatrix m1, RotationMatrix m2)
@@ -281,9 +281,9 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsIdentity()
         {
-            return Math.Abs(R[0] - 1) < EPSILON2 && Math.Abs(R[1]) < EPSILON2 && Math.Abs(R[2]) < EPSILON2
-                && Math.Abs(R[3]) < EPSILON2 && Math.Abs(R[4] - 1) < EPSILON2 && Math.Abs(R[5]) < EPSILON2
-                && Math.Abs(R[6]) < EPSILON2 && Math.Abs(R[7]) < EPSILON2 && Math.Abs(R[8] - 1) < EPSILON2;
+            return Math.Abs(R[0] - 1) < MMath.EPSILON2 && Math.Abs(R[1]) < MMath.EPSILON2 && Math.Abs(R[2]) < MMath.EPSILON2
+                && Math.Abs(R[3]) < MMath.EPSILON2 && Math.Abs(R[4] - 1) < MMath.EPSILON2 && Math.Abs(R[5]) < MMath.EPSILON2
+                && Math.Abs(R[6]) < MMath.EPSILON2 && Math.Abs(R[7]) < MMath.EPSILON2 && Math.Abs(R[8] - 1) < MMath.EPSILON2;
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace Machina.Types.Geometry
             RotationMatrix t = new RotationMatrix(this);
             t.Transpose();
             RotationMatrix ident = RotationMatrix.Multiply(this, t);
-            return ident.IsIdentity() && Math.Abs(this.Determinant() - 1) < EPSILON2;
+            return ident.IsIdentity() && Math.Abs(this.Determinant() - 1) < MMath.EPSILON2;
         }
 
         /// <summary>
@@ -390,7 +390,7 @@ namespace Machina.Types.Geometry
             // Calculate the determinant
             double det = a00 * b01 + a01 * b11 + a02 * b21;
 
-            if (det < EPSILON2)
+            if (det < MMath.EPSILON2)
             {
                 return false;
             }
@@ -529,9 +529,9 @@ namespace Machina.Types.Geometry
             double sinv = 1 / Math.Sqrt(2);  // 0.7071...
 
             // Check for singularities
-            if (Math.Abs(M12 - M21) < EPSILON2
-                && Math.Abs(M13 - M31) < EPSILON2
-                && Math.Abs(M23 - M32) < EPSILON2)
+            if (Math.Abs(M12 - M21) < MMath.EPSILON2
+                && Math.Abs(M13 - M31) < MMath.EPSILON2
+                && Math.Abs(M23 - M32) < MMath.EPSILON2)
             {
                 // If identity matrix (angle = 0), return a non rotation AxisAngle
                 if (this.IsIdentity())
@@ -550,7 +550,7 @@ namespace Machina.Types.Geometry
                 // If m00 is the largest diagonal
                 if (xx > yy && xx > zz)
                 {
-                    if (xx < EPSILON2)
+                    if (xx < MMath.EPSILON2)
                     {
                         x = 0;
                         y = sinv;
@@ -566,7 +566,7 @@ namespace Machina.Types.Geometry
                 // If m11 is the largest diagonal
                 else if (yy > zz)
                 {
-                    if (yy < EPSILON2)
+                    if (yy < MMath.EPSILON2)
                     {
                         x = sinv;
                         y = 0;
@@ -582,7 +582,7 @@ namespace Machina.Types.Geometry
                 // m22 is the largest diagonal
                 else
                 {
-                    if (zz < EPSILON2)
+                    if (zz < MMath.EPSILON2)
                     {
                         x = sinv;
                         y = sinv;
@@ -603,8 +603,8 @@ namespace Machina.Types.Geometry
             double s = Math.Sqrt((M32 - M23) * (M32 - M23)
                     + (M13 - M31) * (M13 - M31)
                     + (M21 - M12) * (M21 - M12));  // for normalization (is this necessary here?)
-            if (Math.Abs(s) < EPSILON2) s = 1;  // "prevent divide by zero, should not happen if matrix is orthogonal and should be caught by singularity test above, but I've left it in just in case"
-            angle = TO_DEGS * Math.Acos(0.5 * (M11 + M22 + M33 - 1));
+            if (Math.Abs(s) < MMath.EPSILON2) s = 1;  // "prevent divide by zero, should not happen if matrix is orthogonal and should be caught by singularity test above, but I've left it in just in case"
+            angle = MMath.TO_DEGS * Math.Acos(0.5 * (M11 + M22 + M33 - 1));
             x = (M32 - M23) / s;
             y = (M13 - M31) / s;
             z = (M21 - M12) / s;
@@ -648,23 +648,23 @@ namespace Machina.Types.Geometry
             double xAng, yAng, zAng;
 
             // North pole singularity (yAng ~ 90degs)? Note m02 is -sin(y) = -sin(90) = -1
-            if (this.M31 < -1 + EPSILON3)
+            if (this.M31 < -1 + MMath.EPSILON3)
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
                 zAng = Math.Atan2(this.M23, this.M13);
-                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
-                else if (zAng > Math.PI) zAng -= TAU;
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
             }
 
             // South pole singularity (yAng ~ -90degs)? Note m02 is -sin(y) = -sin(-90) = 1
-            else if (this.M31 > 1 - EPSILON3) 
+            else if (this.M31 > 1 - MMath.EPSILON3) 
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;
                 zAng = Math.Atan2(-this.M23, -this.M13);
-                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
-                else if (zAng > Math.PI) zAng -= TAU;
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
             }
             
             // Regular derivation
@@ -675,7 +675,7 @@ namespace Machina.Types.Geometry
                 zAng = Math.Atan2(this.M21, this.M11);
             }
 
-            return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
+            return new YawPitchRoll(MMath.TO_DEGS * xAng, MMath.TO_DEGS * yAng, MMath.TO_DEGS * zAng);
         }
 
 
@@ -685,15 +685,15 @@ namespace Machina.Types.Geometry
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "RotationMatrix[[{0}, {1}, {2}], [{3}, {4}, {5}], [{6}, {7}, {8}]]",
-                Math.Round(M11, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M12, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M13, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M21, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M22, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M23, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M31, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M32, STRING_ROUND_DECIMALS_MM),
-                Math.Round(M33, STRING_ROUND_DECIMALS_MM));
+                Math.Round(M11, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M12, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M13, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M21, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M22, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M23, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M31, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M32, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(M33, MMath.STRING_ROUND_DECIMALS_MM));
         }
 
     }

@@ -42,12 +42,12 @@ namespace Machina
         {
             return string.Format("{0}({1},{2},{3},{4},{5},{6});",
                 (this.relative ? "Axes" : "AxesTo"),
-                Math.Round(this.joints.A1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.A2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.A3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.A4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.A5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(this.joints.A6, Geometry.STRING_ROUND_DECIMALS_DEGS)
+                Math.Round(this.joints.A1, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A2, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A3, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A4, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A5, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(this.joints.A6, MMath.STRING_ROUND_DECIMALS_DEGS)
             );
         }
     }

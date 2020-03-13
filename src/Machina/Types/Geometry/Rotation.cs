@@ -327,23 +327,23 @@ namespace Machina.Types.Geometry
                 "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}]",
                 labels ? "Rotation" : "",
                 labels ? "X:" : "",
-                Math.Round(AA.X, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.X, MMath.STRING_ROUND_DECIMALS_VECTOR),
                 labels ? "Y:" : "",
-                Math.Round(AA.Y, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Y, MMath.STRING_ROUND_DECIMALS_VECTOR),
                 labels ? "Z:" : "",
-                Math.Round(AA.Z, STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Z, MMath.STRING_ROUND_DECIMALS_VECTOR),
                 labels ? "A:" : "",
-                Math.Round(Angle, STRING_ROUND_DECIMALS_VECTOR));
+                Math.Round(Angle, MMath.STRING_ROUND_DECIMALS_VECTOR));
         }
 
         public string ToArrayString()
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3}]",
-                Math.Round(AA.X, STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(AA.Y, STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(AA.Z, STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(Angle, STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(AA.X, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Y, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(AA.Z, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(Angle, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
 
     }

@@ -49,22 +49,22 @@ namespace Machina
             if (this.relative)
             {
                 return string.Format("Rotate({0},{1},{2},{3});",
-                    Math.Round(this.rotation.AA.X, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                    Math.Round(this.rotation.AA.Y, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                    Math.Round(this.rotation.AA.Z, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                    Math.Round(this.rotation.AA.Angle, Geometry.STRING_ROUND_DECIMALS_DEGS)
+                    Math.Round(this.rotation.AA.X, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                    Math.Round(this.rotation.AA.Y, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                    Math.Round(this.rotation.AA.Z, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                    Math.Round(this.rotation.AA.Angle, MMath.STRING_ROUND_DECIMALS_DEGS)
                 );
             }
 
             // @TODO: improve this! 
             Orientation ori = new Orientation(this.rotation);
             return string.Format("RotateTo({0},{1},{2},{3},{4},{5});",
-                Math.Round(ori.XAxis.X, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(ori.XAxis.Y, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(ori.XAxis.Z, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(ori.YAxis.X, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(ori.YAxis.Y, Geometry.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(ori.YAxis.Z, Geometry.STRING_ROUND_DECIMALS_VECTOR)
+                Math.Round(ori.XAxis.X, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.XAxis.Y, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.XAxis.Z, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.YAxis.X, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.YAxis.Y, MMath.STRING_ROUND_DECIMALS_VECTOR),
+                Math.Round(ori.YAxis.Z, MMath.STRING_ROUND_DECIMALS_VECTOR)
             );
         }
     }

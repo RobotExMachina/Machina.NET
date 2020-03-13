@@ -100,13 +100,13 @@ namespace Machina.Types.Data
             double angleZ = Vector.AngleBetween(baseVZ, targetVZ);
             Vector crossZ = Vector.CrossProduct(baseVZ, targetVZ);
             int signAngleZ = (crossZ * targetVX) > 0 ? 1 : -1;
-            angleZ *= signAngleZ * Geometry.Geometry.TO_DEGS;
+            angleZ *= signAngleZ * MMath.TO_DEGS;
 
             // Theta offset angle between X vectors.
             double angleX = Vector.AngleBetween(baseVX, targetVX);
             Vector crossX = Vector.CrossProduct(baseVX, targetVX);
             int signAngleX = (crossX * baseVZ) > 0 ? 1 : -1;
-            angleX *= signAngleX * Geometry.Geometry.TO_DEGS;
+            angleX *= signAngleX * MMath.TO_DEGS;
 
             return new DHParameters
             {

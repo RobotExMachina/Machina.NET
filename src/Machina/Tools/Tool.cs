@@ -36,7 +36,7 @@ namespace Machina
         /// Position of the Tool Center Point (TCP) relative to the Tool's base coordinate system. 
         /// In other words, if the Tool gets attached to the robot flange in XYZ [0, 0, 0], where is the tooltip relative to this?
         /// </summary>
-        public Point TCPPosition { get; internal set; }
+        public Vector TCPPosition { get; internal set; }
 
         /// <summary>
         /// Orientation of the Tool Center Point (TCP) relative to the Tool's base coordinate system. 
@@ -62,10 +62,10 @@ namespace Machina
             double weight, double cogX, double cogY, double cogZ)
         {
             this.name = name;
-            this.TCPPosition = new Point(tcpX, tcpY, tcpZ);
+            this.TCPPosition = new Vector(tcpX, tcpY, tcpZ);
             this.TCPOrientation = new Orientation(tcp_vX0, tcp_vX1, tcp_vX2, tcp_vY0, tcp_vY1, tcp_vY2);
             this.Weight = weight;
-            this.CenterOfGravity = new Point(cogX, cogY, cogZ);
+            this.CenterOfGravity = new Vector(cogX, cogY, cogZ);
         }
 
         ///// <summary>
@@ -131,7 +131,7 @@ namespace Machina
         /// <param name="TCPPosition">Tool Center Point</param>
         /// <param name="TCPOrientation">Orientation of Tool Center Point</param>
         /// <returns></returns>
-        static public Tool Create(string name, Point TCPPosition, Orientation TCPOrientation)
+        static public Tool Create(string name, Vector TCPPosition, Orientation TCPOrientation)
         {
             Vector centerOfGravity = new Vector(TCPPosition);
             centerOfGravity.Scale(0.5);  // quick estimation
@@ -153,7 +153,7 @@ namespace Machina
         /// <param name="weightKg">Tool weight in Kg</param>
         /// <param name="centerOfGravity">Center Of Gravity</param>
         /// <returns></returns>
-        static public Tool Create(string name, Point TCPPosition, Orientation TCPOrientation, double weightKg, Point centerOfGravity)
+        static public Tool Create(string name, Vector TCPPosition, Orientation TCPOrientation, double weightKg, Vector centerOfGravity)
         {
             return new Tool(name,
                 TCPPosition.X, TCPPosition.Y, TCPPosition.Z,

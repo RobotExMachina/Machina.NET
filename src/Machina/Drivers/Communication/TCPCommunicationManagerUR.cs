@@ -536,15 +536,15 @@ namespace Machina.Drivers.Communication
 
                     initPos = new Vector(1000 * values[1] / 10000.0, 1000 * values[2] / 10000.0, 1000 * values[3] / 10000.0);
 
-                    initRot = new Rotation(new RotationVector(Geometry.TO_DEGS * values[4] / 10000.0,
-                        Geometry.TO_DEGS * values[5] / 10000.0, Geometry.TO_DEGS * values[6] / 10000.0).ToQuaternion());
+                    initRot = new Rotation(new RotationVector(MMath.TO_DEGS * values[4] / 10000.0,
+                        MMath.TO_DEGS * values[5] / 10000.0, MMath.TO_DEGS * values[6] / 10000.0).ToQuaternion());
 
-                    initAx = new Axes(Geometry.TO_DEGS * values[7] / 10000,
-                        Geometry.TO_DEGS * values[8] / 10000, 
-                        Geometry.TO_DEGS * values[9] / 10000,
-                        Geometry.TO_DEGS * values[10] / 10000,
-                        Geometry.TO_DEGS * values[11] / 10000,
-                        Geometry.TO_DEGS * values[12] / 10000);
+                    initAx = new Axes(MMath.TO_DEGS * values[7] / 10000,
+                        MMath.TO_DEGS * values[8] / 10000, 
+                        MMath.TO_DEGS * values[9] / 10000,
+                        MMath.TO_DEGS * values[10] / 10000,
+                        MMath.TO_DEGS * values[11] / 10000,
+                        MMath.TO_DEGS * values[12] / 10000);
 
                     logger.Debug("Received robot pose:");
                     logger.Debug(initPos);

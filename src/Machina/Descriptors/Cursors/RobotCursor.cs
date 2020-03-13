@@ -167,13 +167,13 @@ namespace Machina.Descriptors.Cursors
         /// <param name="rotation"></param>
         /// <param name="joints"></param>
         /// <returns></returns>
-        public bool Initialize(Vector position, Rotation rotation, Axes joints, ExternalAxes extAx,
+        public bool Initialize(Vector? position, Rotation rotation, Axes joints, ExternalAxes extAx,
             double speed, double acceleration, double precision, MotionType mType, ReferenceCS refCS)
         {
             if (position != null)
             {
-                this.position = new Vector(position);
-                this.prevPosition = new Vector(position);
+                this.position = new Vector(position.Value.X, position.Value.Y, position.Value.Z);
+                this.prevPosition = new Vector(position.Value.X, position.Value.Y, position.Value.Z);
             }
             if (rotation != null)
             {
@@ -662,7 +662,7 @@ namespace Machina.Descriptors.Cursors
                     return false;
                 }
 
-                newPosition.Set(action.translation);
+                newPosition = action.translation;
             }
 
             // @TODO: this must be more programmatically implemented 

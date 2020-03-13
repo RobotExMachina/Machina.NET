@@ -47,7 +47,7 @@ namespace Machina.Solvers.FK
             {
                 for (int i = 0; i < jointValues.Count; i++)
                 {
-                    rotsRad.Add(jointValues[i] * Geometry.TO_RADS);
+                    rotsRad.Add(jointValues[i] * MMath.TO_RADS);
                 }
             }
             else if (units == Units.Radians)
@@ -106,7 +106,7 @@ namespace Machina.Solvers.FK
 
             // FRAME 1
             Matrix4x4 p1 = _model.Base.BasePlane;
-            p1 = Matrix4x4.CreateRotation(p1.Z, rots[0] * Geometry.TO_DEGS, p1.Translation);
+            p1 = Matrix4x4.CreateRotation(p1.Z, rots[0] * MMath.TO_DEGS, p1.Translation);
 
 
 

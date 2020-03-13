@@ -657,7 +657,7 @@ namespace Machina
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        public bool MoveTo(Point position)
+        public bool MoveTo(Vector position)
         {
             return c.IssueTranslationRequest(position, false);
         }
@@ -796,7 +796,7 @@ namespace Machina
         /// <param name="position"></param>
         /// <param name="rotation"></param>
         /// <returns></returns>
-        public bool TransformTo(Point position, Orientation orientation)
+        public bool TransformTo(Vector position, Orientation orientation)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
             //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
@@ -811,7 +811,7 @@ namespace Machina
         /// <param name="rotation"></param>
         /// <param name="position"></param>
         /// <returns></returns>
-        public bool TransformTo(Orientation orientation, Point position)
+        public bool TransformTo(Orientation orientation, Vector position)
         {
             // Action order is irrelevant in absolute mode (since translations are applied based on immutable world XYZ)
             //return c.IssueTranslationAndRotationRequest(true, position, false, true, rotation, false);
@@ -1118,7 +1118,7 @@ namespace Machina
         /// <param name="TCPPosition"></param>
         /// <param name="TCPOrientation"></param>
         /// <returns></returns>
-        public bool DefineTool(string name, Point TCPPosition, Orientation TCPOrientation)
+        public bool DefineTool(string name, Vector TCPPosition, Orientation TCPOrientation)
         {
             if (!Utilities.Strings.IsValidVariableName(name))
             {
@@ -1139,7 +1139,7 @@ namespace Machina
         /// <param name="weightKg"></param>
         /// <param name="centerOfGravity"></param>
         /// <returns></returns>
-        public bool DefineTool(string name, Point TCPPosition, Orientation TCPOrientation, double weightKg, Point centerOfGravity)
+        public bool DefineTool(string name, Vector TCPPosition, Orientation TCPOrientation, double weightKg, Vector centerOfGravity)
         {
             if (!Utilities.Strings.IsValidVariableName(name))
             {
@@ -1390,7 +1390,7 @@ namespace Machina
         /// Returns a Point representation of the Robot's TCP position in mm and World coordinates.
         /// </summary>
         /// <returns></returns>
-        public Point GetCurrentPosition() => c.GetCurrentPosition();
+        public Vector GetCurrentPosition() => c.GetCurrentPosition();
 
         /// <summary>
         /// Returns a Rotation representation of the Robot's TCP orientation in quaternions.

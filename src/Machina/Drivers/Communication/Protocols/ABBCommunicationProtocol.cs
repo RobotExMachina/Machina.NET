@@ -74,13 +74,13 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         cursor.motionType == MotionType.Linear ? INST_MOVEL : INST_MOVEJ,
-                        Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(cursor.rotation.Q.W, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(cursor.rotation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(cursor.rotation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(cursor.rotation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.position.X, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.position.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.position.Z, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.rotation.Q.W, MMath.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.X, MMath.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.Y, MMath.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.Z, MMath.STRING_ROUND_DECIMALS_QUAT),
                         STR_MESSAGE_END_CHAR));
                     break;
 
@@ -91,12 +91,12 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         INST_MOVEABSJ,
-                        Math.Round(cursor.axes.A1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.A2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.A3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.A4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.A5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                        Math.Round(cursor.axes.A6, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A1, MMath.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A2, MMath.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A3, MMath.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A4, MMath.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A5, MMath.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.A6, MMath.STRING_ROUND_DECIMALS_DEGS),
                         STR_MESSAGE_END_CHAR));
                     break;
 
@@ -171,17 +171,17 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         INST_TOOL,
-                        Math.Round(t.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(t.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(t.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(t.TCPOrientation.Q.W, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(t.TCPOrientation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(t.TCPOrientation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(t.TCPOrientation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                        Math.Round(t.Weight, Geometry.STRING_ROUND_DECIMALS_KG),
-                        Math.Round(t.CenterOfGravity.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(t.CenterOfGravity.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                        Math.Round(t.CenterOfGravity.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPPosition.X, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPPosition.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPPosition.Z, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPOrientation.Q.W, MMath.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.TCPOrientation.Q.X, MMath.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.TCPOrientation.Q.Y, MMath.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.TCPOrientation.Q.Z, MMath.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(t.Weight, MMath.STRING_ROUND_DECIMALS_KG),
+                        Math.Round(t.CenterOfGravity.X, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.CenterOfGravity.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.CenterOfGravity.Z, MMath.STRING_ROUND_DECIMALS_MM),
 
                         //// Was getting messages longer than 80 chars, temporal worksround
                         //Math.Round(t.TCPPosition.X, 1),
@@ -336,7 +336,7 @@ namespace Machina.Drivers.Communication.Protocols
                         STR_MESSAGE_ID_CHAR,
                         action.Id,
                         INST_EXT_JOINTS_ROBTARGET,
-                        Math.Round(aaa.angle, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(aaa.angle, MMath.STRING_ROUND_DECIMALS_DEGS),
                         STR_MESSAGE_END_CHAR));
                     break;
 
@@ -374,7 +374,7 @@ namespace Machina.Drivers.Communication.Protocols
                 }
                 else
                 {
-                    param += Math.Round((double) extax[i], Geometry.STRING_ROUND_DECIMALS_MM)
+                    param += Math.Round((double) extax[i], MMath.STRING_ROUND_DECIMALS_MM)
                         .ToString(CultureInfo.InvariantCulture);
                 }
 

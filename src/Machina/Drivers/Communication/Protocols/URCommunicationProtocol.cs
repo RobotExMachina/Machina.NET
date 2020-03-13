@@ -112,13 +112,13 @@ namespace Machina.Drivers.Communication.Protocols
                         (int) Math.Round(cursor.position.X * 0.001 * FACTOR_M),
                         (int) Math.Round(cursor.position.Y * 0.001 * FACTOR_M),
                         (int) Math.Round(cursor.position.Z * 0.001 * FACTOR_M),
-                        (int) Math.Round(rv.X * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(rv.Y * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(rv.Z * Geometry.TO_RADS * FACTOR_RAD)
+                        (int) Math.Round(rv.X * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(rv.Y * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(rv.Z * MMath.TO_RADS * FACTOR_RAD)
                     };
 
                     // Workaround to SW3.0 crash problem: https://github.com/RobotExMachina/Machina.NET/issues/7
-                    if (ZERO_PRECISION_ON_SAME_POSITION_MOTION && cursor.precision != 0 && cursor.prevPosition != null && cursor.position.IsSimilar(cursor.prevPosition))
+                    if (ZERO_PRECISION_ON_SAME_POSITION_MOTION && cursor.precision != 0 && cursor.prevPosition != null && cursor.position.IsSimilarTo(cursor.prevPosition, MMath.EPSILON2))
                     {
                         Logger.Debug("Applying ZERO_PRECISION_ON_SAME_POSITION_MOTION");
                         _params = WrapParamsWithZeroPrecision(_params, cursor);
@@ -131,12 +131,12 @@ namespace Machina.Drivers.Communication.Protocols
                     {
                         _action.Id,
                         INST_MOVEJ_Q,
-                        (int) Math.Round(cursor.axes.A1 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.A2 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.A3 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.A4 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.A5 * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(cursor.axes.A6 * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A1 * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A2 * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A3 * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A4 * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A5 * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(cursor.axes.A6 * MMath.TO_RADS * FACTOR_RAD),
                     };
 
                     // Another ZERO_PRECISION_ON_SAME_POSITION_MOTION check should happen here for 6th axis rotation only...
@@ -173,9 +173,9 @@ namespace Machina.Drivers.Communication.Protocols
                         (int) Math.Round(t.TCPPosition.X * 0.001 * FACTOR_M),
                         (int) Math.Round(t.TCPPosition.Y * 0.001 * FACTOR_M),
                         (int) Math.Round(t.TCPPosition.Z * 0.001 * FACTOR_M),
-                        (int) Math.Round(trv.X * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(trv.Y * Geometry.TO_RADS * FACTOR_RAD),
-                        (int) Math.Round(trv.Z * Geometry.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(trv.X * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(trv.Y * MMath.TO_RADS * FACTOR_RAD),
+                        (int) Math.Round(trv.Z * MMath.TO_RADS * FACTOR_RAD),
                         (int) Math.Round(t.Weight * FACTOR_KG)
                     };
                     break;
@@ -267,10 +267,10 @@ namespace Machina.Drivers.Communication.Protocols
                     //    poppedSettings.Add(INST_TCP_ACC, (int)Math.Round(cursor.acceleration * 0.001 * FACTOR_M));
 
                     //if (beforePop.JointSpeed != cursor.jointSpeed)
-                    //    poppedSettings.Add(INST_Q_SPEED, (int)Math.Round(cursor.jointSpeed * Geometry.TO_RADS * FACTOR_RAD));
+                    //    poppedSettings.Add(INST_Q_SPEED, (int)Math.Round(cursor.jointSpeed * MachinaMath.TO_RADS * FACTOR_RAD));
 
                     //if (beforePop.JointAcceleration != cursor.jointAcceleration)
-                    //    poppedSettings.Add(INST_Q_ACC, (int)Math.Round(cursor.jointAcceleration * Geometry.TO_RADS * FACTOR_RAD));
+                    //    poppedSettings.Add(INST_Q_ACC, (int)Math.Round(cursor.jointAcceleration * MachinaMath.TO_RADS * FACTOR_RAD));
 
                     // These are the states kept in the controller as of v1.0 of the driver
                     if (beforePop.Speed != cursor.speed)

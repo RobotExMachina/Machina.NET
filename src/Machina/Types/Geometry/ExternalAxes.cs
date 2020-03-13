@@ -100,27 +100,27 @@ namespace Machina.Types.Geometry
                 labels ? "EA1:" : "",
                 this._externalAxes[0] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[0], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[0], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 labels ? "EA2:" : "",
                 this._externalAxes[1] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[1], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[1], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 labels ? "EA3:" : "",
                 this._externalAxes[2] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[2], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[2], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 labels ? "EA4:" : "",
                 this._externalAxes[3] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[3], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[3], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 labels ? "EA5:" : "",
                 this._externalAxes[4] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[4], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[4], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 labels ? "EA6:" : "",
                 this._externalAxes[5] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[5], STRING_ROUND_DECIMALS_MM).ToString());
+                    : Math.Round((double) this._externalAxes[5], MMath.STRING_ROUND_DECIMALS_MM).ToString());
         }
 
         public string ToArrayString()
@@ -129,22 +129,22 @@ namespace Machina.Types.Geometry
                 "[{0},{1},{2},{3},{4},{5}]",
                 this._externalAxes[0] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[0], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[0], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 this._externalAxes[1] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[1], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[1], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 this._externalAxes[2] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[2], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[2], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 this._externalAxes[3] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[3], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[3], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 this._externalAxes[4] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[4], STRING_ROUND_DECIMALS_MM).ToString(),
+                    : Math.Round((double) this._externalAxes[4], MMath.STRING_ROUND_DECIMALS_MM).ToString(),
                 this._externalAxes[5] == null
                     ? "null"
-                    : Math.Round((double) this._externalAxes[5], STRING_ROUND_DECIMALS_MM).ToString());
+                    : Math.Round((double) this._externalAxes[5], MMath.STRING_ROUND_DECIMALS_MM).ToString());
         }
     }
 }

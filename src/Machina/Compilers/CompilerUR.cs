@@ -198,18 +198,18 @@ namespace Machina
                         dec = string.Format(CultureInfo.InvariantCulture, 
                             "  movej(target{0}, a={1}, v={2}, r={3})",
                             id,
-                            Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
-                            Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
-                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                            Math.Round(MMath.TO_RADS * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_RADS),
+                            Math.Round(MMath.TO_RADS * cursor.speed, MMath.STRING_ROUND_DECIMALS_RADS),
+                            Math.Round(0.001 * cursor.precision, MMath.STRING_ROUND_DECIMALS_M));
                     }
                     else
                     {
                         dec = string.Format(CultureInfo.InvariantCulture, 
                             "  movep(target{0}, a={1}, v={2}, r={3})",
                             id,
-                            Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
-                            Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
-                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                            Math.Round(0.001 * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_M),
+                            Math.Round(0.001 * cursor.speed, MMath.STRING_ROUND_DECIMALS_M),
+                            Math.Round(0.001 * cursor.precision, MMath.STRING_ROUND_DECIMALS_M));
                     }
 
 
@@ -219,17 +219,17 @@ namespace Machina
                     //{
                     //    dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
                     //        id,
-                    //        cursor.jointAcceleration > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
-                    //        cursor.jointSpeed > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
-                    //        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    //        cursor.jointAcceleration > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointAcceleration, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                    //        cursor.jointSpeed > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointSpeed, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
+                    //        Math.Round(0.001 * cursor.precision, MachinaMath.STRING_ROUND_DECIMALS_M));
                     //}
                     //else
                     //{
                     //    dec = string.Format("  movel(target{0}, a={1}, v={2}, r={3})",
                     //        id,
-                    //        cursor.acceleration > Geometry.EPSILON ? Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_ACCELERATION,
-                    //        cursor.speed > Geometry.EPSILON ? Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_SPEED,
-                    //        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    //        cursor.acceleration > MachinaMath.EPSILON ? Math.Round(0.001 * cursor.acceleration, MachinaMath.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_ACCELERATION,
+                    //        cursor.speed > MachinaMath.EPSILON ? Math.Round(0.001 * cursor.speed, MachinaMath.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_SPEED,
+                    //        Math.Round(0.001 * cursor.precision, MachinaMath.STRING_ROUND_DECIMALS_M));
                     //}
                     break;
 
@@ -238,15 +238,15 @@ namespace Machina
                     dec = string.Format(CultureInfo.InvariantCulture, 
                             "  movej(target{0}, a={1}, v={2}, r={3})",
                             id,
-                            Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
-                            Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
-                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                            Math.Round(MMath.TO_RADS * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_RADS),
+                            Math.Round(MMath.TO_RADS * cursor.speed, MMath.STRING_ROUND_DECIMALS_RADS),
+                            Math.Round(0.001 * cursor.precision, MMath.STRING_ROUND_DECIMALS_M));
 
                     //dec = string.Format("  movej(target{0}, a={1}, v={2}, r={3})",
                     //    id,
-                    //    cursor.jointAcceleration > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
-                    //    cursor.jointSpeed > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
-                    //    Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    //    cursor.jointAcceleration > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointAcceleration, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                    //    cursor.jointSpeed > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointSpeed, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
+                    //    Math.Round(0.001 * cursor.precision, MachinaMath.STRING_ROUND_DECIMALS_M));
                     break;
 
                 case ActionType.Message:
@@ -319,12 +319,12 @@ namespace Machina
                     }
                     else
                     {
-                        //dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
+                        //dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, MachinaMath.STRING_ROUND_DECIMALS_VOLTAGE)})";
                         dec = string.Format(CultureInfo.InvariantCulture,
                             "  set_standard_analog_out({0}, {1})",
                             //aioa.isToolPin ? "tool" : "standard",  // there is no analog out on the tool!
                             aioa.pinNum,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                            Math.Round(aioa.value, MMath.STRING_ROUND_DECIMALS_VOLTAGE));
 
                     }
                     break;
@@ -379,18 +379,18 @@ namespace Machina
                         dec = string.Format(CultureInfo.InvariantCulture, 
                             "  movej({0}, a={1}, v={2}, r={3})",
                             GetPoseTargetValue(cursor),
-                            Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
-                            Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
-                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                            Math.Round(MMath.TO_RADS * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_RADS),
+                            Math.Round(MMath.TO_RADS * cursor.speed, MMath.STRING_ROUND_DECIMALS_RADS),
+                            Math.Round(0.001 * cursor.precision, MMath.STRING_ROUND_DECIMALS_M));
                     }
                     else
                     {
                         dec = string.Format(CultureInfo.InvariantCulture, 
                             "  movep({0}, a={1}, v={2}, r={3})",
                             GetPoseTargetValue(cursor),
-                            Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M),
-                            Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M),
-                            Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                            Math.Round(0.001 * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_M),
+                            Math.Round(0.001 * cursor.speed, MMath.STRING_ROUND_DECIMALS_M),
+                            Math.Round(0.001 * cursor.precision, MMath.STRING_ROUND_DECIMALS_M));
                     }
                     break;
 
@@ -400,17 +400,17 @@ namespace Machina
                 //{
                 //    dec = string.Format("  movej({0}, a={1}, v={2}, r={3})",
                 //        GetPoseTargetValue(cursor),
-                //        cursor.jointAcceleration > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
-                //        cursor.jointSpeed > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
-                //        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                //        cursor.jointAcceleration > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointAcceleration, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                //        cursor.jointSpeed > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointSpeed, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
+                //        Math.Round(0.001 * cursor.precision, MachinaMath.STRING_ROUND_DECIMALS_M));
                 //}
                 //else
                 //{
                 //    dec = string.Format("  movel({0}, a={1}, v={2}, r={3})",
                 //        GetPoseTargetValue(cursor),
-                //        cursor.acceleration > Geometry.EPSILON ? Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_ACCELERATION,
-                //        cursor.speed > Geometry.EPSILON ? Math.Round(0.001 * cursor.speed, Geometry.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_SPEED,
-                //        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                //        cursor.acceleration > MachinaMath.EPSILON ? Math.Round(0.001 * cursor.acceleration, MachinaMath.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_ACCELERATION,
+                //        cursor.speed > MachinaMath.EPSILON ? Math.Round(0.001 * cursor.speed, MachinaMath.STRING_ROUND_DECIMALS_M) : DEFAULT_TOOL_SPEED,
+                //        Math.Round(0.001 * cursor.precision, MachinaMath.STRING_ROUND_DECIMALS_M));
                 //}
                 //break;
 
@@ -418,15 +418,15 @@ namespace Machina
                     dec = string.Format(CultureInfo.InvariantCulture, 
                         "  movej({0}, a={1}, v={2}, r={3})",
                         GetJointTargetValue(cursor),
-                        Math.Round(Geometry.TO_RADS * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_RADS),
-                        Math.Round(Geometry.TO_RADS * cursor.speed, Geometry.STRING_ROUND_DECIMALS_RADS),
-                        Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                        Math.Round(MMath.TO_RADS * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_RADS),
+                        Math.Round(MMath.TO_RADS * cursor.speed, MMath.STRING_ROUND_DECIMALS_RADS),
+                        Math.Round(0.001 * cursor.precision, MMath.STRING_ROUND_DECIMALS_M));
 
                     //dec = string.Format("  movej({0}, a={1}, v={2}, r={3})",
                     //    GetJointTargetValue(cursor),
-                    //    cursor.jointAcceleration > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointAcceleration, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
-                    //    cursor.jointSpeed > Geometry.EPSILON ? Math.Round(Geometry.TO_RADS * cursor.jointSpeed, Geometry.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
-                    //    Math.Round(0.001 * cursor.precision, Geometry.STRING_ROUND_DECIMALS_M));
+                    //    cursor.jointAcceleration > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointAcceleration, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_ACCELERATION,
+                    //    cursor.jointSpeed > MachinaMath.EPSILON ? Math.Round(MachinaMath.TO_RADS * cursor.jointSpeed, MachinaMath.STRING_ROUND_DECIMALS_RADS) : DEFAULT_JOINT_SPEED,
+                    //    Math.Round(0.001 * cursor.precision, MachinaMath.STRING_ROUND_DECIMALS_M));
                     break;
 
                 case ActionType.Message:
@@ -499,12 +499,12 @@ namespace Machina
                     }
                     else
                     {
-                        //dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)})";
+                        //dec = $"  set_{(aioa.isToolPin ? "tool" : "standard")}_analog_out({aioa.pinNum}, {Math.Round(aioa.value, MachinaMath.STRING_ROUND_DECIMALS_VOLTAGE)})";
                         dec = string.Format(CultureInfo.InvariantCulture,
                             "  set_{0}_analog_out({1}, {2})",
                             aioa.isToolPin ? "tool" : "standard",
                             aioa.pinNum,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                            Math.Round(aioa.value, MMath.STRING_ROUND_DECIMALS_VOLTAGE));
                     }
                     break;
 
@@ -552,12 +552,12 @@ namespace Machina
             RotationVector axisAng = cursor.rotation.GetRotationVector(true);
             return string.Format(CultureInfo.InvariantCulture, 
                 "p[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(0.001 * cursor.position.X, Geometry.STRING_ROUND_DECIMALS_M),
-                Math.Round(0.001 * cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_M),
-                Math.Round(0.001 * cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_M),
-                Math.Round(axisAng.X, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(axisAng.Y, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(axisAng.Z, Geometry.STRING_ROUND_DECIMALS_RADS));
+                Math.Round(0.001 * cursor.position.X, MMath.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.position.Y, MMath.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.position.Z, MMath.STRING_ROUND_DECIMALS_M),
+                Math.Round(axisAng.X, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Y, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Z, MMath.STRING_ROUND_DECIMALS_RADS));
         }
 
         /// <summary>
@@ -567,15 +567,15 @@ namespace Machina
         internal static string GetJointTargetValue(RobotCursor cursor)
         {
             Axes jrad = new Axes(cursor.axes);  // use a shallow copy
-            jrad.Scale(Geometry.TO_RADS);  // convert to radians
+            jrad.Scale(MMath.TO_RADS);  // convert to radians
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(jrad.A1, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.A2, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.A3, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.A4, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.A5, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(jrad.A6, Geometry.STRING_ROUND_DECIMALS_RADS));
+                Math.Round(jrad.A1, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A2, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A3, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A4, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A5, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(jrad.A6, MMath.STRING_ROUND_DECIMALS_RADS));
         }
 
         /// <summary>
@@ -594,12 +594,12 @@ namespace Machina
 
             return string.Format(CultureInfo.InvariantCulture, 
                 "p[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(0.001 * cursor.tool.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_M),
-                Math.Round(0.001 * cursor.tool.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_M),
-                Math.Round(0.001 * cursor.tool.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_M),
-                Math.Round(axisAng.X, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(axisAng.Y, Geometry.STRING_ROUND_DECIMALS_RADS),
-                Math.Round(axisAng.Z, Geometry.STRING_ROUND_DECIMALS_RADS));
+                Math.Round(0.001 * cursor.tool.TCPPosition.X, MMath.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.tool.TCPPosition.Y, MMath.STRING_ROUND_DECIMALS_M),
+                Math.Round(0.001 * cursor.tool.TCPPosition.Z, MMath.STRING_ROUND_DECIMALS_M),
+                Math.Round(axisAng.X, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Y, MMath.STRING_ROUND_DECIMALS_RADS),
+                Math.Round(axisAng.Z, MMath.STRING_ROUND_DECIMALS_RADS));
 
         }
 

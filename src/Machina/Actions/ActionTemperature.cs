@@ -41,14 +41,14 @@ namespace Machina
                 return string.Format("{0} {1} temperature by {2} C{3}",
                     this.temperature < 0 ? "Decrease" : "Increase",
                     Enum.GetName(typeof(RobotPartType), this.robotPart),
-                    Math.Round(this.temperature, Geometry.STRING_ROUND_DECIMALS_TEMPERATURE),
+                    Math.Round(this.temperature, MMath.STRING_ROUND_DECIMALS_TEMPERATURE),
                     this.wait ? " and wait" : "");
             }
             else
             {
                 return string.Format("Set {0} temperature to {1} C{2}",
                     Enum.GetName(typeof(RobotPartType), this.robotPart),
-                    Math.Round(this.temperature, Geometry.STRING_ROUND_DECIMALS_TEMPERATURE),
+                    Math.Round(this.temperature, MMath.STRING_ROUND_DECIMALS_TEMPERATURE),
                     this.wait ? " and wait" : "");
             }
         }

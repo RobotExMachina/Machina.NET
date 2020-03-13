@@ -71,15 +71,15 @@ namespace Machina
             Orientation ori = new Orientation(this.rotation);
 
             return string.Format("TransformTo({0},{1},{2},{3},{4},{5},{6},{7},{8});",
-                    Math.Round(this.translation.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(this.translation.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(this.translation.Z, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(ori.XAxis.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(ori.XAxis.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(ori.XAxis.Z, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(ori.YAxis.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(ori.YAxis.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                    Math.Round(ori.YAxis.Z, Geometry.STRING_ROUND_DECIMALS_MM)
+                    Math.Round(this.translation.X, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.translation.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(this.translation.Z, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.XAxis.X, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.XAxis.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.XAxis.Z, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.YAxis.X, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.YAxis.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                    Math.Round(ori.YAxis.Z, MMath.STRING_ROUND_DECIMALS_MM)
                 );
         }
     }

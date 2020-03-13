@@ -145,7 +145,7 @@ namespace Machina
                     // If precision is very close to an integer, make it integer and/or use predefined zones
                     bool predef = false;
                     int roundZone = 0;
-                    if (Math.Abs(writer.precision - Math.Round(writer.precision)) < Geometry.EPSILON) {
+                    if (Math.Abs(writer.precision - Math.Round(writer.precision)) < MMath.EPSILON) {
                         roundZone = (int) Math.Round(writer.precision);
                         predef = PredefinedZones.Contains(roundZone);
                     }
@@ -342,9 +342,9 @@ namespace Machina
             switch (action.Type)
             {
                 case ActionType.Acceleration:
-                    bool zero = cursor.acceleration < Geometry.EPSILON;
+                    bool zero = cursor.acceleration < MMath.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
-                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
+                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 //case ActionType.JointSpeed:
@@ -359,11 +359,11 @@ namespace Machina
                     // Find if there was a change in acceleration, and set the corresponsing instruction...
                     ActionPushPop app = action as ActionPushPop;
                     if (app.push) break;  // only necessary for pops
-                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON) break;  // no change
+                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < MMath.EPSILON) break;  // no change
                     // If here, there was a change, so...
-                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON;
+                    bool zeroAcc = cursor.acceleration < MMath.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
-                        zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
+                        zeroAcc ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 case ActionType.Translation:
@@ -485,9 +485,9 @@ namespace Machina
             switch (action.Type)
             {
                 case ActionType.Acceleration:
-                    bool zero = cursor.acceleration < Geometry.EPSILON;
+                    bool zero = cursor.acceleration < MMath.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
-                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
+                        zero ? "\\Off" : "\\On := " + Math.Round(0.001 * cursor.acceleration, MMath.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 //case ActionType.JointSpeed:
@@ -502,14 +502,14 @@ namespace Machina
                     // Find if there was a change in acceleration, and set the corresponsing instruction...
                     ActionPushPop app = action as ActionPushPop;
                     if (app.push) break;  // only necessary for pops
-                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < Geometry.EPSILON) break;  // no change
+                    if (Math.Abs(cursor.acceleration - cursor.settingsBuffer.SettingsBeforeLastPop.Acceleration) < MMath.EPSILON) break;  // no change
                     // If here, there was a change, so...
-                    bool zeroAcc = cursor.acceleration < Geometry.EPSILON;
+                    bool zeroAcc = cursor.acceleration < MMath.EPSILON;
                     dec = string.Format("    WorldAccLim {0};",
                             zeroAcc
                                 ? "\\Off"
                                 : "\\On := " + Math.Round(0.001 * cursor.acceleration,
-                        Geometry.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
+                        MMath.STRING_ROUND_DECIMALS_M)).ToString(CultureInfo.InvariantCulture);
                     break;
 
                 case ActionType.Translation:
@@ -658,7 +658,7 @@ namespace Machina
             // ABB format: [TCP linear speed in mm/s, TCP reorientation speed in deg/s, linear external axis speed in mm/s, rotational external axis speed in deg/s]
             // Default linear speeddata are [vel, 500, 5000, 1000], which feels like a lot. 
             // Just use the speed data as linear or rotational value, and stay safe. 
-            string vel = Math.Round(cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
+            string vel = Math.Round(cursor.speed, MMath.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
 
             return string.Format("[{0},{1},{2},{3}]", vel, vel, vel, vel);
             
@@ -666,7 +666,7 @@ namespace Machina
             //// Using either rotationSpeed value or the same value as lin motion here.
             //return string.Format("[{0},{1},{2},{3}]", 
             //    cursor.speed, 
-            //    cursor.rotationSpeed > Geometry.EPSILON2 ? cursor.rotationSpeed : cursor.speed, 
+            //    cursor.rotationSpeed > MachinaMath.EPSILON2 ? cursor.rotationSpeed : cursor.speed, 
             //    5000, 
             //    1000);
 
@@ -679,7 +679,7 @@ namespace Machina
         /// <returns></returns>
         static internal string GetZoneValue(RobotCursor cursor)
         {
-            if (cursor.precision < Geometry.EPSILON)
+            if (cursor.precision < MMath.EPSILON)
                 return "fine";
 
             // Following conventions for default RAPID zones.
@@ -749,7 +749,7 @@ namespace Machina
             for (int i = 0; i < extax.Length; i++)
             {
                 val = extax[i];
-                extj += (val == null) ? "9E9" : Math.Round((double) val, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
+                extj += (val == null) ? "9E9" : Math.Round((double) val, MMath.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
                 if (i < extax.Length - 1)
                 {
                     extj += ",";
@@ -759,7 +759,7 @@ namespace Machina
             return extj;
         }
 
-        static internal string SafeDoubleName(double value) => Math.Round(value, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture).Replace('.', '_');
+        static internal string SafeDoubleName(double value) => Math.Round(value, MMath.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture).Replace('.', '_');
 
     }
 }

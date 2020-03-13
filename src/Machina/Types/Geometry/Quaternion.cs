@@ -47,10 +47,10 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsSimilar(Quaternion other)
         {
-            return Math.Abs(this.W - other.W) < EPSILON2
-                && Math.Abs(this.X - other.X) < EPSILON2
-                && Math.Abs(this.Y - other.Y) < EPSILON2
-                && Math.Abs(this.Z - other.Z) < EPSILON2;
+            return Math.Abs(this.W - other.W) < MMath.EPSILON2
+                && Math.Abs(this.X - other.X) < MMath.EPSILON2
+                && Math.Abs(this.Y - other.Y) < MMath.EPSILON2
+                && Math.Abs(this.Z - other.Z) < MMath.EPSILON2;
         }
 
 
@@ -306,7 +306,7 @@ namespace Machina.Types.Geometry
         {
             double len = this.Length();
 
-            if (Math.Abs(len) < EPSILON2)
+            if (Math.Abs(len) < MMath.EPSILON2)
             {
                 this.Identity();
                 return false;  // check for zero quaternion
@@ -336,7 +336,7 @@ namespace Machina.Types.Geometry
             }
 
             // Can't deal with zero-length quaternions or axis vectors
-            if (this.Length() < EPSILON2 || Geometry.Length(this.X, this.Y, this.Z) < EPSILON2)
+            if (this.Length() < MMath.EPSILON2 || MMath.Length(this.X, this.Y, this.Z) < MMath.EPSILON2)
             {
                 this.Identity(this.W >= 0);
                 return false;
@@ -347,7 +347,7 @@ namespace Machina.Types.Geometry
             bool pos;
 
             // Avoid divisions by zero
-            if (Math.Abs(this.X) > EPSILON2)
+            if (Math.Abs(this.X) > MMath.EPSILON2)
             {
                 double yx, zx;
 
@@ -362,7 +362,7 @@ namespace Machina.Types.Geometry
 
                 return true;
             }
-            else if (Math.Abs(this.Y) > EPSILON2)
+            else if (Math.Abs(this.Y) > MMath.EPSILON2)
             {
                 double xy, zy;
 
@@ -377,7 +377,7 @@ namespace Machina.Types.Geometry
 
                 return true;
             }
-            else if (Math.Abs(this.Z) > EPSILON2)
+            else if (Math.Abs(this.Z) > MMath.EPSILON2)
             {
                 double xz, yz;
 
@@ -464,7 +464,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsUnit()
         {
-            return Math.Abs(this.SqLength() - 1) < EPSILON2;
+            return Math.Abs(this.SqLength() - 1) < MMath.EPSILON2;
         }
 
         /// <summary>
@@ -473,7 +473,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsZero()
         {
-            return Math.Abs(this.SqLength()) < EPSILON2;
+            return Math.Abs(this.SqLength()) < MMath.EPSILON2;
         }
 
         /// <summary>
@@ -483,10 +483,10 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public bool IsIdentity()
         {
-            return (Math.Abs(this.W - 1) < EPSILON2 || Math.Abs(this.W + 1) < EPSILON2)  // check for (1,0,0,0) or (-1,0,0,0)
-                && Math.Abs(this.X) < EPSILON2
-                && Math.Abs(this.Y) < EPSILON2
-                && Math.Abs(this.Z) < EPSILON2;
+            return (Math.Abs(this.W - 1) < MMath.EPSILON2 || Math.Abs(this.W + 1) < MMath.EPSILON2)  // check for (1,0,0,0) or (-1,0,0,0)
+                && Math.Abs(this.X) < MMath.EPSILON2
+                && Math.Abs(this.Y) < MMath.EPSILON2
+                && Math.Abs(this.Z) < MMath.EPSILON2;
         }
 
         /// <summary>
@@ -508,7 +508,7 @@ namespace Machina.Types.Geometry
             //      q = -q;
             double sumQ = this.Sum();
             double sumQn = qn.Sum();
-            return (Math.Abs(sumQ + sumQn) < EPSILON2 || Math.Abs(sumQn - sumQ) < EPSILON2);
+            return (Math.Abs(sumQ + sumQn) < MMath.EPSILON2 || Math.Abs(sumQn - sumQ) < MMath.EPSILON2);
         }
 
         /// <summary>
@@ -721,13 +721,13 @@ namespace Machina.Types.Geometry
             double theta2 = 2 * Math.Acos(this.W);
 
             // If angle == 0, no rotation is performed and this Quat is identity
-            if (theta2 < EPSILON2)
+            if (theta2 < MMath.EPSILON2)
             {
                 return new AxisAngle(0, 0, 0, 0);
             }
 
             double s = Math.Sin(0.5 * theta2);
-            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * TO_DEGS, false);
+            return new AxisAngle(this.X / s, this.Y / s, this.Z / s, theta2 * MMath.TO_DEGS, false);
         }
 
         /// <summary>
@@ -805,21 +805,21 @@ namespace Machina.Types.Geometry
 
             // First, test if close to pitch 90deg singularity:
             double test = this.W * this.Y - this.Z * this.X;
-            if (test > 0.5 - EPSILON3)  // singularity at north pole
+            if (test > 0.5 - MMath.EPSILON3)  // singularity at north pole
             {
                 xAng = 0;
                 yAng = 0.5 * Math.PI;
                 zAng = 2 * Math.Atan2(this.X, -this.W);
-                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
-                else if (zAng > Math.PI) zAng -= TAU;
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
             }
-            else if (test < -0.5 + EPSILON3)  // singularity at south pole
+            else if (test < -0.5 + MMath.EPSILON3)  // singularity at south pole
             {
                 xAng = 0;
                 yAng = -0.5 * Math.PI;
                 zAng = -2 * Math.Atan2(this.X, -this.W);
-                if (zAng < -Math.PI) zAng += TAU;  // remap to [-180, 180]
-                else if (zAng > Math.PI) zAng -= TAU;
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
             }
             else
             {
@@ -836,7 +836,7 @@ namespace Machina.Types.Geometry
                                          1 - 2 * (this.Y * this.Y + this.Z * this.Z));
             }
 
-            return new YawPitchRoll(TO_DEGS * xAng, TO_DEGS * yAng, TO_DEGS * zAng);
+            return new YawPitchRoll(MMath.TO_DEGS * xAng, MMath.TO_DEGS * yAng, MMath.TO_DEGS * zAng);
         }
 
 
@@ -851,23 +851,23 @@ namespace Machina.Types.Geometry
                 "{0}[{1}{2}, {3}{4}, {5}{6}, {7}{8}]",
                 labels ? "Quaternion" : "",
                 labels ? "W:" : "",
-                Math.Round(W, STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(W, MMath.STRING_ROUND_DECIMALS_QUAT),
                 labels ? "X:" : "",
-                Math.Round(X, STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(X, MMath.STRING_ROUND_DECIMALS_QUAT),
                 labels ? "Y:" : "",
-                Math.Round(Y, STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(Y, MMath.STRING_ROUND_DECIMALS_QUAT),
                 labels ? "Z:" : "",
-                Math.Round(Z, STRING_ROUND_DECIMALS_QUAT));
+                Math.Round(Z, MMath.STRING_ROUND_DECIMALS_QUAT));
         }
 
         public string ToArrayString()
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3}]",
-                Math.Round(W, STRING_ROUND_DECIMALS_QUAT),
-                Math.Round(X, STRING_ROUND_DECIMALS_QUAT),
-                Math.Round(Y, STRING_ROUND_DECIMALS_QUAT),
-                Math.Round(Z, STRING_ROUND_DECIMALS_QUAT));
+                Math.Round(W, MMath.STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(X, MMath.STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(Y, MMath.STRING_ROUND_DECIMALS_QUAT),
+                Math.Round(Z, MMath.STRING_ROUND_DECIMALS_QUAT));
         }
 
     }

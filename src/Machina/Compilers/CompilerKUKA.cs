@@ -408,7 +408,7 @@ namespace Machina
                     dec = string.Format(CultureInfo.InvariantCulture,
                         //"  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",  // This was reported to not work
                         "  $VEL.CP = {0}",  // @TODO: figure out how to also incorporate ORI1 and ORI2
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.speed, 3 + MMath.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Precision:
@@ -506,11 +506,11 @@ namespace Machina
                     }
                     else
                     {
-                        //dec = "  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                        //dec = "  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, MachinaMath.STRING_ROUND_DECIMALS_VOLTAGE)}";
                         dec = string.Format(CultureInfo.InvariantCulture,
                             "  $ANOUT[{0}] = {1}",
                             aioa.pinNum,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                            Math.Round(aioa.value, MMath.STRING_ROUND_DECIMALS_VOLTAGE));
 
                     }
                     break;
@@ -560,7 +560,7 @@ namespace Machina
                     dec = string.Format(CultureInfo.InvariantCulture,
                         //"  $VEL = {{CP {0}, ORI1 100, ORI2 100}}",  // This was reported to not work
                         "  $VEL.CP = {0}",  // @TODO: figure out how to also incorporate ORI1 and ORI2
-                        Math.Round(0.001 * cursor.speed, 3 + Geometry.STRING_ROUND_DECIMALS_MM));
+                        Math.Round(0.001 * cursor.speed, 3 + MMath.STRING_ROUND_DECIMALS_MM));
                     break;
 
                 case ActionType.Precision:
@@ -658,11 +658,11 @@ namespace Machina
                     }
                     else
                     {
-                        //dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE)}";
+                        //dec = $"  $ANOUT[{aioa.pinNum}] = {Math.Round(aioa.value, MachinaMath.STRING_ROUND_DECIMALS_VOLTAGE)}";
                         dec = string.Format(CultureInfo.InvariantCulture,
                             "  $ANOUT[{0}] = {1}",
                             aioa.pinNum,
-                            Math.Round(aioa.value, Geometry.STRING_ROUND_DECIMALS_VOLTAGE));
+                            Math.Round(aioa.value, MMath.STRING_ROUND_DECIMALS_VOLTAGE));
                     }
                     break;
 
@@ -712,13 +712,13 @@ namespace Machina
 
             return string.Format(CultureInfo.InvariantCulture,
                 "{{POS: X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
-                Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.X, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Z, MMath.STRING_ROUND_DECIMALS_MM),
                 // note reversed ZYX order
-                Math.Round(euler.ZAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(euler.YAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(euler.XAngle, Geometry.STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(euler.ZAngle, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.YAngle, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.XAngle, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
 
         /// <summary>
@@ -729,12 +729,12 @@ namespace Machina
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
-                Math.Round(cursor.axes.A1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.A2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.A3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.A4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.A5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(cursor.axes.A6, Geometry.STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(cursor.axes.A1, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A2, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A3, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A4, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A5, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(cursor.axes.A6, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
 
         /// <summary>
@@ -753,13 +753,13 @@ namespace Machina
 
             return string.Format(CultureInfo.InvariantCulture, 
                 "{{X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
-                Math.Round(cursor.tool.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(cursor.tool.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                Math.Round(cursor.tool.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.tool.TCPPosition.X, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.tool.TCPPosition.Y, MMath.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.tool.TCPPosition.Z, MMath.STRING_ROUND_DECIMALS_MM),
                 // note reversed ZYX order
-                Math.Round(euler.ZAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(euler.YAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(euler.XAngle, Geometry.STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(euler.ZAngle, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.YAngle, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(euler.XAngle, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
 
     }
