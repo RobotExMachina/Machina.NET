@@ -872,43 +872,43 @@ namespace Machina.Types.Geometry
         }
 
 
-        ///// <summary>
-        ///// Equality checks.
-        ///// </summary>
-        ///// <ref>https://github.com/imshz/simplify-net</ref>
-        ///// <param name="obj"></param>
-        ///// <returns></returns>
-        //public override bool Equals(object obj)
-        //{
-        //    if (ReferenceEquals(null, obj)) return false;
-        //    if (ReferenceEquals(this, obj)) return true;
+        /// <summary>
+        /// Equality checks.
+        /// </summary>
+        /// <ref>https://github.com/imshz/simplify-net</ref>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
 
-        //    if (obj.GetType() != typeof(Vector))
-        //        return false;
+            if (obj.GetType() != typeof(Vector))
+                return false;
 
-        //    if (obj is Vector)
-        //    {
-        //        return Equals((Vector)obj);
-        //    }
+            if (obj is Vector)
+            {
+                return Equals((Vector)obj);
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
 
-        ///// <summary>
-        ///// Equality checks.
-        ///// </summary>
-        ///// <ref>https://github.com/imshz/simplify-net</ref>
-        ///// <param name="obj"></param>
-        ///// <returns></returns>
-        //public bool Equals(Vector other)
-        //{
-        //    if (ReferenceEquals(null, other)) return false;
-        //    if (ReferenceEquals(this, other)) return true;
-        //    //return other.X.Equals(X) && other.Y.Equals(Y) && other.Z.Equals(Z);
-        //    return Math.Abs(X - other.X) < EPSILON2 &&
-        //           Math.Abs(Y - other.Y) < EPSILON2 &&
-        //           Math.Abs(Z - other.Z) < EPSILON2;
-        //}
+        /// <summary>
+        /// Equality checks.
+        /// </summary>
+        /// <ref>https://github.com/imshz/simplify-net</ref>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Vector other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            //return other.X.Equals(X) && other.Y.Equals(Y) && other.Z.Equals(Z);
+            return Math.Abs(X - other.X) < MMath.EPSILON2 &&
+                   Math.Abs(Y - other.Y) < MMath.EPSILON2 &&
+                   Math.Abs(Z - other.Z) < MMath.EPSILON2;
+        }
 
         public override string ToString()
         {
