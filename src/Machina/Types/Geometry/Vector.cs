@@ -39,9 +39,9 @@ namespace Machina.Types.Geometry
         /// <param name="z">The Z (third) component.</param>
         public Vector(double x, double y, double z)
         {
-            this._x = x;
-            this._y = y;
-            this._z = z;
+            _x = x;
+            _y = y;
+            _z = z;
         }
         
         /// <summary>
@@ -267,6 +267,7 @@ namespace Machina.Types.Geometry
             return Math.Acos(div);
         }
 
+        // JL: from Rhinocmmon, adapt when Frame structure is in!
         ///// <summary>
         ///// Computes the angle on a plane between two vectors.
         ///// </summary>
@@ -326,20 +327,6 @@ namespace Machina.Types.Geometry
                 a._x * b._y - a._y * b._x);
         }
 
-
-        ///// <summary>
-        ///// Returns a unit Vector orthogonal to specified guiding Vector, contained
-        ///// in the plane defined by guiding Vector and reference Vector. The direction of the 
-        ///// resulting Vector will be on the side of the reference Vector.
-        ///// </summary>
-        ///// <param name="guiding"></param>
-        ///// <param name="reference"></param>
-        ///// <returns></returns>
-        //public static Vector OrthogonalTo(Vector guiding, Vector reference)
-        //{
-        //    return new CoordinateSystem(guiding, reference).YAxis;
-        //}
-
         /// <summary>
         /// Given two vectors, this method outputs three new orthogonal vectors where the first one is 
         /// parallel to the original (although normalized), and the second one is perpendicular to the 
@@ -373,6 +360,86 @@ namespace Machina.Types.Geometry
 
             return true;
         }
+
+        /// <summary>
+        /// Creates a vector perpendicular to the source one. The direction of the perpendicular
+        /// vector depends on the orientation of the source one.
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+        public static bool PerpendicularTo(Vector vec, out Vector perp)
+        {
+            // Adapted from RC/ON
+            int i, j, k;
+            double a, b;
+            k = 2;
+            if (Math.Abs(vec.Y) > Math.Abs(vec.X))
+            {
+                if (Math.Abs(vec.Z) > Math.Abs(vec.Y))
+                {
+                    // |v.Z| > |v.Y| > |v.X|
+                    i = 2;
+                    j = 1;
+                    k = 0;
+                    a = vec.Z;
+                    b = -vec.Y;
+                }
+                else if (Math.Abs(vec.Z) >= Math.Abs(vec.X))
+                {
+                    // |v.Y| >= |v.Z| >= |v.X|
+                    i = 1;
+                    j = 2;
+                    k = 0;
+                    a = vec.Y;
+                    b = -vec.Z;
+                }
+                else
+                {
+                    // |v.Y| > |v.X| > |v.Z|
+                    i = 1;
+                    j = 0;
+                    k = 2;
+                    a = vec.Y;
+                    b = -vec.X;
+                }
+            }
+            else if (Math.Abs(vec.Z) > Math.Abs(vec.X))
+            {
+                // |v.Z| > |v.X| >= |v.Y|
+                i = 2;
+                j = 0;
+                k = 1;
+                a = vec.Z;
+                b = -vec.X;
+            }
+            else if (Math.Abs(vec.Z) > Math.Abs(vec.Y))
+            {
+                // |v.X| >= |v.Z| > |v.Y|
+                i = 0;
+                j = 2;
+                k = 1;
+                a = vec.X;
+                b = -vec.Z;
+            }
+            else
+            {
+                // |v.X| >= |v.Y| >= |v.Z|
+                i = 0;
+                j = 1;
+                k = 2;
+                a = vec.X;
+                b = -vec.Y;
+            }
+
+            perp = Vector.Zero;
+            perp[i] = b;
+            perp[j] = a;
+            perp[k] = 0.0;
+            
+            return (a != 0.0) ? true : false;
+        }
+
+
 
         #endregion operators
 
@@ -968,6 +1035,7 @@ namespace Machina.Types.Geometry
                    dz = _z - other._z;
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
+
 
         /// <summary>
         /// Computes the hash code for the current vector.
