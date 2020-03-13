@@ -347,19 +347,19 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
-        /// Returns a Rotation Matrix representation of this Axis Angle. 
+        /// Returns a Matrix representation of this AxisAngle. 
         /// Please note that rotation matrices represent rotations in orthonormalized coordinates,  
-        /// so that additional Axis Angle information such as overturns (angles outside [0, 180])
+        /// so that additional AxisAngle information such as overturns (angles outside [0, 180])
         /// will get lost, and rotation axis might be flipped. 
-        /// If this Axis Angle represents no effective rotation, the identity matrix will be returned. 
+        /// If this AxiAngle represents no effective rotation, the identity matrix will be returned. 
         /// </summary>
         /// <returns></returns>
-        public RotationMatrix ToRotationMatrix()
+        public Matrix4x4 ToMatrix()
         {
             // Some sanity: if this AA represents no rotation, return identity matrix
             if (this.IsZero())
             {
-                return new RotationMatrix();
+                return Matrix4x4.Identity;
             }
 
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
@@ -369,7 +369,7 @@ namespace Machina.Types.Geometry
             double s = Math.Sin(ang);
             double t = 1 - c;
 
-            RotationMatrix m = new RotationMatrix();
+            Matrix4x4 m = Matrix4x4.Identity;
             m.M11 = c + t * this.Axis.X * this.Axis.X;
             m.M22 = c + t * this.Axis.Y * this.Axis.Y;
             m.M33 = c + t * this.Axis.Z * this.Axis.Z;

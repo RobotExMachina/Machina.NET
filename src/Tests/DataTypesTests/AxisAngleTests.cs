@@ -427,10 +427,10 @@ namespace DataTypesTests
         }
 
         [TestMethod]
-        public void AxisAngle_ToRotationMatrix_ToAxisAngle()
+        public void AxisAngle_ToMatrix_ToAxisAngle()
         {
             AxisAngle aa, aabis;
-            RotationMatrix m;
+            Matrix4x4 m;
 
             double x, y, z, angle;
             Vector axis;
@@ -444,8 +444,8 @@ namespace DataTypesTests
                 angle = Random(-1440, 1440);  // test any possible angle
 
                 aa = new AxisAngle(x, y, z, angle);
-                m = aa.ToRotationMatrix();
-                aabis = m.ToAxisAngle();
+                m = aa.ToMatrix();
+                aabis = m.GetAxisAngle();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z + " " + angle);
@@ -463,8 +463,8 @@ namespace DataTypesTests
                 angle = 90 * RandomInt(-8, 8);
 
                 aa = new AxisAngle(axis, angle);
-                m = aa.ToRotationMatrix();
-                aabis = m.ToAxisAngle();
+                m = aa.ToMatrix();
+                aabis = m.GetAxisAngle();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(axis + " " + angle);
@@ -481,7 +481,7 @@ namespace DataTypesTests
         public void AxisAngle_ToYawPitchRoll_ComparisonThroughRotationMatrix()
         {
             AxisAngle aa;
-            RotationMatrix m;
+            Matrix4x4 m;
             YawPitchRoll eu1, eu2;
 
             double x, y, z, angle;
@@ -497,7 +497,7 @@ namespace DataTypesTests
 
                 aa = new AxisAngle(x, y, z, angle);
                 eu1 = aa.ToYawPitchRoll();
-                m = aa.ToRotationMatrix();
+                m = aa.ToMatrix();
                 eu2 = m.ToYawPitchRoll();
 
                 Trace.WriteLine("");
@@ -516,7 +516,7 @@ namespace DataTypesTests
 
                 aa = new AxisAngle(axis, angle);
                 eu1 = aa.ToYawPitchRoll();
-                m = aa.ToRotationMatrix();
+                m = aa.ToMatrix();
                 eu2 = m.ToYawPitchRoll();
 
                 Trace.WriteLine("");

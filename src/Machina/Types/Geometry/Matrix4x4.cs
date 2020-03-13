@@ -137,6 +137,32 @@ namespace Machina.Types.Geometry
             this.M44 = m44;
         }
 
+        /// <summary>
+        /// Constructs a Matrix4x4 from the given components.
+        /// </summary>
+        public Matrix4x4(double[] values)
+        {
+            this.M11 = values[0];
+            this.M12 = values[1];
+            this.M13 = values[2];
+            this.M14 = values[3];
+
+            this.M21 = values[4];
+            this.M22 = values[5];
+            this.M23 = values[6];
+            this.M24 = values[7];
+
+            this.M31 = values[8];
+            this.M32 = values[9];
+            this.M33 = values[10];
+            this.M34 = values[11];
+
+            this.M41 = values[12];
+            this.M42 = values[13];
+            this.M43 = values[14];
+            this.M44 = values[15];
+        }
+
         private static readonly Matrix4x4 _identity = new Matrix4x4
         (
             1, 0, 0, 0,
@@ -760,6 +786,52 @@ namespace Machina.Types.Geometry
             m.M44 = 1;
 
             return m;
+        }
+
+        /// <summary>
+        /// Creates a matrix with an orthogonal special rotation part, for any two input vectors.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static Matrix4x4 CreateOrthogonal(double x0, double x1, double x2, double y0, double y1, double y2)
+        {
+            Matrix4x4 m;
+
+            m.M11 = x0;
+            m.M12 = x1;
+            m.M13 = x2;
+            m.M14 = 0;
+
+            m.M21 = y0;
+            m.M22 = y1;
+            m.M23 = y2;
+            m.M24 = 0;
+
+            m.M31 = 0;
+            m.M32 = 0;
+            m.M33 = 1;
+            m.M34 = 0;
+
+            m.M41 = 0;
+            m.M42 = 0;
+            m.M43 = 0;
+            m.M44 = 1;
+
+            m.OrthogonalizeRotation();
+
+            return m;
+        }
+
+        /// <summary>
+        /// Creates a matrix with an orthogonal special rotation part, for any two input vectors.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static Matrix4x4 CreateOrthogonal(Vector x, Vector y)
+        {
+            return CreateOrthogonal(x.X, x.Y, x.Z, y.X, y.Y, y.Z);
         }
 
 
@@ -1549,37 +1621,7 @@ namespace Machina.Types.Geometry
             return result;
         }
 
-        /// <summary>
-        /// Returns a new matrix with only the 3x3 rotational part of the original one.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static Matrix4x4 ExtractRotation(Matrix4x4 source)
-        {
-            Matrix4x4 result;
-
-            result.M11 = source.M11;
-            result.M12 = source.M12;
-            result.M13 = source.M13;
-            result.M14 = 0;
-
-            result.M21 = source.M21;
-            result.M22 = source.M22;
-            result.M23 = source.M23;
-            result.M24 = 0;
-            
-            result.M31 = source.M31;
-            result.M32 = source.M32;
-            result.M33 = source.M33;
-            result.M34 = 0;
-
-            result.M41 = 0;
-            result.M42 = 0;
-            result.M43 = 0;
-            result.M44 = 1;
-
-            return result;
-        }
+       
 
         #endregion operators
 
@@ -1696,7 +1738,7 @@ namespace Machina.Types.Geometry
             }
         }
 
-        public bool IsRotationOrthogonal
+        public bool IsOrthogonalRotation
         {
             get
             {
@@ -1705,7 +1747,7 @@ namespace Machina.Types.Geometry
                 // (the matrix multiplied by its transpose yields the identity matrix)
                 // As a consequence, it also holds that the transpose of an orthogonal matrix equals its inverse:
                 // Qt = Q^-1
-                Matrix4x4 rot = ExtractRotation(this);
+                Matrix4x4 rot = this.GetRotationMatrix();
                 Matrix4x4 trans = Transpose(rot);
                 Matrix4x4 ident = this * trans;
                 return 
@@ -1831,6 +1873,269 @@ namespace Machina.Types.Geometry
             M42 = trans.M42;
             M43 = trans.M43;
             M44 = trans.M44;
+        }
+
+        /// <summary>
+        /// Returns a new matrix with only the 3x3 rotational part of the original one.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public Matrix4x4 GetRotationMatrix()
+        {
+            Matrix4x4 result;
+
+            result.M11 = M11;
+            result.M12 = M12;
+            result.M13 = M13;
+            result.M14 = 0;
+
+            result.M21 = M21;
+            result.M22 = M22;
+            result.M23 = M23;
+            result.M24 = 0;
+
+            result.M31 = M31;
+            result.M32 = M32;
+            result.M33 = M33;
+            result.M34 = 0;
+
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the rotational part of this matrix as a Quaternion.
+        /// </summary>
+        /// <returns></returns>
+        public bool GetQuaternion(out Quaternion q)
+        {
+            q = new Quaternion();
+
+            // This conversion assumes the rotation matrix is special orthogonal.
+            // As a result, the returned Quaternion will be a versor.
+            // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+            if (!IsOrthogonalRotation)
+            {
+                return false;
+            }
+
+            double trace = M11 + M22 + M33;
+            double s;
+
+            // Compute a regular conversion
+            if (trace > 0)
+            {
+                s = 2 * Math.Sqrt(trace + 1);
+                q.W = 0.25 * s;
+                q.X = (M32 - M23) / s;
+                q.Y = (M13 - M31) / s;
+                q.Z = (M21 - M12) / s;
+            }
+
+            // If trace is zero or negative, avoid division by zero, square root of negative and floating-point degeneracy
+            // by searching which major diagonal element has the greatest value:
+            else
+            {
+                if (M11 > M22 && M11 > M33)
+                {
+                    s = 2 * Math.Sqrt(1 + M11 - M22 - M33);
+                    q.W = (M32 - M23) / s;
+                    q.X = 0.25 * s;
+                    q.Y = (M12 + M21) / s;
+                    q.Z = (M13 + M31) / s;
+                }
+                else if (M22 > M33)
+                {
+                    s = 2 * Math.Sqrt(1 + M22 - M11 - M33);
+                    q.W = (M13 - M31) / s;
+                    q.X = (M12 + M21) / s;
+                    q.Y = 0.25 * s;
+                    q.Z = (M23 + M32) / s;
+                }
+                else
+                {
+                    s = 2 * Math.Sqrt(1 + M33 - M11 - M22);
+                    q.W = (M21 - M12) / s;
+                    q.X = (M13 + M31) / s;
+                    q.Y = (M23 + M32) / s;
+                    q.Z = 0.25 * s;
+                }
+            }
+
+            return true;
+
+            //// Alternative method?
+            ////http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/christian.htm
+            //Quaternion q = new Quaternion();
+            //q.W = 0.5 * Math.Sqrt(Math.Max(0, 1 + m00 + m11 + m22));
+            //q.X = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 + m00 - m11 - m22)), m21 - m12);
+            //q.Y = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 + m11 - m22)), m02 - m20);
+            //q.Z = Copysign(0.5 * Math.Sqrt(Math.Max(0, 1 - m00 - m11 + m22)), m10 - m01);
+
+            //// From the ABB Rapid manual p.1151
+            //double w = 0.5 * Math.Sqrt(1 + XAxis.X + YAxis.Y + ZAxis.Z);
+            //double x = 0.5 * Math.Sqrt(1 + XAxis.X - YAxis.Y - ZAxis.Z) * (YAxis.Z - ZAxis.Y >= 0 ? 1 : -1);
+            //double y = 0.5 * Math.Sqrt(1 - XAxis.X + YAxis.Y - ZAxis.Z) * (ZAxis.X - XAxis.Z >= 0 ? 1 : -1);
+            //double z = 0.5 * Math.Sqrt(1 - XAxis.X - YAxis.Y + ZAxis.Z) * (XAxis.Y - YAxis.X >= 0 ? 1 : -1);
+            //return new Quaternion(w, x, y, z, true);
+        }
+
+
+        /// <summary>
+        /// Returns an Axis Angle representation of the rotation part Matrix. 
+        /// Note that the returned AxisAngle will always represent a positive rotation between [0, 180]
+        /// </summary>
+        /// <returns></returns>
+        public AxisAngle GetAxisAngle()
+        {
+            // Taken from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
+            double x, y, z, angle;
+            double sinv = 1 / Math.Sqrt(2);  // 0.7071...
+
+            // Check for singularities
+            if (Math.Abs(M12 - M21) < MMath.EPSILON2
+                && Math.Abs(M13 - M31) < MMath.EPSILON2
+                && Math.Abs(M23 - M32) < MMath.EPSILON2)
+            {
+                // If identity matrix (angle = 0), return a non rotation AxisAngle
+                if (this.IsIdentity)
+                {
+                    return new AxisAngle();
+                }
+                // Otherwise, angle is 180
+                angle = 180;
+                double xx = 0.5 * M11 + 0.5;
+                double yy = 0.5 * M22 + 0.5;
+                double zz = 0.5 * M33 + 0.5;
+                double xy = 0.25 * (M12 + M21);
+                double xz = 0.25 * (M13 + M31);
+                double yz = 0.25 * (M23 + M32);
+
+                // If m00 is the largest diagonal
+                if (xx > yy && xx > zz)
+                {
+                    if (xx < MMath.EPSILON2)
+                    {
+                        x = 0;
+                        y = sinv;
+                        z = sinv;
+                    }
+                    else
+                    {
+                        x = Math.Sqrt(xx);
+                        y = xy / x;
+                        z = xz / x;
+                    }
+                }
+                // If m11 is the largest diagonal
+                else if (yy > zz)
+                {
+                    if (yy < MMath.EPSILON2)
+                    {
+                        x = sinv;
+                        y = 0;
+                        z = sinv;
+                    }
+                    else
+                    {
+                        y = Math.Sqrt(yy);
+                        x = xy / y;
+                        z = yz / y;
+                    }
+                }
+                // m22 is the largest diagonal
+                else
+                {
+                    if (zz < MMath.EPSILON2)
+                    {
+                        x = sinv;
+                        y = sinv;
+                        z = 0;
+                    }
+                    else
+                    {
+                        z = Math.Sqrt(zz);
+                        x = xz / z;
+                        y = yz / z;
+                    }
+                }
+
+                return new AxisAngle(x, y, z, angle, false);
+            }
+
+            // No singularities then, proceed normally
+            double s = Math.Sqrt((M32 - M23) * (M32 - M23)
+                    + (M13 - M31) * (M13 - M31)
+                    + (M21 - M12) * (M21 - M12));  // for normalization (is this necessary here?)
+            if (Math.Abs(s) < MMath.EPSILON2) s = 1;  // "prevent divide by zero, should not happen if matrix is orthogonal and should be caught by singularity test above, but I've left it in just in case"
+            angle = MMath.TO_DEGS * Math.Acos(0.5 * (M11 + M22 + M33 - 1));
+            x = (M32 - M23) / s;
+            y = (M13 - M31) / s;
+            z = (M21 - M12) / s;
+
+            return new AxisAngle(x, y, z, angle, false);
+        }
+        
+
+        /// <summary>
+        /// Return the YawPitchRoll representation of this matrix.s
+        /// </summary>
+        /// <returns></returns>
+        public YawPitchRoll ToYawPitchRoll()
+        {
+            /**
+             * Adapted from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/index.htm with:
+             *      - Machina conventions: ES uses different heading/pitch/bank axes, fixed here
+             *      - More singularity precision: using 0.001 triggers on angles above 86.3 degrees, 
+             *        resulting in imprecise sets of conversions in those areas, like:
+             *              Quaternion[0.027125, 0.691126, -0.058642, 0.71984]
+                            EulerZYX[Z:175.504902, Y:-90, X:0]
+                            Quaternion[0.027731, 0.706563, -0.027731, 0.706563]
+                            EulerZYX[Z:175.504902, Y:-90, X:0]
+                      instead of the following for 0.000001:
+                            [Quaternion[0.027125, 0.691126, -0.058642, 0.71984]]
+                            [EulerZYX[Z:-135.814015, Y:-86.544758, X:-51.142989]]
+                            [Quaternion[-0.027125, -0.691126, 0.058642, -0.71984]]
+             *      - Consistency adjustment on singularities: as a result of the 2 * atan2 operation, singularities
+             *        may yield Z rotations between [-TAU, TAU], instead of the regular [-PI, PI]. This is not a big deal, 
+             *        but for the sake of consistency in the Euler Angle representation, this has been readapted. 
+             **/
+
+            double xAng, yAng, zAng;
+
+            // North pole singularity (yAng ~ 90degs)? Note m02 is -sin(y) = -sin(90) = -1
+            if (this.M31 < -1 + MMath.EPSILON3)
+            {
+                xAng = 0;
+                yAng = 0.5 * Math.PI;
+                zAng = Math.Atan2(this.M23, this.M13);
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
+            }
+
+            // South pole singularity (yAng ~ -90degs)? Note m02 is -sin(y) = -sin(-90) = 1
+            else if (this.M31 > 1 - MMath.EPSILON3)
+            {
+                xAng = 0;
+                yAng = -0.5 * Math.PI;
+                zAng = Math.Atan2(-this.M23, -this.M13);
+                if (zAng < -Math.PI) zAng += MMath.TAU;  // remap to [-180, 180]
+                else if (zAng > Math.PI) zAng -= MMath.TAU;
+            }
+
+            // Regular derivation
+            else
+            {
+                xAng = Math.Atan2(this.M32, this.M33);
+                yAng = -Math.Asin(this.M31);
+                zAng = Math.Atan2(this.M21, this.M11);
+            }
+
+            return new YawPitchRoll(MMath.TO_DEGS * xAng, MMath.TO_DEGS * yAng, MMath.TO_DEGS * zAng);
         }
 
 

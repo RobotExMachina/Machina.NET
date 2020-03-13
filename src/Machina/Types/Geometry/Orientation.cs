@@ -60,31 +60,31 @@ namespace Machina.Types.Geometry
         /// Implicit conversion to RotationMatrix object.
         /// </summary>
         /// <param name="ori"></param>
-        public static implicit operator RotationMatrix(Orientation ori) => ori.RM;
-        
+        public static implicit operator Matrix4x4(Orientation ori) => ori.RM;
+
 
         internal Quaternion Q = null;
-        internal RotationMatrix RM = null;  // useful for vector-to-quaternion conversions and as storage of orientation vectors
-        
+        internal Matrix4x4 RM;  // useful for vector-to-quaternion conversions and as storage of orientation vectors
+
         /// <summary>
         /// The main X direction of this Orientation.
         /// </summary>
-        public Vector XAxis => this.RM == null ? 
-                    new Vector(1, 0, 0) : 
+        public Vector XAxis => this.RM == null ?
+                    new Vector(1, 0, 0) :
                     new Vector(this.RM.M11, this.RM.M21, this.RM.M31);
 
         /// <summary>
         /// The main Y direction of this Orientation.
         /// </summary>
-        public Vector YAxis => this.RM == null ? 
-                    new Vector(0, 1, 0) : 
+        public Vector YAxis => this.RM == null ?
+                    new Vector(0, 1, 0) :
                     new Vector(this.RM.M12, this.RM.M22, this.RM.M32);
 
         /// <summary>
         /// The main Z direction of this Orientation.
         /// </summary>
-        public Vector ZAxis => this.RM == null ? 
-                    new Vector(0, 0, 1) : 
+        public Vector ZAxis => this.RM == null ?
+                    new Vector(0, 0, 1) :
                     new Vector(this.RM.M13, this.RM.M23, this.RM.M33);
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Machina.Types.Geometry
         public Orientation()
         {
             this.Q = new Quaternion();
-            this.RM = new RotationMatrix();
+            this.RM = new Matrix4x4();
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="vectorX"></param>
         /// <param name="vectorY"></param>
-        public Orientation(Vector vectorX, Vector vectorY) 
+        public Orientation(Vector vectorX, Vector vectorY)
             : this(vectorX.X, vectorX.Y, vectorX.Z, vectorY.X, vectorY.Y, vectorY.Z) { }
 
         /// <summary>
@@ -127,8 +127,9 @@ namespace Machina.Types.Geometry
         /// <param name="y2"></param>
         public Orientation(double x0, double x1, double x2, double y0, double y1, double y2)
         {
-            this.RM = new RotationMatrix(x0, x1, x2, y0, y1, y2);
-            this.Q = this.RM.ToQuaternion();
+            this.RM = Matrix4x4.CreateOrthogonal(x0, x1, x2, y0, y1, y2);
+            //this.Q = 
+            this.RM.GetQuaternion(out this.Q);
         }
 
         /// <summary>
@@ -139,7 +140,7 @@ namespace Machina.Types.Geometry
         internal Orientation(Quaternion q)
         {
             this.Q = new Quaternion(q);
-            this.RM = this.Q.ToRotationMatrix();
+            this.RM = this.Q.ToMatrix();
         }
 
         /// <summary>
@@ -151,19 +152,19 @@ namespace Machina.Types.Geometry
 
 
         public Quaternion ToQuaternion() => this.Q;
-        public RotationMatrix ToRotationMatrix() => this.RM;
+        public Matrix4x4 ToMatrix() => this.RM;
         public RotationVector ToRotationVector() => this.Q.ToAxisAngle().ToRotationVector();  // @TODO: this is grose... 
 
 
 
 
         public override string ToString() => this.ToString(false);
-        
+
         public string ToString(bool labels)
         {
             if (labels)
             {
-                return string.Format(CultureInfo.InvariantCulture, 
+                return string.Format(CultureInfo.InvariantCulture,
                     "Orientation[X:[{0}, {1}, {2}], Y:[{3}, {4}, {5}], Z:[{6}, {7}, {8}]]",
                     Math.Round(this.RM.M11, MMath.STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M21, MMath.STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M31, MMath.STRING_ROUND_DECIMALS_MM),
                     Math.Round(this.RM.M12, MMath.STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M22, MMath.STRING_ROUND_DECIMALS_MM), Math.Round(this.RM.M32, MMath.STRING_ROUND_DECIMALS_MM),
@@ -181,7 +182,7 @@ namespace Machina.Types.Geometry
 
         public string ToArrayString()
         {
-            return string.Format(CultureInfo.InvariantCulture, 
+            return string.Format(CultureInfo.InvariantCulture,
                 "[{0},{1},{2},{3},{4},{5}]",
                 Math.Round(this.RM.M11, MMath.STRING_ROUND_DECIMALS_MM),
                 Math.Round(this.RM.M21, MMath.STRING_ROUND_DECIMALS_MM),

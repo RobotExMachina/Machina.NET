@@ -19,10 +19,10 @@ namespace TEST_Workbench
 
             Matrix4x4 a = Matrix4x4.CreateFromQuaternion(1, 2, 3, 4);
             Console.WriteLine(a);
-            Console.WriteLine(a.IsRotationOrthogonal);
+            Console.WriteLine(a.IsOrthogonalRotation);
             Console.WriteLine(a.OrthogonalizeRotation());
             Console.WriteLine(a);
-            Console.WriteLine(a.IsRotationOrthogonal);
+            Console.WriteLine(a.IsOrthogonalRotation);
 
 
             Console.WriteLine("Press any key to EXIT...");

@@ -144,7 +144,7 @@ namespace DataTypesTests
         public void YawPitchRoll_ToRotationMatrix_ToYawPitchRoll()
         {
             YawPitchRoll eu1, eu2, eu3;
-            RotationMatrix m1, m2, m3;
+            Matrix4x4 m1, m2, m3;
 
             double x, y, z;
 
@@ -156,11 +156,11 @@ namespace DataTypesTests
                 z = Random(-1440, 1440);
 
                 eu1 = new YawPitchRoll(x, y, z);
-                m1 = eu1.ToRotationMatrix();
+                m1 = eu1.ToMatrix();
                 eu2 = m1.ToYawPitchRoll();
-                m2 = eu2.ToRotationMatrix();
+                m2 = eu2.ToMatrix();
                 eu3 = m2.ToYawPitchRoll();
-                m3 = eu3.ToRotationMatrix();
+                m3 = eu3.ToMatrix();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z);
@@ -173,8 +173,8 @@ namespace DataTypesTests
 
                 Assert.IsTrue(eu1.IsEquivalent(eu2), "Eulers1 not equiv");
                 Assert.IsTrue(eu2.IsSimilar(eu3), "Eulers2 not equal");
-                Assert.IsTrue(m1.IsSimilar(m2), "Matrices1 not equiv");
-                Assert.IsTrue(m2.IsSimilar(m3), "Matrices2 not equal");
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON3), "Matrices1 not equiv");
+                Assert.IsTrue(m2.IsSimilarTo(m3, MMath.EPSILON3), "Matrices2 not equal");
             }
 
             // Try orthogonal configurations
@@ -185,11 +185,11 @@ namespace DataTypesTests
                 z = 90 * RandomInt(-16, 16);
 
                 eu1 = new YawPitchRoll(x, y, z);
-                m1 = eu1.ToRotationMatrix();
+                m1 = eu1.ToMatrix();
                 eu2 = m1.ToYawPitchRoll();
-                m2 = eu2.ToRotationMatrix();
+                m2 = eu2.ToMatrix();
                 eu3 = m2.ToYawPitchRoll();
-                m3 = eu3.ToRotationMatrix();
+                m3 = eu3.ToMatrix();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z);
@@ -202,8 +202,8 @@ namespace DataTypesTests
 
                 Assert.IsTrue(eu1.IsEquivalent(eu2), "Eulers1 not equiv");
                 Assert.IsTrue(eu2.IsEquivalent(eu3), "Eulers2 not equal");
-                Assert.IsTrue(m1.IsSimilar(m2), "Matrices1 not equiv");
-                Assert.IsTrue(m2.IsSimilar(m3), "Matrices2 not equal");
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON3), "Matrices1 not equiv");
+                Assert.IsTrue(m2.IsSimilarTo(m3, MMath.EPSILON3), "Matrices2 not equal");
             }
         }
 
@@ -212,7 +212,7 @@ namespace DataTypesTests
         public void YawPitchRoll_ToRotationMAtrix_ToYawPitchRoll_Singularities()
         {
             YawPitchRoll eu1, eu2;
-            RotationMatrix m1, m2;
+            Matrix4x4 m1, m2;
 
             double x, y, z;
             int cycles = 500;
@@ -224,9 +224,9 @@ namespace DataTypesTests
                 z = Random(-180, 180);
 
                 eu1 = new YawPitchRoll(x, y, z);
-                m1 = eu1.ToRotationMatrix();
+                m1 = eu1.ToMatrix();
                 eu2 = m1.ToYawPitchRoll();
-                m2 = eu2.ToRotationMatrix();
+                m2 = eu2.ToMatrix();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z);

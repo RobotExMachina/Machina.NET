@@ -25,55 +25,67 @@ namespace DataTypesTests
 
 
         [TestMethod]
-        public void RotationMatrix_OrthogonalOnCreation_RandomValues()
+        public void Matrix_Orthogonalization_RandomValues()
         {
-            RotationMatrix m;
+            Matrix4x4 m;
 
-            double[] r = new double[9];
+            double[] r = new double[16];
 
             for (var i = 0; i < 50; i++)
             {
-                for (int j = 0; j < 9; j++)
+                for (int j = 0; j < 16; j++)
                 {
                     r[j] = Random(-100, 100);
                 }
 
-                m = new RotationMatrix(r);
+                m = new Matrix4x4(r);
 
                 Trace.WriteLine("");
-                for (int j = 0; j < 9; j++)
+                for (int j = 0; j < 16; j++)
                 {
                     Trace.Write(r[j] + " ");
                 }
-                Trace.WriteLine("");
+                Trace.WriteLine("PRE");
                 Trace.WriteLine(m);
-                Assert.IsTrue(m.IsOrthogonal(), "RotationMatrix isn't orthogonal");
+
+                if (!m.IsOrthogonalRotation) m.OrthogonalizeRotation();
+
+                Trace.WriteLine("ORTHO");
+                Trace.WriteLine(m);
+
+                Assert.IsTrue(m.IsOrthogonalRotation, "Matrix didn't orthogonalize.");
             }
 
             for (var i = 0; i < 50; i++)
             {
-                for (int j = 0; j < 9; j++)
+                for (int j = 0; j < 16; j++)
                 {
                     r[j] = RandomInt(-1, 1);
                 }
 
-                m = new RotationMatrix(r);
+                m = new Matrix4x4(r);
 
                 Trace.WriteLine("");
-                for (int j = 0; j < 9; j++)
+                for (int j = 0; j < 16; j++)
                 {
                     Trace.Write(r[j] + " ");
                 }
-                Trace.WriteLine("");
+                Trace.WriteLine("PRE");
                 Trace.WriteLine(m);
-                Assert.IsTrue(m.IsOrthogonal(), "RotationMatrix isn't orthogonal");
+
+                if (!m.IsOrthogonalRotation) m.OrthogonalizeRotation();
+
+                Trace.WriteLine("ORTHO");
+                Trace.WriteLine(m);
+
+                Assert.IsTrue(m.IsOrthogonalRotation, "Matrix didn't orthogonalize.");
             }
         }
 
         [TestMethod]
-        public void RotationMatrix_OrthogonalOnCreation_RandomVectors()
+        public void Matrix_Orthogonalization_RandomVectors()
         {
-            RotationMatrix m;
+            Matrix4x4 m;
             Vector vecX, vecY;
             Vector mVecX, mVecY, mVecZ;
             int dir;
@@ -82,12 +94,12 @@ namespace DataTypesTests
             {
                 vecX = Vector.RandomFromDoubles(-100, 100);
                 vecY = Vector.RandomFromDoubles(-100, 100);
-                m = new RotationMatrix(vecX, vecY);
+                m = Matrix4x4.CreateOrthogonal(vecX, vecY);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY);
                 Trace.WriteLine(m);
-                Assert.IsTrue(m.IsOrthogonal(), "RotationMatrix isn't orthogonal");
+                Assert.IsTrue(m.IsOrthogonalRotation, "Matrix isn't orthogonal");
 
                 mVecX = new Vector(m.M11, m.M21, m.M31);
                 Assert.IsTrue(Vector.CompareDirections(vecX, mVecX) == 1, "Original VectorX and orthogonalized one are not parallel");
@@ -99,7 +111,7 @@ namespace DataTypesTests
                 vecY = Vector.RandomFromInts(-1, 1);
                 dir = Vector.CompareDirections(vecX, vecY);
 
-                m = new RotationMatrix(vecX, vecY);
+                m = Matrix4x4.CreateOrthogonal(vecX, vecY);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
@@ -107,11 +119,11 @@ namespace DataTypesTests
 
                 if (dir == 1 || dir == 3)
                 {
-                    Assert.IsTrue(m.IsIdentity(), "Parallel vectors should yield an identity matrix");
+                    Assert.IsTrue(m.IsIdentity, "Parallel vectors should yield an identity matrix");
                 }
                 else
                 {
-                    Assert.IsTrue(m.IsOrthogonal(), "RotationMatrix isn't orthogonal");
+                    Assert.IsTrue(m.IsOrthogonalRotation, "Matrix isn't orthogonal");
 
                     mVecX = new Vector(m.M11, m.M21, m.M31);
                     Assert.IsTrue(Vector.CompareDirections(vecX, mVecX) == 1, "Original VectorX and orthogonalized X should be parallel");
@@ -129,18 +141,11 @@ namespace DataTypesTests
             }
         }
 
-        [TestMethod]
-        public void RotationMatrix_OrthogonalOnCreation_ZeroVector()
-        {
-            RotationMatrix m = new RotationMatrix(0, 0, 0, 0, 0, 0, 0, 0, 0);
-            Assert.IsTrue(m.IsIdentity());
-
-        }
 
         [TestMethod]
-        public void RotationMatrix_ToQuaternion_VsSystemNumerics()
+        public void Matrix_ToQuaternion_VsSystemNumerics()
         {
-            RotationMatrix m;
+            Matrix4x4 m;
             Quaternion q;
             SysMatrix44 m44, m44bis;
             SysQuat sq;
@@ -162,8 +167,8 @@ namespace DataTypesTests
                 }
 
                 dir = Vector.CompareDirections(vecX, vecY);
-                m = new RotationMatrix(vecX, vecY);
-                q = m.ToQuaternion();
+                m = m = Matrix4x4.CreateOrthogonal(vecX, vecY);
+                Assert.IsTrue(m.GetQuaternion(out q), "Could not convert to Quaternion");
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
@@ -189,20 +194,21 @@ namespace DataTypesTests
 
         // @TODO: design a test with matrices with very low traces...
         [TestMethod]
-        public void RotationMatrix_ToQuaternion_LowTrace()
+        public void Matrix_ToQuaternion_LowTrace()
         {
-            RotationMatrix m = new RotationMatrix(new Vector(0, 1, 0), new Vector(-1, 0, 0));
-            Quaternion q = m.ToQuaternion();
-            RotationMatrix m1 = q.ToRotationMatrix();
+            Matrix4x4 m = Matrix4x4.CreateOrthogonal(new Vector(0, 1, 0), new Vector(-1, 0, 0));
+            Quaternion q;
+            Assert.IsTrue(m.GetQuaternion(out q), "Could not convert to Quaternion");
+            Matrix4x4 m1 = Matrix4x4.CreateFromQuaternion(q);
 
-            Assert.IsTrue(m.IsSimilar(m1));
+            Assert.IsTrue(m.IsSimilarTo(m1, MMath.EPSILON3));
         }
 
 
         [TestMethod]
-        public void RotationMatrix_ToQuaternion_ToRotationMatrix()
+        public void Matrix_ToQuaternion_ToMatrix()
         {
-            RotationMatrix m1, m2;
+            Matrix4x4 m1, m2;
             Quaternion q;
             Vector vecX, vecY;
             int dir;
@@ -215,9 +221,9 @@ namespace DataTypesTests
                 vecY = Vector.RandomFromDoubles(-100, 100);
                 dir = Vector.CompareDirections(vecX, vecY);
 
-                m1 = new RotationMatrix(vecX, vecY);
-                q = m1.ToQuaternion();
-                m2 = q.ToRotationMatrix();
+                m1 = Matrix4x4.CreateOrthogonal(vecX, vecY);
+                Assert.IsTrue(m1.GetQuaternion(out q), "Could not convert to Quaternion");
+                m2 = Matrix4x4.CreateFromQuaternion(q);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
@@ -225,15 +231,15 @@ namespace DataTypesTests
                 Trace.WriteLine(q);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1.IsSimilar(m2));
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON3));
             }
         }
 
         [TestMethod]
-        public void RotationMatrix_ToAxisAngle_ToRotationMatrix()
+        public void Matrix_ToAxisAngle_ToMatrix()
         {
 
-            RotationMatrix m1, m2;
+            Matrix4x4 m1, m2;
             AxisAngle aa1, aa2;
 
             double x, y, z, angle;
@@ -248,9 +254,9 @@ namespace DataTypesTests
                 angle = Random(-1440, 1440);  // test any possible angle
 
                 aa1 = new AxisAngle(x, y, z, angle);  // a random AA is easier to create than a random RM
-                m1 = aa1.ToRotationMatrix();
-                aa2 = m1.ToAxisAngle();
-                m2 = aa2.ToRotationMatrix();
+                m1 = aa1.ToMatrix();
+                aa2 = m1.GetAxisAngle();
+                m2 = aa2.ToMatrix();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(x + " " + y + " " + z + " " + angle);
@@ -259,7 +265,7 @@ namespace DataTypesTests
                 Trace.WriteLine(aa2);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1.IsSimilar(m2));
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON3));
                 Assert.IsTrue(aa1.IsEquivalent(aa2));  // just for the sake of it, not the point of this test ;)
             }
 
@@ -271,9 +277,9 @@ namespace DataTypesTests
                 angle = 90 * RandomInt(-8, 8);
 
                 aa1 = new AxisAngle(axis, angle);  // a random AA is easier to create than a random RM
-                m1 = aa1.ToRotationMatrix();
-                aa2 = m1.ToAxisAngle();
-                m2 = aa2.ToRotationMatrix();
+                m1 = aa1.ToMatrix();
+                aa2 = m1.GetAxisAngle();
+                m2 = aa2.ToMatrix();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(axis + " " + angle);
@@ -282,7 +288,7 @@ namespace DataTypesTests
                 Trace.WriteLine(aa2);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1.IsSimilar(m2));
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON3));
                 Assert.IsTrue(aa1.IsEquivalent(aa2));  // just for the sake of it, not the point of this test ;)
             }
         }
@@ -291,7 +297,7 @@ namespace DataTypesTests
         public void RotationMatrix_ToYawPitchRoll_ToRotationMatrix()
         {
 
-            RotationMatrix m1, m2, m3;
+            Matrix4x4 m1, m2, m3;
             YawPitchRoll eu1, eu2, eu3;
             AxisAngle aa;
 
@@ -307,11 +313,11 @@ namespace DataTypesTests
                 angle = Random(-1440, 1440);  // test any possible angle
 
                 aa = new AxisAngle(x, y, z, angle);  // a random AA is easier to create than a random RM
-                m1 = aa.ToRotationMatrix();
+                m1 = aa.ToMatrix();
                 eu1 = m1.ToYawPitchRoll();
-                m2 = eu1.ToRotationMatrix();
+                m2 = eu1.ToMatrix();
                 eu2 = m2.ToYawPitchRoll();
-                m3 = eu2.ToRotationMatrix();
+                m3 = eu2.ToMatrix();
                 eu3 = m3.ToYawPitchRoll();
 
                 Trace.WriteLine("");
@@ -324,8 +330,8 @@ namespace DataTypesTests
                 Trace.WriteLine(m3);
                 Trace.WriteLine(eu3);
 
-                Assert.IsTrue(m1.IsSimilar(m2));
-                Assert.IsTrue(m2.IsSimilar(m3));
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON2));
+                Assert.IsTrue(m2.IsSimilarTo(m3, MMath.EPSILON2));
                 Assert.IsTrue(eu1.IsEquivalent(eu2));
                 Assert.IsTrue(eu2.IsSimilar(eu3));
             }
@@ -338,11 +344,11 @@ namespace DataTypesTests
                 angle = 90 * RandomInt(-16, 16);
 
                 aa = new AxisAngle(axis, angle);  // a random AA is easier to create than a random RM
-                m1 = aa.ToRotationMatrix();
+                m1 = aa.ToMatrix();
                 eu1 = m1.ToYawPitchRoll();
-                m2 = eu1.ToRotationMatrix();
+                m2 = eu1.ToMatrix();
                 eu2 = m2.ToYawPitchRoll();
-                m3 = eu2.ToRotationMatrix();
+                m3 = eu2.ToMatrix();
                 eu3 = m3.ToYawPitchRoll();
 
                 Trace.WriteLine("");
@@ -355,8 +361,8 @@ namespace DataTypesTests
                 Trace.WriteLine(m3);
                 Trace.WriteLine(eu3);
 
-                Assert.IsTrue(m1.IsSimilar(m2));
-                Assert.IsTrue(m2.IsSimilar(m3));
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON2));
+                Assert.IsTrue(m2.IsSimilarTo(m3, MMath.EPSILON2));
                 Assert.IsTrue(eu1.IsEquivalent(eu2));
                 Assert.IsTrue(eu2.IsSimilar(eu3));
             }

@@ -367,7 +367,7 @@ namespace DataTypesTests
         public void Quaternion_ToRotationMatrix_ToQuaternion()
         {
             Quaternion q1, q2;
-            RotationMatrix m;
+            Matrix4x4 m;
 
             SysQuat sq1, sq2;
             SysMatrix44 sm;
@@ -389,8 +389,8 @@ namespace DataTypesTests
                 z = Random(-100, 100);
 
                 q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
-                m = q1.ToRotationMatrix();
-                q2 = m.ToQuaternion();
+                m = q1.ToMatrix();
+                Assert.IsTrue(m.GetQuaternion(out q2), "Could not convert to Quaternion");
 
                 // Compare with System quaternions
                 sq1 = new SysQuat((float)q1.X, (float)q1.Y, (float)q1.Z, (float)q1.W);  // use same q1 normalization
@@ -429,8 +429,8 @@ namespace DataTypesTests
                         for (z = -1; z <= 1; z += 0.5)
                         {
                             q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
-                            m = q1.ToRotationMatrix();
-                            q2 = m.ToQuaternion();
+                            m = q1.ToMatrix();
+                            Assert.IsTrue(m.GetQuaternion(out q2), "Could not convert to Quaternion");
 
                             // Compare with System quaternions
                             sq1 = new SysQuat((float)q1.X, (float)q1.Y, (float)q1.Z, (float)q1.W);  // use same q1 normalization
@@ -462,7 +462,7 @@ namespace DataTypesTests
         public void Quaternion_ToRotationMatrix_FromEquivalentQuaternions()
         {
             Quaternion q1, q2;
-            RotationMatrix m1, m2;
+            Matrix4x4 m1, m2;
 
             double w, x, y, z, factor;
 
@@ -476,9 +476,9 @@ namespace DataTypesTests
                 factor = Random(-10, 10);
 
                 q1 = new Quaternion(w, x, y, z);  // gets automatically normalized
-                m1 = q1.ToRotationMatrix();
+                m1 = q1.ToMatrix();
                 q2 = Quaternion.Scale(q1, factor);
-                m2 = q2.ToRotationMatrix();
+                m2 = q2.ToMatrix();
 
                 Trace.WriteLine("");
                 Trace.WriteLine(w + " " + x + " " + y + " " + z);
@@ -487,7 +487,7 @@ namespace DataTypesTests
                 Trace.WriteLine(q2);
                 Trace.WriteLine(m2);
 
-                Assert.IsTrue(m1.IsSimilar(m2));
+                Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON3));
             }
 
             factor = -1;
@@ -501,9 +501,9 @@ namespace DataTypesTests
                         for (z = -1; z <= 1; z += 0.5)
                         {
                             q1 = new Quaternion(w, x, y, z);
-                            m1 = q1.ToRotationMatrix();
+                            m1 = q1.ToMatrix();
                             q2 = Quaternion.Scale(q1, factor);
-                            m2 = q2.ToRotationMatrix();
+                            m2 = q2.ToMatrix();
 
                             Trace.WriteLine("");
                             Trace.WriteLine(w + " " + x + " " + y + " " + z);
@@ -512,7 +512,7 @@ namespace DataTypesTests
                             Trace.WriteLine(q2);
                             Trace.WriteLine(m2);
 
-                            Assert.IsTrue(m1.IsSimilar(m2));
+                            Assert.IsTrue(m1.IsSimilarTo(m2, MMath.EPSILON3));
                         }
                     }
                 }
