@@ -790,37 +790,41 @@ namespace Machina.Types.Geometry
 
         /// <summary>
         /// Creates a matrix with an orthogonal special rotation part, for any two input vectors.
+        /// If failed (vectors were parallel or zero), the identity matrix will be returned).
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
-        public static Matrix4x4 CreateOrthogonal(double x0, double x1, double x2, double y0, double y1, double y2)
+        /// <returns>True if </returns>
+        public static bool CreateOrthogonal(double x0, double x1, double x2, double y0, double y1, double y2, out Matrix4x4 m)
         {
-            Matrix4x4 m;
-
             m.M11 = x0;
-            m.M12 = x1;
-            m.M13 = x2;
-            m.M14 = 0;
-
-            m.M21 = y0;
-            m.M22 = y1;
-            m.M23 = y2;
-            m.M24 = 0;
-
-            m.M31 = 0;
-            m.M32 = 0;
-            m.M33 = 1;
-            m.M34 = 0;
-
+            m.M21 = x1;
+            m.M31 = x2;
             m.M41 = 0;
+
+            m.M12 = y0;
+            m.M22 = y1;
+            m.M32 = y2;
             m.M42 = 0;
+
+            m.M13 = 0;
+            m.M23 = 0;
+            m.M33 = 1;
             m.M43 = 0;
+
+            m.M14 = 0;
+            m.M24 = 0;
+            m.M34 = 0;
             m.M44 = 1;
 
-            m.OrthogonalizeRotation();
+            bool success = m.OrthogonalizeRotation();
 
-            return m;
+            if (!success)
+            {
+                m = Identity;
+            }
+
+            return success;
         }
 
         /// <summary>
@@ -829,9 +833,9 @@ namespace Machina.Types.Geometry
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public static Matrix4x4 CreateOrthogonal(Vector x, Vector y)
+        public static bool  CreateOrthogonal(Vector x, Vector y, out Matrix4x4 m)
         {
-            return CreateOrthogonal(x.X, x.Y, x.Z, y.X, y.Y, y.Z);
+            return CreateOrthogonal(x.X, x.Y, x.Z, y.X, y.Y, y.Z, out m);
         }
 
 

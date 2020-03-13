@@ -127,7 +127,7 @@ namespace Machina.Types.Geometry
         /// <param name="y2"></param>
         public Orientation(double x0, double x1, double x2, double y0, double y1, double y2)
         {
-            this.RM = Matrix4x4.CreateOrthogonal(x0, x1, x2, y0, y1, y2);
+            Matrix4x4.CreateOrthogonal(x0, x1, x2, y0, y1, y2, out this.RM);
             //this.Q = 
             this.RM.GetQuaternion(out this.Q);
         }

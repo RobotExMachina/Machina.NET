@@ -39,6 +39,7 @@ namespace DataTypesTests
                 }
 
                 m = new Matrix4x4(r);
+                m = m.GetRotationMatrix();
 
                 Trace.WriteLine("");
                 for (int j = 0; j < 16; j++)
@@ -48,7 +49,13 @@ namespace DataTypesTests
                 Trace.WriteLine("PRE");
                 Trace.WriteLine(m);
 
-                if (!m.IsOrthogonalRotation) m.OrthogonalizeRotation();
+                
+                if (!m.IsOrthogonalRotation)
+                {
+                    // Since the matrix was created from random double numbers, it is highly unlikely that X and Y will be purely parallel. 
+                    // So, let's maintain this as a test.
+                    Assert.IsTrue(m.OrthogonalizeRotation(), "Could not orthogonalize matrix.");
+                }
 
                 Trace.WriteLine("ORTHO");
                 Trace.WriteLine(m);
@@ -64,6 +71,7 @@ namespace DataTypesTests
                 }
 
                 m = new Matrix4x4(r);
+                m = m.GetRotationMatrix();
 
                 Trace.WriteLine("");
                 for (int j = 0; j < 16; j++)
@@ -73,12 +81,26 @@ namespace DataTypesTests
                 Trace.WriteLine("PRE");
                 Trace.WriteLine(m);
 
-                if (!m.IsOrthogonalRotation) m.OrthogonalizeRotation();
-
+                // Since using 0 and 1, it is very likely to hit parallel/opposite vectors.
+                bool isOrtho = true;
+                if (!m.IsOrthogonalRotation)
+                {
+                    isOrtho = m.OrthogonalizeRotation();
+                }
+                
                 Trace.WriteLine("ORTHO");
                 Trace.WriteLine(m);
 
-                Assert.IsTrue(m.IsOrthogonalRotation, "Matrix didn't orthogonalize.");
+                if (isOrtho)
+                {
+                    Assert.IsTrue(m.IsOrthogonalRotation, "Matrix didn't orthogonalize.");
+                }
+                else
+                {
+                    int dir = Vector.CompareDirections(m.X, m.Y);
+                    Assert.IsTrue(dir == -1 || dir == 1 || dir == 3, "Matrix didn't orthogonalize vectors with direction " + dir);
+                }
+
             }
         }
 
@@ -89,12 +111,13 @@ namespace DataTypesTests
             Vector vecX, vecY;
             Vector mVecX, mVecY, mVecZ;
             int dir;
+            bool success;
 
             for (var i = 0; i < 50; i++)
             {
                 vecX = Vector.RandomFromDoubles(-100, 100);
                 vecY = Vector.RandomFromDoubles(-100, 100);
-                m = Matrix4x4.CreateOrthogonal(vecX, vecY);
+                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY);
@@ -102,7 +125,8 @@ namespace DataTypesTests
                 Assert.IsTrue(m.IsOrthogonalRotation, "Matrix isn't orthogonal");
 
                 mVecX = new Vector(m.M11, m.M21, m.M31);
-                Assert.IsTrue(Vector.CompareDirections(vecX, mVecX) == 1, "Original VectorX and orthogonalized one are not parallel");
+                dir = Vector.CompareDirections(vecX, mVecX);
+                Assert.IsTrue(dir == 1, "Original VectorX and orthogonalized one are not parallel");
             }
 
             for (var i = 0; i < 100; i++)
@@ -111,13 +135,17 @@ namespace DataTypesTests
                 vecY = Vector.RandomFromInts(-1, 1);
                 dir = Vector.CompareDirections(vecX, vecY);
 
-                m = Matrix4x4.CreateOrthogonal(vecX, vecY);
+                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m);
 
                 Trace.WriteLine("");
                 Trace.WriteLine(vecX + " " + vecY + " dir:" + dir);
                 Trace.WriteLine(m);
 
-                if (dir == 1 || dir == 3)
+                if (dir == -1)
+                {
+                    Assert.IsTrue(vecX.IsZero || vecY.IsZero, "One of the vectors should be zero.");
+                }
+                else if (dir == 1 || dir == 3)
                 {
                     Assert.IsTrue(m.IsIdentity, "Parallel vectors should yield an identity matrix");
                 }
@@ -151,6 +179,7 @@ namespace DataTypesTests
             SysQuat sq;
             Vector vecX, vecY;
             int dir;
+            bool success;
 
             int runs = 500;
             for (var i = 0; i < runs; i++)
@@ -167,7 +196,7 @@ namespace DataTypesTests
                 }
 
                 dir = Vector.CompareDirections(vecX, vecY);
-                m = m = Matrix4x4.CreateOrthogonal(vecX, vecY);
+                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m);
                 Assert.IsTrue(m.GetQuaternion(out q), "Could not convert to Quaternion");
 
                 Trace.WriteLine("");
@@ -196,7 +225,7 @@ namespace DataTypesTests
         [TestMethod]
         public void Matrix_ToQuaternion_LowTrace()
         {
-            Matrix4x4 m = Matrix4x4.CreateOrthogonal(new Vector(0, 1, 0), new Vector(-1, 0, 0));
+            bool success = Matrix4x4.CreateOrthogonal(new Vector(0, 1, 0), new Vector(-1, 0, 0), out Matrix4x4 m);
             Quaternion q;
             Assert.IsTrue(m.GetQuaternion(out q), "Could not convert to Quaternion");
             Matrix4x4 m1 = Matrix4x4.CreateFromQuaternion(q);
@@ -212,6 +241,7 @@ namespace DataTypesTests
             Quaternion q;
             Vector vecX, vecY;
             int dir;
+            bool success;
 
             double[] r = new double[9];
 
@@ -221,7 +251,7 @@ namespace DataTypesTests
                 vecY = Vector.RandomFromDoubles(-100, 100);
                 dir = Vector.CompareDirections(vecX, vecY);
 
-                m1 = Matrix4x4.CreateOrthogonal(vecX, vecY);
+                success = Matrix4x4.CreateOrthogonal(vecX, vecY, out m1);
                 Assert.IsTrue(m1.GetQuaternion(out q), "Could not convert to Quaternion");
                 m2 = Matrix4x4.CreateFromQuaternion(q);
 
@@ -411,7 +441,7 @@ namespace DataTypesTests
                 Trace.WriteLine(ori);
 
                 // If parallel or opposite, rotation matrix should be identity...
-                if (dir == 1 || dir == 3)
+                if (dir == -1 || dir == 1 || dir == 3)
                 {
                     Assert.IsTrue(ori.XAxis.IsSimilarTo(Vector.XAxis, MMath.EPSILON2));
                 }

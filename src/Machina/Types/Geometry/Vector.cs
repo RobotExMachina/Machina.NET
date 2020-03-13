@@ -226,7 +226,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static double operator *(Vector a, Vector b)
         {
-            return a._x * b._x + a._y * b._y + a._x * b._y;
+            return a._x * b._x + a._y * b._y + a._z * b._z;
         }
 
         /// <summary>
@@ -355,9 +355,9 @@ namespace Machina.Types.Geometry
         {
             // Some sanity
             int dir = Vector.CompareDirections(refX, refY);
-            if (dir == 1 || dir == 3)
+            if (dir == -1 || dir == 1 || dir == 3)
             {
-                Logger.Verbose("Cannot orthogonalize vectors with the same direction");
+                Logger.Verbose("Invalid vectors for orthogonalization.");
                 orthoX = Unset;
                 orthoY = Unset;
                 orthoZ = Unset;
@@ -590,28 +590,32 @@ namespace Machina.Types.Geometry
         /// Compares the directions of two vectors, regardless of their magnitude.
         /// Returns 1 if parallel (same direction), 2 if orthogonal (perpendicular
         /// directions), 3 if opposite (parallel in opposite directions), 
-        /// 0 otherwise
+        /// -1 if angle is non-computable (any vector is zero?), 0 otherwise.
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static int CompareDirections(Vector a, Vector b)
+        public static Directions CompareDirections(Vector a, Vector b)
         {
             double alpha = AngleBetween(a, b);
 
-            if (alpha < MMath.EPSILON2)
+            if (alpha == MMath.UNSET_VALUE)
             {
-                return 1;
+                return Directions.Invalid;
+            } 
+            else if (alpha < MMath.EPSILON2)
+            {
+                return Directions.Parallel;
             }
             else if (alpha < 0.5 * Math.PI + MMath.EPSILON2 && alpha > 0.5 * Math.PI - MMath.EPSILON2)
             {
-                return 2;
+                return Directions.Orthogonal;
             }
             else if (Math.Abs(alpha - Math.PI) < MMath.EPSILON2)
             {
-                return 3;
+                return Directions.Opposite;
             }
-            return 0;
+            return Directions.Other;
         }
 
         /// <summary>

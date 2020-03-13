@@ -238,4 +238,35 @@ namespace Machina
         Milimiters,
         Meters
     }
+
+    /// <summary>
+    /// Defines the direction relation between two vectors.
+    /// </summary>
+    public enum Directions
+    {
+        /// <summary>
+        /// Can't determine, one of them is probably zero.
+        /// </summary>
+        Invalid = -1,
+
+        /// <summary>
+        /// Vectors form an arbitrary angle between them.
+        /// </summary>
+        Other = 0,
+
+        /// <summary>
+        /// Vectors are parallel and have the same direction (angle = 0).
+        /// </summary>
+        Parallel = 1,
+
+        /// <summary>
+        /// Vectors are perpendicular in space (angle = 90).
+        /// </summary>
+        Orthogonal = 2,
+
+        /// <summary>
+        /// Vectors are parallel and have opposite directions (angle = 180).
+        /// </summary>
+        Opposite = 3
+    }
 }
