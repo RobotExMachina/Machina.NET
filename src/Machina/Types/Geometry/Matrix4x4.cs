@@ -139,10 +139,10 @@ namespace Machina.Types.Geometry
 
         private static readonly Matrix4x4 _identity = new Matrix4x4
         (
-            1f, 0f, 0f, 0f,
-            0f, 1f, 0f, 0f,
-            0f, 0f, 1f, 0f,
-            0f, 0f, 0f, 1f
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
         );
 
         /// <summary>
@@ -162,25 +162,25 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            result.M11 = 1.0f;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
+            result.M11 = 1;
+            result.M12 = 0;
+            result.M13 = 0;
             result.M14 = position.X;
 
-            result.M21 = 0.0f;
-            result.M22 = 1.0f;
-            result.M23 = 0.0f;
+            result.M21 = 0;
+            result.M22 = 1;
+            result.M23 = 0;
             result.M24 = position.Y;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
-            result.M33 = 1.0f;
+            result.M31 = 0;
+            result.M32 = 0;
+            result.M33 = 1;
             result.M34 = position.Z;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -196,25 +196,25 @@ namespace Machina.Types.Geometry
         {
             Matrix4x4 result;
 
-            result.M11 = 1.0f;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
+            result.M11 = 1;
+            result.M12 = 0;
+            result.M13 = 0;
             result.M14 = xPosition;
 
-            result.M21 = 0.0f;
-            result.M22 = 1.0f;
-            result.M23 = 0.0f;
+            result.M21 = 0;
+            result.M22 = 1;
+            result.M23 = 0;
             result.M24 = yPosition;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
-            result.M33 = 1.0f;
+            result.M31 = 0;
+            result.M32 = 0;
+            result.M33 = 1;
             result.M34 = zPosition;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -231,24 +231,24 @@ namespace Machina.Types.Geometry
             Matrix4x4 result;
 
             result.M11 = xScale;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
-            result.M14 = 0.0f;
+            result.M12 = 0;
+            result.M13 = 0;
+            result.M14 = 0;
 
-            result.M21 = 0.0f;
+            result.M21 = 0;
             result.M22 = yScale;
-            result.M23 = 0.0f;
-            result.M24 = 0.0f;
+            result.M23 = 0;
+            result.M24 = 0;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
+            result.M31 = 0;
+            result.M32 = 0;
             result.M33 = zScale;
-            result.M34 = 0.0f;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -263,24 +263,24 @@ namespace Machina.Types.Geometry
             Matrix4x4 result;
 
             result.M11 = scales.X;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
-            result.M14 = 0.0f;
+            result.M12 = 0;
+            result.M13 = 0;
+            result.M14 = 0;
 
-            result.M21 = 0.0f;
+            result.M21 = 0;
             result.M22 = scales.Y;
-            result.M23 = 0.0f;
-            result.M24 = 0.0f;
+            result.M23 = 0;
+            result.M24 = 0;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
+            result.M31 = 0;
+            result.M32 = 0;
             result.M33 = scales.Z;
-            result.M34 = 0.0f;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -295,24 +295,24 @@ namespace Machina.Types.Geometry
             Matrix4x4 result;
 
             result.M11 = scale;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
-            result.M14 = 0.0f;
+            result.M12 = 0;
+            result.M13 = 0;
+            result.M14 = 0;
 
-            result.M21 = 0.0f;
+            result.M21 = 0;
             result.M22 = scale;
-            result.M23 = 0.0f;
-            result.M24 = 0.0f;
+            result.M23 = 0;
+            result.M24 = 0;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
+            result.M31 = 0;
+            result.M32 = 0;
             result.M33 = scale;
-            result.M34 = 0.0f;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -334,24 +334,24 @@ namespace Machina.Types.Geometry
             double tz = centerPoint.Z * (1 - zScale);
 
             result.M11 = xScale;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
+            result.M12 = 0;
+            result.M13 = 0;
             result.M14 = tx;
 
-            result.M21 = 0.0f;
+            result.M21 = 0;
             result.M22 = yScale;
-            result.M23 = 0.0f;
+            result.M23 = 0;
             result.M24 = ty;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
+            result.M31 = 0;
+            result.M32 = 0;
             result.M33 = zScale;
             result.M34 = tz;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -373,25 +373,25 @@ namespace Machina.Types.Geometry
             // [  0  c -s  0 ]
             // [  0  s  c  0 ]
             // [  0  0  0  1 ]
-            result.M11 = 1.0f;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
-            result.M14 = 0.0f;
+            result.M11 = 1;
+            result.M12 = 0;
+            result.M13 = 0;
+            result.M14 = 0;
 
-            result.M21 = 0.0f;
+            result.M21 = 0;
             result.M22 = c;
             result.M23 = -s;
-            result.M24 = 0.0f;
+            result.M24 = 0;
 
-            result.M31 = 0.0f;
+            result.M31 = 0;
             result.M32 = s;
             result.M33 = c;
-            result.M34 = 0.0f;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -417,25 +417,25 @@ namespace Machina.Types.Geometry
             // [  0  c -s  y ]
             // [  0  s  c  z ]
             // [  0  0  0  1 ]
-            result.M11 = 1.0f;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
-            result.M14 = 0.0f;
+            result.M11 = 1;
+            result.M12 = 0;
+            result.M13 = 0;
+            result.M14 = 0;
 
-            result.M21 = 0.0f;
+            result.M21 = 0;
             result.M22 = c;
             result.M23 = -s;
             result.M24 = y;
 
-            result.M31 = 0.0f;
+            result.M31 = 0;
             result.M32 = s;
             result.M33 = c;
             result.M34 = z;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -458,24 +458,24 @@ namespace Machina.Types.Geometry
             // [ -s  0  c  0 ]
             // [  0  0  0  1 ]
             result.M11 = c;
-            result.M12 = 0.0f;
+            result.M12 = 0;
             result.M13 = s;
-            result.M14 = 0.0f;
+            result.M14 = 0;
 
-            result.M21 = 0.0f;
-            result.M22 = 1.0f;
-            result.M23 = 0.0f;
-            result.M24 = 0.0f;
+            result.M21 = 0;
+            result.M22 = 1;
+            result.M23 = 0;
+            result.M24 = 0;
 
             result.M31 = -s;
-            result.M32 = 0.0f;
+            result.M32 = 0;
             result.M33 = c;
-            result.M34 = 0.0f;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -502,24 +502,24 @@ namespace Machina.Types.Geometry
             // [ -s  0  c  z ]
             // [  0  0  0  1 ]
             result.M11 = c;
-            result.M12 = 0.0f;
+            result.M12 = 0;
             result.M13 = s;
             result.M14 = x;
 
-            result.M21 = 0.0f;
-            result.M22 = 1.0f;
-            result.M23 = 0.0f;
-            result.M24 = 0.0f;
+            result.M21 = 0;
+            result.M22 = 1;
+            result.M23 = 0;
+            result.M24 = 0;
 
             result.M31 = -s;
-            result.M32 = 0.0f;
+            result.M32 = 0;
             result.M33 = c;
             result.M34 = z;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -543,23 +543,23 @@ namespace Machina.Types.Geometry
             // [  0  0  0  1 ]
             result.M11 = c;
             result.M12 = -s;
-            result.M13 = 0.0f;
-            result.M14 = 0.0f;
+            result.M13 = 0;
+            result.M14 = 0;
 
             result.M21 = s;
             result.M22 = c;
-            result.M23 = 0.0f;
-            result.M24 = 0.0f;
+            result.M23 = 0;
+            result.M24 = 0;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
-            result.M33 = 1.0f;
-            result.M34 = 0.0f;
+            result.M31 = 0;
+            result.M32 = 0;
+            result.M33 = 1;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -587,23 +587,23 @@ namespace Machina.Types.Geometry
             // [  0  0  0  1 ]
             result.M11 = c;
             result.M12 = -s;
-            result.M13 = 0.0f;
+            result.M13 = 0;
             result.M14 = x;
 
             result.M21 = s;
             result.M22 = c;
-            result.M23 = 0.0f;
+            result.M23 = 0;
             result.M24 = y;
 
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
-            result.M33 = 1.0f;
-            result.M34 = 0.0f;
+            result.M31 = 0;
+            result.M32 = 0;
+            result.M33 = 1;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -639,22 +639,22 @@ namespace Machina.Types.Geometry
             result.M11 = t * xx + c;
             result.M12 = t * xy - z * s;
             result.M13 = t * xz + y * s;
-            result.M14 = 0.0f;
+            result.M14 = 0;
 
             result.M21 = t * xy + z * s;
             result.M22 = t * yy + c;
             result.M23 = t * yz - x * s;
-            result.M24 = 0.0f;
+            result.M24 = 0;
 
             result.M31 = t * xz - y * s;
             result.M32 = t * yz + x * s;
             result.M33 = t * zz + c;
-            result.M34 = 0.0f;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -705,10 +705,10 @@ namespace Machina.Types.Geometry
             result.M33 = plane.ZAxis.Z;
             result.M34 = plane.Origin.Z;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -754,10 +754,10 @@ namespace Machina.Types.Geometry
             m.M33 = z2;
             m.M34 = originZ;
 
-            m.M41 = 0.0f;
-            m.M42 = 0.0f;
-            m.M43 = 0.0f;
-            m.M44 = 1.0f;
+            m.M41 = 0;
+            m.M42 = 0;
+            m.M43 = 0;
+            m.M44 = 1;
 
             return m;
         }
@@ -770,10 +770,22 @@ namespace Machina.Types.Geometry
         /// <returns>The rotation matrix.</returns>
         public static Matrix4x4 CreateFromQuaternion(Quaternion quaternion)
         {
+            return CreateFromQuaternion(quaternion.W, quaternion.X, quaternion.Y, quaternion.Z);
+        }
+
+        /// <summary>
+        /// Creates a rotation matrix from the given Quaternion rotation value.
+        /// </summary>
+        /// <param name="w">The scalar part.</param>
+        /// <param name="x">The i part.</param>
+        /// <param name="y">The j part.</param>
+        /// <param name="z">The k part.</param>
+        /// <returns>The rotation matrix.</returns>
+        public static Matrix4x4 CreateFromQuaternion(double w, double x, double y, double z)
+        {
             // double implementation of Quaternion.ToRotationMatrix()
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
-            double x = quaternion.X, y = quaternion.Y,
-                z = quaternion.Z, w = quaternion.W;
+
             double xx2 = 2 * x * x,
                 xy2 = 2 * x * y,
                 xz2 = 2 * x * z,
@@ -789,22 +801,22 @@ namespace Machina.Types.Geometry
             result.M11 = 1 - yy2 - zz2;
             result.M12 = xy2 - zw2;
             result.M13 = xz2 + yw2;
-            result.M14 = 0.0f;
+            result.M14 = 0;
 
             result.M21 = xy2 + zw2;
             result.M22 = 1 - xx2 - zz2;
             result.M23 = yz2 - xw2;
-            result.M24 = 0.0f;
+            result.M24 = 0;
 
             result.M31 = xz2 - yw2;
             result.M32 = yz2 + xw2;
             result.M33 = 1 - xx2 - yy2;
-            result.M34 = 0.0f;
+            result.M34 = 0;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -857,15 +869,15 @@ namespace Machina.Types.Geometry
             result.M23 = -ct * sa;
             result.M24 = radius * st;
 
-            result.M31 = 0.0f;
+            result.M31 = 0;
             result.M32 = sa;
             result.M33 = ca;
             result.M34 = distance;
 
-            result.M41 = 0.0f;
-            result.M42 = 0.0f;
-            result.M43 = 0.0f;
-            result.M44 = 1.0f;
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
 
             return result;
         }
@@ -1202,7 +1214,7 @@ namespace Machina.Types.Geometry
                 return false;
             }
 
-            double invDet = 1.0f / det;
+            double invDet = 1 / det;
 
             result.M11 = a11 * invDet;
             result.M21 = a12 * invDet;
@@ -1271,17 +1283,17 @@ namespace Machina.Types.Geometry
             double yz2 = y * z2;
             double zz2 = z * z2;
 
-            double q11 = 1.0f - yy2 - zz2;
+            double q11 = 1 - yy2 - zz2;
             double q12 = xy2 - wz2;
             double q13 = xz2 + wy2;
 
             double q21 = xy2 + wz2;
-            double q22 = 1.0f - xx2 - zz2;
+            double q22 = 1 - xx2 - zz2;
             double q23 = yz2 - wx2;
 
             double q31 = xz2 - wy2;
             double q32 = yz2 + wx2;
-            double q33 = 1.0f - xx2 - yy2;
+            double q33 = 1 - xx2 - yy2;
 
             Matrix4x4 result;
 
@@ -1537,6 +1549,38 @@ namespace Machina.Types.Geometry
             return result;
         }
 
+        /// <summary>
+        /// Returns a new matrix with only the 3x3 rotational part of the original one.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static Matrix4x4 ExtractRotation(Matrix4x4 source)
+        {
+            Matrix4x4 result;
+
+            result.M11 = source.M11;
+            result.M12 = source.M12;
+            result.M13 = source.M13;
+            result.M14 = 0;
+
+            result.M21 = source.M21;
+            result.M22 = source.M22;
+            result.M23 = source.M23;
+            result.M24 = 0;
+            
+            result.M31 = source.M31;
+            result.M32 = source.M32;
+            result.M33 = source.M33;
+            result.M34 = 0;
+
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
+
+            return result;
+        }
+
         #endregion operators
 
 
@@ -1644,11 +1688,29 @@ namespace Machina.Types.Geometry
         {
             get
             {
-                return M11 == 1f && M22 == 1f && M33 == 1f && M44 == 1f && // Check diagonal element first for early out.
-                       M12 == 0f && M13 == 0f && M14 == 0f &&
-                       M21 == 0f && M23 == 0f && M24 == 0f &&
-                       M31 == 0f && M32 == 0f && M34 == 0f &&
-                       M41 == 0f && M42 == 0f && M43 == 0f;
+                return M11 == 1 && M22 == 1 && M33 == 1 && M44 == 1 && // Check diagonal element first for early out.
+                       M12 == 0 && M13 == 0 && M14 == 0 &&
+                       M21 == 0 && M23 == 0 && M24 == 0 &&
+                       M31 == 0 && M32 == 0 && M34 == 0 &&
+                       M41 == 0 && M42 == 0 && M43 == 0;
+            }
+        }
+
+        public bool IsRotationOrthogonal
+        {
+            get
+            {
+                // Orthogonal matrices satisfy that:
+                // Q * Qt = Qt * Q = I;  
+                // (the matrix multiplied by its transpose yields the identity matrix)
+                // As a consequence, it also holds that the transpose of an orthogonal matrix equals its inverse:
+                // Qt = Q^-1
+                Matrix4x4 rot = ExtractRotation(this);
+                Matrix4x4 trans = Transpose(rot);
+                Matrix4x4 ident = this * trans;
+                return 
+                    ident.IsSimilarTo(Identity, MMath.EPSILON3) && 
+                    Math.Abs(this.GetDeterminant() - 1) < MMath.EPSILON2;
             }
         }
 
@@ -1711,6 +1773,66 @@ namespace Machina.Types.Geometry
 
 
         #region methods
+
+        /// <summary>
+        /// Force the orthogonalization of this matrix. This means that the rotation part of the matrix
+        /// will become an orthogonal coordinate system of three unit vectors. 
+        /// </summary>
+        /// <returns></returns>
+        public bool OrthogonalizeRotation()
+        {
+            // This algorithm will orthogonalize this matrix by
+            // maintaining the main X direction and XY plane, 
+            // and recomputing the Y and Z axes to comply with this condition.
+            Vector oldX = new Vector(M11, M21, M31),
+                   oldY = new Vector(M12, M22, M32);
+
+            if (Vector.Orthogonalize(oldX, oldY, out Vector newX, out Vector newY, out Vector newZ) == false)
+            {
+                Logger.Verbose("Cannot orthogonalize a Matrix with X & Y parallel vectors");
+                return false;
+            }
+
+            M11 = newX.X;
+            M21 = newX.Y;
+            M31 = newX.Z;
+
+            M12 = newY.X;
+            M22 = newY.Y;
+            M32 = newY.Z;
+
+            M13 = newZ.X;
+            M23 = newZ.Y;
+            M33 = newZ.Z;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Transposes the rows and columns of this matrix.
+        /// </summary>
+        public void Transpose()
+        {
+            Matrix4x4 trans = Matrix4x4.Transpose(this);
+            
+            M11 = trans.M11;
+            M12 = trans.M12;
+            M13 = trans.M13;
+            M14 = trans.M14;
+            M21 = trans.M21;
+            M22 = trans.M22;
+            M23 = trans.M23;
+            M24 = trans.M24;
+            M31 = trans.M31;
+            M32 = trans.M32;
+            M33 = trans.M33;
+            M34 = trans.M34;
+            M41 = trans.M41;
+            M42 = trans.M42;
+            M43 = trans.M43;
+            M44 = trans.M44;
+        }
+
 
         /// <summary>
         /// Calculates the determinant of the matrix.

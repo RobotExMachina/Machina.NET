@@ -347,7 +347,7 @@ namespace Machina.Types.Geometry
         /// Returns false if operation could not be processed (both vectors have the same direction)
         /// </summary>
         /// <param name="refX"></param>
-        /// <param name="Y"></param>
+        /// <param name="refY"></param>
         /// <param name="orthoX"></param>
         /// <param name="orthoY"></param>
         /// <param name="orthoZ"></param>

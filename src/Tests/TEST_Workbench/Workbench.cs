@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Machina;
+using Machina.Types.Geometry;
 
 
 namespace TEST_Workbench
@@ -13,26 +14,16 @@ namespace TEST_Workbench
     {
         static void Main(string[] args)
         {
-            Robot bot = Robot.Create("Test", "ABB");
+            Machina.Logger.SetLogLevel(5);
+            Machina.Logger.WriteLine += Console.WriteLine;
 
-            bot.DebugMode(true);
-            bot.ControlMode(ControlType.Online);
+            Matrix4x4 a = Matrix4x4.CreateFromQuaternion(1, 2, 3, 4);
+            Console.WriteLine(a);
+            Console.WriteLine(a.IsRotationOrthogonal);
+            Console.WriteLine(a.OrthogonalizeRotation());
+            Console.WriteLine(a);
+            Console.WriteLine(a.IsRotationOrthogonal);
 
-            var parameters = new Dictionary<string, string>()
-            {
-                {"HOSTNAME", "192.168.125.1"},
-                {"PORT", "7000"}
-            };
-            var files = bot.GetDeviceDriverModules(parameters);
-
-            foreach (var entry in files)
-            {
-                string filename = entry.Key;
-                string content = entry.Value;
-
-                System.IO.File.WriteAllText(filename, content);
-
-            }
 
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
