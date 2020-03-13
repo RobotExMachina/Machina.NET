@@ -204,7 +204,7 @@ namespace DataTypesTests
                 angle = Random(-720, 720);
 
                 Trace.WriteLine("");
-                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + MMath.Length(x, y, z));
 
                 aa = new AxisAngle(x, y, z, angle);
                 q = aa.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
@@ -233,7 +233,7 @@ namespace DataTypesTests
                         for (angle = -720; angle <= 720; angle += 22.5)
                         {
                             Trace.WriteLine("");
-                            Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + MMath.Length(x, y, z));
 
                             // Normalize
                             v = new Vector(x, y, z);
@@ -292,7 +292,7 @@ namespace DataTypesTests
                 angle = Random(360);  // choose only positive angles, because quaternion coversion will always return a positive rotation in [0, 360]
 
                 Trace.WriteLine("");
-                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + MMath.Length(x, y, z));
 
                 aa1 = new AxisAngle(x, y, z, angle);
                 q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
@@ -315,7 +315,7 @@ namespace DataTypesTests
                         for (angle = 0; angle <= 360; angle += 45)
                         {
                             Trace.WriteLine("");
-                            Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+                            Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + MMath.Length(x, y, z));
 
                             aa1 = new AxisAngle(x, y, z, angle);
                             q = aa1.ToQuaternion();
@@ -363,7 +363,7 @@ namespace DataTypesTests
                 angle = Random(-360, 0);  // choose only negative angles
 
                 Trace.WriteLine("");
-                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + MMath.Length(x, y, z));
 
                 aa1 = new AxisAngle(x, y, z, angle);
                 q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as neccesary for spatial rotation representation
@@ -400,7 +400,7 @@ namespace DataTypesTests
                 angle = Random(-1000, 1000);  // test any possible angle
 
                 Trace.WriteLine("");
-                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + Geometry.Length(x, y, z));
+                Trace.WriteLine(x + " " + y + " " + z + " " + angle + " length: " + MMath.Length(x, y, z));
 
                 aa1 = new AxisAngle(x, y, z, angle);
                 q = aa1.ToQuaternion();      // this method will normalize the Quaternion, as necessary for spatial rotation representation

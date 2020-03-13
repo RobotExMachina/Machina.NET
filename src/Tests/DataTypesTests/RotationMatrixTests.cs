@@ -407,7 +407,7 @@ namespace DataTypesTests
                 // If parallel or opposite, rotation matrix should be identity...
                 if (dir == 1 || dir == 3)
                 {
-                    Assert.IsTrue(ori.XAxis.IsSimilar(Vector.XAxis));
+                    Assert.IsTrue(ori.XAxis.IsSimilarTo(Vector.XAxis, MMath.EPSILON2));
                 }
                 else
                 {

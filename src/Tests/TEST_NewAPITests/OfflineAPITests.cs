@@ -33,7 +33,7 @@ namespace TEST_OfflineAPITests
             arm.SaveProgram(program, @"D:\temp");
 
             //arm.DebugRobotCursors();
-            //arm.DebugBuffers();  // at this point, the buffer should be empty and nothing should show up
+            //arm.DebugBuffers();  // at this Vector, the buffer should be empty and nothing should show up
 
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
@@ -72,7 +72,7 @@ namespace TEST_OfflineAPITests
             bot.Move(0, -100, 0);
             bot.Wait(2000);
 
-            bot.DefineTool("tool_100", new Point(0, 0, 100), Orientation.WorldXY);
+            bot.DefineTool("tool_100", new Vector(0, 0, 100), Orientation.WorldXY);
             bot.AttachTool("tool_100");
             bot.Move(0, 0, 0);
             bot.Move(0, 100, 0);
@@ -81,7 +81,7 @@ namespace TEST_OfflineAPITests
             bot.Move(0, 0, 0);
             bot.Wait(2000);
 
-            bot.DefineTool("tool_300", new Point(0, 0, 300), Orientation.WorldXY);
+            bot.DefineTool("tool_300", new Vector(0, 0, 300), Orientation.WorldXY);
             bot.AttachTool("tool_300");
             bot.Move(0, 0, 0);
             bot.Move(0, 100, 0);
@@ -139,7 +139,7 @@ namespace TEST_OfflineAPITests
             bot.Message("Starting vertical square");
             
             // A 100 mm long tool with no TCP rotation
-            Tool rod = Tool.Create("rod", new Point(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Point(0, 0, 50));
+            Tool rod = Tool.Create("rod", new Vector(0, 0, 100), new Orientation(1, 0, 0, 0, 1, 0), 1, new Vector(0, 0, 50));
             bot.Attach(rod);
 
             // Home
@@ -147,7 +147,7 @@ namespace TEST_OfflineAPITests
             bot.PrecisionTo(10.4);
             bot.AxesTo(0, 0, 0, 0, 90, 0);
             
-            // Joint move and rotate to starting point
+            // Joint move and rotate to starting Vector
             bot.PushSettings();
             bot.MotionMode(MotionType.Joint);
             bot.AccelerationTo(2000);
@@ -156,7 +156,7 @@ namespace TEST_OfflineAPITests
             //bot.JointSpeedTo(45);
             //bot.JointAccelerationTo(90);
             bot.PrecisionTo(5);
-            bot.TransformTo(new Point(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
+            bot.TransformTo(new Vector(300, 300, 300), new Orientation(-1, 0, 0, 0, 1, 0));
             bot.Rotate(0, 1, 0, -90);
             bot.PopSettings();
             bot.Wait(500);
@@ -215,12 +215,12 @@ namespace TEST_OfflineAPITests
                 arm.AxesTo(0, 0, 0, 0, 0, 0);
             }
 
-            // Transform to starting point (needs a transform after a joint movement)
+            // Transform to starting Vector (needs a transform after a joint movement)
             arm.PushSettings();
             arm.Speed(100);  // relative increase
             arm.Precision(5);    // rel increase
             arm.MotionMode("joint");
-            arm.TransformTo(new Point(200, 300, 400), new Orientation(-1, 0, 0, 0, 1, 0));
+            arm.TransformTo(new Vector(200, 300, 400), new Orientation(-1, 0, 0, 0, 1, 0));
 
             // Align TCP vertically
             //arm.Motion("linear");  // if this is joint mov, UR doesn't do it! XD
@@ -619,7 +619,7 @@ namespace TEST_OfflineAPITests
         public static void TransformTests(Robot arm)
         {
             // Reset
-            Point home = new Point(300, 0, 500);
+            Vector home = new Vector(300, 0, 500);
             Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
@@ -654,7 +654,7 @@ namespace TEST_OfflineAPITests
         public static void TestCircleTransformAbsolute(Robot arm, double r)
         {
             // Reset
-            Point home = new Point(300, 0, 500);
+            Vector home = new Vector(300, 0, 500);
             Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
@@ -668,7 +668,7 @@ namespace TEST_OfflineAPITests
             // Trace a circle with absolute coordinates and rotations
             for (var i = 0; i < 36; i++)
             {
-                Point target = new Point(
+                Vector target = new Vector(
                     x + r * Math.Cos(2 * Math.PI * i / 36.0),
                     y + r * Math.Sin(2 * Math.PI * i / 36.0),
                     z);
@@ -679,7 +679,7 @@ namespace TEST_OfflineAPITests
             // Trace it back (and 'disentagle' Axis 6...)
             for (var i = 0; i > -36; i--)
             {
-                Point target = new Point(
+                Vector target = new Vector(
                     x + r * Math.Cos(2 * Math.PI * i / 36.0),
                     y + r * Math.Sin(2 * Math.PI * i / 36.0),
                     z);
@@ -694,7 +694,7 @@ namespace TEST_OfflineAPITests
         public static void TestCircleTransformLocal(Robot arm, double side)
         {
             // Reset
-            Point home = new Point(300, 0, 500);
+            Vector home = new Vector(300, 0, 500);
             Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
@@ -734,7 +734,7 @@ namespace TEST_OfflineAPITests
         public static void TestCircleTransformGlobal(Robot arm, double side)
         {
             // Reset
-            Point home = new Point(300, 0, 500);
+            Vector home = new Vector(300, 0, 500);
             Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
@@ -779,7 +779,7 @@ namespace TEST_OfflineAPITests
         static public void TestZTableLimitations(Robot arm)
         {
             // Reset
-            Point home = new Point(300, 0, 500);
+            Vector home = new Vector(300, 0, 500);
             Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             Rotation noRot = new Rotation();
 
@@ -787,14 +787,14 @@ namespace TEST_OfflineAPITests
             arm.TransformTo(home, homeXYZ);
 
             // Bring close to limit (100 by default)
-            arm.TransformTo(new Point(300, 0, 101), homeXYZ);
+            arm.TransformTo(new Vector(300, 0, 101), homeXYZ);
 
             // Try to go trough (should not work)
-            arm.TransformTo(new Point(300, 0, 99), homeXYZ);
+            arm.TransformTo(new Vector(300, 0, 99), homeXYZ);
             arm.Coordinates("local");
-            arm.Transform(new Point(0, 0, 2), noRot);
+            arm.Transform(new Vector(0, 0, 2), noRot);
             arm.Coordinates("global");
-            arm.Transform(new Point(0, 0, -2), noRot);
+            arm.Transform(new Vector(0, 0, -2), noRot);
 
             // Back home
             arm.TransformTo(home, homeXYZ);
@@ -804,7 +804,7 @@ namespace TEST_OfflineAPITests
         public static void TestSnake(Robot arm)
         {
             // Reset
-            Point home = new Point(300, 0, 500);
+            Vector home = new Vector(300, 0, 500);
             Orientation homeXYZ = new Orientation(-1, 0, 0, 0, 1, 0);
             arm.SpeedTo(100);
             arm.TransformTo(home, homeXYZ);
@@ -884,7 +884,7 @@ namespace TEST_OfflineAPITests
             arm.AxesTo(0, -90, -90, -90, 90, 90);  // UR
 
             // Issue an absolute RT movement (should work)
-            arm.TransformTo(new Point(200, 200, 200), Rotation.FlippedAroundY);
+            arm.TransformTo(new Vector(200, 200, 200), Rotation.FlippedAroundY);
 
             // Issue a relative one (should work)
             arm.Transform(new Vector(50, 0, 0), new Rotation(Vector.XAxis, 45));
@@ -915,7 +915,7 @@ namespace TEST_OfflineAPITests
 
             // Issue absolute movement (SHOULD NOT WORK)
             arm.MoveTo(400, 0, 200);                // missing rotation information
-            arm.RotateTo(Rotation.FlippedAroundY);  // missing point information
+            arm.RotateTo(Rotation.FlippedAroundY);  // missing Vector information
 
             // Back home (should work)
             //arm.AxesTo(0, 0, 0, 0, 90, 0);    // ABB

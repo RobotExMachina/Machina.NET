@@ -48,7 +48,7 @@ namespace DataTypesTests
                 v1.Normalize();
                 v2 = rv.GetVector();
 
-                Assert.IsTrue(v1.IsSimilar(v2));
+                Assert.IsTrue(v1.IsSimilarTo(v2, MMath.EPSILON2));
             }
 
             // Test all permutations of unitary components (including zero)
@@ -87,7 +87,7 @@ namespace DataTypesTests
                                 v1.Normalize();
                                 v2 = rv.GetVector();
 
-                                Assert.IsTrue(v1.IsSimilar(v2));
+                                Assert.IsTrue(v1.IsSimilarTo(v2, MMath.EPSILON2));
                             }
                         }
                     }
@@ -121,9 +121,9 @@ namespace DataTypesTests
 
                 v1 = new Vector(x, y, z);
                 v1.Normalize();
-                v1.Invert();
+                v1.Reverse();
                 v2 = rv.GetVector();
-                Assert.IsTrue(v1.IsSimilar(v2));
+                Assert.IsTrue(v1.IsSimilarTo(v2, MMath.EPSILON2));
 
 
                 // Raw check
@@ -171,9 +171,9 @@ namespace DataTypesTests
                                 v1 = new Vector(x, y, z);
                                 v1.Normalize();
                                 v2 = rv.GetVector();
-                                v2.Invert();
+                                v2.Reverse();
 
-                                Assert.IsTrue(v1.IsSimilar(v2));
+                                Assert.IsTrue(v1.IsSimilarTo(v2, MMath.EPSILON2));
                             }
                         }
                     }

@@ -18,7 +18,7 @@ namespace Machina.Types.Geometry
     /// <summary>
     /// Represents a three dimensional vector.
     /// </summary>
-    public struct Vector : IEpsilonComparable<Vector>, ISerializableArray, ISerializableJSON
+    public class Vector : IEpsilonComparable<Vector>, ISerializableArray, ISerializableJSON
     {
 
         #region fields
@@ -58,7 +58,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         public static Vector Zero
         {
-            get { return new Vector(); }
+            get { return new Vector(0.0, 0.0, 0.0); }
         }
 
         /// <summary>
@@ -705,8 +705,32 @@ namespace Machina.Types.Geometry
         //    return newPoints;
         //}
 
-        
 
+        /// <summary>
+        /// Sets the values of this Vector from another Vector (shallow copy if this is a class).
+        /// </summary>
+        /// <param name="newX"></param>
+        /// <param name="newY"></param>
+        /// <param name="newZ"></param>
+        public void Set(Vector clone)
+        {
+            x = clone.x;
+            y = clone.y;
+            z = clone.z;
+        }
+
+        /// <summary>
+        /// Sets the values of this Vector.
+        /// </summary>
+        /// <param name="newX"></param>
+        /// <param name="newY"></param>
+        /// <param name="newZ"></param>
+        public void Set(double newX, double newY, double newZ)
+        {
+            x = newX;
+            y = newY;
+            z = newZ;
+        }
 
         /// <summary>
         /// Add specified values to this Vector.

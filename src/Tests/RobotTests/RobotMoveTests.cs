@@ -95,7 +95,7 @@ namespace RobotTests
             Trace.WriteLine(ror.Q);
 
             Orientation ori = new Orientation(1, 1, 0, 1, -1, 0);
-            Point pos = new Point(200, 200, 200);
+            Vector pos = new Vector(200, 200, 200);
             bot.TransformTo(ori, pos);
             ror = bot.GetCurrentRotation();
             Trace.WriteLine(ror);
