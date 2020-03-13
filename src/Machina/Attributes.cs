@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina.Attributes
+namespace Machina
 {
     /// <summary>
     /// A `ParseableFromString` API method is one that can be invoked through reflection

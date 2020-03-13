@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.IO;
 using System.Runtime.Serialization.Json;
-using Machina.Attributes;
 using Machina.Types;
 using Machina.Types.Geometry;
 using Machina.Types.Data;
@@ -1597,13 +1596,13 @@ namespace Machina
             Type robotType = typeof(Robot);
             _reflectedAPI = robotType
                 .GetMethods()
-                .Where(x => x.GetCustomAttributes().OfType<Attributes.ParseableFromString>().Any())
+                .Where(x => x.GetCustomAttributes().OfType<ParseableFromString>().Any())
                 .ToDictionary(y => y.Name);
 
             // This one is to issue warnings for badly cased instructions.  
             _reflectedAPICaseInsensitive = robotType
                 .GetMethods()
-                .Where(x => x.GetCustomAttributes().OfType<Attributes.ParseableFromString>().Any())
+                .Where(x => x.GetCustomAttributes().OfType<ParseableFromString>().Any())
                 .ToDictionary(y => y.Name, StringComparer.InvariantCultureIgnoreCase);
 
             Machina.Logger.Debug("Loaded reflected API");
