@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Machina.Types.Geometry;
 using Machina.Types.Data;
+using Machina.Buffers;
 
 namespace Machina.Descriptors.Cursors
 {
@@ -102,7 +103,7 @@ namespace Machina.Descriptors.Cursors
         /// <summary>
         /// Manages pending and released Actions, plus blocks. 
         /// </summary>
-        public ActionBuffer actionBuffer;
+        public ActionsBuffer actionBuffer;
 
         /// <summary>
         /// A lock for buffer manipulation operations. 
@@ -156,7 +157,7 @@ namespace Machina.Descriptors.Cursors
             }
 
             // Initialize buffers
-            actionBuffer = new ActionBuffer(this);
+            actionBuffer = new ActionsBuffer(this);
             settingsBuffer = new SettingsBuffer();
         }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using static System.FormattableString;
 using Machina.Types.Geometry;
 using Machina.Descriptors.Cursors;
-
+using Machina.Types.Data;
 
 namespace Machina.Drivers.Communication.Protocols
 {

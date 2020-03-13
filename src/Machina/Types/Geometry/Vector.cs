@@ -910,6 +910,10 @@ namespace Machina.Types.Geometry
                    Math.Abs(Z - other.Z) < MMath.EPSILON2;
         }
 
+        /// <summary>
+        /// ToString
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return this.ToString(false);

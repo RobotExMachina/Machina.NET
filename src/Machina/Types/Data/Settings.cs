@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina
+namespace Machina.Types.Data
 {
     /// <summary>
     /// A class representing a Setting state, to be un/buffered.
@@ -20,12 +20,12 @@ namespace Machina
 
         public Settings(double speed, double acc, double precision, MotionType mType, ReferenceCS refcs, double extrusionRate)
         {
-            this.Speed = speed;
-            this.Acceleration = acc;
-            this.Precision = precision;
-            this.MotionType = mType;
-            this.RefCS = refcs;
-            this.ExtrusionRate = extrusionRate;
+            Speed = speed;
+            Acceleration = acc;
+            Precision = precision;
+            MotionType = mType;
+            RefCS = refcs;
+            ExtrusionRate = extrusionRate;
         }
 
         public Settings Clone() => new Settings(Speed, Acceleration, Precision, MotionType, RefCS, ExtrusionRate);

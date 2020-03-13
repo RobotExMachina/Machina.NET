@@ -74,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\Action.cs" />
-    <Compile Include="ActionBuffer.cs" />
+    <Compile Include="Buffers\ActionsBuffer.cs" />
     <Compile Include="Actions\ActionAcceleration.cs" />
     <Compile Include="Actions\ActionArmAngle.cs" />
     <Compile Include="Actions\ActionAttachTool.cs" />
@@ -100,7 +100,7 @@
     <Compile Include="Actions\ActionTranslation.cs" />
     <Compile Include="Actions\ActionWait.cs" />
     <Compile Include="Actions\ActionExternalAxis.cs" />
-    <Compile Include="ParseableFromString.cs" />
+    <Compile Include="Attributes.cs" />
     <Compile Include="Compilers\CompilerMACHINA.cs" />
     <Compile Include="Compilers\CompilerZMORPH.cs" />
     <Compile Include="Compilers\CompilerKUKA.cs" />
@@ -160,14 +160,14 @@
     <Compile Include="Types\Geometry\RotationMatrix.cs" />
     <Compile Include="Types\Geometry\Quaternion.cs" />
     <Compile Include="Types\Geometry\RotationVector.cs" />
-    <Compile Include="SettingsBuffer.cs" />
+    <Compile Include="Buffers\SettingsBuffer.cs" />
     <Compile Include="Drivers\OldDriver.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="Compilers\Compiler.cs" />
     <Compile Include="Robot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Descriptors\Cursors\RobotCursor.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Types\Data\Settings.cs" />
     <Compile Include="Tools\Tool.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Utilities\FileIO.cs" />

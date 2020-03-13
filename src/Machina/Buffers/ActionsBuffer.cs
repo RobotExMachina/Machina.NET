@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Machina.Descriptors.Cursors;
 
-namespace Machina
+namespace Machina.Buffers
 {
     /// <summary>
     /// A class that manages a FIFO list of Actions.
     /// </summary>
-    internal class ActionBuffer
+    internal class ActionsBuffer
     {
         /// <summary>
         /// Actions pending to be released.
@@ -35,13 +35,13 @@ namespace Machina
         /// <summary>
         /// Main constructor.
         /// </summary>
-        public ActionBuffer(RobotCursor parent)
+        public ActionsBuffer(RobotCursor parent)
         {
-            this._parent = parent;
+            _parent = parent;
 
-            this.released = new List<Action>();
-            this.pending = new List<Action>();
-            this.blockCounts = new List<int>();
+            released = new List<Action>();
+            pending = new List<Action>();
+            blockCounts = new List<int>();
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Machina
         /// <returns></returns>
         public bool Add(Action act)
         {
-            pending.Add(act); 
+            pending.Add(act);
             return true;
         }
 
@@ -232,7 +232,7 @@ namespace Machina
         /// </summary>
         public void DebugBufferedActions()
         {
-            Logger.Debug("--> RELEASED:" );
+            Logger.Debug("--> RELEASED:");
             foreach (Action a in released) Logger.Debug("    " + a);
 
             Logger.Debug("--> PENDING: ");
@@ -244,9 +244,10 @@ namespace Machina
             int b = 0;
             foreach (Action a in pending)
             {
-                if (blockCounts.Count > 0 && b < blockCounts.Count)                {
+                if (blockCounts.Count > 0 && b < blockCounts.Count)
+                {
                     it++;
-                    if(it >= blockCounts[b])
+                    if (it >= blockCounts[b])
                     {
                         b++;
                         if (b >= blockCounts.Count)
@@ -264,7 +265,7 @@ namespace Machina
                 {
                     Logger.Debug("    Block " + b + ":");
                 }
-                
+
                 if (it >= 0)
                 {
                     Logger.Debug("        " + a);
@@ -278,7 +279,7 @@ namespace Machina
 
         public override string ToString()
         {
-            return string.Format("ACTION BUFFER FROM {2}: {0} issued, {1} remaining", released.Count, pending.Count, this._parent.name);
+            return string.Format("ACTION BUFFER FROM {2}: {0} issued, {1} remaining", released.Count, pending.Count, _parent.name);
         }
     }
 }

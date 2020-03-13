@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Machina.Descriptors.Cursors;
+using Machina.Types.Data;
 
-namespace Machina
+namespace Machina.Buffers
 {
     /// <summary>
     /// A buffer manager for Settings objects.
