@@ -490,8 +490,6 @@ namespace Machina.Types.Geometry
             return v;
         }
 
-
-
         #endregion operators
 
 

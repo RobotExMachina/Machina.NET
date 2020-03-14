@@ -187,8 +187,6 @@ namespace Machina.Types.Geometry
             Vector.PerpendicularTo(m_zaxis, out m_xaxis);
             m_xaxis.Normalize();
             m_yaxis = Vector.CrossProduct(m_zaxis, m_xaxis);
-            //m_yaxis.Normalize();  // unnecesary, z and x were normal already
-
         }
 
         /// <summary>
@@ -202,23 +200,40 @@ namespace Machina.Types.Geometry
         /// Non-zero vector not parallel to x_dir that is used to determine the
         /// yaxis direction. y_dir does not need to be perpendicular to x_dir.
         /// </param>
-        public Plane(Vector origin, Vector xAxis, Vector yAxis)
+        public Plane(Vector origin, Vector xAxis, Vector yAxis) :
+            this(origin.X, origin.Y, origin.Z,
+                xAxis.X, xAxis.Y, xAxis.Z,
+                yAxis.X, yAxis.Y, yAxis.Z) { }
+
+        /// <summary>
+        /// Constructs a plane from a point and two vectors in the plane.
+        /// </summary>
+        /// <param name='origin'>Origin point of the plane.</param>
+        /// <param name='xAxis'>
+        /// Non-zero vector in the plane that determines the x-axis direction.
+        /// </param>
+        /// <param name='yAxis'>
+        /// Non-zero vector not parallel to x_dir that is used to determine the
+        /// yaxis direction. y_dir does not need to be perpendicular to x_dir.
+        /// </param>
+        public Plane(double originX, double originY, double originZ, 
+            double xAxisX, double xAxisY, double xAxisZ,
+            double yAxisX, double yAxisY, double yAxisZ)
         {
             // Adapted from RC/ON
             //UnsafeNativeMethods.ON_Plane_CreateFromFrame(ref this, origin, xDirection, yDirection);
 
+            m_origin = new Vector(originX, originY, originZ);
+            m_xaxis = new Vector(xAxisX, xAxisY, xAxisZ);
+            m_yaxis = new Vector(yAxisX, yAxisY, yAxisZ);
+
             // Sanity
-            Direction dir = Vector.CompareDirections(xAxis, yAxis);
+            Direction dir = Vector.CompareDirections(m_xaxis, m_yaxis);
             if (dir == Direction.Invalid || dir == Direction.Parallel || dir == Direction.Opposite)
             {
                 this = Unset;
                 return;
             }
-
-            // Shallow copies
-            m_origin = new Vector(origin);
-            m_xaxis = new Vector(xAxis);
-            m_yaxis = new Vector(yAxis);
 
             m_xaxis.Normalize();
             m_yaxis -= Vector.DotProduct(m_yaxis, m_xaxis) * m_xaxis;
@@ -410,91 +425,96 @@ namespace Machina.Types.Geometry
         /// <returns>true on success, false on failure.</returns>
         public bool Transform(Matrix transform)
         {
-            //return UnsafeNativeMethods.ON_Plane_Transform(ref this, ref xform);
+            Matrix planeM = Matrix.CreateFromPlane(this);
+            Matrix xform = transform * planeM;
+
+            this = new Plane(xform.Translation, xform.X, xform.Y);
+
+            return this != Unset;
         }
 
-        /// <summary>
-        /// Translate (move) the plane along a vector.
-        /// </summary>
-        /// <param name="delta">Translation (motion) vector.</param>
-        /// <returns>true on success, false on failure.</returns>
-        public bool Translate(Vector3d delta)
-        {
-            if (!delta.IsValid)
-                return false;
+        ///// <summary>
+        ///// Translate (move) the plane along a vector.
+        ///// </summary>
+        ///// <param name="delta">Translation (motion) vector.</param>
+        ///// <returns>true on success, false on failure.</returns>
+        //public bool Translate(Vector3d delta)
+        //{
+        //    if (!delta.IsValid)
+        //        return false;
 
-            Origin += delta;
-            return true;
-        }
+        //    Origin += delta;
+        //    return true;
+        //}
 
-        /// <summary>
-        /// Rotate the plane about its origin point.
-        /// </summary>
-        /// <param name="sinAngle">Sin(angle).</param>
-        /// <param name="cosAngle">Cos(angle).</param>
-        /// <param name="axis">Axis of rotation.</param>
-        /// <returns>true on success, false on failure.</returns>
-        public bool Rotate(double sinAngle, double cosAngle, Vector3d axis)
-        {
-            bool rc = true;
-            if (axis == ZAxis)
-            {
-                Vector3d x = cosAngle * XAxis + sinAngle * YAxis;
-                Vector3d y = cosAngle * YAxis - sinAngle * XAxis;
-                XAxis = x;
-                YAxis = y;
-            }
-            else
-            {
-                Point3d origin_pt = Origin;
-                rc = Rotate(sinAngle, cosAngle, axis, Origin);
-                Origin = origin_pt; // to kill any fuzz
-            }
-            return rc;
-        }
+        ///// <summary>
+        ///// Rotate the plane about its origin point.
+        ///// </summary>
+        ///// <param name="sinAngle">Sin(angle).</param>
+        ///// <param name="cosAngle">Cos(angle).</param>
+        ///// <param name="axis">Axis of rotation.</param>
+        ///// <returns>true on success, false on failure.</returns>
+        //public bool Rotate(double sinAngle, double cosAngle, Vector3d axis)
+        //{
+        //    bool rc = true;
+        //    if (axis == ZAxis)
+        //    {
+        //        Vector3d x = cosAngle * XAxis + sinAngle * YAxis;
+        //        Vector3d y = cosAngle * YAxis - sinAngle * XAxis;
+        //        XAxis = x;
+        //        YAxis = y;
+        //    }
+        //    else
+        //    {
+        //        Point3d origin_pt = Origin;
+        //        rc = Rotate(sinAngle, cosAngle, axis, Origin);
+        //        Origin = origin_pt; // to kill any fuzz
+        //    }
+        //    return rc;
+        //}
 
-        /// <summary>
-        /// Rotate the plane about its origin point.
-        /// </summary>
-        /// <param name="angle">Angle in radians.</param>
-        /// <param name="axis">Axis of rotation.</param>
-        /// <returns>true on success, false on failure.</returns>
-        public bool Rotate(double angle, Vector3d axis)
-        {
-            return Rotate(Math.Sin(angle), Math.Cos(angle), axis);
-        }
+        ///// <summary>
+        ///// Rotate the plane about its origin point.
+        ///// </summary>
+        ///// <param name="angle">Angle in radians.</param>
+        ///// <param name="axis">Axis of rotation.</param>
+        ///// <returns>true on success, false on failure.</returns>
+        //public bool Rotate(double angle, Vector3d axis)
+        //{
+        //    return Rotate(Math.Sin(angle), Math.Cos(angle), axis);
+        //}
 
-        /// <summary>
-        /// Rotate the plane about a custom anchor point.
-        /// </summary>
-        /// <param name="angle">Angle in radians.</param>
-        /// <param name="axis">Axis of rotation.</param>
-        /// <param name="centerOfRotation">Center of rotation.</param>
-        /// <returns>true on success, false on failure.</returns>
-        public bool Rotate(double angle, Vector3d axis, Point3d centerOfRotation)
-        {
-            return Rotate(Math.Sin(angle), Math.Cos(angle), axis, centerOfRotation);
-        }
+        ///// <summary>
+        ///// Rotate the plane about a custom anchor point.
+        ///// </summary>
+        ///// <param name="angle">Angle in radians.</param>
+        ///// <param name="axis">Axis of rotation.</param>
+        ///// <param name="centerOfRotation">Center of rotation.</param>
+        ///// <returns>true on success, false on failure.</returns>
+        //public bool Rotate(double angle, Vector3d axis, Point3d centerOfRotation)
+        //{
+        //    return Rotate(Math.Sin(angle), Math.Cos(angle), axis, centerOfRotation);
+        //}
 
-        /// <summary>Rotate the plane about a custom anchor point.</summary>
-        /// <param name="sinAngle">Sin(angle)</param>
-        /// <param name="cosAngle">Cos(angle)</param>
-        /// <param name="axis">Axis of rotation.</param>
-        /// <param name="centerOfRotation">Center of rotation.</param>
-        /// <returns>true on success, false on failure.</returns>
-        public bool Rotate(double sinAngle, double cosAngle, Vector3d axis, Point3d centerOfRotation)
-        {
-            if (centerOfRotation == Origin)
-            {
-                Transform rot = Rhino.Geometry.Transform.Rotation(sinAngle, cosAngle, axis, Point3d.Origin);
-                XAxis = rot * XAxis;
-                YAxis = rot * YAxis;
-                ZAxis = rot * ZAxis;
-                return true;
-            }
-            Transform rot2 = Rhino.Geometry.Transform.Rotation(sinAngle, cosAngle, axis, centerOfRotation);
-            return Transform(rot2);
-        }
+        ///// <summary>Rotate the plane about a custom anchor point.</summary>
+        ///// <param name="sinAngle">Sin(angle)</param>
+        ///// <param name="cosAngle">Cos(angle)</param>
+        ///// <param name="axis">Axis of rotation.</param>
+        ///// <param name="centerOfRotation">Center of rotation.</param>
+        ///// <returns>true on success, false on failure.</returns>
+        //public bool Rotate(double sinAngle, double cosAngle, Vector3d axis, Point3d centerOfRotation)
+        //{
+        //    if (centerOfRotation == Origin)
+        //    {
+        //        Transform rot = Rhino.Geometry.Transform.Rotation(sinAngle, cosAngle, axis, Point3d.Origin);
+        //        XAxis = rot * XAxis;
+        //        YAxis = rot * YAxis;
+        //        ZAxis = rot * ZAxis;
+        //        return true;
+        //    }
+        //    Transform rot2 = Rhino.Geometry.Transform.Rotation(sinAngle, cosAngle, axis, centerOfRotation);
+        //    return Transform(rot2);
+        //}
         #endregion
         #endregion
     }
