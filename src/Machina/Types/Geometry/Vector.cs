@@ -230,6 +230,17 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
+        /// Vector scalar division.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static Vector operator /(Vector v, double s)
+        {
+            return new Vector(v._x / s, v._y / s, v._z / s);
+        }
+
+        /// <summary>
         /// Returns the <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a> 
         /// of two Vectors.
         /// </summary>
@@ -438,6 +449,45 @@ namespace Machina.Types.Geometry
             perp[k] = 0.0;
             
             return (a != 0.0) ? true : false;
+        }
+
+        /// <summary>
+        /// Compute the signed Euclidean length of the projection of one vector over another. 
+        /// </summary>
+        /// <param name="main"></param>
+        /// <param name="toProject"></param>
+        /// <returns></returns>
+        public static double ProjectionLength(Vector main, Vector toProject)
+        {
+            double len = main.Length;
+            if (len == 0)
+            {
+                return 0;
+            }
+            double dot = main * toProject;
+            return dot / len;
+        }
+
+        /// <summary>
+        /// Returns the projection of one vector over another.
+        /// </summary>
+        /// <param name="main"></param>
+        /// <param name="toProject"></param>
+        /// <returns></returns>
+        public static Vector ProjectOnto(Vector main, Vector toProject)
+        {
+            Vector v = new Vector(main); // shallow copy
+            double len = v.Length;
+            if (len == 0)
+            {
+                return null;
+            }
+            double dot = main * toProject;
+            double projectedLength = dot / len;
+            v /= len;
+            v *= projectedLength;
+
+            return v;
         }
 
 
