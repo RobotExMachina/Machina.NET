@@ -125,7 +125,29 @@ namespace Machina.Types.Geometry
         }
         #endregion
 
+
         #region constructors
+        /// <summary>
+        /// Create a new Plane. Vectors must be unit and orthogonal, otherwise, 
+        /// lots of badness may happen down the road...
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="xAxis"></param>
+        /// <param name="yAxis"></param>
+        internal static Plane CreateUnsafe(Vector origin, Vector xAxis, Vector yAxis)
+        {
+            // This is a lightweight constructor in case data is coming clean.
+            Plane p = new Plane
+            {
+                m_origin = new Vector(origin),
+                m_xaxis = new Vector(xAxis),
+                m_yaxis = new Vector(yAxis)
+            };
+            p.m_zaxis = Vector.CrossProduct(p.m_xaxis, p.m_yaxis);
+
+            return p;
+        }
+
         /// <summary>Copy constructor.
         /// <para>This is nothing special and performs the same as assigning to another variable.</para>
         /// </summary>
@@ -166,20 +188,20 @@ namespace Machina.Types.Geometry
         /// Constructs a plane from a point and two vectors in the plane.
         /// </summary>
         /// <param name='origin'>Origin point of the plane.</param>
-        /// <param name='xDirection'>
+        /// <param name='xAxis'>
         /// Non-zero vector in the plane that determines the x-axis direction.
         /// </param>
-        /// <param name='yDirection'>
+        /// <param name='yAxis'>
         /// Non-zero vector not parallel to x_dir that is used to determine the
         /// yaxis direction. y_dir does not need to be perpendicular to x_dir.
         /// </param>
-        public Plane(Vector origin, Vector xDirection, Vector yDirection)
+        public Plane(Vector origin, Vector xAxis, Vector yAxis)
         {
             // Adapted from RC/ON
             //UnsafeNativeMethods.ON_Plane_CreateFromFrame(ref this, origin, xDirection, yDirection);
 
             // Sanity
-            Direction dir = Vector.CompareDirections(xDirection, yDirection);
+            Direction dir = Vector.CompareDirections(xAxis, yAxis);
             if (dir == Direction.Invalid || dir == Direction.Parallel || dir == Direction.Opposite)
             {
                 this = Unset;
@@ -188,40 +210,38 @@ namespace Machina.Types.Geometry
 
             // Shallow copies
             m_origin = new Vector(origin);
-            m_xaxis = new Vector(xDirection);
-            m_yaxis = new Vector(yDirection);
+            m_xaxis = new Vector(xAxis);
+            m_yaxis = new Vector(yAxis);
 
             m_xaxis.Normalize();
-            m_yaxis = m_yaxis - Vector.DotProduct(m_yaxis, m_xaxis) * m_xaxis;
+            m_yaxis -= Vector.DotProduct(m_yaxis, m_xaxis) * m_xaxis;
             m_yaxis.Normalize();
 
             m_zaxis = Vector.CrossProduct(m_xaxis, m_yaxis);
-
-            //m_zaxis
-
         }
 
-        //        /// <summary>
-        //        /// Initializes a plane from three non-colinear points.
-        //        /// </summary>
-        //        /// <param name='origin'>Origin point of the plane.</param>
-        //        /// <param name='xPoint'>
-        //        /// Second point in the plane. The x-axis will be parallel to x_point-origin.
-        //        /// </param>
-        //        /// <param name='yPoint'>
-        //        /// Third point on the plane that is not colinear with the first two points.
-        //        /// yaxis*(y_point-origin) will be &gt; 0.
-        //        /// </param>
-        //        /// <example>
-        //        /// <code source='examples\vbnet\ex_addclippingplane.vb' lang='vbnet'/>
-        //        /// <code source='examples\cs\ex_addclippingplane.cs' lang='cs'/>
-        //        /// <code source='examples\py\ex_addclippingplane.py' lang='py'/>
-        //        /// </example>
-        //        public Plane(Point3d origin, Point3d xPoint, Point3d yPoint)
-        //          : this()
-        //        {
-        //            UnsafeNativeMethods.ON_Plane_CreateFromPoints(ref this, origin, xPoint, yPoint);
-        //        }
+
+
+        ///// <summary>
+        ///// Initializes a plane from three non-colinear points.
+        ///// </summary>
+        ///// <param name='origin'>Origin point of the plane.</param>
+        ///// <param name='xPoint'>
+        ///// Second point in the plane. The x-axis will be parallel to x_point-origin.
+        ///// </param>
+        ///// <param name='yPoint'>
+        ///// Third point on the plane that is not colinear with the first two points.
+        ///// yaxis*(y_point-origin) will be &gt; 0.
+        ///// </param>
+        ///// <example>
+        ///// </example>
+        //public Plane(Point3d origin, Point3d xPoint, Point3d yPoint)
+        //  : this()
+        //{
+        //    UnsafeNativeMethods.ON_Plane_CreateFromPoints(ref this, origin, xPoint, yPoint);
+        //}
+
+
 
         //        /// <summary>
         //        /// Constructs a plane from an equation
