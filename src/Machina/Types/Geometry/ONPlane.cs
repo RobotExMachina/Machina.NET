@@ -140,7 +140,7 @@ namespace Machina.Types.Geometry
         /// </summary>
         /// <param name="origin">Origin point of the plane.</param>
         /// <param name="normal">Non-zero normal to the plane.</param>
-        public Plane(Vector origin, Vector normal) : this()
+        public Plane(Vector origin, Vector normal)
         {
             // Adapted from RC/ON
             //UnsafeNativeMethods.ON_Plane_CreateFromNormal(ref this, origin, normal);
@@ -162,22 +162,44 @@ namespace Machina.Types.Geometry
 
         }
 
-        //        /// <summary>
-        //        /// Constructs a plane from a point and two vectors in the plane.
-        //        /// </summary>
-        //        /// <param name='origin'>Origin point of the plane.</param>
-        //        /// <param name='xDirection'>
-        //        /// Non-zero vector in the plane that determines the x-axis direction.
-        //        /// </param>
-        //        /// <param name='yDirection'>
-        //        /// Non-zero vector not parallel to x_dir that is used to determine the
-        //        /// yaxis direction. y_dir does not need to be perpendicular to x_dir.
-        //        /// </param>
-        //        public Plane(Point3d origin, Vector3d xDirection, Vector3d yDirection)
-        //          : this()
-        //        {
-        //            UnsafeNativeMethods.ON_Plane_CreateFromFrame(ref this, origin, xDirection, yDirection);
-        //        }
+        /// <summary>
+        /// Constructs a plane from a point and two vectors in the plane.
+        /// </summary>
+        /// <param name='origin'>Origin point of the plane.</param>
+        /// <param name='xDirection'>
+        /// Non-zero vector in the plane that determines the x-axis direction.
+        /// </param>
+        /// <param name='yDirection'>
+        /// Non-zero vector not parallel to x_dir that is used to determine the
+        /// yaxis direction. y_dir does not need to be perpendicular to x_dir.
+        /// </param>
+        public Plane(Vector origin, Vector xDirection, Vector yDirection)
+        {
+            // Adapted from RC/ON
+            //UnsafeNativeMethods.ON_Plane_CreateFromFrame(ref this, origin, xDirection, yDirection);
+
+            // Sanity
+            Direction dir = Vector.CompareDirections(xDirection, yDirection);
+            if (dir == Direction.Invalid || dir == Direction.Parallel || dir == Direction.Opposite)
+            {
+                this = Unset;
+                return;
+            }
+
+            // Shallow copies
+            m_origin = new Vector(origin);
+            m_xaxis = new Vector(xDirection);
+            m_yaxis = new Vector(yDirection);
+
+            m_xaxis.Normalize();
+            m_yaxis = m_yaxis - Vector.DotProduct(m_yaxis, m_xaxis) * m_xaxis;
+            m_yaxis.Normalize();
+
+            m_zaxis = Vector.CrossProduct(m_xaxis, m_yaxis);
+
+            //m_zaxis
+
+        }
 
         //        /// <summary>
         //        /// Initializes a plane from three non-colinear points.

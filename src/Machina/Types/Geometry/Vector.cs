@@ -654,6 +654,38 @@ namespace Machina.Types.Geometry
             return alpha < Math.PI + MMath.EPSILON2 && alpha > Math.PI - MMath.EPSILON2;
         }
 
+        ///// <summary>
+        ///// Compares the directions of two vectors, regardless of their magnitude.
+        ///// Returns 1 if parallel (same direction), 2 if orthogonal (perpendicular
+        ///// directions), 3 if opposite (parallel in opposite directions), 
+        ///// -1 if angle is non-computable (any vector is zero?), 0 otherwise.
+        ///// </summary>
+        ///// <param name="a"></param>
+        ///// <param name="b"></param>
+        ///// <returns></returns>
+        //public static Direction CompareDirections(Vector a, Vector b)
+        //{
+        //    double alpha = AngleBetween(a, b);
+
+        //    if (alpha == MMath.UNSET_VALUE)
+        //    {
+        //        return Direction.Invalid;
+        //    } 
+        //    else if (alpha < MMath.EPSILON2)
+        //    {
+        //        return Direction.Parallel;
+        //    }
+        //    else if (alpha < 0.5 * Math.PI + MMath.EPSILON2 && alpha > 0.5 * Math.PI - MMath.EPSILON2)
+        //    {
+        //        return Direction.Orthogonal;
+        //    }
+        //    else if (Math.Abs(alpha - Math.PI) < MMath.EPSILON2)
+        //    {
+        //        return Direction.Opposite;
+        //    }
+        //    return Direction.Other;
+        //}
+
         /// <summary>
         /// Compares the directions of two vectors, regardless of their magnitude.
         /// Returns 1 if parallel (same direction), 2 if orthogonal (perpendicular
@@ -665,24 +697,30 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Direction CompareDirections(Vector a, Vector b)
         {
-            double alpha = AngleBetween(a, b);
+            Vector ua = new Vector(a);
+            Vector ub = new Vector(b);
 
-            if (alpha == MMath.UNSET_VALUE)
+            if (!ua.Normalize() || !ub.Normalize())
             {
                 return Direction.Invalid;
-            } 
-            else if (alpha < MMath.EPSILON2)
+            }
+
+            // Use the dot product instead of computing the angle, it's cheaper
+            double dot = ua * ub;
+
+            if (Math.Abs(dot - 1) < MMath.EPSILON2)
             {
                 return Direction.Parallel;
             }
-            else if (alpha < 0.5 * Math.PI + MMath.EPSILON2 && alpha > 0.5 * Math.PI - MMath.EPSILON2)
+            else if (dot < MMath.EPSILON2 && -dot < MMath.EPSILON2)
             {
                 return Direction.Orthogonal;
             }
-            else if (Math.Abs(alpha - Math.PI) < MMath.EPSILON2)
+            else if (Math.Abs(dot + 1) < MMath.EPSILON2)
             {
                 return Direction.Opposite;
             }
+
             return Direction.Other;
         }
 
