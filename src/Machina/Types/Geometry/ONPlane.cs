@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Machina.Types.Geometry
     /// <summary>
     /// A Plane class taken mostly from RhinoCommon/OpenNurbs.
     /// </summary>
-    public struct Plane // : IEquatable<Matrix>, IEpsilonComparable<Matrix>, ISerializableArray, ISerializableJSON
+    public struct Plane : ISerializableArray, ISerializableJSON // IEquatable<Matrix>, IEpsilonComparable<Matrix>, 
     {
 
         #region members
@@ -270,51 +271,6 @@ namespace Machina.Types.Geometry
                    (a.m_yaxis != b.m_yaxis) ||
                    (a.m_zaxis != b.m_zaxis);
         }
-
-        /// <summary>
-        /// Determines if an object is a plane and has the same components as this plane.
-        /// </summary>
-        /// <param name="obj">An object.</param>
-        /// <returns>true if obj is a plane and has the same components as this plane; false otherwise.</returns>
-        public override bool Equals(object obj)
-        {
-            return ((obj is Plane) && (this == (Plane)obj));
-        }
-
-        /// <summary>
-        /// Determines if another plane has the same components as this plane.
-        /// </summary>
-        /// <param name="plane">A plane.</param>
-        /// <returns>true if plane has the same components as this plane; false otherwise.</returns>
-        public bool Equals(Plane plane)
-        {
-            return (m_origin == plane.m_origin) &&
-                   (m_xaxis == plane.m_xaxis) &&
-                   (m_yaxis == plane.m_yaxis) &&
-                   (m_zaxis == plane.m_zaxis);
-        }
-
-        /// <summary>
-        /// Gets a non-unique hashing code for this entity.
-        /// </summary>
-        /// <returns>A particular number for a specific instance of plane.</returns>
-        public override int GetHashCode()
-        {
-            // MSDN docs recommend XOR'ing the internal values to get a hash code
-            return m_origin.GetHashCode() ^ m_xaxis.GetHashCode() ^ m_yaxis.GetHashCode() ^ m_zaxis.GetHashCode();
-        }
-
-        /// <summary>
-        /// Constructs the string representation of this plane.
-        /// </summary>
-        /// <returns>Text.</returns>
-        public override string ToString()
-        {
-            string rc = String.Format(System.Globalization.CultureInfo.InvariantCulture,
-              "Origin={0} XAxis={1}, YAxis={2}, ZAxis={3}",
-              Origin, XAxis, YAxis, ZAxis.ToString());
-            return rc;
-        }
         #endregion
 
         #region methods
@@ -433,89 +389,144 @@ namespace Machina.Types.Geometry
             return this != Unset;
         }
 
-        ///// <summary>
-        ///// Translate (move) the plane along a vector.
-        ///// </summary>
-        ///// <param name="delta">Translation (motion) vector.</param>
-        ///// <returns>true on success, false on failure.</returns>
-        //public bool Translate(Vector3d delta)
-        //{
-        //    if (!delta.IsValid)
-        //        return false;
+        /// <summary>
+        /// Translate (move) the plane along a vector.
+        /// </summary>
+        /// <param name="delta">Translation (motion) vector.</param>
+        /// <returns>true on success, false on failure.</returns>
+        public bool Translate(Vector delta)
+        {
+            m_origin += delta;
+            return true;
+        }
 
-        //    Origin += delta;
-        //    return true;
-        //}
+        /// <summary>
+        /// Rotate the plane about its origin point.
+        /// </summary>
+        /// <param name="angle">Angle in radians.</param>
+        /// <param name="axis">Axis of rotation.</param>
+        /// <returns>true on success, false on failure.</returns>
+        public bool Rotate(double angle, Vector axis)
+        {
+            bool rc = true;
+            if (axis == ZAxis)
+            {
+                double s = Math.Sin(angle),
+                    c = Math.Cos(angle);
+                Vector x = c * XAxis + s * YAxis;
+                Vector y = c * YAxis - s * XAxis;
+                XAxis = x;
+                YAxis = y;
+            }
+            else
+            {
+                Vector origin_pt = Origin;
+                rc = Rotate(angle, axis, Origin);
+                Origin = origin_pt; // to kill any fuzz
+            }
+            return rc;
+        }
 
-        ///// <summary>
-        ///// Rotate the plane about its origin point.
-        ///// </summary>
-        ///// <param name="sinAngle">Sin(angle).</param>
-        ///// <param name="cosAngle">Cos(angle).</param>
-        ///// <param name="axis">Axis of rotation.</param>
-        ///// <returns>true on success, false on failure.</returns>
-        //public bool Rotate(double sinAngle, double cosAngle, Vector3d axis)
-        //{
-        //    bool rc = true;
-        //    if (axis == ZAxis)
-        //    {
-        //        Vector3d x = cosAngle * XAxis + sinAngle * YAxis;
-        //        Vector3d y = cosAngle * YAxis - sinAngle * XAxis;
-        //        XAxis = x;
-        //        YAxis = y;
-        //    }
-        //    else
-        //    {
-        //        Point3d origin_pt = Origin;
-        //        rc = Rotate(sinAngle, cosAngle, axis, Origin);
-        //        Origin = origin_pt; // to kill any fuzz
-        //    }
-        //    return rc;
-        //}
+        /// <summary>
+        /// Rotate the plane about a custom anchor point.
+        /// </summary>
+        /// <param name="angle">Angle in radians.</param>
+        /// <param name="axis">Axis of rotation.</param>
+        /// <param name="centerOfRotation">Center of rotation.</param>
+        /// <returns>true on success, false on failure.</returns>
+        public bool Rotate(double angle, Vector axis, Vector centerOfRotation)
+        {
+            if (centerOfRotation == Origin)
+            {
+                Matrix rot = Matrix.CreateRotation(axis, angle, Origin);
+                Matrix pm = Matrix.CreateFromPlane(this);
+                Matrix trans = rot * pm;
+                XAxis = trans.X;
+                YAxis = trans.Y;
+                ZAxis = trans.Z;
+                // leave origin intact to avoid fuzz
+                return true;
+            }
+            Matrix rot2 = Matrix.CreateRotation(axis, angle, centerOfRotation);
+            return Transform(rot2);
+        }
 
-        ///// <summary>
-        ///// Rotate the plane about its origin point.
-        ///// </summary>
-        ///// <param name="angle">Angle in radians.</param>
-        ///// <param name="axis">Axis of rotation.</param>
-        ///// <returns>true on success, false on failure.</returns>
-        //public bool Rotate(double angle, Vector3d axis)
-        //{
-        //    return Rotate(Math.Sin(angle), Math.Cos(angle), axis);
-        //}
-
-        ///// <summary>
-        ///// Rotate the plane about a custom anchor point.
-        ///// </summary>
-        ///// <param name="angle">Angle in radians.</param>
-        ///// <param name="axis">Axis of rotation.</param>
-        ///// <param name="centerOfRotation">Center of rotation.</param>
-        ///// <returns>true on success, false on failure.</returns>
-        //public bool Rotate(double angle, Vector3d axis, Point3d centerOfRotation)
-        //{
-        //    return Rotate(Math.Sin(angle), Math.Cos(angle), axis, centerOfRotation);
-        //}
-
-        ///// <summary>Rotate the plane about a custom anchor point.</summary>
-        ///// <param name="sinAngle">Sin(angle)</param>
-        ///// <param name="cosAngle">Cos(angle)</param>
-        ///// <param name="axis">Axis of rotation.</param>
-        ///// <param name="centerOfRotation">Center of rotation.</param>
-        ///// <returns>true on success, false on failure.</returns>
-        //public bool Rotate(double sinAngle, double cosAngle, Vector3d axis, Point3d centerOfRotation)
-        //{
-        //    if (centerOfRotation == Origin)
-        //    {
-        //        Transform rot = Rhino.Geometry.Transform.Rotation(sinAngle, cosAngle, axis, Point3d.Origin);
-        //        XAxis = rot * XAxis;
-        //        YAxis = rot * YAxis;
-        //        ZAxis = rot * ZAxis;
-        //        return true;
-        //    }
-        //    Transform rot2 = Rhino.Geometry.Transform.Rotation(sinAngle, cosAngle, axis, centerOfRotation);
-        //    return Transform(rot2);
-        //}
         #endregion
         #endregion
+
+        /// <summary>
+        /// Determines if an object is a plane and has the same components as this plane.
+        /// </summary>
+        /// <param name="obj">An object.</param>
+        /// <returns>true if obj is a plane and has the same components as this plane; false otherwise.</returns>
+        public override bool Equals(object obj)
+        {
+            return ((obj is Plane) && (this == (Plane)obj));
+        }
+
+        /// <summary>
+        /// Determines if another plane has the same components as this plane.
+        /// </summary>
+        /// <param name="plane">A plane.</param>
+        /// <returns>true if plane has the same components as this plane; false otherwise.</returns>
+        public bool Equals(Plane plane)
+        {
+            return (m_origin == plane.m_origin) &&
+                   (m_xaxis == plane.m_xaxis) &&
+                   (m_yaxis == plane.m_yaxis) &&
+                   (m_zaxis == plane.m_zaxis);
+        }
+
+        /// <summary>
+        /// Gets a non-unique hashing code for this entity.
+        /// </summary>
+        /// <returns>A particular number for a specific instance of plane.</returns>
+        public override int GetHashCode()
+        {
+            // MSDN docs recommend XOR'ing the internal values to get a hash code
+            return m_origin.GetHashCode() ^ m_xaxis.GetHashCode() ^ m_yaxis.GetHashCode() ^ m_zaxis.GetHashCode();
+        }
+
+        /// <summary>
+        /// Constructs the string representation of this plane.
+        /// </summary>
+        /// <returns>Text.</returns>
+        public override string ToString()
+        {
+            string rc = String.Format(System.Globalization.CultureInfo.InvariantCulture,
+              "Origin={0} XAxis={1}, YAxis={2}, ZAxis={3}",
+              Origin, XAxis, YAxis, ZAxis.ToString());
+            return rc;
+        }
+
+        /// <summary>
+        /// JSON array representation of this object with rounding decimals. Use -1 for no rounding.
+        /// </summary>
+        /// <returns></returns>
+        public string ToArrayString(int decimals)
+        {
+            // No need for culture, it will come from below...
+            return string.Format(  
+                    "[{0},{1},{2},{3}]",
+                    m_origin.ToArrayString(decimals),
+                    m_xaxis.ToArrayString(decimals),
+                    m_yaxis.ToArrayString(decimals),
+                    m_zaxis.ToArrayString(decimals));
+        }
+
+        /// <summary>
+        /// JSON object representation of this Vector.
+        /// </summary>
+        /// <returns></returns>
+        public string ToJSONString(int decimals)
+        {
+            // No need for culture, it will come from below...
+            return string.Format(
+                    "{{\"Origin\":{0},\"XAxis\":{1},\"YAxis\":{2},\"ZAxis\":{3}}}",
+                    m_origin.ToArrayString(decimals),
+                    m_xaxis.ToArrayString(decimals),
+                    m_yaxis.ToArrayString(decimals),
+                    m_zaxis.ToArrayString(decimals));
+        }
     }
 }

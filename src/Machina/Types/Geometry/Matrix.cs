@@ -385,13 +385,13 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Creates a matrix for rotating points around the X-axis.
         /// </summary>
-        /// <param name="degrees">The amount, in degrees, by which to rotate around the X-axis.</param>
+        /// <param name="angle">The angle by which to rotate around the X-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateRotationX(double degrees)
+        public static Matrix CreateRotationX(double angle, bool inRadians = false)
         {
             Matrix result;
 
-            double radians = degrees * MMath.TO_RADS;
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -425,14 +425,14 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Creates a matrix for rotating points around the X-axis, from a center point.
         /// </summary>
-        /// <param name="degrees">The amount, in degrees, by which to rotate around the X-axis.</param>
+        /// <param name="angle">The angle by which to rotate around the X-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateRotationX(double degrees, Vector centerPoint)
+        public static Matrix CreateRotationX(double angle, Vector centerPoint, bool inRadians = false)
         {
             Matrix result;
 
-            double radians = degrees * MMath.TO_RADS;
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -469,13 +469,13 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Creates a matrix for rotating points around the Y-axis.
         /// </summary>
-        /// <param name="degrees">The amount, in degrees, by which to rotate around the Y-axis.</param>
+        /// <param name="angle">The angle by which to rotate around the Y-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateRotationY(double degrees)
+        public static Matrix CreateRotationY(double angle, bool inRadians = false)
         {
             Matrix result;
 
-            double radians = degrees * MMath.TO_RADS;
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -509,14 +509,14 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Creates a matrix for rotating points around the Y-axis, from a center point.
         /// </summary>
-        /// <param name="degrees">The amount, in degrees, by which to rotate around the Y-axis.</param>
+        /// <param name="angle">The angle by which to rotate around the Y-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateRotationY(double degrees, Vector centerPoint)
+        public static Matrix CreateRotationY(double angle, Vector centerPoint, bool inRadians = false)
         {
             Matrix result;
 
-            double radians = degrees * MMath.TO_RADS;
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -553,13 +553,13 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Creates a matrix for rotating points around the Z-axis.
         /// </summary>
-        /// <param name="degrees">The amount, in radians, by which to rotate around the Z-axis.</param>
+        /// <param name="angle">The angle by which to rotate around the Z-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateRotationZ(double degrees)
+        public static Matrix CreateRotationZ(double angle, bool inRadians = false)
         {
             Matrix result;
 
-            double radians = degrees * MMath.TO_RADS;
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -593,14 +593,14 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Creates a matrix for rotating points around the Z-axis, from a center point.
         /// </summary>
-        /// <param name="degrees">The amount, in radians, by which to rotate around the Z-axis.</param>
+        /// <param name="angle">The angle by which to rotate around the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateRotationZ(double degrees, Vector centerPoint)
+        public static Matrix CreateRotationZ(double angle, Vector centerPoint, bool inRadians = false)
         {
             Matrix result;
 
-            double radians = degrees * MMath.TO_RADS;
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
             double c = Math.Cos(radians);
             double s = Math.Sin(radians);
 
@@ -638,9 +638,9 @@ namespace Machina.Types.Geometry
         /// Creates a matrix that rotates around an arbitrary vector.
         /// </summary>
         /// <param name="axis">The normalized axis to rotate around.</param>
-        /// <param name="angleDegs">The angle to rotate around the given axis, in degrees.</param>
+        /// <param name="angle">The angle to rotate around the given axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateFromAxisAngle(Vector axis, double angleDegs)
+        public static Matrix CreateFromAxisAngle(Vector axis, double angle, bool inRadians = false)
         {
             // Not using the original System.Numerics.Matrix4x4 implementation, but yields same results. 
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
@@ -652,9 +652,9 @@ namespace Machina.Types.Geometry
             //      [ 0          0          0          1]
             //
 
-            double ang = angleDegs * MMath.TO_RADS;
-            double c = Math.Cos(ang);
-            double s = Math.Sin(ang);
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
+            double c = Math.Cos(radians);
+            double s = Math.Sin(radians);
             double t = 1 - c;
             double x = axis.X, y = axis.Y, z = axis.Z;
             double xx = x * x, yy = y * y, zz = z * z;
@@ -685,11 +685,20 @@ namespace Machina.Types.Geometry
             return result;
         }
 
-        public static Matrix CreateRotation(Vector axis, double angleDegs, Vector center)
+        /// <summary>
+        /// Creates a rotation around an arbitray axis and center.
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="angle"></param>
+        /// <param name="center"></param>
+        /// <returns></returns>
+        public static Matrix CreateRotation(Vector axis, double angle, Vector center, bool inRadians = false)
         {
+            double radians = inRadians ? angle : angle * MMath.TO_RADS;
+
             // @TODO: this should be optimized to use an algebraic form.
             Matrix T1 = Matrix.CreateTranslation(-center);
-            Matrix R = Matrix.CreateFromAxisAngle(axis, angleDegs);
+            Matrix R = Matrix.CreateFromAxisAngle(axis, radians, true);
             Matrix T2 = Matrix.CreateTranslation(center);
 
             return T2 * R * T1;
@@ -1660,7 +1669,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public string ToArrayString(int decimals)
         {
-            if (decimals == -1)
+            if (decimals < 0)
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     "[{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}]",
@@ -1694,7 +1703,7 @@ namespace Machina.Types.Geometry
         public string ToJSONString(int decimals)
         {
 
-            if (decimals == -1)
+            if (decimals < 0)
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     "{{\"M11\":{0},\"M12\":{1},\"M13\":{2},\"M14\":{3},\"M21\":{4},\"M22\":{5},\"M23\":{6},\"M24\":{7},\"M31\":{8},\"M32\":{9},\"M33\":{10},\"M34\":{11},\"M41\":{12},\"M42\":{13},\"M43\":{14},\"M44\":{15}}}",

@@ -106,7 +106,7 @@ namespace Machina.Solvers.FK
 
             // FRAME 1
             Matrix p1 = _model.Base.BasePlane;
-            p1 = Matrix.CreateRotation(p1.Z, rots[0] * MMath.TO_DEGS, p1.Translation);
+            p1 = Matrix.CreateRotation(p1.Z, rots[0], p1.Translation);
 
 
 

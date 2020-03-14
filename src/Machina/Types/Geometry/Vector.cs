@@ -515,7 +515,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public string ToArrayString(int decimals)
         {
-            if (decimals == -1)
+            if (decimals < 0)
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     "[{0},{1},{2}]",
@@ -535,7 +535,7 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public string ToJSONString(int decimals)
         {
-            if (decimals == -1)
+            if (decimals < 0)
             {
                 return string.Format(CultureInfo.InvariantCulture,
                     "{{\"X\":{0},\"Y\":{1},\"Z\":{2}}}",

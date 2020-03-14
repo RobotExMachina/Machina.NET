@@ -17,13 +17,6 @@ namespace TEST_Workbench
             Machina.Logger.SetLogLevel(5);
             Machina.Logger.WriteLine += Console.WriteLine;
 
-            //Matrix a = Matrix.CreateFromQuaternion(1, 2, 3, 4);
-            //Console.WriteLine(a);
-            //Console.WriteLine(a.IsOrthogonalRotation);
-            //Console.WriteLine(a.OrthogonalizeRotation());
-            //Console.WriteLine(a);
-            //Console.WriteLine(a.IsOrthogonalRotation);
-
             Plane p = new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);
             Console.WriteLine(p);
             
@@ -42,6 +35,11 @@ namespace TEST_Workbench
             Matrix r45 = Matrix.CreateRotation(Vector.ZAxis, 45, new Vector(10, 0, 0));
             p.Transform(r45);
             Console.WriteLine(p);
+
+            Matrix s10 = Matrix.CreateScale(10);
+            p.Transform(s10);
+            Console.WriteLine(p);
+            Console.WriteLine(p.ToArrayString(-1));
 
 
 
