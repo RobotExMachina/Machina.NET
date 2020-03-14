@@ -143,10 +143,9 @@
     <Compile Include="Types\Data\RobotProgramFile.cs" />
     <Compile Include="Types\Geometry\Interval.cs" />
     <Compile Include="Types\Geometry\Matrix.cs" />
-    <Compile Include="Types\Geometry\ONPlane.cs" />
+    <Compile Include="Types\Geometry\Plane.cs" />
     <Compile Include="Types\Geometry\Orientation.cs" />
     <Compile Include="Types\Geometry\Geometry.cs" />
-    <Compile Include="Types\Geometry\Plane.cs" />
     <Compile Include="Types\Data\RobotProgram.cs" />
     <Compile Include="Types\Geometry\Rotation.cs" />
     <Compile Include="Types\Geometry\Axes.cs" />
