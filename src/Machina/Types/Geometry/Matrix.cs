@@ -795,7 +795,6 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Matrix CreateFromPlane(Plane plane)
         {
-            // This needs a LOT of optimization...
             Matrix result;
 
             result.M11 = plane.XAxis.X;
@@ -1959,6 +1958,19 @@ namespace Machina.Types.Geometry
             M42 = trans.M42;
             M43 = trans.M43;
             M44 = trans.M44;
+        }
+        
+        /// <summary>
+        /// Rotates this matrix around an arbitrary axis and center. 
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="angle"></param>
+        /// <param name="center"></param>
+        /// <param name="inRadians"></param>
+        public void Rotate(Vector axis, double angle, Vector center, bool inRadians = false)
+        {
+            // @TODO: this could be optimized to member-wise inline components?
+            this = Matrix.CreateRotation(axis, angle, center, inRadians) * this;
         }
 
         /// <summary>

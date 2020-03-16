@@ -279,6 +279,30 @@ namespace Machina.Types.Geometry
                    (a.m_yaxis != b.m_yaxis) ||
                    (a.m_zaxis != b.m_zaxis);
         }
+
+        /// <summary>
+        /// Transforms a plane by a matrix. 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static Plane operator *(Matrix m, Plane p)
+        {
+            // From Rhinocommon/OpenNurbs
+            Vector newO = m * p.Origin;
+            
+            bool useVecXform = (
+                m.M41 == 0.0 &&
+                m.M42 == 0.0 &&
+                m.M43 == 0.0 &&
+                m.M44 == 1.0);
+
+            Vector newX = useVecXform ? m * p.XAxis : ((m * (p.Origin + p.XAxis)) - newO);
+            Vector newY = useVecXform ? m * p.YAxis : ((m * (p.Origin + p.YAxis)) - newO);
+
+            return new Plane(newO, newX, newY);
+        }
+
         #endregion
 
         #region methods
@@ -457,6 +481,37 @@ namespace Machina.Types.Geometry
             }
             Matrix rot2 = Matrix.CreateRotation(axis, angle, centerOfRotation);
             return Transform(rot2);
+        }
+
+        /// <summary>
+        /// Returns a Matrix representation of this plane
+        /// </summary>
+        /// <returns></returns>
+        public Matrix ToMatrix()
+        {
+            Matrix result;
+
+            result.M11 = m_xaxis.X;
+            result.M12 = m_yaxis.X;
+            result.M13 = m_zaxis.X;
+            result.M14 = m_origin.X;
+
+            result.M21 = m_xaxis.Y;
+            result.M22 = m_yaxis.Y;
+            result.M23 = m_zaxis.Y;
+            result.M24 = m_origin.Y;
+
+            result.M31 = m_xaxis.Z;
+            result.M32 = m_yaxis.Z;
+            result.M33 = m_zaxis.Z;
+            result.M34 = m_origin.Z;
+
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
+
+            return result;
         }
 
         #endregion

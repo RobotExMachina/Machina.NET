@@ -230,6 +230,22 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
+        /// Transform a vector by a matrix.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector operator *(Matrix m, Vector v)
+        {
+            double 
+                x = m.M11 * v._x + m.M12 * v._y + m.M13 * v._z,
+                y = m.M21 * v._x + m.M22 * v._y + m.M23 * v._z,
+                z = m.M31 * v._x + m.M32 * v._y + m.M33 * v._z;
+
+            return new Vector(x, y, z);
+        }
+
+        /// <summary>
         /// Vector scalar division.
         /// </summary>
         /// <param name="v"></param>
