@@ -56,8 +56,20 @@ namespace Machina
         public const double TO_DEGS = 180.0 / Math.PI;
         public const double TO_RADS = Math.PI / 180.0;
 
-        // TAU ;)
+        /// <summary>
+        /// An alias for 2 * PI :)... See https://fathom.info/notebook/11298/
+        /// </summary>
         public const double TAU = 2 * Math.PI;
+
+        /// <summary>
+        /// An alias for PI :)... See https://fathom.info/notebook/11298/
+        /// </summary>
+        public const double TAU_2 = Math.PI;
+
+        /// <summary>
+        /// An alias for 0.5 * PI :)... See https://fathom.info/notebook/11298/
+        /// </summary>
+        public const double TAU_4 = 0.5 * Math.PI;
 
         /// <summary>
         /// Gets the Machina standard Unset value. Use this value rather than Double.NaN when 
