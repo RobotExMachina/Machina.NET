@@ -156,6 +156,14 @@ namespace Machina.Types.Geometry
             return p;
         }
 
+        internal static Plane CreateFromMatrix(Matrix m)
+        {
+            return new Plane(
+                m.M14, m.M24, m.M34,
+                m.M11, m.M21, m.M31,
+                m.M12, m.M22, m.M32);
+        }
+
         /// <summary>Copy constructor.
         /// <para>This is nothing special and performs the same as assigning to another variable.</para>
         /// </summary>

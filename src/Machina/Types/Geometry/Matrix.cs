@@ -163,6 +163,33 @@ namespace Machina.Types.Geometry
             this.M44 = values[15];
         }
 
+        /// <summary>
+        /// Constructs a Matrix as a shallow copy of another one. 
+        /// </summary>
+        /// <param name="m"></param>
+        public Matrix(Matrix m)
+        {
+            this.M11 = m.M11;
+            this.M12 = m.M12;
+            this.M13 = m.M13;
+            this.M14 = m.M14;
+
+            this.M21 = m.M21;
+            this.M22 = m.M22;
+            this.M23 = m.M23;
+            this.M24 = m.M24;
+
+            this.M31 = m.M31;
+            this.M32 = m.M32;
+            this.M33 = m.M33;
+            this.M34 = m.M34;
+
+            this.M41 = m.M41;
+            this.M42 = m.M42;
+            this.M43 = m.M43;
+            this.M44 = m.M44;
+        }
+
         private static readonly Matrix _identity = new Matrix
         (
             1, 0, 0, 0,
@@ -694,14 +721,60 @@ namespace Machina.Types.Geometry
         /// <returns></returns>
         public static Matrix CreateRotation(Vector axis, double angle, Vector center, bool inRadians = false)
         {
+            // From https://sites.google.com/site/glennmurray/Home/rotation-matrices-and-formulas/rotation-about-an-arbitrary-axis-in-3-dimensions
+              
+            // Formulation assumes unit vector.
+            Vector n = new Vector(axis);
+            n.Normalize();
             double radians = inRadians ? angle : angle * MMath.TO_RADS;
+            double sin = Math.Sin(radians);
+            double cos = Math.Cos(radians);
+            double t = 1 - cos;
+            double u = n.X,
+                v = n.Y,
+                w = n.Z,
+                uu = u * u,
+                vv = v * v,
+                ww = w * w,
+                uv = u * v,
+                uw = u * w,
+                vw = v * w;
 
-            // @TODO: this should be optimized to use an algebraic form.
-            Matrix T1 = Matrix.CreateTranslation(-center);
-            Matrix R = Matrix.CreateFromAxisAngle(axis, radians, true);
-            Matrix T2 = Matrix.CreateTranslation(center);
+            double a = center.X,
+                b = center.Y,
+                c = center.Z;
 
-            return T2 * R * T1;
+            Matrix result;
+
+            result.M11 = uu + (vv + ww) * cos;
+            result.M12 = uv * t - w * sin;
+            result.M13 = uw * t + v * sin;
+            result.M14 = (a * (vv + ww) - u * (b * v + c * w)) * t + (b * w - c * v) * sin;
+
+            result.M21 = uv * t + w * sin;
+            result.M22 = vv + (uu + ww) * cos;
+            result.M23 = vw * t - u * sin;
+            result.M24 = (b * (uu + ww) - v * (a * u + c * w)) * t + (c * u - a * w) * sin;
+
+            result.M31 = uw * t - v * sin;
+            result.M32 = vw * t + u * sin;
+            result.M33 = ww + (uu + vv) * cos;
+            result.M34 = (c * (uu + vv) - w * (a * u + b * v)) * t + (a * v - b * u) * sin;
+
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
+
+            return result;
+
+
+            //// @TODO: this should be optimized to use an algebraic form.
+            //Matrix T1 = Matrix.CreateTranslation(-center);
+            //Matrix R = Matrix.CreateFromAxisAngle(axis, radians, true);
+            //Matrix T2 = Matrix.CreateTranslation(center);
+
+            //return T2 * R * T1;
         }
 
 

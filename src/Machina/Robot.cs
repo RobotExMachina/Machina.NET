@@ -38,7 +38,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1603;
+        public static readonly int Build = 1604;
 
         /// <summary>
         /// Version number.

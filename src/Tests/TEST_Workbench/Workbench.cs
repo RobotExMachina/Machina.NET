@@ -32,7 +32,7 @@ namespace TEST_Workbench
             p.Transform(rz90);
             Console.WriteLine(p);
 
-            Matrix r45 = Matrix.CreateRotation(Vector.ZAxis, 45, new Vector(10, 0, 0));
+            Matrix r45 = Matrix.CreateRotation(Vector.ZAxis, 90, new Vector(10, 0, 0));
             p.Transform(r45);
             Console.WriteLine(p);
 
@@ -41,6 +41,15 @@ namespace TEST_Workbench
             Console.WriteLine(p);
             Console.WriteLine(p.ToArrayString(-1));
 
+
+            p.Origin = new Vector(4, 5, 6);
+            Console.WriteLine(p);
+
+            Matrix rr = Matrix.CreateRotation(new Vector(1, 2, 3), 37, new Vector(15, 24, 10));
+            Console.WriteLine(rr);
+
+            p.Transform(rr);
+            Console.WriteLine(p);
 
 
             Console.WriteLine("Press any key to EXIT...");
