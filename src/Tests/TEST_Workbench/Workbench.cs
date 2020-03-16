@@ -56,5 +56,13 @@ namespace TEST_Workbench
             Console.ReadKey();
         }
 
+        static void Scale(List<double> rots, int factor)
+        {
+            for (int i = 0; i < rots.Count; i++)
+            {
+                rots[i] *= factor;
+            }
+        }
+
     }
 }

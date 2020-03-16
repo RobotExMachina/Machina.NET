@@ -67,7 +67,7 @@ namespace Machina.Solvers.FK
             frames.Add(_model.Base.BasePlane);
 
             // Arm portion
-            List<Matrix> armFrames = forwardKinematicsArm(rotsRad);
+            List<Matrix> armFrames = ForwardKinematicsArm(rotsRad);
             frames.AddRange(armFrames);
 
             //// Wrist portion
@@ -80,16 +80,19 @@ namespace Machina.Solvers.FK
          /// <summary>
         /// Compute the forward kinematics of this robot for the arm portion. 
         /// </summary>
-        /// <param name="rots">The list of the full arm rotations.</param>
+        /// <param name="rots">The list of the full arm rotations in radians.</param>
         /// <returns>List of the three transforms for the arm axes.</returns>
-        private List<Matrix> forwardKinematicsArm(List<double> rots)
+        private List<Matrix> ForwardKinematicsArm(List<double> rots)
         {
             // List of joint frames
             List<Matrix> frames = new List<Matrix>();
-
-
+            
             // Remember: this was my first FK solver, I clearly didn't have a 
             // good grasp of DH parameters at this point... :sweat_smile: 
+            // Also, relied very heavily on RC types, replicated here for 
+            // educational purposes. 
+            // Finally, this is super hard-coded for an ABB IRB140, needs to
+            // be more generalizable! 
             Vector v01 = new Vector(70, 0, 352);    // o1 in base plane coords
             Vector v12 = new Vector(0, -360, 0);    // o2 in o1 local coords
             Vector v34 = new Vector(0, 0, 380);     // o4 in o3 local coords
@@ -102,14 +105,18 @@ namespace Machina.Solvers.FK
              r.v23 = new Vector3d(380, 0, 0);    // o3 in o2 local coordinates
              r.v56 = new Vector3d(0, 0, 65);     // o6 in o5 local coordinates
             */
-
-
+            
             // FRAME 1
-            Matrix p1 = _model.Base.BasePlane;
-            p1 = Matrix.CreateRotation(p1.Z, rots[0], p1.Translation);
+            Plane p1 = Plane.CreateFromMatrix(_model.Base.BasePlane);
+            p1.Rotate(rots[0], p1.ZAxis);
+            //Vector origin1 = plane1.PointAt(v01.X, v01.Y, v01.Z);
+            //Vector vector1 = origin1 - plane1.Origin;
+            //plane1.Translate(vector1);
+            p1.Translate(v01);
+            p1.Rotate(-MMath.TAU_4, p1.XAxis);
+            frames.Add(p1.ToMatrix());
 
-
-
+            ////FRAME 1
             //Plane p1 = basePlane;
             //p1.Rotate(rots[0], p1.ZAxis);
             //Point3d o1 = p1.PointAt(v01.X, v01.Y, v01.Z);
@@ -118,6 +125,13 @@ namespace Machina.Solvers.FK
             //p1.Rotate(-PI_2, p1.ZAxis);
             //p1.Rotate(-PI_2, p1.YAxis);
             //frames.Add(p1);
+
+            // FRAME 2
+            Plane p2 = p1;
+            p2.Rotate(rots[1], p2.ZAxis);
+            p2.Translate(v12);
+            p2.Rotate(-MMath.TAU_4, p2.ZAxis);
+            frames.Add(p2.ToMatrix());
 
             //// FRAME 2
             //Plane p2 = p1;
@@ -128,7 +142,13 @@ namespace Machina.Solvers.FK
             //p2.Rotate(PI_2, p2.ZAxis);
             //frames.Add(p2);
 
-            //// FRAME 3
+            // FRAME 3
+            Plane p3 = p2;
+            p3.Rotate(rots[2], p3.ZAxis);
+            p3.Rotate(-MMath.TAU_4, p3.XAxis);
+            frames.Add(p3.ToMatrix());
+
+            //// FRAME    
             //Plane p3 = p2;
             //p3.Rotate(rots[2], p3.ZAxis);
             //Point3d o3 = p3.PointAt(v23.X, v23.Y, v23.Z);
@@ -137,6 +157,13 @@ namespace Machina.Solvers.FK
             //p3.Rotate(PI_2, p3.YAxis);
             //p3.Rotate(PI_2, p3.ZAxis);
             //frames.Add(p3);
+
+            // FRAME 4
+            Plane p4 = p3;
+            p4.Rotate(rots[3], p4.ZAxis);
+            p4.Translate(v34);
+            p4.Rotate(MMath.TAU_4, p4.XAxis);
+            frames.Add(p4.ToMatrix());
 
             return frames;
         }
