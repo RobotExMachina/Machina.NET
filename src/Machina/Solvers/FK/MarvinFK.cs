@@ -28,6 +28,27 @@ namespace Machina.Solvers.FK
         /// </summary>
         private RobotSixAxesArm _model;
 
+        // Remember: this was my first FK solver, I clearly didn't have a 
+        // good grasp of DH parameters at this point... :sweat_smile: 
+        // Also, relied very heavily on RC types, replicated here for 
+        // educational purposes. 
+        // Finally, this is super hard-coded for an ABB IRB140, needs to
+        // be more generalizable! 
+        Vector v01 = new Vector(70, 0, 352);    // o1 in base plane coords
+        Vector v12 = new Vector(0, -360, 0);    // o2 in o1 local coords
+        Vector v23 = new Vector(0, 0, 0);       
+        Vector v34 = new Vector(0, 0, 380);     // o4 in o3 local coords
+        Vector v45 = new Vector(0, 0, 0);
+        Vector v56 = new Vector(0, 0, 65);      // o6 in o5 local coords
+
+        /*
+         // define geometry per link in local frame coordinates
+         r.v01 = new Vector3d(70, 0, 352);   // in base plane coordinates
+         r.v12 = new Vector3d(360, 0, 0);    // o2 in o1 local coordinates
+         r.v23 = new Vector3d(380, 0, 0);    // o3 in o2 local coordinates
+         r.v56 = new Vector3d(0, 0, 65);     // o6 in o5 local coordinates
+        */
+
         internal MarvinFK(RobotModelBase model) : base(model)
         {
             _model = (RobotSixAxesArm) model;  // we want an exception if this doesn't work...
@@ -70,9 +91,9 @@ namespace Machina.Solvers.FK
             List<Matrix> armFrames = ForwardKinematicsArm(rotsRad);
             frames.AddRange(armFrames);
 
-            //// Wrist portion
-            //List<Plane> wristFrames = forwardKinematicsWrist(rotsRad.GetRange(3, 3), frames.Last(), false);
-            //frames.AddRange(wristFrames);
+            // Wrist portion
+            List<Matrix> wristFrames = ForwardKinematicsWrist(rotsRad.GetRange(3, 3), frames.Last());
+            frames.AddRange(wristFrames);
 
             return frames;
         }
@@ -86,26 +107,7 @@ namespace Machina.Solvers.FK
         {
             // List of joint frames
             List<Matrix> frames = new List<Matrix>();
-            
-            // Remember: this was my first FK solver, I clearly didn't have a 
-            // good grasp of DH parameters at this point... :sweat_smile: 
-            // Also, relied very heavily on RC types, replicated here for 
-            // educational purposes. 
-            // Finally, this is super hard-coded for an ABB IRB140, needs to
-            // be more generalizable! 
-            Vector v01 = new Vector(70, 0, 352);    // o1 in base plane coords
-            Vector v12 = new Vector(0, -360, 0);    // o2 in o1 local coords
-            Vector v34 = new Vector(0, 0, 380);     // o4 in o3 local coords
-            Vector v56 = new Vector(0, 0, 65);      // o6 in o5 local coords
-
-            /*
-             // define geometry per link in local frame coordinates
-             r.v01 = new Vector3d(70, 0, 352);   // in base plane coordinates
-             r.v12 = new Vector3d(360, 0, 0);    // o2 in o1 local coordinates
-             r.v23 = new Vector3d(380, 0, 0);    // o3 in o2 local coordinates
-             r.v56 = new Vector3d(0, 0, 65);     // o6 in o5 local coordinates
-            */
-            
+                        
             // FRAME 1
             Plane p1 = Plane.CreateFromMatrix(_model.Base.BasePlane);
             p1.Rotate(rots[0], p1.ZAxis);
@@ -145,6 +147,7 @@ namespace Machina.Solvers.FK
             // FRAME 3
             Plane p3 = p2;
             p3.Rotate(rots[2], p3.ZAxis);
+            p3.Translate(v23);
             p3.Rotate(-MMath.TAU_4, p3.XAxis);
             frames.Add(p3.ToMatrix());
 
@@ -158,14 +161,66 @@ namespace Machina.Solvers.FK
             //p3.Rotate(PI_2, p3.ZAxis);
             //frames.Add(p3);
 
+
+            return frames;
+        }
+
+        private List<Matrix> ForwardKinematicsWrist(List<double> rots, Matrix joint3)
+        {
+            // List of joint frames
+            List<Matrix> frames = new List<Matrix>();
+
             // FRAME 4
-            Plane p4 = p3;
+            Plane p4 = Plane.CreateFromMatrix(joint3);
             p4.Rotate(rots[3], p4.ZAxis);
             p4.Translate(v34);
             p4.Rotate(MMath.TAU_4, p4.XAxis);
             frames.Add(p4.ToMatrix());
 
+            // FRAME 5
+            Plane p5 = p4;
+            p5.Rotate(rots[4], p5.ZAxis);
+            p5.Translate(v45);
+            p5.Rotate(-MMath.TAU_4, p5.XAxis);
+            frames.Add(p5.ToMatrix());
+
+            // FRAME 6
+            Plane p6 = p5;
+            p6.Rotate(rots[5], p6.ZAxis);
+            p6.Translate(v56);
+            p6.Rotate(MMath.TAU_2, p6.ZAxis);
+            frames.Add(p6.ToMatrix());
+
             return frames;
+
+
+
+            //// list of joint frames
+            //List<Plane> frames = new List<Plane>();
+
+            //// FRAME 4
+            //Plane p4 = wristPlane;
+            //p4.Rotate(rots[0], p4.ZAxis);
+            //p4.Rotate(-PI_2, p4.XAxis);
+            //p4.Rotate(-PI_2, p4.ZAxis);
+            //frames.Add(p4);
+
+            //// FRAME 5
+            //Plane p5 = p4;
+            //p5.Rotate(rots[1], p5.ZAxis);
+            //p5.Rotate(PI_2, p5.ZAxis);
+            //p5.Rotate(PI_2, p5.XAxis);
+            //frames.Add(p5);
+
+            //// FRAME 6
+            //Plane p6 = p5;
+            //p6.Rotate(rots[2], p6.ZAxis);
+            //Point3d o6 = p6.PointAt(v56.X, v56.Y, v56.Z);
+            //Vector3d v6 = o6 - p6.Origin;
+            //p6.Translate(v6);
+            //frames.Add(p6);
+
+            //return frames;
         }
     }
 }
