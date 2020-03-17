@@ -21,9 +21,9 @@ namespace Machina.Solvers.FK
     /// </summary>
     internal abstract class SolverFK
     {
-        internal RobotModelBase Model { get; set; }
+        internal RobotModel Model { get; set; }
 
-        internal SolverFK(RobotModelBase model)
+        internal SolverFK(RobotModel model)
         {
             this.Model = model;
         }

@@ -49,7 +49,7 @@ namespace Machina.Solvers.FK
          r.v56 = new Vector3d(0, 0, 65);     // o6 in o5 local coordinates
         */
 
-        internal MarvinFK(RobotModelBase model) : base(model)
+        internal MarvinFK(RobotModel model) : base(model)
         {
             _model = (RobotSixAxesArm) model;  // we want an exception if this doesn't work...
         }
@@ -114,7 +114,7 @@ namespace Machina.Solvers.FK
             //Vector origin1 = plane1.PointAt(v01.X, v01.Y, v01.Z);
             //Vector vector1 = origin1 - plane1.Origin;
             //plane1.Translate(vector1);
-            p1.Translate(v01);
+            p1.Offset(v01);
             p1.Rotate(-MMath.TAU_4, p1.XAxis);
             frames.Add(p1.ToMatrix());
 
@@ -131,7 +131,7 @@ namespace Machina.Solvers.FK
             // FRAME 2
             Plane p2 = p1;
             p2.Rotate(rots[1], p2.ZAxis);
-            p2.Translate(v12);
+            p2.Offset(v12);
             p2.Rotate(-MMath.TAU_4, p2.ZAxis);
             frames.Add(p2.ToMatrix());
 
@@ -147,7 +147,7 @@ namespace Machina.Solvers.FK
             // FRAME 3
             Plane p3 = p2;
             p3.Rotate(rots[2], p3.ZAxis);
-            p3.Translate(v23);
+            p3.Offset(v23);
             p3.Rotate(-MMath.TAU_4, p3.XAxis);
             frames.Add(p3.ToMatrix());
 
@@ -172,55 +172,26 @@ namespace Machina.Solvers.FK
 
             // FRAME 4
             Plane p4 = Plane.CreateFromMatrix(joint3);
-            p4.Rotate(rots[3], p4.ZAxis);
-            p4.Translate(v34);
+            p4.Rotate(rots[0], p4.ZAxis);
+            p4.Offset(v34);
             p4.Rotate(MMath.TAU_4, p4.XAxis);
             frames.Add(p4.ToMatrix());
 
             // FRAME 5
             Plane p5 = p4;
-            p5.Rotate(rots[4], p5.ZAxis);
-            p5.Translate(v45);
+            p5.Rotate(rots[1], p5.ZAxis);
+            p5.Offset(v45);
             p5.Rotate(-MMath.TAU_4, p5.XAxis);
             frames.Add(p5.ToMatrix());
 
             // FRAME 6
             Plane p6 = p5;
-            p6.Rotate(rots[5], p6.ZAxis);
-            p6.Translate(v56);
+            p6.Rotate(rots[2], p6.ZAxis);
+            p6.Offset(v56);
             p6.Rotate(MMath.TAU_2, p6.ZAxis);
             frames.Add(p6.ToMatrix());
 
             return frames;
-
-
-
-            //// list of joint frames
-            //List<Plane> frames = new List<Plane>();
-
-            //// FRAME 4
-            //Plane p4 = wristPlane;
-            //p4.Rotate(rots[0], p4.ZAxis);
-            //p4.Rotate(-PI_2, p4.XAxis);
-            //p4.Rotate(-PI_2, p4.ZAxis);
-            //frames.Add(p4);
-
-            //// FRAME 5
-            //Plane p5 = p4;
-            //p5.Rotate(rots[1], p5.ZAxis);
-            //p5.Rotate(PI_2, p5.ZAxis);
-            //p5.Rotate(PI_2, p5.XAxis);
-            //frames.Add(p5);
-
-            //// FRAME 6
-            //Plane p6 = p5;
-            //p6.Rotate(rots[2], p6.ZAxis);
-            //Point3d o6 = p6.PointAt(v56.X, v56.Y, v56.Z);
-            //Vector3d v6 = o6 - p6.Origin;
-            //p6.Translate(v6);
-            //frames.Add(p6);
-
-            //return frames;
         }
     }
 }

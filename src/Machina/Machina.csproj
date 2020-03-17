@@ -112,7 +112,7 @@
     <Compile Include="Controllers\OfflineControlManager.cs" />
     <Compile Include="Controllers\StreamControlManager.cs" />
     <Compile Include="Descriptors\Components\RobotJoint.cs" />
-    <Compile Include="Descriptors\Models\RobotModelBase.cs" />
+    <Compile Include="Descriptors\Models\RobotModel.cs" />
     <Compile Include="Descriptors\Models\RobotSixAxesArm.cs" />
     <Compile Include="Drivers\Communication\Protocols\URCommunicationProtocol.cs" />
     <Compile Include="Drivers\Communication\RobotStudioManager.cs" />

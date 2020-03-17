@@ -422,14 +422,24 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
-        /// Translate (move) the plane along a vector.
+        /// Translate (move) the plane along a vector in world coordinates.
         /// </summary>
         /// <param name="delta">Translation (motion) vector.</param>
-        /// <returns>true on success, false on failure.</returns>
-        public bool Translate(Vector delta)
+        public void Translate(Vector delta)
         {
             m_origin += delta;
-            return true;
+        }
+
+        /// <summary>
+        /// Translate this plane along a vector in the plane's 
+        /// local coordinate system.
+        /// </summary>
+        /// <param name="relativeDelta"></param>
+        /// <returns></returns>
+        public void Offset(Vector relativeDelta)
+        {
+            Vector newOrigin = this.PointAt(relativeDelta.X, relativeDelta.Y, relativeDelta.Z);
+            m_origin = newOrigin;
         }
 
         /// <summary>
@@ -470,7 +480,7 @@ namespace Machina.Types.Geometry
         {
             if (centerOfRotation == Origin)
             {
-                Matrix rot = Matrix.CreateRotation(axis, angle, Origin);
+                Matrix rot = Matrix.CreateRotation(axis, angle, Origin, true);
                 Matrix pm = Matrix.CreateFromPlane(this);
                 Matrix trans = rot * pm;
                 XAxis = trans.X;

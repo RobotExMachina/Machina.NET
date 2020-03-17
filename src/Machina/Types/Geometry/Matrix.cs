@@ -722,7 +722,7 @@ namespace Machina.Types.Geometry
         public static Matrix CreateRotation(Vector axis, double angle, Vector center, bool inRadians = false)
         {
             // From https://sites.google.com/site/glennmurray/Home/rotation-matrices-and-formulas/rotation-about-an-arbitrary-axis-in-3-dimensions
-              
+
             // Formulation assumes unit vector.
             Vector n = new Vector(axis);
             n.Normalize();
@@ -770,6 +770,7 @@ namespace Machina.Types.Geometry
 
 
             //// @TODO: this should be optimized to use an algebraic form.
+            //double radians = inRadians ? angle : angle * MMath.TO_RADS;
             //Matrix T1 = Matrix.CreateTranslation(-center);
             //Matrix R = Matrix.CreateFromAxisAngle(axis, radians, true);
             //Matrix T2 = Matrix.CreateTranslation(center);
