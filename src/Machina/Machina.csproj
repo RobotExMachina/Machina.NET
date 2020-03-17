@@ -136,7 +136,8 @@
     <Compile Include="Logger.cs" />
     <Compile Include="Net\Net.cs" />
     <Compile Include="Solvers\FK\MarvinFK.cs" />
-    <Compile Include="Solvers\FK\SolverFKBase.cs" />
+    <Compile Include="Solvers\FK\SolverFK.cs" />
+    <Compile Include="Solvers\IK\SolverIK.cs" />
     <Compile Include="Types\Data\DHParameters.cs" />
     <Compile Include="Types\Geometry\AxisAngle.cs" />
     <Compile Include="Types\Geometry\ExternalAxes.cs" />

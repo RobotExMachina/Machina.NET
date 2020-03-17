@@ -54,9 +54,9 @@ namespace Machina.Solvers.FK
             _model = (RobotSixAxesArm) model;  // we want an exception if this doesn't work...
         }
 
-
         /// <summary>
         /// Compute the FK of this robot for the end-effector. 
+        /// Takes a list of 6 rotations, and returns 7 frames.
         /// </summary>
         /// <param name="jointValues"></param>
         /// <param name="units"></param>
