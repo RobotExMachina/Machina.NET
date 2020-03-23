@@ -73,7 +73,7 @@ MODULE Machina_Driver
     LOCAL VAR socketdev clientSocket;
 
     ! A RAPID-code oriented API:
-    !                                                 INSTRUCTION P1 P2 P3 P4...
+    !                                                     INSTRUCTION P1 P2 P3 P4...
     CONST num INST_MOVEL := 1;                          ! MoveL X Y Z QW QX QY QZ
     CONST num INST_MOVEJ := 2;                          ! MoveJ X Y Z QW QX QY QZ
     CONST num INST_MOVEABSJ := 3;                       ! MoveAbsJ J1 J2 J3 J4 J5 J6
@@ -100,12 +100,12 @@ MODULE Machina_Driver
     CONST num INST_SET_MOTION_UPDATE_INTERVAL := 103;   ! Sets the motion update interval in seconds.
 
     ! (these could be straight strings since they are never used for checks...?)
-    PERS num RES_VERSION := 20;                         ! "$20 1 2 1;" Sends version numbers
-    PERS num RES_POSE := 21;                            ! "$21 400 300 500 0 0 1 0;" Sends pose
-    PERS num RES_JOINTS := 22;                          ! "$22 0 0 0 0 90 0;" Sends joints
-    PERS num RES_EXTAX := 23;                           ! "$23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
-    PERS num RES_FULL_POSE := 24;                       ! "$24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6 C1 C2 C3 C4;" Sends all pose and joint info (probably on split messages)
-    PERS num RES_CONF := 25;                            ! "$25 C1 C2 C3 C4;" Sends configuration info.
+    PERS num RES_VERSION := 201;                        ! "$201 1 2 1;" Sends version numbers
+    PERS num RES_POSE := 202;                           ! "$202 400 300 500 0 0 1 0;" Sends pose
+    PERS num RES_JOINTS := 203;                         ! "$203 0 0 0 0 90 0;" Sends joints
+    PERS num RES_EXTAX := 204;                          ! "$204 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
+    PERS num RES_FULL_POSE := 205;                      ! "$205 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6 C1 C2 C3 C4;" Sends all pose and joint info (probably on split messages)
+    PERS num RES_CONF := 206;                           ! "$206 C1 C2 C3 C4;" Sends configuration info.
 
     ! Characters used for buffer parsing
     PERS string STR_MESSAGE_END_CHAR := ";";            ! Marks the end of a message

@@ -1094,6 +1094,7 @@ namespace Machina
         public bool CustomCode(string statement, bool isDeclaration = false) =>
                 c.IssueCustomCodeRequest(statement, isDeclaration);
 
+
         /// <summary>
         /// Define a Tool object on the Robot's internal library to make it avaliable for future Attach/Detach actions.
         /// </summary>

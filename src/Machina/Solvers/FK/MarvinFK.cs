@@ -42,7 +42,7 @@ namespace Machina.Solvers.FK
         Vector v56 = new Vector(0, 0, 65);      // o6 in o5 local coords
 
         /*
-         // define geometry per link in local frame coordinates
+         // Define geometry per link in local frame coordinates
          r.v01 = new Vector3d(70, 0, 352);   // in base plane coordinates
          r.v12 = new Vector3d(360, 0, 0);    // o2 in o1 local coordinates
          r.v23 = new Vector3d(380, 0, 0);    // o3 in o2 local coordinates
