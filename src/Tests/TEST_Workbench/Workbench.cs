@@ -19,10 +19,10 @@ namespace TEST_Workbench
             Machina.Logger.WriteLine += Console.WriteLine;
 
 
-            List<double> home = new List<double> { 0, 0, 0, 0, 90, 0 };
+            List<double> target = new List<double> { 0, 0, 0, 0, 90, 0 };
 
             RobotModel bot = RobotModel.CreateABBIRB140();
-            var frames = bot.ForwardKinematics(home, Units.Degrees);
+            var frames = bot.ForwardKinematics(target, Units.Degrees);
 
             var it = 0;
             foreach (var m in frames)
@@ -31,7 +31,8 @@ namespace TEST_Workbench
                 Console.WriteLine(m);
                 it++;
             }
-            
+
+
 
 
             //Plane p = new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);

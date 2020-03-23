@@ -74,43 +74,44 @@ MODULE Machina_Driver
 
     ! A RAPID-code oriented API:
     !                                                 INSTRUCTION P1 P2 P3 P4...
-    CONST num INST_MOVEL := 1;                      ! MoveL X Y Z QW QX QY QZ
-    CONST num INST_MOVEJ := 2;                      ! MoveJ X Y Z QW QX QY QZ
-    CONST num INST_MOVEABSJ := 3;                   ! MoveAbsJ J1 J2 J3 J4 J5 J6
-    CONST num INST_SPEED := 4;                      ! (setspeed V_TCP [V_ORI V_LEAX V_REAX])
-    CONST num INST_ZONE := 5;                       ! (setzone FINE TCP [ORI EAX ORI LEAX REAX])
-    CONST num INST_WAITTIME := 6;                   ! WaitTime T
-    CONST num INST_TPWRITE := 7;                    ! TPWrite "MSG"
-    CONST num INST_TOOL := 8;                       ! (settool X Y Z QW QX QY QZ KG CX CY CZ)
-    CONST num INST_NO_TOOL := 9;                    ! (settool tool0)
-    CONST num INST_SETDO := 10;                     ! SetDO "NAME" ON
-    CONST num INST_SETAO := 11;                     ! SetAO "NAME" V
-    CONST num INST_EXT_JOINTS_ALL := 12;            ! (setextjoints a1 a2 a3 a4 a5 a6, applies to both rob and jointtarget) --> send non-string 9E9 for inactive axes
-    CONST num INST_ACCELERATION := 13;              ! WorldAccLim \On V (V = 0 sets \Off, any other value sets WorldAccLim \On V)
-    CONST num INST_SING_AREA := 14;                 ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
-    CONST num INST_EXT_JOINTS_ROBTARGET := 15;      ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
-    CONST num INST_EXT_JOINTS_JOINTTARGET := 16;    ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
-    CONST num INST_CUSTOM_ACTION := 17;             ! This is a wildcard for custom user functions that do not really fit in the Machina API (mainly Yumi gripping right now)
-    CONST num INST_WOBJ := 18;                      ! (setwobj X Y Z QW QX QY QZ) --> defaults to not robot not holding wobj, fixed user coordinate system (ucs), and ucs == worldcs
-    CONST num INST_NO_WOBJ := 19;                   ! (setwobj wobj0)
+    CONST num INST_MOVEL := 1;                          ! MoveL X Y Z QW QX QY QZ
+    CONST num INST_MOVEJ := 2;                          ! MoveJ X Y Z QW QX QY QZ
+    CONST num INST_MOVEABSJ := 3;                       ! MoveAbsJ J1 J2 J3 J4 J5 J6
+    CONST num INST_SPEED := 4;                          ! (setspeed V_TCP [V_ORI V_LEAX V_REAX])
+    CONST num INST_ZONE := 5;                           ! (setzone FINE TCP [ORI EAX ORI LEAX REAX])
+    CONST num INST_WAITTIME := 6;                       ! WaitTime T
+    CONST num INST_TPWRITE := 7;                        ! TPWrite "MSG"
+    CONST num INST_TOOL := 8;                           ! (settool X Y Z QW QX QY QZ KG CX CY CZ)
+    CONST num INST_NO_TOOL := 9;                        ! (settool tool0)
+    CONST num INST_SETDO := 10;                         ! SetDO "NAME" ON
+    CONST num INST_SETAO := 11;                         ! SetAO "NAME" V
+    CONST num INST_EXT_JOINTS_ALL := 12;                ! (setextjoints a1 a2 a3 a4 a5 a6, applies to both rob and jointtarget) --> send non-string 9E9 for inactive axes
+    CONST num INST_ACCELERATION := 13;                  ! WorldAccLim \On V (V = 0 sets \Off, any other value sets WorldAccLim \On V)
+    CONST num INST_SING_AREA := 14;                     ! SingArea ON (ON = 0 sets SingArea \Off, any other value sets SingArea \Wrist)
+    CONST num INST_EXT_JOINTS_ROBTARGET := 15;          ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
+    CONST num INST_EXT_JOINTS_JOINTTARGET := 16;        ! (setextjoints a1 a2 a3 a4 a5 a6, applies only to robtarget)
+    CONST num INST_CUSTOM_ACTION := 17;                 ! This is a wildcard for custom user functions that do not really fit in the Machina API (mainly Yumi gripping right now)
+    CONST num INST_WOBJ := 18;                          ! (setwobj X Y Z QW QX QY QZ) --> defaults to not robot not holding wobj, fixed user coordinate system (ucs), and ucs == worldcs
+    CONST num INST_NO_WOBJ := 19;                       ! (setwobj wobj0)
 
-    CONST num INST_STOP_EXECUTION := 100;           ! Stops execution of the server module
-    CONST num INST_GET_INFO := 101;                 ! A way to retreive state information from the server (not implemented)
-    CONST num INST_SET_CONFIGURATION := 102;        ! A way to make some changes to the configuration of the server
-    CONST num INST_SET_MOTION_UPDATE_INTERVAL := 103;  ! Sets the motion update interval in seconds.
+    CONST num INST_STOP_EXECUTION := 100;               ! Stops execution of the server module
+    CONST num INST_GET_INFO := 101;                     ! A way to retreive state information from the server (not implemented)
+    CONST num INST_SET_CONFIGURATION := 102;            ! A way to make some changes to the configuration of the server
+    CONST num INST_SET_MOTION_UPDATE_INTERVAL := 103;   ! Sets the motion update interval in seconds.
 
     ! (these could be straight strings since they are never used for checks...?)
-    PERS num RES_VERSION := 20;                     ! ">20 1 2 1;" Sends version numbers
-    PERS num RES_POSE := 21;                        ! ">21 400 300 500 0 0 1 0;" Sends pose
-    PERS num RES_JOINTS := 22;                      ! ">22 0 0 0 0 90 0;" Sends joints
-    PERS num RES_EXTAX := 23;                       ! ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
-    PERS num RES_FULL_POSE := 24;                   ! ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
+    PERS num RES_VERSION := 20;                         ! "$20 1 2 1;" Sends version numbers
+    PERS num RES_POSE := 21;                            ! "$21 400 300 500 0 0 1 0;" Sends pose
+    PERS num RES_JOINTS := 22;                          ! "$22 0 0 0 0 90 0;" Sends joints
+    PERS num RES_EXTAX := 23;                           ! "$23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
+    PERS num RES_FULL_POSE := 24;                       ! "$24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6 C1 C2 C3 C4;" Sends all pose and joint info (probably on split messages)
+    PERS num RES_CONF := 25;                            ! "$25 C1 C2 C3 C4;" Sends configuration info.
 
     ! Characters used for buffer parsing
-    PERS string STR_MESSAGE_END_CHAR := ";";        ! Marks the end of a message
-    PERS string STR_MESSAGE_CONTINUE_CHAR := ">";   ! Marks the end of an unfinished message, to be continued on next message. Useful when the message is too long and needs to be split in chunks
-    PERS string STR_MESSAGE_ID_CHAR := "@";         ! Flags a message as an acknowledgment message corresponding to a source id
-    PERS string STR_MESSAGE_RESPONSE_CHAR := "$";   ! Flags a message as a response to an information request (acknowledgments do not include it)
+    PERS string STR_MESSAGE_END_CHAR := ";";            ! Marks the end of a message
+    PERS string STR_MESSAGE_CONTINUE_CHAR := ">";       ! Marks the end of an unfinished message, to be continued on next message. Useful when the message is too long and needs to be split in chunks
+    PERS string STR_MESSAGE_ID_CHAR := "@";             ! Flags a message as an acknowledgment message corresponding to a source id
+    PERS string STR_MESSAGE_RESPONSE_CHAR := "$";       ! Flags a message as a response to an information request (acknowledgments do not include it)
 
     ! Rounding parameters for string representation of values (consistent with current Machina standards...)
     PERS num STR_RND_M := 6;

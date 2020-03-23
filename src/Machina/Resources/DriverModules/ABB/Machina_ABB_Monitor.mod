@@ -72,6 +72,7 @@ MODULE Machina_Monitor
     PERS num RES_JOINTS;
     PERS num RES_EXTAX;
     PERS num RES_FULL_POSE;
+    PERS num RES_CONF;
 
     PERS string STR_MESSAGE_END_CHAR;
     PERS string STR_MESSAGE_CONTINUE_CHAR;

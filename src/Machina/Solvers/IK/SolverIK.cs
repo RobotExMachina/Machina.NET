@@ -21,6 +21,6 @@ namespace Machina.Solvers.IK
         /// <summary>
         /// Compute the Inverse Kinematics for this device, given a Matrix representing the TCP.
         /// </summary>
-        internal abstract List<double> InverseKinematics(Matrix targetTCP, Matrix prevTCP, Tool tool = null);
+        internal abstract List<double> InverseKinematics(Matrix targetTCP, Matrix? prevTCP, Tool tool = null);
     }
 }

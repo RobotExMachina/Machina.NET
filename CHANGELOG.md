@@ -13,7 +13,7 @@
 //  ╚██████╗██║  ██║██║  ██║██║ ╚████║╚██████╔╝███████╗███████╗╚██████╔╝╚██████╔╝
 //   ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚══════╝ ╚═════╝  ╚═════╝
 ```
-# TODO:
+# WISHLIST
 - [ ] Hopefully turn this changelog into something more [orthodox](http://keepachangelog.com/en/1.0.0/)
 - [ ] Make `Machina` types JSON-de/serializable via `DataContract`s
 - [ ] The `HUMAN` compiler doesn't export actions with the real/abs and axis/cartesian problem, even though it should since it doesn't really need to apply the actions to the writer... Same for 'MACHINA' compiler...
@@ -21,9 +21,24 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
-# v0.9.0
-## BUILD 1604
 
+
+
+# v0.9.0
+# GOALS
+- [ ] Test the `MarvinFK` solver
+- [ ] Implement joint out of range error handling for FK
+- [ ] Base class for IK solvers
+- [ ] Implement `MarvinIK`
+- [ ] Integrate both solvers into the action-application architecture
+- [ ] Extract hard-coded robot into a description
+- [ ] Make use of the description to load the particular robot
+
+## BUILD 1605
+
+
+## BUILD 1604
+- Basic `MarvinFK` solver!
 
 ## BUILD 1603
 - Port `Plane` object from Rhinocomm/OpenNurbs
