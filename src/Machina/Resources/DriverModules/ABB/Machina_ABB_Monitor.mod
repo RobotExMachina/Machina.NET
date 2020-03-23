@@ -224,7 +224,7 @@ MODULE Machina_Monitor
             + NumToStr(nowrt.robconf.cf1, 0) + STR_WHITE
             + NumToStr(nowrt.robconf.cf4, 0) + STR_WHITE
             + NumToStr(nowrt.robconf.cf6, 0) + STR_WHITE
-            + NumToStr(nowrt.robconf.cfx, 0) + STR_MESSAGE_END_CHAR;
+            + NumToStr(nowrt.robconf.cfx, 0) + STR_MESSAGE_CONTINUE_CHAR;
         SendMessage(response);
 
         ! Joints

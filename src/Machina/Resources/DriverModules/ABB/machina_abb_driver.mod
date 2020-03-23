@@ -106,7 +106,7 @@ MODULE Machina_Driver
     PERS num RES_JOINTS := 203;                         ! "$203 0 0 0 0 90 0;" Sends joints
     PERS num RES_EXTAX := 204;                          ! "$204 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
     PERS num RES_FULL_POSE := 205;                      ! "$205 X Y Z QW QX QY QZ C1 C4 C6 CX J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
-    PERS num RES_CALC_FK := 206;                        ! "$206 @ID X Y Z QW QX QY QZ C1 C4 C6 CX;" Sends a FK calculation as response to a INST_CALC_FK request. Carries INST ID number for identification.
+    PERS num RES_CALC_FK := 206;                        ! "$206 ID J1 J2 J3 J4 J5 J6 X Y Z QW QX QY QZ C1 C4 C6 CX;" Sends a FK calculation as response to a INST_CALC_FK request. Carries ID number from action for identification.
 
     ! Characters used for buffer parsing
     PERS string STR_MESSAGE_END_CHAR := ";";            ! Marks the end of a message
@@ -480,8 +480,9 @@ MODULE Machina_Driver
     PROC SendPose()
         nowrt := CRobT(\Tool:=tool0, \WObj:=wobj0);
 
-        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_POSE, 0) + STR_WHITE
-            + RobTargetToString(nowrt) + STR_MESSAGE_END_CHAR;
+        response := 
+            STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_POSE, 0) + STR_WHITE +
+            RobTargetToString(nowrt) + STR_MESSAGE_END_CHAR;
 
         SocketSend clientSocket \Str:=response;
     ENDPROC
@@ -490,14 +491,9 @@ MODULE Machina_Driver
     PROC SendJoints()
         nowjt := CJointT();
 
-        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_JOINTS, 0);
-        response := response + STR_WHITE
-            + NumToStr(nowjt.robax.rax_1, STR_RND_DEGS) + STR_WHITE
-            + NumToStr(nowjt.robax.rax_2, STR_RND_DEGS) + STR_WHITE
-            + NumToStr(nowjt.robax.rax_3, STR_RND_DEGS) + STR_WHITE
-            + NumToStr(nowjt.robax.rax_4, STR_RND_DEGS) + STR_WHITE
-            + NumToStr(nowjt.robax.rax_5, STR_RND_DEGS) + STR_WHITE
-            + NumToStr(nowjt.robax.rax_6, STR_RND_DEGS) + STR_MESSAGE_END_CHAR;
+        response := 
+            STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_JOINTS, 0) + STR_WHITE +
+            JointTargetToString(nowjt) + STR_MESSAGE_END_CHAR;
 
         SocketSend clientSocket \Str:=response;
     ENDPROC
@@ -521,7 +517,7 @@ MODULE Machina_Driver
         SocketSend clientSocket \Str:=response;
     ENDPROC
 
-
+    ! Send the values of a FK calculation from a jointtarget. Used for testing.
     PROC SendCalcFK(action a)
         VAR robtarget rt;
         VAR jointtarget jt;
@@ -529,10 +525,15 @@ MODULE Machina_Driver
         jt := GetJointTarget(a);
         rt := CalcRobT(jt, tool0);
         
-        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_CALC_FK, 0) + STR_WHITE
-            + RobTargetToString(rt) + STR_MESSAGE_END_CHAR;
-
+        response := 
+            STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_CALC_FK, 0) + STR_WHITE +
+            NumToStr(a.id, 0) + STR_WHITE +
+            JointTargetToString(jt) + STR_MESSAGE_CONTINUE_CHAR;
         SocketSend clientSocket \Str:=response;
+
+        response := RobTargetToString(rt) + STR_MESSAGE_END_CHAR;
+        SocketSend clientSocket \Str:=response;
+
     ENDPROC
 
 
@@ -936,6 +937,18 @@ MODULE Machina_Driver
             + NumToStr(rt.robconf.cf4, 0) + STR_WHITE
             + NumToStr(rt.robconf.cf6, 0) + STR_WHITE
             + NumToStr(rt.robconf.cfx, 0);
+    ENDFUNC
+
+
+    ! Converts a jointtarget to a string in the form "J1 J2 J3 J4 J5 J6"
+    FUNC string JointTargetToString(jointtarget jt)
+        RETURN
+            NumToStr(jt.robax.rax_1, STR_RND_DEGS) + STR_WHITE +
+            NumToStr(jt.robax.rax_2, STR_RND_DEGS) + STR_WHITE +
+            NumToStr(jt.robax.rax_3, STR_RND_DEGS) + STR_WHITE +
+            NumToStr(jt.robax.rax_4, STR_RND_DEGS) + STR_WHITE +
+            NumToStr(jt.robax.rax_5, STR_RND_DEGS) + STR_WHITE +
+            NumToStr(jt.robax.rax_6, STR_RND_DEGS);
     ENDFUNC
 
 
