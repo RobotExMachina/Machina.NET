@@ -146,6 +146,7 @@ namespace Machina.Types.Geometry
             return A1 * A1 + A2 * A2 + A3 * A3 + A4 * A4 + A5 * A5 + A6 * A6;
         }
 
+
         public static Axes Add(Axes j1, Axes j2)
         {
             return new Axes(j1.A1 + j2.A1,
@@ -154,6 +155,41 @@ namespace Machina.Types.Geometry
                               j1.A4 + j2.A4,
                               j1.A5 + j2.A5,
                               j1.A6 + j2.A6);
+        }
+
+        /// <summary>
+        /// Returns a random object with values between specified double ranges. 
+        /// Useful for testing and debugging.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static Axes RandomFromDoubles(double min, double max)
+        {
+            return new Axes(
+                MMath.Random(min, max), 
+                MMath.Random(min, max), 
+                MMath.Random(min, max),
+                MMath.Random(min, max),
+                MMath.Random(min, max),
+                MMath.Random(min, max));
+        }
+
+        /// <summary>
+        /// Returns a random object with integer values between specified double ranges. 
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static Axes RandomFromInts(int min, int max)
+        {
+            return new Axes(
+                MMath.RandomInt(min, max),
+                MMath.RandomInt(min, max),
+                MMath.RandomInt(min, max),
+                MMath.RandomInt(min, max),
+                MMath.RandomInt(min, max),
+                MMath.RandomInt(min, max));
         }
 
 
@@ -185,6 +221,18 @@ namespace Machina.Types.Geometry
         {
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3},{4},{5}]",
+                Math.Round(A1, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A2, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A3, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A4, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A5, MMath.STRING_ROUND_DECIMALS_DEGS),
+                Math.Round(A6, MMath.STRING_ROUND_DECIMALS_DEGS));
+        }
+
+        public string ToWhitespacedValues()
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "{0} {1} {2} {3} {4} {5}",
                 Math.Round(A1, MMath.STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(A2, MMath.STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(A3, MMath.STRING_ROUND_DECIMALS_DEGS),

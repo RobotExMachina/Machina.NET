@@ -142,7 +142,7 @@ namespace Machina.Types.Geometry
         /// <param name="origin"></param>
         /// <param name="xAxis"></param>
         /// <param name="yAxis"></param>
-        internal static Plane CreateUnsafe(Vector origin, Vector xAxis, Vector yAxis)
+        public static Plane CreateUnsafe(Vector origin, Vector xAxis, Vector yAxis)
         {
             // This is a lightweight constructor in case data is coming clean.
             Plane p = new Plane
@@ -156,7 +156,7 @@ namespace Machina.Types.Geometry
             return p;
         }
 
-        internal static Plane CreateFromMatrix(Matrix m)
+        public static Plane CreateFromMatrix(Matrix m)
         {
             return new Plane(
                 m.M14, m.M24, m.M34,

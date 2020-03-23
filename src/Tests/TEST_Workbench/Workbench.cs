@@ -18,57 +18,40 @@ namespace TEST_Workbench
             Machina.Logger.SetLogLevel(5);
             Machina.Logger.WriteLine += Console.WriteLine;
 
-
-            List<double> target = new List<double> { 0, 0, 0, 0, 90, 0 };
+            //List<double> target = new List<double> { 0, 0, 0, 0, 90, 0 };
+            List<double> target = new List<double> { 72.474, 67.689, -126.868, 0, -30.821, 287.526 };
 
             RobotModel bot = RobotModel.CreateABBIRB140();
             var frames = bot.ForwardKinematics(target, Units.Degrees);
 
-            var it = 0;
-            foreach (var m in frames)
+            //var it = 0;
+            //foreach (var m in frames)
+            //{
+            //    Console.WriteLine(it);
+            //    Console.WriteLine(m);
+            //    it++;
+            //}
+
+            Console.WriteLine(Plane.CreateFromMatrix(frames[frames.Count - 1]));
+
+            Robot arm = Robot.Create("FKTest", "ABB");
+            arm.ConnectionManager(ConnectionType.Machina);
+            arm.ControlMode(ControlType.Online);
+            arm.Connect();
+
+            arm.Message("FK TEST STARTING");
+
+            for (int i = 0; i < 25; i++)
             {
-                Console.WriteLine(it);
-                Console.WriteLine(m);
-                it++;
+                Axes a = Axes.RandomFromDoubles(-400, 400);
+                string msg = "20 " + a.ToWhitespacedValues();
+                arm.CustomCode(msg);
             }
 
+            Console.WriteLine("Press any key to DISCONNECT...");
+            Console.ReadKey();
 
-
-
-            //Plane p = new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);
-            //Console.WriteLine(p);
-            
-            //Matrix t10 = Matrix.CreateTranslation(0, 0, 10);
-            //p.Transform(t10);
-            //Console.WriteLine(p);
-            
-            //Matrix rx90 = Matrix.CreateRotationX(90);
-            //p.Transform(rx90);
-            //Console.WriteLine(p);
-
-            //Matrix rz90 = Matrix.CreateRotationZ(90);
-            //p.Transform(rz90);
-            //Console.WriteLine(p);
-
-            //Matrix r45 = Matrix.CreateRotation(Vector.ZAxis, 90, new Vector(10, 0, 0));
-            //p.Transform(r45);
-            //Console.WriteLine(p);
-
-            //Matrix s10 = Matrix.CreateScale(10);
-            //p.Transform(s10);
-            //Console.WriteLine(p);
-            //Console.WriteLine(p.ToArrayString(-1));
-
-
-            //p.Origin = new Vector(4, 5, 6);
-            //Console.WriteLine(p);
-
-            //Matrix rr = Matrix.CreateRotation(new Vector(1, 2, 3), 37, new Vector(15, 24, 10));
-            //Console.WriteLine(rr);
-
-            //p.Transform(rr);
-            //Console.WriteLine(p);
-
+            arm.Disconnect();
 
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
@@ -81,6 +64,8 @@ namespace TEST_Workbench
                 rots[i] *= factor;
             }
         }
+
+
 
     }
 }
