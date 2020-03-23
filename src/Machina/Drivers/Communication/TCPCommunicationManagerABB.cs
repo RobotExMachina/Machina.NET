@@ -504,10 +504,11 @@ namespace Machina.Drivers.Communication
                         }
                         break;
 
-                    // "$RES 400 300 500 0 0 1 0;"
+                    // "$RES X Y Z QW QX QY QZ C1 C4 C6 CX;"
                     case ABBCommunicationProtocol.RES_POSE:
                         this.initPos = new Vector(data[0], data[1], data[2]);
                         this.initRot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
+                        // do something with configuration too
                         break;
 
 
@@ -521,21 +522,16 @@ namespace Machina.Drivers.Communication
                         this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
                         break;
 
-                    // "$RES X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
+                    // "$RES X Y Z QW QX QY QZ C1 C4 C6 CX J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
                     case ABBCommunicationProtocol.RES_FULL_POSE:
                         Vector pos = new Vector(data[0], data[1], data[2]);
                         Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
-                        Axes ax = new Axes(data[7], data[8], data[9], data[10], data[11], data[12]);
-                        ExternalAxes extax = new ExternalAxes(data[13], data[14], data[15], data[16], data[17], data[18]);
+                        // configuration would go here
+                        Axes ax = new Axes(data[11], data[12], data[13], data[14], data[15], data[16]);
+                        ExternalAxes extax = new ExternalAxes(data[17], data[18], data[19], data[20], data[21], data[22]);
 
                         this._motionCursor.UpdateFullPose(pos, rot, ax, extax);
                         this._parentDriver.parentControl.RaiseMotionUpdateEvent();
-
-                        break;
-
-                    // "$RES C1 C2 C3 C4;"
-                    case ABBCommunicationProtocol.RES_CONF:
-
 
                         break;
                 }

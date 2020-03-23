@@ -93,6 +93,7 @@ MODULE Machina_Driver
     CONST num INST_CUSTOM_ACTION := 17;                 ! This is a wildcard for custom user functions that do not really fit in the Machina API (mainly Yumi gripping right now)
     CONST num INST_WOBJ := 18;                          ! (setwobj X Y Z QW QX QY QZ) --> defaults to not robot not holding wobj, fixed user coordinate system (ucs), and ucs == worldcs
     CONST num INST_NO_WOBJ := 19;                       ! (setwobj wobj0)
+    CONST num INST_CALC_FK := 20;                       ! "@ID INST J1 J2 J3 J4 J5 J6;" Requests a simple FK calculation (doesn't move the robot). Response will be "@ID INST X Y Z QW QX QY QZ C1 C2 C3 C4;"
 
     CONST num INST_STOP_EXECUTION := 100;               ! Stops execution of the server module
     CONST num INST_GET_INFO := 101;                     ! A way to retreive state information from the server (not implemented)
@@ -101,10 +102,10 @@ MODULE Machina_Driver
 
     ! (these could be straight strings since they are never used for checks...?)
     PERS num RES_VERSION := 201;                        ! "$201 1 2 1;" Sends version numbers
-    PERS num RES_POSE := 202;                           ! "$202 400 300 500 0 0 1 0;" Sends pose
+    PERS num RES_POSE := 202;                           ! "$202 400 300 500 0 0 1 0 C1 C4 C6 CX;" Sends pose
     PERS num RES_JOINTS := 203;                         ! "$203 0 0 0 0 90 0;" Sends joints
     PERS num RES_EXTAX := 204;                          ! "$204 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
-    PERS num RES_FULL_POSE := 205;                      ! "$205 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6 C1 C2 C3 C4;" Sends all pose and joint info (probably on split messages)
+    PERS num RES_FULL_POSE := 205;                      ! "$205 X Y Z QW QX QY QZ C1 C4 C6 CX J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
     PERS num RES_CONF := 206;                           ! "$206 C1 C2 C3 C4;" Sends configuration info.
 
     ! Characters used for buffer parsing
@@ -298,6 +299,9 @@ MODULE Machina_Driver
                 CASE INST_NO_WOBJ:
                     cursorWObj := wobj0;
 
+                CASE INST_CALC_FK:
+
+
                 ENDTEST
 
                 ! Send acknowledgement message
@@ -481,7 +485,11 @@ MODULE Machina_Driver
             + NumToStr(nowrt.rot.q1, STR_RND_QUAT) + STR_WHITE
             + NumToStr(nowrt.rot.q2, STR_RND_QUAT) + STR_WHITE
             + NumToStr(nowrt.rot.q3, STR_RND_QUAT) + STR_WHITE
-            + NumToStr(nowrt.rot.q4, STR_RND_QUAT) + STR_MESSAGE_END_CHAR;
+            + NumToStr(nowrt.rot.q4, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(nowrt.robconf.cf1, 0) + STR_WHITE
+            + NumToStr(nowrt.robconf.cf4, 0) + STR_WHITE
+            + NumToStr(nowrt.robconf.cf6, 0) + STR_WHITE
+            + NumToStr(nowrt.robconf.cfx, 0) + STR_MESSAGE_END_CHAR;
 
         SocketSend clientSocket \Str:=response;
     ENDPROC
@@ -520,6 +528,7 @@ MODULE Machina_Driver
 
         SocketSend clientSocket \Str:=response;
     ENDPROC
+
 
 
     !   __      __  __      __
