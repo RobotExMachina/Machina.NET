@@ -12,7 +12,7 @@ MODULE Machina_Driver
     ! waits for a TCP client, listens to a stream of formatted string messages,
     ! buffers them parsed into an 'action' struct, and runs a loop to execute them.
     !
-    ! IMPORTANT: make sure to adjust {{HOSTNAME}} and {{PORT}} to your current setup
+    ! IMPORTANT: make sure to adjust 127.0.0.1 and 7000 to your current setup
     !
     ! More info on https://github.com/RobotExMachina
     ! A project by https://github.com/garciadelcastillo
@@ -58,8 +58,8 @@ MODULE Machina_Driver
     ENDRECORD
 
     ! SERVER DATA --> to modify by user
-    PERS string SERVER_IP := "{{HOSTNAME}}";     ! Replace "{{HOSTNAME}}" with device IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
-    CONST num SERVER_PORT := {{PORT}};           ! Replace {{PORT}} with custom port number, like for example 7000
+    PERS string SERVER_IP := "127.0.0.1";     ! Replace "127.0.0.1" with device IP, typically "192.168.125.1" if working with a real robot or "127.0.0.1" if testing a virtual one (RobotStudio)
+    CONST num SERVER_PORT := 7000;           ! Replace 7000 with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
     CONST string MACHINA_SERVER_VERSION := "1.4.1";
@@ -106,7 +106,7 @@ MODULE Machina_Driver
     PERS num RES_JOINTS := 203;                         ! "$203 0 0 0 0 90 0;" Sends joints
     PERS num RES_EXTAX := 204;                          ! "$204 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
     PERS num RES_FULL_POSE := 205;                      ! "$205 X Y Z QW QX QY QZ C1 C4 C6 CX J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
-    PERS num RES_CONF := 206;                           ! "$206 C1 C2 C3 C4;" Sends configuration info.
+    PERS num RES_CALC_FK := 206;                        ! "$206 @ID X Y Z QW QX QY QZ C1 C4 C6 CX;" Sends a FK calculation as response to a INST_CALC_FK request. Carries INST ID number for identification.
 
     ! Characters used for buffer parsing
     PERS string STR_MESSAGE_END_CHAR := ";";            ! Marks the end of a message
@@ -149,6 +149,9 @@ MODULE Machina_Driver
     LOCAL VAR robtarget nowrt;
     LOCAL VAR jointtarget nowjt;
     LOCAL VAR extjoint nowexj;
+
+    ! Temp variables used for calculations
+    LOCAL VAR robtarget calcfk;
 
     ! Buffer of incoming messages
     CONST num msgBufferSize := 1000;
@@ -300,7 +303,7 @@ MODULE Machina_Driver
                     cursorWObj := wobj0;
 
                 CASE INST_CALC_FK:
-
+                    SendCalcFK(currentAction);
 
                 ENDTEST
 
@@ -477,19 +480,8 @@ MODULE Machina_Driver
     PROC SendPose()
         nowrt := CRobT(\Tool:=tool0, \WObj:=wobj0);
 
-        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_POSE, 0);
-        response := response + STR_WHITE
-            + NumToStr(nowrt.trans.x, STR_RND_MM) + STR_WHITE
-            + NumToStr(nowrt.trans.y, STR_RND_MM) + STR_WHITE
-            + NumToStr(nowrt.trans.z, STR_RND_MM) + STR_WHITE
-            + NumToStr(nowrt.rot.q1, STR_RND_QUAT) + STR_WHITE
-            + NumToStr(nowrt.rot.q2, STR_RND_QUAT) + STR_WHITE
-            + NumToStr(nowrt.rot.q3, STR_RND_QUAT) + STR_WHITE
-            + NumToStr(nowrt.rot.q4, STR_RND_QUAT) + STR_WHITE
-            + NumToStr(nowrt.robconf.cf1, 0) + STR_WHITE
-            + NumToStr(nowrt.robconf.cf4, 0) + STR_WHITE
-            + NumToStr(nowrt.robconf.cf6, 0) + STR_WHITE
-            + NumToStr(nowrt.robconf.cfx, 0) + STR_MESSAGE_END_CHAR;
+        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_POSE, 0) + STR_WHITE
+            + RobTargetToString(nowrt) + STR_MESSAGE_END_CHAR;
 
         SocketSend clientSocket \Str:=response;
     ENDPROC
@@ -525,6 +517,20 @@ MODULE Machina_Driver
             + NumToStr(nowexj.eax_d, STR_RND_MM \Exp) + STR_WHITE
             + NumToStr(nowexj.eax_e, STR_RND_MM \Exp) + STR_WHITE
             + NumToStr(nowexj.eax_f, STR_RND_MM \Exp) + STR_MESSAGE_END_CHAR;
+
+        SocketSend clientSocket \Str:=response;
+    ENDPROC
+
+
+    PROC SendCalcFK(action a)
+        VAR robtarget rt;
+        VAR jointtarget jt;
+        
+        jt := GetJointTarget(a);
+        rt := CalcRobT(jt, tool0);
+        
+        response := STR_MESSAGE_RESPONSE_CHAR + NumToStr(RES_CALC_FK, 0) + STR_WHITE
+            + RobTargetToString(rt) + STR_MESSAGE_END_CHAR;
 
         SocketSend clientSocket \Str:=response;
     ENDPROC
@@ -897,7 +903,6 @@ MODULE Machina_Driver
     ENDPROC
 
 
-
     ! Stores this action in the buffer
     PROC StoreAction(action a)
         IF isActionPosWriteWrapped = TRUE AND actionPosWrite = actionPosExecute THEN
@@ -917,6 +922,21 @@ MODULE Machina_Driver
     ENDPROC
 
 
+    ! Converts a robtarget to a string in the form "X Y Z QW QX QY QZ C1 C4 C6 CX"
+    FUNC string RobTargetToString(robtarget rt)
+        RETURN
+            NumToStr(rt.trans.x, STR_RND_MM) + STR_WHITE
+            + NumToStr(rt.trans.y, STR_RND_MM) + STR_WHITE
+            + NumToStr(rt.trans.z, STR_RND_MM) + STR_WHITE
+            + NumToStr(rt.rot.q1, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(rt.rot.q2, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(rt.rot.q3, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(rt.rot.q4, STR_RND_QUAT) + STR_WHITE
+            + NumToStr(rt.robconf.cf1, 0) + STR_WHITE
+            + NumToStr(rt.robconf.cf4, 0) + STR_WHITE
+            + NumToStr(rt.robconf.cf6, 0) + STR_WHITE
+            + NumToStr(rt.robconf.cfx, 0);
+    ENDFUNC
 
 
 
@@ -1045,8 +1065,6 @@ MODULE Machina_Driver
             + NumToStr(a.p9, 0) + " " + NumToStr(a.p10, 0) + " "
             + NumToStr(a.p11, 0) + STR_MESSAGE_END_CHAR;
     ENDPROC
-
-
 
 
     !   __     _____ __        __         _____  __      __
