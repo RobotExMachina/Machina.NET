@@ -1090,6 +1090,7 @@ namespace Machina
         /// <param name="statement">Code in the machine's native language.</param>
         /// <param name="isDeclaration">Is this a declaration, like a variable or a workobject? If so, this statement will be placed at the beginning of the program.</param>
         /// <returns></returns>
+        [ParseableFromString]
         public bool CustomCode(string statement, bool isDeclaration = false) =>
                 c.IssueCustomCodeRequest(statement, isDeclaration);
 

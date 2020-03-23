@@ -140,27 +140,29 @@ namespace Machina.Types.Geometry
 
 
         #region operators
-        /// <summary>
-        /// Are all the components of these vectors numerically equal?
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static bool operator ==(Vector a, Vector b)
-        {
-            return a._x == b._x && a._y == b._y && a._z == b._z;
-        }
+        // DEACTIVATED: doesn't work for nullity checks
+        ///// <summary>
+        ///// Are all the components of these vectors numerically equal?
+        ///// </summary>
+        ///// <param name="a"></param>
+        ///// <param name="b"></param>
+        ///// <returns></returns>
+        //public static bool operator ==(Vector a, Vector b)
+        //{
+        //    return a._x == b._x && a._y == b._y && a._z == b._z;
+        //}
 
-        /// <summary>
-        /// Are any of components of these vectors numerically not equal?
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public static bool operator !=(Vector a, Vector b)
-        {
-            return a._x != b._x || a._y != b._y || a._z == b._z;
-        }
+        // DEACTIVATED: doesn't work for nullity checks
+        ///// <summary>
+        ///// Are any of components of these vectors numerically not equal?
+        ///// </summary>
+        ///// <param name="a"></param>
+        ///// <param name="b"></param>
+        ///// <returns></returns>
+        //public static bool operator !=(Vector a, Vector b)
+        //{
+        //    return a._x != b._x || a._y != b._y || a._z == b._z;
+        //}
 
 
         /// <summary>

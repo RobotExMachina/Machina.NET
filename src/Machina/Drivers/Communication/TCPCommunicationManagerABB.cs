@@ -490,7 +490,7 @@ namespace Machina.Drivers.Communication
 
                 switch (resType)
                 {
-                    // "$20 1 2 1;" Sends version numbers
+                    // "$RES 1 2 1;" Sends version numbers
                     case ABBCommunicationProtocol.RES_VERSION:
                         this._deviceDriverVersion = Convert.ToInt32(data[0]) + "." + Convert.ToInt32(data[1]) + "." + Convert.ToInt32(data[2]);
                         int comp = Utilities.Strings.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
@@ -504,24 +504,24 @@ namespace Machina.Drivers.Communication
                         }
                         break;
 
-                    // "$21 400 300 500 0 0 1 0;"
+                    // "$RES 400 300 500 0 0 1 0;"
                     case ABBCommunicationProtocol.RES_POSE:
                         this.initPos = new Vector(data[0], data[1], data[2]);
                         this.initRot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
                         break;
 
 
-                    // "$22 0 0 0 0 90 0;"
+                    // "$RES 0 0 0 0 90 0;"
                     case ABBCommunicationProtocol.RES_JOINTS:
                         this.initAx = new Axes(data[0], data[1], data[2], data[3], data[4], data[5]);
                         break;
 
-                    // "$23 1000 9E9 9E9 9E9 9E9 9E9;"
+                    // "$RES 1000 9E9 9E9 9E9 9E9 9E9;"
                     case ABBCommunicationProtocol.RES_EXTAX:
                         this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
                         break;
 
-                    // "$24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
+                    // "$RES X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
                     case ABBCommunicationProtocol.RES_FULL_POSE:
                         Vector pos = new Vector(data[0], data[1], data[2]);
                         Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
@@ -533,7 +533,7 @@ namespace Machina.Drivers.Communication
 
                         break;
 
-                    // "$25 C1 C2 C3 C4;"
+                    // "$RES C1 C2 C3 C4;"
                     case ABBCommunicationProtocol.RES_CONF:
 
 
