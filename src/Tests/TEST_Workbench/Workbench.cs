@@ -66,8 +66,8 @@ namespace TEST_Workbench
         {
             var frames = robotModel.ForwardKinematics(args.Axes.ToList(), Units.Degrees);
             var tcp = frames.Last();
-            Console.WriteLine($"Robot: {args.Position.ToArrayString(3)}, FK: {tcp.Translation.ToArrayString(3)}");
-            Console.WriteLine($"Robot: {args.Orientation.ToQuaternion().ToArrayString(3)}, FK: {tcp.ToYawPitchRoll().ToQuaternion().ToArrayString(3)}");
+            Console.WriteLine($"Robot: {args.TCP.ToArrayString(6)}\n   FK: {tcp.ToArrayString(6)}");
+            Console.WriteLine($"SIMILAR: {args.TCP.IsSimilarTo(tcp, 0.001)}");
 
         }
 

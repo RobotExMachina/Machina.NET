@@ -541,11 +541,10 @@ namespace Machina.Drivers.Communication
                     case ABBCommunicationProtocol.RES_CALC_FK:
                         int id = (int)data[0];
                         Axes axes = new Axes(data[1], data[2], data[3], data[4], data[5], data[6]);
-                        Vector pos2 = new Vector(data[7], data[8], data[9]);
-                        Orientation ori = new Orientation(new Quaternion(data[10], data[11], data[12], data[13]));
+                        Matrix tcp = Matrix.CreateFromPositionAndQuaterion(data[7], data[8], data[9], data[10], data[11], data[12], data[13]);
                         ConfigurationABB conf = new ConfigurationABB((int)data[14], (int)data[15], (int)data[16], (int)data[17]);
 
-                        SolutionFKReceivedArgs args = new SolutionFKReceivedArgs(id, axes, pos2, ori, conf);
+                        SolutionFKReceivedArgs args = new SolutionFKReceivedArgs(id, axes, tcp, conf);
 
                         this._parentDriver.parentControl.parentRobot.OnSolutionFKReceived(args);
 

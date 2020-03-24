@@ -915,7 +915,7 @@ namespace Machina.Types.Geometry
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public static bool  CreateOrthogonal(Vector x, Vector y, out Matrix m)
+        public static bool CreateOrthogonal(Vector x, Vector y, out Matrix m)
         {
             return CreateOrthogonal(x.X, x.Y, x.Z, y.X, y.Y, y.Z, out m);
         }
@@ -934,25 +934,25 @@ namespace Machina.Types.Geometry
         /// <summary>
         /// Creates a rotation matrix from the given Quaternion rotation value.
         /// </summary>
-        /// <param name="w">The scalar part.</param>
-        /// <param name="x">The i part.</param>
-        /// <param name="y">The j part.</param>
-        /// <param name="z">The k part.</param>
+        /// <param name="qw">The scalar part.</param>
+        /// <param name="qx">The i part.</param>
+        /// <param name="qy">The j part.</param>
+        /// <param name="qz">The k part.</param>
         /// <returns>The rotation matrix.</returns>
-        public static Matrix CreateFromQuaternion(double w, double x, double y, double z)
+        public static Matrix CreateFromQuaternion(double qw, double qx, double qy, double qz)
         {
             // double implementation of Quaternion.ToRotationMatrix()
             // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
 
-            double xx2 = 2 * x * x,
-                xy2 = 2 * x * y,
-                xz2 = 2 * x * z,
-                xw2 = 2 * x * w,
-                yy2 = 2 * y * y,
-                yz2 = 2 * y * z,
-                yw2 = 2 * y * w,
-                zz2 = 2 * z * z,
-                zw2 = 2 * z * w;
+            double xx2 = 2 * qx * qx,
+                xy2 = 2 * qx * qy,
+                xz2 = 2 * qx * qz,
+                xw2 = 2 * qx * qw,
+                yy2 = 2 * qy * qy,
+                yz2 = 2 * qy * qz,
+                yw2 = 2 * qy * qw,
+                zz2 = 2 * qz * qz,
+                zw2 = 2 * qz * qw;
 
             Matrix result;
 
@@ -970,6 +970,57 @@ namespace Machina.Types.Geometry
             result.M32 = yz2 + xw2;
             result.M33 = 1 - xx2 - yy2;
             result.M34 = 0;
+
+            result.M41 = 0;
+            result.M42 = 0;
+            result.M43 = 0;
+            result.M44 = 1;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a matrix from a translation and a quaternion rotation.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="qw"></param>
+        /// <param name="qx"></param>
+        /// <param name="qy"></param>
+        /// <param name="qz"></param>
+        /// <returns></returns>
+        public static Matrix CreateFromPositionAndQuaterion(double x, double y, double z, double qw, double qx, double qy, double qz)
+        {
+            // double implementation of Quaternion.ToRotationMatrix()
+            // Based on http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
+
+            double xx2 = 2 * qx * qx,
+                xy2 = 2 * qx * qy,
+                xz2 = 2 * qx * qz,
+                xw2 = 2 * qx * qw,
+                yy2 = 2 * qy * qy,
+                yz2 = 2 * qy * qz,
+                yw2 = 2 * qy * qw,
+                zz2 = 2 * qz * qz,
+                zw2 = 2 * qz * qw;
+
+            Matrix result;
+
+            result.M11 = 1 - yy2 - zz2;
+            result.M12 = xy2 - zw2;
+            result.M13 = xz2 + yw2;
+            result.M14 = x;
+
+            result.M21 = xy2 + zw2;
+            result.M22 = 1 - xx2 - zz2;
+            result.M23 = yz2 - xw2;
+            result.M24 = y;
+
+            result.M31 = xz2 - yw2;
+            result.M32 = yz2 + xw2;
+            result.M33 = 1 - xx2 - yy2;
+            result.M34 = z;
 
             result.M41 = 0;
             result.M42 = 0;

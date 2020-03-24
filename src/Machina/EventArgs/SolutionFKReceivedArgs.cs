@@ -15,29 +15,23 @@ namespace Machina.EventArgs
 
         public Axes Axes { get; }
 
-        // Shuld probably replace pos + ori with a matrix...
-        public Vector Position { get; }
-
-        public Orientation Orientation { get; }
+        public Matrix TCP { get; }
 
         public ConfigurationABB Configuration { get; }
 
-        public SolutionFKReceivedArgs(int id, Axes axes, Vector pos, Orientation ori, ConfigurationABB conf)
+        public SolutionFKReceivedArgs(int id, Axes axes, Matrix tcp, ConfigurationABB conf)
         {
             ActionId = id;
             Axes = axes;
-            Position = pos;
-            Orientation = ori;
+            TCP = tcp;
             Configuration = conf;
         }
 
         public override string ToJSONString()
         {
-            return string.Format("{{\"event\":\"solution-fk\",\"id\":{0},\"pos\":{1},\"ori\":{2},\"quat\":{3},\"axes\":{4},\"conf\":{5}}}",
+            return string.Format("{{\"event\":\"solution-fk\",\"id\":{0},\"tcp\":{1},\"axes\":{2},\"conf\":{3}}}",
                 ActionId,
-                Position.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM),
-                Orientation.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM),
-                Orientation.ToQuaternion().ToArrayString(MMath.STRING_ROUND_DECIMALS_QUAT),
+                TCP.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM),
                 Axes.ToArrayString(MMath.STRING_ROUND_DECIMALS_DEGS),
                 Configuration.ToArrayString(0));
         }
