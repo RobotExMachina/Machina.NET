@@ -27,7 +27,7 @@
 # v0.9.0
 # GOALS
 - [x] Test the `MarvinFK` solver
-- [ ] Implement joint out of range error handling for FK
+- [x] Implement joint out of range error handling for FK
 - [ ] Base class for IK solvers
 - [ ] Implement `MarvinIK`
 - [ ] Integrate both solvers into the action-application architecture
@@ -35,7 +35,7 @@
 - [ ] Make use of the description to load the particular robot
 
 ## BUILD 1606
-
+- Add `OutOfRangeError` checks for `MarvinFK`
 
 ## BUILD 1605
 - Added `CALC-FK` instruction to the ABB driver, returns a new response with a FK calc.

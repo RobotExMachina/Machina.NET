@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Machina.Types.Geometry;
 using Machina.Descriptors.Models;
+using Machina.Solvers.Errors;
 
 namespace Machina.Solvers.FK
 {
@@ -34,7 +35,7 @@ namespace Machina.Solvers.FK
         /// <param name="jointValues">These are typically the angular rotation of the joints, but could be motion for linear joints.</param>
         /// <param name="units">Units defined for these joint values.</param>
         /// <returns>Transformation matrices for each joint.</returns>
-        internal abstract List<Matrix> ForwardKinematics(List<double> jointValues, Units units);
+        internal abstract List<Matrix> ForwardKinematics(List<double> jointValues, Units units, out List<SolverError> errors);
 
     }
 }

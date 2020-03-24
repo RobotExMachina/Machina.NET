@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Machina.Types.Geometry;
 using Machina.Descriptors.Models;
+using Machina.Solvers.Errors;
 
 namespace Machina.Solvers.FK
 {
@@ -54,7 +55,7 @@ namespace Machina.Solvers.FK
         /// <param name="jointValues"></param>
         /// <param name="units"></param>
         /// <returns></returns>
-        internal override List<Matrix> ForwardKinematics(List<double> jointValues, Units units)
+        internal override List<Matrix> ForwardKinematics(List<double> jointValues, Units units, out List<SolverError> errors)
         {
             // Sanity
             if (jointValues.Count != 6)
@@ -62,13 +63,18 @@ namespace Machina.Solvers.FK
                 throw new System.InvalidOperationException("Rotations list for complete Forward Kinematics must contain 6 elements");
             }
 
+            errors = null;
+
             // Check joint ranges
-            //if (_model.Joints[1].IsInRange(jointValues[0], units))
-            //{
-            //    // raise error...
-            //}
-
-
+            for (int i = 1; i < 7; i++)
+            {
+                if (!_model.Joints[i].IsInRange(jointValues[i - 1], units))
+                {
+                    if (errors == null) errors = new List<SolverError>();
+                    errors.Add(new JointOutOfRangeError($"Joint {i} out of range: {jointValues[i - 1]} {units}"));
+                }
+            }
+            
             // Convert to radians
             List<double> rots = new List<double>();
             if (units == Units.Degrees)

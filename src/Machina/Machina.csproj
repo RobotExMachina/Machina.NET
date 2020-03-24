@@ -137,6 +137,8 @@
     <Compile Include="Logger.cs" />
     <Compile Include="MotionUpdateArgs.cs" />
     <Compile Include="Net\Net.cs" />
+    <Compile Include="Solvers\Errors\JointOutOfRangeError.cs" />
+    <Compile Include="Solvers\Errors\SolverError.cs" />
     <Compile Include="Solvers\FK\MarvinFK.cs" />
     <Compile Include="Solvers\FK\SolverFK.cs" />
     <Compile Include="Solvers\IK\SolverIK.cs" />

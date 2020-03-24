@@ -34,18 +34,19 @@ namespace Machina.Descriptors.Components
         /// </summary>
         public RobotJointType RobotJointType { get; set; }
 
+        private Interval _jointRange;
         /// <summary>
         /// The linear/angular limitations for this joint in degrees.
         /// </summary>
         public Interval JointRange {
             get
             {
-                return JointRange;
+                return _jointRange;
             }
             set
             {
-                JointRange = value;
-                JointRangeRadians = MMath.TO_RADS * JointRange;
+                _jointRange = value;
+                JointRangeRadians = MMath.TO_RADS * _jointRange;
             }
         }
 
@@ -100,6 +101,27 @@ namespace Machina.Descriptors.Components
                 JointRange = jointRange,
                 MaxSpeed = maxSpeed
             };
+        }
+
+        /// <summary>
+        /// Checks if a particular angle value is within the range of this Joint.
+        /// </summary>
+        /// <param name="angleValue"></param>
+        /// <param name="units"></param>
+        /// <returns></returns>
+        public bool IsInRange(double angleValue, Units units)
+        {
+            switch(units)
+            {
+                case Units.Degrees:
+                    return JointRange.IncludesParameter(angleValue);
+
+                case Units.Radians:
+                    return JointRangeRadians.IncludesParameter(angleValue);
+
+                default:
+                    throw new Exception(units + " units not allowed here.");
+            }
         }
 
     }

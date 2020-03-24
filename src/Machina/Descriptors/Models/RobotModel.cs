@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Machina.Types.Geometry;
 using Machina.Solvers.FK;
 using Machina.Descriptors.Components;
+using Machina.Solvers.Errors;
 
 namespace Machina.Descriptors.Models
 {
@@ -23,9 +24,9 @@ namespace Machina.Descriptors.Models
         /// <param name="jointValues"></param>
         /// <param name="units"></param>
         /// <returns></returns>
-        public List<Matrix> ForwardKinematics(List<double> jointValues, Units units)
+        public List<Matrix> ForwardKinematics(List<double> jointValues, Units units, out List<SolverError> errors)
         {
-            return solverFK.ForwardKinematics(jointValues, units);
+            return solverFK.ForwardKinematics(jointValues, units, out errors);
         }
 
         /// <summary>
