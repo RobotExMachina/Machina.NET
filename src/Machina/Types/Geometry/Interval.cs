@@ -66,6 +66,28 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
+        /// Multiplies the extremes of this interval by a factor.
+        /// </summary>
+        /// <param name="factor"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public static Interval operator *(double factor, Interval interval)
+        {
+            return new Interval(interval.Start * factor, interval.End * factor);
+        }
+
+        /// <summary>
+        /// Multiplies the extremes of this interval by a factor.
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <param name="factor"></param>
+        /// <returns></returns>
+        public static Interval operator *(Interval interval, double factor)
+        {
+            return new Interval(interval.Start * factor, interval.End * factor);
+        }
+
+        /// <summary>
         /// Tests a value for inclusion in the interval domain.
         /// </summary>
         /// <param name="val"></param>

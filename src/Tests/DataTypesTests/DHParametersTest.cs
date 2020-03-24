@@ -128,7 +128,7 @@ namespace DataTypesTests
             RobotSixAxesArm bot = new RobotSixAxesArm();
 
             // The Base (this is currently reduntant, but we will need it down the road?).
-            bot.Base = new RobotJoint
+            bot.Joints[0] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
                 TransformedPlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
@@ -137,49 +137,49 @@ namespace DataTypesTests
                 MaxSpeed = 0
             };
 
-            bot.Joint1 = RobotJoint.CreateFromDHParameters(
-                bot.Base,
+            bot.Joints[1] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[0],
                 127.3, 0, 90, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
 
             // Values from GH tests
             Matrix j1 = Matrix.CreateFromPlane(0, 0, 127.3, 1, 0, 0, 0, 0, 1);
-            Assert.IsTrue(j1.IsSimilarTo(bot.Joint1.TransformedPlane, MMath.EPSILON2));
+            Assert.IsTrue(j1.IsSimilarTo(bot.Joints[1].TransformedPlane, MMath.EPSILON2));
             
-            bot.Joint2 = RobotJoint.CreateFromDHParameters(
-                bot.Joint1,
+            bot.Joints[2] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[1],
                 0, -612, 0, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
             Matrix j2 = Matrix.CreateFromPlane(-612, 0, 127.3, 1, 0, 0, 0, 0, 1);
-            Assert.IsTrue(j2.IsSimilarTo(bot.Joint2.TransformedPlane, MMath.EPSILON2));
+            Assert.IsTrue(j2.IsSimilarTo(bot.Joints[2].TransformedPlane, MMath.EPSILON2));
 
-            bot.Joint3 = RobotJoint.CreateFromDHParameters(
-                bot.Joint2,
+            bot.Joints[3] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[2],
                 0, -572.3, 0, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
             Matrix j3 = Matrix.CreateFromPlane(-1184.3, 0, 127.3, 1, 0, 0, 0, 0, 1);
-            Assert.IsTrue(j3.IsSimilarTo(bot.Joint3.TransformedPlane, MMath.EPSILON2));
+            Assert.IsTrue(j3.IsSimilarTo(bot.Joints[3].TransformedPlane, MMath.EPSILON2));
 
-            bot.Joint4 = RobotJoint.CreateFromDHParameters(
-                bot.Joint3,
+            bot.Joints[4] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[3],
                 163.941, 0, 90, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
             Matrix j4 = Matrix.CreateFromPlane(-1184.3, -163.941, 127.3, 1, 0, 0, 0, -1, 0);
-            Assert.IsTrue(j4.IsSimilarTo(bot.Joint4.TransformedPlane, MMath.EPSILON2));
+            Assert.IsTrue(j4.IsSimilarTo(bot.Joints[4].TransformedPlane, MMath.EPSILON2));
 
-            bot.Joint5 = RobotJoint.CreateFromDHParameters(
-                bot.Joint4,
+            bot.Joints[5] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[4],
                 115.7, 0, -90, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
             Matrix j5 = Matrix.CreateFromPlane(-1184.3, -163.941, 11.6, 1, 0, 0, 0, 0, 1);
-            Assert.IsTrue(j5.IsSimilarTo(bot.Joint5.TransformedPlane, MMath.EPSILON2));
+            Assert.IsTrue(j5.IsSimilarTo(bot.Joints[5].TransformedPlane, MMath.EPSILON2));
 
-            bot.Joint6 = RobotJoint.CreateFromDHParameters(
-                bot.Joint5,
+            bot.Joints[6] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[5],
                 92.2, 0, 0, 0,
                 RobotJointType.Revolute, Interval.Zero, 0);
             Matrix j6 = Matrix.CreateFromPlane(-1184.3, -256.141, 11.6, 1, 0, 0, 0, 0, 1);
-            Assert.IsTrue(j6.IsSimilarTo(bot.Joint6.TransformedPlane, MMath.EPSILON2));
+            Assert.IsTrue(j6.IsSimilarTo(bot.Joints[6].TransformedPlane, MMath.EPSILON2));
 
         }
     }

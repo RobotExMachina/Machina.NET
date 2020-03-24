@@ -48,7 +48,7 @@ namespace Machina.Descriptors.Models
             RobotSixAxesArm bot = new RobotSixAxesArm();
 
             // The Base (this is currently reduntant, but we will need it down the road?)
-            bot.Base = new RobotJoint
+            bot.Joints[0] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
                 TransformedPlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
@@ -58,7 +58,7 @@ namespace Machina.Descriptors.Models
             };
 
             // Joint 1
-            bot.Joint1 = new RobotJoint
+            bot.Joints[1] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
                 TransformedPlane = Matrix.CreateFromPlane(70, 0, 352, 1, 0, 0, 0, 0, -1),
@@ -68,7 +68,7 @@ namespace Machina.Descriptors.Models
             };
 
             // Joint 2
-            bot.Joint2 = new RobotJoint
+            bot.Joints[2] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(70, 0, 352, 1, 0, 0, 0, 0, -1),
                 TransformedPlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 1, 0, 0),
@@ -78,7 +78,7 @@ namespace Machina.Descriptors.Models
             };
 
             // Joint 3
-            bot.Joint3 = new RobotJoint
+            bot.Joints[3] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 1, 0, 0),
                 TransformedPlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 0, -1, 0),
@@ -88,7 +88,7 @@ namespace Machina.Descriptors.Models
             };
 
             // Joint 4
-            bot.Joint4 = new RobotJoint
+            bot.Joints[4] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(70, 0, 712, 0, 0, 1, 0, -1, 0),
                 TransformedPlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 1, 0, 0),
@@ -98,7 +98,7 @@ namespace Machina.Descriptors.Models
             };
 
             // Joint 5
-            bot.Joint5 = new RobotJoint
+            bot.Joints[5] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 1, 0, 0),
                 TransformedPlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 0, -1, 0),
@@ -108,7 +108,7 @@ namespace Machina.Descriptors.Models
             };
 
             // Joint 6
-            bot.Joint6 = new RobotJoint
+            bot.Joints[6] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(450, 0, 712, 0, 0, 1, 0, -1, 0),
                 TransformedPlane = Matrix.CreateFromPlane(515, 0, 712, 0, 0, -1, 0, 1, 0),
@@ -132,7 +132,7 @@ namespace Machina.Descriptors.Models
             RobotSixAxesArm bot = new RobotSixAxesArm();
 
             // The Base (this is currently reduntant, but we will need it down the road?).
-            bot.Base = new RobotJoint
+            bot.Joints[0] = new RobotJoint
             {
                 BasePlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
                 TransformedPlane = Matrix.CreateFromPlane(0, 0, 0, 1, 0, 0, 0, 1, 0),
@@ -141,33 +141,33 @@ namespace Machina.Descriptors.Models
                 MaxSpeed = 0
             };
 
-            bot.Joint1 = RobotJoint.CreateFromDHParameters(
-                bot.Base,
+            bot.Joints[1] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[0],
                 127.3, 0, 90, 0,
                 RobotJointType.Revolute, new Interval(-360, 360), 120);
 
-            bot.Joint2 = RobotJoint.CreateFromDHParameters(
-                bot.Joint1,
+            bot.Joints[2] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[1],
                 0, -612, 0, 0,
                 RobotJointType.Revolute, new Interval(-360, 360), 120);
 
-            bot.Joint3 = RobotJoint.CreateFromDHParameters(
-                bot.Joint2,
+            bot.Joints[3] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[2],
                 0, -572.3, 0, 0,
                 RobotJointType.Revolute, new Interval(-360, 360), 180);
 
-            bot.Joint4 = RobotJoint.CreateFromDHParameters(
-                bot.Joint3,
+            bot.Joints[4] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[3],
                 163.941, 0, 90, 0,
                 RobotJointType.Revolute, new Interval(-360, 360), 180);
 
-            bot.Joint5 = RobotJoint.CreateFromDHParameters(
-                bot.Joint4,
+            bot.Joints[5] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[4],
                 115.7, 0, -90, 0,
                 RobotJointType.Revolute, new Interval(-360, 360), 180);
 
-            bot.Joint6 = RobotJoint.CreateFromDHParameters(
-                bot.Joint5,
+            bot.Joints[6] = RobotJoint.CreateFromDHParameters(
+                bot.Joints[5],
                 92.2, 0, 0, 0,
                 RobotJointType.Revolute, new Interval(-360, 360), 180);
 

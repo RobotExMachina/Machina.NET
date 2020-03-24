@@ -34,6 +34,9 @@
 - [ ] Extract hard-coded robot into a description
 - [ ] Make use of the description to load the particular robot
 
+## BUILD 1606
+
+
 ## BUILD 1605
 - Added `CALC-FK` instruction to the ABB driver, returns a new response with a FK calc.
 - Added more array stringification to several types.

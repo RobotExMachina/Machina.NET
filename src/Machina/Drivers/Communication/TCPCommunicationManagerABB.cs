@@ -544,6 +544,7 @@ namespace Machina.Drivers.Communication
                         Matrix tcp = Matrix.CreateFromPositionAndQuaterion(data[7], data[8], data[9], data[10], data[11], data[12], data[13]);
                         ConfigurationABB conf = new ConfigurationABB((int)data[14], (int)data[15], (int)data[16], (int)data[17]);
 
+                        // Raise an event with this info
                         this._parentDriver.parentControl.parentRobot.OnSolutionFKReceived(new SolutionFKReceivedArgs(id, axes, tcp, conf));
 
                         break;

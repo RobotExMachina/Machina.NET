@@ -41,13 +41,6 @@ namespace Machina.Solvers.FK
         Vector v45 = new Vector(0, 0, 0);
         Vector v56 = new Vector(0, 0, 65);      // o6 in o5 local coords
 
-        /*
-         // Define geometry per link in local frame coordinates
-         r.v01 = new Vector3d(70, 0, 352);   // in base plane coordinates
-         r.v12 = new Vector3d(360, 0, 0);    // o2 in o1 local coordinates
-         r.v23 = new Vector3d(380, 0, 0);    // o3 in o2 local coordinates
-         r.v56 = new Vector3d(0, 0, 65);     // o6 in o5 local coordinates
-        */
 
         internal MarvinFK(RobotModel model) : base(model)
         {
@@ -68,6 +61,13 @@ namespace Machina.Solvers.FK
             {
                 throw new System.InvalidOperationException("Rotations list for complete Forward Kinematics must contain 6 elements");
             }
+
+            // Check joint ranges
+            //if (_model.Joints[1].IsInRange(jointValues[0], units))
+            //{
+            //    // raise error...
+            //}
+
 
             // Convert to radians
             List<double> rots = new List<double>();
@@ -91,10 +91,10 @@ namespace Machina.Solvers.FK
             List<Matrix> frames = new List<Matrix>();
 
             // Base
-            frames.Add(_model.Base.BasePlane);
+            frames.Add(_model.Joints[0].BasePlane);
 
             // FRAME 1
-            Plane p1 = Plane.CreateFromMatrix(_model.Base.BasePlane);
+            Plane p1 = Plane.CreateFromMatrix(_model.Joints[0].BasePlane);
             p1.Rotate(rots[0], p1.ZAxis);
             p1.Offset(v01);
             p1.Rotate(-MMath.TAU_4, p1.XAxis);

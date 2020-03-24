@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
 
-using Machina.Users;
+using Machina;
 using Machina.Types.Geometry;
+using Machina.Types.Data;
 
 using ABB.Robotics;
 using ABB.Robotics.Controllers;
@@ -16,7 +17,6 @@ using ABB.Robotics.Controllers.RapidDomain;
 using ABB.Robotics.Controllers.EventLogDomain;
 using ABB.Robotics.Controllers.FileSystemDomain;
 using ABBTask = ABB.Robotics.Controllers.RapidDomain.Task;
-
 
 namespace Machina.Drivers.Communication
 {

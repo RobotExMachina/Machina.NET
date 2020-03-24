@@ -39,7 +39,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1605;
+        public static readonly int Build = 1606;
 
         /// <summary>
         /// Version number.
@@ -1558,7 +1558,9 @@ namespace Machina
         public delegate void MotionUpdateHandler(object sender, MotionUpdateArgs args);
         internal virtual void OnMotionUpdate(MotionUpdateArgs args) => MotionUpdate?.Invoke(this, args);
 
-
+        /// <summary>
+        /// Will be raised whenever a FK solution was requested from the controlled robot. Mainly for testing and debugging purposes.
+        /// </summary>
         public event SolutionFKReceivedHandler SolutionFKReceived;
         public delegate void SolutionFKReceivedHandler(object sender, SolutionFKReceivedArgs args);
         internal virtual void OnSolutionFKReceived(SolutionFKReceivedArgs args) => SolutionFKReceived?.Invoke(this, args);

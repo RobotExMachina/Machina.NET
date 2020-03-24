@@ -35,9 +35,24 @@ namespace Machina.Descriptors.Components
         public RobotJointType RobotJointType { get; set; }
 
         /// <summary>
-        /// The linear/angular limitations for this joint.
+        /// The linear/angular limitations for this joint in degrees.
         /// </summary>
-        public Interval JointRange { get; set; }
+        public Interval JointRange {
+            get
+            {
+                return JointRange;
+            }
+            set
+            {
+                JointRange = value;
+                JointRangeRadians = MMath.TO_RADS * JointRange;
+            }
+        }
+
+        /// <summary>
+        /// The linear/angular limitations for this joint in radians.
+        /// </summary>
+        public Interval JointRangeRadians { get; private set; }
 
         /// <summary>
         /// Max joint speed in degrees/sec or mm/sec.

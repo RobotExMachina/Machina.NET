@@ -166,7 +166,7 @@
     <Compile Include="Descriptors\Cursors\RobotCursor.cs" />
     <Compile Include="Types\Data\Settings.cs" />
     <Compile Include="Tools\Tool.cs" />
-    <Compile Include="Users\User.cs" />
+    <Compile Include="Types\Data\User.cs" />
     <Compile Include="Utilities\FileIO.cs" />
     <Compile Include="Utilities\Parsing.cs" />
     <Compile Include="Utilities\Strings.cs" />
@@ -193,7 +193,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_empty.pgf" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Users\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM JL: for the time being, only copy ddlls manually to avoid breaking the dependent projects

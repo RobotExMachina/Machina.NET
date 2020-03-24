@@ -164,7 +164,7 @@ namespace Machina.Drivers
                 if (!_rsBridge.SetupStreamingMode())
                 {
                      logger.Error("Could not initialize Streaming Mode in the controller");
-                    return false;
+                     return false;
                 }
             }
             else

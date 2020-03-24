@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Machina;
+using Machina.Types.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina.Users
+namespace Machina.Types.Data
 {
     /// <summary>
     /// A class representing an user profile for signup and logging purposes.
