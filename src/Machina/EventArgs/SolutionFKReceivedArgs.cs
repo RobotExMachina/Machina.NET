@@ -9,14 +9,29 @@ using System.Threading.Tasks;
 
 namespace Machina.EventArgs
 {
+    /// <summary>
+    /// Argument for SolutionFKReceived events.
+    /// </summary>
     public class SolutionFKReceivedArgs : MachinaEventArgs
     {
+        /// <summary>
+        /// Id of the action that requested the calculation.
+        /// </summary>
         public int ActionId { get; }
 
+        /// <summary>
+        /// Axes used for the request.
+        /// </summary>
         public Axes Axes { get; }
 
+        /// <summary>
+        /// TCP computed by the robot's FK solver.
+        /// </summary>
         public Matrix TCP { get; }
 
+        /// <summary>
+        /// Robot configuration returned by the robot.
+        /// </summary>
         public ConfigurationABB Configuration { get; }
 
         public SolutionFKReceivedArgs(int id, Axes axes, Matrix tcp, ConfigurationABB conf)
