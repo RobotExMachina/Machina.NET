@@ -2229,6 +2229,18 @@ namespace Machina.Types.Geometry
 
             return new AxisAngle(x, y, z, angle, false);
         }
+
+        /// <summary>
+        /// Return the Plane representation of this Matrix.
+        /// </summary>
+        /// <returns></returns>
+        public Plane ToPlane()
+        {
+            return new Plane(
+                    M14, M24, M34,
+                    M11, M21, M31,
+                    M12, M22, M32);
+        }
         
 
         /// <summary>

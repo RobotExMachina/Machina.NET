@@ -56,6 +56,16 @@ namespace Machina.Types.Geometry
         }
 
         /// <summary>
+        /// Creates a vector with components 0.
+        /// </summary>
+        public Vector()
+        {
+            _x = 0;
+            _y = 0;
+            _z = 0;
+        }
+
+        /// <summary>
         /// Gets the value of the vector with components 0,0,0.
         /// </summary>
         public static Vector Zero

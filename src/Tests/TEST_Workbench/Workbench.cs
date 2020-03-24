@@ -22,22 +22,33 @@ namespace TEST_Workbench
             Machina.Logger.WriteLine += Console.WriteLine;
 
             //List<double> target = new List<double> { 0, 0, 0, 0, 90, 0 };
-            List<double> target = new List<double> { 259, 67.689, -126.868, 0, -30.821, 287.526 };
+            //List<double> target = new List<double> { 259, 67.689, -126.868, 0, -30.821, 287.526 };
+
+            Plane target = new Plane(300, 400, 500, -1, 0, 0, 0, 1, 0);
 
             List<SolverError> errors;
 
             robotModel = RobotModel.CreateABBIRB140();
-            var frames = robotModel.ForwardKinematics(target, Units.Degrees, out errors);
+            //var frames = robotModel.ForwardKinematics(target, Units.Degrees, out errors);
+            var rots = robotModel.InverseKinematics(target.ToMatrix(), null, null, out errors);
 
-            Console.WriteLine(frames.Last());
+            if (rots != null) Console.WriteLine(Print(rots));
 
-            foreach (var err in errors)
+            if (errors != null)
             {
-                Console.WriteLine(err);
+                foreach (var err in errors)
+                {
+                    Console.WriteLine(err);
+                }
             }
 
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static string Print(List<double> rots)
+        {
+            return $"[{rots[0]},{rots[1]},{rots[2]},{rots[3]},{rots[4]},{rots[5]}]";
         }
 
 

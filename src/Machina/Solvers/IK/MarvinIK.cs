@@ -61,8 +61,12 @@ namespace Machina.Solvers.IK
             errors = null;
             List<Solution> solutions = new List<Solution>();
 
+            Plane target = Plane.CreateFromMatrix(targetTCP);
+
             // wrist position in robot coordinates
-            Vector wrist = wristLocalPosition(targetTCP);
+            Vector wrist = wristLocalPosition(target);
+
+            Console.WriteLine("Wrist: " + wrist);
 
             return null;
         }
@@ -76,7 +80,9 @@ namespace Machina.Solvers.IK
         /// <returns></returns>
         private Vector wristLocalPosition(Plane endEffectorFrame)
         {
-            return localPoint(endEffectorFrame.PointAt(-v56.X, -v56.Y, -v56.Z));
+            Vector eep = endEffectorFrame.PointAt(-v56.X, -v56.Y, -v56.Z);
+            _model.Joints[0].BasePlane.ToPlane().RemapToPlaneSpace(eep, out Vector p);
+            return p;
         }
     }
 

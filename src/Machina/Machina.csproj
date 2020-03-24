@@ -141,6 +141,7 @@
     <Compile Include="Solvers\Errors\SolverError.cs" />
     <Compile Include="Solvers\FK\MarvinFK.cs" />
     <Compile Include="Solvers\FK\SolverFK.cs" />
+    <Compile Include="Solvers\IK\MarvinIK.cs" />
     <Compile Include="Solvers\IK\SolverIK.cs" />
     <Compile Include="Types\Data\ConfigurationABB.cs" />
     <Compile Include="Types\Data\DHParameters.cs" />
