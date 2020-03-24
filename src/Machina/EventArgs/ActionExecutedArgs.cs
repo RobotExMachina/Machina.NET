@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Machina;
+using Machina.EventArgs;
 using Machina.Types.Geometry;
 
-namespace Machina
+namespace Machina.EventArgs
 {
     //   █████╗  ██████╗████████╗██╗ ██████╗ ███╗   ██╗   ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗██████╗     █████╗ ██████╗  ██████╗ ███████╗
     //  ██╔══██╗██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║   ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║   ██║╚══██╔══╝██╔════╝██╔══██╗   ██╔══██╗██╔══██╗██╔════╝ ██╔════╝
@@ -56,13 +58,13 @@ namespace Machina
 
         public ActionExecutedArgs(Action last, int pendingExecutionOnDevice, int pendingExecutionTotal, Vector pos, Rotation ori, Axes axes, ExternalAxes extax)
         {
-            this.LastAction = last;
-            this.PendingExecutionOnDevice = pendingExecutionOnDevice;
-            this.PendingExecutionTotal = pendingExecutionTotal;
-            this.Position = pos;
-            this.Rotation = ori;
-            this.Axes = axes;
-            this.ExternalAxes = ExternalAxes;
+            LastAction = last;
+            PendingExecutionOnDevice = pendingExecutionOnDevice;
+            PendingExecutionTotal = pendingExecutionTotal;
+            Position = pos;
+            Rotation = ori;
+            Axes = axes;
+            ExternalAxes = ExternalAxes;
         }
 
         public override string ToString() => ToJSONString();
@@ -70,16 +72,16 @@ namespace Machina
         public override string ToJSONString()
         {
             return string.Format("{{\"event\":\"action-executed\",\"last\":\"{0}\",\"id\":{9},\"pendDev\":{1},\"pendTot\":{2},\"pos\":{3},\"ori\":{4},\"quat\":{5},\"axes\":{6},\"extax\":{7},\"conf\":{8}}}",
-                Utilities.Strings.EscapeDoubleQuotes(this.LastAction?.ToInstruction()) ?? "null",
-                this.PendingExecutionOnDevice,
-                this.PendingExecutionTotal,
-                this.Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
-                this.Rotation?.ToOrientation()?.ToArrayString() ?? "null",
-                this.Rotation?.Q.ToArrayString() ?? "null",
-                this.Axes?.ToArrayString() ?? "null",
-                this.ExternalAxes?.ToArrayString() ?? "null",
+                Utilities.Strings.EscapeDoubleQuotes(LastAction?.ToInstruction()) ?? "null",
+                PendingExecutionOnDevice,
+                PendingExecutionTotal,
+                Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
+                Rotation?.ToOrientation()?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
+                Rotation?.Q.ToArrayString(MMath.STRING_ROUND_DECIMALS_QUAT) ?? "null",
+                Axes?.ToArrayString(MMath.STRING_ROUND_DECIMALS_DEGS) ?? "null",
+                ExternalAxes?.ToArrayString() ?? "null",
                 "null",  // placeholder for whenever IK solvers are introduced...
-                this.LastAction == null ? "null" : this.LastAction.Id.ToString());
+                LastAction == null ? "null" : LastAction.Id.ToString());
         }
     }
 }

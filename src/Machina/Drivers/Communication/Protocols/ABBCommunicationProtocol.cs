@@ -42,6 +42,7 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int RES_JOINTS = 203;                    // "$203 0 0 0 0 90 0;"
         internal const int RES_EXTAX = 204;                     // "$204 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
         internal const int RES_FULL_POSE = 205;                 // "$205 X Y Z QW QX QY QZ C1 C4 C6 CX J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
+        internal const int RES_CALC_FK = 206;                   // "$206 ID J1 J2 J3 J4 J5 J6 X Y Z QW QX QY QZ C1 C4 C6 CX;" Sends a FK calculation as response to a INST_CALC_FK request.Carries ID number from action for identification.
 
         // Characters used for buffer parsing
         internal const char STR_MESSAGE_END_CHAR = ';';         // Marks the end of a message

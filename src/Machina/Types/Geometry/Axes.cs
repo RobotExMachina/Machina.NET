@@ -17,7 +17,7 @@ namespace Machina.Types.Geometry
     /// <summary>
     /// Represents the 6 angular rotations of the axes in a 6-axis manipulator, in degrees.
     /// </summary>
-    public class Axes : Geometry
+    public class Axes : Geometry, ISerializableArray
     {
         public double A1, A2, A3, A4, A5, A6;
 
@@ -192,6 +192,10 @@ namespace Machina.Types.Geometry
                 MMath.RandomInt(min, max));
         }
 
+        public List<double> ToList()
+        {
+            return new List<double> { A1, A2, A3, A4, A5, A6 };
+        }
 
         public override string ToString()
         {
@@ -217,16 +221,22 @@ namespace Machina.Types.Geometry
                 Math.Round(A6, MMath.STRING_ROUND_DECIMALS_DEGS));
         }
 
-        public string ToArrayString()
+        public string ToArrayString(int decimals)
         {
+            if (decimals < 0)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    $"[{A1},{A2},{A3},{A4},{A5},{A6}]");
+            }
+
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(A1, MMath.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A2, MMath.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A3, MMath.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A4, MMath.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A5, MMath.STRING_ROUND_DECIMALS_DEGS),
-                Math.Round(A6, MMath.STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(A1, decimals),
+                Math.Round(A2, decimals),
+                Math.Round(A3, decimals),
+                Math.Round(A4, decimals),
+                Math.Round(A5, decimals),
+                Math.Round(A6, decimals));
         }
 
         public string ToWhitespacedValues()

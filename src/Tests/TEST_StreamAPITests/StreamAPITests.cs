@@ -7,6 +7,7 @@ using System.Threading;
 
 using Machina;
 using Machina.Types.Geometry;
+using Machina.EventArgs;
 
 namespace TEST_StreamAPITests
 {

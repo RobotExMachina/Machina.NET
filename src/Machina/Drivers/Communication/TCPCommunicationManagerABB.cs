@@ -7,7 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Machina.Drivers.Communication.Protocols;
 using Machina.Types.Geometry;
+using Machina.Types.Data;
 using Machina.Descriptors.Cursors;
+using Machina.EventArgs;
 
 namespace Machina.Drivers.Communication
 {
@@ -532,6 +534,20 @@ namespace Machina.Drivers.Communication
 
                         this._motionCursor.UpdateFullPose(pos, rot, ax, extax);
                         this._parentDriver.parentControl.RaiseMotionUpdateEvent();
+
+                        break;
+
+                    // "$206 ID J1 J2 J3 J4 J5 J6 X Y Z QW QX QY QZ C1 C4 C6 CX;"
+                    case ABBCommunicationProtocol.RES_CALC_FK:
+                        int id = (int)data[0];
+                        Axes axes = new Axes(data[1], data[2], data[3], data[4], data[5], data[6]);
+                        Vector pos2 = new Vector(data[7], data[8], data[9]);
+                        Orientation ori = new Orientation(new Quaternion(data[10], data[11], data[12], data[13]));
+                        ConfigurationABB conf = new ConfigurationABB((int)data[14], (int)data[15], (int)data[16], (int)data[17]);
+
+                        SolutionFKReceivedArgs args = new SolutionFKReceivedArgs(id, axes, pos2, ori, conf);
+
+                        this._parentDriver.parentControl.parentRobot.OnSolutionFKReceived(args);
 
                         break;
                 }

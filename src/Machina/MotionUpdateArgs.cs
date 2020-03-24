@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Machina;
 using Machina.EventArgs;
 using Machina.Types.Geometry;
 
-namespace Machina.EventArgs
+namespace Machina
 {
     //  ███╗   ███╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗   ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗    █████╗ ██████╗  ██████╗ ███████╗
     //  ████╗ ████║██╔═══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║   ██║   ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝   ██╔══██╗██╔══██╗██╔════╝ ██╔════╝
@@ -43,10 +42,10 @@ namespace Machina.EventArgs
 
         public MotionUpdateArgs(Vector pos, Rotation ori, Axes axes, ExternalAxes extax)
         {
-            Position = pos;
-            Rotation = ori;
-            Axes = axes;
-            ExternalAxes = extax;
+            this.Position = pos;
+            this.Rotation = ori;
+            this.Axes = axes;
+            this.ExternalAxes = extax;
         }
 
         public override string ToString() => ToJSONString();
@@ -54,11 +53,11 @@ namespace Machina.EventArgs
         public override string ToJSONString()
         {
             return string.Format("{{\"event\":\"motion-update\",\"pos\":{0},\"ori\":{1},\"quat\":{2},\"axes\":{3},\"extax\":{4},\"conf\":{5}}}",
-                Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
+                this.Position?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
                 Rotation?.ToOrientation()?.ToArrayString(MMath.STRING_ROUND_DECIMALS_MM) ?? "null",
                 Rotation?.Q.ToArrayString(MMath.STRING_ROUND_DECIMALS_QUAT) ?? "null",
                 Axes?.ToArrayString(MMath.STRING_ROUND_DECIMALS_DEGS) ?? "null",
-                ExternalAxes?.ToArrayString() ?? "null",
+                this.ExternalAxes?.ToArrayString() ?? "null",
                 "null");  // placeholder for whenever IK solvers are introduced...
         }
     }

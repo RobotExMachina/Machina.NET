@@ -11,6 +11,7 @@ using System.Runtime.Serialization.Json;
 using Machina.Types;
 using Machina.Types.Geometry;
 using Machina.Types.Data;
+using Machina.EventArgs;
 
 //  ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗ 
 //  ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗
@@ -1557,6 +1558,10 @@ namespace Machina
         public delegate void MotionUpdateHandler(object sender, MotionUpdateArgs args);
         internal virtual void OnMotionUpdate(MotionUpdateArgs args) => MotionUpdate?.Invoke(this, args);
 
+
+        public event SolutionFKReceivedHandler SolutionFKReceived;
+        public delegate void SolutionFKReceivedHandler(object sender, SolutionFKReceivedArgs args);
+        internal virtual void OnSolutionFKReceived(SolutionFKReceivedArgs args) => SolutionFKReceived?.Invoke(this, args);
 
 
 

@@ -18,7 +18,7 @@ namespace Machina.Types.Geometry
     /// <summary>
     /// A class to represent a spatial rotation as a Quaternion.
     /// </summary>
-    public class Quaternion : Geometry
+    public class Quaternion : Geometry, ISerializableArray
     {
         /// <summary>
         /// W property of the Quaternion (scalar)
@@ -862,14 +862,20 @@ namespace Machina.Types.Geometry
                 Math.Round(Z, MMath.STRING_ROUND_DECIMALS_QUAT));
         }
 
-        public string ToArrayString()
+        public string ToArrayString(int decimals)
         {
-            return string.Format(CultureInfo.InvariantCulture, 
+            if (decimals < 0)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    $"[{W},{X},{Y},{Z}]");
+            }
+
+            return string.Format(CultureInfo.InvariantCulture,
                 "[{0},{1},{2},{3}]",
-                Math.Round(W, MMath.STRING_ROUND_DECIMALS_QUAT),
-                Math.Round(X, MMath.STRING_ROUND_DECIMALS_QUAT),
-                Math.Round(Y, MMath.STRING_ROUND_DECIMALS_QUAT),
-                Math.Round(Z, MMath.STRING_ROUND_DECIMALS_QUAT));
+                Math.Round(W, decimals),
+                Math.Round(X, decimals),
+                Math.Round(Y, decimals),
+                Math.Round(Z, decimals));
         }
 
     }

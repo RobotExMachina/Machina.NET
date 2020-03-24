@@ -13,6 +13,9 @@ namespace TEST_Workbench
 {
     class Workbench
     {
+        static Robot bot;
+        static RobotModel robotModel;
+
         static void Main(string[] args)
         {
             Machina.Logger.SetLogLevel(5);
@@ -21,8 +24,8 @@ namespace TEST_Workbench
             //List<double> target = new List<double> { 0, 0, 0, 0, 90, 0 };
             List<double> target = new List<double> { 72.474, 67.689, -126.868, 0, -30.821, 287.526 };
 
-            RobotModel bot = RobotModel.CreateABBIRB140();
-            var frames = bot.ForwardKinematics(target, Units.Degrees);
+            robotModel = RobotModel.CreateABBIRB140();
+            var frames = robotModel.ForwardKinematics(target, Units.Degrees);
 
             //var it = 0;
             //foreach (var m in frames)
@@ -34,27 +37,38 @@ namespace TEST_Workbench
 
             Console.WriteLine(Plane.CreateFromMatrix(frames[frames.Count - 1]));
 
-            Robot arm = Robot.Create("FKTest", "ABB");
-            arm.ConnectionManager(ConnectionType.Machina);
-            arm.ControlMode(ControlType.Online);
-            arm.Connect();
+            bot = Robot.Create("FKTest", "ABB");
+            bot.ConnectionManager(ConnectionType.Machina);
+            bot.ControlMode(ControlType.Online);
+            bot.Connect();
 
-            arm.Message("FK TEST STARTING");
+            bot.SolutionFKReceived += Arm_SolutionFKReceived;
+
+            bot.Message("FK TEST STARTING");
 
             for (int i = 0; i < 25; i++)
             {
                 Axes a = Axes.RandomFromDoubles(-400, 400);
                 string msg = "20 " + a.ToWhitespacedValues();
-                arm.CustomCode(msg);
+                bot.CustomCode(msg);
             }
 
             Console.WriteLine("Press any key to DISCONNECT...");
             Console.ReadKey();
 
-            arm.Disconnect();
+            bot.Disconnect();
 
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        private static void Arm_SolutionFKReceived(object sender, Machina.EventArgs.SolutionFKReceivedArgs args)
+        {
+            var frames = robotModel.ForwardKinematics(args.Axes.ToList(), Units.Degrees);
+            var tcp = frames.Last();
+            Console.WriteLine($"Robot: {args.Position.ToArrayString(3)}, FK: {tcp.Translation.ToArrayString(3)}");
+            Console.WriteLine($"Robot: {args.Orientation.ToQuaternion().ToArrayString(3)}, FK: {tcp.ToYawPitchRoll().ToQuaternion().ToArrayString(3)}");
+
         }
 
         static void Scale(List<double> rots, int factor)

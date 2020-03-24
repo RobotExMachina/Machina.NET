@@ -20,7 +20,7 @@ namespace Machina.Types.Geometry
     /// Defines an Orientation in three-dimensional space represented by a triplet of orthogonal XYZ unit vectors
     /// following right-hand rule orientations. Useful for spatial and rotational orientation operations. 
     /// </summary>
-    public class Orientation : Geometry
+    public class Orientation : Geometry, ISerializableArray
     {
         /**
          * NOTE: just as rotation, this class is just a wrapper around the underlying 
@@ -180,16 +180,23 @@ namespace Machina.Types.Geometry
             }
         }
 
-        public string ToArrayString()
+
+        public string ToArrayString(int decimals)
         {
+            if (decimals < 0)
+            {
+                string.Format(CultureInfo.InvariantCulture,
+                    $"[{RM.M11},{RM.M21},{RM.M31},{RM.M12},{RM.M22},{RM.M32}]");
+            }
+
             return string.Format(CultureInfo.InvariantCulture,
                 "[{0},{1},{2},{3},{4},{5}]",
-                Math.Round(this.RM.M11, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.M21, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.M31, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.M12, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.M22, MMath.STRING_ROUND_DECIMALS_MM),
-                Math.Round(this.RM.M32, MMath.STRING_ROUND_DECIMALS_MM));
+                Math.Round(this.RM.M11, decimals),
+                Math.Round(this.RM.M21, decimals),
+                Math.Round(this.RM.M31, decimals),
+                Math.Round(this.RM.M12, decimals),
+                Math.Round(this.RM.M22, decimals),
+                Math.Round(this.RM.M32, decimals));
         }
 
     }

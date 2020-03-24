@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Machina;
+using Machina.EventArgs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Machina
+namespace Machina.EventArgs
 {
     //  ███████╗██╗   ██╗███████╗███╗   ██╗████████╗ █████╗ ██████╗  ██████╗ ███████╗
     //  ██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔══██╗██╔══██╗██╔════╝ ██╔════╝
@@ -13,7 +15,7 @@ namespace Machina
     //  ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ██║  ██║██║  ██║╚██████╔╝███████║
     //  ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
     //                                                                              
-    public abstract class MachinaEventArgs : EventArgs
+    public abstract class MachinaEventArgs : System.EventArgs
     {
         /// <summary>
         /// The arguments on this event must be serializable to a JSON object.

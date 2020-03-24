@@ -21,7 +21,7 @@ namespace Machina.Types.Geometry
     /// definition inputs are possible, such as Quaternions, Rotation Matrices or
     /// Euler Angles (Yaw-Pitch-Roll).
     /// </summary>
-    public class Rotation : Geometry
+    public class Rotation : Geometry, ISerializableArray
     {
 
         // NOTE: this class is basically a wrapper containing both the AxisAngle and Quaternion 
@@ -336,14 +336,21 @@ namespace Machina.Types.Geometry
                 Math.Round(Angle, MMath.STRING_ROUND_DECIMALS_VECTOR));
         }
 
-        public string ToArrayString()
+        public string ToArrayString(int decimals)
         {
+            if (decimals < 0)
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                $"[{AA.X},{AA.Y},{AA.Z},{Angle}]");
+
+            }
+
             return string.Format(CultureInfo.InvariantCulture, 
                 "[{0},{1},{2},{3}]",
-                Math.Round(AA.X, MMath.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(AA.Y, MMath.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(AA.Z, MMath.STRING_ROUND_DECIMALS_VECTOR),
-                Math.Round(Angle, MMath.STRING_ROUND_DECIMALS_DEGS));
+                Math.Round(AA.X, decimals),
+                Math.Round(AA.Y, decimals),
+                Math.Round(AA.Z, decimals),
+                Math.Round(Angle, decimals));
         }
 
     }
