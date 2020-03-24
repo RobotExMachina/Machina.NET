@@ -8,6 +8,7 @@ using Machina.Types.Geometry;
 using Machina.Solvers.FK;
 using Machina.Descriptors.Components;
 using Machina.Solvers.Errors;
+using Machina.Solvers.IK;
 
 namespace Machina.Descriptors.Models
 {
@@ -17,6 +18,7 @@ namespace Machina.Descriptors.Models
     public abstract class RobotModel
     {
         internal SolverFK solverFK;
+        internal SolverIK solverIK;
 
         /// <summary>
         /// Compute Forward Kinematics for this RobotModel, given a list of joint values.
@@ -30,13 +32,27 @@ namespace Machina.Descriptors.Models
         }
 
         /// <summary>
-        /// Links an instance of a SolveFK to this RobotModel. 
+        /// Compute the Inverse Kinematics for this device, given a Matrix representing the TCP.
+        /// </summary>
+        /// <param name="targetTCP"></param>
+        /// <param name="prevTCP"></param>
+        /// <param name="tool"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
+        public List<double> InverseKinematics(Matrix targetTCP, Matrix? prevTCP, Tool tool, out List<SolverError> errors)
+        {
+            return solverIK.InverseKinematics(targetTCP, prevTCP, tool, out errors);
+        }
+
+        /// <summary>
+        /// Links sovler instances to this RobotModel. 
         /// </summary>
         /// <param name="solverFK"></param>
         /// <returns></returns>
-        internal bool AssignSolverFK(SolverFK solverFK)
+        internal bool AssignSolvers(SolverFK solverFK, SolverIK solverIK)
         {
             this.solverFK = solverFK;
+            this.solverIK = solverIK;
             return true;
         }
 
@@ -118,8 +134,8 @@ namespace Machina.Descriptors.Models
                 MaxSpeed = 450
             };
 
-            // Assign a FK solver.
-            bot.AssignSolverFK(new MarvinFK(bot));
+            // Assign solvers
+            bot.AssignSolvers(new MarvinFK(bot), new MarvinIK(bot));
 
             return bot;
         }
