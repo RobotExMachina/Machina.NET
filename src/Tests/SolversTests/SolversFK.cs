@@ -65,7 +65,7 @@ namespace SolversTests
 
         private static void Arm_SolutionFKReceived(object sender, Machina.EventArgs.SolutionFKReceivedArgs args)
         {
-            var frames = robotModel.ForwardKinematics(args.Axes.ToList(), Units.Degrees);
+            var frames = robotModel.ForwardKinematics(args.Axes.ToList(), Units.Degrees, out _);
             var tcp = frames.Last();
             Console.WriteLine($"Robot: {args.TCP.ToArrayString(6)}\n   FK: {tcp.ToArrayString(6)}");
             Assert.IsTrue(args.TCP.IsSimilarTo(tcp, 0.001), "FK solution differs from the robot's");

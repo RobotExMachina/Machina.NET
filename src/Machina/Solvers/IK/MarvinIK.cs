@@ -71,6 +71,29 @@ namespace Machina.Solvers.IK
             // Arm solutions
             var armSolutions = InverseKinematicsArm(wrist);
 
+            // Full solutions
+            for (int i = 0; i < 4; i++)
+            {
+                var armSol = armSolutions[i];
+
+                // If arm could reach here, ad two invalid solutions
+                if (armSol == null)
+                {
+                    solutions.Add(null);
+                    solutions.Add(null);
+                }
+                // Otherwise, compute wrist solutions and add them
+                else
+                {
+                    // @TODO: continue here! 
+                    // There is a problem, which is that my robot definition keeps the wrist plane
+                    // before the wrist, as opposed to MARVIN. For Joint4, wrist plane is already in place,
+                    // but has an extra rotation. The decoupling doesn't work like this, will have to do 
+                    // some edits to fix it.
+                    continue here;
+                }
+            }
+
 
             Console.WriteLine("Wrist: " + wrist);
             foreach (var sol in armSolutions)
