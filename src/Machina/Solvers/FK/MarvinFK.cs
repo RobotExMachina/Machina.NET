@@ -37,7 +37,7 @@ namespace Machina.Solvers.FK
         // be more generalizable! 
         Vector v01 = new Vector(70, 0, 352);    // o1 in base plane coords
         Vector v12 = new Vector(0, -360, 0);    // o2 in o1 local coords
-        Vector v23 = new Vector(0, 0, 0);       
+        Vector v23 = new Vector(0, 0, 0);
         Vector v34 = new Vector(0, 0, 380);     // o4 in o3 local coords
         Vector v45 = new Vector(0, 0, 0);
         Vector v56 = new Vector(0, 0, 65);      // o6 in o5 local coords
@@ -52,7 +52,7 @@ namespace Machina.Solvers.FK
 
         internal MarvinFK(RobotModel model) : base(model)
         {
-            _model = (RobotSixAxesArm) model;  // we want an exception if this doesn't work...
+            _model = (RobotSixAxesArm)model;  // we want an exception if this doesn't work...
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Machina.Solvers.FK
                     errors.Add(new JointOutOfRangeError($"Joint {i} out of range: {jointValues[i - 1]} {units}"));
                 }
             }
-            
+
             // Convert to radians
             List<double> rots = new List<double>();
             if (units == Units.Degrees)
@@ -106,13 +106,32 @@ namespace Machina.Solvers.FK
             // Base
             frames.Add(_model.Joints[0].BasePlane);
 
+            // Arm portion
+            frames.AddRange(ForwardKinematicsArm(rots));
+
+            // Wrist portion
+            frames.AddRange(ForwardKinematicsWrist(rots, frames.Last().ToPlane()));
+            
+            return frames;
+        }
+
+        /// <summary>
+        /// Computes the arm part of the FK until the wrist plane. 
+        /// </summary>
+        /// <param name="rots"></param>
+        /// <returns></returns>
+        public List<Matrix> ForwardKinematicsArm(List<double> rots)
+        {
+            // List of joint frames
+            List<Matrix> frames = new List<Matrix>();
+
             // FRAME 1
             Plane p1 = Plane.CreateFromMatrix(_model.Joints[0].BasePlane);
             p1.Rotate(rots[0], p1.ZAxis);
             p1.Offset(v01);
             p1.Rotate(-MMath.TAU_4, p1.XAxis);
             frames.Add(p1.ToMatrix());
-            
+
             // FRAME 2
             Plane p2 = p1;
             p2.Rotate(rots[1], p2.ZAxis);
@@ -134,8 +153,22 @@ namespace Machina.Solvers.FK
             p4.Rotate(MMath.TAU_4, p4.XAxis);
             frames.Add(p4.ToMatrix());
 
+            return frames;
+        }
+
+        /// <summary>
+        /// Computes the wrist part of the FK.
+        /// </summary>
+        /// <param name="rots"></param>
+        /// <param name="wristPlane"></param>
+        /// <returns></returns>
+        public List<Matrix> ForwardKinematicsWrist(List<double> rots, Plane wristPlane)
+        {
+            // List of joint frames
+            List<Matrix> frames = new List<Matrix>();
+
             // FRAME 5
-            Plane p5 = p4;
+            Plane p5 = wristPlane;
             p5.Rotate(rots[4], p5.ZAxis);
             p5.Offset(v45);
             p5.Rotate(-MMath.TAU_4, p5.XAxis);
@@ -150,6 +183,5 @@ namespace Machina.Solvers.FK
 
             return frames;
         }
-
     }
 }
