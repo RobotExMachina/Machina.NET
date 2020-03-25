@@ -67,6 +67,11 @@ namespace Machina
         public const double TAU_2 = Math.PI;
 
         /// <summary>
+        /// Aaaaaaaalriiiight... PI is here too...
+        /// </summary>
+        public const double PI = Math.PI;
+
+        /// <summary>
         /// An alias for 0.5 * PI :)... See https://fathom.info/notebook/11298/
         /// </summary>
         public const double TAU_4 = 0.5 * Math.PI;

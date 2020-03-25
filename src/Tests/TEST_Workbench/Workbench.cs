@@ -24,7 +24,8 @@ namespace TEST_Workbench
             //List<double> target = new List<double> { 0, 0, 0, 0, 90, 0 };
             //List<double> target = new List<double> { 259, 67.689, -126.868, 0, -30.821, 287.526 };
 
-            Plane target = new Plane(300, 400, 500, -1, 0, 0, 0, 1, 0);
+            //Plane target = new Plane(300, 400, 500, -1, 0, 0, 0, 1, 0);
+            Plane target = new Plane(450, 0, 647, -1, 0, 0, 0, 1, 0);
 
             List<SolverError> errors;
 

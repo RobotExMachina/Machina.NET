@@ -2244,7 +2244,7 @@ namespace Machina.Types.Geometry
         
 
         /// <summary>
-        /// Return the YawPitchRoll representation of this matrix.s
+        /// Return the YawPitchRoll representation of this Matrix.
         /// </summary>
         /// <returns></returns>
         public YawPitchRoll ToYawPitchRoll()

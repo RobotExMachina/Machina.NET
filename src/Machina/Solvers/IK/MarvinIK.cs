@@ -61,16 +61,103 @@ namespace Machina.Solvers.IK
             errors = null;
             List<Solution> solutions = new List<Solution>();
 
+            // Going back and forth between Planes and Matrices makes no sense, 
+            // but let's stick to it here since that was the original implementation. 
             Plane target = Plane.CreateFromMatrix(targetTCP);
 
-            // wrist position in robot coordinates
-            Vector wrist = wristLocalPosition(target);
+            // Wrist position in robot coordinates
+            Vector wrist = WristLocalPosition(target);
+
+            // Arm solutions
+            var armSolutions = InverseKinematicsArm(wrist);
+
 
             Console.WriteLine("Wrist: " + wrist);
+            foreach (var sol in armSolutions)
+            {
+                
+                Console.WriteLine(sol);
+            }
 
             return null;
         }
 
+        /// <summary>
+        /// Given a point in local robot coordinates, returns a list of 4 
+        /// Solutions representing the rotations of the 4 possible solutions 
+        /// (left/right arm, elbow up/down). If invalid solution, null instead. 
+        /// </summary>
+        /// <param name="wrist"></param>
+        /// <returns></returns>
+        private List<Solution> InverseKinematicsArm(Vector wrist)
+        {
+            double j3max = _model.Joints[3].JointRangeRadians.Max;
+
+            // Solve arm IK
+            var solutions = new List<Solution>();
+            for (int i = 0; i < 4; i++)
+            {
+                Solution sol = new Solution();
+                double r;
+
+                // Q1
+                // Left arm
+                if (i < 2)
+                {
+                    sol.Rotations[0] = Math.Atan2(wrist.Y, wrist.X);
+                    r = Math.Sqrt(wrist.X * wrist.X + wrist.Y * wrist.Y) - v01.X;
+                }
+                // Right arm
+                else
+                {
+                    sol.Rotations[0] = MMath.TAU_2 + Math.Atan2(wrist.Y, wrist.X);
+                    if (sol.Rotations[0] > MMath.TAU_2) sol.Rotations[0] -= MMath.TAU;
+                    r = -(Math.Sqrt(wrist.X * wrist.X + wrist.Y * wrist.Y) + v01.X);
+                }
+
+                double s = wrist.Z - v01.Z;
+                double D = (v12.Y * v12.Y + v34.Z * v34.Z - r * r - s * s) / (2 * -v12.Y * v34.Z);
+                double disc = 1 - D * D;
+                if (disc < 0)
+                {
+                    solutions.Add(null);
+                    continue;  // go to next solution (this one is out of reach)
+                }
+                double sqDisc = Math.Sqrt(disc);
+
+                // Q3
+                // elbow up
+                if (i % 2 == 0)
+                {
+                    sol.Rotations[2] = MMath.TAU_4 - Math.Atan2(sqDisc, D);
+                }
+                // elbow down
+                else
+                {
+                    sol.Rotations[2] = MMath.TAU_4 - Math.Atan2(-sqDisc, D);
+                }
+                // capping the solution
+                if (sol.Rotations[2] > j3max)
+                {
+                    sol.Rotations[2] -= MMath.TAU;
+                }
+
+                // Q2
+                sol.Rotations[1] = MMath.TAU_4 - Math.Atan2(s, r) - Math.Atan2(v34.Z * Math.Cos(sol.Rotations[2]), -v12.Y - v34.Z * Math.Sin(sol.Rotations[2]));
+                if (sol.Rotations[1] > MMath.PI)
+                {
+                    sol.Rotations[1] -= MMath.TAU;
+                }
+
+                sol.ArmConfiguration = i;
+                sol.ToDegrees();
+
+                // add this solution to list
+                solutions.Add(sol);
+            }
+
+            return solutions;
+        }
 
         /// <summary>
         /// Given the end effector frame in world coordinates,
@@ -78,7 +165,7 @@ namespace Machina.Solvers.IK
         /// </summary>
         /// <param name="endEffectorFrame"></param>
         /// <returns></returns>
-        private Vector wristLocalPosition(Plane endEffectorFrame)
+        private Vector WristLocalPosition(Plane endEffectorFrame)
         {
             Vector eep = endEffectorFrame.PointAt(-v56.X, -v56.Y, -v56.Z);
             _model.Joints[0].BasePlane.ToPlane().RemapToPlaneSpace(eep, out Vector p);
@@ -91,18 +178,45 @@ namespace Machina.Solvers.IK
     internal class Solution
     {
         public List<double> Rotations;
-        public int ArmConfiguration;  // this is a number 0-3 representing 
+        public int ArmConfiguration;  // this is a number 0-3 representing (left/right arm, elbow up/down)
+        public Units Units;
 
-        // a valid solution
-        public Solution(List<double> rots, int _armConfig)
+
+        // A valid solution
+        public Solution(List<double> rots, int _armConfig, Units units)
         {
             Rotations = rots;
             ArmConfiguration = _armConfig;
         }
 
+        public Solution()
+        {
+            Rotations = new List<double>() { 0, 0, 0, 0, 0, 0 };
+            ArmConfiguration = -1;
+            Units = Units.Undefined;
+        }
+
+        public void ToDegrees()
+        {
+            for (int i = 0; i < Rotations.Count; i++)
+            {
+                Rotations[i] *= MMath.TO_DEGS;
+            }
+            Units = Units.Degrees;
+        }
+
+        public void ToRadians()
+        {
+            for (int i = 0; i < Rotations.Count; i++)
+            {
+                Rotations[i] *= MMath.TO_RADS;
+            }
+            Units = Units.Radians;
+        }
+
         public override string ToString()
         {
-            return $"[{Rotations[0]},{Rotations[1]},{Rotations[2]},{Rotations[3]},{Rotations[4]},{Rotations[5]},{ArmConfiguration}]";
+            return $"[{Rotations[0]},{Rotations[1]},{Rotations[2]},{Rotations[3]},{Rotations[4]},{Rotations[5]},{ArmConfiguration},{Units}]";
         }
     }
 }
