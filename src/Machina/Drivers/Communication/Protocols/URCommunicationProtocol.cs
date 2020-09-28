@@ -44,7 +44,7 @@ namespace Machina.Drivers.Communication.Protocols
         //   internal const int INST_POPUP = 11                   // [ID, CODE, MSG] (in (string) "msg" + STR_MESSAGE_END_CHAR) (NOT IMPLEMENTED)
         internal const int INST_SET_TOOL = 12;               // [ID, CODE, X, Y, Z, RX, RY, RZ, KG] (in (int) M * FACTOR_M, RAD * FACTOR_RAD, KG * FACTOR_KG)
         internal const int INST_SET_DIGITAL_OUT = 13;        // [ID, CODE, PIN, ON, TOOL] (in (int), bool) 
-        internal const int INST_SET_ANALOG_OUT = 14;         // [ID, CODE, PIN, VOLTAGE, TOOL] (in (int) VOLTAGE * FACTOR_VOLT) (there is no analog out on the tool)
+        internal const int INST_SET_ANALOG_OUT = 14;         // [ID, CODE, PIN, VOLTAGE] (in (int) VOLTAGE * FACTOR_VOLT) (there is no analog out on the tool)
         // This value sets the same speed value for TCP and Q, taken as mm/s and deg/s. E.g: if setting to 20 mm/s or deg/s, the received value should be 0.02 m/s * FACTOR_M, and this will be converted internally to 0.349 rad/s (=20 deg/s)
         internal const int INST_ALL_SPEED = 15;              // [ID, CODE, VEL] (in (int) M/S * FACTOR_M)
         // Similarly here, a received value in "puffed" m/s^2 will be internally translated to rad/s^2

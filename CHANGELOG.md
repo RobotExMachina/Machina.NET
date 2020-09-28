@@ -28,6 +28,11 @@
 - [ ] `noTool` gets declared on every ABB program, even if not used. Fix this, and probably use `tool0` on compilation?
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
+
+# v0.8.13
+## BUILD 1505
+- Fixed a bug with `WriteAnalog` on `UR` devices.
+
 # v0.8.12b
 ## BUILD 1504
 `Action.Id` generation comes from a `static` counter in the `Action` class. This had a couple problems:
