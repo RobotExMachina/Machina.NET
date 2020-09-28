@@ -663,7 +663,7 @@ namespace Machina.Descriptors.Cursors
                     return false;
                 }
 
-                newPosition.Set(action.translation);
+                newPosition = new Vector(action.translation);
             }
 
             // @TODO: this must be more programmatically implemented 

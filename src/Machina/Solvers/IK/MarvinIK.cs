@@ -90,7 +90,7 @@ namespace Machina.Solvers.IK
                     // before the wrist, as opposed to MARVIN. For Joint4, wrist plane is already in place,
                     // but has an extra rotation. The decoupling doesn't work like this, will have to do 
                     // some edits to fix it.
-                    continue here;
+                    //continue here;
                 }
             }
 

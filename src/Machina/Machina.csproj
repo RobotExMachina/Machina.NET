@@ -135,7 +135,6 @@
     <Compile Include="Interfaces.cs" />
     <Compile Include="IO\IO.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="MotionUpdateArgs.cs" />
     <Compile Include="Net\Net.cs" />
     <Compile Include="Solvers\Errors\JointOutOfRangeError.cs" />
     <Compile Include="Solvers\Errors\SolverError.cs" />

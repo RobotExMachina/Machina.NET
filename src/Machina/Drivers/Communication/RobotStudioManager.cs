@@ -873,13 +873,15 @@ namespace Machina.Drivers.Communication
         {
             if (!_isConnected)
             {
-                throw new Exception("Cannot load program, not connected to controller");
+                logger.Error("Cannot load program, not connected to controller");
+                return false;
             }
 
             string path = Path.Combine(Path.GetTempPath(), targetName);
             if (!IO.SaveStringToFile(path, module, Encoding.ASCII))
             {
-                throw new Exception("Could not save module to temp file");
+                logger.Error("Could not save module to temp file");
+                return false;
             }
             else
             {
@@ -888,12 +890,14 @@ namespace Machina.Drivers.Communication
 
             if (!UploadFileToController(path))
             {
-                throw new Exception($"Could not upload module {path} to controller");
+                logger.Error($"Could not upload module {path} to controller");
+                return false;
             }
 
             if (!LoadModuleFromControllerToTask(task, targetName))
             {
-                throw new Exception($"Could not load module {targetName} from controller to task {task.Name}");
+                logger.Error($"Could not load module {targetName} from controller to task {task.Name}");
+                return false;
             }
 
             return true;
@@ -912,17 +916,18 @@ namespace Machina.Drivers.Communication
 
             if (!_isConnected)
             {
-                throw new Exception($"Could not load module '{fullPath}', not connected to controller");
+                logger.Error($"Could not load module '{fullPath}', not connected to controller");
+                return false;
             }
 
             // check for correct ABB file extension
             if (!extension.ToLower().Equals(".mod"))
             {
-                throw new Exception("Wrong file type, must use .mod files for ABB robots");
+                logger.Error("Wrong file type, must use .mod files for ABB robots");
+                return false;
             }
 
             // Upload the module
-            bool success = false;
             try
             {
                 using (Mastership.Request(controller.Rapid))
@@ -950,8 +955,9 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
+                logger.Error("Could not upload module to controller");
                 logger.Debug(ex);
-                throw new Exception("ERROR: Could not upload module to controller");
+                return false;
             }
 
             return true;
@@ -971,7 +977,8 @@ namespace Machina.Drivers.Communication
             {
                 if (ClearAllModules(task) < 0)
                 {
-                    throw new Exception($"Error clearing modules on task {task.Name}");
+                    logger.Error($"Error clearing modules on task {task.Name}");
+                    return false;
                 }
             }
 
@@ -996,8 +1003,10 @@ namespace Machina.Drivers.Communication
             }
             catch (Exception ex)
             {
+                logger.Error("Could not LoadModuleFromControllerToTask");
                 logger.Debug(ex);
-                throw new Exception("ERROR: Could not LoadModuleFromControllerToTask");
+
+                return false;
             }
 
             if (success)
