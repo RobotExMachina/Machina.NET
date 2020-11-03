@@ -30,6 +30,9 @@
 
 
 # v0.8.13
+## BUILD 1506
+- Fixed bug that wouldn't allow `WriteAnalog` and `WriteDigital` to be exected on the same program.
+
 ## BUILD 1505
 - Fixed a bug with `WriteAnalog` on `UR` devices.
 

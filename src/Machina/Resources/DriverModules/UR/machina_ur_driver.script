@@ -193,8 +193,8 @@ def machina_ur_driver():
         end
 
       elif action_code == INST_SET_ANALOG_OUT:
-        params3 = socket_read_binary_integer(2)
-        set_standard_analog_out(params3[1], params3[2] / FACTOR_VOLT)
+        params2 = socket_read_binary_integer(2)
+        set_standard_analog_out(params2[1], params2[2] / FACTOR_VOLT)
 
       elif action_code == INST_ALL_SPEED:
         params1 = socket_read_binary_integer(1)
