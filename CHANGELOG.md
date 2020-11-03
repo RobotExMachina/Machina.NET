@@ -29,10 +29,11 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 
-# v0.8.13
+# v0.8.13b
 ## BUILD 1506
 - Fixed bug that wouldn't allow `WriteAnalog` and `WriteDigital` to be exected on the same program.
 
+# v0.8.13
 ## BUILD 1505
 - Fixed a bug with `WriteAnalog` on `UR` devices.
 
