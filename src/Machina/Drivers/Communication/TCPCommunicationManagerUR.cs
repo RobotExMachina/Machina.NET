@@ -133,9 +133,12 @@ namespace Machina.Drivers.Communication
                     _isServerListeningRunning = false;
 
                     // TESTING
-                    _robotSocket.Close();
-                    _robotSocket.Dispose();
-                    _robotSocket = null;
+                    if (_robotSocket != null)
+                    {
+                        _robotSocket.Close();
+                        _robotSocket.Dispose();
+                        _robotSocket = null;
+                    }
 
                     _serverSocket.Stop();
                     _serverSocket = null;

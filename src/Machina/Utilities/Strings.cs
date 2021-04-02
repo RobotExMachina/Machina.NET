@@ -163,12 +163,12 @@ namespace Machina.Utilities
                 return str;
 
             string s = str;
-            while (s[0] == rem)
+            while (s.Length > 0 && s[0] == rem)
             {
                 s = s.Remove(0, 1);
             }
 
-            while (s[s.Length - 1] == rem)
+            while (s.Length > 0 && s[s.Length - 1] == rem)
             {
                 s = s.Remove(s.Length - 1);
             }
@@ -227,6 +227,16 @@ namespace Machina.Utilities
         public static string RemoveString(string str, string rem)
         {
             return str.Replace(rem, "");
+        }
+
+        /// <summary>
+        /// Given a string, removes \r\n new line characters. 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string RemoveNewLineChars(string str)
+        {
+            return str.Replace("\n", "").Replace("\r", "");
         }
     }    
 }

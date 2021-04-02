@@ -81,24 +81,17 @@ namespace Machina.Utilities
         /// <returns></returns>
         public static string[] SplitStatements(string program, char statementSeparator, string inlineCommentSymbol)
         {
-            // Clean new line chars
-            //string inline = Strings.RemoveString(program, Environment.NewLine);  // not working if received a string from a different system (like a ws message)
-            
-            // Clean new line chars from any system
-            string inline = Strings.RemoveString(program, "\n");
-            inline = Strings.RemoveString(inline, "\r");
+            // Remove inline comments
+            string clean = RemoveInLineComments(program, inlineCommentSymbol);
 
-            // Split by statement
-            //string[] statements = inline.Split(new char[] {statementSeparator}, StringSplitOptions.RemoveEmptyEntries);
+            // Clean new line chars from any system
+            string inline = Strings.RemoveNewLineChars(clean);
 
             // Split by statement maintaining chars wrapped in doublequotes https://stackoverflow.com/a/1757107/1934487
-            string[] statements = Machina.Utilities.Strings.RemoveEmptyLines(Regex.Split(inline, statementSeparator + "(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")).ToArray();
+            string[] statements = Regex.Split(inline, statementSeparator + "(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-            // Remove inline comments
-            for (int i = 0; i < statements.Length; i++)
-            {
-                statements[i] = RemoveInLineComments(statements[i], inlineCommentSymbol);
-            }
+            // Clean empty lines
+            statements = Strings.RemoveEmptyLines(statements).ToArray();
 
             // Clean preceding-trailing whitespaces
             for (int i = 0; i < statements.Length; i++)
@@ -110,16 +103,23 @@ namespace Machina.Utilities
         }
 
         /// <summary>
-        /// Given a line of code, returns a new one with all inline comments removed from it.
+        /// Given a full program, returns the same program without inline comments.
+        /// @TODO: this should avoid characters wrapped in double quotes... 
         /// </summary>
-        /// <param name="instruction"></param>
+        /// <param name="code"></param>
         /// <param name="commentSymbol"></param>
         /// <returns></returns>
-        public static string RemoveInLineComments(string instruction, string commentSymbol)
+        public static string RemoveInLineComments(string program, string commentSymbol)
         {
-            bool commented = Regex.IsMatch(instruction, commentSymbol);
-            if (!commented) return instruction;
-            return instruction.Split(new string[] { commentSymbol }, StringSplitOptions.None)[0];
+            // This expression will match anything starting with the comment symbol, 
+            // and up to any form of newline character. 
+            // This is better than just `.*` because this was capturing (and removing) `\r`,
+            // probably because it is not a Windows newline char. 
+            // https://regex101.com/r/Q845DQ/1
+            string re = commentSymbol + ".*?(?=\r\n|\n\r|\n|\r)";
+
+            return Regex.Replace(program, re, "");
         }
+
     }    
 }
