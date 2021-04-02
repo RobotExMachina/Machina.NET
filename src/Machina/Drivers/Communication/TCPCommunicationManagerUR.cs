@@ -178,6 +178,11 @@ namespace Machina.Drivers.Communication
                 }
                 logger.Debug("Machina local IP: " + _serverIP);
 
+                //// DIRTY FIX FOR REMOTE TESTING RUNNING ON TWO NETWORKS
+                //// Override local IP manually
+                //_serverIP = "192.168.0.100";
+                //logger.Warning("Machina local IP OVERRIDEN TO: " + _serverIP);
+
                 _serverSocket = new TcpListener(IPAddress.Parse(_serverIP), _serverPort);
                 _serverSocket.Start();
 

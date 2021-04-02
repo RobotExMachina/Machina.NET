@@ -82,7 +82,11 @@ namespace Machina.Utilities
         public static string[] SplitStatements(string program, char statementSeparator, string inlineCommentSymbol)
         {
             // Clean new line chars
-            string inline = Strings.RemoveString(program, Environment.NewLine);
+            //string inline = Strings.RemoveString(program, Environment.NewLine);  // not working if received a string from a different system (like a ws message)
+            
+            // Clean new line chars from any system
+            string inline = Strings.RemoveString(program, "\n");
+            inline = Strings.RemoveString(inline, "\r");
 
             // Split by statement
             //string[] statements = inline.Split(new char[] {statementSeparator}, StringSplitOptions.RemoveEmptyEntries);
