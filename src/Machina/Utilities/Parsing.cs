@@ -121,5 +121,33 @@ namespace Machina.Utilities
             return Regex.Replace(program, re, "");
         }
 
+
+        public static T ParseEnumValue<T>(string name) where T : Enum
+        {
+            T t;
+            Type type = typeof(T);
+            try
+            {
+                t = (T)Enum.Parse(type, name, true);
+                if (Enum.IsDefined(type, t))
+                {
+                    return t;
+                }
+                else
+                {
+                    throw new Exception("Undefined value");
+                }
+            }
+            catch (Exception)
+            {
+                Machina.Logger.Error($"{name} is not a {type}, please specify one of the following: ");
+                foreach (string str in Enum.GetNames(type))
+                {
+                    Machina.Logger.Error(str);
+                }
+            }
+            return default;
+        }
+
     }    
 }

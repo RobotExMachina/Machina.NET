@@ -130,23 +130,25 @@ namespace Machina
         /// <returns></returns>
         static public Robot Create(string name, string make)
         {
-            RobotType rt;
-            try
-            {
-                rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
-                if (Enum.IsDefined(typeof(RobotType), rt))
-                {
-                    return new Robot(name, rt);
-                }
-            }
-            catch
-            {
-                Machina.Logger.Error($"{make} is not a RobotType, please specify one of the following: ");
-                foreach (string str in Enum.GetNames(typeof(RobotType)))
-                {
-                    Machina.Logger.Error(str);
-                }
-            }
+            //RobotType rt;
+            //try
+            //{
+            //    rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
+            //    if (Enum.IsDefined(typeof(RobotType), rt))
+            //    {
+            //        return new Robot(name, rt);
+            //    }
+            //}
+            //catch
+            //{
+            //    Machina.Logger.Error($"{make} is not a RobotType, please specify one of the following: ");
+            //    foreach (string str in Enum.GetNames(typeof(RobotType)))
+            //    {
+            //        Machina.Logger.Error(str);
+            //    }
+            //}
+
+            RobotType rt = Utilities.Parsing.ParseEnumValue<RobotType>(make);
 
             return null;
         }
