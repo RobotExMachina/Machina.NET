@@ -48,22 +48,37 @@ namespace Machina
 
             // HEADER file
             RobotProgramFile datFile = new RobotProgramFile(programName, "dat", Encoding, CC);
-            
-            List<string> header = new List<string>();
-            header.AddRange(GenerateDisclaimerHeader(programName));
-            header.Add("&ACCESS RVP");
-            header.Add("& REL 1");
-            header.Add("& PARAM EDITMASK = *");
-            header.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
-            header.Add(@"& PARAM DISKPATH = KRC:\R1\Program");  // @TODO: this path should be programmatically generated...
-            header.Add(string.Format("DEFDAT  {0}", programName));
-            header.Add("EXT BAS (BAS_COMMAND: IN, REAL: IN)");
-            header.Add("DECL INT SUCCESS");
-            header.Add("ENDDAT");
 
+            /* We might not even need to include any header for a clean program (Arastoo a.khajehee@gmail.com)
+             * 
+                List<string> header = new List<string>();
+                header.AddRange(GenerateDisclaimerHeader(programName));
+                header.Add("&ACCESS RVP");
+                header.Add("&REL 1");
+                header.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
+                header.Add("&PARAM EDITMASK = *");
+
+            */
+
+            /*
+             * 
+             * // This line might also be optional (Arastoo)
+                  header.Add(@"&PARAM DISKPATH = KRC:\R1\Program");  // @TODO: this path should be programmatically generated...
+            
+             These lines are not needed for an offline program'
+             * We don't need to create an extra DAT file for the offline program to work (Arastoo a.khajehee@gmail.com)
+                header.Add(string.Format("DEFDAT  {0}", programName));
+                header.Add("EXT BAS (BAS_COMMAND: IN, REAL: IN)");
+                header.Add("DECL INT SUCCESS");
+                header.Add("ENDDAT");
+            */
+
+            /* No need for DAT file (Arastoo a.khajehee@gmail.com)
             datFile.SetContent(header);
             robotProgram.Add(datFile);
-                        
+             */
+
+
             // PROGRAM FILE
             addActionString = humanComments;
 
@@ -79,23 +94,54 @@ namespace Machina
             List<string> customDeclarationLines = new List<string>();
             List<string> initializationLines = new List<string>();
             List<string> instructionLines = new List<string>();
-                       
+
             //KUKA INITIALIZATION BOILERPLATE
             //declarationLines.Add("  ; @TODO: consolidate all same datatypes into single inline declarations...");
             //declarationLines.Add("  EXT BAS (BAS_COMMAND :IN, REAL :IN)");              // import BAS sys function  --> This needs to move to `.dat` file
 
-            initializationLines.Add("  GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM()");  // legacy support for user-programming safety
-            initializationLines.Add("  INTERRUPT ON 3");
-            initializationLines.Add("  BAS (#INITMOV, 0)");  // use base function to initialize sys vars to defaults
+            //BCO movement of the robot to allow movement after the BCO
+            // Declaring the current position variable
+            initializationLines.Add("DECL axis joint_pos_tgt");
+            initializationLines.Add("DECL POS current_position");
+            initializationLines.Add("DECL POS IK_pose_position");
+
+            initializationLines.Add(";FOLD INI");  // legacy support for user-programming safety
+            initializationLines.Add(";FOLD BCO INI");  // legacy support for user-programming safety
+            initializationLines.Add("GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )");  // legacy support for user-programming safety
+
+            
+            
+            initializationLines.Add("INTERRUPT ON 3");
+            initializationLines.Add("BAS (#INITMOV,0 )");  // use base function to initialize sys vars to defaults
+            initializationLines.Add(";ENDFOLD (BCO INI)");
+            initializationLines.Add(";ENDFOLD (INI)");
             initializationLines.Add("");
+
+            // excecuting the BCO movment
+            initializationLines.Add("joint_pos_tgt = $axis_act_meas");
+            initializationLines.Add("PTP joint_pos_tgt");
+
+            // excecuting the Status Turn (Robot IK configuration setting)
+            initializationLines.Add("current_position = $POS_ACT_MES");
+            initializationLines.Add("IK_pose_position = {X 0,Y 0,Z 0,A 0,B 0,C 0, S 'B 110'}");
+            initializationLines.Add("IK_pose_position.X = current_position.X");
+            initializationLines.Add("IK_pose_position.Y = current_position.Y");
+            initializationLines.Add("IK_pose_position.Z = current_position.Z");
+            initializationLines.Add("IK_pose_position.A = current_position.A");
+            initializationLines.Add("IK_pose_position.B = current_position.B");
+            initializationLines.Add("IK_pose_position.C = current_position.C");
+            initializationLines.Add("PTP IK_pose_position C_PTP");
+
+            // adding the disclamer messages to the program @Arastoo
+            initializationLines.AddRange(GenerateDisclaimerHeader(programName));
 
             // This was reported not to work
             //initializationLines.Add("  $TOOL = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no tool
             //initializationLines.Add("  $LOAD.M = 0");   // no mass
             //initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
 
-            // This was reported to be needed
-            initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
+            // This was reported to be needed (Probably not though (Arastoo Khajehee@gmail.com))
+            //initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
 
             // DATA GENERATION
             // Use the write RobotCursor to generate the data
@@ -146,20 +192,21 @@ namespace Machina
             List<string> module = new List<string>();
 
             // Banner
-            module.AddRange(GenerateDisclaimerHeader(programName));
+            //module.AddRange(GenerateDisclaimerHeader(programName));
 
             // SOME INTERFACE INITIALIZATION
             // These are all for interface handling, ignored by the compiler (?)
             module.Add(@"&ACCESS RVP");  // read-write permissions
             module.Add(@"&REL 1");       // release number (increments on file changes)
-            //module.Add(@"&COMMENT MACHINA PROGRAM");  // This was reported to not work
             module.Add(@"&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe");
             module.Add(@"&PARAM EDITMASK = *");
-            module.Add("");
 
             // MODULE HEADER
-            module.Add("DEF " + programName + "()");
+            module.Add("DEF " + programName + " ( )");
             module.Add("");
+            module.Add("");
+
+            //module.Add(@"&COMMENT MACHINA PROGRAM");  // This was reported to not work
 
             // Declarations
             if (declarationLines.Count != 0)
@@ -182,6 +229,12 @@ namespace Machina
                 module.Add("");
             }
 
+            // Before going to the instructions let's add some default settings 
+            // like approximation settings "$ADVANCE"
+            module.Add(@"$VEL.CP=0.25");
+            module.Add(@"$ADVANCE=3");
+            module.Add("");
+
             // MAIN PROCEDURE
             // Instructions
             if (instructionLines.Count != 0)
@@ -191,7 +244,7 @@ namespace Machina
             }
 
             module.Add("END");
-            module.Add("");
+            //module.Add("");
 
 
             RobotProgramFile srcFile = new RobotProgramFile(programName, "src", Encoding, CC);
@@ -200,7 +253,6 @@ namespace Machina
 
             return robotProgram;
         }
-
 
         ///// <summary>
         ///// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
