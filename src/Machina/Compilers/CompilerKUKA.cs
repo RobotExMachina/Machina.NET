@@ -49,7 +49,7 @@ namespace Machina
             // HEADER file
             RobotProgramFile datFile = new RobotProgramFile(programName, "dat", Encoding, CC);
 
-            /* We might not even need to include any header for a clean program (Arastoo a.khajehee@gmail.com)
+            /* We might not even need to include any header for a clean program (@Arastoo a.khajehee@gmail.com)
              * 
                 List<string> header = new List<string>();
                 header.AddRange(GenerateDisclaimerHeader(programName));
@@ -62,18 +62,18 @@ namespace Machina
 
             /*
              * 
-             * // This line might also be optional (Arastoo)
+             * // This line might also be optional (@Arastoo)
                   header.Add(@"&PARAM DISKPATH = KRC:\R1\Program");  // @TODO: this path should be programmatically generated...
             
              These lines are not needed for an offline program'
-             * We don't need to create an extra DAT file for the offline program to work (Arastoo a.khajehee@gmail.com)
+             * We don't need to create an extra DAT file for the offline program to work (@Arastoo)
                 header.Add(string.Format("DEFDAT  {0}", programName));
                 header.Add("EXT BAS (BAS_COMMAND: IN, REAL: IN)");
                 header.Add("DECL INT SUCCESS");
                 header.Add("ENDDAT");
             */
 
-            /* No need for DAT file (Arastoo a.khajehee@gmail.com)
+            /* No need for DAT file (@Arastoo)
             datFile.SetContent(header);
             robotProgram.Add(datFile);
              */
@@ -140,7 +140,7 @@ namespace Machina
             //initializationLines.Add("  $LOAD.M = 0");   // no mass
             //initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
 
-            // This was reported to be needed (Probably not though (Arastoo Khajehee@gmail.com))
+            // This was reported to be needed (Probably not though (@Arastoo))
             //initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
 
             // DATA GENERATION
