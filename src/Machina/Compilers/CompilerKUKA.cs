@@ -49,7 +49,7 @@ namespace Machina
             // HEADER file
             RobotProgramFile datFile = new RobotProgramFile(programName, "dat", Encoding, CC);
 
-            /* We might not even need to include any header for a clean program (Arastoo a.khajehee@gmail.com)
+            /* We might not even need to include any header for a clean program (@Arastoo a.khajehee@gmail.com)
              * 
                 List<string> header = new List<string>();
                 header.AddRange(GenerateDisclaimerHeader(programName));
@@ -62,18 +62,18 @@ namespace Machina
 
             /*
              * 
-             * // This line might also be optional (Arastoo)
+             * // This line might also be optional (@Arastoo)
                   header.Add(@"&PARAM DISKPATH = KRC:\R1\Program");  // @TODO: this path should be programmatically generated...
             
              These lines are not needed for an offline program'
-             * We don't need to create an extra DAT file for the offline program to work (Arastoo a.khajehee@gmail.com)
+             * We don't need to create an extra DAT file for the offline program to work (@Arastoo)
                 header.Add(string.Format("DEFDAT  {0}", programName));
                 header.Add("EXT BAS (BAS_COMMAND: IN, REAL: IN)");
                 header.Add("DECL INT SUCCESS");
                 header.Add("ENDDAT");
             */
 
-            /* No need for DAT file (Arastoo a.khajehee@gmail.com)
+            /* No need for DAT file (@Arastoo)
             datFile.SetContent(header);
             robotProgram.Add(datFile);
              */
@@ -109,13 +109,16 @@ namespace Machina
             initializationLines.Add(";FOLD BCO INI");  // legacy support for user-programming safety
             initializationLines.Add("GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )");  // legacy support for user-programming safety
 
-            
-            
             initializationLines.Add("INTERRUPT ON 3");
             initializationLines.Add("BAS (#INITMOV,0 )");  // use base function to initialize sys vars to defaults
             initializationLines.Add(";ENDFOLD (BCO INI)");
             initializationLines.Add(";ENDFOLD (INI)");
             initializationLines.Add("");
+
+            // by default the controller does not revert the tool back to default
+            // so we need these two lines to set the tools back to nothing.
+            initializationLines.Add("$BASE = $WORLD; setting of the base coordinate system");
+            initializationLines.Add("$TOOL = $NULLFRAME; setting of the tool coordinate system");
 
             // excecuting the BCO movment
             initializationLines.Add("joint_pos_tgt = $axis_act_meas");
@@ -123,7 +126,7 @@ namespace Machina
 
             // excecuting the Status Turn (Robot IK configuration setting)
             initializationLines.Add("current_position = $POS_ACT_MES");
-            initializationLines.Add("IK_pose_position = {X 0,Y 0,Z 0,A 0,B 0,C 0, S 'B 110'}");
+            initializationLines.Add("IK_pose_position = {X 0,Y 0,Z 0,A 0,B 0,C 0, S 'B 010'}");
             initializationLines.Add("IK_pose_position.X = current_position.X");
             initializationLines.Add("IK_pose_position.Y = current_position.Y");
             initializationLines.Add("IK_pose_position.Z = current_position.Z");
@@ -140,7 +143,7 @@ namespace Machina
             //initializationLines.Add("  $LOAD.M = 0");   // no mass
             //initializationLines.Add("  $LOAD.CM = {X 0, Y 0, Z 0, A 0, B 0, C 0}");  // no CoG
 
-            // This was reported to be needed (Probably not though (Arastoo Khajehee@gmail.com))
+            // This was reported to be needed (Probably not though (@Arastoo))
             //initializationLines.Add("  BASE_DATA[1] = {X 0, Y 0, Z 0, A 0, B 0, C 0}");
 
             // DATA GENERATION
@@ -253,6 +256,7 @@ namespace Machina
 
             return robotProgram;
         }
+
 
         ///// <summary>
         ///// Creates a textual program representation of a set of Actions using native KUKA Robot Language.
@@ -430,6 +434,14 @@ namespace Machina
             switch (action.Type)
             {
                 case ActionType.Translation:
+                    // @Arastoo
+                    // making a case for Translation as it requires only XYZ
+                    // adding ABC would mess with the orientation of the robot
+                    // GetPositionTargetValue_Translation_Only
+                    dec = string.Format("  target{0} = {1}",
+                            id,
+                            GetPositionTargetValue_Translation_Only(cursor));
+                    break;
                 case ActionType.Rotation:
                 case ActionType.Transformation:
                     dec = string.Format("  target{0} = {1}",
@@ -463,18 +475,36 @@ namespace Machina
                     break;
 
                 case ActionType.Precision:
-                    dec = string.Format(CultureInfo.InvariantCulture, 
+                    dec = string.Format(CultureInfo.InvariantCulture,
                         "  $APO.CDIS = {0}",
                         cursor.precision);
                     break;
 
+                // There was no acceleration action
+                case ActionType.Acceleration:
+                    dec = string.Format(CultureInfo.InvariantCulture,
+                        "  $ACC.CP = {0}",
+                        cursor.acceleration / 1000.0);
+                    break;
+
+                // @Aratoo 
+                // creating another case for translation as it should not have ABC euler angles in it.
+                // having angles would mess with the orientation of the robot and result in unexpected movements.
                 case ActionType.Translation:
+                    dec = string.Format("  {0} target{1} {2}",
+                        cursor.motionType == MotionType.Linear ? "LIN" : "PTP",
+                        id,
+                        cursor.precision >= 1 ? "C_DIS" : "");
+
+                    break;
+
                 case ActionType.Rotation:
                 case ActionType.Transformation:
                     dec = string.Format("  {0} target{1} {2}",
-                        cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
+                        cursor.motionType == MotionType.Linear ? "LIN" : "PTP",
                         id,
                         cursor.precision >= 1 ? "C_DIS" : "");
+
                     break;
 
                 case ActionType.Axes:
@@ -484,7 +514,9 @@ namespace Machina
                         cursor.precision >= 1 ? "C_DIS" : "");  // @TODO: figure out how to turn this into C_PTP
                     break;
 
+
                 // @TODO: apparently, messages in KRL are kind fo tricky, with several manuals just dedicated to it.
+                //      @Fixed by Arastoo
                 // Will figure this out later.
                 case ActionType.Message:
                     ActionMessage am = (ActionMessage)action;
@@ -495,7 +527,7 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format(CultureInfo.InvariantCulture, 
+                    dec = string.Format(CultureInfo.InvariantCulture,
                         "  WAIT SEC {0}",
                         0.001 * aw.millis);
                     break;
@@ -615,18 +647,55 @@ namespace Machina
                     break;
 
                 case ActionType.Precision:
-                    dec = string.Format(CultureInfo.InvariantCulture, 
+                    dec = string.Format(CultureInfo.InvariantCulture,
                         "  $APO.CDIS = {0}",
                         cursor.precision);
                     break;
 
+                case ActionType.Acceleration:
+                    dec = string.Format(CultureInfo.InvariantCulture,
+                        "  $ACC.CP = {0}",
+                        cursor.acceleration / 1000.0);
+                    break;
+
                 case ActionType.Translation:
+                    // @Arastoo
+                    // making a case for Translation as it requires only XYZ
+                    // adding ABC would mess with the orientation of the robot
+                    // GetPositionTargetValue_Translation_Only
+                    if (cursor.motionType == MotionType.Joint)
+                    {
+                        dec = string.Format("  {0} {1} {2}",
+                            cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
+                            GetPositionTargetValue_Translation_Only(cursor),
+                            cursor.precision >= 1 ? "C_PTP" : "");
+                    }
+                    else if (cursor.motionType == MotionType.Linear)
+                    {
+                        dec = string.Format("  {0} {1} {2}",
+                            cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
+                            GetPositionTargetValue_Translation_Only(cursor),
+                            cursor.precision >= 1 ? "C_DIS" : "");
+                    }
+                    break;
+
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  {0} {1} {2}",
-                        cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
-                        GetPositionTargetValue(cursor),
-                        cursor.precision >= 1 ? "C_DIS" : "");
+
+                    if (cursor.motionType == MotionType.Joint)
+                    {
+                        dec = string.Format("  {0} {1} {2}",
+                            cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
+                            GetPositionTargetValue(cursor),
+                            cursor.precision >= 1 ? "C_PTP" : "");
+                    }
+                    else if (cursor.motionType == MotionType.Linear)
+                    {
+                        dec = string.Format("  {0} {1} {2}",
+                            cursor.motionType == MotionType.Joint ? "PTP" : "LIN",
+                            GetPositionTargetValue(cursor),
+                            cursor.precision >= 1 ? "C_DIS" : "");
+                    }
                     break;
 
                 case ActionType.Axes:
@@ -647,7 +716,7 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format(CultureInfo.InvariantCulture, 
+                    dec = string.Format(CultureInfo.InvariantCulture,
                         "  WAIT SEC {0}",
                         0.001 * aw.millis);
                     break;
@@ -761,6 +830,7 @@ namespace Machina
         {
             YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
 
+            // @TODO: E6POS: External Axes (Arastoo)
             return string.Format(CultureInfo.InvariantCulture,
                 "{{POS: X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
                 Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
@@ -772,13 +842,26 @@ namespace Machina
                 Math.Round(euler.XAngle, Geometry.STRING_ROUND_DECIMALS_DEGS));
         }
 
+        internal string GetPositionTargetValue_Translation_Only(RobotCursor cursor)
+        {
+            YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
+
+            // @TODO: E6POS: External Axes (Arastoo)
+            return string.Format(CultureInfo.InvariantCulture,
+                "{{POS: X {0}, Y {1}, Z {2}}}",
+                Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM)
+                );
+        }
+
         /// <summary>
         /// Returns a KRL AXIS joint representation of the current state of the cursor.
         /// </summary>
         /// <returns></returns>
         internal string GetAxisTargetValue(RobotCursor cursor)
         {
-            return string.Format(CultureInfo.InvariantCulture, 
+            return string.Format(CultureInfo.InvariantCulture,
                 "{{AXIS: A1 {0}, A2 {1}, A3 {2}, A4 {3}, A5 {4}, A6 {5}}}",
                 Math.Round(cursor.axes.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
                 Math.Round(cursor.axes.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
@@ -802,7 +885,7 @@ namespace Machina
 
             YawPitchRoll euler = cursor.tool.TCPOrientation.Q.ToYawPitchRoll();
 
-            return string.Format(CultureInfo.InvariantCulture, 
+            return string.Format(CultureInfo.InvariantCulture,
                 "{{X {0}, Y {1}, Z {2}, A {3}, B {4}, C {5}}}",
                 Math.Round(cursor.tool.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
                 Math.Round(cursor.tool.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
