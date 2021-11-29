@@ -109,8 +109,6 @@ namespace Machina
             initializationLines.Add(";FOLD BCO INI");  // legacy support for user-programming safety
             initializationLines.Add("GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )");  // legacy support for user-programming safety
 
-
-
             initializationLines.Add("INTERRUPT ON 3");
             initializationLines.Add("BAS (#INITMOV,0 )");  // use base function to initialize sys vars to defaults
             initializationLines.Add(";ENDFOLD (BCO INI)");
@@ -121,9 +119,6 @@ namespace Machina
             // so we need these two lines to set the tools back to nothing.
             initializationLines.Add("$BASE = $WORLD; setting of the base coordinate system");
             initializationLines.Add("$TOOL = $NULLFRAME; setting of the tool coordinate system");
-
-
-
 
             // excecuting the BCO movment
             initializationLines.Add("joint_pos_tgt = $axis_act_meas");
@@ -553,10 +548,9 @@ namespace Machina
 
                 case ActionType.AttachTool:
                     ActionAttachTool at = (ActionAttachTool)action;
-                    dec = string.Format("BAS(#TOOL, {0})",
+                    dec = string.Format("  $TOOL = {0}",
                         GetToolValue(cursor));
                     break;
-
 
                 case ActionType.DetachTool:
                     ActionDetachTool ad = (ActionDetachTool)action;
