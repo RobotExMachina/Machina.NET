@@ -117,6 +117,14 @@ namespace Machina
             initializationLines.Add(";ENDFOLD (INI)");
             initializationLines.Add("");
 
+            // by default the controller does not revert the tool back to default
+            // so we need these two lines to set the tools back to nothing.
+            initializationLines.Add("$BASE = $WORLD; setting of the base coordinate system");
+            initializationLines.Add("$TOOL = $NULLFRAME; setting of the tool coordinate system");
+
+
+
+
             // excecuting the BCO movment
             initializationLines.Add("joint_pos_tgt = $axis_act_meas");
             initializationLines.Add("PTP joint_pos_tgt");
@@ -477,6 +485,13 @@ namespace Machina
                         cursor.precision);
                     break;
 
+                // There was no acceleration action
+                case ActionType.Acceleration:
+                    dec = string.Format(CultureInfo.InvariantCulture,
+                        "  $ACC.CP = {0}",
+                        cursor.acceleration / 1000.0);
+                    break;
+
                 // @Aratoo 
                 // creating another case for translation as it should not have ABC euler angles in it.
                 // having angles would mess with the orientation of the robot and result in unexpected movements.
@@ -538,9 +553,10 @@ namespace Machina
 
                 case ActionType.AttachTool:
                     ActionAttachTool at = (ActionAttachTool)action;
-                    dec = string.Format("  $TOOL = {0}",
+                    dec = string.Format("BAS(#TOOL, {0})",
                         GetToolValue(cursor));
                     break;
+
 
                 case ActionType.DetachTool:
                     ActionDetachTool ad = (ActionDetachTool)action;
@@ -640,6 +656,12 @@ namespace Machina
                     dec = string.Format(CultureInfo.InvariantCulture,
                         "  $APO.CDIS = {0}",
                         cursor.precision);
+                    break;
+
+                case ActionType.Acceleration:
+                    dec = string.Format(CultureInfo.InvariantCulture,
+                        "  $ACC.CP = {0}",
+                        cursor.acceleration / 1000.0);
                     break;
 
                 case ActionType.Translation:
