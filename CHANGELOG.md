@@ -29,6 +29,11 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 
+# v0.8.14
+## BUILD 1507
+- Improvements to the `KUKA` compiler from @Arastookhajehee! 😄
+
+
 # v0.8.13b
 ## BUILD 1506
 - Fixed bug that wouldn't allow `WriteAnalog` and `WriteDigital` to be exected on the same program.
