@@ -473,7 +473,8 @@ namespace Machina
             { typeof (ActionInitialization),            (act, robCur) => robCur.ApplyAction((ActionInitialization) act) },
             { typeof (ActionExternalAxis),              (act, robCur) => robCur.ApplyAction((ActionExternalAxis) act) },
             { typeof (ActionCustomCode),                (act, robCur) => robCur.ApplyAction((ActionCustomCode) act) },
-            { typeof (ActionArmAngle),                  (act, robCur) => robCur.ApplyAction((ActionArmAngle) act) }
+            { typeof (ActionArmAngle),                  (act, robCur) => robCur.ApplyAction((ActionArmAngle) act) },
+            { typeof (ActionArcMotion),                 (act, robCur) => robCur.ApplyAction((ActionArcMotion) act) }
         };
 
         /// <summary>
@@ -856,6 +857,91 @@ namespace Machina
             axes = null;  // flag joints as null to avoid Joint instructions using obsolete data
 
             if (isExtruding) this.ComputeExtrudedLength();
+
+            if (_logRelativeActions && action.relative)
+            {
+                logger.Verbose("TCP transform at " + this.position + " " + new Orientation(this.rotation));
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply ArcMotion Action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public bool ApplyAction(ActionArcMotion action)
+        {
+            Vector newPos;
+            Rotation newRot;
+
+            // Relative transform
+            if (action.relative)
+            {
+                // If user issued a relative action, make sure there are absolute values to work with. (This limitation is due to current lack of FK/IK solvers)
+                if (position == null || rotation == null)
+                {
+                    logger.Warning($"Cannot apply \"{action}\", must provide absolute transform values first before applying relative ones...");
+                    return false;
+                }
+
+                // As of right now, we are only supporting relative arc motions that are position-only.
+                // Sanity check just in case.
+                if (!action.positionOnly)
+                {
+                    logger.Error("Unsupported relative plane-plane ArcMotion");
+                    return false;
+                }
+
+
+                if (referenceCS == ReferenceCS.World)
+                {
+                    // Translate to endpoint, keep orientation as-is
+                    newPos = position + action.end.Origin;
+                    newRot = rotation;
+                }
+                else
+                {
+                    // Translate relative to tool, keep orientation as-is
+                    Vector worldVector = Vector.Rotation(action.end.Origin, this.rotation);
+                    newPos = position + worldVector;
+                    newRot = rotation;
+                }
+
+            }
+
+            // Absolute transform
+            else
+            {
+                newPos = action.end.Origin;
+                
+                if (action.positionOnly)
+                {
+                    newRot = rotation;
+                }
+                else
+                {
+                    newRot = action.end.Orientation;
+                }
+            }
+
+
+            prevPosition = position;
+            position = newPos;
+            prevRotation = rotation;
+            rotation = newRot;
+
+            prevAxes = axes;
+            axes = null;  // flag joints as null to avoid Joint instructions using obsolete data
+
+            // @TODO: Implement this at some point
+            //if (isExtruding) this.ComputeExtrudedLength();
+
+            if (isExtruding)
+            {
+                logger.Error("Extrusion calculations not implemented for ArcMotion, unexpected extrusions may follow");
+            }
 
             if (_logRelativeActions && action.relative)
             {
@@ -1364,6 +1450,7 @@ namespace Machina
         /// <param name="tool"></param>
         internal void UndoToolTransformOnCursor(RobotCursor cursor, Tool tool, RobotLogger logger, bool log)
         {
+            // TODO: should this method be static??
             // TODO: at some point in the future, check for translationFirst here
             Rotation newRot = Rotation.Combine(cursor.rotation, Rotation.Inverse(tool.TCPOrientation));  // postmultiplication by the inverse rotation
             Vector worldVector = Vector.Rotation(tool.TCPPosition, cursor.rotation);
@@ -1382,6 +1469,45 @@ namespace Machina
             }
         }
 
+        /// <summary>
+        /// For the current state of the cursor, out the pos/rot of the through point of an arc action.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        internal bool ComputeThroughPlane(ActionArcMotion action, out Vector throughPos, out Rotation throughRot)
+        {
+            if (action.relative)
+            {
+                throughPos = this.position - action.end.Origin + action.through.Origin;
+                
+                if (action.positionOnly)
+                {
+                    throughRot = this.rotation;
+                } 
+                else
+                {
+                    logger.Error("Unsupported relative frame-frame actions!");
+                    throughRot = null;
+                    return false;
+                }
+            }
+            else
+            {
+                throughPos = action.through.Origin;
+                if (action.positionOnly)
+                {
+                    throughRot = this.rotation;
+                }
+                else
+                {
+                    throughRot = action.through.Orientation;
+                }
+            }
+
+            return true; 
+        }
 
 
         public override string ToString() => $"{name}: {motionType} p{position} r{rotation} j{axes} a{acceleration} v{speed} p{precision} {(this.tool == null ? "" : "t" + this.tool)}";

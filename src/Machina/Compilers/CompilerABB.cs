@@ -119,7 +119,8 @@ namespace Machina
             // DATA GENERATION
             // Use the write robot pointer to generate the data
             int it = 0;
-            string line = null;
+            string line;
+            var declarationLines = new List<string>();
             bool usesIO = false;
             foreach (Action a in actions)
             {
@@ -144,8 +145,9 @@ namespace Machina
                     // If precision is very close to an integer, make it integer and/or use predefined zones
                     bool predef = false;
                     int roundZone = 0;
-                    if (Math.Abs(writer.precision - Math.Round(writer.precision)) < Geometry.EPSILON) {
-                        roundZone = (int) Math.Round(writer.precision);
+                    if (Math.Abs(writer.precision - Math.Round(writer.precision)) < Geometry.EPSILON)
+                    {
+                        roundZone = (int)Math.Round(writer.precision);
                         predef = PredefinedZones.Contains(roundZone);
                     }
                     zonePredef.Add(writer.precision, predef);
@@ -178,19 +180,19 @@ namespace Machina
                 else
                 {
                     // Generate lines of code
-                    if (GenerateVariableDeclaration(a, writer, it, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    if (GenerateVariableDeclaration(a, writer, it, out declarationLines))
                     {
-                        variableLines.Add(line);
+                        variableLines.AddRange(declarationLines);
                     }
 
-                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, velNames, zoneNames, toolNames, out line))  // there will be a number jump on target-less instructions, but oh well...
+                    if (GenerateInstructionDeclarationFromVariable(a, writer, it, velNames, zoneNames, toolNames, out line))
                     {
                         instructionLines.Add(line);
                     }
                 }
 
-                // Move on
-                it++;
+                // Move on (only for var-decs);
+                it += declarationLines.Count;
             }
 
 
@@ -223,7 +225,7 @@ namespace Machina
             // PROGRAM ASSEMBLY
             // Initialize a module list
             List<string> module = new List<string>();
-            
+
             // MODULE HEADER
             module.Add("MODULE " + programName);
             module.Add("");
@@ -308,24 +310,30 @@ namespace Machina
         //  ╦ ╦╔╦╗╦╦  ╔═╗
         //  ║ ║ ║ ║║  ╚═╗
         //  ╚═╝ ╩ ╩╩═╝╚═╝
-        internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out string declaration)
+        internal bool GenerateVariableDeclaration(Action action, RobotCursor cursor, int id, out List<string> declarations)
         {
-            string dec = null;
+            declarations = new List<string>();
             switch (action.Type)
             {
                 case ActionType.Translation:
                 case ActionType.Rotation:
                 case ActionType.Transformation:
-                    dec = string.Format("  CONST robtarget target{0} := {1};", id, GetRobTargetValue(cursor));
+                    declarations.Add(string.Format("  CONST robtarget target{0} := {1};", id, GetRobTargetValue(cursor)));
                     break;
 
                 case ActionType.Axes:
-                    dec = string.Format("  CONST jointtarget target{0} := {1};", id, GetJointTargetValue(cursor));
+                    declarations.Add(string.Format("  CONST jointtarget target{0} := {1};", id, GetJointTargetValue(cursor)));
+                    break;
+
+                case ActionType.ArcMotion:
+                    ActionArcMotion aam = action as ActionArcMotion;
+                    cursor.ComputeThroughPlane(aam, out Vector throughPos, out Rotation throughRot);
+                    declarations.Add(string.Format("  CONST robtarget target{0} := {1};", id, GetRobTargetValue(cursor, throughPos, throughRot)));
+                    declarations.Add(string.Format("  CONST robtarget target{0} := {1};", id + 1, GetRobTargetValue(cursor)));
                     break;
             }
 
-            declaration = dec;
-            return dec != null;
+            return declarations.Count != 0;
         }
 
         internal bool GenerateInstructionDeclarationFromVariable(
@@ -377,6 +385,17 @@ namespace Machina
                         "WObj:=WObj0");
                     break;
 
+                case ActionType.ArcMotion:
+                    dec = string.Format("    MoveC target{0}, target{1}, {2}, {3}, {4}\\{5};",
+                        id,
+                        id + 1,
+                        velNames[cursor.speed],
+                        zoneNames[cursor.precision],
+                        cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
+                        "WObj:=WObj0");
+
+                    break;
+
                 case ActionType.Axes:
                     dec = string.Format("    MoveAbsJ target{0}, {1}, {2}, {3}\\{4};",
                         id,
@@ -396,7 +415,7 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format(CultureInfo.InvariantCulture, 
+                    dec = string.Format(CultureInfo.InvariantCulture,
                         "    WaitTime {0};",
                         0.001 * aw.millis);
                     break;
@@ -447,9 +466,9 @@ namespace Machina
                     }
                     break;
 
-                //default:
-                //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
+                    //default:
+                    //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    //    break;
 
             }
 
@@ -523,6 +542,18 @@ namespace Machina
                         "WObj:=WObj0");
                     break;
 
+                case ActionType.ArcMotion:
+                    ActionArcMotion aam = action as ActionArcMotion;
+                    cursor.ComputeThroughPlane(aam, out Vector throughPos, out Rotation throughRot);
+                    dec = string.Format("    MoveC {0}, {1}, {2}, {3}, {4}\\{5};",
+                        GetRobTargetValue(cursor, throughPos, throughRot),
+                        GetRobTargetValue(cursor),
+                        velNames[cursor.speed],
+                        zoneNames[cursor.precision],
+                        cursor.tool == null ? "Tool0" : toolNames[cursor.tool],
+                        "WObj:=WObj0");
+                    break;
+
                 case ActionType.Axes:
                     dec = string.Format("    MoveAbsJ {0}, {1}, {2}, {3}\\{4};",
                         GetJointTargetValue(cursor),
@@ -542,7 +573,7 @@ namespace Machina
 
                 case ActionType.Wait:
                     ActionWait aw = (ActionWait)action;
-                    dec = string.Format(CultureInfo.InvariantCulture, 
+                    dec = string.Format(CultureInfo.InvariantCulture,
                         "    WaitTime {0};",
                         0.001 * aw.millis);
                     break;
@@ -592,9 +623,9 @@ namespace Machina
                     }
                     break;
 
-                //default:
-                //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
-                //    break;
+                    //default:
+                    //    dec = string.Format("    ! ACTION \"{0}\" NOT IMPLEMENTED", action);
+                    //    break;
 
             }
 
@@ -627,12 +658,28 @@ namespace Machina
         /// <returns></returns>
         static internal string GetRobTargetValue(RobotCursor cursor)
         {
-            return string.Format(CultureInfo.InvariantCulture, 
+            return string.Format(CultureInfo.InvariantCulture,
                 "[{0}, {1}, {2}, {3}]",
                 cursor.position.ToString(false),
                 cursor.rotation.Q.ToString(false),
                 "[0,0,0,0]",  // no IK at this moment
-                GetExternalJointsRobTargetValue(cursor)); 
+                GetExternalJointsRobTargetValue(cursor));
+        }
+
+        /// <summary>
+        /// Returns an RAPID robtarget representation of the SPECIFIED POS/ROT, not the current cursor state.
+        /// WARNING: this method is UNSAFE; it performs no IK calculations, assigns default [0,0,0,0] 
+        /// robot configuration and assumes the robot controller will figure out the correct one.
+        /// </summary>
+        /// <returns></returns>
+        static internal string GetRobTargetValue(RobotCursor cursor, Vector position, Rotation rotation)
+        {
+            return string.Format(CultureInfo.InvariantCulture,
+                "[{0}, {1}, {2}, {3}]",
+                position.ToString(false),
+                rotation.Q.ToString(false),
+                "[0,0,0,0]",  // no IK at this moment
+                GetExternalJointsRobTargetValue(cursor));
         }
 
         /// <summary>
@@ -642,8 +689,8 @@ namespace Machina
         static internal string GetJointTargetValue(RobotCursor cursor)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "[{0}, {1}]", 
-                cursor.axes, 
+                "[{0}, {1}]",
+                cursor.axes,
                 GetExternalJointsJointTargetValue(cursor));
         }
 
@@ -660,7 +707,7 @@ namespace Machina
             string vel = Math.Round(cursor.speed, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
 
             return string.Format("[{0},{1},{2},{3}]", vel, vel, vel, vel);
-            
+
             //// Default speed declarations in ABB always use 500 deg/s as rot speed, but it feels too fast (and scary). 
             //// Using either rotationSpeed value or the same value as lin motion here.
             //return string.Format("[{0},{1},{2},{3}]", 
@@ -684,8 +731,8 @@ namespace Machina
             // Following conventions for default RAPID zones.
             double high = 1.5 * cursor.precision;
             double low = 0.10 * cursor.precision;
-            return string.Format(CultureInfo.InvariantCulture, 
-                "[FALSE,{0},{1},{2},{3},{4},{5}]", 
+            return string.Format(CultureInfo.InvariantCulture,
+                "[FALSE,{0},{1},{2},{3},{4},{5}]",
                 cursor.precision, high, high, low, high, low);
         }
 
@@ -701,7 +748,7 @@ namespace Machina
                 throw new Exception("Cursor has no tool attached");
             }
 
-            return string.Format(CultureInfo.InvariantCulture, 
+            return string.Format(CultureInfo.InvariantCulture,
                 "[TRUE, [{0},{1}], [{2},{3},{4},0,0,0]]",
                 cursor.tool.TCPPosition,
                 cursor.tool.TCPOrientation.Q.ToString(false),
@@ -709,7 +756,7 @@ namespace Machina
                 cursor.tool.CenterOfGravity,
                 "[1,0,0,0]");  // no internial axes by default
         }
-        
+
 
         /// <summary>
         /// Gets the cursors extax representation for a Cartesian target.
@@ -730,7 +777,7 @@ namespace Machina
 
         static internal string GetExternalJointsJointTargetValue(RobotCursor cursor) =>
                 GetExternalAxesValue(cursor.externalAxesJoints);
-       
+
         /// <summary>
         /// Gets the RAPID extax representation from an ExternalAxes object.
         /// </summary>
@@ -748,7 +795,7 @@ namespace Machina
             for (int i = 0; i < extax.Length; i++)
             {
                 val = extax[i];
-                extj += (val == null) ? "9E9" : Math.Round((double) val, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
+                extj += (val == null) ? "9E9" : Math.Round((double)val, Geometry.STRING_ROUND_DECIMALS_MM).ToString(CultureInfo.InvariantCulture);
                 if (i < extax.Length - 1)
                 {
                     extj += ",";

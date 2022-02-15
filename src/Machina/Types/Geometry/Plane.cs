@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Machina.Types.Geometry
 {
-    class Plane : Geometry
+    public class Plane : Geometry
     {
         public static Plane WorldXY => new Plane(0, 0, 0, 1, 0, 0, 0, 1, 0);
         
@@ -74,6 +74,15 @@ namespace Machina.Types.Geometry
         //    // must apply to targetPlane the inverse transformation represented by baseplane
         //}
 
-
+        /// <summary>
+        /// Returns a deep copy of this object.
+        /// </summary>
+        public Plane Clone()
+        {
+            return new Plane(
+                this.Origin.X, this.Origin.Y, this.Origin.Z,
+                this.Orientation.XAxis.X, this.Orientation.XAxis.Y, this.Orientation.XAxis.Z,
+                this.Orientation.YAxis.X, this.Orientation.YAxis.Y, this.Orientation.YAxis.Z);
+        }
     }
 }

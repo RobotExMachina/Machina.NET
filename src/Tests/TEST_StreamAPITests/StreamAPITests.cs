@@ -55,12 +55,7 @@ namespace TEST_StreamAPITests
 
             //arm.StreamConfiguration(3, 10);
 
-            arm.SpeedTo(100);
-            arm.PrecisionTo(10);
-            arm.MoveTo(300, 300, 300);
-            arm.Move(0, 0, 200);
-            arm.Wait(1000);
-            arm.AxesTo(homeJoints);
+            ArcMotionTest(arm);
                        
 
             Console.WriteLine(" ");
@@ -78,6 +73,30 @@ namespace TEST_StreamAPITests
         private static void Logger_CustomLogging(LoggerArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        static void ArcMotionTest(Robot bot)
+        {
+            bot.SpeedTo(1000);
+            bot.TransformTo(500, 500, 500, -1, 0, 0, 0, 1, 0);
+            bot.Wait(1000);
+
+            bot.SpeedTo(25);
+
+            // This should end in [600, 600, 500, 0, -1, 0, 0, 0, -1]
+            bot.ArcMotionTo(
+                500, 600, 500, -1, 0, 0, 0, 1, 0,
+                600, 600, 500, 0, -1, 0, 0, 0, -1);
+
+            // these should end in (600, 600, 500) with 
+            //bot.ArcMotionTo(500, 600, 500, 600, 600, 500);
+            bot.ArcMotion(0, 100, 0, 100, 100, 0);
+
+            bot.Wait(2000);
+
+            bot.SpeedTo(1000);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+
         }
 
         static void WObjTesting(Robot bot)

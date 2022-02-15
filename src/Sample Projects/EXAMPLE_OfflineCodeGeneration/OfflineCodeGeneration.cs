@@ -51,7 +51,8 @@ namespace EXAMPLE_OfflineCodeGeneration
             arm.DebugBuffers();
 
             // Export buffered program to local file
-            arm.Compile(@"C:\square.prg");
+            var program = arm.Compile();
+            arm.SaveProgram(program, @"C:\square.prg");
 
             // Exit
             Console.WriteLine("Press any key to EXIT...");

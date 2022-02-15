@@ -62,7 +62,7 @@ MODULE Machina_Driver
     CONST num SERVER_PORT := {{PORT}};           ! Replace {{PORT}} with custom port number, like for example 7000
 
     ! Useful for handshakes and version compatibility checks...
-    CONST string MACHINA_SERVER_VERSION := "1.4.1";
+    CONST string MACHINA_SERVER_VERSION := "1.4.2";
 
     ! Should program exit on any kind of error?
     PERS bool USE_STRICT := TRUE;
@@ -99,6 +99,9 @@ MODULE Machina_Driver
     CONST num INST_SET_CONFIGURATION := 102;        ! A way to make some changes to the configuration of the server
     CONST num INST_SET_MOTION_UPDATE_INTERVAL := 103;  ! Sets the motion update interval in seconds.
 
+    ! 2# codes where already in use, resume motion codes on 3#... lol
+    CONST num INST_MOVEC := 30;                     ! MoveC eX eY eZ eQW eQX eQY eQZ tX tY tZ (end robt + through robt) 
+
     ! (these could be straight strings since they are never used for checks...?)
     PERS num RES_VERSION := 20;                     ! ">20 1 2 1;" Sends version numbers
     PERS num RES_POSE := 21;                        ! ">21 400 300 500 0 0 1 0;" Sends pose
@@ -134,6 +137,7 @@ MODULE Machina_Driver
     PERS tooldata cursorTool;
     PERS wobjdata cursorWObj;
     VAR robtarget cursorRobTarget;
+    VAR robtarget throughRobTarget;
     VAR jointtarget cursorJointTarget;
     VAR extjoint cursorExtJointsRobTarget;  ! extax portion of robtarget
     VAR extjoint cursorExtJointsJointTarget;  ! extax portion of jointtarget
@@ -189,6 +193,9 @@ MODULE Machina_Driver
         ConfJ \Off;
         ConfL \Off;
 
+        ! Use default interpolation for MoveC
+        CirPathMode \PathFrame;
+
         CursorsInitialize;
         ServerInitialize;
 
@@ -222,6 +229,11 @@ MODULE Machina_Driver
                 CASE INST_MOVEJ:
                     cursorRobTarget := GetRobTarget(currentAction);
                     MoveJ cursorRobTarget, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
+
+                CASE INST_MOVEC:
+                    cursorRobTarget := GetRobTarget(currentAction);
+                    throughRobTarget := GetThroughRobTarget(currentAction);
+                    MoveC throughRobTarget, cursorRobTarget, cursorSpeed, cursorZone, cursorTool, \WObj:=cursorWObj;
 
                 CASE INST_MOVEABSJ:
                     cursorJointTarget := GetJointTarget(currentAction);
@@ -296,6 +308,9 @@ MODULE Machina_Driver
 
                 CASE INST_NO_WOBJ:
                     cursorWObj := wobj0;
+
+                DEFAULT: 
+                    TPWrite("Don't understand action code " + NumToStr(currentAction.code, 0));
 
                 ENDTEST
 
@@ -946,9 +961,18 @@ MODULE Machina_Driver
         RETURN [[a.p1, a.p2, a.p3, a.p4, a.p5, a.p6], cursorExtJointsJointTarget];
     ENDFUNC
 
-    ! Return the robottarget represented by an Action
+    ! Return the robtarget represented by an Action
     FUNC robtarget GetRobTarget(action a)
         RETURN [[a.p1, a.p2, a.p3], [a.p4, a.p5, a.p6, a.p7], [0, 0, 0, 0], cursorExtJointsRobTarget];
+    ENDFUNC
+
+    ! Return the through robtarget represented by a MoveC Action
+    FUNC robtarget GetThroughRobTarget(action a)
+        ! By default, orientation of the through frame is ignored, 
+        ! as orientation is linearly interpolated between start and end targets.
+        ! This could be customized with CirPathMode.
+        ! Position of the external axes in through frame is not used. 
+        RETURN [[a.p8, a.p9, a.p10], [1, 0, 0, 0], [0, 0, 0, 0], cursorExtJointsJointTarget];
     ENDFUNC
 
     ! Return the speeddata represented by an Action

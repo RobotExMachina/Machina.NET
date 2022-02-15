@@ -42,6 +42,8 @@ namespace Machina.Drivers.Communication.Protocols
         internal const int RES_EXTAX = 23;                      // ">23 1000 9E9 9E9 9E9 9E9 9E9;" Sends external axes values
         internal const int RES_FULL_POSE = 24;                  // ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;" Sends all pose and joint info (probably on split messages)
 
+        // 2# codes where already in use, resume motion codes on 3#... lol
+        internal const int INST_MOVEC = 30;                     // MoveC eX eY eZ eQW eQX eQY eQZ tX tY tZ (end robt + through robt
 
         // Characters used for buffer parsing
         internal const char STR_MESSAGE_END_CHAR = ';';         // Marks the end of a message
@@ -80,6 +82,30 @@ namespace Machina.Drivers.Communication.Protocols
                         Math.Round(cursor.rotation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         Math.Round(cursor.rotation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
                         Math.Round(cursor.rotation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        STR_MESSAGE_END_CHAR));
+                    break;
+
+                case ActionType.ArcMotion:
+                    // MoveC eX eY eZ eQW eQX eQY eQZ tX tY tZ 
+                    // Apparently, the orientation of the through frame is ignored by the controller,
+                    // so it is not included in the message.
+                    ActionArcMotion aam = action as ActionArcMotion;
+                    cursor.ComputeThroughPlane(aam, out Vector throughPos, out _);
+                    msgs.Add(string.Format(CultureInfo.InvariantCulture,
+                        "{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12}{13}",
+                        STR_MESSAGE_ID_CHAR,
+                        action.Id,
+                        INST_MOVEC,
+                        Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(cursor.rotation.Q.W, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(cursor.rotation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
+                        Math.Round(throughPos.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(throughPos.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(throughPos.Z, Geometry.STRING_ROUND_DECIMALS_MM),
                         STR_MESSAGE_END_CHAR));
                     break;
 

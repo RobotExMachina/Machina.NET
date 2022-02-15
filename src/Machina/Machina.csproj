@@ -79,6 +79,7 @@
     <Compile Include="Actions\ActionArmAngle.cs" />
     <Compile Include="Actions\ActionAttachTool.cs" />
     <Compile Include="Actions\ActionAxes.cs" />
+    <Compile Include="Actions\ActionArcMotion.cs" />
     <Compile Include="Actions\ActionComment.cs" />
     <Compile Include="Actions\ActionCoordinates.cs" />
     <Compile Include="Actions\ActionCustomCode.cs" />
@@ -90,7 +91,7 @@
     <Compile Include="Actions\ActionIOAnalog.cs" />
     <Compile Include="Actions\ActionIODigital.cs" />
     <Compile Include="Actions\ActionMessage.cs" />
-    <Compile Include="Actions\ActionMotion.cs" />
+    <Compile Include="Actions\ActionMotionMode.cs" />
     <Compile Include="Actions\ActionPrecision.cs" />
     <Compile Include="Actions\ActionPushPop.cs" />
     <Compile Include="Actions\ActionRotation.cs" />

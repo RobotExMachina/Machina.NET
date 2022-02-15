@@ -39,7 +39,7 @@ namespace Machina
         /// <summary>
         /// Build number.
         /// </summary>
-        public static readonly int Build = 1507;
+        public static readonly int Build = 1508;
 
         /// <summary>
         /// Version number.
@@ -130,27 +130,20 @@ namespace Machina
         /// <returns></returns>
         static public Robot Create(string name, string make)
         {
-            //RobotType rt;
-            //try
-            //{
-            //    rt = (RobotType)Enum.Parse(typeof(RobotType), make, true);
-            //    if (Enum.IsDefined(typeof(RobotType), rt))
-            //    {
-            //        return new Robot(name, rt);
-            //    }
-            //}
-            //catch
-            //{
-            //    Machina.Logger.Error($"{make} is not a RobotType, please specify one of the following: ");
-            //    foreach (string str in Enum.GetNames(typeof(RobotType)))
-            //    {
-            //        Machina.Logger.Error(str);
-            //    }
-            //}
-
-            RobotType rt = Utilities.Parsing.ParseEnumValue<RobotType>(make);
-
-            return null;
+            try
+            {
+                RobotType rt = Utilities.Parsing.ParseEnumValue<RobotType>(make);
+                return new Robot(name, rt);
+            }
+            catch
+            {
+                Machina.Logger.Error($"{make} is not a RobotType, please specify one of the following: ");
+                foreach (string str in Enum.GetNames(typeof(RobotType)))
+                {
+                    Machina.Logger.Error(str);
+                }
+                return null;
+            }
         }
 
 
@@ -767,7 +760,10 @@ namespace Machina
         /// <summary>
         /// Issue a compound RELATIVE local Translation + Rotation request
         /// according to the current reference system.
-        /// Note that, if using local coordinates, order of Actions will matter.  // TODO: wouldn't they matter too if the are in global coordinates?
+        /// Note that, if using local coordinates, order of Actions will matter. 
+        /// TODO: wouldn't they matter too if they were in global coordinates?
+        /// TODO II: should this be changed to simply mean a sort of plane to plane transform? 
+        /// Such change would make this more intuitive...
         /// </summary>
         /// <param name="direction"></param>
         /// <param name="rotation"></param>
@@ -783,7 +779,10 @@ namespace Machina
         /// <summary>
         /// Issue a compound RELATIVE local Rotation + Translation request
         /// according to the current reference system.
-        /// Note that, if using local coordinates, order of Actions will matter. // TODO: wouldn't they matter too if the are in global coordinates?
+        /// Note that, if using local coordinates, order of Actions will matter. 
+        /// TODO: wouldn't they matter too if they were in global coordinates?
+        /// TODO II: should this be changed to simply mean a sort of plane to plane transform? 
+        /// Such change would make this more intuitive...
         /// </summary>
         /// <param name="rotation"></param>
         /// <param name="direction"></param>
@@ -841,8 +840,171 @@ namespace Machina
         /// <param name="vY2"></param>
         /// <returns></returns>
         [ParseableFromString]
-        public bool TransformTo(double x, double y, double z, double vX0, double vX1, double vX2, double vY0, double vY1, double vY2) =>
-            c.IssueTransformationRequest(new Vector(x, y, z), new Orientation(vX0, vX1, vX2, vY0, vY1, vY2), false, true);
+        public bool TransformTo(double x, double y, double z, double vX0, double vX1, double vX2, double vY0, double vY1, double vY2) 
+        {
+            return c.IssueTransformationRequest(new Vector(x, y, z), new Orientation(vX0, vX1, vX2, vY0, vY1, vY2), false, true);
+        }
+
+        /// <summary>
+        /// Issue a RELATIVE arc motion request according to the current reference system.
+        /// Orientation will remain constant throughout the motion.
+        /// </summary>
+        /// <param name="through">Point to fit the arc motion through.</param>
+        /// <param name="end">Point to end the arc motion at.</param>
+        /// <returns></returns>
+        public bool ArcMotion(Point through, Point end)
+        {
+            Plane throughP = new Plane(
+                through.X, through.Y, through.Z,
+                1, 0, 0,
+                0, 1, 0);  // world XY, won't be used anyway
+
+            Plane endP = new Plane(
+                end.X, end.Y, end.Z,
+                1, 0, 0,
+                0, 1, 0);  // world XY, won't be used anyway
+
+            return c.IssueArcMotionRequest(throughP, endP, true, true);
+        }
+
+        /// <summary>
+        /// Issue a RELATIVE arc motion request according to the current reference system.
+        /// Orientation will remain constant throughout the motion.
+        /// </summary>
+        /// <param name="throughX"></param>
+        /// <param name="throughY"></param>
+        /// <param name="throughZ"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <param name="endZ"></param>
+        /// <returns></returns>
+        [ParseableFromString]
+        public bool ArcMotion(
+            double throughX, double throughY, double throughZ,
+            double endX, double endY, double endZ)
+        {
+            Plane through = new Plane(
+                throughX, throughY, throughZ,
+                1, 0, 0,
+                0, 1, 0);  // world XY, won't be used anyway
+
+            Plane end = new Plane(
+                endX, endY, endZ,
+                1, 0, 0,
+                0, 1, 0);  // world XY, won't be used anyway
+
+            return c.IssueArcMotionRequest(through, end, true, true);
+        }
+
+        /// <summary>
+        /// Issue an ABSOLUTE arc motion request according to the current reference system.
+        /// Orientation will remain constant throughout the motion.
+        /// </summary>
+        /// <param name="through">Point to fit the arc motion through.</param>
+        /// <param name="end">Point to end the arc motion at.</param>
+        /// <returns></returns>
+        public bool ArcMotionTo(Point through, Point end)
+        {
+            Plane throughP = new Plane(
+                through.X, through.Y, through.Z,
+                1, 0, 0,
+                0, 1, 0);  // world XY, won't be used anyway
+
+            Plane endP = new Plane(
+                end.X, end.Y, end.Z,
+                1, 0, 0,
+                0, 1, 0);  // world XY, won't be used anyway
+
+            return c.IssueArcMotionRequest(throughP, endP, false, true);
+        }
+
+        /// <summary>
+        /// Issue an ABSOLUTE arc motion request according to the current reference system.
+        /// Orientation will remain constant throughout the motion.
+        /// </summary>
+        /// <param name="throughX"></param>
+        /// <param name="throughY"></param>
+        /// <param name="throughZ"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <param name="endZ"></param>
+        /// <returns></returns>
+        [ParseableFromString]
+        public bool ArcMotionTo(
+            double throughX, double throughY, double throughZ,
+            double endX, double endY, double endZ)
+        {
+            Plane through = new Plane(
+                throughX, throughY, throughZ,
+                1, 0, 0, 
+                0, 1, 0);  // world XY, won't be used anyway
+
+            Plane end = new Plane(
+                endX, endY, endZ,
+                1, 0, 0,
+                0, 1, 0);  // world XY, won't be used anyway
+
+            return c.IssueArcMotionRequest(through, end, false, true);
+        }
+
+        /// <summary>
+        /// Issue an ABSOLUTE arc motion request according to the current reference system.
+        /// Orientation will also change through the fit planes.
+        /// </summary>
+        /// <param name="through">Plane to fit the arc motion through.</param>
+        /// <param name="end">Plane to end the arc motion at.</param>
+        /// <returns></returns>
+        public bool ArcMotionTo(Plane through, Plane end)
+        {
+            // Use deep copies to avoid reference conflicts 
+            // @TODO: really need to convert geo types to structs soon!
+            return c.IssueArcMotionRequest(through.Clone(), end.Clone(), false, false);
+        }
+
+        /// <summary>
+        /// Issue an ABSOLUTE arc motion request according to the current reference system.
+        /// Orientation will also change through the fit planes.
+        /// </summary>
+        /// <param name="throughX"></param>
+        /// <param name="throughY"></param>
+        /// <param name="throughZ"></param>
+        /// <param name="throughVX0"></param>
+        /// <param name="throughVX1"></param>
+        /// <param name="throughVX2"></param>
+        /// <param name="throughVY0"></param>
+        /// <param name="throughVY1"></param>
+        /// <param name="throughVY2"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <param name="endZ"></param>
+        /// <param name="endVX0"></param>
+        /// <param name="endVX1"></param>
+        /// <param name="endVX2"></param>
+        /// <param name="endVY0"></param>
+        /// <param name="endVY1"></param>
+        /// <param name="endVY2"></param>
+        /// <returns></returns>
+        public bool ArcMotionTo(
+            double throughX, double throughY, double throughZ,
+            double throughVX0, double throughVX1, double throughVX2, 
+            double throughVY0, double throughVY1, double throughVY2,
+            double endX, double endY, double endZ, 
+            double endVX0, double endVX1, double endVX2, 
+            double endVY0, double endVY1, double endVY2)
+        {
+            //This would be nice to have [ParseableFromString] too, but we currently cannot discriminate between multiple functions with the same name... 
+            Plane through = new Plane(
+                throughX, throughY, throughZ,
+                throughVX0, throughVX1, throughVX2,
+                throughVY0, throughVY1, throughVY2);
+
+            Plane end = new Plane(
+                endX, endY, endZ,
+                endVX0, endVX1, endVX2,
+                endVY0, endVY1, endVY2);
+
+            return c.IssueArcMotionRequest(through, end, false, false);
+        }
 
 
         /// <summary>

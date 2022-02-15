@@ -40,7 +40,8 @@ namespace Machina
         Initialization, 
         ExternalAxis,
         CustomCode,
-        ArmAngle
+        ArmAngle,
+        ArcMotion
     }
 
     

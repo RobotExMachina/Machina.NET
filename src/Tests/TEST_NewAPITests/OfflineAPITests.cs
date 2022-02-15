@@ -13,16 +13,20 @@ namespace TEST_OfflineAPITests
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("--> GENERAL TEST");
+            Console.WriteLine("--> ARC MOTION TEST");
 
 
-            Robot arm = Robot.Create("SimpleFK", "KUKA");
+            Robot arm = Robot.Create("ArcMotion", "ABB");
 
             arm.DebugMode(true);
 
             //SimpleFK(arm);
             //RotationTest(arm);
-            ToolTesting(arm);
+            //ToolTesting(arm);
+            ArcMotionTest(arm);
+
+            //Console.WriteLine(arm.GetCurrentPosition());
+            //Console.WriteLine(arm.GetCurrentRotation().ToOrientation());
 
             //arm.Compile(arm.IsBrand("ABB") ? @"D:\offlineTests.prg" :
             //    arm.IsBrand("UR") ? @"D:\offlineTests.script" :
@@ -38,6 +42,29 @@ namespace TEST_OfflineAPITests
             Console.WriteLine(" ");
             Console.WriteLine("Press any key to EXIT...");
             Console.ReadKey();
+        }
+
+        static void ArcMotionTest(Robot bot)
+        {
+            bot.SpeedTo(1000);
+            bot.TransformTo(500, 500, 500, -1, 0, 0, 0, 1, 0);
+            bot.Wait(1000);
+
+            bot.SpeedTo(25);
+            //// these should end in (600, 600, 500) with 
+            //bot.ArcMotionTo(500, 600, 500, 600, 600, 500);
+            //bot.ArcMotion(0, 100, 0, 100, 100, 0);
+
+            // This should end in [600, 600, 500, 0, -1, 0, 0, 0, -1]
+            bot.ArcMotionTo(
+                500, 600, 500, -1, 0, 0, 0, 1, 0,
+                600, 600, 500, 0, -1, 0, 0, 0, -1);
+
+            bot.Wait(2000);
+
+            bot.SpeedTo(1000);
+            bot.AxesTo(0, 0, 0, 0, 90, 0);
+
         }
 
         static void SimpleFK(Robot bot)

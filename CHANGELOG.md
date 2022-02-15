@@ -30,6 +30,12 @@
 
 
 # v0.8.14
+## BUILD 1508
+- Added `ArcMotion/To` action.
+- `ArcMotion` action compiles to ABB offline
+- `ArcMotion` action streams to ABB online
+- Fixed ABB variable-base compiler, id numbers are now correlative. 
+
 ## BUILD 1507
 - Improvements to the `KUKA` compiler from @Arastookhajehee! 😄
 

@@ -720,9 +720,13 @@ namespace Machina
         //  ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
         //                                                         
 
+        /// <summary>
+        /// Issues an action from a stringified instruction form, such as "Move(100, 0, 0)"
+        /// </summary>
+        /// <param name="statement"></param>
+        /// <returns></returns>
         public bool IssueApplyActionRequestFromStringStatement(string statement)
         {
-
             string[] args = Machina.Utilities.Parsing.ParseStatement(statement);
             if (args == null || args.Length == 0)
             {
@@ -733,6 +737,7 @@ namespace Machina
             // Perform some sanity checks
             string methodName = args[0];
 
+            // @TODO: this doesn't consider two methods with same name but different amount of arguments, would be nice!
             // Correct method name, including casing?
             MethodInfo reflectedMethod;
             if (!Robot._reflectedAPI.TryGetValue(methodName, out reflectedMethod))
@@ -923,9 +928,20 @@ namespace Machina
         /// <param name="rel"></param>
         /// <param name="translationFirst"></param>
         /// <returns></returns>
+        /// <returns></returns>
         public bool IssueTransformationRequest(Vector trans, Rotation rot, bool rel, bool translationFirst) =>
                 IssueApplyActionRequest(new ActionTransformation(trans, rot, rel, translationFirst));
 
+        /// <summary>
+        /// Issue an arc motion requesti with fully customized parameters.
+        /// </summary>
+        /// <param name="through"></param>
+        /// <param name="end"></param>
+        /// <param name="relative"></param>
+        /// <param name="positionOnly"></param>
+        /// <returns></returns>
+        public bool IssueArcMotionRequest(Plane through, Plane end, bool relative, bool positionOnly) =>
+            IssueApplyActionRequest(new ActionArcMotion(through, end, relative, positionOnly));
 
         /// <summary>
         /// Issue a request to set the values of joint angles in configuration space. 
