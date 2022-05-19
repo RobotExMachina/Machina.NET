@@ -193,25 +193,25 @@ namespace Machina.Drivers.Communication
                     // @TODO: THIS WILL NEED TO BE CHANGED TO CONVERT A BUNCH OF ACTIONS INTO ONE SINGLE MESSAGE...
                     List<string> msgs = this._translator.GetMessagesForNextAction(this._releaseCursor);
 
-                    //string xmlMessageBlock = "";
-                    //string openningXML = "<DT><DC>" + msgs.Count  + "</DC><DR>";
-                    //string closingXML = "</DR><Msg><Str /><Con>1</Con></Msg></DT>";
+                    string xmlMessageBlock = "";
+                    string openningXML = "<DT><DC>" + msgs.Count + "</DC><DR>";
+                    string closingXML = "</DR><Msg><Str /><Con>1</Con></Msg></DT>";
 
-                    //xmlMessageBlock += openningXML;
-                    //foreach (string messagePart in msgs) openningXML += messagePart;
-                    //xmlMessageBlock += closingXML;
+                    xmlMessageBlock += openningXML;
+                    foreach (string messagePart in msgs) xmlMessageBlock += messagePart;
+                    xmlMessageBlock += closingXML;
 
                     if (msgs != null)
                     {
-                        foreach (var msg in msgs)
-                        {
-                            _sendMsgBytes = Encoding.ASCII.GetBytes(msg);
+                        //foreach (var msg in msgs)
+                        //{
+                            _sendMsgBytes = Encoding.ASCII.GetBytes(xmlMessageBlock);
                             _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
                             _sentMessages++;
                             //Console.WriteLine("Sending mgs: " + msg);
                             logger.Debug($"Sent:");
-                            logger.Debug(msg);
-                        }
+                            logger.Debug(xmlMessageBlock);
+                        //}
                     }
 
                     // Action was released to the device, raise event

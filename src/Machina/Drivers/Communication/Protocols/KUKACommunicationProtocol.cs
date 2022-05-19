@@ -50,9 +50,9 @@ namespace Machina.Drivers.Communication.Protocols
         {
             List<string> msgs = new List<string>();
 
-            // TEMP: this needs to be streamlined...
-            string xml = "<DT><DC>1</DC><DR>";
-            //string xml = "";
+            //// TEMP: this needs to be streamlined...
+            //string xml = "<DT><DC>1</DC><DR>";
+            string xml = "";
 
 
             switch (action.Type)
@@ -397,7 +397,7 @@ namespace Machina.Drivers.Communication.Protocols
             }
 
            // Close the XML
-           xml += "</DR><Msg><Str M01=\"" + Sending_Message + "\"/><Con>1</Con></Msg></DT>";
+           //xml += "</DR><Msg><Str M01=\"" + Sending_Message + "\"/><Con>1</Con></Msg></DT>";
 
             msgs.Add(xml);
 
