@@ -55,21 +55,22 @@ namespace Machina.Drivers.Communication
 
         private int _sentMessages = 0;
         private int _receivedMessages = 0;
-        private int _maxStreamCount = 10;
+        private int _maxStreamCount = 5;
         private int _sendNewBatchOn = 2;
 
         private string _deviceDriverVersion = null;
 
-        // Props for Monitor module (if available)
-        private TcpClient _monitorClientSocket;
-        private TCPConnectionStatus _monitorStatus;
-        private Thread _monitoringThread;
-        private string _monitorIP;
-        private int _monitorPort;
-        private int _monitorReceiveByteCount;
-        private string _monitorMessage;
-        private byte[] _monitorReceiveMsgBytes = new byte[1024];
-        private int _monitorReceivedMessages = 0;
+        // delete for kuka
+        //// Props for Monitor module (if available)
+        //private TcpClient _monitorClientSocket;
+        //private TCPConnectionStatus _monitorStatus;
+        //private Thread _monitoringThread;
+        //private string _monitorIP;
+        //private int _monitorPort;
+        //private int _monitorReceiveByteCount;
+        //private string _monitorMessage;
+        //private byte[] _monitorReceiveMsgBytes = new byte[1024];
+        //private int _monitorReceivedMessages = 0;
 
         private bool _isMonitored = false;
         public bool IsMonitored => _isMonitored;
@@ -85,8 +86,9 @@ namespace Machina.Drivers.Communication
             this._motionCursor = driver.parentControl.MotionCursor;   // @TODO: homogenize how the driver picks cursors from parent control: as constructor arguments or directly from the object 
             this._ip = ip;
             this._port = port;
-            this._monitorIP = ip;               
-            this._monitorPort = port + 1;  // these should be configurable...   
+            // delete for kuka
+            //this._monitorIP = ip;               
+            //this._monitorPort = port + 1;  // these should be configurable...   
 
             this._translator = Protocols.Factory.GetTranslator(this._parentDriver);
         }
@@ -190,6 +192,15 @@ namespace Machina.Drivers.Communication
                 {
                     // @TODO: THIS WILL NEED TO BE CHANGED TO CONVERT A BUNCH OF ACTIONS INTO ONE SINGLE MESSAGE...
                     List<string> msgs = this._translator.GetMessagesForNextAction(this._releaseCursor);
+
+                    //string xmlMessageBlock = "";
+                    //string openningXML = "<DT><DC>" + msgs.Count  + "</DC><DR>";
+                    //string closingXML = "</DR><Msg><Str /><Con>1</Con></Msg></DT>";
+
+                    //xmlMessageBlock += openningXML;
+                    //foreach (string messagePart in msgs) openningXML += messagePart;
+                    //xmlMessageBlock += closingXML;
+
                     if (msgs != null)
                     {
                         foreach (var msg in msgs)
@@ -292,36 +303,50 @@ namespace Machina.Drivers.Communication
         /// <param name="res"></param>
         private void ParseResponse(string res)
         {
+
+            //res = "<S VR = \"1.000000\" A1 = \"4.999516\" A2 = \"-90.000031\" A3 = \"100.000015\" A4 = \"0.000884\" A5 = \"10.002779\" A6 = \"0.000462\" X = \"1057.835205\" Y = \"-92.828331\" Z = \"1149.374878\" A = \"174.995850\" B = \"69.865311\" C = \" - 179.959747\" ></ S >";
+
+            //res = res.Trim();
             // for the time being, log response and fake 
             logger.Debug("Parsing: " + res);
 
-            // BOGUS DATA! DANGER!
-            this.initPos = new Vector(1037, -92, 893);
-            this.initRot = new Rotation(new Quaternion());
-            this.initAx = new Joints(5, -90, 100, 0, 10, 0);
-            this.initExtAx = new ExternalAxes(0,0,0,0,0,0);
+            //// BOGUS DATA! DANGER!
+            //this._deviceDriverVersion = "0.1";
+            //this.initPos = new Vector(1037, -92, 893);
+            //this.initRot = new Rotation(new Quaternion());
+            //this.initAx = new Joints(5, -90, 100, 0, 10, 0);
+            //this.initExtAx = new ExternalAxes(0, 0, 0, 0, 0, 0);
 
+            //return;
 
             // @TODO: replace this shit with actual code that discriminates between an acknowledgement and a status
 
-            //// If first char is an id marker (otherwise, we can't know which action it is)
-            //// @TODO: this is hardcoded for ABB, do this programmatically...
-            //if (res[0] == ABBCommunicationProtocol.STR_MESSAGE_ID_CHAR)
-            //{
-            //    AcknowledgmentReceived(res);
-            //}
-            //else if (res[0] == ABBCommunicationProtocol.STR_MESSAGE_RESPONSE_CHAR)
-            //{
-            //    //Console.WriteLine("RECEIVED: " + res);
-            //    DataReceived(res);
-            //}
+            // If first char is an id marker (otherwise, we can't know which action it is)
+            // @TODO: this is hardcoded for ABB, do this programmatically...
+            if (res[1] == 'R')
+            {
+                AcknowledgmentReceived(res);
+            }
+            else if (res[1] == 'S')
+
+            {
+                //Console.WriteLine("RECEIVED: " + res);
+                DataReceived(res);
+            }
         }
 
         private void AcknowledgmentReceived(string res)
         {
-            // @TODO: Add some sanity here for incorrectly formatted messages
-            string[] _responseChunks = res.Split(' ');
-            string idStr = _responseChunks[0].Substring(1);
+
+            // <R ID="4" T="" />
+            // https://stackoverflow.com/questions/8401280/read-a-xml-from-a-string-and-get-some-fields-problems-reading-xml
+            XmlDocument document = new XmlDocument();
+            document.LoadXml(res);
+            // Select a single node
+            XmlNode nodeID = document.SelectSingleNode("R/@ID");
+            //XmlNode nodeType = document.SelectSingleNode("R/@T");
+            string idStr = nodeID.InnerText;
+
             int id = Convert.ToInt32(idStr);
 
             // An Action may have been issued and released, but we may have not received an acknowledgement
@@ -356,64 +381,131 @@ namespace Machina.Drivers.Communication
         {
             lock(_dataReceivedLock)
             {
-                string[] _responseChunks = res.Split(' ');
-                int resType = Convert.ToInt32(_responseChunks[0].Substring(1));
 
-                double[] data = new double[_responseChunks.Length - 1];
-                for (int i = 0; i < data.Length; i++)
+                ////this._deviceDriverVersion = "0.1";
+                ////this.initPos = new Vector(1037, -92, 893);
+                ////this.initRot = new Rotation(new Quaternion());
+                //////this.initAx = new Joints(5, -90, 100, 0, 10, 0);
+                ////this.initExtAx = new ExternalAxes(0, 0, 0, 0, 0, 0);
+
+                // version a1 a2 a3 a4 a5 a6 x y z a b c
+                double[] values = Extract_KUKA_Robot_Status_XML(res);
+
+                this._deviceDriverVersion = values[0].ToString();
+                if (values[0] == 1.0)
                 {
-                    // @TODO: add sanity like Double.TryParse(...)
-                    data[i] = Double.Parse(_responseChunks[i + 1]);
+                    logger.Verbose($"Using ABB Driver version {1.0}, found {_deviceDriverVersion}.");
+                }
+                else
+                {
+                    logger.Warning($"Found driver version {_deviceDriverVersion}, expected at least {1.0}. Please update driver module or unexpected behavior may arise.");
                 }
 
-                switch (resType)
-                {
-                    // ">20 1 2 1;" Sends version numbers
-                    case ABBCommunicationProtocol.RES_VERSION:
-                        this._deviceDriverVersion = Convert.ToInt32(data[0]) + "." + Convert.ToInt32(data[1]) + "." + Convert.ToInt32(data[2]);
-                        int comp = Utilities.Strings.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
-                        if (comp > -1)
-                        {
-                            logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {_deviceDriverVersion}.");
-                        }
-                        else
-                        {
-                            logger.Warning($"Found driver version {_deviceDriverVersion}, expected at least {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}. Please update driver module or unexpected behavior may arise.");
-                        }
-                        break;
+                this.initAx = new Joints(values[1], values[2], values[3], values[4], values[5], values[6]);
+                this.initExtAx = new ExternalAxes(0, 0, 0, 0, 0, 0);
+                this.initPos = new Vector(values[7], values[8], values[9]);
 
-                    // ">21 400 300 500 0 0 1 0;"
-                    case ABBCommunicationProtocol.RES_POSE:
-                        this.initPos = new Vector(data[0], data[1], data[2]);
-                        this.initRot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
-                        break;
+                YawPitchRoll yawPitchRoll = new YawPitchRoll(values[10], values[11], values[12]);
+                this.initRot = new Rotation(yawPitchRoll.ToQuaternion());
+
+                //string[] _responseChunks = res.Split(' ');
+                //int resType = Convert.ToInt32(_responseChunks[0].Substring(1));
+
+                //double[] data = new double[_responseChunks.Length - 1];
+                //for (int i = 0; i < data.Length; i++)
+                //{
+                //    // @TODO: add sanity like Double.TryParse(...)
+                //    data[i] = Double.Parse(_responseChunks[i + 1]);
+                //}
+
+                //switch (resType)
+                //{
+                //    //// ">20 1 2 1;" Sends version numbers
+                //    //case ABBCommunicationProtocol.RES_VERSION:
+                //    //    this._deviceDriverVersion = Convert.ToInt32(data[0]) + "." + Convert.ToInt32(data[1]) + "." + Convert.ToInt32(data[2]);
+                //    //    int comp = Utilities.Strings.CompareVersions(ABBCommunicationProtocol.MACHINA_SERVER_VERSION, _deviceDriverVersion);
+                //    //    if (comp > -1)
+                //    //    {
+                //    //        logger.Verbose($"Using ABB Driver version {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}, found {_deviceDriverVersion}.");
+                //    //    }
+                //    //    else
+                //    //    {
+                //    //        logger.Warning($"Found driver version {_deviceDriverVersion}, expected at least {ABBCommunicationProtocol.MACHINA_SERVER_VERSION}. Please update driver module or unexpected behavior may arise.");
+                //    //    }
+                //    //    break;
+
+                //    // ">21 400 300 500 0 0 1 0;"
+                //    case ABBCommunicationProtocol.RES_POSE:
+                //        this.initPos = new Vector(data[0], data[1], data[2]);
+                //        this.initRot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
+                //        break;
 
 
-                    // ">22 0 0 0 0 90 0;"
-                    case ABBCommunicationProtocol.RES_JOINTS:
-                        this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
-                        break;
+                //    // ">22 0 0 0 0 90 0;"
+                //    case ABBCommunicationProtocol.RES_JOINTS:
+                //        this.initAx = new Joints(data[0], data[1], data[2], data[3], data[4], data[5]);
+                //        break;
 
-                    // ">23 1000 9E9 9E9 9E9 9E9 9E9;"
-                    case ABBCommunicationProtocol.RES_EXTAX:
-                        this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
-                        break;
+                //    // ">23 1000 9E9 9E9 9E9 9E9 9E9;"
+                //    case ABBCommunicationProtocol.RES_EXTAX:
+                //        this.initExtAx = new ExternalAxes(data[0], data[1], data[2], data[3], data[4], data[5]);
+                //        break;
 
-                    // ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
-                    case ABBCommunicationProtocol.RES_FULL_POSE:
-                        Vector pos = new Vector(data[0], data[1], data[2]);
-                        Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
-                        Joints ax = new Joints(data[7], data[8], data[9], data[10], data[11], data[12]);
-                        ExternalAxes extax = new ExternalAxes(data[13], data[14], data[15], data[16], data[17], data[18]);
+                //    // ">24 X Y Z QW QX QY QZ J1 J2 J3 J4 J5 J6 A1 A2 A3 A4 A5 A6;"
+                //    case ABBCommunicationProtocol.RES_FULL_POSE:
+                //        Vector pos = new Vector(data[0], data[1], data[2]);
+                //        Rotation rot = new Rotation(new Quaternion(data[3], data[4], data[5], data[6]));
+                //        Joints ax = new Joints(data[7], data[8], data[9], data[10], data[11], data[12]);
+                //        ExternalAxes extax = new ExternalAxes(data[13], data[14], data[15], data[16], data[17], data[18]);
 
-                        this._motionCursor.UpdateFullPose(pos, rot, ax, extax);
-                        this._parentDriver.parentControl.RaiseMotionUpdateEvent();
+                //        this._motionCursor.UpdateFullPose(pos, rot, ax, extax);
+                //        this._parentDriver.parentControl.RaiseMotionUpdateEvent();
 
-                        break;
-                }
+                //        break;
+                //}
 
             }
 
+        }
+
+        public static double[] Extract_KUKA_Robot_Status_XML(string xmlString)
+        {
+            // <Result ID="4" T="" />
+            // https://stackoverflow.com/questions/8401280/read-a-xml-from-a-string-and-get-some-fields-problems-reading-xml
+            XmlDocument document = new XmlDocument();
+            document.LoadXml(xmlString);
+            // Select a single node
+            XmlNode nodeVR = document.SelectSingleNode("S/@VR");
+            XmlNode nodeA1 = document.SelectSingleNode("S/@A1");
+            XmlNode nodeA2 = document.SelectSingleNode("S/@A2");
+            XmlNode nodeA3 = document.SelectSingleNode("S/@A3");
+            XmlNode nodeA4 = document.SelectSingleNode("S/@A4");
+            XmlNode nodeA5 = document.SelectSingleNode("S/@A5");
+            XmlNode nodeA6 = document.SelectSingleNode("S/@A6");
+            XmlNode nodeX = document.SelectSingleNode("S/@X");
+            XmlNode nodeY = document.SelectSingleNode("S/@Y");
+            XmlNode nodeZ = document.SelectSingleNode("S/@Z");
+            XmlNode nodeA = document.SelectSingleNode("S/@A");
+            XmlNode nodeB = document.SelectSingleNode("S/@B");
+            XmlNode nodeC = document.SelectSingleNode("S/@C");
+
+            double vr = Convert.ToDouble(nodeVR.InnerText);
+            double a1 = Convert.ToDouble(nodeA1.InnerText);
+            double a2 = Convert.ToDouble(nodeA2.InnerText);
+            double a3 = Convert.ToDouble(nodeA3.InnerText);
+            double a4 = Convert.ToDouble(nodeA4.InnerText);
+            double a5 = Convert.ToDouble(nodeA5.InnerText);
+            double a6 = Convert.ToDouble(nodeA6.InnerText);
+            double x = Convert.ToDouble(nodeX.InnerText);
+            double y = Convert.ToDouble(nodeY.InnerText);
+            double z = Convert.ToDouble(nodeZ.InnerText);
+            double a = Convert.ToDouble(nodeA.InnerText);
+            double b = Convert.ToDouble(nodeB.InnerText);
+            double c = Convert.ToDouble(nodeC.InnerText);
+
+            double[] currentStatus = { vr, a1, a2, a3, a4, a5, a6, x, y, z, a, b, c };
+
+            return currentStatus;
         }
 
     }

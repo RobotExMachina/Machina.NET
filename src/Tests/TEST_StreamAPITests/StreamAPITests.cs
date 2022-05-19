@@ -57,6 +57,7 @@ namespace TEST_StreamAPITests
 
             //arm.StreamConfiguration(3, 10);
 
+            //Thread.Sleep(3000);
             SimpleTransform(arm);
                        
 
@@ -79,7 +80,11 @@ namespace TEST_StreamAPITests
 
         static void SimpleTransform(Robot bot)
         {
-            bot.TransformTo(900, 100, 700, -1, 0, 0, 0, 1, 0);
+            //bot.TransformTo(900, 100, 700, -1, 0, 0, 0, 1, 0);
+            bot.AxesTo(-32, -65, 110, -35, -25, -10);
+            bot.AxesTo(-32, -90, 110, -35, -25, -10);
+            bot.AxesTo(-32, -65, 110, -35, -25, -10);
+            bot.AxesTo(-32, -90, 110, -35, -25, -10);
         }
 
 
