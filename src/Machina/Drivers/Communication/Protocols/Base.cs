@@ -26,6 +26,20 @@ namespace Machina.Drivers.Communication.Protocols
 
             return GetActionMessages(action, cursor);  // this might be null if the action doesn't have a message representation here (e.g. PushSettings, Comment...)
         }
+        //Machina.Drivers.Communication
+
+        public List<string> GetMessagesForNextAction_KUKA(RobotCursor cursor, out Action actionObj)
+        {
+            Action action;
+
+            if (!cursor.ApplyNextAction(out action))
+            {
+                actionObj = null;
+                return null;  // cursor buffer is empty
+            }
+            actionObj = action;
+            return GetActionMessages(action, cursor);  // this might be null if the action doesn't have a message representation here (e.g. PushSettings, Comment...)
+        }
 
         /// <summary>
         /// Given a (write cursor, apply next Action in the buffer and return a byte[] representation

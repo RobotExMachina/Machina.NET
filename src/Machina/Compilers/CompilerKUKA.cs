@@ -812,6 +812,8 @@ namespace Machina
         /// <returns></returns>
         internal string GetPositionTargetValue(RobotCursor cursor)
         {
+            // adjusting the action's rotation to match the KUKA robot's convention
+            cursor.rotation.RotateLocal(new Rotation(0, 1, 0, 90));
             YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
 
             // @TODO: E6POS: External Axes (Arastoo)
@@ -828,6 +830,8 @@ namespace Machina
 
         internal string GetPositionTargetValue_Translation_Only(RobotCursor cursor)
         {
+            // adjusting the action's rotation to match the KUKA robot's convention
+            cursor.rotation.RotateLocal(new Rotation(0, 1, 0, 90));
             YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
 
             // @TODO: E6POS: External Axes (Arastoo)
@@ -867,6 +871,9 @@ namespace Machina
                 throw new Exception("Cursor has no tool attached");
             }
 
+            // @To Do
+            // adjusting the action's rotation to match the KUKA robot's convention
+            //cursor.rotation.RotateLocal(new Rotation(0, 1, 0, 90));
             YawPitchRoll euler = cursor.tool.TCPOrientation.Q.ToYawPitchRoll();
 
             return string.Format(CultureInfo.InvariantCulture,

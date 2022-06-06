@@ -61,6 +61,8 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Rotation:
                 case ActionType.Transformation:
 
+                    // adjusting the action's rotation to match the KUKA robot's convention
+                    cursor.rotation.RotateLocal(new Rotation(0, 1, 0, 90));
                     YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
 
                     // PTP/LIN X Y Z A B C 
@@ -142,12 +144,15 @@ namespace Machina.Drivers.Communication.Protocols
 
                 case ActionType.Speed:
 
+                    double linSpeed = cursor.speed * Speed_MMS_To_MS;
+                    int axisRelativeSpeed = Convert.ToInt32(linSpeed / 3 * 100);
+
                     xml += string.Format(CultureInfo.InvariantCulture,
                         "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
                         action.Id,
                         (int)action.Type,
                         cursor.speed * Speed_MMS_To_MS,  // the frame values should be shifted to start on V1! 
-                        Default_Value,
+                        axisRelativeSpeed,
                         Default_Value,
                         Default_Value,
                         Default_Value,
@@ -204,10 +209,28 @@ namespace Machina.Drivers.Communication.Protocols
                         Default_Value,
                         Default_Value);
                     break;
+
+                case ActionType.MotionMode:
+                    // Add a log here to avoid a confusing default warning.
+                    Logger.Verbose("`DefineTool()` doesn't need to be streamed.");
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
                     break;
 
                 case ActionType.AttachTool:
-                    // !(settool X Y Z QW QX QY QZ KG CX CY CZ)
+
+                    // @To Do
+                    // adjusting the action's rotation to match the KUKA robot's convention
+                    //cursor.rotation.RotateLocal(new Rotation(0, 1, 0, 90));
                     Tool t = cursor.tool;  // @TODO: should I just pull from the library? need to rethink the general approach: take info from cursor state (like motion actions) or action data...
                     euler = cursor.tool.TCPOrientation.ToQuaternion().ToYawPitchRoll();
                     // PTP/LIN X Y Z A B C 
@@ -396,9 +419,7 @@ namespace Machina.Drivers.Communication.Protocols
                     return null;
             }
 
-           // Close the XML
-           //xml += "</DR><Msg><Str M01=\"" + Sending_Message + "\"/><Con>1</Con></Msg></DT>";
-
+           // adding the formatted xml string to the action
             msgs.Add(xml);
 
             return msgs;

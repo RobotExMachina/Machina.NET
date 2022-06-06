@@ -55,7 +55,7 @@ namespace Machina.Drivers.Communication
 
         private int _sentMessages = 0;
         private int _receivedMessages = 0;
-        private int _maxStreamCount = 5;
+        private int _maxStreamCount = 10;
         private int _sendNewBatchOn = 2;
 
         private string _deviceDriverVersion = null;
@@ -188,38 +188,57 @@ namespace Machina.Drivers.Communication
             // Expire the thread on disconnection
             while (_clientStatus != TCPConnectionStatus.Disconnected)
             {
+                int KUKApendingActionCount = this._releaseCursor.ActionsPendingCount();
+                int howManyToSend = _maxStreamCount <= KUKApendingActionCount ? _maxStreamCount : KUKApendingActionCount;
+
+                string xmlMessageBlock = "";
+                string openningXML = "<DT><DC>" + howManyToSend + "</DC><DR>";
+                string closingMsgXML = "</DR><Msg><Str ";
+                string closingXML = "/><Con>1</Con></Msg></DT>";
+                xmlMessageBlock += openningXML;
+
+                //bool breakLoop = false;
+
+                //int countForEnoughMessages = 0;
+
+                var actionMsgContentList = new List<Action>();
+                int msgListCount = 0;
                 while (this.ShouldSend() && this._releaseCursor.AreActionsPending())
                 {
+
                     // @TODO: THIS WILL NEED TO BE CHANGED TO CONVERT A BUNCH OF ACTIONS INTO ONE SINGLE MESSAGE...
-                    List<string> msgs = this._translator.GetMessagesForNextAction(this._releaseCursor);
-
-                    string xmlMessageBlock = "";
-                    string openningXML = "<DT><DC>" + msgs.Count + "</DC><DR>";
-                    string closingXML = "</DR><Msg><Str /><Con>1</Con></Msg></DT>";
-
-                    xmlMessageBlock += openningXML;
+                    string msgString = "";
+                    Action action = null;
+                    List<string> msgs = this._translator.GetMessagesForNextAction_KUKA(this._releaseCursor,out action);
+                    actionMsgContentList.Add(action);
                     foreach (string messagePart in msgs) xmlMessageBlock += messagePart;
-                    xmlMessageBlock += closingXML;
+                    // Action was released to the ***ActionList, raise event
+                    this._parentDriver.parentControl.RaiseActionReleasedEvent();
+                    msgListCount++;
 
-                    if (msgs != null)
+                    //countForEnoughMessages++;
+                    if (msgListCount == howManyToSend)
                     {
-                        //foreach (var msg in msgs)
-                        //{
-                            _sendMsgBytes = Encoding.ASCII.GetBytes(xmlMessageBlock);
-                            _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
-                            _sentMessages++;
-                            //Console.WriteLine("Sending mgs: " + msg);
-                            logger.Debug($"Sent:");
-                            logger.Debug(xmlMessageBlock);
-                        //}
+                        
+                        // adding the messages and closig the xml structure
+                        xmlMessageBlock += closingMsgXML;
+                        for (int i = 0; i < msgListCount; i++)
+                        {
+                            xmlMessageBlock += Get_ActionMessageString(actionMsgContentList[i], i);
+                        }
+                        xmlMessageBlock += closingXML;
+
+                        _sendMsgBytes = Encoding.ASCII.GetBytes(xmlMessageBlock);
+                        _clientNetworkStream.Write(_sendMsgBytes, 0, _sendMsgBytes.Length);
+                        _sentMessages += msgListCount;
+                        logger.Debug($"Sent:");
+                        logger.Debug(xmlMessageBlock);
+                        break;
                     }
 
-                    // Action was released to the device, raise event
-                    this._parentDriver.parentControl.RaiseActionReleasedEvent();
                 }
 
                 //RaiseBufferEmptyEventCheck();
-
                 Thread.Sleep(30);
             }
         }
@@ -243,8 +262,9 @@ namespace Machina.Drivers.Communication
 
                     // @TODO: WRITE HERE WHAT TO DO WITH THE RESPONSES;
                     logger.Debug("Received message from driver: " + _response);
-                    ParseResponse(_response);
-                    _receivedMessages++;
+                    int responseCount = 0;
+                     ParseResponse(_response, out responseCount);
+                    _receivedMessages += responseCount;
                 }
 
                 Thread.Sleep(30);
@@ -301,7 +321,7 @@ namespace Machina.Drivers.Communication
         /// Parse the response and decide what to do with it.
         /// </summary>
         /// <param name="res"></param>
-        private void ParseResponse(string res)
+        private void ParseResponse(string res, out int messageCount)
         {
 
             //res = "<S VR = \"1.000000\" A1 = \"4.999516\" A2 = \"-90.000031\" A3 = \"100.000015\" A4 = \"0.000884\" A5 = \"10.002779\" A6 = \"0.000462\" X = \"1057.835205\" Y = \"-92.828331\" Z = \"1149.374878\" A = \"174.995850\" B = \"69.865311\" C = \" - 179.959747\" ></ S >";
@@ -325,19 +345,29 @@ namespace Machina.Drivers.Communication
             // @TODO: this is hardcoded for ABB, do this programmatically...
             if (res[1] == 'R')
             {
-                AcknowledgmentReceived(res);
+                int msgCount = 0;
+                AcknowledgmentReceived(res, out msgCount);
+                messageCount = msgCount;
             }
             else if (res[1] == 'S')
 
             {
                 //Console.WriteLine("RECEIVED: " + res);
+                messageCount = 1;
+                DataReceived(res);
+            }
+            else 
+            {
+                messageCount = 1;
                 DataReceived(res);
             }
         }
 
-        private void AcknowledgmentReceived(string res)
+        private void AcknowledgmentReceived(string res, out int messageCount)
         {
-
+            int msgCount = 0;
+            res = CleanupResponse(res, out msgCount);
+            messageCount = msgCount;
             // <R ID="4" T="" />
             // https://stackoverflow.com/questions/8401280/read-a-xml-from-a-string-and-get-some-fields-problems-reading-xml
             XmlDocument document = new XmlDocument();
@@ -404,9 +434,11 @@ namespace Machina.Drivers.Communication
                 this.initAx = new Joints(values[1], values[2], values[3], values[4], values[5], values[6]);
                 this.initExtAx = new ExternalAxes(0, 0, 0, 0, 0, 0);
                 this.initPos = new Vector(values[7], values[8], values[9]);
-
+                
                 YawPitchRoll yawPitchRoll = new YawPitchRoll(values[10], values[11], values[12]);
-                this.initRot = new Rotation(yawPitchRoll.ToQuaternion());
+                var rotation = new Rotation(yawPitchRoll.ToQuaternion());
+                rotation.RotateLocal(new Rotation(0, 1, 0, 90));
+                this.initRot = rotation;
 
                 //string[] _responseChunks = res.Split(' ');
                 //int resType = Convert.ToInt32(_responseChunks[0].Substring(1));
@@ -468,6 +500,24 @@ namespace Machina.Drivers.Communication
 
         }
 
+        public static string CleanupResponse(string response, out int messageCount)
+        {
+            bool combinedMsg = response.Contains("</R><R");
+            if (combinedMsg)
+            {
+                // count how many concanated messages has arrived
+                var msgCount = response.Count(x => x == 'T');
+                char[] splitter = { 'I', 'D' };
+                string[] splitMsg = response.Split(splitter);
+                messageCount = msgCount;
+                return "<R ID" + splitMsg[splitMsg.Length - 1];
+            }
+            else 
+            {
+                messageCount = 1;
+                return response; 
+            }
+        }
         public static double[] Extract_KUKA_Robot_Status_XML(string xmlString)
         {
             // <Result ID="4" T="" />
@@ -506,6 +556,22 @@ namespace Machina.Drivers.Communication
             double[] currentStatus = { vr, a1, a2, a3, a4, a5, a6, x, y, z, a, b, c };
 
             return currentStatus;
+        }
+
+        public static string Get_ActionMessageString(Action action, int index)
+        {
+            if (action.Type != ActionType.Message) return "";
+            ActionMessage actMsg = action as ActionMessage;
+            index++; // Adding the index by one since KUKA's indexing system starts from 1 and not 0
+            int stringLength = actMsg.message.Length;
+            if (stringLength > 80)
+            {
+                stringLength = 80; // The maximum character length of a message to send to a KUKA robot is 80 characters
+            }
+            string actionString = string.Format("M{0}=\"{1}\" ",
+                index.ToString("00"),
+                actMsg.message.Substring(0, stringLength));
+            return actionString;
         }
 
     }
