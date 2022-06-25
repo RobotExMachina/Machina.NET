@@ -20,6 +20,8 @@ Polyline simplification algorithms were borrowed from https://github.com/imshz/s
 
 Communication with ABB devices is handled using the [ABB PC SDK libraries](http://developercenter.robotstudio.com/Downloads), which you will need to install in order to make this work.
 
+[@Arastookhajehee](https://github.com/Arastookhajehee) is the mastermind and mastercoder behind much of the KUKA implementation, specially the online part 🤓
+
 I am sure I have forgotten many people who should be acknowledged here. If you feel that is the case, poke me and tell me you deserve it. You will probably be right ;)
 
 Machina was created and is maintained by [Jose Luis Garcia del Castillo](http://www.garciadelcastillo.es).
