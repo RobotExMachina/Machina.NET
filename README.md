@@ -112,17 +112,17 @@ There are other projects that use Machina at their core:
 
 ## Current Limitations
 
-As of v0.2.5, Machina works for the following robotic arms in different degrees of robustness:
+As of ~~v0.2.5~~ the latest version, Machina works for the following robotic arms in different degrees of robustness:
 
 ```text
-ABB:    [=========  ]  (tested offline, wip online)
-KUKA:   [==         ]  (untested offline, wanna try?)
-UR:     [=====      ]  (pseudo-tested offline)
+ABB:    [=========  ]  (pretty solid both online and offline)
+UR:     [========   ]  (also quite solid both online and offline)
+KUKA:   [=====      ]  (recently launched online mode thanks to @Arastookhajehee! undertested, BE CAREFUL)
 ```
 
 Other devices are currently under active development.
 Much of the development has focused on making the best of what Machina can do, rather than fixing what it can't yet. There are several known limitations:
-- No forward/inverse kinematics solvers. This means that robotic programs coming out of Machina include no arm configurations, and it is up to the controller to decide them. It also means that for motion actions, switching from `Joints` to any `Move` action and vice versa requires an absolute action first, which can then be followed by any relative actions of the same kind.
+- No forward/inverse kinematics solvers. This means that robotic programs coming out of Machina include no arm configurations, and it is up to the controller to decide them. It also means that for motion actions, switching from `Joints` to any `Move` action and vice versa requires an absolute action first, which can then be followed by any relative actions of the same kind. See #11
 - Closing Machina applications without properly disposing COM objects causes ABB controllers to silently reject variable subscriptions. Remember to always properly `Disconnect`, and if failed to do so... you may have to restart the machine.
 - Many, many other things that you will discover along the way ;)
 
