@@ -16,10 +16,24 @@ namespace Machina.Drivers.Communication.Protocols
 
         // A KUKA-KRL-code oriented API:
         //                                                      // INSTRUCTION: V1 V2 V3 V4...
+        internal const int Linear_MotionMode = 0;                  // PTP or LIN motion: X Y Z A B C
+        internal const int PTP_MotionMode = 1;                  // PTP or LIN motion: X Y Z A B C
+        internal const int Default_Value = 0;                  // PTP or LIN motion: X Y Z A B C
+        internal const int Message_Max_Length = 80;                  // PTP or LIN motion: X Y Z A B C
+        internal const int Message_Notification = 1;                  // PTP or LIN motion: X Y Z A B C
+        internal const int Message_Warning = 2;                  // PTP or LIN motion: X Y Z A B C
+        internal const int Message_Critical_Stop = 3;                  // PTP or LIN motion: X Y Z A B C
+        internal const int Message_State = 4;                  // PTP or LIN motion: X Y Z A B C
+        internal const int Detach_Tool = 16;
+        internal const double Speed_MMS_To_MS = 0.001;
+
         internal const int INST_TRANSFORM = 3;                  // PTP or LIN motion: X Y Z A B C
+        internal const int INST_AXES = 4;                       // PTP: A1 A2 A3 A4 A5 A6
 
         internal const int INST_PTP = 20;
         internal const int INST_LIN = 21;
+
+        private string Sending_Message = "";
 
         // @TODO: fill in the API of instruction codes...
 
@@ -36,8 +50,9 @@ namespace Machina.Drivers.Communication.Protocols
         {
             List<string> msgs = new List<string>();
 
-            // TEMP: this needs to be streamlined...
-            string xml = "<Data><DataCount>1</DataCount><Dir>";
+            //// TEMP: this needs to be streamlined...
+            //string xml = "<DT><DC>1</DC><DR>";
+            string xml = "";
 
 
             switch (action.Type)
@@ -46,15 +61,16 @@ namespace Machina.Drivers.Communication.Protocols
                 case ActionType.Rotation:
                 case ActionType.Transformation:
 
+                    // adjusting the action's rotation to match the KUKA robot's convention
+                    cursor.rotation.RotateLocal(new Rotation(0, 1, 0, 90));
                     YawPitchRoll euler = cursor.rotation.Q.ToYawPitchRoll();  // @TODO: does this actually work...?
 
                     // PTP/LIN X Y Z A B C 
                     xml += string.Format(CultureInfo.InvariantCulture,
-                        "<Action ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
                         action.Id,
-                        cursor.motionType == MotionType.Linear ? INST_TRANSFORM : INST_TRANSFORM,
-                        //cursor.motionType == MotionType.Linear ? INST_LIN : INST_PTP,  // <-- It should look like this in the future...
-                        0,  // the frame values should be shifted to start on V1! 
+                        (int) action.Type,
+                        cursor.motionType == MotionType.Linear ? Linear_MotionMode : PTP_MotionMode,
                         Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
                         Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
@@ -66,168 +82,206 @@ namespace Machina.Drivers.Communication.Protocols
 
                 // @TODO: complete rest of actions
 
-                //case ActionType.ArcMotion:
-                //    // MoveC eX eY eZ eQW eQX eQY eQZ tX tY tZ 
-                //    // Apparently, the orientation of the through frame is ignored by the controller,
-                //    // so it is not included in the message.
-                //    ActionArcMotion aam = action as ActionArcMotion;
-                //    cursor.ComputeThroughPlane(aam, out Vector throughPos, out _);
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12}{13}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_MOVEC,
-                //        Math.Round(cursor.position.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(cursor.position.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(cursor.position.Z, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(cursor.rotation.Q.W, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(cursor.rotation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(cursor.rotation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(cursor.rotation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(throughPos.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(throughPos.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(throughPos.Z, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                case ActionType.Axes:
+                    // PTP A1 A2 A3 A4 A5 A6 C_PTP
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        Default_Value,  // the frame values should be shifted to start on V1! 
+                        Math.Round(cursor.axes.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(cursor.axes.J6, Geometry.STRING_ROUND_DECIMALS_DEGS));
+                    break;
 
-                //case ActionType.Axes:
-                //    // MoveAbsJ J1 J2 J3 J4 J5 J6
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} {3} {4} {5} {6} {7} {8}{9}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_MOVEABSJ,
-                //        Math.Round(cursor.axes.J1, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                //        Math.Round(cursor.axes.J2, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                //        Math.Round(cursor.axes.J3, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                //        Math.Round(cursor.axes.J4, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                //        Math.Round(cursor.axes.J5, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                //        Math.Round(cursor.axes.J6, Geometry.STRING_ROUND_DECIMALS_DEGS),
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                case ActionType.Message:
 
-                //case ActionType.Speed:
-                //    // (setspeed V_TCP[V_ORI V_LEAX V_REAX]) --> this accepts more velocity params, but those are still not implemented in Machina... 
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,  
-                //        "{0}{1} {2} {3}{4}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_SPEED,
-                //        cursor.speed,
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                    ActionMessage am = (ActionMessage)action;
+                    Sending_Message = am.message;
 
-                //case ActionType.Acceleration:
-                //    // WorldAccLim \On V (V = 0 sets \Off, any other value sets WorldAccLim \On V)
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} {3}{4}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_ACCELERATION,
-                //        cursor.acceleration,
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                    int stringLength = Sending_Message.Length;
+                    if (stringLength > Message_Max_Length)
+                    {
+                        stringLength = Message_Max_Length; // The maximum character length of a message to send to a KUKA robot is 80 characters
+                    }
+                    Sending_Message = Sending_Message.Substring(0, stringLength);
 
-                //case ActionType.Precision:
-                //    // (setzone FINE TCP[ORI EAX ORI LEAX REAX])  --> this accepts more zone params, but those are still not implemented in Machina... 
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} {3}{4}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_ZONE,
-                //        cursor.precision,
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
 
-                //case ActionType.Wait:
-                //    // WaitTime T
-                //    ActionWait aw = (ActionWait)action;
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} {3}{4}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_WAITTIME,
-                //        0.001 * aw.millis,
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        Message_Notification,  // the frame values should be shifted to start on V1! 
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
 
-                //case ActionType.Message:
-                //    // TPWrite "MSG"
-                //    ActionMessage am = (ActionMessage)action;
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} \"{3}\"{4}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_TPWRITE,
-                //        am.message,
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                    break;
 
-                //case ActionType.DefineTool:
-                //    // Add a log here to avoid a confusing default warning.
-                //    Logger.Verbose("`DefineTool()` doesn't need to be streamed.");
-                //    break;
+                case ActionType.Wait:
+                    // WaitTime T
+                    ActionWait aw = (ActionWait)action;
 
-                //case ActionType.AttachTool:
-                //    // !(settool X Y Z QW QX QY QZ KG CX CY CZ)
-                //    Tool t = cursor.tool;  // @TODO: should I just pull from the library? need to rethink the general approach: take info from cursor state (like motion actions) or action data...
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        0.001 * aw.millis,  // the frame values should be shifted to start on V1! 
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
 
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13}{14}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_TOOL,
-                //        Math.Round(t.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(t.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(t.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(t.TCPOrientation.Q.W, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(t.TCPOrientation.Q.X, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(t.TCPOrientation.Q.Y, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(t.TCPOrientation.Q.Z, Geometry.STRING_ROUND_DECIMALS_QUAT),
-                //        Math.Round(t.Weight, Geometry.STRING_ROUND_DECIMALS_KG),
-                //        Math.Round(t.CenterOfGravity.X, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(t.CenterOfGravity.Y, Geometry.STRING_ROUND_DECIMALS_MM),
-                //        Math.Round(t.CenterOfGravity.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                    break;
 
-                //        //// Was getting messages longer than 80 chars, temporal worksround
-                //        //Math.Round(t.TCPPosition.X, 1),
-                //        //Math.Round(t.TCPPosition.Y, 1),
-                //        //Math.Round(t.TCPPosition.Z, 1),
-                //        //Math.Round(t.TCPOrientation.Q.W, 3),
-                //        //Math.Round(t.TCPOrientation.Q.X, 3),
-                //        //Math.Round(t.TCPOrientation.Q.Y, 3),
-                //        //Math.Round(t.TCPOrientation.Q.Z, 3),
-                //        //Math.Round(t.Weight, 1),
-                //        //Math.Round(t.CenterOfGravity.X, 1),
-                //        //Math.Round(t.CenterOfGravity.Y, 1),
-                //        //Math.Round(t.CenterOfGravity.Z, 1),
+                case ActionType.Speed:
 
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                    double linSpeed = cursor.speed * Speed_MMS_To_MS;
+                    int axisRelativeSpeed = Convert.ToInt32(linSpeed / 3 * 100);
 
-                //case ActionType.DetachTool:
-                //    // !(settool0)
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2}{3}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_NO_TOOL,
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        cursor.speed * Speed_MMS_To_MS,  // the frame values should be shifted to start on V1! 
+                        axisRelativeSpeed,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
 
-                //case ActionType.IODigital:
-                //    // !SetDO "NAME" ON
-                //    ActionIODigital aiod = (ActionIODigital)action;
-                //    //msgs.Add($"{STR_MESSAGE_ID_CHAR}{action.Id} {INST_SETDO} \"{aiod.pinName}\" {(aiod.on ? 1 : 0)}{STR_MESSAGE_END_CHAR}");
-                //    msgs.Add(string.Format(CultureInfo.InvariantCulture,
-                //        "{0}{1} {2} \"{3}\" {4}{5}",
-                //        STR_MESSAGE_ID_CHAR,
-                //        action.Id,
-                //        INST_SETDO,
-                //        aiod.pinName,
-                //        aiod.on ? 1 : 0,
-                //        STR_MESSAGE_END_CHAR));
-                //    break;
+                    break;
+
+                case ActionType.Acceleration:
+
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        cursor.acceleration * Speed_MMS_To_MS,  // the frame values should be shifted to start on V1! 
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
+
+                    break;
+
+                case ActionType.Precision:
+
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        cursor.precision,  // the frame values should be shifted to start on V1! 
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
+
+                    break;
+
+
+                case ActionType.DefineTool:
+                    // Add a log here to avoid a confusing default warning.
+                    Logger.Verbose("`DefineTool()` doesn't need to be streamed.");
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
+                    break;
+
+                case ActionType.MotionMode:
+                    // Add a log here to avoid a confusing default warning.
+                    Logger.Verbose("`DefineTool()` doesn't need to be streamed.");
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value,
+                        Default_Value);
+                    break;
+
+                case ActionType.AttachTool:
+
+                    // @To Do
+                    // adjusting the action's rotation to match the KUKA robot's convention
+                    //cursor.rotation.RotateLocal(new Rotation(0, 1, 0, 90));
+                    Tool t = cursor.tool;  // @TODO: should I just pull from the library? need to rethink the general approach: take info from cursor state (like motion actions) or action data...
+                    euler = cursor.tool.TCPOrientation.ToQuaternion().ToYawPitchRoll();
+                    // PTP/LIN X Y Z A B C 
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                        "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                        action.Id,
+                        (int)action.Type,
+                        Default_Value,
+                        Math.Round(t.TCPPosition.X, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPPosition.Y, Geometry.STRING_ROUND_DECIMALS_MM),
+                        Math.Round(t.TCPPosition.Z, Geometry.STRING_ROUND_DECIMALS_MM),
+                        // note reversed ZYX order
+                        Math.Round(euler.ZAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(euler.YAngle, Geometry.STRING_ROUND_DECIMALS_DEGS),
+                        Math.Round(euler.XAngle, Geometry.STRING_ROUND_DECIMALS_DEGS));
+                    break;
+
+                case ActionType.DetachTool:
+
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                       "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                       action.Id,
+                       (int)action.Type,
+                       Detach_Tool,  // the frame values should be shifted to start on V1! 
+                       Default_Value,
+                       Default_Value,
+                       Default_Value,
+                       Default_Value,
+                       Default_Value,
+                       Default_Value);
+
+                    break;
+
+                case ActionType.IODigital:
+
+                    // !SetDO "NAME" ON
+                    ActionIODigital aiod = (ActionIODigital)action;
+
+                    xml += string.Format(CultureInfo.InvariantCulture,
+                       "<A ID=\"{0}\" T=\"{1}\" V1=\"{2}\" V2=\"{3}\" V3=\"{4}\" V4=\"{5}\" V5=\"{6}\" V6=\"{7}\" V7=\"{8}\"/>",
+                       action.Id,
+                       (int)action.Type,
+                       aiod.pinName,  // the frame values should be shifted to start on V1! 
+                       aiod.on ? 1 : 0,
+                       Default_Value,
+                       Default_Value,
+                       Default_Value,
+                       Default_Value,
+                       Default_Value);
+
+                    break;
 
                 //case ActionType.IOAnalog:
                 //    // !SetAO "NAME" V
@@ -292,7 +346,7 @@ namespace Machina.Drivers.Communication.Protocols
                 //case ActionType.ExternalAxis:
                 //    string @params, id;
                 //    ActionExternalAxis aea = action as ActionExternalAxis;
-                    
+
                 //    // Cartesian msg
                 //    if (aea.target == ExternalAxesTarget.All || aea.target == ExternalAxesTarget.Cartesian)
                 //    {
@@ -331,7 +385,7 @@ namespace Machina.Drivers.Communication.Protocols
                 //            @params,
                 //            STR_MESSAGE_END_CHAR));
                 //    }
-                    
+
                 //    break;
 
                 //case ActionType.ArmAngle:
@@ -358,15 +412,15 @@ namespace Machina.Drivers.Communication.Protocols
                 //        acc.statement,
                 //        STR_MESSAGE_END_CHAR));
                 //    break;
-                    
+
                 // If the Action wasn't on the list above, it doesn't have a message representation...
                 default:
                     Logger.Debug("Action `" + action + "` is not streamable...");
                     return null;
             }
 
-            // Close the XML
-            xml += "</Dir><Msg><Str/><Con>1</Con></Msg></Data>";
+           // adding the formatted xml string to the action
+            msgs.Add(xml);
 
             return msgs;
         }
