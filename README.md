@@ -34,14 +34,14 @@ Assuming your computer is [connected to a real or virtual robotic arm](https://g
 using Machina;
 
 // Instantiate a new Robot object
-Robot bot = new Robot();
+Robot bot = Robot.Create("MyRobot", RobotType.UR);
 
 // Do real-time streaming
-bot.Mode("stream");
+bot.ControlMode(ControlType.Online);
 
 // Connect to the controller and start running
 bot.Connect();
-bot.Start();
+bot.Initialize();
 
 // Display a message on the handheld pendant
 bot.Message("Hello world!");
@@ -55,7 +55,7 @@ bot.Move(0, 0, 50);
 bot.Move(0, 50, 0);
 bot.Move(0, 0, -50);
 bot.Move(0, -50, 0);
-
+            
 // ... let the robot complete these actions before shutting down
 
 // kthxbye
