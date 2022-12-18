@@ -54,6 +54,7 @@ bot.Rotate(0, 1, 0, -90);
 bot.Move(0, 0, 50);
 bot.Move(0, 50, 0);
 bot.Move(0, 0, -50);
+bot.Move(0, -50, 0);
             
 // ... let the robot complete these actions before shutting down
 
