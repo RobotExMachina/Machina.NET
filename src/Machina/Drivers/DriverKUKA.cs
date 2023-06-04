@@ -99,9 +99,9 @@ namespace Machina.Drivers
 
             var files = new Dictionary<string, string>()
             {
+                {"machina_kuka_server.xml", serverMod},
                 {"machina_kuka_driver.src", driverMod},
                 {"machina_kuka_data.dat", dataMod},
-                {"machina_kuka_server.xml", serverMod},
             };
 
             return files;
