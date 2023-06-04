@@ -1,0 +1,70 @@
+&ACCESS RVP
+&REL 53
+&PARAM DISKPATH = KRC:\R1\Program\Arastoo\Driver
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM EDITMASK = *
+DEFDAT  MachinaDriver
+; For loop incrementing Integer Variables
+DECL INT FI
+DECL INT popfi
+DECL INT repopfi
+DECL INT readfi
+; List aciton poplulation indecies
+DECL REAL driver_ver=1.0
+DECL INT lastaction=1
+DECL INT current=2
+DECL INT index=1
+DECL INT tempindex=1
+DECL INT dataCount=8
+DECL INT newdatacount=1
+DECL BOOL wrap=FALSE
+DECL BOOL startover=TRUE
+DECL INT axisSpeed=0
+
+;BCO Variables
+DECL AXIS joint_pos_tgt
+DECL POS current_position
+DECL POS IK_pose_position
+
+; Messaging Interface variables
+DECL EKI_STATUS RET
+DECL CHAR MessagePath[15] ;path is used in the eki_getstring() function for the xml path finding
+DECL CHAR pathextent1[15] ; for a string of numbers like "000000000111111" for searching for the path number char -> "0 "
+DECL CHAR pathextent2[15] ; for a string of numbers like "123456789012345" for searching for the path number char -> " 5" --> "05"
+DECL CHAR act_message[80] ; length of a messsage to be sent to the contorller is 80 characters
+DECL KRLMSG_T Messenger
+DECL KRLMSGPAR_T Parameter[3]
+DECL KRLMSGOPT_T Opt
+DECL INT Ticket
+DECL INT msg_type
+DECL INT action_motion_mode
+DECL INT action_d_out_index
+DECL INT action_d_out_state
+
+; action properties
+DECL INT actionType=-1
+STRUC actionstruct INT id,INT type,REAL v1,REAL v2,REAL v3,REAL v4,REAL v5,REAL v6,REAL v7,CHAR msg[80] ; a struct for all the actions to be cast to
+DECL actionstruct actions[200]
+; arrays to receive data from the TCP buffer
+DECL INT ids[15]
+DECL INT types[15]
+DECL REAL newacts_v1[15]
+DECL REAL newacts_v2[15]
+DECL REAL newacts_v3[15]
+DECL REAL newacts_v4[15]
+DECL REAL newacts_v5[15]
+DECL REAL newacts_v6[15]
+DECL REAL newacts_v7[15]
+
+;motion position variables
+POS posmove={X 1455.5,Y 123.0,Z 137.0,A 0.0,B 90.0,C 0.0,S 'B0010'}
+AXIS axispos={A1 0.0,A2 -85.0,A3 105.0,A4 0.0,A5 -20.0,A6 0.0}
+DECL FRAME moveframe={X 1122.75806,Y -318.985992,Z 833.369019}
+DECL FRAME toolframe={X 234.621994,Y 2.7349999,Z 70.7060013,A 0.0,B 0.0,C 0.0}
+
+;current position status
+AXIS current_axispos={A1 -6.00493336,A2 -54.8471794,A3 90.9039688,A4 -190.071884,A5 36.6114769,A6 -171.896576}
+POS current_sudoAxis={X 1060.0,Y -150.0,Z 1000.0,A 180.0,B 0.0,C 0.0}
+POS current_posmove={X 1324.29065,Y 122.270988,Z 807.622925,A -86.7022171,B 89.9991837,C -86.7026062,S 'B00010010',T 'B00101011'}
+
+ENDDAT

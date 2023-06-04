@@ -1,0 +1,62 @@
+<ETHERNETKRL>
+	<CONFIGURATION>
+		<EXTERNAL>
+			<TYPE>Client</TYPE>
+		</EXTERNAL>
+		<INTERNAL>
+			<IP>10.10.100.20</IP>
+         <PORT>54600</PORT>
+			<ALIVE Set_Flag="1"/>
+		</INTERNAL>
+	</CONFIGURATION>
+	<RECEIVE>
+		<XML>
+			<ELEMENT Tag="DT/DC" Type="INT"/>
+			<ELEMENT Tag="DT/DR/A/@ID" Type="INT" />
+			<ELEMENT Tag="DT/DR/A/@T" Type="INT" />
+			<ELEMENT Tag="DT/DR/A/@V1" Type="REAL" />
+			<ELEMENT Tag="DT/DR/A/@V2" Type="REAL" />
+			<ELEMENT Tag="DT/DR/A/@V3" Type="REAL" />
+			<ELEMENT Tag="DT/DR/A/@V4" Type="REAL" />
+			<ELEMENT Tag="DT/DR/A/@V5" Type="REAL" />
+			<ELEMENT Tag="DT/DR/A/@V6" Type="REAL" />
+			<ELEMENT Tag="DT/DR/A/@V7" Type="REAL" />
+                  <ELEMENT Tag="DT/Msg/Str/@M01" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M02" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M03" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M04" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M05" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M06" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M07" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M08" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M09" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M10" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M11" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M12" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M13" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M14" Type="STRING"/>
+                  <ELEMENT Tag="DT/Msg/Str/@M15" Type="STRING"/>
+			<ELEMENT Tag="DT/Msg/Con" Type="INT" Set_Flag="2"/>
+                  
+		</XML>
+	</RECEIVE>
+	<SEND>
+		<XML>
+                  <ELEMENT Tag="S/@VR" Type="REAL"/>
+			<ELEMENT Tag="S/@A1" Type="REAL"/>
+			<ELEMENT Tag="S/@A2" Type="REAL"/>
+			<ELEMENT Tag="S/@A3" Type="REAL"/>
+			<ELEMENT Tag="S/@A4" Type="REAL"/>
+			<ELEMENT Tag="S/@A5" Type="REAL"/>
+			<ELEMENT Tag="S/@A6" Type="REAL"/>
+			<ELEMENT Tag="S/@X" Type="REAL"/>
+			<ELEMENT Tag="S/@Y" Type="REAL"/>
+			<ELEMENT Tag="S/@Z" Type="REAL"/>
+			<ELEMENT Tag="S/@A" Type="REAL"/>
+			<ELEMENT Tag="S/@B" Type="REAL"/>
+			<ELEMENT Tag="S/@C" Type="REAL"/>
+			<ELEMENT Tag="R/@ID" Type="INT"/>
+                  <ELEMENT Tag="R/@T" Type="INT"/>
+		</XML>
+	</SEND>
+</ETHERNETKRL>

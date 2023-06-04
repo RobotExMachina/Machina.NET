@@ -1,0 +1,514 @@
+&ACCESS RVP
+&REL 53
+&PARAM DISKPATH = KRC:\R1\Program\Arastoo\Driver
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM EDITMASK = *
+DEF MachinaDriver( )
+
+;FOLD INI
+;FOLD BCO INI
+GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+INTERRUPT ON 3
+BAS (#INITMOV,0 )
+;ENDFOLD (BCO INI)
+;ENDFOLD (INI)
+
+
+
+$ADVANCE=3
+
+
+RET=EKI_Init("MachinaDriverServer")
+RET=EKI_Open("MachinaDriverServer")
+
+;PTP {A1 0,A2 -85,A3 105,A4 0,A5 -20,A6 0}
+;FOLD INI
+;FOLD BCO INI
+GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+INTERRUPT ON 3
+BAS (#INITMOV,0 )
+;ENDFOLD (BCO INI)
+;ENDFOLD (INI)
+
+; Setting status and turn for the initial position of the robot
+joint_pos_tgt = $axis_act_meas
+PTP joint_pos_tgt
+current_position = $POS_ACT_MES
+IK_pose_position = {X 0,Y 0,Z 0,A 0,B 0,C 0}
+IK_pose_position.X = current_position.X
+IK_pose_position.Y = current_position.Y
+IK_pose_position.Z = current_position.Z
+IK_pose_position.A = current_position.A
+IK_pose_position.B = current_position.B
+IK_pose_position.C = current_position.C
+PTP IK_pose_position C_PTP
+$TOOL = $NULLFRAME
+
+$VEL.CP=0.02
+FOR FI=1 TO 6
+$VEL_AXIS[FI] = 10 ;all axis velocities to 10%
+ENDFOR
+
+$APO.CDIS = 5
+$APO.CPTP = 5
+
+wait for $FLAG[1] ;Please Connect Machina Bridge To the Robot!
+$FLAG[32] = FALSE
+IF $FLAG[1] == TRUE THEN
+
+current_axispos = $AXIS_ACT_MEAS
+current_posmove = $POS_ACT_MES
+
+;Read and send the current position data to Machina
+RET = eki_setreal("MachinaDriverServer", "S/@VR", driver_ver)
+RET = eki_setreal("MachinaDriverServer", "S/@A1", current_axispos.A1)
+RET = eki_setreal("MachinaDriverServer", "S/@A2", current_axispos.A2)
+RET = eki_setreal("MachinaDriverServer", "S/@A3", current_axispos.A3)
+RET = eki_setreal("MachinaDriverServer", "S/@A4", current_axispos.A4)
+RET = eki_setreal("MachinaDriverServer", "S/@A5", current_axispos.A5)
+RET = eki_setreal("MachinaDriverServer", "S/@A6", current_axispos.A6)
+RET = eki_setreal("MachinaDriverServer", "S/@X", current_posmove.X)
+RET = eki_setreal("MachinaDriverServer", "S/@Y", current_posmove.Y)
+RET = eki_setreal("MachinaDriverServer", "S/@Z", current_posmove.Z)
+RET = eki_setreal("MachinaDriverServer", "S/@A", current_posmove.A)
+RET = eki_setreal("MachinaDriverServer", "S/@B", current_posmove.B)
+RET = eki_setreal("MachinaDriverServer", "S/@C", current_posmove.C)
+
+RET = eki_send("MachinaDriverServer", "S")  
+
+ENDIF 
+
+;instantiation
+FOR FI = 1 TO 200 STEP 1
+actions[FI].id = -1
+actions[FI].type = -1
+actions[FI].v1 = -1000
+actions[FI].v2 = -1000
+actions[FI].v3 = -1000
+actions[FI].v4 = -1000
+actions[FI].v5 = -1000
+actions[FI].v6 = -1000
+actions[FI].v7 = -1000
+actions[FI].msg[] = "place holder" 
+ENDFOR
+MessagePath[] = "DT/Msg/Str/@M05"
+pathextent1[] = "000000000111111"
+pathextent2[] = "123456789012345"
+act_message[] = "place holder"
+msg_type = 0
+action_motion_mode = 0 ;Default motion mode is linear
+action_d_out_index = -1
+action_d_out_state = 0 ;Default digital output is false
+
+FOR FI = 1 TO 15 STEP 1
+ids[FI] = -1
+types[FI] = -1
+newacts_v1[FI] = -1000
+newacts_v2[FI] = -1000
+newacts_v3[FI] = -1000
+newacts_v4[FI] = -1000
+newacts_v5[FI] = -1000
+newacts_v6[FI] = -1000
+newacts_v7[FI] = -1000
+ENDFOR
+
+;current = 1
+lastaction = 0
+;dataCount = 0
+
+
+WAIT FOR $FLAG[2] ; Watinging For Actions!
+read_data_cnn()
+populate_lst()
+$FLAG[2] = FALSE
+
+;start of the infinite loop
+LOOP
+
+FOR FI = 1 TO 200 STEP 1
+
+;Default Non-Action = -1
+;Undefined = 00
+;Translation = 01
+;Rotation = 02
+;Transformation = 03
+;Axes = 04
+;Message = 05
+;Wait = 06
+;Speed = 07
+;Acceleration = 08
+;Precision = 09
+;MotionMode = 10
+;Coordinates = 11
+;PushPop = 12
+;Comment = 13
+;DefineTool = 14
+;AttachTool = 15
+;DetachTool = 16
+;IODigital = 17
+;IOAnalog = 18
+;Temperature = 19
+;Extrusion = 20
+;ExtrusionRate = 21
+;Initialization = 22
+;ExternalAxis = 23
+;CustomCode = 24
+;ArmAngle = 25
+
+SWITCH actions[FI].type
+
+CASE -1,-2
+startover = TRUE
+IF startover == TRUE THEN 
+WAIT FOR $FLAG[2]
+startover = FALSE
+lastaction = 0
+ENDIF
+
+IF $FLAG[2] == TRUE THEN
+read_data_cnn()
+repopulate_lst()
+$FLAG[2] = FALSE
+ENDIF
+; default non-action for breaking the for loop and going back to waiting for messasges
+ EXIT
+ 
+CASE 0 ;Undefined = 00
+; Do Nothing
+
+CASE 1 ;Translation = 01
+ moveframe.X = actions[FI].v2
+ moveframe.Y = actions[FI].v3
+ moveframe.Z = actions[FI].v4
+ IF actions[FI].v1 == 1 THEN 
+ PTP moveframe C_PTP
+ ELSE 
+ LIN moveframe C_DIS
+ ENDIF
+
+CASE 2 ;Rotation = 02
+ posmove.x = actions[FI].v2  
+ posmove.y = actions[FI].v3  
+ posmove.z = actions[FI].v4  
+ posmove.a = actions[FI].v5  
+ posmove.b = actions[FI].v6  
+ posmove.c = actions[FI].v7
+ LIN posmove C_DIS 
+ 
+CASE 3 ;Transformation = 03
+ posmove.x = actions[FI].v2  
+ posmove.y = actions[FI].v3  
+ posmove.z = actions[FI].v4  
+ posmove.a = actions[FI].v5  
+ posmove.b = actions[FI].v6  
+ posmove.c = actions[FI].v7
+
+ IF actions[FI].v1 == 1 THEN 
+ PTP posmove C_PTP
+ ELSE 
+ LIN posmove C_DIS
+ ENDIF
+ 
+CASE 4 ;Axes = 04
+ axispos.A1 = actions[FI].v2  
+ axispos.A2 = actions[FI].v3  
+ axispos.A3 = actions[FI].v4  
+ axispos.A4 = actions[FI].v5  
+ axispos.A5 = actions[FI].v6  
+ axispos.A6 = actions[FI].v7
+ PTP axispos C_PTP
+ 
+CASE 5 ;Message = 05
+   msg_type = actions[FI].v1
+   SWITCH msg_type
+
+     CASE 1
+     ;Notification Interface
+     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger.Msg_txt[] =  actions[FI].msg[] 
+     Messenger.NR = FI
+     Parameter[1]= {Par_type #empty}
+     Parameter[2]= {Par_type #empty}
+     Parameter[3]= {Par_type #empty}
+     Opt = {VL_Stop TRUE, Clear_P_Reset TRUE, Clear_P_SAW FALSE, Log_To_DB FALSE}
+     Ticket = Set_KrlMsg (#Notify,Messenger,Parameter[],Opt)
+     
+     CASE 2
+     ;Alert Interface
+     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger.Msg_txt[] =  actions[FI].msg[]
+     Messenger.NR = FI
+     Parameter[1]= {Par_type #empty}
+     Parameter[2]= {Par_type #empty}
+     Parameter[3]= {Par_type #empty}
+     Opt = {VL_Stop TRUE, Clear_P_Reset TRUE, Clear_P_SAW FALSE, Log_To_DB FALSE}
+     Ticket = Set_KrlMsg (#Quit,Messenger,Parameter[],Opt)
+     
+     CASE 3
+     ;Critical Alert Interface
+     ;Alert Interface
+     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger.Msg_txt[] =  actions[FI].msg[]
+     Messenger.NR = FI
+     Parameter[1]= {Par_type #empty}
+     Parameter[2]= {Par_type #empty}
+     Parameter[3]= {Par_type #empty}
+     Opt = {VL_Stop TRUE, Clear_P_Reset TRUE, Clear_P_SAW FALSE, Log_To_DB FALSE}
+     Ticket = Set_KrlMsg (#Quit,Messenger,Parameter[],Opt)
+     HALT
+     
+     CASE 4
+     ;State Interface
+     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger.Msg_txt[] =  actions[FI].msg[]
+     Messenger.NR = FI
+     Parameter[1]= {Par_type #empty}
+     Parameter[2]= {Par_type #empty}
+     Parameter[3]= {Par_type #empty}
+     Opt = {VL_Stop TRUE, Clear_P_Reset TRUE, Clear_P_SAW TRUE, Log_To_DB FALSE}
+     Ticket = Set_KrlMsg (#State,Messenger,Parameter[],Opt)
+     
+     DEFAULT
+     ; Do nothing
+   ENDSWITCH
+   
+CASE 6 ;Wait = 06
+ WAIT SEC actions[FI].v1
+ 
+CASE 7 ;Speed = 07
+ $VEL.CP = actions[FI].v1
+ axisSpeed = actions[FI].v2
+ FOR tempindex=1 TO 6
+ $VEL_AXIS[tempindex] = axisSpeed ;all axis velocities to 10%
+ ENDFOR
+
+CASE 8 ;Acceleration = 08
+
+CASE 9 ;Precision = 09
+ $APO.CDIS = actions[FI].v1
+ 
+;CASE 10 ;MotionMode = 10 
+; action_motion_mode = actions[FI].v1 
+ 
+CASE 11 ;Coordinates = 11
+
+CASE 12 ;PushPop = 12
+
+CASE 13 ;Comment = 13
+
+CASE 14 ;DefineTool = 14
+ ; tool name set
+CASE 15 ;AttachTool = 15
+ toolframe.x = actions[FI].v2  
+ toolframe.y = actions[FI].v3  
+ toolframe.z = actions[FI].v4  
+ toolframe.a = actions[FI].v5  
+ toolframe.b = actions[FI].v6  
+ toolframe.c = actions[FI].v7
+ $TOOL = toolframe
+ 
+CASE 16 ;DetachTool = 16
+ $TOOL = $NULLFRAME
+
+CASE 17 ;IODigital = 17
+ action_d_out_index = actions[FI].v1
+ action_d_out_state = actions[FI].v2
+ IF action_d_out_state == 0 THEN
+ 
+ CONTINUE
+ TRIGGER WHEN DISTANCE=0 DELAY=0 DO $OUT[action_d_out_index] = FALSE 
+ ;$OUT[action_d_out_index] = FALSE
+ ENDIF
+ IF action_d_out_state == 1 THEN
+ CONTINUE
+ TRIGGER WHEN DISTANCE=0 DELAY=0 DO $OUT[action_d_out_index] = TRUE
+ ;$OUT[action_d_out_index] = TRUE
+ ENDIF
+ 
+CASE 18 ;IOAnalog = 18
+
+CASE 19 ;Temperature = 19
+
+CASE 20 ;Extrusion = 20
+
+CASE 21 ;ExtrusionRate = 21
+
+CASE 22 ;Initialization = 22
+
+CASE 23 ;ExternalAxis = 23
+
+CASE 24 ;CustomCode = 24
+
+CASE 25 ;ArmAngle = 25
+ axispos.A1 = actions[FI].v2  
+ axispos.A2 = actions[FI].v3  
+ axispos.A3 = actions[FI].v4  
+ axispos.A4 = actions[FI].v5  
+ axispos.A5 = actions[FI].v6  
+ axispos.A6 = actions[FI].v7
+ PTP axispos C_PTP
+
+DEFAULT
+; Do Nothing
+  
+ENDSWITCH 
+
+
+
+IF $FLAG[2] == TRUE THEN
+read_data_cnn()
+repopulate_lst()
+$FLAG[2] = FALSE
+ENDIF
+
+machinafeedback()
+actions[FI].type = -1 
+
+ENDFOR
+
+; end of the infinite loop
+ENDLOOP
+ 
+END
+
+DEF machinafeedback( )
+
+;Undefined = 00
+;Translation = 01
+;Rotation = 02
+;Transformation = 03
+;Axes = 04
+;Message = 05
+;Wait = 06
+;Speed = 07
+;Acceleration = 08
+;Precision = 09
+;MotionMode = 10
+;Coordinates = 11
+;PushPop = 12
+;Comment = 13
+;DefineTool = 14
+;AttachTool = 15
+;DetachTool = 16
+;IODigital = 17
+;IOAnalog = 18
+;Temperature = 19
+;Extrusion = 20
+;ExtrusionRate = 21
+;Initialization = 22
+;ExternalAxis = 23
+;CustomCode = 24
+;ArmAngle = 25
+IF actions[FI].type > -1 THEN
+
+RET = eki_setint("MachinaDriverServer", "R/@ID", actions[FI].id) 
+RET = eki_setint("MachinaDriverServer", "R/@T", actions[FI].type)
+
+$FLAG[32] = TRUE
+IF $FLAG[32] == TRUE THEN
+
+SWITCH actions[FI].type
+ ;Message = 05 Speed = 07 Acceleration = 08 Precision = 09 MotionMode = 10
+ ;Comment = 13 DefineTool = 14 AttachTool = 15 IODigital = 17 IOAnalog = 18  
+ CASE 5,7,8,9,10,13,14,15,17,18 
+   continue
+   WAIT SEC 0.2
+ DEFAULT
+   continue
+   WAIT SEC 0.05
+   
+ENDSWITCH
+
+RET = eki_send("MachinaDriverServer", "R")
+RET = EKI_ClearBuffer("MachinaDriverServer", "R")
+ENDIF
+
+$FLAG[32] = FALSE
+
+ENDIF
+ 
+END 
+DEF read_data_cnn( )
+;A function to read actions from the incomin stream
+RET = eki_getint("MachinaDriverServer", "DT/DC", newdatacount)
+RET = eki_getintarray("MachinaDriverServer", "DT/DR/A/@ID", ids[]) 
+RET = eki_getintarray("MachinaDriverServer", "DT/DR/A/@T", types[]) 
+RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V1", newacts_v1[])
+RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V2", newacts_v2[])
+RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V3", newacts_v3[])
+RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V4", newacts_v4[])
+RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V5", newacts_v5[])
+RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V6", newacts_v6[])
+RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V7", newacts_v7[])
+
+END
+DEF populate_lst( )
+; A function to add incoming actions to the actions array
+FOR popfi = 1 TO newdatacount STEP 1
+
+
+index = popfi + lastaction
+actions[index].ID = ids[popfi]
+actions[index].type = types[popfi]
+actions[index].v1 = newacts_v1[popfi]
+actions[index].v2 = newacts_v2[popfi]
+actions[index].v3 = newacts_v3[popfi]
+actions[index].v4 = newacts_v4[popfi]
+actions[index].v5 = newacts_v5[popfi]
+actions[index].v6 = newacts_v6[popfi]
+actions[index].v7 = newacts_v7[popfi]
+
+IF types[popfi] == 5 THEN
+MessagePath[14] = pathextent1[popfi] 
+MessagePath[15] = pathextent2[popfi]
+RET = eki_getstring("MachinaDriverServer", MessagePath[], act_message[])
+actions[index].msg[] = act_message[]
+ENDIF
+
+ENDFOR
+
+lastaction = lastaction + newdatacount
+
+RET = EKI_ClearBuffer("MachinaDriverServer", "DT")
+END
+DEF repopulate_lst( )
+;A function to add incoming actions to the action array while the robot is moving
+tempindex = 1
+
+FOR repopfi = 1 TO newdatacount STEP 1
+ 
+ index = repopfi + lastaction
+ 
+ IF index > 200 THEN
+ wrap = TRUE
+ index = repopfi + lastaction - 200
+ ENDIF
+ 
+ actions[index].ID = ids[repopfi]
+ actions[index].type = types[repopfi]
+ actions[index].v1 = newacts_v1[repopfi]
+ actions[index].v2 = newacts_v2[repopfi]
+ actions[index].v3 = newacts_v3[repopfi]
+ actions[index].v4 = newacts_v4[repopfi]
+ actions[index].v5 = newacts_v5[repopfi]
+ actions[index].v6 = newacts_v6[repopfi]
+ actions[index].v7 = newacts_v7[repopfi]
+
+ IF types[repopfi] == 5 THEN
+ MessagePath[14] = pathextent1[repopfi] 
+ MessagePath[15] = pathextent2[repopfi]
+ RET = eki_getstring("MachinaDriverServer", MessagePath[], act_message[])
+ actions[index].msg[] = act_message[]
+ ENDIF
+
+ENDFOR
+
+IF wrap == FALSE THEN
+lastaction = lastaction + newdatacount
+ELSE 
+lastaction = index
+wrap = FALSE
+ENDIF
+
+RET = EKI_ClearBuffer("MachinaDriverServer", "DT")
+END

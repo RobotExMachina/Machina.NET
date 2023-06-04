@@ -56,60 +56,56 @@ namespace Machina.Drivers
             logger = this.parentControl.logger;
         }
 
+        /// <summary>
+        /// Returns the driver modules necessary to run on this device for Machina to talk to it.
+        /// Takes a dictionary of values to be replaced on the modules, such as {"IP","192.168.125.1"} or {"PORT","7000"}.
+        /// Returns a dict with filename-file pairs. 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public override Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters)
         {
-            throw new NotImplementedException();
+            if (!parameters.ContainsKey("HOSTNAME"))
+            {
+                Logger.Error("Cannot retrieve KUKA driver modules, most provide a HOSTNAME value.");
+                return null;
+            }
+
+            if (!parameters.ContainsKey("PORT"))
+            {
+                Logger.Error("Cannot retrieve KUKA driver modules, most provide a PORT value.");
+                return null;
+            }
+
+            int port = 0;
+            if (!Int32.TryParse(parameters["PORT"], out port))
+            {
+                Logger.Error("Invalid PORT value");
+                return null;
+            }
+
+            // the ip address for kuka robots should be set in the xml server configuration file
+            // developed by Arastoo Khajehee https://github.com/Arastookhajehee
+            string serverMod = IO.ReadTextResource("Machina.Resources.DriverModules.KUKA.machina_kuka_server.xml");
+            string ipAddressString = string.Format("<IP>{0}</IP>", parameters["HOSTNAME"]);
+            string portAddressString = string.Format("<PORT>{0}</PORT>", parameters["PORT"]);
+            serverMod = serverMod.Replace("<IP>10.10.100.20</IP>", ipAddressString);
+            serverMod = serverMod.Replace("<PORT>54600</PORT>", portAddressString);
+
+            string driverMod = IO.ReadTextResource("Machina.Resources.DriverModules.KUKA.machina_kuka_driver.src");
+
+            string dataMod = IO.ReadTextResource("Machina.Resources.DriverModules.KUKA.machina_kuka_data.dat");
+
+
+            var files = new Dictionary<string, string>()
+            {
+                {"machina_kuka_driver.src", driverMod},
+                {"machina_kuka_data.dat", dataMod},
+                {"machina_kuka_server.xml", serverMod},
+            };
+
+            return files;
         }
-
-        ///// <summary>
-        ///// Returns the driver modules necessary to run on this device for Machina to talk to it.
-        ///// Takes a dictionary of values to be replaced on the modules, such as {"IP","192.168.125.1"} or {"PORT","7000"}.
-        ///// Returns a dict with filename-file pairs. 
-        ///// </summary>
-        ///// <param name="parameters"></param>
-        ///// <returns></returns>
-        //public override Dictionary<string, string> GetDeviceDriverModules(Dictionary<string, string> parameters)
-        //{
-        //    if (!parameters.ContainsKey("HOSTNAME"))
-        //    {
-        //        Logger.Error("Cannot retrieve ABB driver modules, most provide a HOSTNAME value.");
-        //        return null;
-        //    }
-
-        //    if (!parameters.ContainsKey("PORT"))
-        //    {
-        //        Logger.Error("Cannot retrieve ABB driver modules, most provide a PORT value.");
-        //        return null;
-        //    }
-
-        //    int port = 0;
-        //    if (!Int32.TryParse(parameters["PORT"], out port))
-        //    {
-        //        Logger.Error("Invalid PORT value");
-        //        return null;
-        //    }
-
-        //    string driverMod = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.mod");
-        //    driverMod = driverMod.Replace("{{HOSTNAME}}", parameters["HOSTNAME"]);
-        //    driverMod = driverMod.Replace("{{PORT}}", parameters["PORT"]);
-
-        //    string driverPgf = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_driver.pgf");
-
-        //    string monitorMod = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.mod");
-        //    monitorMod = monitorMod.Replace("{{PORT}}", (port + 1).ToString());  // @TODO: must make this more programmatic
-
-        //    string monitorPgf = IO.ReadTextResource("Machina.Resources.DriverModules.ABB.machina_abb_monitor.pgf");
-
-        //    var files = new Dictionary<string, string>()
-        //    {
-        //        {"machina_abb_driver.mod", driverMod},
-        //        {"machina_abb_driver.pgf", driverPgf},
-        //        {"machina_abb_monitor.mod", monitorMod},
-        //        {"machina_abb_monitor.pgf", monitorPgf},
-        //    };
-
-        //    return files;
-        //}
 
         /// <summary>
         /// Start a TCP connection to device via its address on the network.

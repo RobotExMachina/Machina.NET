@@ -173,6 +173,7 @@
     <Compile Include="Utilities\Numeric.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx" />
     <EmbeddedResource Include="Resources\DriverModules\UR\machina_ur_driver.script" />
   </ItemGroup>
   <ItemGroup>
@@ -192,7 +193,13 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_empty.pgf" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_data.dat" />
+    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_driver.src" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_server.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM JL: for the time being, only copy ddlls manually to avoid breaking the dependent projects
