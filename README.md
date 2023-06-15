@@ -23,7 +23,7 @@ When using robots in a real-time interactive environment, please make sure:
 - and the robot has the __appropriate guarding__ in place, including, but not reduced to, e-stops, physical barriers, light curtains, etc.
 
 __Machina is in a very early stage of development.__ You are using this software at your own risk, no warranties are provided herewith, and unexpected results/bugs may arise during its use. Always test and simulate your applications thoroughly before running them on a real device. The author/s shall not be liable for any injuries, damages or losses consequence of using this software in any way whatsoever.
- 
+
 
 ## Hello World
 
@@ -34,14 +34,14 @@ Assuming your computer is [connected to a real or virtual robotic arm](https://g
 using Machina;
 
 // Instantiate a new Robot object
-Robot bot = new Robot();
+Robot bot = Robot.Create("MyRobot", RobotType.UR);
 
 // Do real-time streaming
-bot.Mode("stream");
+bot.ControlMode(ControlType.Online);
 
 // Connect to the controller and start running
 bot.Connect();
-bot.Start();
+bot.Initialize();
 
 // Display a message on the handheld pendant
 bot.Message("Hello world!");
@@ -55,7 +55,7 @@ bot.Move(0, 0, 50);
 bot.Move(0, 50, 0);
 bot.Move(0, 0, -50);
 bot.Move(0, -50, 0);
-
+            
 // ... let the robot complete these actions before shutting down
 
 // kthxbye
@@ -112,17 +112,18 @@ There are other projects that use Machina at their core:
 
 ## Current Limitations
 
-As of v0.2.5, Machina works for the following robotic arms in different degrees of robustness:
+As of ~~v0.2.5~~ the latest version, Machina works for the following robotic arms in different degrees of robustness:
 
 ```text
-ABB:    [=========  ]  (tested offline, wip online)
-KUKA:   [==         ]  (untested offline, wanna try?)
-UR:     [=====      ]  (pseudo-tested offline)
+ABB:    [=========  ]  (pretty solid both online and offline)
+UR:     [========   ]  (also quite solid both online and offline)
+KUKA:   [=====      ]  (recently launched online mode thanks to @Arastookhajehee! undertested, BE CAREFUL)
+KUKA:   ------------>  (Known Bug: relative rotations result in unpredictable orientations! Avoid relative rotation!)
 ```
 
 Other devices are currently under active development.
 Much of the development has focused on making the best of what Machina can do, rather than fixing what it can't yet. There are several known limitations:
-- No forward/inverse kinematics solvers. This means that robotic programs coming out of Machina include no arm configurations, and it is up to the controller to decide them. It also means that for motion actions, switching from `Joints` to any `Move` action and vice versa requires an absolute action first, which can then be followed by any relative actions of the same kind.
+- No forward/inverse kinematics solvers. This means that robotic programs coming out of Machina include no arm configurations, and it is up to the controller to decide them. It also means that for motion actions, switching from `Joints` to any `Move` action and vice versa requires an absolute action first, which can then be followed by any relative actions of the same kind. See #11
 - Closing Machina applications without properly disposing COM objects causes ABB controllers to silently reject variable subscriptions. Remember to always properly `Disconnect`, and if failed to do so... you may have to restart the machine.
 - Many, many other things that you will discover along the way ;)
 
