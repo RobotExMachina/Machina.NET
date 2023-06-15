@@ -194,11 +194,13 @@
     <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_empty.pgf" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_data.dat" />
     <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_driver.src" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_server.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_driver.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -94,14 +94,14 @@ namespace Machina.Drivers
 
             string driverMod = IO.ReadTextResource("Machina.Resources.DriverModules.KUKA.machina_kuka_driver.src");
 
-            string dataMod = IO.ReadTextResource("Machina.Resources.DriverModules.KUKA.machina_kuka_data.dat");
+            string dataMod = IO.ReadTextResource("Machina.Resources.DriverModules.KUKA.machina_kuka_driver.dat");
 
 
             var files = new Dictionary<string, string>()
             {
                 {"machina_kuka_server.xml", serverMod},
                 {"machina_kuka_driver.src", driverMod},
-                {"machina_kuka_data.dat", dataMod},
+                {"machina_kuka_driver.dat", dataMod},
             };
 
             return files;

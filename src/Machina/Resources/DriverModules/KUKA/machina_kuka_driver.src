@@ -3,7 +3,7 @@
 &PARAM DISKPATH = KRC:\R1\Program\Arastoo\Driver
 &PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
 &PARAM EDITMASK = *
-DEF MachinaDriver( )
+DEF machina_kuka_driver( )
 
 ;FOLD INI
 ;FOLD BCO INI
@@ -18,8 +18,8 @@ BAS (#INITMOV,0 )
 $ADVANCE=3
 
 
-RET=EKI_Init("MachinaDriverServer")
-RET=EKI_Open("MachinaDriverServer")
+RET=EKI_Init("machina_kuka_server")
+RET=EKI_Open("machina_kuka_server")
 
 ;PTP {A1 0,A2 -85,A3 105,A4 0,A5 -20,A6 0}
 ;FOLD INI
@@ -60,21 +60,21 @@ current_axispos = $AXIS_ACT_MEAS
 current_posmove = $POS_ACT_MES
 
 ;Read and send the current position data to Machina
-RET = eki_setreal("MachinaDriverServer", "S/@VR", driver_ver)
-RET = eki_setreal("MachinaDriverServer", "S/@A1", current_axispos.A1)
-RET = eki_setreal("MachinaDriverServer", "S/@A2", current_axispos.A2)
-RET = eki_setreal("MachinaDriverServer", "S/@A3", current_axispos.A3)
-RET = eki_setreal("MachinaDriverServer", "S/@A4", current_axispos.A4)
-RET = eki_setreal("MachinaDriverServer", "S/@A5", current_axispos.A5)
-RET = eki_setreal("MachinaDriverServer", "S/@A6", current_axispos.A6)
-RET = eki_setreal("MachinaDriverServer", "S/@X", current_posmove.X)
-RET = eki_setreal("MachinaDriverServer", "S/@Y", current_posmove.Y)
-RET = eki_setreal("MachinaDriverServer", "S/@Z", current_posmove.Z)
-RET = eki_setreal("MachinaDriverServer", "S/@A", current_posmove.A)
-RET = eki_setreal("MachinaDriverServer", "S/@B", current_posmove.B)
-RET = eki_setreal("MachinaDriverServer", "S/@C", current_posmove.C)
+RET = eki_setreal("machina_kuka_server", "S/@VR", driver_ver)
+RET = eki_setreal("machina_kuka_server", "S/@A1", current_axispos.A1)
+RET = eki_setreal("machina_kuka_server", "S/@A2", current_axispos.A2)
+RET = eki_setreal("machina_kuka_server", "S/@A3", current_axispos.A3)
+RET = eki_setreal("machina_kuka_server", "S/@A4", current_axispos.A4)
+RET = eki_setreal("machina_kuka_server", "S/@A5", current_axispos.A5)
+RET = eki_setreal("machina_kuka_server", "S/@A6", current_axispos.A6)
+RET = eki_setreal("machina_kuka_server", "S/@X", current_posmove.X)
+RET = eki_setreal("machina_kuka_server", "S/@Y", current_posmove.Y)
+RET = eki_setreal("machina_kuka_server", "S/@Z", current_posmove.Z)
+RET = eki_setreal("machina_kuka_server", "S/@A", current_posmove.A)
+RET = eki_setreal("machina_kuka_server", "S/@B", current_posmove.B)
+RET = eki_setreal("machina_kuka_server", "S/@C", current_posmove.C)
 
-RET = eki_send("MachinaDriverServer", "S")  
+RET = eki_send("machina_kuka_server", "S")  
 
 ENDIF 
 
@@ -224,7 +224,7 @@ CASE 5 ;Message = 05
 
      CASE 1
      ;Notification Interface
-     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger = {Modul[] "machina_kuka_driver",Nr 1,Msg_txt[] "PlaceHolder"}
      Messenger.Msg_txt[] =  actions[FI].msg[] 
      Messenger.NR = FI
      Parameter[1]= {Par_type #empty}
@@ -235,7 +235,7 @@ CASE 5 ;Message = 05
      
      CASE 2
      ;Alert Interface
-     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger = {Modul[] "machina_kuka_driver",Nr 1,Msg_txt[] "PlaceHolder"}
      Messenger.Msg_txt[] =  actions[FI].msg[]
      Messenger.NR = FI
      Parameter[1]= {Par_type #empty}
@@ -247,7 +247,7 @@ CASE 5 ;Message = 05
      CASE 3
      ;Critical Alert Interface
      ;Alert Interface
-     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger = {Modul[] "machina_kuka_driver",Nr 1,Msg_txt[] "PlaceHolder"}
      Messenger.Msg_txt[] =  actions[FI].msg[]
      Messenger.NR = FI
      Parameter[1]= {Par_type #empty}
@@ -259,7 +259,7 @@ CASE 5 ;Message = 05
      
      CASE 4
      ;State Interface
-     Messenger = {Modul[] "MachinaDriver",Nr 1,Msg_txt[] "PlaceHolder"}
+     Messenger = {Modul[] "machina_kuka_driver",Nr 1,Msg_txt[] "PlaceHolder"}
      Messenger.Msg_txt[] =  actions[FI].msg[]
      Messenger.NR = FI
      Parameter[1]= {Par_type #empty}
@@ -401,8 +401,8 @@ DEF machinafeedback( )
 ;ArmAngle = 25
 IF actions[FI].type > -1 THEN
 
-RET = eki_setint("MachinaDriverServer", "R/@ID", actions[FI].id) 
-RET = eki_setint("MachinaDriverServer", "R/@T", actions[FI].type)
+RET = eki_setint("machina_kuka_server", "R/@ID", actions[FI].id) 
+RET = eki_setint("machina_kuka_server", "R/@T", actions[FI].type)
 
 $FLAG[32] = TRUE
 IF $FLAG[32] == TRUE THEN
@@ -419,8 +419,8 @@ SWITCH actions[FI].type
    
 ENDSWITCH
 
-RET = eki_send("MachinaDriverServer", "R")
-RET = EKI_ClearBuffer("MachinaDriverServer", "R")
+RET = eki_send("machina_kuka_server", "R")
+RET = EKI_ClearBuffer("machina_kuka_server", "R")
 ENDIF
 
 $FLAG[32] = FALSE
@@ -430,16 +430,16 @@ ENDIF
 END 
 DEF read_data_cnn( )
 ;A function to read actions from the incomin stream
-RET = eki_getint("MachinaDriverServer", "DT/DC", newdatacount)
-RET = eki_getintarray("MachinaDriverServer", "DT/DR/A/@ID", ids[]) 
-RET = eki_getintarray("MachinaDriverServer", "DT/DR/A/@T", types[]) 
-RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V1", newacts_v1[])
-RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V2", newacts_v2[])
-RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V3", newacts_v3[])
-RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V4", newacts_v4[])
-RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V5", newacts_v5[])
-RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V6", newacts_v6[])
-RET = eki_getrealarray("MachinaDriverServer", "DT/DR/A/@V7", newacts_v7[])
+RET = eki_getint("machina_kuka_server", "DT/DC", newdatacount)
+RET = eki_getintarray("machina_kuka_server", "DT/DR/A/@ID", ids[]) 
+RET = eki_getintarray("machina_kuka_server", "DT/DR/A/@T", types[]) 
+RET = eki_getrealarray("machina_kuka_server", "DT/DR/A/@V1", newacts_v1[])
+RET = eki_getrealarray("machina_kuka_server", "DT/DR/A/@V2", newacts_v2[])
+RET = eki_getrealarray("machina_kuka_server", "DT/DR/A/@V3", newacts_v3[])
+RET = eki_getrealarray("machina_kuka_server", "DT/DR/A/@V4", newacts_v4[])
+RET = eki_getrealarray("machina_kuka_server", "DT/DR/A/@V5", newacts_v5[])
+RET = eki_getrealarray("machina_kuka_server", "DT/DR/A/@V6", newacts_v6[])
+RET = eki_getrealarray("machina_kuka_server", "DT/DR/A/@V7", newacts_v7[])
 
 END
 DEF populate_lst( )
@@ -461,7 +461,7 @@ actions[index].v7 = newacts_v7[popfi]
 IF types[popfi] == 5 THEN
 MessagePath[14] = pathextent1[popfi] 
 MessagePath[15] = pathextent2[popfi]
-RET = eki_getstring("MachinaDriverServer", MessagePath[], act_message[])
+RET = eki_getstring("machina_kuka_server", MessagePath[], act_message[])
 actions[index].msg[] = act_message[]
 ENDIF
 
@@ -469,7 +469,7 @@ ENDFOR
 
 lastaction = lastaction + newdatacount
 
-RET = EKI_ClearBuffer("MachinaDriverServer", "DT")
+RET = EKI_ClearBuffer("machina_kuka_server", "DT")
 END
 DEF repopulate_lst( )
 ;A function to add incoming actions to the action array while the robot is moving
@@ -497,7 +497,7 @@ FOR repopfi = 1 TO newdatacount STEP 1
  IF types[repopfi] == 5 THEN
  MessagePath[14] = pathextent1[repopfi] 
  MessagePath[15] = pathextent2[repopfi]
- RET = eki_getstring("MachinaDriverServer", MessagePath[], act_message[])
+ RET = eki_getstring("machina_kuka_server", MessagePath[], act_message[])
  actions[index].msg[] = act_message[]
  ENDIF
 
@@ -510,5 +510,5 @@ lastaction = index
 wrap = FALSE
 ENDIF
 
-RET = EKI_ClearBuffer("MachinaDriverServer", "DT")
+RET = EKI_ClearBuffer("machina_kuka_server", "DT")
 END

@@ -3,7 +3,7 @@
 &PARAM DISKPATH = KRC:\R1\Program\Arastoo\Driver
 &PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
 &PARAM EDITMASK = *
-DEFDAT  MachinaDriver
+DEFDAT  machina_kuka_driver
 ; For loop incrementing Integer Variables
 DECL INT FI
 DECL INT popfi
