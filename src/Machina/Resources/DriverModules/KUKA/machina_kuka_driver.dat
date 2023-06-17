@@ -5,8 +5,10 @@
 &PARAM EDITMASK = *
 DEFDAT  machina_kuka_driver
 
-; This file starts a synchronous, single-threaded server on a virtual/real ABB robot,
-; waits for a TCP client, listens to a stream of formatted string messages,
+; For KUKA 3 files need to be installed: .src driver, .dat data file, and .xml server configurations
+; in the xml file we specify the precise format of each action, accessed by the src driver program
+; This file starts a TCP server on a real KUKA robot,
+; waits for a TCP client, listens to a stream of formatted string messages in xml,
 ; buffers them parsed into an 'action' struct, and runs a loop to execute them.
 
 ; IMPORTANT: make sure to adjust {{HOSTNAME}} and {{PORT}} to your current setup
