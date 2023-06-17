@@ -15,8 +15,10 @@ BAS (#INITMOV,0 )
 
 
 
-; This file starts a synchronous, single-threaded server on a virtual/real ABB robot,
-; waits for a TCP client, listens to a stream of formatted string messages,
+; For KUKA 3 files need to be installed: .src driver, .dat data file, and .xml server configurations
+; in the xml file we specify the precise format of each action, accessed by the src driver program
+; This file starts a TCP server on a real KUKA robot,
+; waits for a TCP client, listens to a stream of formatted string messages in xml,
 ; buffers them parsed into an 'action' struct, and runs a loop to execute them.
 
 ; IMPORTANT: make sure to adjust {{HOSTNAME}} and {{PORT}} to your current setup
@@ -45,9 +47,10 @@ BAS (#INITMOV,0 )
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
+; specifying the robot will read 3 commands in advance so that it can blend movements
 $ADVANCE=3
 
-
+; Initializing a TCP server on the robot and listening for clients and messages
 RET=EKI_Init("machina_kuka_server")
 RET=EKI_Open("machina_kuka_server")
 
@@ -61,6 +64,7 @@ BAS (#INITMOV,0 )
 ;ENDFOLD (INI)
 
 ; Setting status and turn for the initial position of the robot
+; status and turn define the joint configuration of a robot for a position
 joint_pos_tgt = $axis_act_meas
 PTP joint_pos_tgt
 current_position = $POS_ACT_MES
@@ -79,6 +83,7 @@ FOR FI=1 TO 6
 $VEL_AXIS[FI] = 10 ;all axis velocities to 10%
 ENDFOR
 
+; setting default movement path blending values
 $APO.CDIS = 5
 $APO.CPTP = 5
 
@@ -86,6 +91,7 @@ wait for $FLAG[1] ;Please Connect Machina Bridge To the Robot!
 $FLAG[32] = FALSE
 IF $FLAG[1] == TRUE THEN
 
+; get the current position of the robot to stream to machina bridge
 current_axispos = $AXIS_ACT_MEAS
 current_posmove = $POS_ACT_MES
 
@@ -185,6 +191,7 @@ FOR FI = 1 TO 200 STEP 1
 ;CustomCode = 24
 ;ArmAngle = 25
 
+; a switch case block that executes actions according to their types
 SWITCH actions[FI].type
 
 CASE -1,-2
@@ -384,13 +391,14 @@ DEFAULT
 ENDSWITCH 
 
 
-
+; right after executing an action we check if we have more incoming actions from Machina
 IF $FLAG[2] == TRUE THEN
 read_data_cnn()
 repopulate_lst()
 $FLAG[2] = FALSE
 ENDIF
 
+; after each action execution we send feedback to machina bridge
 machinafeedback()
 actions[FI].type = -1 
 
@@ -434,6 +442,9 @@ IF actions[FI].type > -1 THEN
 RET = eki_setint("machina_kuka_server", "R/@ID", actions[FI].id) 
 RET = eki_setint("machina_kuka_server", "R/@T", actions[FI].type)
 
+; setting the flag 32 and making the robot wait for milliseconds creates
+; enough time for feedback messages to be sent individually and to prevent
+; message from merging
 $FLAG[32] = TRUE
 IF $FLAG[32] == TRUE THEN
 
@@ -449,6 +460,7 @@ SWITCH actions[FI].type
    
 ENDSWITCH
 
+; send feedback
 RET = eki_send("machina_kuka_server", "R")
 RET = EKI_ClearBuffer("machina_kuka_server", "R")
 ENDIF
@@ -508,7 +520,8 @@ tempindex = 1
 FOR repopfi = 1 TO newdatacount STEP 1
  
  index = repopfi + lastaction
- 
+
+; We have limited memory on the robot so we have to rewrite the action queue
  IF index > 200 THEN
  wrap = TRUE
  index = repopfi + lastaction - 200
@@ -539,6 +552,6 @@ ELSE
 lastaction = index
 wrap = FALSE
 ENDIF
-
+; clearning the TCP buffer prevents memory overload on the robot
 RET = EKI_ClearBuffer("machina_kuka_server", "DT")
 END
