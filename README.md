@@ -118,7 +118,7 @@ As of ~~v0.2.5~~ the latest version, Machina works for the following robotic arm
 ABB:    [=========  ]  (pretty solid both online and offline)
 UR:     [========   ]  (also quite solid both online and offline)
 KUKA:   [=====      ]  (recently launched online mode thanks to @Arastookhajehee! undertested, BE CAREFUL)
-KUKA:   ------------>  (Known Bug: relative rotations result in unpredictable orientations! Avoid relative rotation!)
+                       (Known KUKA Bug: relative rotations result in unpredictable orientations! Avoid relative rotation!)
 ```
 
 Other devices are currently under active development.
