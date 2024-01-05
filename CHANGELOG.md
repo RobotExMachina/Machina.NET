@@ -29,7 +29,9 @@
 - [ ] Review if second attachments produce a TCP transformation without undoing the previous tool.
 
 
-> Personal reminder here to publish a build with @Arastookhajehee 's new online KUKA contribution #21
+# v0.9.0
+## BUILD 1600
+- Added `KUKA` online control thanks to @Arastookhajehee! 🤓
 
 
 # v0.8.14
