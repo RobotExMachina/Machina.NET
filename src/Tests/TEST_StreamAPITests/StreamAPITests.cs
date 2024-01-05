@@ -25,7 +25,7 @@ namespace TEST_StreamAPITests
 
         static void Main(string[] args)
         {
-            Robot arm = Robot.Create("StreamTests", "ABB");
+            Robot arm = Robot.Create("StreamTests", "KUKA");
 
             //arm.DebugMode(true);
 
@@ -45,17 +45,20 @@ namespace TEST_StreamAPITests
 
 
             arm.ControlMode("stream");
-            arm.ConnectionManager("machina");
-            arm.Connect();
-            //arm.ConnectionManager("user");
-            //arm.Connect("127.0.0.1", 7000);
+
+            //arm.ConnectionManager("machina");
+            //arm.Connect();
+
+            arm.ConnectionManager("user");
+            arm.Connect("10.10.100.20", 54600);
 
             //arm.SetUser("BUILD", "password");
             //arm.Connect("192.168.0.101", 6969);
 
             //arm.StreamConfiguration(3, 10);
 
-            ArcMotionTest(arm);
+            //Thread.Sleep(3000);
+            SimpleTransform(arm);
                        
 
             Console.WriteLine(" ");
@@ -74,6 +77,18 @@ namespace TEST_StreamAPITests
         {
             throw new NotImplementedException();
         }
+
+        static void SimpleTransform(Robot bot)
+        {
+            //bot.TransformTo(900, 100, 700, -1, 0, 0, 0, 1, 0);
+            bot.AxesTo(-32, -65, 110, -35, -25, -10);
+            bot.AxesTo(-32, -90, 110, -35, -25, -10);
+            bot.AxesTo(-32, -65, 110, -35, -25, -10);
+            bot.AxesTo(-32, -90, 110, -35, -25, -10);
+        }
+
+
+
 
         static void ArcMotionTest(Robot bot)
         {

@@ -18,6 +18,9 @@ namespace Machina.Drivers.Communication.Protocols
                 case RobotType.UR:
                     return new URCommunicationProtocol();
 
+                case RobotType.KUKA:
+                    return new KUKACommunicationProtocol();
+
                 default:
                     throw new NotImplementedException();
             }

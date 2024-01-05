@@ -112,11 +112,14 @@
     <Compile Include="Controllers\ControlManager.cs" />
     <Compile Include="Controllers\OfflineControlManager.cs" />
     <Compile Include="Controllers\StreamControlManager.cs" />
+    <Compile Include="Drivers\Communication\Protocols\KUKACommunicationProtocol.cs" />
     <Compile Include="Drivers\Communication\Protocols\URCommunicationProtocol.cs" />
     <Compile Include="Drivers\Communication\RobotStudioManager.cs" />
+    <Compile Include="Drivers\Communication\TCPCommunicationManagerKUKA.cs" />
     <Compile Include="Drivers\Communication\TCPCommunicationManagerUR.cs" />
     <Compile Include="Drivers\Communication\TCPCommunicationManagerABB.cs" />
     <Compile Include="Drivers\Driver.cs" />
+    <Compile Include="Drivers\DriverKUKA.cs" />
     <Compile Include="Drivers\DriverUR.cs" />
     <Compile Include="Drivers\DriverABB.cs" />
     <Compile Include="Drivers\DriverOffline.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="Utilities\Numeric.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx" />
     <EmbeddedResource Include="Resources\DriverModules\UR\machina_ur_driver.script" />
   </ItemGroup>
   <ItemGroup>
@@ -189,7 +193,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\DriverModules\ABB\machina_abb_empty.pgf" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_driver.src" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_server.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DriverModules\KUKA\machina_kuka_driver.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>REM JL: for the time being, only copy ddlls manually to avoid breaking the dependent projects
